@@ -141,8 +141,8 @@ await performValidationGroup(
 
 **Playwright grep and file scope (CI or local):**
 
-- **`FUNCTIONAL_TEST_SCOPE`** — Passed to Playwright as `--grep` (matches text in test titles, e.g. `@PR`, `@regression`, `@nightly`). For `yarn test:functional` the default in the script is `@regression` if unset; PR builds set `@PR` unless overridden (see CI section below).
-- **`E2E_POD_KEYWORD`** — Optional. When set, `playwright.config.ts` narrows runs to specs whose **basename** contains this substring: `**/*<keyword>*.spec.ts` under `src/test/ui`. Use the **exact casing** of the filename (e.g. `makeAnApplication` for `makeAnApplication.*.spec.ts`). If unset, all specs under `src/test/ui` are considered (still filtered by `--grep`).
+- **`FUNCTIONAL_TEST_SCOPE`** — Playwright `grep` in `playwright.config.ts` (matches text in test titles, e.g. `@PR`, `@regression`, `@nightly`). **Empty string** = no grep (run all tests). For `yarn test:E2eChrome` (and Firefox/Safari), if unset locally the script defaults the env to `@nightly` before running. For `yarn test:functional` the default in the script is still `@regression` via CLI `--grep` if unset; PR builds set `@PR` unless overridden (see CI section below).
+- **`E2E_SPEC`** — Optional substring of a path under `src/test/ui` (must match at least one `*.spec.ts`; same as `**/*<keyword>*.spec.ts`). **Empty** = all specs. If set but **no file** contains that substring, Playwright falls back to **all specs** and logs a warning.
 
 ```bash
 yarn test:functional
@@ -202,27 +202,28 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 **Optional GitHub labels on PRs**
 
-| Label pattern                      | Effect                                                                                                                                                                        |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `e2e-tag:<value>`                  | Overrides the default PR grep, e.g. `e2e-tag:@regression` → `FUNCTIONAL_TEST_SCOPE=@regression`.                                                                              |
-| `e2e-pod:<keyword>`                | Sets `E2E_POD_KEYWORD` so only `*<keyword>*.spec.ts` files under `src/test/ui` run (substring must match the real filename **exact case**, e.g. `e2e-pod:makeAnApplication`). |
-| `enable_all_page_functional_tests` | Turns on broad page validation flags used by the framework.                                                                                                                   |
-| `enable_content_validation`        | Enables content validation.                                                                                                                                                   |
-| `enable_error_messages_validation` | Enables error-message validation.                                                                                                                                             |
-| `enable_navigation_tests`          | Enables navigation tests.                                                                                                                                                     |
+| Label pattern                         | Effect                                                                                                                                                    |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `e2e-tag:<value>` or `e2eTag:<value>` | If the label exists **and** the value after the prefix is non-empty, sets `FUNCTIONAL_TEST_SCOPE`. Otherwise default PR grep **`@PR`**.                   |
+| `e2e-spec:<keyword>`                  | If the label exists **and** the value is non-empty, sets **`E2E_SPEC`** (narrow to `*<keyword>*.spec.ts`). If no label or empty value, no spec narrowing. |
+| `enable_all_page_functional_tests`    | Turns on broad page validation flags used by the framework.                                                                                               |
+| `enable_content_validation`           | Enables content validation.                                                                                                                               |
+| `enable_error_messages_validation`    | Enables error-message validation.                                                                                                                         |
+| `enable_navigation_tests`             | Enables navigation tests.                                                                                                                                 |
 
-You can combine `e2e-tag:` and `e2e-pod:` (narrow files, then filter by tag in test titles).
+You can combine `e2e-tag:` and `e2e-spec:` to narrow files and filter by title tag.
 
 **API preview:** A label like `pcs-api-pr:<id>` still rewires PCS/CCD URLs for that API PR (unchanged).
 
 ### Nightly (`Jenkinsfile_nightly`)
 
+Runs only the scheduled nightly job; it does **not** drive PR or **master** builds (`Jenkinsfile_CNP`).
+
 - **Schedule:** Mon–Fri at ~07:00 (cron `H`).
-- **E2E:** Stages per browser (Chrome, Firefox, Safari / WebKit) via `test:E2eChrome` and siblings; default grep is `@nightly` unless overridden.
+- **E2E:** Checkboxes pick which Playwright **projects** run (`test:E2eChrome`, `test:E2eFirefox`, `test:E2eSafari`, `test:E2eMicrosoftEdge`). **Defaults:** only **Chrome** on; other browsers off. **`PLAYWRIGHT_GREP_TAG`** defaults to **`@nightly`** (first choice); **`(all tests)`** clears `FUNCTIONAL_TEST_SCOPE`. **`PLAYWRIGHT_SPEC`** defaults empty = all specs.
 - **Jenkins parameters (relevant to Playwright):**
-  - **`PLAYWRIGHT_GREP_TAG`** — `@nightly`, `@smoke`, `@regression`, or `@PR`; sets `FUNCTIONAL_TEST_SCOPE`.
-  - **`PLAYWRIGHT_POD_KEYWORD`** — Optional; sets `E2E_POD_KEYWORD` (same rules as PR `e2e-pod:`). Empty = all spec files under `src/test/ui` (subject to grep).
-- **Other parameters:** `ENVIRONMENT`, `PR_NUMBER` (for preview), toggles for Chrome / Firefox / WebKit / Accessibility.
-- **Accessibility:** When enabled, runs `@accessibility` tests on Chrome.
+  - **`PLAYWRIGHT_GREP_TAG`** — `@nightly` (default), `(all tests)`, `@smoke`, `@regression`, or `@accessibility`. Maps to `FUNCTIONAL_TEST_SCOPE`.
+  - **`PLAYWRIGHT_SPEC`** — Optional; sets **`E2E_SPEC`**. Empty = all spec files (subject to grep).
+- **Other parameters:** **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`** (default **true**). Nightly always uses **AAT** (`TEST_URL`).
 - **Slack:** Notifications to `#hdp-qa-e2e-test-results` (per stage configuration).
 - **Stage behaviour:** A failing browser stage can be marked unstable while later stages still run (see Jenkins job logs).

@@ -4,45 +4,40 @@ properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
-    choice(
-      name: 'ENVIRONMENT',
-      choices: ['aat', 'preview'],
-      description: 'Environment to run the test.'
-    ),
-    string(
-      name: 'PR_NUMBER',
-      defaultValue: '',
-      description: 'PR number (REQUIRED if environment is preview, leave blank otherwise).'
-    ),
     booleanParam(
       name: 'CHROME_TESTS',
       defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Chrome.'
+      description: 'Desktop Chrome'
     ),
     booleanParam(
       name: 'FIREFOX_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Firefox.'
+      defaultValue: false,
+      description: 'Desktop Firefox'
     ),
     booleanParam(
       name: 'WEBKIT_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Webkit.'
+      defaultValue: false,
+      description: 'Desktop WebKit (Safari)'
     ),
     booleanParam(
-      name: 'ACCESSIBILITY_TESTS',
+      name: 'MICROSOFT_EDGE_TESTS',
+      defaultValue: false,
+      description: 'Microsoft Edge (desktop)'
+    ),
+    booleanParam(
+      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
       defaultValue: true,
-      description: 'Tick the checkbox to run Accessibility tests.'
+      description: 'Enable page functional tests (content, errors, navigation) in Playwright.'
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@regression', '@PR'],
-      description: 'Playwright --grep tag (default @nightly matches previous nightly behaviour).'
+      choices: ['@nightly', '(all tests)', '@smoke', '@regression', '@accessibility'],
+      description: 'Test title tag. Default @nightly. (all tests) = no tag filter.'
     ),
     string(
-      name: 'PLAYWRIGHT_POD_KEYWORD',
+      name: 'PLAYWRIGHT_SPEC',
       defaultValue: '',
-      description: 'Optional basename substring for *.spec.ts under src/test/ui (exact case). Leave empty for all specs.'
+      description: 'Substring of a spec path (exact case). Leave blank for all specs. Invalid / no file match → all specs.'
     ),
   ])
 ])
@@ -71,7 +66,6 @@ def secrets = [
 ]
 
 withNightlyPipeline(type, product, component) {
-  validateInputs()
   enableSlackNotifications('#pcs-tech')
   loadVaultSecrets(secrets)
   handleEnvironmentSetting()
@@ -81,54 +75,44 @@ withNightlyPipeline(type, product, component) {
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
-    if (params.ACCESSIBILITY_TESTS) {
-      runAccessibilityTests(yarnBuilder)
-    }
-  }
-}
-
-def validateInputs() {
-  if (params.ENVIRONMENT == 'preview' && (!params.PR_NUMBER?.trim())) {
-    error("Validation Failed: PR number is required when environment is 'preview'")
-  }
-  if (params.ENVIRONMENT == 'preview' && !params.PR_NUMBER.trim().matches("^\\d+\$")) {
-    error("Validation Failed: PR number must contain only numerical values")
   }
 }
 
 def handleEnvironmentSetting() {
-  env.TEST_URL = (params.ENVIRONMENT == 'preview')
-    ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
-    : "https://pcs.${params.ENVIRONMENT}.platform.hmcts.net/"
+  env.TEST_URL = 'https://pcs.aat.platform.hmcts.net/'
 }
 
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
-  env.FUNCTIONAL_TEST_SCOPE = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
-  env.E2E_POD_KEYWORD = params.PLAYWRIGHT_POD_KEYWORD?.trim() ?: ''
+  def grepChoice = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
+  env.FUNCTIONAL_TEST_SCOPE = (grepChoice == '(all tests)') ? '' : grepChoice
+  env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
+  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = (params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS != false) ? 'true' : 'false'
 }
 
 def runE2ETests(yarnBuilder) {
-  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
   if (params.CHROME_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Chrome')
+    runE2ETestsForProject(yarnBuilder, 'Chrome', 'Chrome')
   }
   if (params.FIREFOX_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Firefox')
+    runE2ETestsForProject(yarnBuilder, 'Firefox', 'Firefox')
   }
   if (params.WEBKIT_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Safari')
+    runE2ETestsForProject(yarnBuilder, 'Safari', 'WebKit')
+  }
+  if (params.MICROSOFT_EDGE_TESTS) {
+    runE2ETestsForProject(yarnBuilder, 'MicrosoftEdge', 'Microsoft Edge')
   }
 }
 
-def runE2ETestsForBrowser(yarnBuilder, String browser) {
-  stage("Full E2E Test - ${browser}") {
+def runE2ETestsForProject(yarnBuilder, String yarnScriptSuffix, String stageLabel) {
+  stage("Full E2E Test - ${stageLabel}") {
     node {
       checkout scm
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        yarnBuilder.yarn("test:E2e${browser}")
+        yarnBuilder.yarn("test:E2e${yarnScriptSuffix}")
       }
       publishHTML([
         allowMissing: true,
@@ -136,35 +120,13 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
         keepAll: true,
         reportDir: "allure-report",
         reportFiles: 'index.html',
-        reportName: "Full ${browser} E2E Test Report"
+        reportName: "Full ${stageLabel} E2E Test Report"
       ])
       steps.archiveArtifacts(
         allowEmptyArchive: true,
         artifacts: 'definitions/test/playwright-report/**'
       )
-      sendAllureReportToSlack(browser, "Full_20${browser}_20E2E_20Test_20Report/")
-    }
-  }
-}
-
-def runAccessibilityTests(yarnBuilder) {
-  stage("Full Accessibility Test") {
-    node {
-      checkout scm
-      sh 'rm -rf allure-results allure-report'
-      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        yarnBuilder.yarn("test:accessibility")
-      }
-      publishHTML([
-        allowMissing         : true,
-        alwaysLinkToLastBuild: true,
-        keepAll              : true,
-        reportDir            : "allure-report",
-        reportFiles          : 'index.html',
-        reportName           : 'Accessibility Test Report'
-      ])
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
-      sendAllureReportToSlack('Chrome', 'Accessibility_20Test_20Report/')
+      sendAllureReportToSlack(yarnScriptSuffix, "Full_20${yarnScriptSuffix}_20E2E_20Test_20Report/")
     }
   }
 }

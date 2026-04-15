@@ -3,6 +3,7 @@ import path from 'path';
 
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
+import { globSync } from 'glob';
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
@@ -24,11 +25,38 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
-const e2ePod = process.env.E2E_POD_KEYWORD?.trim();
+function resolveE2eSpecKeyword(raw: string | undefined): string | undefined {
+  const keyword = raw?.trim();
+  if (!keyword) {
+    return undefined;
+  }
+  const testRoot = path.join(__dirname, 'src/test/ui');
+  const specFiles = globSync('**/*.spec.ts', { cwd: testRoot, nodir: true });
+  const hasMatch = specFiles.some(f => f.includes(keyword));
+  if (!hasMatch) {
+    // eslint-disable-next-line no-console -- intentional operator-facing warning when spec filter matches nothing
+    console.warn(`[playwright] E2E_SPEC "${keyword}" matched no *.spec.ts files under src/test/ui — using all specs.`);
+    return undefined;
+  }
+  return keyword;
+}
+
+const e2eSpecKeyword = resolveE2eSpecKeyword(process.env.E2E_SPEC);
+
+function functionalTestGrepFromEnv(): RegExp | undefined {
+  const scope = process.env.FUNCTIONAL_TEST_SCOPE?.trim();
+  if (!scope) {
+    return undefined;
+  }
+  return new RegExp(scope.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+}
+
+const resolvedFunctionalGrep = functionalTestGrepFromEnv();
 
 export default defineConfig({
   testDir: './src/test/ui',
-  ...(e2ePod ? { testMatch: [`**/*${e2ePod}*.spec.ts`] } : {}),
+  ...(e2eSpecKeyword ? { testMatch: [`**/*${e2eSpecKeyword}*.spec.ts`] } : {}),
+  ...(resolvedFunctionalGrep ? { grep: resolvedFunctionalGrep } : {}),
   /* Run tests in files in parallel */
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
