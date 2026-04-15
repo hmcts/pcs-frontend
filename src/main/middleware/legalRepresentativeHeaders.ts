@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import config from 'config';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
