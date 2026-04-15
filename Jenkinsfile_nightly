@@ -6,27 +6,27 @@ properties([
     booleanParam(
       name: 'CHROME_TESTS',
       defaultValue: true,
-      description: 'Desktop Chrome'
+      description: 'Tick the checkbox to run E2E tests in Desktop Chrome.'
     ),
     booleanParam(
       name: 'FIREFOX_TESTS',
       defaultValue: false,
-      description: 'Desktop Firefox'
+      description: 'Tick the checkbox to run E2E tests in Desktop Firefox.'
     ),
     booleanParam(
       name: 'WEBKIT_TESTS',
       defaultValue: false,
-      description: 'Desktop WebKit (Safari)'
+      description: 'Tick the checkbox to run E2E tests in Desktop WebKit (Safari).'
     ),
     booleanParam(
       name: 'MICROSOFT_EDGE_TESTS',
       defaultValue: false,
-      description: 'Microsoft Edge'
+      description: 'Tick the checkbox to run E2E tests in Desktop Edge.'
     ),
     booleanParam(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
       defaultValue: true,
-      description: 'Page functional tests (content, errors, navigation).'
+      description: 'Tick the checkbox to enable page functional tests (content, errors, navigation).'
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
@@ -67,7 +67,6 @@ def secrets = [
 withNightlyPipeline(type, product, component) {
   enableSlackNotifications('#pcs-tech')
   loadVaultSecrets(secrets)
-  env.TEST_URL = 'https://pcs.aat.platform.hmcts.net/'
   setFunctionalTestEnvVars()
   enableFortifyScan()
 
@@ -78,6 +77,7 @@ withNightlyPipeline(type, product, component) {
 }
 
 def setFunctionalTestEnvVars() {
+  env.TEST_URL = 'https://pcs.aat.platform.hmcts.net/'
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
   def tag = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
