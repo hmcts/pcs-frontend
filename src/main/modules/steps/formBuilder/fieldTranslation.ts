@@ -5,7 +5,7 @@ import { buildComponentConfig } from './componentBuilders';
 import { buildConditionalContent, getNestedFieldName } from './conditionalFields';
 import { getTranslation, normalizeCheckboxValue } from './helpers';
 
-import type { FormFieldConfig, FormFieldOption } from '@interfaces/formFieldConfig.interface';
+import type { FormFieldConfig, FormFieldOption } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 export function buildFieldValues(
   fields: FormFieldConfig[],

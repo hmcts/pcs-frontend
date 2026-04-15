@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { type CcdCase, CcdCaseModel, type PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
+import { type CcdCase, CcdCaseModel, type PossessionClaimResponse } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 type PlainRecord = Record<string, unknown>;

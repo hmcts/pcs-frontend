@@ -1,12 +1,13 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig, FormFieldOption } from '../../../../../main/interfaces/formFieldConfig.interface';
 import {
   buildComponentConfig,
   buildConditionalItemContent,
   buildSelectionItems,
 } from '../../../../../main/modules/steps/formBuilder/componentBuilders';
+
+import type { FormFieldConfig, FormFieldOption } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 describe('componentBuilders', () => {
   const mockT = ((key: string, defaultValue?: string | Record<string, unknown>) => {

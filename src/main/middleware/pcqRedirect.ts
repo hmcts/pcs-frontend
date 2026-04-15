@@ -3,8 +3,8 @@ import config from 'config';
 import { NextFunction, Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 
-import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
 import { Logger } from '@modules/logger';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { createToken } from '@services/pcq/createToken';
 
