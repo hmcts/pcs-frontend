@@ -214,6 +214,20 @@ export enum GenAppType {
   SOMETHING_ELSE,
 }
 
+export enum LanguageUsed {
+  ENGLISH,
+  WELSH,
+  ENGLISH_AND_WELSH,
+}
+
 export interface CitizenGenAppRequest {
-  applicationType: GenAppType;
+  applicationType?: GenAppType;
+  within14Days?: YesNoValue;
+  needHwf?: YesNoValue;
+  appliedForHwf?: YesNoValue;
+  hwfReference?: string;
+  otherPartiesAgreed?: YesNoValue;
+  withoutNotice?: YesNoValue;
+  withoutNoticeReason?: string;
+  languageUsed?: LanguageUsed;
 }

@@ -2,8 +2,17 @@
   "pageTitle": "cyAre there any reasons that this application should not be shared with the other parties?",
   "caption": "cyMake an application",
   "heading": "cyAre there any reasons that this application should not be shared with the other parties?",
-  "question": "cyAre there any reasons that this application should not be shared with the other parties?",
+  "mainQuestion": "cyAre there any reasons that this application should not be shared with the other parties?",
+  "reasonForNotSharingQuestion": "cyProvide a reason this application should not be shared with the other party",
+  "weUsuallySendACopyOfYourApplication": "cyWe usually send a copy of your application to the other parties (your landlord, housing association or mortgage lender). This gives them the opportunity to respond to it.",
+  "inSomeExceptionalCircumstances": "cyIn some exceptional circumstances, the judge will consider your application without telling the other party first.",
+  "forExampleIf": "cyFor example, if:",
+  "itIsUrgent": "cyit is so urgent that there is not enough time to give notice",
+  "couldUndermineTheOrder": "cygiving someone notice could undermine the order you want the court to grant.",
+  "youBelieveYouAreAtRisk": "cyyou believe you are at risk from the other party",
+  "weWillAskYouToProvideTheReason": "cyWarning text: We will ask you to provide the reason. The court will consider your reason, and you may not be successful.",
   "errors": {
-    "typeOfApplication": "cyYou must select whether there are any reasons that this application should not be shared with the other parties"
+    "confirmIfThereIsAReason": "cyConfirm whether there is a reason why this application should not be shared with the other parties",
+    "provideAReason": "cyConfirm why the other parties shoud not be informed"
   }
 }

@@ -10,18 +10,19 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/isTheCourtHearingInTheNext14Days.njk`,
   fields: [
     {
-      name: 'courtHearingInNext14Days',
+      name: 'hearingInNext14Days',
       type: 'radio',
       required: true,
-      translationKey: { label: 'question' },
+      errorMessage: 'errors.inNext14Days',
+      translationKey: { label: 'question', hint: 'hintText' },
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
         {
-          value: 'YES',
+          value: 'yes',
           translationKey: 'options.yes',
         },
         {
-          value: 'NO',
+          value: 'no',
           translationKey: 'options.no',
         },
       ],

@@ -5,7 +5,11 @@ import { CitizenGenAppRequest } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation, getTranslationFunction } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
+import { toYesNoEnum } from '../../utils/yesNoEnum';
 import { MAKE_AN_APPLICATION_ROUTE, flowConfig } from '../flow.config';
+
+import { buildSummaryListRows } from './summaryListRowFactory';
+import VisibleFormDataView from './visibleFormDataView';
 
 const STEP_NAME = 'check-your-answers';
 const stepNavigation = createStepNavigation(flowConfig);
@@ -23,35 +27,9 @@ export const step: StepDefinition = {
       (req: Request) => {
         const t: TFunction = getTranslationFunction(req, STEP_NAME, ['common']);
 
-        const formData = req.session.formData;
-
-        if (!formData) {
-          throw Error('No existing formData in session');
-        }
-
-        const typeOfApplication = formData['choose-an-application']['typeOfApplication'];
-
         return {
           summaryData: {
-            rows: [
-              {
-                key: {
-                  text: t('answers.chooseAnApplication.label'),
-                },
-                value: {
-                  text: t(`answers.chooseAnApplication.options.${typeOfApplication}`),
-                },
-                actions: {
-                  items: [
-                    {
-                      href: './choose-an-application',
-                      text: t('change'),
-                      visuallyHiddenText: t('answers.chooseAnApplication.changeHint'),
-                    },
-                  ],
-                },
-              },
-            ],
+            rows: buildSummaryListRows(req, t),
           },
         };
       },
@@ -71,8 +49,18 @@ export const step: StepDefinition = {
         throw Error('No existing formData in session');
       }
 
+      const visibleFormData = new VisibleFormDataView(req);
+
       const citizenGenAppRequest: CitizenGenAppRequest = {
-        applicationType: formData['choose-an-application']['typeOfApplication'],
+        applicationType: visibleFormData.getApplicationTypeField()?.fieldValue,
+        within14Days: toYesNoEnum(visibleFormData.getHearingInNext14DaysField()?.fieldValue),
+        needHwf: toYesNoEnum(visibleFormData.getHelpWithFeesNeededField()?.fieldValue),
+        appliedForHwf: toYesNoEnum(visibleFormData.getAlreadyAppliedForHwfField()?.fieldValue),
+        hwfReference: visibleFormData.getHwfReferenceField()?.fieldValue,
+        otherPartiesAgreed: toYesNoEnum(visibleFormData.getOtherPartiesAgreedField()?.fieldValue),
+        withoutNotice: toYesNoEnum(visibleFormData.getAnyReasonsNotToShareField()?.fieldValue),
+        withoutNoticeReason: visibleFormData.getReasonForNotSharingField()?.fieldValue,
+        languageUsed: visibleFormData.getWhichLanguageField()?.fieldValue,
       };
 
       await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
