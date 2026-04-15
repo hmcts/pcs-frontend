@@ -12,7 +12,7 @@ export class GenAppsAction implements IAction {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['chooseAnApplication', () => this.chooseAnApplication(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
-      ['selectLanguageUsedToComplete',() => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
+      ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {

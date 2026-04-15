@@ -3,14 +3,11 @@ import { whichLanguageDidYouUseToCompleteThisService } from '../../data/page-dat
 import { performAction, performValidation } from '../../utils/controller';
 
 export async function whichLanguageDidYouUseToCompleteThisServiceErrorValidation(): Promise<void> {
-  await performAction('inputErrorValidationGenApp', {
-
+  await performAction('inputErrorValidationGenApp', {});
+}
+export async function whichLanguageDidYouUseToCompleteThisServiceNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', whichLanguageDidYouUseToCompleteThisService.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: whichLanguageDidYouUseToCompleteThisService.pageSlug,
   });
-  }
-  export async function whichLanguageDidYouUseToCompleteThisServiceNavigationTests(): Promise<void> {
-    await performValidation('pageNavigation', whichLanguageDidYouUseToCompleteThisService.feedbackLink, {
-      element: feedback.tellUsWhatYouThinkParagraph,
-      pageSlug: whichLanguageDidYouUseToCompleteThisService.pageSlug,
-    });
-  }
-
+}
