@@ -1,9 +1,9 @@
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { PossessionClaimResponse, YesNoValue } from '@interfaces/ccdCase.interface';
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'exceptional-hardship',
@@ -77,7 +77,7 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'Yes', no: 'No' };
+    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
     const exceptionalHardship = ccdMapping[exceptionalHardshipValue];
     const exceptionalHardshipDetails =
       exceptionalHardshipValue === 'yes'

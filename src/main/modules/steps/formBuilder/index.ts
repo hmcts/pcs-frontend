@@ -12,11 +12,11 @@ import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
 import { validateConfigInDevelopment } from './schema';
 
-import type { BuiltFormContent, FormBuilderConfig } from '@interfaces/formFieldConfig.interface';
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import type { BuiltFormContent, FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 
-export type { FormBuilderConfig } from '@interfaces/formFieldConfig.interface';
+export type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 function getPersistedFormData(
   req: Request,

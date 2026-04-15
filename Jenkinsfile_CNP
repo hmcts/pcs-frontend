@@ -44,6 +44,9 @@ withPipeline(type, product, component) {
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_content_validation").size() > 0) {
       env.ENABLE_CONTENT_VALIDATION = 'true'
     }
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_visibility_validation").size() > 0) {
+      env.ENABLE_VISIBILITY_VALIDATION = 'true'
+    }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_error_messages_validation").size() > 0) {
       env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
     }
