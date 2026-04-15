@@ -1,13 +1,14 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse, TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interface';
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { isWalesProperty } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { PossessionClaimResponse, TenancyTypeCorrectValue } from '@services/ccdCase.interface';
+// Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'tenancyTypeConfirm',

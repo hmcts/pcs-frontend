@@ -1,7 +1,8 @@
 import { Request } from 'express';
 
-import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
 import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
+
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 describe('isWalesProperty', () => {
   describe('when property is in Wales', () => {

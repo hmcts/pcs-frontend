@@ -1,11 +1,11 @@
 import type { NextFunction, Request, Response } from 'express';
 
-import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
-import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
-import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 import * as flowModule from '@modules/steps/flow';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import { createPostHandler } from '@modules/steps/formBuilder/postHandler';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import * as dashboardModule from '@routes/dashboard';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 jest.mock('@routes/dashboard');
 jest.mock('@modules/i18n');
