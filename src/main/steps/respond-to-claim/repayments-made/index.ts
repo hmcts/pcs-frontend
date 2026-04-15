@@ -32,7 +32,7 @@ export const step: StepDefinition = createFormStep({
       },
       options: [
         {
-          value: 'Yes',
+          value: 'YES',
           translationKey: 'options.yes',
           subFields: {
             repaymentsInfo: {
@@ -48,7 +48,7 @@ export const step: StepDefinition = createFormStep({
             },
           },
         },
-        { value: 'No', translationKey: 'options.no' },
+        { value: 'NO', translationKey: 'options.no' },
       ],
     },
   ],
@@ -59,7 +59,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     const paymentDetails: string | undefined =
-      confirmRepaymentsMade === 'Yes' ? req.body?.['confirmRepaymentsMade.repaymentsInfo'] : undefined;
+      confirmRepaymentsMade === 'YES' ? req.body?.['confirmRepaymentsMade.repaymentsInfo'] : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
@@ -81,15 +81,15 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
 
-    if (confirmRepaymentsMade === 'Yes') {
+    if (confirmRepaymentsMade === 'YES') {
       const repaymentsInfo: string | undefined = paymentAgreement?.paymentDetails;
       return {
-        confirmRepaymentsMade: 'Yes',
+        confirmRepaymentsMade: 'YES',
         'confirmRepaymentsMade.repaymentsInfo': repaymentsInfo ?? '',
       };
     }
     return {
-      confirmRepaymentsMade: 'No',
+      confirmRepaymentsMade: 'NO',
     };
   },
   extendGetContent: req => {
