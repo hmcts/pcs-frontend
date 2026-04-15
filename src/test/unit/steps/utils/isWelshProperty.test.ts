@@ -1,5 +1,6 @@
 import { Request } from 'express';
 
+import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
 import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
 
 describe('isWalesProperty', () => {
@@ -8,11 +9,7 @@ describe('isWalesProperty', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'Wales' } }),
           },
         },
       } as unknown as Request;
@@ -26,11 +23,7 @@ describe('isWalesProperty', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'WALES',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'WALES' } }),
           },
         },
       } as unknown as Request;
@@ -44,11 +37,7 @@ describe('isWalesProperty', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'wales',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'wales' } }),
           },
         },
       } as unknown as Request;
@@ -64,11 +53,7 @@ describe('isWalesProperty', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'England',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'England' } }),
           },
         },
       } as unknown as Request;
@@ -82,9 +67,7 @@ describe('isWalesProperty', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {},
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: {} }),
           },
         },
       } as unknown as Request;

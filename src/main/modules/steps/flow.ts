@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '../../interfaces/stepFlow.interface';
-
+import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '@interfaces/stepFlow.interface';
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('stepDependencyCheck');
@@ -24,6 +23,41 @@ export async function getNextStep(
   formData: Record<string, unknown>,
   currentStepData: Record<string, unknown> = {}
 ): Promise<string | null> {
+  if (flowConfig.useShowConditions) {
+    return getNextStepByShowCondition(req, currentStepName, flowConfig);
+  } else {
+    return getNextStepByRouteConditions(req, currentStepName, flowConfig, formData, currentStepData);
+  }
+}
+
+async function getNextStepByShowCondition(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+  const currentIndex = getStepIndex(flowConfig, currentStepName);
+
+  for (let stepIndex = currentIndex + 1; stepIndex < flowConfig.stepOrder.length; stepIndex++) {
+    const candidateNextStepName = flowConfig.stepOrder[stepIndex];
+    const candidateNextStep = flowConfig.steps[candidateNextStepName];
+
+    if (!candidateNextStep || !candidateNextStep.showCondition) {
+      // No show condition defined
+      return candidateNextStepName;
+    }
+
+    if (candidateNextStep.showCondition(req)) {
+      // Show condition matches
+      return candidateNextStepName;
+    }
+  }
+
+  return null;
+}
+
+async function getNextStepByRouteConditions(
+  req: Request,
+  currentStepName: string,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown>,
+  currentStepData: Record<string, unknown>
+) {
   const stepConfig = flowConfig.steps[currentStepName];
 
   if (stepConfig?.routes) {
@@ -56,6 +90,48 @@ export async function getPreviousStep(
   flowConfig: JourneyFlowConfig,
   formData: Record<string, unknown> = {}
 ): Promise<string | null> {
+  if (flowConfig.useShowConditions) {
+    // Rule deprecated: https://eslint.org/docs/latest/rules/no-return-await
+    // eslint-disable-next-line no-return-await
+    return await getPreviousStepByShowConditions(req, currentStepName, flowConfig);
+  } else {
+    // eslint-disable-next-line no-return-await
+    return await getPreviousStepByRouteConditions(req, currentStepName, flowConfig, formData);
+  }
+}
+
+async function getPreviousStepByShowConditions(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+  const currentStepConfig = flowConfig.steps[currentStepName];
+  if (currentStepConfig?.preventBack) {
+    return null;
+  }
+
+  const currentIndex = getStepIndex(flowConfig, currentStepName);
+
+  for (let stepIndex = currentIndex - 1; stepIndex >= 0; stepIndex--) {
+    const candidatePreviousStepName = flowConfig.stepOrder[stepIndex];
+    const candidatePreviousStep = flowConfig.steps[candidatePreviousStepName];
+
+    if (!candidatePreviousStep || !candidatePreviousStep.showCondition) {
+      // No show condition defined
+      return candidatePreviousStepName;
+    }
+
+    if (candidatePreviousStep.showCondition(req) && !candidatePreviousStep.preventBack) {
+      // Show condition matches
+      return candidatePreviousStepName;
+    }
+  }
+
+  return null;
+}
+
+async function getPreviousStepByRouteConditions(
+  req: Request,
+  currentStepName: string,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown>
+) {
   const stepConfig = flowConfig.steps[currentStepName];
 
   // If step has explicit previousStep configuration, use it
@@ -191,4 +267,12 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
 
     next();
   };
+}
+
+function getStepIndex(flowConfig: JourneyFlowConfig, stepName: string) {
+  const stepIndex = flowConfig.stepOrder.indexOf(stepName);
+  if (stepIndex === -1) {
+    throw new Error(`Step ${stepName} not found in stepOrder`);
+  }
+  return stepIndex;
 }

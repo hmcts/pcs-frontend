@@ -1,13 +1,13 @@
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
+import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
 import {
   type FormError,
   buildErrorSummary,
   fieldTypeForErrorKey,
   getErrorMessage,
   renderWithErrors,
-} from '../../../../../main/modules/steps/formBuilder/errorUtils';
+} from '@modules/steps/formBuilder/errorUtils';
 
 describe('errorUtils', () => {
   describe('fieldTypeForErrorKey', () => {

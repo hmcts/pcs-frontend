@@ -9,8 +9,8 @@ import {
   processFieldData,
   setFormData,
   validateForm,
-} from '../../../../main/modules/steps';
-import { getErrorMessage } from '../../../../main/modules/steps/formBuilder/errorUtils';
+} from '@modules/steps';
+import { getErrorMessage } from '@modules/steps/formBuilder/errorUtils';
 
 describe('formHelpers', () => {
   describe('getFormData', () => {
