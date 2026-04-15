@@ -20,7 +20,7 @@ import {
   installmentPayments,
   landlordLicensed,
   landlordRegistered,
-  languageScreen,
+  languageUsed,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
@@ -527,7 +527,7 @@ export class RespondToClaimAction implements IAction {
       question: languageScreenData.question,
       option: languageScreenData.radioOption,
     });
-    await performAction('clickButton', languageScreen.saveAndContinueButton);
+    await performAction('clickButton', languageUsed.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
