@@ -2,14 +2,14 @@ import { fromYesNoEnum, toYesNoEnum } from '../../../../main/steps/utils/yesNoEn
 
 describe('yesNoEnum utilities', () => {
   describe('toYesNoEnum', () => {
-    it('should convert "yes" to "Yes"', () => {
+    it('should convert "yes" to "YES"', () => {
       const result = toYesNoEnum('yes');
-      expect(result).toBe('Yes');
+      expect(result).toBe('YES');
     });
 
-    it('should convert "no" to "No"', () => {
+    it('should convert "no" to "NO"', () => {
       const result = toYesNoEnum('no');
-      expect(result).toBe('No');
+      expect(result).toBe('NO');
     });
 
     it('should return undefined for undefined', () => {

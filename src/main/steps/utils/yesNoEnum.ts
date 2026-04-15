@@ -18,12 +18,11 @@ export function toYesNoEnum(value: 'yes' | 'no' | undefined): YesNoValue | undef
   if (!value) {
     return undefined;
   }
-  return value.toLowerCase() === 'yes' ? 'Yes' : 'No';
+  return value.toLowerCase() === 'yes' ? 'YES' : 'NO';
 }
 
 /**
- * Converts backend CCD enum to frontend 'yes'/'no' string.
- * Accepts title-case ('Yes'/'No') and legacy uppercase ('YES'/'NO') values.
+ * Converts backend CCD enum to frontend 'yes'/'no' string, with case-insensitive matching
  * @param value - CCD enum value
  * @returns Frontend radio button value ('yes' or 'no'), or undefined if value is null/invalid
  * @example
