@@ -7,8 +7,7 @@ import type { Request } from 'express';
  * Returns true if noticeServed is "Yes" (case-insensitive), false otherwise.
  */
 export const isNoticeServed = async (req: Request): Promise<boolean> => {
-  const caseData = req.res?.locals?.validatedCase?.data;
-  const noticeServed = caseData?.noticeServed;
+  const { noticeServed } = req.res?.locals?.validatedCase ?? { noticeServed: '' };
 
   // Case-insensitive comparison to handle "Yes", "YES", "yes", etc.
   return noticeServed?.toUpperCase() === 'YES';

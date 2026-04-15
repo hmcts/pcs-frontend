@@ -1,6 +1,6 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 
 export const step: StepDefinition = createFormStep({
@@ -14,12 +14,12 @@ export const step: StepDefinition = createFormStep({
     heading: 'heading',
     paragraph1: 'paragraph1',
     paragraph2: 'paragraph2',
+    paragraph3: 'paragraph3',
     bullet1: 'bullet1',
     bullet2: 'bullet2',
     bullet3: 'bullet3',
     bullet4: 'bullet4',
     bullet5: 'bullet5',
-    paragraph3: 'paragraph3',
   },
   fields: [],
   customTemplate: `${__dirname}/situationInterstitial.njk`,
