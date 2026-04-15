@@ -34,11 +34,11 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { HTTPError } from '../HttpError';
-import { CaseState } from '../interfaces/ccdCase.interface';
-import type { CcdCase, CcdUserCases, StartCallbackData } from '../interfaces/ccdCase.interface';
-import { http } from '../modules/http';
 
+import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import { CaseState } from '@services/ccdCase.interface';
+import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
 
 const logger = Logger.getLogger('ccdCaseService');
 
@@ -137,10 +137,10 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: Record<string, unknown>
+  data: CcdCaseData | Record<string, unknown>
 ): Promise<CcdCase> {
   const payload = {
-    data,
+    data: data as Record<string, unknown>,
     event: {
       id: eventId,
       summary: `Citizen ${eventId} summary`,
@@ -167,15 +167,13 @@ export const ccdCaseService = {
 
     try {
       logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
-      const response = await http.get<{ case_details?: { case_data?: Record<string, unknown> } }>(
-        eventUrl,
-        getCaseHeaders(accessToken)
-      );
+      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
       logger.info(`[ccdCaseService] Case access validated successfully for caseId: ${caseId}`);
 
+      const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
       return {
         id: caseId,
-        data: response.data.case_details?.case_data || {},
+        data: caseData,
       };
     } catch (error) {
       const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
@@ -210,7 +208,7 @@ export const ccdCaseService = {
         logger.info(`Draft case found: ${JSON.stringify(draftCase, null, 2)}`);
         return {
           id: draftCase.id,
-          data: draftCase.case_data,
+          data: draftCase.case_data as CcdCaseData,
         };
       }
 

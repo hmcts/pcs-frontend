@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express';
 
-import type { JourneyFlowConfig } from '../../../../main/interfaces/stepFlow.interface';
 import {
   checkStepDependencies,
   createStepNavigation,
@@ -8,7 +7,8 @@ import {
   getPreviousStep,
   getStepUrl,
   stepDependencyCheckMiddleware,
-} from '../../../../main/modules/steps/flow';
+} from '@modules/steps/flow';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 jest.mock('@modules/logger', () => ({
   Logger: {
@@ -574,7 +574,7 @@ describe('stepFlow', () => {
         },
       } as unknown as Request;
 
-      const result = await navigation.getNextStepUrl(req, 'step1', {});
+      const result = await navigation.getNextStepUrl(req, 'step1');
       expect(result).toBe('/steps/test-journey/step2');
     });
 
@@ -587,7 +587,7 @@ describe('stepFlow', () => {
         },
       } as unknown as Request;
 
-      const result = await navigation.getNextStepUrl(req, 'step3', {});
+      const result = await navigation.getNextStepUrl(req, 'step3');
       expect(result).toBeNull();
     });
 
