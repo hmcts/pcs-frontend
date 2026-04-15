@@ -1,6 +1,9 @@
 import { Page } from '@playwright/test';
 
-import { chooseAnApplication } from '../../../data/page-data/genApps-page-data';
+import {
+  chooseAnApplication,
+  whichLanguageDidYouUseToCompleteThisService,
+} from '../../../data/page-data/genApps-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -9,6 +12,7 @@ export class GenAppsAction implements IAction {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['chooseAnApplication', () => this.chooseAnApplication(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
+      ['selectLanguageUsedToComplete',() => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -23,6 +27,14 @@ export class GenAppsAction implements IAction {
       option: chooseApp.option,
     });
     await performAction('clickButton', chooseAnApplication.continueButton);
+  }
+
+  private async selectLanguageUsedToComplete(selectLanguageData: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: selectLanguageData.question,
+      option: selectLanguageData.option,
+    });
+    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {

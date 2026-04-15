@@ -1,6 +1,14 @@
 export const whichLanguageDidYouUseToCompleteThisService = {
   mainHeader: `Which language did you use to complete this service?`,
-  placeholderParagraph: `Placeholder page`,
+  makeAnApplicationParagraph: `Make an application`,
+  ifSomeoneElseHelpedYouToAnswerParagraph: `If someone else helped you to answer a question in this service, ask them if they answered any questions in Welsh. We’ll use this to make sure your claim is processed correctly.`,
+  whichLanguageDidYouUseQuestion: `Which language did you use to complete this service?`,
+  englishRadioOption: `English`,
+  welshRadioOption: `Welsh`,
+  englishAndWelshRadioOption: `English and Welsh`,
+  backLink: `Back`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
+  feedbackLink: `Feedback`,
+  pageSlug: `which-language-did-you-use-to-complete-this-service`,
 };
