@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { chooseAnApplication, isTheCourtHearingInTheNext14Days } from '../../../data/page-data/genApps-page-data';
+import { chooseAnApplication, doYouNeedHelpPayingTheFee, isTheCourtHearingInTheNext14Days } from '../../../data/page-data/genApps-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -9,6 +9,7 @@ export class GenAppsAction implements IAction {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['chooseAnApplication', () => this.chooseAnApplication(fieldName as actionRecord)],
       ['confirmIfCourtHearingInNext14Days', () => this.confirmIfCourtHearingInNext14Days(fieldName as actionRecord)],
+      ['doYouNeedHelpPayingFee', () => this.doYouNeedHelpPayingFee(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -34,6 +35,15 @@ export class GenAppsAction implements IAction {
       option: courtHearing.option,
     });
     await performAction('clickButton', isTheCourtHearingInTheNext14Days.continueButton);
+  }
+
+  private async doYouNeedHelpPayingFee(feeHelp: actionRecord) {
+    await performAction('recordUserEntry', feeHelp);
+    await performAction('clickRadioButton', {
+      question: feeHelp.question,
+      option: feeHelp.option,
+    });
+    await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
