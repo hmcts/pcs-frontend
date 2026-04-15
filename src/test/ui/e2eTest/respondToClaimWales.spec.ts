@@ -153,7 +153,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);

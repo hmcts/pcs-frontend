@@ -357,7 +357,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);
@@ -367,7 +367,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
-      radioOption: languageUsed.welshRadioOption,
+      radioOption: languageUsed.englishRadioOption,
     });
   });
 
@@ -449,7 +449,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);
@@ -543,7 +543,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);
@@ -631,7 +631,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);
@@ -720,7 +720,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);
@@ -813,7 +813,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);
@@ -910,7 +910,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);
@@ -1000,7 +1000,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);
