@@ -3,7 +3,6 @@ import { generateRandomString } from '../../utils/common/string.utils';
 export const whatRegularIncomeDoYouReceive = {
   mainHeader: `What regular income do you receive? (Optional)`,
   respondToClaimParagraph: `Respond to a property possession claim`,
-  doYouWantToProvideDetailsTextLabel: `Do you want to provide details of your income and expenses?`,
   selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate. `,
   incomeFromAllJobsParagraph: `Income from all jobs you do`,
   totalAmountReceivedHiddenTextLabel: `Total amount received`,
@@ -50,7 +49,6 @@ export const whatRegularIncomeDoYouReceive = {
   tooManyCharErrorMessage: `Must be 500 characters or fewer`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  cancelLink: `Cancel`,
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
