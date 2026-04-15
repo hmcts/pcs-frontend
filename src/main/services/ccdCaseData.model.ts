@@ -8,9 +8,9 @@ import {
   CcdDefendantResponses,
   PossessionClaimResponse,
   YesNoEnum,
-} from '@interfaces/ccdCase.interface';
+} from '@services/ccdCase.interface';
 
-export type { CcdCase, PossessionClaimResponse, YesNoNotSureValue } from '@interfaces/ccdCase.interface';
+export type { CcdCase, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
 
 export class CcdCaseModel {
   protected readonly validatedCase: CcdCase;

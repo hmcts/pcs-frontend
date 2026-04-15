@@ -1,5 +1,5 @@
-import { CcdCase, CcdCaseAddress, YesNoEnum } from '../../../main/interfaces/ccdCase.interface';
-import { CcdCaseModel } from '../../../main/interfaces/ccdCaseData.model';
+import { CcdCase, CcdCaseAddress, YesNoEnum } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 const buildModel = (overrides: Partial<CcdCase> = {}): CcdCaseModel => {
   const baseCase: CcdCase = {
