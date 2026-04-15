@@ -27,27 +27,16 @@
   <p class="govuk-body">{{ beforeUploadText }}</p>
 
   <form method="post" action="{{ url }}" novalidate>
-    {{ fileUploadMoj(
-      {
-        id: "documents",
-        name: "documents",
-        label: {
-          text: uploadLabel,
-          classes: "govuk-label--m"
-        },
-        accept: acceptAttribute,
-        uploadUrl: uploadUrl,
-        deleteUrl: deleteUrl,
-        maxFileSize: maxFileSizeMb,
-        errorWrongType: wrongFileTypeError,
-        errorFileTooLarge: fileTooLargeError,
-        errorDelete: deleteFailedError,
-        deleteButtonText: deleteButton
-      },
-      uploadButton,
-      filesAddedHeading,
-      uploadedFiles
-    ) }}
+    {% for field in fields %}
+      {% if field.componentType == 'fileUpload' %}
+        {{ fileUploadMoj(
+          field.component,
+          field.component.uploadButtonText,
+          field.component.filesAddedHeading,
+          field.component.value
+        ) }}
+      {% endif %}
+    {% endfor %}
 
     {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}

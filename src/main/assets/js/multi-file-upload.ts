@@ -64,8 +64,12 @@ function clearErrorSummary(form: HTMLFormElement): void {
 }
 
 function hasVisibleError(container: HTMLElement): boolean {
-  const errorSpan = container.querySelector('.moj-multi-file-upload__error');
-  return !!errorSpan && errorSpan.textContent !== '';
+  const form = container.closest('form');
+  if (!form) {
+    return false;
+  }
+  const summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
+  return !!summary && !summary.hidden;
 }
 
 function installCsrfInterceptor(): void {
@@ -118,6 +122,7 @@ function initContainer(container: HTMLElement): void {
   const wrongTypeMessage = container.dataset.errorWrongType || '';
   const tooLargeMessage = container.dataset.errorFileTooLarge || '';
   const deleteFailedMessage = container.dataset.errorDelete || '';
+  const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
 
   new MultiFileUpload(container, {
     uploadUrl,
@@ -151,6 +156,30 @@ function initContainer(container: HTMLElement): void {
         } catch {
           // Response parsing failed; hidden input not created
         }
+
+        // Clear any failed upload rows (MOJ keeps them in the list)
+        container.querySelectorAll('.moj-multi-file-upload__row--error, .moj-multi-file-upload__error').forEach(el => {
+          const row = el.closest('.moj-multi-file-upload__row');
+          if (row) {
+            row.remove();
+          } else {
+            el.remove();
+          }
+        });
+
+        // MOJ component creates delete buttons with "Delete" text -- patch to match translation
+        container.querySelectorAll<HTMLButtonElement>('.moj-multi-file-upload__delete').forEach(btn => {
+          const hiddenSpan = btn.querySelector('.govuk-visually-hidden');
+          const filename = hiddenSpan?.textContent || '';
+          btn.textContent = '';
+          btn.appendChild(document.createTextNode(deleteButtonText + ' '));
+          if (filename) {
+            const span = document.createElement('span');
+            span.className = 'govuk-visually-hidden';
+            span.textContent = filename;
+            btn.appendChild(span);
+          }
+        });
       },
 
       errorHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {

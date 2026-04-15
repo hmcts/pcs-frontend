@@ -30,12 +30,16 @@ function getUserToken(req: Request): string {
   return req.session?.user?.accessToken || '';
 }
 
-async function uploadErrorMessages(req: Request): Promise<{ wrongType: string; tooLarge: string }> {
+async function getErrorTranslations(req: Request) {
   await loadStepNamespace(req, 'upload-document', 'respondToClaim');
   const t = getTranslationFunction(req, 'upload-document', ['common']);
   return {
     wrongType: t('common:errors.documentUpload.wrongFileTypeDocStore'),
     tooLarge: t('common:errors.documentUpload.fileTooLargeDocStore', { maxSize: String(UPLOAD_MAX_FILE_SIZE_MB) }),
+    noFile: t('common:errors.documentUpload.noFileSelected'),
+    uploadFailed: t('common:errors.documentUpload.uploadFailed'),
+    deleteFailed: t('common:errors.documentUpload.fileDeleteFailed'),
+    documentUrlRequired: t('common:errors.documentUpload.documentUrlRequired'),
   };
 }
 
@@ -46,16 +50,12 @@ export default function documentUploadRoutes(app: Application): void {
     (req: Request, res: Response, next) => {
       upload.single('documents')(req, res, async err => {
         if (err) {
-          const { wrongType, tooLarge } = await uploadErrorMessages(req);
+          const errors = await getErrorTranslations(req);
           if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
-            return res.status(400).json({
-              error: { message: tooLarge },
-            });
+            return res.status(400).json({ error: { message: errors.tooLarge } });
           }
           if (err.message === 'INVALID_FILE_TYPE' || err.message === 'BLOCKED_MEDIA') {
-            return res.status(400).json({
-              error: { message: wrongType },
-            });
+            return res.status(400).json({ error: { message: errors.wrongType } });
           }
           return next(err);
         }
@@ -63,16 +63,14 @@ export default function documentUploadRoutes(app: Application): void {
       });
     },
     async (req: Request, res: Response) => {
+      const errors = await getErrorTranslations(req);
       try {
-        const file = req.file;
-        if (!file) {
-          return res.status(400).json({
-            error: { message: 'No file was uploaded' },
-          });
+        if (!req.file) {
+          return res.status(400).json({ error: { message: errors.noFile } });
         }
 
         const userToken = getUserToken(req);
-        const document = await uploadDocument(file, userToken);
+        const document = await uploadDocument(req.file, userToken);
 
         return res.json({
           success: {
@@ -89,9 +87,7 @@ export default function documentUploadRoutes(app: Application): void {
         logger.error('Failed to upload document to CDAM', {
           error: error instanceof Error ? error.message : String(error),
         });
-        return res.status(502).json({
-          error: { message: 'Failed to upload document' },
-        });
+        return res.status(502).json({ error: { message: errors.uploadFailed } });
       }
     }
   );
@@ -100,12 +96,11 @@ export default function documentUploadRoutes(app: Application): void {
     '/case/:caseReference/respond-to-claim/upload-document/delete',
     oidcMiddleware,
     async (req: Request, res: Response) => {
+      const errors = await getErrorTranslations(req);
       try {
         const documentUrl = (req.body as Record<string, string>).delete || '';
         if (!documentUrl) {
-          return res.status(400).json({
-            error: { message: 'Document URL is required' },
-          });
+          return res.status(400).json({ error: { message: errors.documentUrlRequired } });
         }
 
         const userToken = getUserToken(req);
@@ -116,9 +111,7 @@ export default function documentUploadRoutes(app: Application): void {
         logger.error('Failed to delete document from CDAM', {
           error: error instanceof Error ? error.message : String(error),
         });
-        return res.status(502).json({
-          error: { message: 'Failed to delete document' },
-        });
+        return res.status(502).json({ error: { message: errors.deleteFailed } });
       }
     }
   );

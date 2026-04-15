@@ -204,7 +204,15 @@ export function buildComponentConfig({
       component.maxFileSize = field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB;
       component.uploadUrl = field.uploadUrl || '';
       component.deleteUrl = field.deleteUrl || '';
-      component.classes = field.classes || 'moj-multi-file-upload__input';
+      component.classes = field.classes || 'govuk-file-upload';
+      component.errorWrongType = t('common:errors.documentUpload.wrongFileTypeDocStore');
+      component.errorTooLarge = t('common:errors.documentUpload.fileTooLargeDocStore', {
+        maxSize: String(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
+      });
+      component.errorDelete = t('common:errors.documentUpload.fileDeleteFailed');
+      component.uploadButtonText = t('uploadButton');
+      component.filesAddedHeading = t('filesAddedHeading');
+      component.deleteButtonText = t('deleteButton');
       componentType = 'fileUpload';
       break;
     }

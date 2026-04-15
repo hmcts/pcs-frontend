@@ -46,14 +46,15 @@
       "data-max-file-size-mb": component.maxFileSize,
       "data-error-wrong-type": component.errorWrongType or "",
       "data-error-file-too-large": component.errorFileTooLarge or "",
-      "data-error-delete": component.errorDelete or ""
+      "data-error-delete": component.errorDelete or "",
+      "data-delete-button-text": component.deleteButtonText or "Remove"
     }
   }) }}
 
   <div id="uploaded-documents-container">
     {% if uploadedFiles %}
       {% for file in uploadedFiles %}
-        <input type="hidden" name="uploadedDocuments[]" value='{{ file | dump | safe }}' data-document-url="{{ file.document_url }}" />
+        <input type="hidden" name="uploadedDocuments[]" value="{{ file | dump }}" data-document-url="{{ file.document_url }}" />
       {% endfor %}
     {% endif %}
   </div>

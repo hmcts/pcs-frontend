@@ -1,3 +1,5 @@
+import type { Request } from 'express';
+
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -5,8 +7,30 @@ import type { CcdCollectionItem, CcdDocumentReference } from '@interfaces/ccdCas
 import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
 import type { CdamDocument } from '@interfaces/documentUpload.interface';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { createFormStep } from '@modules/steps';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
+
+function mapCcdDocToCdamDoc(v: CcdDocumentReference): CdamDocument {
+  const doc: CdamDocument = {
+    document_url: v.document_url,
+    document_binary_url: v.document_binary_url,
+    document_filename: v.document_filename,
+  };
+  if (v.category_id) {
+    try {
+      const meta = JSON.parse(v.category_id);
+      if (meta.mimeType) {
+        doc.content_type = meta.mimeType;
+      }
+      if (typeof meta.size === 'number') {
+        doc.size = meta.size;
+      }
+    } catch {
+      // category_id is not JSON metadata -- ignore
+    }
+  }
+  return doc;
+}
 
 function parseUploadedDocuments(body: Record<string, unknown>): CdamDocument[] {
   const raw = body['uploadedDocuments[]'];
@@ -73,6 +97,10 @@ export const step: StepDefinition = createFormStep({
       required: false,
       accept: ACCEPT_ATTRIBUTE_EXTENSIONS,
       maxFileSize: UPLOAD_MAX_FILE_SIZE_MB,
+      labelClasses: 'govuk-label--m',
+      translationKey: {
+        label: 'uploadLabel',
+      },
     },
   ],
   translationKeys: {
@@ -87,49 +115,23 @@ export const step: StepDefinition = createFormStep({
     uploadButton: 'uploadButton',
     deleteButton: 'deleteButton',
   },
-  extendGetContent: async (req, formContent) => {
-    const t = getTranslationFunction(req, 'upload-document', ['common']);
-
+  getInitialFormData: (req: Request) => {
     const existingDocs = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.uploadedDocuments;
-
-    const uploadedFiles: CdamDocument[] = existingDocs
-      ? existingDocs.map((item: CcdCollectionItem<CcdDocumentReference>) => {
-          const v = item.value;
-          const doc: CdamDocument = {
-            document_url: v.document_url,
-            document_binary_url: v.document_binary_url,
-            document_filename: v.document_filename,
-          };
-          if (v.category_id) {
-            try {
-              const meta = JSON.parse(v.category_id);
-              if (meta.mimeType) {
-                doc.content_type = meta.mimeType;
-              }
-              if (typeof meta.size === 'number') {
-                doc.size = meta.size;
-              }
-            } catch {
-              // category_id is not JSON metadata -- ignore
-            }
-          }
-          return doc;
-        })
-      : [];
-
+    if (!existingDocs?.length) {
+      return {};
+    }
     return {
-      ...formContent,
-      uploadUrl: `${req.originalUrl}/upload`,
-      deleteUrl: `${req.originalUrl}/delete`,
-      uploadedFiles,
-      acceptAttribute: ACCEPT_ATTRIBUTE_EXTENSIONS,
-      maxFileSizeMb: UPLOAD_MAX_FILE_SIZE_MB,
-      wrongFileTypeError: t('common:errors.documentUpload.wrongFileTypeDocStore'),
-      fileTooLargeError: t('common:errors.documentUpload.fileTooLargeDocStore', {
-        maxSize: String(UPLOAD_MAX_FILE_SIZE_MB),
-      }),
-      deleteFailedError: t('common:errors.documentUpload.fileDeleteFailed'),
+      documents: existingDocs.map((item: CcdCollectionItem<CcdDocumentReference>) => mapCcdDocToCdamDoc(item.value)),
     };
+  },
+  extendGetContent: (req, formContent) => {
+    const basePath = req.originalUrl.split('?')[0];
+    const fileField = formContent.fields?.find((f: { componentType?: string }) => f.componentType === 'fileUpload');
+    if (fileField?.component) {
+      fileField.component.uploadUrl = `${basePath}/upload`;
+      fileField.component.deleteUrl = `${basePath}/delete`;
+    }
+    return {};
   },
   beforeRedirect: async req => {
     const documents = parseUploadedDocuments(req.body);
