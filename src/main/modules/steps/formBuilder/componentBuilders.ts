@@ -206,7 +206,7 @@ export function buildComponentConfig({
       component.deleteUrl = field.deleteUrl || '';
       component.classes = field.classes || 'govuk-file-upload';
       component.errorWrongType = t('common:errors.documentUpload.wrongFileTypeDocStore');
-      component.errorTooLarge = t('common:errors.documentUpload.fileTooLargeDocStore', {
+      component.errorFileTooLarge = t('common:errors.documentUpload.fileTooLargeDocStore', {
         maxSize: String(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
       });
       component.errorDelete = t('common:errors.documentUpload.fileDeleteFailed');

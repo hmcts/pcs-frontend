@@ -85,8 +85,8 @@
           {% elif field.componentType == 'dateInput' %}
             {{ govukDateInput(field.component) }}
           {% elif field.componentType == 'fileUpload' %}
-            {{ fileUploadMoj(field.component, "Upload file", "Files added", []) }}
-            {% endif %}
+            {{ fileUploadMoj(field.component, field.component.uploadButtonText, field.component.filesAddedHeading, field.component.value) }}
+          {% endif %}
         {% endif %}
       {% endfor %}
     {% endif %}
