@@ -1,4 +1,4 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { PossessionClaimResponse } from '../../../services/ccdCase.interface';
 import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';

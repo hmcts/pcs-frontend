@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { PossessionClaimResponse } from '../../../services/ccdCase.interface';
 import {
   formatDatePartsToISODate,
   fromYesNoEnum,

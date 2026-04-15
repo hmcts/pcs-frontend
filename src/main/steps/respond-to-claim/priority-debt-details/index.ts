@@ -1,4 +1,4 @@
-import type { FrequencyValue, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { FrequencyValue, PossessionClaimResponse } from '../../../services/ccdCase.interface';
 import { ccdPenceToPoundsString, getValidatedCaseHouseholdCircumstances, poundsStringToPence } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';

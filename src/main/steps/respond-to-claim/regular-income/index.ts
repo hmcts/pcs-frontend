@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse, YesNoValue } from '../../../interfaces/ccdCase.interface';
+import type { PossessionClaimResponse, YesNoValue } from '../../../services/ccdCase.interface';
 import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
