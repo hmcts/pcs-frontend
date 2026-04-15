@@ -63,7 +63,7 @@ export const submitCaseApiDataWales = {
     //  CORRECTED: Wales requires SECURE_CONTRACT, not SECURE
     // SECURE = England (SECURE_TENANCY)
     // SECURE_CONTRACT = Wales (section 8 Housing (Wales) Act 2014)
-    occupationLicenceTypeWales: 'SECURE_CONTRACT',
+    occupationLicenceTypeWales: process.env.OCCUPATION_LICENCE_TYPE,
 
     licenceStartDate: '1990-11-10',
     licenceDocuments: [],
