@@ -11,25 +11,9 @@ declare module '@ministryofjustice/frontend' {
     };
     hooks?: {
       entryHook?: (upload: InstanceType<typeof MultiFileUpload>, file: File) => void;
-      exitHook?: (
-        upload: InstanceType<typeof MultiFileUpload>,
-        file: File,
-        xhr: XMLHttpRequest,
-        textStatus: string
-      ) => void;
-      errorHook?: (
-        upload: InstanceType<typeof MultiFileUpload>,
-        file: File,
-        xhr: XMLHttpRequest,
-        textStatus: string,
-        error: Error
-      ) => void;
-      deleteHook?: (
-        upload: InstanceType<typeof MultiFileUpload>,
-        file: File | undefined,
-        xhr: XMLHttpRequest,
-        textStatus: string
-      ) => void;
+      exitHook?: (upload: InstanceType<typeof MultiFileUpload>, file: File, xhr: XMLHttpRequest) => void;
+      errorHook?: (upload: InstanceType<typeof MultiFileUpload>, file: File, xhr: XMLHttpRequest) => void;
+      deleteHook?: (upload: InstanceType<typeof MultiFileUpload>, file: File | undefined, xhr: XMLHttpRequest) => void;
     };
   }
 
