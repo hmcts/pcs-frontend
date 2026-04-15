@@ -195,21 +195,21 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 **Functional UI tests** use `yarn test:functional` (Chrome). Jenkins sets env vars consumed by Playwright as above.
 
-| Branch | Default `--grep` (`FUNCTIONAL_TEST_SCOPE`) | Notes |
-| ------ | ------------------------------------------ | ----- |
-| **PR** | `@PR` | Preview app URL from `CHANGE_ID`. |
-| **Master** | `@regression` | AAT URL. On failure, Allure summary may be sent to Slack `#hdp-qa-e2e-test-results`. |
+| Branch     | Default `--grep` (`FUNCTIONAL_TEST_SCOPE`) | Notes                                                                                |
+| ---------- | ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| **PR**     | `@PR`                                      | Preview app URL from `CHANGE_ID`.                                                    |
+| **Master** | `@regression`                              | AAT URL. On failure, Allure summary may be sent to Slack `#hdp-qa-e2e-test-results`. |
 
 **Optional GitHub labels on PRs**
 
-| Label pattern | Effect |
-| ------------- | ------ |
-| `e2e-tag:<value>` | Overrides the default PR grep, e.g. `e2e-tag:@regression` → `FUNCTIONAL_TEST_SCOPE=@regression`. |
-| `e2e-pod:<keyword>` | Sets `E2E_POD_KEYWORD` so only `*<keyword>*.spec.ts` files under `src/test/ui` run (substring must match the real filename **exact case**, e.g. `e2e-pod:makeAnApplication`). |
-| `enable_all_page_functional_tests` | Turns on broad page validation flags used by the framework. |
-| `enable_content_validation` | Enables content validation. |
-| `enable_error_messages_validation` | Enables error-message validation. |
-| `enable_navigation_tests` | Enables navigation tests. |
+| Label pattern                      | Effect                                                                                                                                                                        |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `e2e-tag:<value>`                  | Overrides the default PR grep, e.g. `e2e-tag:@regression` → `FUNCTIONAL_TEST_SCOPE=@regression`.                                                                              |
+| `e2e-pod:<keyword>`                | Sets `E2E_POD_KEYWORD` so only `*<keyword>*.spec.ts` files under `src/test/ui` run (substring must match the real filename **exact case**, e.g. `e2e-pod:makeAnApplication`). |
+| `enable_all_page_functional_tests` | Turns on broad page validation flags used by the framework.                                                                                                                   |
+| `enable_content_validation`        | Enables content validation.                                                                                                                                                   |
+| `enable_error_messages_validation` | Enables error-message validation.                                                                                                                                             |
+| `enable_navigation_tests`          | Enables navigation tests.                                                                                                                                                     |
 
 You can combine `e2e-tag:` and `e2e-pod:` (narrow files, then filter by tag in test titles).
 
