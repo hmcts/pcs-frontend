@@ -29,6 +29,7 @@ rootDir: ./
 npm:
   packages:
     '@hmcts/playwright-common': '1.0.39'
+    config: '^4.1.1'
 
 env:
   PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
