@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 
-import { getDateTranslationKey, validateDateField } from '../../../../../main/modules/steps/formBuilder/dateValidation';
+import { getDateTranslationKey, validateDateField } from '@modules/steps/formBuilder/dateValidation';
 
 describe('dateValidation', () => {
   const createMockT = (translations: Record<string, string> = {}): TFunction => {
@@ -185,7 +185,7 @@ describe('dateValidation', () => {
 
       it('should use translations object for year less than 1900 when provided', () => {
         const translations = { yearMustBeSameOrAfter: 'Custom year {{minYear}} message' };
-        const result = validateDateField('15', '06', '1899', true, undefined, false, true, translations);
+        const result = validateDateField('15', '06', '1899', true, undefined, false, true, false, translations);
         expect(result?.message).toBe('Custom year 1900 message');
         expect(result?.erroneousParts).toEqual(['year']);
       });
@@ -238,7 +238,7 @@ describe('dateValidation', () => {
     });
 
     describe('noFutureDate validation', () => {
-      it('should return error for future date when noFutureDate is true', () => {
+      it('should return error for future date when noFutureDate and noCurrentDate are true', () => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const t = createMockT({ 'errors.date.futureDate': 'Date must be in the past' });
@@ -248,12 +248,13 @@ describe('dateValidation', () => {
           tomorrow.getFullYear().toString(),
           true,
           t,
+          true,
           true
         );
         expect(result?.message).toBe('Date must be in the past');
       });
 
-      it('should return error for current date when noFutureDate is true', () => {
+      it('should return error for current date when noFutureDate and noCurrentDate are true', () => {
         const today = new Date();
         const t = createMockT({ 'errors.date.futureDate': 'Date must be in the past' });
         const result = validateDateField(
@@ -262,27 +263,28 @@ describe('dateValidation', () => {
           today.getFullYear().toString(),
           true,
           t,
+          true,
           true
         );
         expect(result?.message).toBe('Date must be in the past');
       });
 
-      it('should accept past date when noFutureDate is true', () => {
+      it('should accept past date when noFutureDate and noCurrentDate are true', () => {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
-        const t = createMockT();
         const result = validateDateField(
           yesterday.getDate().toString(),
           (yesterday.getMonth() + 1).toString(),
           yesterday.getFullYear().toString(),
           true,
-          t,
+          undefined,
+          true,
           true
         );
         expect(result).toBeNull();
       });
 
-      it('should accept future date when noFutureDate is false', () => {
+      it('should accept any date when noFutureDate is false', () => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const result = validateDateField(
@@ -291,6 +293,7 @@ describe('dateValidation', () => {
           tomorrow.getFullYear().toString(),
           true,
           undefined,
+          false,
           false
         );
         expect(result).toBeNull();
@@ -308,9 +311,57 @@ describe('dateValidation', () => {
           undefined,
           true,
           false,
+          false,
           translations
         );
         expect(result?.message).toBe('Custom future date error');
+      });
+
+      describe('noFutureDate without noCurrentDate (today or past)', () => {
+        it('should accept todays date when noFutureDate is true and noCurrentDate is false', () => {
+          const today = new Date();
+          const result = validateDateField(
+            today.getDate().toString(),
+            (today.getMonth() + 1).toString(),
+            today.getFullYear().toString(),
+            true,
+            undefined,
+            true,
+            false
+          );
+          expect(result).toBeNull();
+        });
+
+        it('should accept a past date when noFutureDate is true and noCurrentDate is false', () => {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const result = validateDateField(
+            yesterday.getDate().toString(),
+            (yesterday.getMonth() + 1).toString(),
+            yesterday.getFullYear().toString(),
+            true,
+            undefined,
+            true,
+            false
+          );
+          expect(result).toBeNull();
+        });
+
+        it('should return error for a future date when noFutureDate is true and noCurrentDate is false', () => {
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const t = createMockT({ 'errors.date.futureDate': 'Date must be today or in the past' });
+          const result = validateDateField(
+            tomorrow.getDate().toString(),
+            (tomorrow.getMonth() + 1).toString(),
+            tomorrow.getFullYear().toString(),
+            true,
+            t,
+            true,
+            false
+          );
+          expect(result?.message).toBe('Date must be today or in the past');
+        });
       });
     });
 
@@ -425,9 +476,94 @@ describe('dateValidation', () => {
           undefined,
           true,
           true,
+          false,
           translations
         );
         expect(result?.message).toBe('Custom future date error from translations');
+      });
+    });
+
+    describe('noPastDate validation', () => {
+      it('should return error for a past date when noPastDate is true and noCurrentDate is false', () => {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const t = createMockT({ 'errors.date.pastDate': 'Date must be today or in the future' });
+        const result = validateDateField(
+          yesterday.getDate().toString(),
+          (yesterday.getMonth() + 1).toString(),
+          yesterday.getFullYear().toString(),
+          true,
+          t,
+          false,
+          false,
+          true
+        );
+        expect(result?.message).toBe('Date must be today or in the future');
+      });
+
+      it('should accept todays date when noPastDate is true and noCurrentDate is false', () => {
+        const today = new Date();
+        const result = validateDateField(
+          today.getDate().toString(),
+          (today.getMonth() + 1).toString(),
+          today.getFullYear().toString(),
+          true,
+          undefined,
+          false,
+          false,
+          true
+        );
+        expect(result).toBeNull();
+      });
+
+      it('should accept a future date when noPastDate is true and noCurrentDate is false', () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const result = validateDateField(
+          tomorrow.getDate().toString(),
+          (tomorrow.getMonth() + 1).toString(),
+          tomorrow.getFullYear().toString(),
+          true,
+          undefined,
+          false,
+          false,
+          true
+        );
+        expect(result).toBeNull();
+      });
+
+      describe('noPastDate with noCurrentDate (strictly future)', () => {
+        it('should return error for todays date when noPastDate and noCurrentDate are both true', () => {
+          const today = new Date();
+          const t = createMockT({ 'errors.date.pastDate': 'Date must be in the future' });
+          const result = validateDateField(
+            today.getDate().toString(),
+            (today.getMonth() + 1).toString(),
+            today.getFullYear().toString(),
+            true,
+            t,
+            false,
+            true,
+            true
+          );
+          expect(result?.message).toBe('Date must be in the future');
+        });
+
+        it('should accept a future date when noPastDate and noCurrentDate are both true', () => {
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const result = validateDateField(
+            tomorrow.getDate().toString(),
+            (tomorrow.getMonth() + 1).toString(),
+            tomorrow.getFullYear().toString(),
+            true,
+            undefined,
+            false,
+            true,
+            true
+          );
+          expect(result).toBeNull();
+        });
       });
     });
   });
@@ -451,6 +587,11 @@ describe('dateValidation', () => {
     it('should return correct translation key for futureDate', () => {
       const result = getDateTranslationKey('futureDate');
       expect(result).toBe('dateFutureDate');
+    });
+
+    it('should return correct translation key for pastDate', () => {
+      const result = getDateTranslationKey('pastDate');
+      expect(result).toBe('datePastDate');
     });
 
     it('should return null for unknown key', () => {

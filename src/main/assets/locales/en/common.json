@@ -25,6 +25,7 @@
     "cancel": "Cancel",
     "finish": "Start a new application",
     "start": "Start",
+    "startNow": "Start now",
     "submit": "Submit"
   },
   "options": {
@@ -43,6 +44,10 @@
     "day": "Day",
     "month": "Month",
     "year": "Year"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   },
   "errors": {
     "title": "There is a problem",
@@ -65,6 +70,7 @@
       "required": "Enter a date",
       "notRealDate": "Date must be a real date",
       "futureDate": "Date must be in the past",
+      "pastDate": "Date must be in the future",
       "invalidValue": "Enter a valid value",
       "yearMustBeSameOrAfter": "The year must be the same as or after {{minYear}}",
       "missingOne": "Date must include a {{missingField}}",
@@ -98,17 +104,6 @@
     "minutes": "minutes",
     "second": "second",
     "seconds": "seconds"
-  },
-  "characterCount": {
-    "charactersUnderLimitText": {
-      "one": "You have %{count} character remaining",
-      "other": "You have %{count} characters remaining"
-    },
-    "charactersAtLimitText": "You have reached the limit",
-    "charactersOverLimitText": {
-      "one": "You have %{count} character too many",
-      "other": "You have %{count} characters too many"
-    }
   },
   "errorPages": {
     "403": {

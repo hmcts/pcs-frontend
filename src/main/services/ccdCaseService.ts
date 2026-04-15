@@ -34,10 +34,10 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { HTTPError } from '../HttpError';
-import { CaseState } from '../interfaces/ccdCase.interface';
-import type { CcdCase, CcdUserCases, StartCallbackData } from '../interfaces/ccdCase.interface';
-import { http } from '../modules/http';
 
+import { CaseState } from '@interfaces/ccdCase.interface';
+import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@interfaces/ccdCase.interface';
+import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('ccdCaseService');
@@ -137,10 +137,10 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: Record<string, unknown>
+  data: CcdCaseData | Record<string, unknown>
 ): Promise<CcdCase> {
   const payload = {
-    data,
+    data: data as Record<string, unknown>,
     event: {
       id: eventId,
       summary: `Citizen ${eventId} summary`,
@@ -167,15 +167,13 @@ export const ccdCaseService = {
 
     try {
       logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
-      const response = await http.get<{ case_details?: { case_data?: Record<string, unknown> } }>(
-        eventUrl,
-        getCaseHeaders(accessToken)
-      );
+      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
       logger.info(`[ccdCaseService] Case access validated successfully for caseId: ${caseId}`);
 
+      const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
       return {
         id: caseId,
-        data: response.data.case_details?.case_data || {},
+        data: caseData,
       };
     } catch (error) {
       const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
@@ -210,7 +208,7 @@ export const ccdCaseService = {
         logger.info(`Draft case found: ${JSON.stringify(draftCase, null, 2)}`);
         return {
           id: draftCase.id,
-          data: draftCase.case_data,
+          data: draftCase.case_data as CcdCaseData,
         };
       }
 
@@ -283,6 +281,19 @@ export const ccdCaseService = {
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
     return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
+  },
+
+  async submitGeneralApplication(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+    if (!ccdCase.id) {
+      throw new HTTPError('Cannot submit general application, case ID not specified', 500);
+    }
+
+    const eventId = 'citizenCreateGenApp';
+    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
+    const eventToken = await getEventToken(accessToken || '', eventUrl);
+    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
+
+    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
   },
 
   async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {

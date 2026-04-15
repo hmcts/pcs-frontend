@@ -25,6 +25,7 @@
     "cancel": "cyCancel",
     "finish": "cyStart a new application",
     "start": "cyStart",
+    "startNow": "cyStart now",
     "submit": "cySubmit"
   },
   "options": {
@@ -44,6 +45,10 @@
     "day": "cyDay",
     "month": "cyMonth",
     "year": "cyYear"
+  },
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
   },
   "errors": {
     "title": "cyThere is a problem",
@@ -68,6 +73,7 @@
       "invalidMonth": "cyEnter a valid month",
       "invalidYear": "cyEnter a valid year",
       "futureDate": "cyDate must be in the past",
+      "pastDate": "cyDate must be in the future",
       "invalidValue": "cyEnter a valid value",
       "yearMustBeSameOrAfter": "cyThe year must be the same as or after {{minYear}}",
       "missingOne": "cyDate must include a {{missingField}}",
@@ -102,17 +108,6 @@
     "second": "cysecond",
     "seconds": "cyseconds",
     "remaining": "cyremaining"
-  },
-  "characterCount": {
-    "charactersUnderLimitText": {
-      "one": "cyYou have %{count} character remaining",
-      "other": "cyYou have %{count} characters remaining"
-    },
-    "charactersAtLimitText": "cyYou have reached the limit",
-    "charactersOverLimitText": {
-      "one": "cyYou have %{count} character too many",
-      "other": "cyYou have %{count} characters too many"
-    }
   },
   "errorPages": {
     "403": {

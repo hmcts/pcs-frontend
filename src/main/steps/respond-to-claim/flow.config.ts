@@ -1,7 +1,7 @@
 import { type Request } from 'express';
 
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
+  getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
@@ -16,11 +16,52 @@ import {
   isWelshProperty,
 } from '../utils';
 
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
+
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
+
+function getContactByTelephoneAnswer(
+  req: Request,
+  currentStepData: Record<string, unknown> = {}
+): 'yes' | 'no' | undefined {
+  const currentAnswer = currentStepData.contactByTelephone;
+  if (currentAnswer === 'yes' || currentAnswer === 'no') {
+    return currentAnswer;
+  }
+
+  // Back-navigation fallback must always come from CCD data.
+  const fromCcd = req.res?.locals?.validatedCase?.isDefendantContactByPhone;
+  if (fromCcd === true) {
+    return 'yes';
+  }
+  if (fromCcd === false) {
+    return 'no';
+  }
+
+  return undefined;
+}
+
+function getConfirmNoticeGivenAnswer(
+  req: Request,
+  currentStepData: Record<string, unknown> = {}
+): 'yes' | 'no' | 'imNotSure' | undefined {
+  const currentAnswer = currentStepData.confirmNoticeGiven;
+  if (currentAnswer === 'yes' || currentAnswer === 'no' || currentAnswer === 'imNotSure') {
+    return currentAnswer;
+  }
+
+  const ccdAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+  if (ccdAnswer === 'yes' || ccdAnswer === 'no' || ccdAnswer === 'imNotSure') {
+    return ccdAnswer;
+  }
+
+  return undefined;
+}
 
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
+  useSessionFormData: false,
   stepOrder: [
     'start-now',
     'free-legal-advice',
@@ -31,6 +72,8 @@ export const flowConfig: JourneyFlowConfig = {
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
+    'installment-payments',
+    'how-much-afford-to-pay',
     'correspondence-address',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
@@ -55,14 +98,14 @@ export const flowConfig: JourneyFlowConfig = {
     'your-circumstances',
     'exceptional-hardship',
     'income-and-expenses',
-    'regular-income',
+    'what-regular-income-do-you-receive',
     'have-you-applied-for-universal-credit',
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
+    'other-considerations',
     'upload-docs',
     'end-now',
-    'installment-payments',
   ],
   steps: {
     'start-now': {
@@ -77,7 +120,7 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           // Route to defendant name capture if defendant is unknown
-          condition: async (req: Request) => !isDefendantNameKnown(req),
+          condition: async (req: Request) => !(await isDefendantNameKnown(req)),
           nextStep: 'defendant-name-capture',
         },
       ],
@@ -107,13 +150,19 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-telephone': {
       routes: [
         {
-          condition: async (req: Request) =>
-            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'yes',
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => getContactByTelephoneAnswer(req, currentStepData) === 'yes',
           nextStep: 'contact-preferences-text-message',
         },
         {
-          condition: async (req: Request) =>
-            req.session?.formData?.['contact-preferences-telephone']?.contactByTelephone === 'no',
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => getContactByTelephoneAnswer(req, currentStepData) === 'no',
           nextStep: 'dispute-claim-interstitial',
         },
       ],
@@ -214,9 +263,13 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
-            if (!confirmed) {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
+            if (confirmNoticeGiven !== 'yes') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -225,9 +278,13 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'confirmation-of-notice-date-when-provided',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmed = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven === 'yes';
-            if (!confirmed) {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
+            if (confirmNoticeGiven !== 'yes') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -236,9 +293,15 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'confirmation-of-notice-date-when-not-provided',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
-            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
+            // Treat any non-yes value as "not yes" to avoid falling through
+            // to notice-date pages when CCD returns an unexpected string.
+            if (confirmNoticeGiven === 'yes') {
               return false;
             }
             const rentArrears = await hasAnyRentArrearsGround(req);
@@ -247,9 +310,15 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'rent-arrears-dispute',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const confirmNoticeGiven = req.session?.formData?.['confirmation-of-notice-given']?.confirmNoticeGiven;
-            if (confirmNoticeGiven !== 'no' && confirmNoticeGiven !== 'imNotSure') {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
+            // Treat any non-yes value as "not yes" to avoid falling through
+            // to notice-date pages when CCD returns an unexpected string.
+            if (confirmNoticeGiven === 'yes') {
               return false;
             }
             const rentArrears = await hasAnyRentArrearsGround(req);
@@ -345,11 +414,15 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           condition: async (
-            _req: Request,
+            req: Request,
             _formData: Record<string, unknown>,
             currentStepData: Record<string, unknown>
-          ): Promise<boolean> => currentStepData.repaymentsAgreed === 'no',
-
+          ): Promise<boolean> => {
+            if (currentStepData.repaymentsAgreed !== 'no') {
+              return false;
+            }
+            return hasAnyRentArrearsGround(req);
+          },
           nextStep: 'installment-payments',
         },
         {
@@ -364,8 +437,26 @@ export const flowConfig: JourneyFlowConfig = {
       ],
       previousStep: 'repayments-made',
     },
-    'your-household-and-circumstances': {
+    'installment-payments': {
       previousStep: 'repayments-agreed',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData?.confirmInstallmentOffer === 'yes',
+          nextStep: 'how-much-afford-to-pay',
+        },
+      ],
+      defaultNext: 'your-household-and-circumstances',
+    },
+    'how-much-afford-to-pay': {
+      previousStep: 'installment-payments',
+      defaultNext: 'your-household-and-circumstances',
+    },
+    'your-household-and-circumstances': {
+      previousStep: (req: Request) => getPreviousStepForYourHouseholdAndCircumstances(req),
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {
@@ -399,23 +490,25 @@ export const flowConfig: JourneyFlowConfig = {
           condition: async (req: Request): Promise<boolean> => {
             return !(await isFinanceDetailsProvided(req));
           },
-          nextStep: 'upload-docs',
+          nextStep: 'other-considerations',
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            return isFinanceDetailsProvided(req);
+            const provided = await isFinanceDetailsProvided(req);
+            return provided;
           },
-          nextStep: 'regular-income',
+          nextStep: 'what-regular-income-do-you-receive',
         },
       ],
-      defaultNext: 'regular-income',
+      defaultNext: 'what-regular-income-do-you-receive',
     },
-    'regular-income': {
+    'what-regular-income-do-you-receive': {
       previousStep: 'income-and-expenses',
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
-            return isUniversalCreditSelected(req);
+            const selected = await isUniversalCreditSelected(req);
+            return selected;
           },
           nextStep: 'priority-debts',
         },
@@ -429,32 +522,34 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
-      previousStep: 'regular-income',
+      previousStep: 'what-regular-income-do-you-receive',
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
       previousStep: async (req: Request): Promise<string> => {
         const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
-        return selectedUniversalCredit ? 'regular-income' : 'have-you-applied-for-universal-credit';
+        return selectedUniversalCredit ? 'what-regular-income-do-you-receive' : 'have-you-applied-for-universal-credit';
       },
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {
+      previousStep: 'priority-debts',
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
-      defaultNext: 'end-now',
+      previousStep: 'priority-debt-details',
+      defaultNext: 'other-considerations',
     },
-    'upload-docs': {
+    'other-considerations': {
       previousStep: async (req: Request): Promise<string> => {
         const fromIncomeExpenditure = await isFromIncomeAndExpenditure(req);
         return fromIncomeExpenditure ? 'income-and-expenses' : 'what-other-regular-expenses-do-you-have';
       },
-      defaultNext: 'end-now',
+      defaultNext: 'upload-docs',
     },
-    'installment-payments': {
-      previousStep: 'repayments-agreed',
-      defaultNext: 'your-household-and-circumstances',
+    'upload-docs': {
+      previousStep: 'other-considerations',
+      defaultNext: 'end-now',
     },
   },
 };

@@ -23,6 +23,7 @@
   "errors": {
     "incomeFromJobsAmount": {
       "required": "Enter the total amount you receive from all jobs you do",
+      "negative": "The total amount you receive from all jobs you do each week or month must be £0.00 or above",
       "largeAmount": "The total amount you receive from all jobs you do each week or month must be less than £1 billion"
     },
     "incomeFromJobsFrequency": {
@@ -30,6 +31,7 @@
     },
     "pensionAmount": {
       "required": "Enter the total amount you receive from a state or private pension",
+      "negative": "The total amount you receive from pension (state and private) each week or month must be £0.00 or above",
       "largeAmount": "The total amount you receive from pension (state and private) each week or month must be less than £1 billion"
     },
     "pensionFrequency": {
@@ -37,6 +39,7 @@
     },
     "universalCreditAmount": {
       "required": "Enter the total amount you receive from Universal Credit",
+      "negative": "The total amount you receive from Universal Credit each week or month must be £0.00 or above",
       "largeAmount": "The total amount you receive from Universal Credit each week or month must be less than £1 billion"
     },
     "universalCreditFrequency": {
@@ -44,18 +47,18 @@
     },
     "otherBenefitsAmount": {
       "required": "Enter the total amount you receive from other benefits and credits",
+      "negative": "The total amount you receive from other benefits and credit each week or month must be £0.00 or above",
       "largeAmount": "The total amount you receive from other benefits and credit each week or month must be less than £1 billion"
     },
     "otherBenefitsFrequency": {
       "required": "Select how frequently you receive income from other benefits and credits"
     },
     "moneyFromElsewhereDetails": {
-      "required": "Give details about the other sources of income and how much you usually receive"
+      "required": "Enter details about the money you receive from somewhere else and how much you usually receive",
+      "invalidCharacters": "Give details about the other sources of income and how much you usually receive must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
     },
     "amount": {
-      "negative": "Amount cannot be negative",
-      "tooLarge": "Amount is too large",
-      "invalidFormat": "Enter amount in pounds and pence, for example 148.00 or 148.50"
+      "invalidFormat": "Enter an amount in the correct format, for example 148.00 or 148.50"
     }
   }
 }

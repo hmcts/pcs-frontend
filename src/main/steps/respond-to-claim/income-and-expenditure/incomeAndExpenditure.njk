@@ -25,10 +25,6 @@
     <p class="govuk-body">{{ infoParagraph2 }}</p>
   {% endif %}
 
-  {% if infoParagraph3 %}
-    <p class="govuk-body">{{ infoParagraph3 }}</p>
-  {% endif %}
-
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
       {% if field.componentType == 'radios' %}

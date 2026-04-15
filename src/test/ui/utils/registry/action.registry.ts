@@ -1,6 +1,7 @@
 import {
   CreateCaseAPIAction,
   FetchPINsAndValidateAccessCodeAPIAction,
+  GenAppsAction,
   LoginAction,
   NavigateToUrlAction,
   RespondToClaimAction,
@@ -44,7 +45,6 @@ export class ActionRegistry {
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
     ['inputErrorValidation', new RespondToClaimAction()],
-    ['selectLegalAdvice', new RespondToClaimAction()],
     ['confirmDefendantDetails', new RespondToClaimAction()],
     ['selectCorrespondenceAddressKnown', new RespondToClaimAction()],
     ['selectCorrespondenceAddressUnKnown', new RespondToClaimAction()],
@@ -66,12 +66,21 @@ export class ActionRegistry {
     ['tenancyOrContractTypeDetails', new RespondToClaimAction()],
     ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
+    ['selectIfAnyOtherAdultsLiveInYourHouse', new RespondToClaimAction()],
+    ['selectAlternativeAccommodation', new RespondToClaimAction()],
     ['readYourHouseholdAndCircumstances', new RespondToClaimAction()],
     ['doYouHaveAnyDependantChildren', new RespondToClaimAction()],
     ['doYouHaveAnyOtherDependants', new RespondToClaimAction()],
+    ['installmentPayments', new RespondToClaimAction()],
+    ['selectHowMuchAffordToPay', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
     ['selectIncomeAndExpenses', new RespondToClaimAction()],
     ['selectWhatRegularIncomeDoYouReceive', new RespondToClaimAction()],
+    ['yourCircumstances', new RespondToClaimAction()],
+    ['exceptionalHardship', new RespondToClaimAction()],
+    //ADD GEN APPS details below this line
+    ['chooseAnApplication', new GenAppsAction()],
+    ['inputErrorValidationGenApp', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {

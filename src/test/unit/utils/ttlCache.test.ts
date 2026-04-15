@@ -1,4 +1,4 @@
-import { TTLCache } from '../../../main/utils/ttlCache';
+import { TTLCache } from '@utils/ttlCache';
 
 describe('TTLCache', () => {
   describe('constructor validation', () => {
