@@ -1,6 +1,5 @@
 import { dashboard, feedback } from '../../data/page-data';
-import { whichLanguageDidYouUseToCompleteThisService,
-} from '../../data/page-data/genApps-page-data';
+import { whichLanguageDidYouUseToCompleteThisService } from '../../data/page-data/genApps-page-data';
 import { performAction, performValidation } from '../../utils/controller';
 
 export async function whichLanguageDidYouUseToCompleteThisServiceErrorValidation(): Promise<void> {
@@ -18,5 +17,9 @@ export async function whichLanguageDidYouUseToCompleteThisServiceNavigationTests
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: whichLanguageDidYouUseToCompleteThisService.pageSlug,
   });
-  await performValidation('pageNavigation', whichLanguageDidYouUseToCompleteThisService.cancelLink, dashboard.mainHeader);
+  await performValidation(
+    'pageNavigation',
+    whichLanguageDidYouUseToCompleteThisService.cancelLink,
+    dashboard.mainHeader
+  );
 }
