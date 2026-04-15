@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
-import axios from 'axios';
+// eslint-disable-next-line import/no-named-as-default
+import Axios from 'axios';
 
 import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
 import { fetchPINsApiData, validateAccessCodeApiData } from '../../../data/api-data';
@@ -24,7 +25,7 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
   }
 
   private async fetchPINsAPI(): Promise<void> {
-    const fetchPinsApi = axios.create(fetchPINsApiData.fetchPINSApiInstance());
+    const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
     const maxRetries = actionRetries;
     const delayMs = VERY_SHORT_TIMEOUT;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -50,7 +51,7 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
   }
 
   private async validateAccessCodeAPI(): Promise<void> {
-    const validateApi = axios.create(validateAccessCodeApiData.validateAccessCodeApiInstance());
+    const validateApi = Axios.create(validateAccessCodeApiData.validateAccessCodeApiInstance());
     const accessCode = pins?.[0];
     if (!accessCode) {
       throw new Error('No access code available for validation');
@@ -60,7 +61,7 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
         accessCode,
       });
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
+      if (Axios.isAxiosError(error)) {
         throw new Error(`Validate access code failed: ${error.response?.status}`);
       }
       throw new Error('Validate access code failed unexpectedly.');
