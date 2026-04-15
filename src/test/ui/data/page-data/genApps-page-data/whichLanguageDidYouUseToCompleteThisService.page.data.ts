@@ -11,4 +11,9 @@ export const whichLanguageDidYouUseToCompleteThisService = {
   cancelLink: `Cancel`,
   feedbackLink: `Feedback`,
   pageSlug: `which-language-did-you-use-to-complete-this-service`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
+  errorValidationField: {
+    errorRadioOption: { type: `none`, input: ``, errMessage: `You must select an type of application to apply for` },
+  },
 };

@@ -69,7 +69,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
-      option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
+      option: whichLanguageDidYouUseToCompleteThisService.welshRadioOption,
     });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);
