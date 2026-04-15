@@ -112,11 +112,12 @@ function mapTaskGroups(app: Application, caseReference: string) {
               ),
             },
             hint,
-            // Absolute internal link is more robust than a relative one
             href:
               task.status === 'NOT_AVAILABLE'
                 ? undefined
-                : `/dashboard/${caseReference}/${taskGroupId}/${task.templateId}`,
+                : task.templateId === 'Task.AAA6.Claim.ViewClaim'
+                  ? `/case/${caseReference}/view-the-claim`
+                  : `/dashboard/${caseReference}/${taskGroupId}/${task.templateId}`,
             status: STATUS_MAP[task.status],
           };
         }),
