@@ -83,13 +83,13 @@ describe('respond-to-claim regular-income step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: 'Yes',
+          universalCredit: 'YES',
         },
       },
     });
   });
 
-  it('POST maps absent universal credit selection to CCD No', async () => {
+  it('POST does not overwrite universal credit when selection is absent', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -106,12 +106,6 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        householdCircumstances: {
-          universalCredit: 'No',
-        },
-      },
-    });
+    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
   });
 });

@@ -1,10 +1,10 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
+import type { PossessionClaimResponse } from '../../../services/ccdCase.interface';
 import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'priority-debts',

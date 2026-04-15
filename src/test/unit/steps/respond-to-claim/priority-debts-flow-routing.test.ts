@@ -94,6 +94,35 @@ describe('respond-to-claim priority-debts flow routing', () => {
     expect(result).toBe('have-you-applied-for-universal-credit');
   });
 
+  it('uses have-you-applied-for-universal-credit as previous step when UC application date exists', async () => {
+    if (!previousStep || typeof previousStep === 'string') {
+      throw new Error('expected previousStep function');
+    }
+
+    const req = {
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: {
+                    universalCredit: 'YES',
+                    ucApplicationDate: '2026-01-15',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const result = await previousStep(req, {});
+    expect(result).toBe('have-you-applied-for-universal-credit');
+  });
+
   it('routes to priority-debt-details from CCD when havePriorityDebts is absent from step data', async () => {
     if (!yesRouteCondition) {
       throw new Error('expected yes route condition');

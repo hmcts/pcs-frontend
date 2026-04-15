@@ -18,7 +18,7 @@ import {
   shouldRouteToUniversalCreditQuestion,
 } from '../utils';
 
-import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
