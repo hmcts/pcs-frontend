@@ -183,7 +183,7 @@ describe('isNoticeDateProvided', () => {
             validatedCase: new CcdCaseModel({
               id: '1771456429013468',
               data: {
-                noticeServed: 'Yes',
+                noticeServed: 'YES',
                 rentArrears_Total: '22222200',
                 legislativeCountry: 'England',
                 notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01',
