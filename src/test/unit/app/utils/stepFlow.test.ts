@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 
-import type { JourneyFlowConfig } from '../../../../main/interfaces/stepFlow.interface';
+import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
 import {
   checkStepDependencies,
   createStepNavigation,
@@ -8,7 +8,7 @@ import {
   getPreviousStep,
   getStepUrl,
   stepDependencyCheckMiddleware,
-} from '../../../../main/modules/steps/flow';
+} from '@modules/steps/flow';
 
 jest.mock('@modules/logger', () => ({
   Logger: {
@@ -574,7 +574,7 @@ describe('stepFlow', () => {
         },
       } as unknown as Request;
 
-      const result = await navigation.getNextStepUrl(req, 'step1', {});
+      const result = await navigation.getNextStepUrl(req, 'step1');
       expect(result).toBe('/steps/test-journey/step2');
     });
 
@@ -587,7 +587,7 @@ describe('stepFlow', () => {
         },
       } as unknown as Request;
 
-      const result = await navigation.getNextStepUrl(req, 'step3', {});
+      const result = await navigation.getNextStepUrl(req, 'step3');
       expect(result).toBeNull();
     });
 
@@ -619,7 +619,7 @@ describe('stepFlow', () => {
   });
 
   describe('stepDependencyCheckMiddleware', () => {
-    it('should call next() when step has no dependencies', () => {
+    it('should call next() when step has no dependencies', async () => {
       const middleware = stepDependencyCheckMiddleware(mockFlowConfig);
       const req = {
         path: '/steps/test-journey/step1',
@@ -630,12 +630,12 @@ describe('stepFlow', () => {
       const res = {} as Response;
       const next = jest.fn();
 
-      middleware(req, res, next);
+      await middleware(req, res, next);
 
       expect(next).toHaveBeenCalled();
     });
 
-    it('should call next() when all dependencies are met', () => {
+    it('should call next() when all dependencies are met', async () => {
       const middleware = stepDependencyCheckMiddleware(mockFlowConfig);
       const req = {
         path: '/steps/test-journey/step2',
@@ -648,12 +648,12 @@ describe('stepFlow', () => {
       const res = {} as Response;
       const next = jest.fn();
 
-      middleware(req, res, next);
+      await middleware(req, res, next);
 
       expect(next).toHaveBeenCalled();
     });
 
-    it('should redirect when dependencies are not met', () => {
+    it('should redirect when dependencies are not met', async () => {
       const middleware = stepDependencyCheckMiddleware(mockFlowConfig);
       const req = {
         path: '/steps/test-journey/step2',
@@ -666,13 +666,13 @@ describe('stepFlow', () => {
       } as unknown as Response;
       const next = jest.fn();
 
-      middleware(req, res, next);
+      await middleware(req, res, next);
 
       expect(res.redirect).toHaveBeenCalledWith(303, '/steps/test-journey/step1');
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should call next() when step name cannot be extracted from path', () => {
+    it('should call next() when step name cannot be extracted from path', async () => {
       const middleware = stepDependencyCheckMiddleware(mockFlowConfig);
       const req = {
         path: '/steps/test-journey/',
@@ -683,12 +683,12 @@ describe('stepFlow', () => {
       const res = {} as Response;
       const next = jest.fn();
 
-      middleware(req, res, next);
+      await middleware(req, res, next);
 
       expect(next).toHaveBeenCalled();
     });
 
-    it('should handle empty path', () => {
+    it('should handle empty path', async () => {
       const middleware = stepDependencyCheckMiddleware(mockFlowConfig);
       const req = {
         path: '',
@@ -699,7 +699,7 @@ describe('stepFlow', () => {
       const res = {} as Response;
       const next = jest.fn();
 
-      middleware(req, res, next);
+      await middleware(req, res, next);
 
       expect(next).toHaveBeenCalled();
     });

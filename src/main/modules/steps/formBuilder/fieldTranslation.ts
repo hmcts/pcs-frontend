@@ -1,11 +1,11 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig, FormFieldOption } from '../../../interfaces/formFieldConfig.interface';
-
 import { buildComponentConfig } from './componentBuilders';
 import { buildConditionalContent, getNestedFieldName } from './conditionalFields';
 import { getTranslation, normalizeCheckboxValue } from './helpers';
+
+import type { FormFieldConfig, FormFieldOption } from '@interfaces/formFieldConfig.interface';
 
 export function buildFieldValues(
   fields: FormFieldConfig[],
@@ -322,19 +322,19 @@ export function translateFields(
       throw new Error('Nunjucks environment is required for building component config');
     }
 
-    const { component, componentType } = buildComponentConfig(
-      { ...processedField, options: processedOptionsWithSubFields },
-      resolvedLabel,
-      processedField.hint,
-      fieldValues[fieldNameForValueLookup] ?? fieldValues[processedField.name],
+    const { component, componentType } = buildComponentConfig({
+      field: { ...processedField, options: processedOptionsWithSubFields },
+      label: resolvedLabel,
+      hint: processedField.hint,
+      fieldValue: fieldValues[fieldNameForValueLookup] ?? fieldValues[processedField.name],
       translatedOptions,
-      hasError || false,
+      hasError: hasError || false,
       errorText,
       index,
       hasTitle,
       t,
-      nunjucksEnv
-    );
+      nunjucksEnv,
+    });
 
     return {
       ...processedField,

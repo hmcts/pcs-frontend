@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
 import type { FormFieldConfig, FormFieldOption } from '../../../../../main/interfaces/formFieldConfig.interface';
@@ -13,17 +14,6 @@ describe('componentBuilders', () => {
       'date.day': 'Day',
       'date.month': 'Month',
       'date.year': 'Year',
-      characterCount: {
-        charactersUnderLimitText: {
-          one: 'You have 1 character remaining',
-          other: 'You have %{count} characters remaining',
-        },
-        charactersAtLimitText: 'You have 0 characters remaining',
-        charactersOverLimitText: {
-          one: 'You have 1 character too many',
-          other: 'You have %{count} characters too many',
-        },
-      },
     };
     return translations[key] || defaultValue || key;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,6 +25,21 @@ describe('componentBuilders', () => {
     render: mockRender,
     renderString: mockRenderString,
   } as unknown as Environment;
+
+  const buildArgs = (field: FormFieldConfig, overrides: Partial<Parameters<typeof buildComponentConfig>[0]> = {}) => ({
+    field,
+    label: 'Test label',
+    hint: undefined,
+    fieldValue: undefined,
+    translatedOptions: undefined,
+    hasError: false,
+    errorText: undefined,
+    index: 0,
+    hasTitle: false,
+    t: mockT as unknown as TFunction,
+    nunjucksEnv: mockNunjucksEnv,
+    ...overrides,
+  });
 
   beforeEach(() => {
     mockRender.mockClear();
@@ -111,17 +116,11 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'First name',
-          'Enter your first name',
-          'John',
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'First name',
+            hint: 'Enter your first name',
+            fieldValue: 'John',
+          })
         );
 
         expect(result.componentType).toBe('input');
@@ -144,17 +143,10 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Amount',
-          undefined,
-          '100.00',
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Amount',
+            fieldValue: '100.00',
+          })
         );
 
         expect(result.component.prefix).toEqual({ text: '£' });
@@ -167,19 +159,7 @@ describe('componentBuilders', () => {
           type: 'text',
         };
 
-        const result = buildComponentConfig(
-          field,
-          'Test',
-          undefined,
-          undefined,
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
-        );
+        const result = buildComponentConfig(buildArgs(field, { label: 'Test' }));
 
         expect(result.component.value).toBe('');
       });
@@ -191,17 +171,12 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Test',
-          undefined,
-          '',
-          undefined,
-          true,
-          'This field is required',
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Test',
+            fieldValue: '',
+            hasError: true,
+            errorText: 'This field is required',
+          })
         );
 
         expect(result.component.errorMessage).toEqual({ text: 'This field is required' });
@@ -214,19 +189,7 @@ describe('componentBuilders', () => {
           classes: 'govuk-input--width-10',
         };
 
-        const result = buildComponentConfig(
-          field,
-          'Test',
-          undefined,
-          '',
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
-        );
+        const result = buildComponentConfig(buildArgs(field, { label: 'Test', fieldValue: '' }));
 
         expect(result.component.classes).toBe('govuk-input--width-10');
       });
@@ -238,19 +201,7 @@ describe('componentBuilders', () => {
           attributes: { autocomplete: 'email', spellcheck: false },
         };
 
-        const result = buildComponentConfig(
-          field,
-          'Email',
-          undefined,
-          '',
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
-        );
+        const result = buildComponentConfig(buildArgs(field, { label: 'Email', fieldValue: '' }));
 
         expect(result.component.attributes).toEqual({ autocomplete: 'email', spellcheck: false });
       });
@@ -264,17 +215,11 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Description',
-          'Provide details',
-          'Some text',
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Description',
+            hint: 'Provide details',
+            fieldValue: 'Some text',
+          })
         );
 
         expect(result.componentType).toBe('textarea');
@@ -291,19 +236,7 @@ describe('componentBuilders', () => {
           attributes: { rows: 10 },
         };
 
-        const result = buildComponentConfig(
-          field,
-          'Notes',
-          undefined,
-          '',
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
-        );
+        const result = buildComponentConfig(buildArgs(field, { label: 'Notes', fieldValue: '' }));
 
         expect(result.component.rows).toBe(10);
         expect(result.component.maxlength).toBe(500);
@@ -311,7 +244,7 @@ describe('componentBuilders', () => {
     });
 
     describe('character-count field', () => {
-      it('should build character count component with translations', () => {
+      it('should build character count component with maxlength', () => {
         const field: FormFieldConfig = {
           name: 'statement',
           type: 'character-count',
@@ -321,17 +254,11 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Your statement',
-          'Explain your situation',
-          'Some text',
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Your statement',
+            hint: 'Explain your situation',
+            fieldValue: 'Some text',
+          })
         );
 
         expect(result.componentType).toBe('characterCount');
@@ -342,9 +269,6 @@ describe('componentBuilders', () => {
           isPageHeading: true,
           classes: 'govuk-label--m',
         });
-        expect(result.component.charactersUnderLimitText).toBeDefined();
-        expect(result.component.charactersAtLimitText).toBeDefined();
-        expect(result.component.charactersOverLimitText).toBeDefined();
       });
 
       it('should handle character count without maxLength', () => {
@@ -354,47 +278,15 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Free text',
-          undefined,
-          '',
-          undefined,
-          false,
-          undefined,
-          1,
-          true,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Free text',
+            fieldValue: '',
+            index: 1,
+            hasTitle: true,
+          })
         );
 
         expect(result.component.maxlength).toBeUndefined();
-        expect(result.component.charactersUnderLimitText).toBeUndefined();
-      });
-
-      it('should handle character count when translation returns string instead of object', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const mockTString = jest.fn(() => 'character count string') as any;
-        const field: FormFieldConfig = {
-          name: 'statement',
-          type: 'character-count',
-          maxLength: 200,
-        };
-
-        const result = buildComponentConfig(
-          field,
-          'Statement',
-          undefined,
-          '',
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockTString,
-          mockNunjucksEnv
-        );
-
-        expect(result.component.charactersUnderLimitText).toBeUndefined();
       });
     });
 
@@ -411,20 +303,15 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Make a choice',
-          'Select one option',
-          'yes',
-          [
-            { value: 'yes', text: 'Yes' },
-            { value: 'no', text: 'No' },
-          ],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Make a choice',
+            hint: 'Select one option',
+            fieldValue: 'yes',
+            translatedOptions: [
+              { value: 'yes', text: 'Yes' },
+              { value: 'no', text: 'No' },
+            ],
+          })
         );
 
         expect(result.componentType).toBe('radios');
@@ -449,17 +336,11 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Answer',
-          undefined,
-          '',
-          [{ value: 'yes', text: 'Yes' }, { divider: 'or' }, { value: 'no', text: 'No' }],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Answer',
+            fieldValue: '',
+            translatedOptions: [{ value: 'yes', text: 'Yes' }, { divider: 'or' }, { value: 'no', text: 'No' }],
+          })
         );
 
         expect((result.component.items as unknown[])?.[1]).toEqual({ divider: 'or' });
@@ -476,20 +357,14 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Do you have details?',
-          undefined,
-          'yes',
-          [
-            { value: 'yes', text: 'Yes' },
-            { value: 'no', text: 'No' },
-          ],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Do you have details?',
+            fieldValue: 'yes',
+            translatedOptions: [
+              { value: 'yes', text: 'Yes' },
+              { value: 'no', text: 'No' },
+            ],
+          })
         );
 
         const firstItem = (result.component.items as unknown[])?.[0] as Record<string, unknown>;
@@ -509,20 +384,14 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Make a choice',
-          undefined,
-          'yes',
-          [
-            { value: 'yes', text: 'Yes', hint: 'This includes advice from a solicitor.' },
-            { value: 'no', text: 'No' },
-          ],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Make a choice',
+            fieldValue: 'yes',
+            translatedOptions: [
+              { value: 'yes', text: 'Yes', hint: 'This includes advice from a solicitor.' },
+              { value: 'no', text: 'No' },
+            ],
+          })
         );
 
         expect(result.component.items).toEqual([
@@ -542,20 +411,14 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Question',
-          undefined,
-          '',
-          [
-            { value: 'yes', text: 'Yes' },
-            { value: 'no', text: 'No' },
-          ],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Question',
+            fieldValue: '',
+            translatedOptions: [
+              { value: 'yes', text: 'Yes' },
+              { value: 'no', text: 'No' },
+            ],
+          })
         );
 
         const firstItem = (result.component.items as unknown[])?.[0] as Record<string, unknown>;
@@ -577,21 +440,15 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Select interests',
-          undefined,
-          ['sports', 'reading'],
-          [
-            { value: 'sports', text: 'Sports' },
-            { value: 'music', text: 'Music' },
-            { value: 'reading', text: 'Reading' },
-          ],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Select interests',
+            fieldValue: ['sports', 'reading'],
+            translatedOptions: [
+              { value: 'sports', text: 'Sports' },
+              { value: 'music', text: 'Music' },
+              { value: 'reading', text: 'Reading' },
+            ],
+          })
         );
 
         expect(result.componentType).toBe('checkboxes');
@@ -610,17 +467,15 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Options',
-          undefined,
-          [],
-          [{ value: 'option1', text: 'Option 1' }, { divider: 'or' }, { value: 'option2', text: 'Option 2' }],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Options',
+            fieldValue: [],
+            translatedOptions: [
+              { value: 'option1', text: 'Option 1' },
+              { divider: 'or' },
+              { value: 'option2', text: 'Option 2' },
+            ],
+          })
         );
 
         expect((result.component.items as unknown[])?.[1]).toEqual({ divider: 'or' });
@@ -634,17 +489,11 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Agreement',
-          undefined,
-          ['agree'],
-          [{ value: 'agree', text: 'I agree' }],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Agreement',
+            fieldValue: ['agree'],
+            translatedOptions: [{ value: 'agree', text: 'I agree' }],
+          })
         );
 
         const firstItem = (result.component.items as unknown[])?.[0] as Record<string, unknown>;
@@ -664,20 +513,14 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Agreement',
-          undefined,
-          ['agree'],
-          [
-            { value: 'agree', text: 'I agree', hint: 'This means you accept the terms.' },
-            { value: 'updates', text: 'Send me updates' },
-          ],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Agreement',
+            fieldValue: ['agree'],
+            translatedOptions: [
+              { value: 'agree', text: 'I agree', hint: 'This means you accept the terms.' },
+              { value: 'updates', text: 'Send me updates' },
+            ],
+          })
         );
 
         expect(result.component.items).toEqual([
@@ -694,17 +537,11 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Options',
-          undefined,
-          ['option1'],
-          [{ value: 'option1', text: 'Option 1' }],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Options',
+            fieldValue: ['option1'],
+            translatedOptions: [{ value: 'option1', text: 'Option 1' }],
+          })
         );
 
         const firstItem = (result.component.items as unknown[])?.[0] as Record<string, unknown>;
@@ -719,17 +556,10 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Options',
-          undefined,
-          undefined,
-          [{ value: 'test', text: 'Test' }],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Options',
+            translatedOptions: [{ value: 'test', text: 'Test' }],
+          })
         );
 
         const firstItem = (result.component.items as unknown[])?.[0] as Record<string, unknown>;
@@ -746,17 +576,11 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Date of birth',
-          'For example, 31 3 1980',
-          { day: '15', month: '06', year: '1990' },
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Date of birth',
+            hint: 'For example, 31 3 1980',
+            fieldValue: { day: '15', month: '06', year: '1990' },
+          })
         );
 
         expect(result.componentType).toBe('dateInput');
@@ -800,19 +624,7 @@ describe('componentBuilders', () => {
           type: 'date',
         };
 
-        const result = buildComponentConfig(
-          field,
-          'Start date',
-          undefined,
-          undefined,
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
-        );
+        const result = buildComponentConfig(buildArgs(field, { label: 'Start date' }));
 
         expect(result.component.items).toEqual([
           {
@@ -844,22 +656,10 @@ describe('componentBuilders', () => {
       it('should default to input componentType for unknown field type', () => {
         const field: FormFieldConfig = {
           name: 'unknown',
-          type: 'postcodeLookup' as 'text', // Cast to bypass TypeScript enum check
+          type: 'postcodeLookup' as 'text',
         };
 
-        const result = buildComponentConfig(
-          field,
-          'Unknown field',
-          undefined,
-          '',
-          undefined,
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
-        );
+        const result = buildComponentConfig(buildArgs(field, { label: 'Unknown field', fieldValue: '' }));
 
         expect(result.componentType).toBe('input');
       });
@@ -874,17 +674,11 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Question',
-          undefined,
-          '',
-          [{ value: 'yes', text: 'Yes' }],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Question',
+            fieldValue: '',
+            translatedOptions: [{ value: 'yes', text: 'Yes' }],
+          })
         );
 
         expect(result.component.fieldset).toEqual({
@@ -904,17 +698,12 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Question',
-          undefined,
-          '',
-          [{ value: 'yes', text: 'Yes' }],
-          false,
-          undefined,
-          1,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Question',
+            fieldValue: '',
+            translatedOptions: [{ value: 'yes', text: 'Yes' }],
+            index: 1,
+          })
         );
 
         expect(result.component.fieldset).toEqual({
@@ -934,17 +723,12 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Question',
-          undefined,
-          '',
-          [{ value: 'yes', text: 'Yes' }],
-          false,
-          undefined,
-          0,
-          true,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Question',
+            fieldValue: '',
+            translatedOptions: [{ value: 'yes', text: 'Yes' }],
+            hasTitle: true,
+          })
         );
 
         expect(result.component.fieldset).toEqual({
@@ -965,17 +749,11 @@ describe('componentBuilders', () => {
         };
 
         const result = buildComponentConfig(
-          field,
-          'Question',
-          undefined,
-          '',
-          [{ value: 'yes', text: 'Yes' }],
-          false,
-          undefined,
-          0,
-          false,
-          mockT,
-          mockNunjucksEnv
+          buildArgs(field, {
+            label: 'Question',
+            fieldValue: '',
+            translatedOptions: [{ value: 'yes', text: 'Yes' }],
+          })
         );
 
         expect(result.component.fieldset).toEqual({

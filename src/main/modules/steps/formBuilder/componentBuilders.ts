@@ -1,15 +1,15 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
+import { normalizeCheckboxValue } from './helpers';
+import { buildSubFieldsHTML } from './subFieldsRenderer';
+
 import type {
   ComponentConfig,
   ComponentType,
   FormFieldConfig,
   FormFieldOption,
-} from '../../../interfaces/formFieldConfig.interface';
-
-import { normalizeCheckboxValue } from './helpers';
-import { buildSubFieldsHTML } from './subFieldsRenderer';
+} from '@interfaces/formFieldConfig.interface';
 
 function createFieldsetLegend(
   label: string,
@@ -69,19 +69,31 @@ export function buildSelectionItems(
   );
 }
 
-export function buildComponentConfig(
-  field: FormFieldConfig,
-  label: string,
-  hint: string | undefined,
-  fieldValue: unknown,
-  translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined,
-  hasError: boolean,
-  errorText: string | undefined,
-  index: number,
-  hasTitle: boolean,
-  t: TFunction,
-  nunjucksEnv: Environment
-): ComponentConfig {
+export function buildComponentConfig({
+  field,
+  label,
+  hint,
+  fieldValue,
+  translatedOptions,
+  hasError,
+  errorText,
+  index,
+  hasTitle,
+  t,
+  nunjucksEnv,
+}: {
+  field: FormFieldConfig;
+  label: string;
+  hint: string | undefined;
+  fieldValue: unknown;
+  translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined;
+  hasError: boolean;
+  errorText: string | undefined;
+  index: number;
+  hasTitle: boolean;
+  t: TFunction;
+  nunjucksEnv: Environment;
+}): ComponentConfig {
   const isFirstField = index === 0 && !hasTitle;
   const component: Record<string, unknown> = {
     id: field.name,
@@ -125,20 +137,6 @@ export function buildComponentConfig(
         classes: field.labelClasses,
       };
 
-      // Add translated character count messages
-      // i18next handles pluralization via the 'one' and 'other' keys in the translation object
-      // The GOV.UK component will use these keys to select the correct plural form
-      if (field.maxLength) {
-        const characterCount = t('characterCount', { returnObjects: true }) as Record<string, unknown> | string;
-        if (characterCount && typeof characterCount === 'object') {
-          Object.assign(component, {
-            charactersUnderLimitText: characterCount.charactersUnderLimitText,
-            charactersAtLimitText: characterCount.charactersAtLimitText,
-            charactersOverLimitText: characterCount.charactersOverLimitText,
-          });
-        }
-      }
-
       componentType = 'characterCount';
       break;
     }
@@ -178,7 +176,7 @@ export function buildComponentConfig(
       };
       component.namePrefix = field.name;
       component.idPrefix = field.name;
-      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
+      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
       component.items = [
         {
           name: 'day',

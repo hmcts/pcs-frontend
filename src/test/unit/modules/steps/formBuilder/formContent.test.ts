@@ -1,8 +1,8 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
-import { buildFormContent } from '../../../../../main/modules/steps/formBuilder/formContent';
+import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
+import { buildFormContent } from '@modules/steps/formBuilder/formContent';
 
 describe('FormContent - Button Text Fix', () => {
   let mockT: jest.Mock;
