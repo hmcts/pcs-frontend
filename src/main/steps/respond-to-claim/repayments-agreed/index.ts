@@ -105,15 +105,6 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'textAreaLabel',
               },
-              validator: (value: unknown) => {
-                const text = (value as string)?.trim();
-                const allowedCharsRegex = /^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u;
-
-                if (allowedCharsRegex.test(text)) {
-                  return true;
-                }
-                return 'errors.repaymentsAgreed.repaymentsAgreedDetails.invalid';
-              },
             },
           },
         },

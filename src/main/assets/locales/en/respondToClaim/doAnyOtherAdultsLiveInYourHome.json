@@ -10,7 +10,9 @@
   "textAreaHintText": "You should include details about how many adults live in your home, their relationship to you, as well as anything else you think the court should know about them",
   "errors": {
     "confirmOtherAdults": "Select if any other adults live in your home",
-    "otherAdultsDetails": "Give details about the other adults living in your home",
-    "otherAdultsDetailsInvalidCharacters": "Give details about the other adults living in your home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "confirmOtherAdults.otherAdultsDetails": "Give details about the other adults living in your home",
+    "otherAdultsDetails": {
+      "specialCharacter": "Give details about the other adults living in your home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    }
   }
 }
