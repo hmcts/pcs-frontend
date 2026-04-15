@@ -230,7 +230,6 @@ export const step: StepDefinition = createFormStep({
       legendNa: t('legendNa'),
       legendhintNa: t('legend.hintNa'),
 
-      caption: t('caption'),
       labels: {
         yes: t('labels.yes'),
         no: t('labels.no'),

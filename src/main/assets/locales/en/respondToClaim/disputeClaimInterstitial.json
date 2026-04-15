@@ -1,6 +1,5 @@
 {
   "pageTitle": "The claimant’s claim",
-  "caption": "Respond to a property possession claim",
   "heading": "{{claimantName, pluralPossessive}} claim",
   "secondaryHeading": "Respond to a property possession claim",
   "paragraph1": "When they made their claim, {{claimantName}} had to give information about:",

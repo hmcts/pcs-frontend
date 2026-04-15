@@ -19,7 +19,6 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
     paragraph: 'dependantChildrenParagraph',
   },
   beforeRedirect: async req => {

@@ -33,7 +33,6 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'captionHeading',
   },
   beforeRedirect: async req => {
     const rentArrears = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
