@@ -106,7 +106,6 @@ export const flowConfig: JourneyFlowConfig = {
     'other-considerations',
     'upload-docs',
     'end-now',
-    'installment-payments',
   ],
   steps: {
     'start-now': {
@@ -495,7 +494,8 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (req: Request): Promise<boolean> => {
-            return isFinanceDetailsProvided(req);
+            const provided = await isFinanceDetailsProvided(req);
+            return provided;
           },
           nextStep: 'what-regular-income-do-you-receive',
         },
@@ -507,7 +507,8 @@ export const flowConfig: JourneyFlowConfig = {
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
-            return isUniversalCreditSelected(req);
+            const selected = await isUniversalCreditSelected(req);
+            return selected;
           },
           nextStep: 'priority-debts',
         },
@@ -532,6 +533,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {
+      previousStep: 'priority-debts',
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
