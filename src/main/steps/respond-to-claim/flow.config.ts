@@ -9,7 +9,7 @@ import {
   isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
-  isWelshProperty,
+  isWalesProperty,
 } from '../utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
@@ -40,14 +40,15 @@ function getContactByTelephoneAnswer(
 function getConfirmNoticeGivenAnswer(
   req: Request,
   currentStepData: Record<string, unknown> = {}
-): 'yes' | 'no' | 'imNotSure' | undefined {
-  const currentAnswer = currentStepData.confirmNoticeGiven;
-  if (currentAnswer === 'yes' || currentAnswer === 'no' || currentAnswer === 'imNotSure') {
+): 'YES' | 'NO' | 'NOT_SURE' | undefined {
+  const currentAnswer = currentStepData.possessionNoticeReceived;
+  if (currentAnswer === 'YES' || currentAnswer === 'NO' || currentAnswer === 'NOT_SURE') {
     return currentAnswer;
   }
 
-  const ccdAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
-  if (ccdAnswer === 'yes' || ccdAnswer === 'no' || ccdAnswer === 'imNotSure') {
+  const ccdAnswer =
+    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived;
+  if (ccdAnswer === 'YES' || ccdAnswer === 'NO' || ccdAnswer === 'NOT_SURE') {
     return ccdAnswer;
   }
 
@@ -169,11 +170,11 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial': {
       routes: [
         {
-          condition: async (req: Request) => isWelshProperty(req),
+          condition: async (req: Request) => isWalesProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !(await isWelshProperty(req)),
+          condition: async (req: Request) => !isWalesProperty(req),
           nextStep: 'tenancy-type-details',
         },
       ],
@@ -202,8 +203,8 @@ export const flowConfig: JourneyFlowConfig = {
         },
       ],
       previousStep: async (req: Request) => {
-        const welshProperty = await isWelshProperty(req);
-        if (welshProperty) {
+        const walesProperty = isWalesProperty(req);
+        if (walesProperty) {
           return 'written-terms';
         }
         return 'dispute-claim-interstitial';
@@ -264,7 +265,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven !== 'yes') {
+            if (confirmNoticeGiven !== 'YES') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -279,7 +280,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven !== 'yes') {
+            if (confirmNoticeGiven !== 'YES') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -294,9 +295,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            // Treat any non-yes value as "not yes" to avoid falling through
-            // to notice-date pages when CCD returns an unexpected string.
-            if (confirmNoticeGiven === 'yes') {
+            if (confirmNoticeGiven === 'YES') {
               return false;
             }
             const rentArrears = await hasAnyRentArrearsGround(req);
@@ -311,9 +310,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            // Treat any non-yes value as "not yes" to avoid falling through
-            // to notice-date pages when CCD returns an unexpected string.
-            if (confirmNoticeGiven === 'yes') {
+            if (confirmNoticeGiven === 'YES') {
               return false;
             }
             const rentArrears = await hasAnyRentArrearsGround(req);
