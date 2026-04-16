@@ -148,6 +148,14 @@ await performValidationGroup(
 yarn test:functional
 ```
 
+### PFT test-env debug logging
+
+In [`playwright.config.ts`](../../../playwright.config.ts), `enable_pft_debug_log` is **`false` by default**. Set it to **`true`** if you want environment variables to be printed in the console while you debug.
+
+```ts
+export const enable_pft_debug_log = false;
+```
+
 ## 8. Troubleshooting
 
 | Issue                  | Solution                                    |
