@@ -11,7 +11,7 @@ jest.mock('@modules/logger', () => ({
   },
 }));
 
-jest.mock('../../../main/utils/caseReference', () => ({
+jest.mock('@utils/caseReference', () => ({
   sanitiseCaseReference: jest.fn((input: string | number) => {
     const str = String(input);
     // Only return valid if it's exactly 16 digits
@@ -21,7 +21,7 @@ jest.mock('../../../main/utils/caseReference', () => ({
 
 const mockGetCaseById = jest.fn();
 
-jest.mock('../../../main/services/ccdCaseService', () => ({
+jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
     getCaseById: (...args: unknown[]) => mockGetCaseById(...args),
   },
@@ -29,6 +29,8 @@ jest.mock('../../../main/services/ccdCaseService', () => ({
 
 import { HTTPError } from '../../../main/HttpError';
 import { caseReferenceParamMiddleware } from '../../../main/middleware/caseReference';
+
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 interface MockSession {
   user?: {
@@ -71,7 +73,8 @@ describe('caseReferenceParamMiddleware', () => {
       await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
       expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef);
-      expect(mockRes.locals?.validatedCase).toEqual(mockCase);
+      expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
+      expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
       expect(next).toHaveBeenCalledWith();
     });
 

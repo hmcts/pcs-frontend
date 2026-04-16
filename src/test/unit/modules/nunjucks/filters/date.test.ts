@@ -1,4 +1,4 @@
-import { date } from '../../../../../main/modules/nunjucks/filters/date';
+import { date } from '@modules/nunjucks/filters/date';
 
 describe('date filter', () => {
   it('should format date with default format', () => {

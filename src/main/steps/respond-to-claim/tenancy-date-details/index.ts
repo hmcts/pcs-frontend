@@ -1,14 +1,15 @@
 import { format, parseISO } from 'date-fns';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-function getTenancyStartDate(caseData: Record<string, unknown> | undefined): string | undefined {
-  return (caseData?.tenancy_TenancyLicenceDate ?? caseData?.licenceStartDate) as string | undefined;
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CcdCaseModel, PossessionClaimResponse } from '@services/ccdCaseData.model';
+
+function getTenancyStartDate(validatedCase?: CcdCaseModel): string | undefined {
+  return validatedCase?.tenancyStartDate as string | undefined;
 }
 
 export const step: StepDefinition = createFormStep({
@@ -20,6 +21,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     caption: 'caption',
     pageTitle: 'pageTitle',
+    heading: 'heading',
     question: 'question',
     hintText: 'hintText',
     subHeading: 'subHeading',
@@ -56,45 +58,45 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  beforeGet: async req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const existingDateIsCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateCorrect as
-      | string
-      | undefined;
-    const existingTenancyStartDate = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDate as
-      | string
-      | undefined;
+  getInitialFormData: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const existingDateIsCorrect = validatedCase?.defendantResponsesTenancyStartDateCorrect as string | undefined;
+    const existingTenancyStartDate = validatedCase?.defendantResponsesTenancyStartDate as string | undefined;
 
-    const existingDraftData = getFormData(req, 'tenancy-date-details');
-    if (existingDateIsCorrect && !existingDraftData?.confirmTenancyDate && !req.body?.confirmTenancyDate) {
-      const formValue =
-        existingDateIsCorrect === 'YES'
-          ? 'yes'
-          : existingDateIsCorrect === 'NO'
-            ? 'no'
-            : existingDateIsCorrect === 'NOT_SURE'
-              ? 'notSure'
-              : undefined;
+    if (!existingDateIsCorrect) {
+      return {};
+    }
 
-      if (formValue) {
-        const draftData: Record<string, unknown> = { confirmTenancyDate: formValue };
+    const formValue =
+      existingDateIsCorrect === 'YES'
+        ? 'yes'
+        : existingDateIsCorrect === 'NO'
+          ? 'no'
+          : existingDateIsCorrect === 'NOT_SURE'
+            ? 'notSure'
+            : undefined;
 
-        if (existingDateIsCorrect === 'NO' && existingTenancyStartDate) {
-          const parsed = parseISO(existingTenancyStartDate);
-          draftData.tenancyStartDate = {
-            day: format(parsed, 'd'),
-            month: format(parsed, 'M'),
-            year: format(parsed, 'yyyy'),
-          };
-        }
+    if (!formValue) {
+      return {};
+    }
 
-        setFormData(req, 'tenancy-date-details', draftData);
+    const initialData: Record<string, unknown> = { confirmTenancyDate: formValue };
+    if (existingDateIsCorrect === 'NO' && existingTenancyStartDate) {
+      const parsed = parseISO(existingTenancyStartDate);
+      if (!Number.isNaN(parsed.getTime())) {
+        initialData.tenancyStartDate = {
+          day: format(parsed, 'd'),
+          month: format(parsed, 'M'),
+          year: format(parsed, 'yyyy'),
+        };
       }
     }
+
+    return initialData;
   },
   beforeRedirect: async req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const existingStartDate = getTenancyStartDate(caseData);
+    const validatedCase = req.res?.locals?.validatedCase;
+    const existingStartDate = getTenancyStartDate(validatedCase);
     const confirmValue = req.body?.confirmTenancyDate as string | undefined;
 
     const defendantResponses: Record<string, unknown> = {};
@@ -124,13 +126,9 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const claimantNameFromValidatedCase = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as
-      | string
-      | undefined;
-    const claimantNameFromSession = caseData?.claimantName as string | undefined;
-    const claimantName = claimantNameFromValidatedCase || claimantNameFromSession;
-    const existingStartDate = getTenancyStartDate(caseData);
+    const validatedCase = req.res?.locals?.validatedCase;
+    const claimantName = validatedCase?.claimantName as string | undefined;
+    const existingStartDate = getTenancyStartDate(validatedCase);
 
     // Format tenancy date with ordinal
     const tenancyStartDate = existingStartDate ? format(parseISO(existingStartDate), 'do LLLL yyyy') : undefined;

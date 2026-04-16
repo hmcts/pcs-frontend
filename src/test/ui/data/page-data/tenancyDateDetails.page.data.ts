@@ -1,4 +1,5 @@
 import { submitCaseApiData } from '../api-data';
+import { submitCaseApiDataWales } from '../api-data/submitCaseWales.api.data';
 
 export const tenancyDateDetails = {
   mainHeader: `Tenancy, occupation contract or licence start date`,
@@ -6,7 +7,7 @@ export const tenancyDateDetails = {
   getDetailsGivenByParagraph: (claimantName: string): string => {
     return `Details given by ${claimantName}:`;
   },
-  yourTenancyOccupationContractOrLicenceDateList: `Your tenancy, occupation contract or licence began on ${convertDateFormatTenancyDate(submitCaseApiData.submitCasePayload.tenancy_TenancyLicenceDate)}`,
+  yourTenancyOccupationContractOrLicenceDateList: `Your tenancy, occupation contract or licence began on ${process.env.WALES_POSTCODE === 'YES' ? convertDateFormatTenancyDate(submitCaseApiDataWales.submitCasePayload.licenceStartDate) : convertDateFormatTenancyDate(submitCaseApiData.submitCasePayload.tenancy_TenancyLicenceDate)}`,
   isTheTenancyLicenceOrOccupationContractQuestion: `Is the tenancy, licence or occupation contract start date correct?`,
   backLink: `Back`,
   yesRadioOption: `Yes`,

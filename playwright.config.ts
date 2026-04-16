@@ -1,6 +1,10 @@
 import * as process from 'node:process';
+import path from 'path';
 
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
 export const VERY_SHORT_TIMEOUT = 1000;
@@ -11,11 +15,14 @@ export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
 if (enable_all_page_functional_tests.toLowerCase() === 'true') {
   process.env.ENABLE_CONTENT_VALIDATION = 'true';
+  process.env.ENABLE_VISIBILITY_VALIDATION = 'true';
   process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true';
   process.env.ENABLE_NAVIGATION_TESTS = 'true';
 }
 
+export const enable_pft_debug_log = false;
 export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'false';
+export const enable_visibility_validation = process.env.ENABLE_VISIBILITY_VALIDATION || 'false';
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';

@@ -1,7 +1,10 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { getClaimantName } from '../../utils/getClaimantName';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CaseData, PaymentAgreement, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-made',
@@ -17,13 +20,14 @@ export const step: StepDefinition = createFormStep({
       name: 'confirmRepaymentsMade',
       type: 'radio',
       required: true,
+      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l',
       translationKey: {
         label: 'question',
       },
       options: [
         {
-          value: 'yes',
+          value: 'YES',
           translationKey: 'options.yes',
           subFields: {
             repaymentsInfo: {
@@ -39,14 +43,59 @@ export const step: StepDefinition = createFormStep({
             },
           },
         },
-        { value: 'no', translationKey: 'options.no' },
+        { value: 'NO', translationKey: 'options.no' },
       ],
     },
   ],
-  extendGetContent: req => ({
-    // TODO:Retrieve claimantName/claimIssueDate dynamically from CCD case data and remove hardcoded default value
-    claimantName: req.session?.ccdCase?.data?.claimantName || 'Treetops Housing',
-    claimIssueDate: req.session?.ccdCase?.data?.claimIssueDate || '16th June 2025',
-  }),
+  beforeRedirect: async req => {
+    const confirmRepaymentsMade: YesNoValue | undefined = req.body?.confirmRepaymentsMade;
+    if (!confirmRepaymentsMade) {
+      return;
+    }
+
+    const paymentDetails: string | undefined =
+      confirmRepaymentsMade === 'YES' ? req.body?.['confirmRepaymentsMade.repaymentsInfo'] : undefined;
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        paymentAgreement: {
+          anyPaymentsMade: confirmRepaymentsMade,
+          paymentDetails: paymentDetails ?? '',
+        },
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  getInitialFormData: req => {
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
+    const paymentAgreement: PaymentAgreement | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+    const confirmRepaymentsMade: YesNoValue | undefined = paymentAgreement?.anyPaymentsMade;
+    if (!confirmRepaymentsMade) {
+      return {};
+    }
+
+    if (confirmRepaymentsMade === 'YES') {
+      const repaymentsInfo: string | undefined = paymentAgreement?.paymentDetails;
+      return {
+        confirmRepaymentsMade: 'YES',
+        'confirmRepaymentsMade.repaymentsInfo': repaymentsInfo ?? '',
+      };
+    }
+    return {
+      confirmRepaymentsMade: 'NO',
+    };
+  },
+  extendGetContent: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const claimantName = getClaimantName(req);
+    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
+
+    return {
+      claimantName,
+      claimIssueDate,
+    };
+  },
   customTemplate: `${__dirname}/repaymentsMade.njk`,
 });
