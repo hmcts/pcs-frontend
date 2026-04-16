@@ -1,14 +1,13 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { StepFormData } from '../../../interfaces/stepFormData.interface';
-
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
 import type { FormError } from './errorUtils';
 
 import { Logger } from '@modules/logger';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepFormData } from '@modules/steps/stepFormData.interface';
 
 const logger = Logger.getLogger('form-builder-helpers');
 

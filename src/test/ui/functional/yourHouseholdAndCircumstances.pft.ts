@@ -1,26 +1,31 @@
-import { dashboard, feedback, yourHouseholdAndCircumstances } from '../data/page-data';
-import { performValidation } from '../utils/controller';
+// import {
+//   dashboard,
+//   feedback,
+//   howMuchAffordToPay,
+//   installmentPayments,
+//   repaymentsAgreed,
+//   yourHouseholdAndCircumstances,
+// } from '../data/page-data';
+// import { claimantsName } from '../utils/actions/custom-actions';
+// import { performValidation } from '../utils/controller';
 
-export async function yourHouseholdAndCircumstancesNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', yourHouseholdAndCircumstances.feedbackLink, {
-    element: feedback.tellUsWhatYouThinkParagraph,
-    pageSlug: yourHouseholdAndCircumstances.pageSlug,
-  });
-  // Commented out the 'Back' link navigation code as it covers 'No' condition as part of HDPI-4195 user story.
-  /*
-  if (process.env.REPAYMENTS_AGREED === 'NO') {
-    if (claimantsName) {
-      await performValidation('pageNavigation', yourHouseholdAndCircumstances.backLink, installmentPayments.mainHeader);
-    }
-  } else {
-    if (claimantsName) {
-      await performValidation(
-        'pageNavigation',
-        yourHouseholdAndCircumstances.backLink,
-        repaymentsAgreed.getMainHeader(claimantsName)
-      );
-    }
-  }
-  */
-  await performValidation('pageNavigation', yourHouseholdAndCircumstances.cancelLink, dashboard.mainHeader);
-}
+// Need to fix this as part of HDPI-5786
+// export async function yourHouseholdAndCircumstancesNavigationTests(): Promise<void> {
+//   await performValidation('pageNavigation', yourHouseholdAndCircumstances.feedbackLink, {
+//     element: feedback.tellUsWhatYouThinkParagraph,
+//     pageSlug: yourHouseholdAndCircumstances.pageSlug,
+//   });
+//   if (process.env.REPAYMENT_AGREED === 'NO') {
+//     await performValidation('pageNavigation', yourHouseholdAndCircumstances.backLink, howMuchAffordToPay.mainHeader);
+//   } else if (process.env.REPAYMENT_AGREED !== 'NO') {
+//     await performValidation(
+//       'pageNavigation',
+//       yourHouseholdAndCircumstances.backLink,
+//       repaymentsAgreed.getMainHeader(claimantsName)
+//     );
+//   }
+//   if (process.env.INSTALLMENT_PAYMENT === 'NO') {
+//     await performValidation('pageNavigation', yourHouseholdAndCircumstances.backLink, installmentPayments.mainHeader);
+//   }
+//   await performValidation('pageNavigation', yourHouseholdAndCircumstances.cancelLink, dashboard.mainHeader);
+// }

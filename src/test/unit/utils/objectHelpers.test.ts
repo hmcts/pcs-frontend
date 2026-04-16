@@ -1,4 +1,4 @@
-import { filterNonEmptyValues, isNonEmpty } from '../../../main/utils/objectHelpers';
+import { filterNonEmptyValues, isNonEmpty } from '@utils/objectHelpers';
 
 describe('objectHelpers', () => {
   describe('isNonEmpty', () => {

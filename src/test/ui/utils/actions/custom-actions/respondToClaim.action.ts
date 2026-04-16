@@ -7,7 +7,7 @@ import {
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
   correspondenceAddress,
-  dateOfBirth,
+  defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
@@ -16,6 +16,8 @@ import {
   doYouHaveAnyOtherDependants,
   exceptionalHardship,
   freeLegalAdvice,
+  howMuchAffordToPay,
+  installmentPayments,
   landlordLicensed,
   landlordRegistered,
   nonRentArrearsDispute,
@@ -77,6 +79,8 @@ export class RespondToClaimAction implements IAction {
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
       ],
       ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
+      ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
+      ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
@@ -106,12 +110,12 @@ export class RespondToClaimAction implements IAction {
     if (defendantData?.dobDay && defendantData?.dobMonth && defendantData?.dobYear) {
       await performActions(
         'Defendant Date of Birth Entry',
-        ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
-        ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
-        ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear]
+        ['inputText', defendantDateOfBirth.dayTextLabel, defendantData.dobDay],
+        ['inputText', defendantDateOfBirth.monthTextLabel, defendantData.dobMonth],
+        ['inputText', defendantDateOfBirth.yearTextLabel, defendantData.dobYear]
       );
     }
-    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
+    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
   }
 
   private async confirmDefendantDetails(defendantData: actionRecord) {
@@ -250,7 +254,7 @@ export class RespondToClaimAction implements IAction {
 
   private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: repaymentsAgreed.getMainHeader(claimantsName),
+      question: repaymentsAgreedData.question,
       option: repaymentsAgreedData.repaymentAgreedOption,
     });
     if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {
@@ -261,6 +265,26 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  }
+  private async installmentPayments(installmentData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: installmentData.question,
+      option: installmentData.radioOption,
+    });
+    await performAction('clickButton', installmentPayments.saveAndContinueButton);
+  }
+
+  private async selectHowMuchAffordToPay(howMuchToPayData: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
+      howMuchToPayData.affordToPay
+    );
+    await performAction('clickRadioButton', {
+      question: howMuchToPayData.question,
+      option: howMuchToPayData.radioOption,
+    });
+    await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {

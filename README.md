@@ -25,7 +25,20 @@ You can take this a step further and integrate auto-detection directly into your
 
 ### Running the application
 
-Get the secret value from the azure keyvault and create .env file with the secrets
+Runtime secrets are pulled live from the AAT key vault (`pcs-aat`) at startup
+via [@hmcts/properties-volume](https://github.com/hmcts/properties-volume-nodejs),
+so you no longer need to copy secret values into `.env` by hand. Authenticate
+once with the Azure CLI:
+
+```bash
+az login
+```
+
+Any secrets declared in `charts/pcs-frontend/values.yaml` under
+`nodejs.keyVaults.pcs.secrets` are fetched on boot. To opt out (e.g. offline
+work, or if you don't have vault access), set `USE_VAULT=false` and populate
+the secrets in `.env` yourself — see `.env.example` for the test-user
+credentials that are still `.env`-only.
 
 Install dependencies by executing the following command:
 
@@ -33,8 +46,9 @@ Install dependencies by executing the following command:
 yarn install
 ```
 
-Docker:
-make sure running the redis
+Redis runs in a local Docker container; `yarn start:dev` now brings it up
+automatically (via the `redis:up` script) on first run and reuses the
+`pcs-redis` container on subsequent runs. If you prefer to manage it yourself:
 
 ```bash
 docker run -d --name pcs-redis -p 6379:6379 redis
@@ -82,7 +96,7 @@ Run:
 yarn start
 ```
 
-The applications's home page will be available at http://localhost:3209
+The application's home page will be available at http://localhost:3209
 
 ### Running with Docker
 

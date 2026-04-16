@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig } from '../../interfaces/formFieldConfig.interface';
-import type { StepFormData } from '../../interfaces/stepFormData.interface';
 import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
@@ -10,6 +8,8 @@ import { getStepTranslations, getTranslationFunction, loadStepNamespace } from '
 
 import { Logger } from '@modules/logger';
 import { StepNavigation } from '@modules/steps/flow';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepFormData } from '@modules/steps/stepFormData.interface';
 
 const logger = Logger.getLogger('controllerFactory');
 
@@ -26,6 +26,7 @@ export class GetController {
     const content = await this.generateContent(req);
     res.render(this.view, {
       ...content,
+      ...(res.locals?.extraHeaders ?? {}),
     });
   };
 }
@@ -140,7 +141,8 @@ export const createPostController = (
         });
       }
 
-      setFormData(req, stepName, req.body);
+      const { action: _, ...bodyWithoutAction } = req.body || {};
+      setFormData(req, stepName, bodyWithoutAction);
 
       if (beforeRedirect) {
         try {
@@ -153,7 +155,7 @@ export const createPostController = (
         }
       }
 
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, req.body);
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
       }

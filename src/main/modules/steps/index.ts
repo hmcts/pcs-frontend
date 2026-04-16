@@ -11,7 +11,7 @@ export { GetController, createGetController, createPostController, createPostRed
 
 // Export form builder API
 export { createFormStep } from './formBuilder';
-export type { FormBuilderConfig } from '../../interfaces/formFieldConfig.interface';
+export type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 // Export form builder helpers (for use in custom step implementations)
 export {

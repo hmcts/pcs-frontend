@@ -2,17 +2,15 @@ import { Request } from 'express';
 
 import { isWelshProperty } from '../../../../main/steps/utils/isWelshProperty';
 
+import { CcdCaseModel } from '@services/ccdCaseData.model';
+
 describe('isWelshProperty', () => {
   describe('when property is in Wales', () => {
     it('should return true when legislativeCountry is Wales (title case)', async () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'Wales',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'Wales' } }),
           },
         },
       } as unknown as Request;
@@ -26,11 +24,7 @@ describe('isWelshProperty', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'WALES',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'WALES' } }),
           },
         },
       } as unknown as Request;
@@ -44,11 +38,7 @@ describe('isWelshProperty', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'wales',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'wales' } }),
           },
         },
       } as unknown as Request;
@@ -64,11 +54,7 @@ describe('isWelshProperty', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {
-                legislativeCountry: 'England',
-              },
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'England' } }),
           },
         },
       } as unknown as Request;
@@ -82,9 +68,7 @@ describe('isWelshProperty', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
-              data: {},
-            },
+            validatedCase: new CcdCaseModel({ id: '', data: {} }),
           },
         },
       } as unknown as Request;
