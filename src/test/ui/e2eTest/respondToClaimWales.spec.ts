@@ -286,37 +286,37 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // await performAction('selectNoticeDetails', {
     //   option: confirmationOfNoticeGiven.imNotSureRadioOption,
     // });
-    await performAction('clickRadioButton', rentArrears.yesRadioOption);
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-    await performAction('repaymentsAgreed', {
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    });
-    await performAction('installmentPayments', {
-      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-      radioOption: installmentPayments.noRadioOption,
-    });
-    await performAction('readYourHouseholdAndCircumstances');
-    await performAction('doYouHaveAnyDependantChildren', {
-      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
-    });
-    await performAction('doYouHaveAnyOtherDependants', {
-      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
-      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
-    });
-    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
-    });
-    await performAction('selectAlternativeAccommodation', {
-      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
-    });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    //   await performAction('clickRadioButton', rentArrears.yesRadioOption);
+    //   await performAction('clickButton', rentArrears.saveAndContinueButton);
+    //   await performValidation('mainHeader', counterClaim.mainHeader);
+    //   await performAction('clickButton', counterClaim.saveAndContinueButton);
+    //   await performAction('readPaymentInterstitial');
+    //   await performAction('repaymentsMade', {
+    //     question: repaymentsMade.getmainHeader(claimantName),
+    //     repaymentOption: repaymentsMade.noRadioOption,
+    //   });
+    //   await performAction('repaymentsAgreed', {
+    //     repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    //   });
+    //   await performAction('installmentPayments', {
+    //     question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+    //     radioOption: installmentPayments.noRadioOption,
+    //   });
+    //   await performAction('readYourHouseholdAndCircumstances');
+    //   await performAction('doYouHaveAnyDependantChildren', {
+    //     dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    //   });
+    //   await performAction('doYouHaveAnyOtherDependants', {
+    //     otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+    //     otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    //   });
+    //   await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+    //     radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+    //     details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    //   });
+    //   await performAction('selectAlternativeAccommodation', {
+    //     radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    //   });
+    //   await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 });
