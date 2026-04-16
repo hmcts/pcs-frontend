@@ -66,13 +66,13 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
-function taskStatus(
+function getTaskUrl(
   templateId: string,
-  status: string,
+  taskStatus: string,
   caseReference: string,
   taskGroupId: string
 ): string | undefined {
-  if (status === 'NOT_AVAILABLE') {
+  if (taskStatus === 'NOT_AVAILABLE') {
     return undefined;
   }
   if (templateId === 'Task.AAA6.Claim.ViewClaim') {
@@ -127,7 +127,7 @@ function mapTaskGroups(app: Application, caseReference: string) {
               ),
             },
             hint,
-            href: taskStatus(task.templateId, task.status, caseReference, taskGroupId),
+            href: getTaskUrl(task.templateId, task.status, caseReference, taskGroupId),
             status: STATUS_MAP[task.status],
           };
         }),
