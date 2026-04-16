@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
+import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
@@ -436,7 +437,7 @@ export class RespondToClaimAction implements IAction {
       } else if (tenancyType === 'other') {
         await performValidation('text', {
           elementType: 'listItem',
-          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiDataWales.submitCaseRentOtherTenancy.otherLicenceTypeDetails}`,
         });
       }
     } else {
