@@ -305,7 +305,7 @@ function getExistingAddress(req: Request): { formattedAddress: string } {
   const defendantDetails = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
   const originalAddress = defendantDetails?.address;
 
-  if (defendantDetails?.addressKnown === 'YES' && originalAddress?.AddressLine1) {
+  if (originalAddress?.AddressLine1) {
     const formattedAddress =
       arrayToString([
         originalAddress.AddressLine1,
