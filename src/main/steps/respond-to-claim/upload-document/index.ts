@@ -3,11 +3,11 @@ import type { Request } from 'express';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { CcdCollectionItem, CcdDefendantDocument } from '@interfaces/ccdCase.interface';
-import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
-import type { CdamDocument } from '@interfaces/documentUpload.interface';
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CcdCollectionItem, CcdDefendantDocument } from '@services/ccdCase.interface';
+import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
+import type { CdamDocument } from '@services/documentUpload.interface';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
 function mapCcdDocToCdamDoc(v: CcdDefendantDocument): CdamDocument {

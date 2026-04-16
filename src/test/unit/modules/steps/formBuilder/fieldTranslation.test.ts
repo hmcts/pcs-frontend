@@ -1,8 +1,9 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
 import { translateFields } from '../../../../../main/modules/steps/formBuilder/fieldTranslation';
+
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 describe('translateFields', () => {
   let mockT: jest.Mock;

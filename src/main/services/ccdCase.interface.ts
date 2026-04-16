@@ -29,6 +29,16 @@ export interface HouseholdCircumstances {
   otherTenantsDetails?: string;
 }
 
+export type PaymentAgreement = {
+  anyPaymentsMade?: YesNoValue;
+  paymentDetails?: string;
+  repaymentPlanAgreed?: YesNoNotSureValue;
+  repaymentAgreedDetails?: string;
+  repayArrearsInstalments?: YesNoValue;
+  additionalRentContribution?: unknown;
+  additionalContributionFrequency?: string;
+};
+
 export interface CcdUserCase {
   id: string;
   state: CaseState;
@@ -115,7 +125,7 @@ export interface CcdCollectionItem<T> {
 }
 
 export interface CcdDefendantResponses {
-  tenancyTypeCorrect?: TenancyTypeCorrectValue;
+  tenancyTypeCorrect?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
   confirmNoticeGiven?: string;
@@ -136,14 +146,10 @@ export interface CcdDefendantResponses {
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
   disputeClaimDetails?: string;
-  paymentAgreement?: {
-    repaymentPlanAgreed?: YesNoNotSureValue;
-    repaymentAgreedDetails?: string;
-    repayArrearsInstalments?: YesNoValue;
-    additionalRentContribution?: unknown;
-    additionalContributionFrequency?: string;
-  };
+  paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
+  possessionNoticeReceived?: YesNoNotSureValue;
+  noticeReceivedDate?: string;
   uploadedDocuments?: CcdCollectionItem<CcdDefendantDocument>[];
 }
 
@@ -237,4 +243,5 @@ export enum GenAppType {
 
 export interface CitizenGenAppRequest {
   applicationType: GenAppType;
+  within14Days?: YesNoValue;
 }

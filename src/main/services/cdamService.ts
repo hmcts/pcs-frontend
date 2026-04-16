@@ -3,9 +3,9 @@ import FormData from 'form-data';
 
 import { CASE_TYPE, CLASSIFICATION, JURISDICTION } from '../constants';
 
-import type { CdamDocument, CdamRawDocument, CdamUploadResponse } from '@interfaces/documentUpload.interface';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import type { CdamDocument, CdamRawDocument, CdamUploadResponse } from '@services/documentUpload.interface';
 
 const logger = Logger.getLogger('cdamService');
 

@@ -40,7 +40,7 @@ import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 import { step as uploadDocument } from './upload-document';
 import { step as writtenTerms } from './written-terms';
 
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,

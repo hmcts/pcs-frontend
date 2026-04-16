@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { JourneyFlowConfig } from './stepFlow.interface';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export type FormFieldType =
   | 'radio'

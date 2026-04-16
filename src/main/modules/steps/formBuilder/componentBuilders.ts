@@ -9,7 +9,7 @@ import type {
   ComponentType,
   FormFieldConfig,
   FormFieldOption,
-} from '@interfaces/formFieldConfig.interface';
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
 function createFieldsetLegend(
