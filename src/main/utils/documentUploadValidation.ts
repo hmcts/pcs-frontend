@@ -72,7 +72,9 @@ const ALLOWED_EXTENSIONS = new Set([
   '.tiff',
 ]);
 
-export const ACCEPT_ATTRIBUTE_EXTENSIONS = Array.from(ALLOWED_EXTENSIONS).sort().join(',');
+export const ACCEPT_ATTRIBUTE_EXTENSIONS = Array.from(ALLOWED_EXTENSIONS)
+  .sort((a, b) => a.localeCompare(b))
+  .join(',');
 
 export function getFileExtensionLower(filename: string): string {
   const i = filename.lastIndexOf('.');
