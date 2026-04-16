@@ -3,7 +3,7 @@ export const doYouNeedHelpPayingTheFee = {
   doYouNeedHelpPayingTheFeeQuestion: `Do you need help paying the fee for this application?`,
   iNeedHelpPayingTheFeeRadioOption: `I need help paying the fee`,
   iDoNotNeedHelpPayingTheFeeRadioOption: `I do not need help paying the fee`,
-  itUsuallyCostParagraph: `It usually costs £123 to apply. The fee will increase to £313 if:`,
+  itUsuallyCostParagraph: `It usually costs £123 to apply. The fee will increase to £3 if:`,
   youHaveAlreadyToldList: `you have already told the other party that you are making this application, and`,
   theyDidNotAgreeList: `they did not agree to it (this means that they have objected to it)`,
   youSeeFinalApplicationFeeParagraph: `You’ll see the final application fee before you pay.`,
@@ -16,6 +16,6 @@ export const doYouNeedHelpPayingTheFee = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
   errorValidationField: {
-    errorRadioOption: { type: `none`, input: ``, errMessage: `You must select an type of application to apply for` },
+    errorRadioOption: { type: `none`, input: ``, errMessage: `Confirm whether you need help paying the fee` },
   },
 };

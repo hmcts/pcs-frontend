@@ -142,6 +142,7 @@ export class PageContentValidation implements IValidation {
       const pageData = await this.getPageData(pageName);
 
       if (!pageData) {
+        console.log(pageName);
         return;
       }
 
@@ -159,6 +160,8 @@ export class PageContentValidation implements IValidation {
         }
         if (typeof value === 'string' && value.trim() !== '') {
           const elementType = this.getElementType(key);
+          console.log('elementType:'+elementType);
+          console.log('value:'+value as string);
           const isVisible = await this.isElementVisible(page, value as string, elementType);
           pageResults.push({ element: key, expected: value as string, status: isVisible ? 'pass' : 'fail' });
         }
