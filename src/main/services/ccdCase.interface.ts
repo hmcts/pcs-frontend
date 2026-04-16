@@ -89,6 +89,7 @@ export interface CcdClaimantEnteredDefendantDetails {
   firstName?: string;
   lastName?: string;
   address?: CcdCaseAddress | Record<string, never>;
+  addressKnown?: YesNoValue;
 }
 
 /** Defendant party contact details (name/address known flags and values). */

@@ -15,15 +15,13 @@ const STEP_NAME = 'correspondence-address';
 
 // Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
 // Session is set in extendGetContent; validation reads it via allData on POST.
-const correspondenceAddressRequired = (_formData: Record<string, unknown>, allData: Record<string, unknown>): boolean =>
-  allData.__isAddressKnown === true;
 
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'correspondenceAddressConfirm',
     type: 'radio',
-    required: correspondenceAddressRequired,
+    required: true,
     translationKey: {
       label: 'legend',
       hint: 'legend.hint',
@@ -121,7 +119,7 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        correspondenceAddressConfirmation: addressConfirmedRadioSelection.toUpperCase(),
+        correspondenceAddressConfirmation: addressConfirmedRadioSelection.toUpperCase() ?? '',
       },
       ...(addressConfirmedRadioSelection === 'no' && {
         defendantContactDetails: {
@@ -304,9 +302,10 @@ function getAddressData(
 
 function getExistingAddress(req: Request): { formattedAddress: string } {
   const caseData = req.res?.locals.validatedCase?.data;
-  const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address;
+  const defendantDetails = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
+  const originalAddress = defendantDetails?.address;
 
-  if (originalAddress?.AddressLine1) {
+  if (defendantDetails?.addressKnown === 'YES' && originalAddress?.AddressLine1) {
     const formattedAddress =
       arrayToString([
         originalAddress.AddressLine1,
