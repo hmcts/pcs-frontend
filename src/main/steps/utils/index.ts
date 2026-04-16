@@ -9,6 +9,7 @@ export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { getPreviousPageForArrears } from './journeyHelpers';
 export { getStepBeforeDisputePages } from './journeyHelpers';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
+export { normalizeYesNoNotSureValue } from './normalizeYesNoNotSureValue';
 export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
 export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
 export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
