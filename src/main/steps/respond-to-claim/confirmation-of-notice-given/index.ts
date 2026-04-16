@@ -1,10 +1,12 @@
+import type { Request } from 'express';
+
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
+import type { CaseData, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'confirmation-of-notice-given',
@@ -18,57 +20,46 @@ export const step: StepDefinition = createFormStep({
     question: 'question',
     hintText: 'hintText',
   },
-  beforeRedirect: async req => {
-    const confirmNoticeGiven = req.body?.confirmNoticeGiven as string | undefined;
-    const existingDefendantResponses = req.res?.locals?.validatedCase?.defendantResponses ?? {};
-
-    if (!confirmNoticeGiven) {
-      return;
-    }
-
-    const enumMapping: Record<string, string> = {
-      yes: 'YES',
-      no: 'NO',
-      imNotSure: 'NOT_SURE',
-    };
-
-    const ccdValue = enumMapping[confirmNoticeGiven];
-    if (!ccdValue) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        ...existingDefendantResponses,
-        confirmNoticeGiven: ccdValue,
-        ...(confirmNoticeGiven === 'yes' ? {} : { noticeDate: '' }),
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
-  },
-  getInitialFormData: req => {
-    const existingAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven as string | undefined;
-
-    return existingAnswer ? { confirmNoticeGiven: existingAnswer } : {};
-  },
   fields: [
     {
-      name: 'confirmNoticeGiven',
+      name: 'possessionNoticeReceived',
       type: 'radio',
       required: true,
       translationKey: { label: 'question', hint: 'hintText' },
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
-        { value: 'yes', translationKey: 'options.yes' },
-        { value: 'no', translationKey: 'options.no' },
+        { value: 'YES', translationKey: 'options.yes' },
+        { value: 'NO', translationKey: 'options.no' },
         { divider: 'options.or' },
-        { value: 'imNotSure', translationKey: 'options.imNotSure' },
+        { value: 'NOT_SURE', translationKey: 'options.imNotSure' },
       ],
     },
   ],
+  getInitialFormData: req => {
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
+    const possessionNoticeReceived: YesNoNotSureValue | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived;
+
+    return possessionNoticeReceived ? { possessionNoticeReceived } : {};
+  },
+  beforeRedirect: async (req: Request) => {
+    const possessionNoticeReceived: YesNoNotSureValue | undefined = req.body?.possessionNoticeReceived;
+
+    if (!possessionNoticeReceived) {
+      return;
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        possessionNoticeReceived,
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
+
     return {
       claimantName,
     };
