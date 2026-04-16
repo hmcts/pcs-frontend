@@ -7,13 +7,23 @@ import type { Request } from 'express';
  * Returns true if ANY claim ground has isRentArrears: "Yes" (case-insensitive), false otherwise.
  */
 export const isRentArrearsClaim = async (req: Request): Promise<boolean> => {
-  const caseData = req.res?.locals?.validatedCase?.data;
-  const claimGroundSummaries = caseData?.claimGroundSummaries;
+  const validatedCase = req.res?.locals?.validatedCase;
+  const claimGroundSummaries = validatedCase?.claimGroundSummaries;
 
-  if (!Array.isArray(claimGroundSummaries)) {
-    return false;
+  if (Array.isArray(claimGroundSummaries)) {
+    // Check if any claim ground has isRentArrears: "Yes" (case-insensitive)
+    return claimGroundSummaries.some(ground => ground?.value?.isRentArrears?.toUpperCase() === 'YES');
   }
 
-  // Check if any claim ground has isRentArrears: "Yes" (case-insensitive)
-  return claimGroundSummaries.some(ground => ground?.value?.isRentArrears?.toUpperCase() === 'YES');
+  const introductoryGrounds = (validatedCase?.introGroundsIntroductoryDemotedOrOtherGrounds ?? []).map(ground =>
+    String(ground).toUpperCase()
+  );
+  if (introductoryGrounds.includes('RENT_ARREARS')) {
+    return true;
+  }
+
+  const welshDiscretionaryGrounds = (validatedCase?.secureGroundsWalesDiscretionaryGrounds ?? []).map(ground =>
+    String(ground).toUpperCase()
+  );
+  return welshDiscretionaryGrounds.some(ground => ground.includes('RENT_ARREARS'));
 };

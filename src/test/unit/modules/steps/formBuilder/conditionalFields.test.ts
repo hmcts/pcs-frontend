@@ -1,4 +1,4 @@
-import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
+import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
 import {
   buildConditionalContent,
   getNestedFieldName,
@@ -7,7 +7,7 @@ import {
   isOptionSelected,
   parseNestedFieldName,
   shouldValidateField,
-} from '../../../../../main/modules/steps/formBuilder/conditionalFields';
+} from '@modules/steps/formBuilder/conditionalFields';
 
 describe('conditionalFields', () => {
   describe('isOptionSelected', () => {

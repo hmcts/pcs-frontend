@@ -1,8 +1,9 @@
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
 import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-text-message',
@@ -39,15 +40,30 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  getInitialFormData: req => {
+    const contactByText = req.res?.locals?.validatedCase?.defendantResponsesContactByText;
+
+    if (contactByText === 'YES') {
+      return { contactByTextMessage: 'yes' };
+    }
+
+    if (contactByText === 'NO') {
+      return { contactByTextMessage: 'no' };
+    }
+
+    return {};
+  },
   beforeRedirect: async req => {
-    const textForm = req.session.formData?.['contact-preferences-text-message'];
-    if (!textForm) {
+    const textForm = req.body as Record<string, unknown>;
+    const contactByTextMessage = textForm.contactByTextMessage as string | undefined;
+
+    if (!contactByTextMessage) {
       return;
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        contactByText: textForm.contactByTextMessage === 'yes' ? 'YES' : 'NO',
+        contactByText: contactByTextMessage === 'yes' ? 'YES' : 'NO',
       },
     };
 

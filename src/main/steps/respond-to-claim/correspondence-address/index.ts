@@ -1,11 +1,12 @@
 import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import type { Address, PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
-import { arrayToString } from '../../../utils/arrayToString';
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
+import type { CcdCaseAddress } from '@interfaces/ccdCase.interface';
+import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
+import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import { createFormStep, getFormData, getTranslationFunction, setFormData } from '@modules/steps';
+import { arrayToString } from '@utils/arrayToString';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -149,7 +150,7 @@ export const step: StepDefinition = createFormStep({
       req,
       stepData,
       partyAddress,
-      correspondenceAddressConfirmed
+      correspondenceAddressConfirmed ?? undefined
     );
 
     const result: Record<string, unknown> = {};
@@ -183,7 +184,7 @@ export const step: StepDefinition = createFormStep({
       req,
       stepData,
       partyAddress,
-      correspondenceAddressConfirmed
+      correspondenceAddressConfirmed ?? undefined
     );
 
     const radioField = formContent.fields.find(f => f.name === 'correspondenceAddressConfirm');
@@ -259,7 +260,7 @@ export const step: StepDefinition = createFormStep({
 function getAddressData(
   req: Request,
   stepData: Record<string, unknown>,
-  partyAddress?: Address,
+  partyAddress?: CcdCaseAddress,
   correspondenceAddressConfirmed?: string
 ) {
   const addressConfirmedRadioSelection =
@@ -267,7 +268,7 @@ function getAddressData(
     stepData?.correspondenceAddressConfirm ||
     (correspondenceAddressConfirmed === 'YES' ? 'yes' : correspondenceAddressConfirmed === 'NO' ? 'no' : undefined);
 
-  const fieldMap: Record<string, keyof Address> = {
+  const fieldMap: Record<string, keyof CcdCaseAddress> = {
     addressLine1: 'AddressLine1',
     addressLine2: 'AddressLine2',
     townOrCity: 'PostTown',
@@ -302,7 +303,7 @@ function getAddressData(
 
 function getExistingAddress(req: Request): { formattedAddress: string } {
   const caseData = req.res?.locals.validatedCase?.data;
-  const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address;
+  const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address ;
 
   if (originalAddress?.AddressLine1) {
     const formattedAddress =
