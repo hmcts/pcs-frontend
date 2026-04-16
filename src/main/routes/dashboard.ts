@@ -133,9 +133,8 @@ function mapTaskGroups(app: Application, caseReference: string) {
                   ),
                 }
               : undefined;
-          
-          const taskStatus = TASK_STATUS_OVERRIDES[task.templateId] ?? task.status;
 
+          const taskStatus = TASK_STATUS_OVERRIDES[task.templateId] ?? task.status;
 
           return {
             title: {
