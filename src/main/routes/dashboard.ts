@@ -66,7 +66,7 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
-function getTaskUrl(
+function taskStatus(
   templateId: string,
   status: string,
   caseReference: string,
@@ -127,7 +127,7 @@ function mapTaskGroups(app: Application, caseReference: string) {
               ),
             },
             hint,
-            href: getTaskUrl(task.templateId, task.status, caseReference, taskGroupId),
+            href: taskStatus(task.templateId, task.status, caseReference, taskGroupId),
             status: STATUS_MAP[task.status],
           };
         }),
