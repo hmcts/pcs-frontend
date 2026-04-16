@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
 
-import type { CcdCase, CcdCaseAddress } from '../interfaces/ccdCase.interface';
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { Logger } from '@modules/logger';
+import type { CcdCase, CcdCaseAddress } from '@services/ccdCase.interface';
 import {
   type DashboardTaskGroup,
   STATUS_MAP,
