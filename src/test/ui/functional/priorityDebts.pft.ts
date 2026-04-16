@@ -1,9 +1,4 @@
-import {
-  dashboard,
-  feedback,
-  haveYouAppliedForUniversalCredit,
-  priorityDebts,
-} from '../data/page-data';
+import { dashboard, feedback, haveYouAppliedForUniversalCredit, priorityDebts } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function priorityDebtsErrorValidation(): Promise<void> {

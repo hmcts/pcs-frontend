@@ -1,9 +1,4 @@
-import {
-  dashboard,
-  feedback,
-  priorityDebtDetails,
-  priorityDebts,
-} from '../data/page-data';
+import { dashboard, feedback, priorityDebtDetails, priorityDebts } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function priorityDebtDetailsErrorValidation(): Promise<void> {
@@ -190,7 +185,6 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
     message2: priorityDebtDetails.enterAmountInTheCorrectFormatErrorMessage,
   });
 }
-
 
 export async function priorityDebtDetailsNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', priorityDebtDetails.feedbackLink, {
