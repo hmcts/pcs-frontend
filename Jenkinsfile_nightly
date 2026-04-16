@@ -26,7 +26,7 @@ properties([
     booleanParam(
       name: 'SAUCE_CROSSBROWSER',
       defaultValue: false,
-      description: 'Tick to run cross-browser tests on Sauce Labs. Runs tests as per the .sauce/config.yaml'
+      description: 'Tick to run cross-browser tests on Sauce Labs (saucectl). Uses .sauce/config-matrix.yml when present; skipped otherwise.'
     ),
     choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
@@ -78,9 +78,19 @@ withNightlyPipeline(type, product, component) {
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
-    if (params.SAUCE_CROSSBROWSER) {
+    if (shouldRunSauceCrossBrowser()) {
       runSauceCrossBrowser(yarnBuilder)
     }
+  }
+}
+
+/** Checkbox param may be Boolean or string depending on Jenkins / job age. */
+def shouldRunSauceCrossBrowser() {
+  try {
+    def v = params.SAUCE_CROSSBROWSER
+    return v == true || v?.toString() == 'true'
+  } catch (ignored) {
+    return false
   }
 }
 
@@ -107,16 +117,22 @@ def runE2ETests(yarnBuilder) {
   }
 }
 
-/** Demo / optional: Sauce Labs cross-browser via saucectl (configure tunnel + .sauce/*.yml separately). */
+/** Optional Sauce Labs run via saucectl (credentials + tunnel must be configured on the agent). */
 def runSauceCrossBrowser(yarnBuilder) {
   stage('Sauce cross-browser') {
     node {
       checkout scm
-      sh 'rm -rf allure-results allure-report'
+      def sauceConfig = '.sauce/config-matrix.yml'
+      def hasConfig = sh(script: "test -f '${sauceConfig}'", returnStatus: true) == 0
+      if (!hasConfig) {
+        echo "Skipping Sauce cross-browser: ${sauceConfig} not in workspace (commit it or disable SAUCE_CROSSBROWSER)."
+        return
+      }
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+        def tunnel = env.SAUCE_TUNNEL_NAME?.trim() ? env.SAUCE_TUNNEL_NAME.trim() : 'reformtunnel'
         withEnv([
           'SAUCE_GREP=@crossbrowser',
-          "SAUCE_TUNNEL_NAME=${env.SAUCE_TUNNEL_NAME ?: 'reformtunnel'}",
+          "SAUCE_TUNNEL_NAME=${tunnel}",
         ]) {
           yarnBuilder.yarn('test:sauce:crossbrowser')
         }
