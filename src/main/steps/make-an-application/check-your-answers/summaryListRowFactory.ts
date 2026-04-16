@@ -1,8 +1,6 @@
 import type { Request } from 'express';
 import { TFunction } from 'i18next';
 
-import type { SummaryListRow } from '../../../interfaces/govukComponents.interface';
-
 import VisibleFormDataView from './visibleFormDataView';
 
 export type SummaryFieldData = {
@@ -10,6 +8,24 @@ export type SummaryFieldData = {
   fieldValue: string;
   fieldLabel: string;
   changeHint: string;
+};
+
+export type SummaryListRow = {
+  key: {
+    text: string;
+  };
+  value: {
+    text: string;
+  };
+  actions: {
+    items: SummaryListRowAction[];
+  };
+};
+
+export type SummaryListRowAction = {
+  href: string;
+  text: string;
+  visuallyHiddenText: string;
 };
 
 function createSummaryListRow(summaryFieldConfig: SummaryFieldData, t: TFunction): SummaryListRow {
