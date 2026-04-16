@@ -163,19 +163,17 @@
     "webpack-dev-middleware": "7.4.5"
   },
   "resolutions": {
-    "@opentelemetry/instrumentation-redis-4": "npm:@opentelemetry/instrumentation-redis@^0.62.0",
+    "@eslint/plugin-kit": "^0.7.0",
     "@opentelemetry/instrumentation": "0.214.0",
-    "semver": "^7.5.2",
+    "@opentelemetry/instrumentation-redis-4": "npm:@opentelemetry/instrumentation-redis@^0.62.0",
     "@types/node": "22.19.3",
-    "glob": "^13.0.1",
-    "js-yaml": "^4.1.1",
     "brace-expansion": "^5.0.5",
     "diff": "^8.0.3",
-    "follow-redirects": "^1.16.0",
-    "form-data": "^4.0.4",
-    "@eslint/plugin-kit": "^0.7.0",
+    "glob": "^13.0.1",
+    "js-yaml": "^4.1.1",
+    "path-to-regexp": "^8.4.0",
     "qs": "^6.14.2",
-    "path-to-regexp": "^8.4.0"
+    "semver": "^7.5.2"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
