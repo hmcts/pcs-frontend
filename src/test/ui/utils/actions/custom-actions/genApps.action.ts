@@ -1,8 +1,8 @@
 import { Page } from '@playwright/test';
 
-import { chooseAnApplication, isTheCourtHearingInTheNext14Days } from '../../../data/page-data/genApps-page-data';
 import {
   chooseAnApplication,
+  isTheCourtHearingInTheNext14Days,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
 import { performAction, performValidation } from '../../controller';
@@ -33,6 +33,7 @@ export class GenAppsAction implements IAction {
   }
 
   private async selectLanguageUsedToComplete(selectLanguageData: actionRecord) {
+    await performAction('recordUserEntry', selectLanguageData);
     await performAction('clickRadioButton', {
       question: selectLanguageData.question,
       option: selectLanguageData.option,
