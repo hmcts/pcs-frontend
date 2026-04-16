@@ -5,7 +5,7 @@ export default {
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'defendant-name-confirmation': 'defendantNameConfirmation',
-  'date-of-birth': 'dateOfBirth',
+  'defendant-date-of-birth': 'defendantDateOfBirth',
   'contact-preferences-telephone': 'contactPreferencesTelephone',
   'contact-preferences-text-message': 'contactPreferencesTextMessage',
   'dispute-claim-interstitial': 'disputeClaimInterstitial',

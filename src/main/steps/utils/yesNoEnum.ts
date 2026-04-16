@@ -3,7 +3,7 @@
  * Used for CCD API integration where boolean choices are represented as enum strings.
  */
 
-import type { VerticalYesNoValue, YesNoValue } from '../../interfaces/ccdCase.interface';
+import type { VerticalYesNoValue, YesNoValue } from '@services/ccdCase.interface';
 
 /**
  * Converts frontend 'yes'/'no' string to backend CCD enum 'YES'/'NO'
