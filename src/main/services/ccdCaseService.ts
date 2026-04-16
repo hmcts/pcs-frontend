@@ -39,11 +39,20 @@ import { CaseState } from '@interfaces/ccdCase.interface';
 import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@interfaces/ccdCase.interface';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import type { DashboardNotification } from '@services/pcsApi/dashboardNotification.interface';
+import type { DashboardTaskGroup } from '@services/pcsApi/dashboardTaskGroup.interface';
+import { unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
 
 const logger = Logger.getLogger('ccdCaseService');
 
 interface EventTokenResponse {
   token: string;
+}
+
+export interface TransformedDashboardData {
+  notifications: DashboardNotification[];
+  taskGroups: DashboardTaskGroup[];
+  propertyAddress: string | undefined;
 }
 
 function getBaseUrl(): string {
@@ -336,6 +345,26 @@ export const ccdCaseService = {
       return response.data;
     } catch (error) {
       throw convertAxiosErrorToHttpError(error, 'save draft response to claim');
+    }
+  },
+
+  async getDashboardView(accessToken: string, caseId: string): Promise<TransformedDashboardData> {
+    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/dashboardView?ignore-warning=false`;
+    console.log('[getDashboardView] Calling CCD dashboardView event trigger:', eventUrl);
+    try {
+      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
+      const raw = response.data.case_details?.case_data?.dashboardData ?? {};
+      console.log('[getDashboardView] Raw dashboardData from CCD:', JSON.stringify(raw, null, 2));
+
+      const notifications = unwrapNotifications(raw.notifications);
+      const taskGroups = unwrapTaskGroups(raw.taskGroups);
+
+      console.log('[getDashboardView] Transformed notifications:', JSON.stringify(notifications, null, 2));
+      console.log('[getDashboardView] Transformed taskGroups:', JSON.stringify(taskGroups, null, 2));
+
+      return { notifications, taskGroups, propertyAddress: raw.propertyAddress };
+    } catch (error) {
+      throw convertAxiosErrorToHttpError(error, 'getDashboardView');
     }
   },
 };

@@ -164,6 +164,7 @@ export interface CcdCaseData {
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
   citizenGenAppRequest?: CitizenGenAppRequest;
+  dashboardData?: CcdDashboardData;
 }
 
 /** Case representation used by services: id + case_data. */
@@ -205,6 +206,38 @@ export interface StartCallbackData {
   _links: CcdStartCallbackLinks;
   case_details: CcdCaseDetails;
   event_id: string;
+}
+
+export interface CcdCollectionItem<T> {
+  value: T;
+  id: string;
+}
+
+export interface CcdTemplateKeyValue {
+  key: string;
+  value: string;
+}
+
+export interface CcdDashboardNotification {
+  templateId: string;
+  templateValues: CcdCollectionItem<CcdTemplateKeyValue>[];
+}
+
+export interface CcdDashboardTask {
+  templateId: string;
+  status: string;
+}
+
+export interface CcdDashboardTaskGroup {
+  groupId: string;
+  tasks: CcdCollectionItem<CcdDashboardTask>[];
+}
+
+export interface CcdDashboardData {
+  caseId?: string;
+  propertyAddress?: string;
+  notifications?: CcdCollectionItem<CcdDashboardNotification>[];
+  taskGroups?: CcdCollectionItem<CcdDashboardTaskGroup>[];
 }
 
 export enum GenAppType {
