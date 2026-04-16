@@ -14,8 +14,8 @@ import {
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
-import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
+import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
