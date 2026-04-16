@@ -4,7 +4,7 @@ export const disputeClaimInterstitial = {
       claimantName.substring(claimantName.length - 1) === 's' ? `${claimantName}'` : `${claimantName}’s`;
     return nameClaimant + ' claim';
   },
-  getYouWillNowBeAskedToRespondParagraph: (claimantName: string): string  => {
+  getYouWillNowBeAskedToRespondParagraph: (claimantName: string): string => {
     const nameClaimant =
       claimantName.substring(claimantName.length - 1) === 's' ? `${claimantName}'` : `${claimantName}’s`;
 
