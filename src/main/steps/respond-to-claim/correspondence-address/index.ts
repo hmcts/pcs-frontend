@@ -278,7 +278,7 @@ function getAddressData(
   };
 
   const getField = (field: keyof typeof fieldMap) => {
-    if (addressConfirmedRadioSelection !== 'no') {
+    if (addressConfirmedRadioSelection && addressConfirmedRadioSelection !== 'no') {
       return '';
     }
 
