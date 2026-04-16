@@ -38,6 +38,11 @@ properties([
       defaultValue: '',
       description: 'Spec path substring (exact case) ex: respondToAClaim. Blank = all specs.'
     ),
+    booleanParam(
+      name: 'SAUCE_CROSSBROWSER',
+      defaultValue: false,
+      description: 'Tick to run cross-browser tests on Sauce Labs (saucectl). Requires SAUCE_* credentials and .sauce config in repo.'
+    ),
   ])
 ])
 
@@ -73,6 +78,9 @@ withNightlyPipeline(type, product, component) {
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
+    if (params.SAUCE_CROSSBROWSER) {
+      runSauceCrossBrowser(yarnBuilder)
+    }
   }
 }
 
@@ -95,6 +103,24 @@ def runE2ETests(yarnBuilder) {
   ].each { row ->
     if (params[row.flag]) {
       runE2eStage(yarnBuilder, row.playwrightProject, row.stageLabel)
+    }
+  }
+}
+
+/** Demo / optional: Sauce Labs cross-browser via saucectl (configure tunnel + .sauce/*.yml separately). */
+def runSauceCrossBrowser(yarnBuilder) {
+  stage('Sauce cross-browser') {
+    node {
+      checkout scm
+      sh 'rm -rf allure-results allure-report'
+      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+        withEnv([
+          'SAUCE_GREP=@crossbrowser',
+          "SAUCE_TUNNEL_NAME=${env.SAUCE_TUNNEL_NAME ?: 'reformtunnel'}",
+        ]) {
+          yarnBuilder.yarn('test:sauce:crossbrowser')
+        }
+      }
     }
   }
 }
