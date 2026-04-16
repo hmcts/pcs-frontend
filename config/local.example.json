@@ -1,0 +1,5 @@
+{
+  "feeService": {
+    "url": "http://localhost:8180"
+  }
+}

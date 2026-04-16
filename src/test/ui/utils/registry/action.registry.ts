@@ -4,6 +4,7 @@ import {
   GenAppsAction,
   LoginAction,
   NavigateToUrlAction,
+  RecordAnswers,
   RespondToClaimAction,
   TriggerPageFunctionalTestsAction,
 } from '../actions/custom-actions';
@@ -77,7 +78,9 @@ export class ActionRegistry {
     ['exceptionalHardship', new RespondToClaimAction()],
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
+    ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
+    ['recordUserEntry', new RecordAnswers()],
     ['languageUsed', new RespondToClaimAction()],
   ]);
 
