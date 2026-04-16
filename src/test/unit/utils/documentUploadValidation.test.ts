@@ -4,7 +4,7 @@ import {
   UPLOAD_MAX_FILE_SIZE_MB,
   getFileExtensionLower,
   isBlockedExtension,
-  validateUploadFile,
+  validateFileType,
 } from '@utils/documentUploadValidation';
 
 describe('documentUploadValidation', () => {
@@ -44,7 +44,7 @@ describe('documentUploadValidation', () => {
     });
   });
 
-  describe('validateUploadFile', () => {
+  describe('validateFileType', () => {
     describe('allowed files', () => {
       it.each([
         ['application/pdf', 'report.pdf'],
@@ -60,7 +60,7 @@ describe('documentUploadValidation', () => {
         ['text/csv', 'data.csv'],
         ['application/rtf', 'document.rtf'],
       ])('returns ok for %s (%s)', (mime, filename) => {
-        expect(validateUploadFile(mime, filename)).toBe('ok');
+        expect(validateFileType(mime, filename)).toBe('ok');
       });
     });
 
@@ -72,47 +72,47 @@ describe('documentUploadValidation', () => {
         ['video/mpeg', 'clip.mpeg'],
         ['audio/x-m4a', 'track.m4a'],
       ])('returns blocked_media for %s (%s)', (mime, filename) => {
-        expect(validateUploadFile(mime, filename)).toBe('blocked_media');
+        expect(validateFileType(mime, filename)).toBe('blocked_media');
       });
 
       it('blocks by extension even with empty mime type', () => {
-        expect(validateUploadFile('', 'song.mp3')).toBe('blocked_media');
+        expect(validateFileType('', 'song.mp3')).toBe('blocked_media');
       });
 
       it('blocks any audio/* mime prefix', () => {
-        expect(validateUploadFile('audio/wav', 'sound.wav')).toBe('blocked_media');
+        expect(validateFileType('audio/wav', 'sound.wav')).toBe('blocked_media');
       });
 
       it('blocks any video/* mime prefix', () => {
-        expect(validateUploadFile('video/quicktime', 'movie.mov')).toBe('blocked_media');
+        expect(validateFileType('video/quicktime', 'movie.mov')).toBe('blocked_media');
       });
     });
 
     describe('invalid file types', () => {
       it('returns invalid_type for unknown mime and extension', () => {
-        expect(validateUploadFile('application/x-executable', 'app.exe')).toBe('invalid_type');
+        expect(validateFileType('application/x-executable', 'app.exe')).toBe('invalid_type');
       });
 
       it('returns invalid_type for html files', () => {
-        expect(validateUploadFile('text/html', 'page.html')).toBe('invalid_type');
+        expect(validateFileType('text/html', 'page.html')).toBe('invalid_type');
       });
     });
 
     describe('octet-stream fallback to extension', () => {
       it('allows application/octet-stream with valid extension', () => {
-        expect(validateUploadFile('application/octet-stream', 'doc.pdf')).toBe('ok');
+        expect(validateFileType('application/octet-stream', 'doc.pdf')).toBe('ok');
       });
 
       it('rejects application/octet-stream with invalid extension', () => {
-        expect(validateUploadFile('application/octet-stream', 'app.exe')).toBe('invalid_type');
+        expect(validateFileType('application/octet-stream', 'app.exe')).toBe('invalid_type');
       });
 
       it('allows empty mime with valid extension', () => {
-        expect(validateUploadFile('', 'doc.pdf')).toBe('ok');
+        expect(validateFileType('', 'doc.pdf')).toBe('ok');
       });
 
       it('rejects empty mime with invalid extension', () => {
-        expect(validateUploadFile('', 'app.exe')).toBe('invalid_type');
+        expect(validateFileType('', 'app.exe')).toBe('invalid_type');
       });
     });
   });

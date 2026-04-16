@@ -6,18 +6,14 @@ import { oidcMiddleware } from '../middleware';
 import { Logger } from '@modules/logger';
 import { getTranslationFunction, loadStepNamespace } from '@modules/steps';
 import { deleteDocument, uploadDocument } from '@services/cdamService';
-import {
-  UPLOAD_MAX_FILE_SIZE_BYTES,
-  UPLOAD_MAX_FILE_SIZE_MB,
-  validateUploadFile,
-} from '@utils/documentUploadValidation';
+import { UPLOAD_MAX_FILE_SIZE_BYTES, UPLOAD_MAX_FILE_SIZE_MB, validateFileType } from '@utils/documentUploadValidation';
 
 const logger = Logger.getLogger('document-upload');
 
 const upload = multer({
   limits: { fileSize: UPLOAD_MAX_FILE_SIZE_BYTES },
   fileFilter: (_req, file, cb) => {
-    const result = validateUploadFile(file.mimetype, file.originalname);
+    const result = validateFileType(file.mimetype, file.originalname);
     if (result === 'ok') {
       cb(null, true);
       return;

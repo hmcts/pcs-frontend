@@ -1,24 +1,12 @@
-export const UPLOAD_MAX_FILE_SIZE_BYTES = 1024 * 1024 * 1024;
 export const UPLOAD_MAX_FILE_SIZE_MB = 1024;
+export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;
 
-export const BLOCKED_EXTENSIONS = new Set(['.mp3', '.m4a', '.mp4', '.mpeg', '.mpg']);
+const BLOCKED_MEDIA_PREFIXES = ['audio/', 'video/'] as const;
 
-const BLOCKED_MIME_PREFIXES = ['audio/', 'video/'] as const;
-
-const BLOCKED_MIME_TYPES = new Set([
-  'audio/mpeg',
-  'audio/mp3',
-  'audio/mp4',
-  'audio/x-m4a',
-  'audio/m4a',
-  'video/mp4',
-  'video/mpeg',
-  'video/quicktime',
-  'video/x-msvideo',
-  'video/x-ms-wmv',
-]);
+const BLOCKED_EXTENSIONS = new Set(['.mp3', '.m4a', '.mp4', '.mpeg', '.mpg']);
 
 const ALLOWED_MIME_TYPES = new Set([
+  // Documents
   'application/pdf',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -31,10 +19,12 @@ const ALLOWED_MIME_TYPES = new Set([
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'application/vnd.openxmlformats-officedocument.presentationml.template',
   'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+  // Text
   'text/plain',
   'text/csv',
   'application/rtf',
   'text/rtf',
+  // Images
   'image/jpeg',
   'image/png',
   'image/bmp',
@@ -85,29 +75,37 @@ export function isBlockedExtension(filename: string): boolean {
   return BLOCKED_EXTENSIONS.has(getFileExtensionLower(filename));
 }
 
-export type UploadFileValidationResult = 'ok' | 'blocked_media' | 'invalid_type';
+function isBlockedMedia(mime: string, ext: string): boolean {
+  if (BLOCKED_EXTENSIONS.has(ext)) {
+    return true;
+  }
+  return BLOCKED_MEDIA_PREFIXES.some(prefix => mime.startsWith(prefix));
+}
 
-export function validateUploadFile(mimetype: string, originalname: string): UploadFileValidationResult {
+function isAllowedMimeType(mime: string): boolean {
+  return ALLOWED_MIME_TYPES.has(mime);
+}
+
+function isUnknownMimeType(mime: string): boolean {
+  return mime === '' || mime === 'application/octet-stream';
+}
+
+export type FileValidationResult = 'ok' | 'blocked_media' | 'invalid_type';
+
+export function validateFileType(mimetype: string, originalname: string): FileValidationResult {
   const ext = getFileExtensionLower(originalname);
   const mime = (mimetype || '').toLowerCase();
 
-  if (BLOCKED_EXTENSIONS.has(ext)) {
+  if (isBlockedMedia(mime, ext)) {
     return 'blocked_media';
-  }
-  if (BLOCKED_MIME_TYPES.has(mime)) {
-    return 'blocked_media';
-  }
-  for (const prefix of BLOCKED_MIME_PREFIXES) {
-    if (mime.startsWith(prefix)) {
-      return 'blocked_media';
-    }
   }
 
-  if (ALLOWED_MIME_TYPES.has(mime)) {
+  if (isAllowedMimeType(mime)) {
     return 'ok';
   }
 
-  if (mime === '' || mime === 'application/octet-stream') {
+  // Browsers may send empty MIME or application/octet-stream for unknown types -- fall back to extension
+  if (isUnknownMimeType(mime)) {
     return ALLOWED_EXTENSIONS.has(ext) ? 'ok' : 'invalid_type';
   }
 
