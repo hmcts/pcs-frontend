@@ -37,3 +37,4 @@ export * from './incomeAndExpenses.page.data';
 export * from './otherRegularExpenses.page.data';
 export * from './priorityDebtDetails.page.data';
 export * from './feedback.page.data';
+export * from './yourHouseholdAndCircumstances.page.data';

@@ -85,6 +85,7 @@ export async function otherRegularExpensesErrorValidation(): Promise<void> {
     header: otherRegularExpenses.errorValidationHeader,
     message: otherRegularExpenses.invalidFormatErrorMessage,
   });
+
   await performAction(
     'inputText',
     otherRegularExpenses.loanPaymentsPaidEveryLabel,
