@@ -4,11 +4,11 @@ import isPostalCode from 'validator/lib/isPostalCode';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { CcdCaseAddress } from '@interfaces/ccdCase.interface';
-import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
-import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '@modules/steps';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CcdCaseAddress } from '@services/ccdCase.interface';
+import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 import { arrayToString } from '@utils/arrayToString';
 
 const STEP_NAME = 'correspondence-address';
