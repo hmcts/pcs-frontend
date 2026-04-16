@@ -16,12 +16,14 @@ const STEP_NAME = 'correspondence-address';
 // Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
 // Session is set in extendGetContent; validation reads it via allData on POST.
 
+const correspondenceAddressRequired = (_formData: Record<string, unknown>, allData: Record<string, unknown>): boolean =>
+  allData.__isAddressKnown === true;
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'correspondenceAddressConfirm',
     type: 'radio',
-    required: true,
+    required: correspondenceAddressRequired,
     translationKey: {
       label: 'legend',
       hint: 'legend.hint',
