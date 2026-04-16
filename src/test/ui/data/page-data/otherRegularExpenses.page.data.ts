@@ -10,7 +10,7 @@ export const otherRegularExpenses = {
   householdBillsPaidEveryLabel: `Paid every:`,
   householdBillsWeekRadioOption: `Week`,
   householdBillsMonthRadioOption: `Month`,
-  amountReceivedHiddenTextLabel:'Amount paid',
+  amountReceivedHiddenTextLabel: 'Amount paid',
 
   // Loan Payments
   loanPaymentsParagraph: `Loan payments`,
@@ -77,7 +77,7 @@ export const otherRegularExpenses = {
   otherExpensesMonthRadioOption: `Month`,
 
   errorValidationHeader: `There is a problem`,
-// Mandatory Field Errors - Amount Missing
+  // Mandatory Field Errors - Amount Missing
   householdBillsAmountErrorMessage: `Enter the amount you pay for household bills`,
   loanPaymentsAmountErrorMessage: `Enter the amount you pay for loan payments`,
   childSpousalMaintenanceAmountErrorMessage: `Enter the amount you pay for child or spousal maintenance`,
@@ -88,7 +88,7 @@ export const otherRegularExpenses = {
   clothingAmountErrorMessage: `Enter the amount you pay for clothing`,
   otherExpensesAmountErrorMessage: `Enter the amount you pay for other regular expenses`,
 
-// Mandatory Field Errors - Frequency Missing
+  // Mandatory Field Errors - Frequency Missing
   householdBillsFrequencyErrorMessage: `Select how frequently you pay household bills`,
   loanPaymentsFrequencyErrorMessage: `Select how frequently you make loan payments`,
   childSpousalMaintenanceFrequencyErrorMessage: `Select how frequently you pay child or spousal maintenance`,
@@ -112,7 +112,7 @@ export const otherRegularExpenses = {
   clothingMinErrorMessage: `The amount you pay for clothing each week or month must be £0.00 or above`,
   otherExpensesMinErrorMessage: `The amount you pay for other expenses each week or month must be £0.00 or above`,
 
-// Maximum Limit Errors
+  // Maximum Limit Errors
   householdBillsMaxErrorMessage: `The amount you pay for household bills each week or month must be less than £1 billion`,
   loanPaymentsMaxErrorMessage: `The amount you pay for loan payments each week or month must be less than £1 billion`,
   childSpousalMaintenanceMaxErrorMessage: `The amount you pay for child or spousal maintenance each week or month must be less than £1 billion`,
@@ -122,7 +122,6 @@ export const otherRegularExpenses = {
   schoolCostsMaxErrorMessage: `The amount you pay for school costs each week or month must be less than £1 billion`,
   clothingMaxErrorMessage: `The amount you pay for clothing each week or month must be less than £1 billion`,
   otherExpensesMaxErrorMessage: `The amount you pay for other expenses each week or month must be less than £1 billion`,
-
 
   incorrectFormatTextInput: `1000`,
   negativeTextInput: `-100.00`,

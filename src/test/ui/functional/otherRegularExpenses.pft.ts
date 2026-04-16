@@ -1,4 +1,4 @@
-import { feedback, otherRegularExpenses,priorityDebtDetails } from '../data/page-data';
+import { feedback, otherRegularExpenses, priorityDebtDetails } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function otherRegularExpensesErrorValidation(): Promise<void> {
@@ -78,10 +78,7 @@ export async function otherRegularExpensesErrorValidation(): Promise<void> {
     otherRegularExpenses.loanPaymentsPaidEveryLabel,
     otherRegularExpenses.incorrectFormatTextInput
   );
-  await performAction(
-    'clickRadioButton',
-    otherRegularExpenses.loanPaymentsMonthRadioOption
-  );
+  await performAction('clickRadioButton', otherRegularExpenses.loanPaymentsMonthRadioOption);
   await performAction('clickButton', otherRegularExpenses.saveAndContinueButton);
 
   await performValidation('errorMessage', {
@@ -117,4 +114,3 @@ export async function otherRegularExpensesNavigationTests(): Promise<void> {
   });
   await performValidation('pageNavigation', otherRegularExpenses.backLink, priorityDebtDetails.mainHeader);
 }
-
