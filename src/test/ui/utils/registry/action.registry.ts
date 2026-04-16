@@ -4,6 +4,7 @@ import {
   GenAppsAction,
   LoginAction,
   NavigateToUrlAction,
+  RecordAnswers,
   RespondToClaimAction,
   TriggerPageFunctionalTestsAction,
 } from '../actions/custom-actions';
@@ -80,7 +81,9 @@ export class ActionRegistry {
     ['enterPriorityDebtDetails', new RespondToClaimAction()],
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
+    ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
+    ['recordUserEntry', new RecordAnswers()],
   ]);
 
   static getAction(actionName: string): IAction {
