@@ -13,7 +13,8 @@
     "start:dev": "yarn deps:up && node --trace-deprecation --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/bootstrap.ts",
     "start": "NODE_ENV=production node -r module-alias/register dist/main/bootstrap.js",
     "createIdamUser": "./bin/dev/createIdamUser.sh",
-    "start:watch": "nodemon --config nodemon.json",
+    "start:watch": "yarn deps:up && nodemon --config nodemon.json",
+    "start:watch:pcs-local": "USE_VAULT=false NODE_CONFIG_ENV=pcs-local yarn start:watch",
     "docker:dev": "docker compose up",
     "docker:dev:ssl": "COMMAND='yarn start:dev:ssl' docker compose up --build",
     "lint": "stylelint **/*.scss -v -q && eslint . --ext .js,.ts && prettier --check .",
@@ -121,11 +122,13 @@
     "@types/totp-generator": "0.0.8",
     "@types/uuid": "10.0.0",
     "@types/validator": "13.15.10",
+    "@types/webpack-env": "1.18.8",
     "@typescript-eslint/eslint-plugin": "8.56.1",
     "@typescript-eslint/parser": "8.56.1",
     "allure-commandline": "2.37.0",
     "allure-js-commons": "3.5.0",
     "allure-playwright": "3.5.0",
+    "chokidar": "3.6.0",
     "copy-webpack-plugin": "13.0.1",
     "css-loader": "7.1.4",
     "eslint": "9.39.3",
@@ -160,7 +163,8 @@
     "typescript": "5.9.3",
     "webpack": "5.106.2",
     "webpack-cli": "6.0.1",
-    "webpack-dev-middleware": "7.4.5"
+    "webpack-dev-middleware": "7.4.5",
+    "webpack-hot-middleware": "2.26.1"
   },
   "resolutions": {
     "@eslint/plugin-kit": "^0.7.0",
