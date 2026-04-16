@@ -29,7 +29,6 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
-import { claimantsName } from '../utils/actions/custom-actions';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
