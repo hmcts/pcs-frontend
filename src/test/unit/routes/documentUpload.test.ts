@@ -23,7 +23,6 @@ import documentUploadRoutes from '../../../main/routes/documentUpload';
 
 import { deleteDocument, uploadDocument } from '@services/cdamService';
 
-
 const mockUploadDocument = uploadDocument as jest.Mock;
 const mockDeleteDocument = deleteDocument as jest.Mock;
 
