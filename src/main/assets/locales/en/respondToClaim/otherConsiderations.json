@@ -1,0 +1,15 @@
+{
+  "caption": "Respond to a possession claim",
+  "pageTitle": "Other considerations",
+  "heading": "Are there any other considerations you would like the court to take into account?",
+  "otherConsiderationsDetailsLabel": "Tell us about the other considerations",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "otherConsiderations": "Select yes if you have other considerations for the court",
+    "otherConsiderationsDetails": "Enter details of the other considerations",
+    "otherConsiderationsInvalid": "Other considerations must not contain emoji or special characters"
+  }
+}

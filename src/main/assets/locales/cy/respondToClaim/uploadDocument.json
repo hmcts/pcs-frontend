@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cy Upload files",
+  "caption": "cy Respond to a property possession claim",
+  "heading": "cy Upload files (optional)",
+  "guidanceText": "cy Upload any files that you think are relevant to your response. The claimant will be able to see the files you upload.",
+  "beforeUploadHeading": "cy Before you upload your files",
+  "beforeUploadText": "cy Give your file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "cy Upload a file",
+  "filesAddedHeading": "cy Files added",
+  "uploadButton": "cy Upload file",
+  "deleteButton": "cy Remove",
+  "noFilesUploaded": "cy No files uploaded"
+}

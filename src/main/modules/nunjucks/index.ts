@@ -17,8 +17,16 @@ export class Nunjucks {
     );
     const cftNunjucksRoot = path.resolve(cftNunjucksPath, '..');
 
+    const mojFrontendPath = path.dirname(require.resolve('@ministryofjustice/frontend/moj/template.njk'));
+    const mojFrontendRoot = path.resolve(mojFrontendPath, '..');
+
     app.locals.nunjucksEnv = nunjucks.configure(
-      [path.join(__dirname, '..', '..', 'views'), path.join(__dirname, '..', '..', 'steps'), cftNunjucksRoot],
+      [
+        path.join(__dirname, '..', '..', 'views'),
+        path.join(__dirname, '..', '..', 'steps'),
+        cftNunjucksRoot,
+        mojFrontendRoot,
+      ],
       {
         autoescape: true,
         watch: this.developmentMode,

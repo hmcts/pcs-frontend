@@ -1,0 +1,55 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/stepButtons.njk" import stepButtons %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "macros/fileUploadMoj.njk" import fileUploadMoj %}
+
+{% block pageTitle %}
+  {{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-l">{{ caption }}</span>
+  {% endif %}
+
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% endif %}
+
+  <p class="govuk-body">{{ guidanceText }}</p>
+
+  <h2 class="govuk-heading-s">{{ beforeUploadHeading }}</h2>
+  <p class="govuk-body">{{ beforeUploadText }}</p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {{ fileUploadMoj(
+      {
+        id: "documents",
+        name: "documents",
+        label: {
+          text: uploadLabel,
+          classes: "govuk-label--m"
+        },
+        accept: acceptAttribute,
+        uploadUrl: uploadUrl,
+        deleteUrl: deleteUrl,
+        maxFileSize: maxFileSizeMb,
+        errorWrongType: wrongFileTypeError,
+        errorFileTooLarge: fileTooLargeError,
+        errorDelete: deleteFailedError,
+        deleteButtonText: deleteButton
+      },
+      uploadButton,
+      filesAddedHeading,
+      uploadedFiles
+    ) }}
+
+    {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
+  </form>
+{% endblock %}

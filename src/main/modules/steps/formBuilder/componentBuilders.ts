@@ -10,6 +10,7 @@ import type {
   FormFieldConfig,
   FormFieldOption,
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
 function createFieldsetLegend(
   label: string,
@@ -195,6 +196,16 @@ export function buildComponentConfig({
         }) || [];
 
       componentType = 'checkboxes';
+      break;
+    }
+    case 'file': {
+      component.value = fieldValue || [];
+      component.accept = field.accept || ACCEPT_ATTRIBUTE_EXTENSIONS;
+      component.maxFileSize = field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB;
+      component.uploadUrl = field.uploadUrl || '';
+      component.deleteUrl = field.deleteUrl || '';
+      component.classes = field.classes || 'moj-multi-file-upload__input';
+      componentType = 'fileUpload';
       break;
     }
     case 'date': {

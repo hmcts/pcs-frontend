@@ -94,6 +94,20 @@ export interface CcdDefendantParty {
 }
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
+export interface CcdDocumentReference {
+  document_url: string;
+  document_binary_url: string;
+  document_filename: string;
+  /** Draft / document table (AC06). */
+  content_type?: string;
+  size?: number;
+}
+
+export interface CcdCollectionItem<T> {
+  id?: string;
+  value: T;
+}
+
 export interface CcdDefendantResponses {
   tenancyTypeCorrect?: TenancyTypeCorrectValue;
   tenancyType?: string;
@@ -124,6 +138,7 @@ export interface CcdDefendantResponses {
     additionalContributionFrequency?: string;
   };
   householdCircumstances?: HouseholdCircumstances;
+  defendantUploadedDocuments?: CcdCollectionItem<CcdDocumentReference>[];
 }
 
 export interface PossessionClaimResponse {

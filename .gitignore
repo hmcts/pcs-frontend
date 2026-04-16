@@ -18,6 +18,7 @@ src/main/resources/localhost-ssl
 node-rpm-packaging/
 mochawesome-report/
 npm-debug.log.*
+package-lock.json
 
 .env
 .project
@@ -26,7 +27,7 @@ dist/
 public/
 src/main/views/govuk
 src/main/views/ui-component-lib
-src/main/assets
+# src/main/assets
 coverage/
 smoke-output/
 functional-output/

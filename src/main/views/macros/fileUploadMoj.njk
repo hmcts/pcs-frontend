@@ -1,0 +1,60 @@
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "moj/components/multi-file-upload/macro.njk" import mojMultiFileUpload %}
+
+{% macro fileUploadMoj(
+  component,
+  uploadButtonText='Upload file',
+  filesAddedHeading='Files added',
+  uploadedFiles=[]
+) %}
+  {% set uploadHtml %}
+    {{ govukFileUpload({
+      id: component.id,
+      name: component.name,
+      classes: "moj-multi-file-upload__input",
+      label: component.label,
+      attributes: { accept: component.accept }
+    }) }}
+    {{ govukButton({
+      text: uploadButtonText,
+      classes: "govuk-button--secondary moj-multi-file-upload__button"
+    }) }}
+  {% endset %}
+
+  {% set uploadedItems = [] %}
+  {% if uploadedFiles %}
+    {% for file in uploadedFiles %}
+      {% set _ = uploadedItems.push({
+        fileName: file.document_url,
+        originalFileName: file.document_filename,
+        message: { text: file.document_filename },
+        deleteButton: { text: component.deleteButtonText or 'Remove' }
+      }) %}
+    {% endfor %}
+  {% endif %}
+
+  {{ mojMultiFileUpload({
+    uploadedFiles: {
+      heading: { text: filesAddedHeading },
+      items: uploadedItems
+    },
+    uploadHtml: uploadHtml,
+    attributes: {
+      "data-upload-url": component.uploadUrl,
+      "data-delete-url": component.deleteUrl,
+      "data-max-file-size-mb": component.maxFileSize,
+      "data-error-wrong-type": component.errorWrongType or "",
+      "data-error-file-too-large": component.errorFileTooLarge or "",
+      "data-error-delete": component.errorDelete or ""
+    }
+  }) }}
+
+  <div id="uploaded-documents-container">
+    {% if uploadedFiles %}
+      {% for file in uploadedFiles %}
+        <input type="hidden" name="uploadedDocuments[]" value='{{ file | dump | safe }}' data-document-url="{{ file.document_url }}" />
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endmacro %}
