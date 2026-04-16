@@ -88,6 +88,7 @@ export const flowConfig: JourneyFlowConfig = {
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
     'upload-document',
+    'support-needs',
     'your-household-and-circumstances',
     'do-you-have-any-dependant-children',
     'do-you-have-any-other-dependants',
@@ -450,10 +451,14 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'upload-document': {
       previousStep: (req: Request) => getPreviousStepForYourHouseholdAndCircumstances(req),
+      defaultNext: 'support-needs',
+    },
+    'support-needs': {
+      previousStep: 'upload-document',
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
-      previousStep: 'upload-document',
+      previousStep: 'support-needs',
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {

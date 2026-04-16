@@ -33,6 +33,7 @@ import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
+import { step as supportNeeds } from './support-needs';
 import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
@@ -65,6 +66,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'upload-document': uploadDocument,
+  'support-needs': supportNeeds,
   'counter-claim': counterClaim,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,

@@ -127,7 +127,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('uses valid static previous step for household interstitial path', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'upload-document'
+      'support-needs'
     );
   });
 });
