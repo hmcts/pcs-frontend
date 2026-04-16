@@ -84,6 +84,7 @@ describe('respond-to-claim regular-income step', () => {
       defendantResponses: {
         householdCircumstances: {
           universalCredit: 'YES',
+          ucApplicationDate: undefined,
         },
       },
     });
@@ -107,5 +108,49 @@ describe('respond-to-claim regular-income step', () => {
     await step.postController.post(req, res, next);
 
     expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+  });
+
+  it('POST clears stale UC answer when selection is absent and existing UC data is present', async () => {
+    (validateForm as jest.Mock).mockReturnValue({});
+    const req = createReq({
+      body: {
+        action: 'continue',
+      },
+      res: {
+        locals: {
+          validatedCase: {
+            id: '1234567890123456',
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: {
+                    universalCredit: 'YES',
+                    ucApplicationDate: '2024-02-10',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+    const next = jest.fn();
+
+    if (!step.postController) {
+      throw new Error('expected postController');
+    }
+
+    await step.postController.post(req, res, next);
+
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
+      defendantResponses: {
+        householdCircumstances: {
+          universalCredit: 'NO',
+          ucApplicationDate: null,
+        },
+      },
+    });
   });
 });

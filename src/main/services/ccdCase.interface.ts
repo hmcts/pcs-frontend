@@ -29,7 +29,7 @@ export interface HouseholdCircumstances {
   otherTenants?: YesNoValue;
   otherTenantsDetails?: string;
   universalCredit?: YesNoValue;
-  ucApplicationDate?: string;
+  ucApplicationDate?: string | null;
   priorityDebts?: YesNoValue;
   debtTotal?: string;
   debtContribution?: string;

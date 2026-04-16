@@ -115,7 +115,7 @@ describe('respond-to-claim universal-credit step', () => {
       defendantResponses: {
         householdCircumstances: {
           universalCredit: 'NO',
-          ucApplicationDate: undefined,
+          ucApplicationDate: null,
         },
       },
     });
@@ -146,7 +146,7 @@ describe('respond-to-claim universal-credit step', () => {
       defendantResponses: {
         householdCircumstances: {
           universalCredit: 'NO',
-          ucApplicationDate: undefined,
+          ucApplicationDate: null,
         },
       },
     });
