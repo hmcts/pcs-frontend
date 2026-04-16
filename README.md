@@ -46,12 +46,21 @@ Install dependencies by executing the following command:
 yarn install
 ```
 
-Redis runs in a local Docker container; `yarn start:dev` now brings it up
-automatically (via the `redis:up` script) on first run and reuses the
+If necessary, login to the hmctsprod ACR:
+
+```bash
+> az acr login -n hmctsprod
+```
+
+Redis and Wiremock run in a local Docker container; `yarn start:dev` now brings it up
+automatically (via the `deps:up` script) on first run and reuses the
 `pcs-redis` container on subsequent runs. If you prefer to manage it yourself:
 
 ```bash
-docker run -d --name pcs-redis -p 6379:6379 redis
+> docker compose up -d
+ ✔ Network pcs-frontend_default       Created                                                                                                                     0.0s
+ ✔ Container pcs-frontend-cache-1     Started                                                                                                                     0.2s
+ ✔ Container pcs-frontend-wiremock-1  Started
 ```
 
 #### Development
@@ -204,6 +213,18 @@ Running accessibility tests:
 ```bash
 yarn test:accessibility
 ```
+
+### Stubbing Wiremock for local development
+
+Wiremock is used locally to stub responses from other services, (just the Fee Service
+at the time of writing). To alter or extend the mappings, edit or add to the files
+in [wiremock/mappings](wiremock/mappings).
+
+Ensure that you have run the docker compose command referenced earlier to
+get the wiremock container running locally.
+
+See the [Wiremock documentation](https://wiremock.org/docs/stubbing/) for more details on how
+to create mapping files.
 
 ### Security
 
