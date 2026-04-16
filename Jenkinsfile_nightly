@@ -41,7 +41,7 @@ properties([
     string(
       name: 'PLAYWRIGHT_SPEC',
       defaultValue: '',
-      description: 'Spec filename keyword(s), exact case. One pattern: respondToAClaim. Multiple: respondToAClaim,makeAnApplication or use ; between. Blank = all specs.'
+      description: 'Spec filename keyword(s), exact case seperated by comma. One pattern: respondToAClaim. Multiple: respondToAClaim,makeAnApplication. Blank = all specs.'
     ),
   ])
 ])
@@ -70,7 +70,7 @@ def secrets = [
 ]
 
 withNightlyPipeline(type, product, component) {
-  enableSlackNotifications('#pcs-tech')
+  enableSlackNotifications('#qa-pipeline-status')
   loadVaultSecrets(secrets)
   setFunctionalTestEnvVars()
   enableFortifyScan()
@@ -174,7 +174,7 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
   def msg = sh(script: "yarn exec ts-node src/test/ui/utils/common/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
-    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    slackSend(channel: '#qa-pipeline-status', message: msg)
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }
