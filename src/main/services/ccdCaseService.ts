@@ -41,7 +41,7 @@ import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import type { DashboardNotification } from '@services/pcsApi/dashboardNotification.interface';
 import type { DashboardTaskGroup } from '@services/pcsApi/dashboardTaskGroup.interface';
-import { unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
+import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
 
 const logger = Logger.getLogger('ccdCaseService');
 
@@ -362,7 +362,7 @@ export const ccdCaseService = {
       console.log('[getDashboardView] Transformed notifications:', JSON.stringify(notifications, null, 2));
       console.log('[getDashboardView] Transformed taskGroups:', JSON.stringify(taskGroups, null, 2));
 
-      return { notifications, taskGroups, propertyAddress: raw.propertyAddress };
+      return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress) };
     } catch (error) {
       throw convertAxiosErrorToHttpError(error, 'getDashboardView');
     }

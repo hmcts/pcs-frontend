@@ -6,18 +6,16 @@ export interface DashboardTaskGroup {
 export interface DashboardTask {
   templateId: string;
   templateValues: Record<string, unknown>;
-  status: 'NOT_AVAILABLE' | 'AVAILABLE' | 'ACTION_NEEDED' | 'IN_PROGRESS' | 'OPTIONAL' | 'COMPLETED';
+  status: string;
 }
 
-export const STATUS_MAP: Record<DashboardTask['status'], { text?: string; tag?: { text: string; classes?: string } }> =
-  {
-    NOT_AVAILABLE: { tag: { text: 'Not available yet', classes: 'govuk-tag--grey' } },
-    AVAILABLE: { tag: { text: 'Available', classes: 'govuk-tag--blue' } },
-    ACTION_NEEDED: { tag: { text: 'Action needed', classes: 'govuk-tag--red' } },
-    IN_PROGRESS: { tag: { text: 'In progress', classes: 'govuk-tag--yellow' } },
-    OPTIONAL: { tag: { text: 'Optional', classes: 'govuk-tag--blue' } },
-    COMPLETED: { text: 'Completed' },
-  };
+export type TaskStatus = 'AVAILABLE' | 'IN_PROGRESS' | 'COMPLETED';
+
+export const STATUS_MAP: Record<TaskStatus, { tag: { text: string; classes: string } }> = {
+  AVAILABLE: { tag: { text: 'Available', classes: 'govuk-tag--blue' } },
+  IN_PROGRESS: { tag: { text: 'In progress', classes: 'govuk-tag--red' } },
+  COMPLETED: { tag: { text: 'Completed', classes: 'govuk-tag--green' } },
+};
 
 export const TASK_GROUP_MAP: Record<DashboardTaskGroup['groupId'], string> = {
   CLAIM: 'The claim',

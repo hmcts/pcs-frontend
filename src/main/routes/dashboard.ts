@@ -1,20 +1,15 @@
 import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
 
-import type { CcdCase, CcdCaseAddress } from '../interfaces/ccdCase.interface';
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { Logger } from '@modules/logger';
-import {
-  type DashboardTaskGroup,
-  STATUS_MAP,
-  TASK_GROUP_MAP,
-  getDashboardNotifications,
-  getDashboardTaskGroups,
-} from '@services/pcsApi';
-import { arrayToString } from '@utils/arrayToString';
+import { ccdCaseService } from '@services/ccdCaseService';
+import type { DashboardTaskGroup, TaskStatus } from '@services/pcsApi/dashboardTaskGroup.interface';
+import { STATUS_MAP, TASK_GROUP_MAP } from '@services/pcsApi/dashboardTaskGroup.interface';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
+import { resolveNotification, resolveTaskHint, resolveTaskTitle } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 interface MappedTask {
@@ -25,25 +20,6 @@ interface MappedTask {
     text?: string;
     tag?: { text: string; classes?: string };
   };
-}
-
-function getPropertyAddressFromValidatedCase(validatedCase: CcdCase): string | null {
-  const address = (validatedCase.data as { propertyAddress?: CcdCaseAddress | undefined })?.propertyAddress;
-
-  if (!address) {
-    return null;
-  }
-
-  const formatted = arrayToString([
-    address.AddressLine1,
-    address.AddressLine2,
-    address.AddressLine3,
-    address.PostTown,
-    address.County,
-    address.PostCode,
-  ]);
-
-  return formatted || null;
 }
 
 interface MappedTaskGroup {
@@ -79,49 +55,23 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
   return `${DASHBOARD_ROUTE}/${sanitised}`;
 };
 
-function mapTaskGroups(app: Application, caseReference: string) {
-  return (taskGroups: DashboardTaskGroup[]): MappedTaskGroup[] => {
-    return taskGroups.map(taskGroup => {
-      const mappedTitle = TASK_GROUP_MAP[taskGroup.groupId];
+function mapTaskGroup(taskGroup: DashboardTaskGroup, caseReference: string): MappedTaskGroup {
+  const taskGroupId = taskGroup.groupId.toLowerCase();
+
+  return {
+    groupId: taskGroup.groupId,
+    title: TASK_GROUP_MAP[taskGroup.groupId] ?? taskGroup.groupId,
+    tasks: taskGroup.tasks.map((task): MappedTask => {
+      const hint = resolveTaskHint(task.templateId, task.templateValues);
+      const knownStatus = STATUS_MAP[task.status as TaskStatus];
 
       return {
-        groupId: taskGroup.groupId,
-        title: mappedTitle,
-        tasks: taskGroup.tasks.map(task => {
-          if (!app.locals.nunjucksEnv) {
-            throw new Error('Nunjucks environment not initialized');
-          }
-
-          const taskGroupId = taskGroup.groupId.toLowerCase();
-
-          const hint =
-            task.templateValues.dueDate || task.templateValues.deadline
-              ? {
-                  html: app.locals.nunjucksEnv.render(
-                    `components/taskGroup/${taskGroupId}/${task.templateId}-hint.njk`,
-                    task.templateValues
-                  ),
-                }
-              : undefined;
-
-          return {
-            title: {
-              html: app.locals.nunjucksEnv.render(
-                `components/taskGroup/${taskGroupId}/${task.templateId}.njk`,
-                task.templateValues
-              ),
-            },
-            hint,
-            // Absolute internal link is more robust than a relative one
-            href:
-              task.status === 'NOT_AVAILABLE'
-                ? undefined
-                : `/dashboard/${caseReference}/${taskGroupId}/${task.templateId}`,
-            status: STATUS_MAP[task.status],
-          };
-        }),
+        title: { html: resolveTaskTitle(task.templateId) },
+        hint,
+        href: knownStatus ? `/dashboard/${caseReference}/${taskGroupId}/${task.templateId}` : undefined,
+        status: knownStatus ?? {},
       };
-    });
+    }),
   };
 }
 
@@ -154,18 +104,32 @@ export default function dashboardRoutes(app: Application): void {
       });
     }
 
-    const caseReferenceNumber = Number(validatedCase.id);
-    const propertyAddress = getPropertyAddressFromValidatedCase(validatedCase);
+    const accessToken = req.session.user?.accessToken;
+    if (!accessToken) {
+      logger.error('Dashboard: user not authenticated - no access token');
+      return res.status(401).render('error', { error: 'Authentication required' });
+    }
+
     const rawDashboardCaseReference = toCaseReference16(validatedCase.id);
     const dashboardCaseReference = rawDashboardCaseReference
       ? rawDashboardCaseReference.replace(/(\d{4})(?=\d)/g, '$1 ')
       : null;
 
     try {
-      const [notifications, taskGroups] = await Promise.all([
-        getDashboardNotifications(caseReferenceNumber),
-        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, validatedCase.id)),
-      ]);
+      console.log('[dashboard route] Fetching dashboardView for case:', validatedCase.id);
+      const dashboardData = await ccdCaseService.getDashboardView(accessToken, validatedCase.id);
+
+      const notifications = dashboardData.notifications.map(n =>
+        resolveNotification(n.templateId, n.templateValues as Record<string, unknown>)
+      );
+
+      const taskGroups = dashboardData.taskGroups.map(tg => mapTaskGroup(tg, validatedCase.id));
+
+      const propertyAddress = dashboardData.propertyAddress ?? null;
+
+      console.log('[dashboard route] Resolved notifications for view:', JSON.stringify(notifications, null, 2));
+      console.log('[dashboard route] Resolved taskGroups for view:', JSON.stringify(taskGroups, null, 2));
+      console.log('[dashboard route] Property address:', propertyAddress);
 
       return res.render('dashboard', {
         notifications,

@@ -235,7 +235,7 @@ export interface CcdDashboardTaskGroup {
 
 export interface CcdDashboardData {
   caseId?: string;
-  propertyAddress?: string;
+  propertyAddress?: CcdCaseAddress;
   notifications?: CcdCollectionItem<CcdDashboardNotification>[];
   taskGroups?: CcdCollectionItem<CcdDashboardTaskGroup>[];
 }

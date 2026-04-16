@@ -1,4 +1,5 @@
 import type {
+  CcdCaseAddress,
   CcdCollectionItem,
   CcdDashboardNotification,
   CcdDashboardTaskGroup,
@@ -6,6 +7,15 @@ import type {
 } from '@interfaces/ccdCase.interface';
 import type { DashboardNotification } from '@services/pcsApi/dashboardNotification.interface';
 import type { DashboardTask, DashboardTaskGroup } from '@services/pcsApi/dashboardTaskGroup.interface';
+
+export function formatAddress(addr: CcdCaseAddress | undefined): string | undefined {
+  if (!addr) {
+    return undefined;
+  }
+  return [addr.AddressLine1, addr.AddressLine2, addr.AddressLine3, addr.PostTown, addr.County, addr.PostCode]
+    .filter(Boolean)
+    .join(', ');
+}
 
 function unwrapCollection<T>(items: CcdCollectionItem<T>[] | undefined): T[] {
   return (items ?? []).map(item => item.value);
@@ -36,7 +46,7 @@ export function unwrapTaskGroups(raw: CcdCollectionItem<CcdDashboardTaskGroup>[]
     tasks: unwrapCollection(g.tasks).map(
       (t): DashboardTask => ({
         templateId: t.templateId,
-        status: t.status as DashboardTask['status'],
+        status: t.status,
         templateValues: {},
       })
     ),
