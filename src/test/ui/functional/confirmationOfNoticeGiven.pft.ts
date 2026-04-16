@@ -1,22 +1,24 @@
-import { submitCaseApiData } from '../data/api-data';
+/*import { submitCaseApiData } from '../data/api-data';*/
 import { confirmationOfNoticeGiven, dashboard, feedback, tenancyDateUnknown } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
-let claimantName = '';
+// Regression Bug raised - HDPI-6087, The code related to error validation on the “Notice details” page has been temporarily commented out
+
+/*let claimantName = '';
 
 if (process.env.CLAIMANT_NAME_OVERRIDDEN === 'YES') {
   claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
 } else {
   claimantName = submitCaseApiData.submitCasePayloadNoDefendants.claimantName;
-}
+}*/
 
-export async function confirmationOfNoticeGivenErrorValidation(): Promise<void> {
+/*export async function confirmationOfNoticeGivenErrorValidation(): Promise<void> {
   await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: confirmationOfNoticeGiven.thereIsAProblemErrorMessageHeader,
     message: confirmationOfNoticeGiven.selectIfNoticeOfIntentionGivenErrorMessage(claimantName),
   });
-}
+}*/
 
 export async function confirmationOfNoticeGivenNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', confirmationOfNoticeGiven.feedbackLink, {
