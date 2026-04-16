@@ -345,7 +345,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     whatRegularIncomeDoYouReceive.emojiTextInput
   );
   console.log(`entered emoji input text`);
-
+  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
     message: whatRegularIncomeDoYouReceive.emojiErrorMessage,
