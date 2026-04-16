@@ -8,7 +8,11 @@ export type StepCondition = (
 
 export type JourneyFlowConfigResolver = (req: Request) => JourneyFlowConfig | Promise<JourneyFlowConfig>;
 
-export type ShowCondition = (req: Request) => boolean;
+export type ShowCondition = (
+  req: Request,
+  formData: Record<string, unknown>,
+  currentStepData: Record<string, unknown>
+) => Promise<boolean> | boolean;
 
 export interface StepRoute {
   condition?: StepCondition;
