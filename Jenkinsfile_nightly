@@ -26,7 +26,7 @@ properties([
     booleanParam(
       name: 'SAUCE_CROSSBROWSER',
       defaultValue: false,
-      description: 'Tick to run cross-browser tests on Sauce Labs (saucectl). Uses .sauce/config-matrix.yml when present; skipped otherwise.'
+      description: 'Tick to run cross-browser tests on Sauce Labs'
     ),
     choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
