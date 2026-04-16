@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 
+import { chooseAnApplication, isTheCourtHearingInTheNext14Days } from '../../../data/page-data/genApps-page-data';
 import {
   chooseAnApplication,
   whichLanguageDidYouUseToCompleteThisService,
@@ -11,6 +12,7 @@ export class GenAppsAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['chooseAnApplication', () => this.chooseAnApplication(fieldName as actionRecord)],
+      ['confirmIfCourtHearingInNext14Days', () => this.confirmIfCourtHearingInNext14Days(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
     ]);
@@ -22,6 +24,7 @@ export class GenAppsAction implements IAction {
   }
 
   private async chooseAnApplication(chooseApp: actionRecord) {
+    await performAction('recordUserEntry', chooseApp);
     await performAction('clickRadioButton', {
       question: chooseApp.question,
       option: chooseApp.option,
@@ -35,6 +38,15 @@ export class GenAppsAction implements IAction {
       option: selectLanguageData.option,
     });
     await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+  }
+
+  private async confirmIfCourtHearingInNext14Days(courtHearing: actionRecord) {
+    await performAction('recordUserEntry', courtHearing);
+    await performAction('clickRadioButton', {
+      question: courtHearing.question,
+      option: courtHearing.option,
+    });
+    await performAction('clickButton', isTheCourtHearingInTheNext14Days.continueButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {

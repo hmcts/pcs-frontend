@@ -1,11 +1,10 @@
 import { Request } from 'express';
 
-import { FeeType } from '../../../interfaces/feeService.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
-import { getFee } from '@services/feeLookupService';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { FeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'ask-to-adjourn-the-court-hearing',

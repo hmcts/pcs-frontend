@@ -1,6 +1,7 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'have-you-already-applied-for-help-with-fees',
@@ -25,6 +26,7 @@ export const step: StepDefinition = createFormStep({
               name: 'hwfReference',
               type: 'text',
               required: true,
+              maxLength: 60,
               labelClasses: 'govuk-!-font-weight-bold',
               translationKey: {
                 label: 'revealedHwfQuestion.label',
