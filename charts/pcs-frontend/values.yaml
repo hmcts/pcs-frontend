@@ -36,3 +36,4 @@ nodejs:
     OTEL_SERVICE_NAME: 'pcs-frontend'
     OTEL_ENABLED: true
     XUI_BASE_URI: 'https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net'
+    CDAM_URL: 'http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
