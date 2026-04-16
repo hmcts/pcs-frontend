@@ -1,12 +1,13 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { CitizenGenAppRequest } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation, getFormData, getTranslationFunction } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { toYesNoEnum } from '../../utils/yesNoEnum';
+import { toYesNoEnum } from '../../utils';
 import { MAKE_AN_APPLICATION_ROUTE, flowConfig } from '../flow.config';
+
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { CitizenGenAppRequest } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'check-your-answers';
 const stepNavigation = createStepNavigation(flowConfig);
