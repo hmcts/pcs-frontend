@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Have the other parties agreed to this application?",
+  "caption": "Make an application",
+  "heading": "Have the other parties agreed to this application?",
+  "question": "Have the other parties agreed to this application?",
+  "errors": {
+    "typeOfApplication": "You must select whether the other parties have agreed to this application"
+  }
+}

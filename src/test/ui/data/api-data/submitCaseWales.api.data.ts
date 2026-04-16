@@ -27,8 +27,8 @@ export const submitCaseApiDataWales = {
     claimantContactEmail: 'pcs-solicitor1@test.com',
     isCorrectClaimantContactEmail: 'YES',
 
-    orgNameFound: 'Yes',
-    orgAddressFound: 'Yes',
+    orgNameFound: 'YES',
+    orgAddressFound: 'YES',
 
     organisationAddress: {
       AddressLine1: 'Ministry Of Justice',
@@ -72,8 +72,8 @@ export const submitCaseApiDataWales = {
     walesLicensedAgentAppointed: 'NO',
     walesRegistered: 'NO',
 
-    showRentArrearsPage: 'Yes',
-    showReasonsForGroundsPageWales: 'Yes',
+    showRentArrearsPage: 'YES',
+    showReasonsForGroundsPageWales: 'YES',
 
     rentDetails_Frequency: 'WEEKLY',
     rentSectionPaymentFrequency: 'WEEKLY',
@@ -106,7 +106,7 @@ export const submitCaseApiDataWales = {
 
     prohibitedConductWalesClaim: 'NO',
 
-    walesNoticeServed: 'Yes',
+    walesNoticeServed: 'YES',
     walesTypeOfNoticeServed: 'terts',
     notice_NoticeServiceMethod: 'FIRST_CLASS_POST',
     notice_NoticePostedDate: '1995-11-10',

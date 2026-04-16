@@ -1,8 +1,7 @@
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-
 import { Logger } from '@modules/logger';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 const logger = Logger.getLogger('form-builder-subFieldsRenderer');
 /**

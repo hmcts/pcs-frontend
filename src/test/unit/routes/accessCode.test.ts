@@ -16,13 +16,13 @@ jest.mock('../../../main/middleware/oidc', () => ({
 }));
 
 const mockValidateAccessCode = jest.fn();
-jest.mock('../../../main/services/pcsApi/pcsApiService', () => ({
+jest.mock('@services/pcsApi/pcsApiService', () => ({
   validateAccessCode: mockValidateAccessCode,
 }));
 
 import type { Application, Request, Response } from 'express';
 
-import accessCodeRoutes from '../../../main/routes/accessCode';
+import accessCodeRoutes from '@routes/accessCode';
 
 describe('accessCode routes', () => {
   let app: Application;

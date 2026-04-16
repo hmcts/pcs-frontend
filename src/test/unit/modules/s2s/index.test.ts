@@ -2,10 +2,9 @@ import config from 'config';
 import { Express } from 'express';
 import { TOTP } from 'totp-generator';
 
-import { http } from '../../../../main/modules/http';
-import { S2S } from '../../../../main/modules/s2s';
-
+import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import { S2S } from '@modules/s2s';
 
 jest.mock('@modules/logger', () => ({
   Logger: {
@@ -23,7 +22,7 @@ jest.mock('ioredis');
 jest.mock('jose', () => ({
   decodeJwt: jest.fn().mockReturnValue({ exp: 1234567890 }),
 }));
-jest.mock('../../../../main/modules/http', () => ({
+jest.mock('@modules/http', () => ({
   http: {
     setToken: jest.fn(),
     setTokenRegenerator: jest.fn(),

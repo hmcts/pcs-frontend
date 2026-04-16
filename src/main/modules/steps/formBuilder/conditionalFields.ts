@@ -1,6 +1,6 @@
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-
 import { normalizeCheckboxValue } from './helpers';
+
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 /**
  * Checks if an option is selected for a radio or checkbox field

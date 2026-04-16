@@ -2,13 +2,16 @@ import { Request } from 'express';
 
 import { isDefendantNameKnown } from '../../../../main/steps/utils/isDefendantNameKnown';
 
+import { CcdCaseModel } from '@services/ccdCaseData.model';
+
 describe('isDefendantNameKnown', () => {
   describe('when defendant name is fully present in CCD', () => {
     it('should return true when nameKnown=YES and both firstName and lastName exist', async () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
+            validatedCase: new CcdCaseModel({
+              id: '',
               data: {
                 possessionClaimResponse: {
                   claimantEnteredDefendantDetails: {
@@ -18,7 +21,7 @@ describe('isDefendantNameKnown', () => {
                   },
                 },
               },
-            },
+            }),
           },
         },
       } as unknown as Request;
@@ -34,7 +37,8 @@ describe('isDefendantNameKnown', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
+            validatedCase: new CcdCaseModel({
+              id: '',
               data: {
                 possessionClaimResponse: {
                   claimantEnteredDefendantDetails: {
@@ -42,7 +46,7 @@ describe('isDefendantNameKnown', () => {
                   },
                 },
               },
-            },
+            }),
           },
         },
       } as unknown as Request;
@@ -56,7 +60,8 @@ describe('isDefendantNameKnown', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
+            validatedCase: new CcdCaseModel({
+              id: '',
               data: {
                 possessionClaimResponse: {
                   claimantEnteredDefendantDetails: {
@@ -65,7 +70,7 @@ describe('isDefendantNameKnown', () => {
                   },
                 },
               },
-            },
+            }),
           },
         },
       } as unknown as Request;
@@ -79,7 +84,8 @@ describe('isDefendantNameKnown', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
+            validatedCase: new CcdCaseModel({
+              id: '',
               data: {
                 possessionClaimResponse: {
                   claimantEnteredDefendantDetails: {
@@ -88,7 +94,7 @@ describe('isDefendantNameKnown', () => {
                   },
                 },
               },
-            },
+            }),
           },
         },
       } as unknown as Request;
@@ -102,11 +108,12 @@ describe('isDefendantNameKnown', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
+            validatedCase: new CcdCaseModel({
+              id: '',
               data: {
                 possessionClaimResponse: {},
               },
-            },
+            }),
           },
         },
       } as unknown as Request;
@@ -132,7 +139,8 @@ describe('isDefendantNameKnown', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: {
+            validatedCase: new CcdCaseModel({
+              id: '',
               data: {
                 possessionClaimResponse: {
                   claimantEnteredDefendantDetails: {
@@ -142,7 +150,7 @@ describe('isDefendantNameKnown', () => {
                   },
                 },
               },
-            },
+            }),
           },
         },
       } as unknown as Request;

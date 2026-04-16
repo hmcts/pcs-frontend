@@ -1,11 +1,12 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'non-rent-arrears-dispute',
@@ -15,6 +16,7 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/nonRentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    heading: 'heading',
     caption: 'caption',
   },
   beforeRedirect: async req => {
