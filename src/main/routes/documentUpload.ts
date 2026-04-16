@@ -70,15 +70,17 @@ export default function documentUploadRoutes(app: Application): void {
         const document = await uploadDocument(req.file, userToken);
 
         const successMessage = errors.uploadSuccess(document.document_filename);
-        const safeFilename = document.document_filename
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
+        const safeSuccessMessage = errors.uploadSuccess(
+          document.document_filename
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+        );
         return res.json({
           success: {
             messageText: successMessage,
-            messageHtml: `${safeFilename} has been uploaded`,
+            messageHtml: safeSuccessMessage,
           },
           file: {
             filename: document.document_url,
