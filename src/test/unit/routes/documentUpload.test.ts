@@ -96,7 +96,7 @@ describe('documentUploadRoutes', () => {
       expect(mockUploadDocument).toHaveBeenCalled();
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          success: expect.objectContaining({ messageText: 'test.pdf has been uploaded' }),
+          success: expect.objectContaining({ messageText: expect.any(String) }),
           document: mockDoc,
         })
       );

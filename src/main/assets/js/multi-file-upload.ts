@@ -14,7 +14,7 @@ function getCsrfToken(): string {
   return document.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value || '';
 }
 
-function getOrCreateErrorSummary(form: HTMLFormElement): HTMLDivElement {
+function getOrCreateErrorSummary(form: HTMLFormElement, title: string): HTMLDivElement {
   let summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
   if (summary) {
     return summary;
@@ -27,7 +27,7 @@ function getOrCreateErrorSummary(form: HTMLFormElement): HTMLDivElement {
   summary.setAttribute('tabindex', '-1');
   summary.setAttribute('aria-labelledby', 'upload-error-summary-title');
   summary.innerHTML = `
-    <h2 class="govuk-error-summary__title" id="upload-error-summary-title">There is a problem</h2>
+    <h2 class="govuk-error-summary__title" id="upload-error-summary-title">${title}</h2>
     <div class="govuk-error-summary__body">
       <ul class="govuk-list govuk-error-summary__list"></ul>
     </div>`;
@@ -35,8 +35,8 @@ function getOrCreateErrorSummary(form: HTMLFormElement): HTMLDivElement {
   return summary;
 }
 
-function showErrorSummary(form: HTMLFormElement, message: string): void {
-  const summary = getOrCreateErrorSummary(form);
+function showErrorSummary(form: HTMLFormElement, message: string, title = 'There is a problem'): void {
+  const summary = getOrCreateErrorSummary(form, title);
   const list = summary.querySelector<HTMLUListElement>('.govuk-error-summary__list');
   if (!list) {
     return;
@@ -122,6 +122,7 @@ function initContainer(container: HTMLElement): void {
   const wrongTypeMessage = container.dataset.errorWrongType || '';
   const tooLargeMessage = container.dataset.errorFileTooLarge || '';
   const deleteFailedMessage = container.dataset.errorDelete || '';
+  const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
 
   new MultiFileUpload(container, {
@@ -131,11 +132,11 @@ function initContainer(container: HTMLElement): void {
       entryHook: (_upload: InstanceType<typeof MultiFileUpload>, file: File) => {
         clearErrorSummary(form);
         if (isBlockedExtension(file.name)) {
-          showErrorSummary(form, wrongTypeMessage);
+          showErrorSummary(form, wrongTypeMessage, errorSummaryTitle);
           throw new Error('blocked');
         }
         if (file.size > maxBytes) {
-          showErrorSummary(form, tooLargeMessage);
+          showErrorSummary(form, tooLargeMessage, errorSummaryTitle);
           throw new Error('too_large');
         }
       },
@@ -192,7 +193,7 @@ function initContainer(container: HTMLElement): void {
         } catch {
           // Use default message
         }
-        showErrorSummary(form, message);
+        showErrorSummary(form, message, errorSummaryTitle);
       },
 
       deleteHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File | undefined, xhr: XMLHttpRequest) => {
@@ -213,7 +214,7 @@ function initContainer(container: HTMLElement): void {
             // Cleanup failed; hidden input may remain
           }
         } else {
-          showErrorSummary(form, deleteFailedMessage);
+          showErrorSummary(form, deleteFailedMessage, errorSummaryTitle);
         }
       },
     },

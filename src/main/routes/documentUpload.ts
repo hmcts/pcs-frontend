@@ -36,6 +36,7 @@ async function getErrorTranslations(req: Request) {
     uploadFailed: t('common:errors.documentUpload.uploadFailed'),
     deleteFailed: t('common:errors.documentUpload.fileDeleteFailed'),
     documentUrlRequired: t('common:errors.documentUpload.documentUrlRequired'),
+    uploadSuccess: (filename: string) => t('common:errors.documentUpload.uploadSuccess', { filename }),
   };
 }
 
@@ -68,6 +69,7 @@ export default function documentUploadRoutes(app: Application): void {
         const userToken = getUserToken(req);
         const document = await uploadDocument(req.file, userToken);
 
+        const successMessage = errors.uploadSuccess(document.document_filename);
         const safeFilename = document.document_filename
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
@@ -75,7 +77,7 @@ export default function documentUploadRoutes(app: Application): void {
           .replace(/"/g, '&quot;');
         return res.json({
           success: {
-            messageText: `${document.document_filename} has been uploaded`,
+            messageText: successMessage,
             messageHtml: `${safeFilename} has been uploaded`,
           },
           file: {

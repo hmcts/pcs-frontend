@@ -210,6 +210,7 @@ export function buildComponentConfig({
         maxSize: String(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
       });
       component.errorDelete = t('common:errors.documentUpload.fileDeleteFailed');
+      component.errorSummaryTitle = t('common:errors.documentUpload.errorSummaryTitle');
       component.uploadButtonText = t('uploadButton');
       component.filesAddedHeading = t('filesAddedHeading');
       component.deleteButtonText = t('deleteButton');

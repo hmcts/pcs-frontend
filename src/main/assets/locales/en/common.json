@@ -78,7 +78,9 @@
       "noFileSelected": "Select a file to upload",
       "uploadFailed": "The file could not be uploaded – try again",
       "fileDeleteFailed": "The file could not be removed – try again",
-      "documentUrlRequired": "Select a file to remove"
+      "documentUrlRequired": "Select a file to remove",
+      "uploadSuccess": "{{filename}} has been uploaded",
+      "errorSummaryTitle": "There is a problem"
     }
   },
   "months": {
