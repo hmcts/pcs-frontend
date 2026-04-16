@@ -140,8 +140,12 @@ export class PageNavigationValidation implements IValidation {
 
         if (validationData.pageSlug) {
           try {
-            expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=respond-to-claim/${validationData.pageSlug}`;
             actualUrl = page.url();
+            if (actualUrl.includes('respond-to-claim')) {
+              expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=respond-to-claim/${validationData.pageSlug}`;
+            } else if (actualUrl.includes('make-an-application')) {
+              expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=make-an-application/${validationData.pageSlug}`;
+            }
             if (actualUrl !== expectedUrlPattern) {
               urlPassed = false;
               urlError = `URL mismatch. Expected: ${expectedUrlPattern}, Actual: ${actualUrl}`;

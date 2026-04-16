@@ -14,6 +14,6 @@ export const whichLanguageDidYouUseToCompleteThisService = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
   errorValidationField: {
-    errorRadioOption: { type: `none`, input: ``, errMessage: `You must select an type of application to apply for` },
+    errorRadioOption: { type: `none`, input: ``, errMessage: `Confirm which language you used to complete this service` },
   },
 };
