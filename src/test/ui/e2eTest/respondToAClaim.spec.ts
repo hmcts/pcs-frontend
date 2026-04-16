@@ -262,7 +262,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', incomeAndExpenses.continueButton);
     await performValidation('mainHeader', regularIncome.mainHeader);
-    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
@@ -275,6 +275,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.monthRadioOption,
     });
+    await performValidation('mainHeader', regularExpenses.mainHeader);
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
@@ -360,10 +361,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', incomeAndExpenses.continueButton);
     await performValidation('mainHeader', regularIncome.mainHeader);
-    await performAction('clickButton', regularIncome.saveAndContinueButton);
-    await performAction('selectUniversalCredit', {
-      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
-    });
+    await performValidation('clickCheckBox', regularIncome.universalCreditCheckBox);
+    await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectPriorityDebts', {
       option: priorityDebts.yesRadioOption,
     });
@@ -456,7 +455,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', incomeAndExpenses.continueButton);
     await performValidation('mainHeader', regularIncome.mainHeader);
-    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
@@ -549,7 +548,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', incomeAndExpenses.continueButton);
     await performValidation('mainHeader', regularIncome.mainHeader);
-    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
       creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
       ...getRelativeDate(5),
@@ -637,7 +636,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', incomeAndExpenses.continueButton);
     await performValidation('mainHeader', regularIncome.mainHeader);
-    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
@@ -730,7 +729,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', incomeAndExpenses.continueButton);
     await performValidation('mainHeader', regularIncome.mainHeader);
-    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
@@ -822,7 +821,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', incomeAndExpenses.continueButton);
     await performValidation('mainHeader', regularIncome.mainHeader);
-    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
       creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
       ...getRelativeDate(5),
@@ -924,7 +923,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', incomeAndExpenses.continueButton);
     await performValidation('mainHeader', regularIncome.mainHeader);
-    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
@@ -1013,7 +1012,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('clickButton', incomeAndExpenses.continueButton);
     await performValidation('mainHeader', regularIncome.mainHeader);
-    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
       creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
       ...getRelativeDate(5),

@@ -18,4 +18,5 @@ export const axe_exclusions = [
   '#shareCircumstances', //page: yourCircumstances, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#exceptionalHardship', //page: exceptionalHardship, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#alreadyAppliedForHelp', //page : alreadyAppliedForHelp,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#haveAppliedForUniversalCredit', //page : haveYouAppliedForUniversalCredit,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
 ];
