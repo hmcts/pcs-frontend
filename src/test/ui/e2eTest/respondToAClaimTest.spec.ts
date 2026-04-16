@@ -2,10 +2,7 @@ import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import {
-  freeLegalAdvice,
-  startNow
-} from '../data/page-data';
+import { freeLegalAdvice, startNow } from '../data/page-data';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';
 
