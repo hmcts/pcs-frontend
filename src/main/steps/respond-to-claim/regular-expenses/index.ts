@@ -13,6 +13,7 @@ import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResp
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const createAmountValidator =
   (largeAmountErrorKey: string, negativeErrorKey: string) =>

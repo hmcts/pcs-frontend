@@ -1,6 +1,5 @@
 import { type Request } from 'express';
 
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
 import {
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
@@ -13,6 +12,8 @@ import {
 } from '../utils';
 
 import { flowConfig as citizenFlowConfig } from './flow.config';
+
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const legalrepFlowConfig: JourneyFlowConfig = {
   ...citizenFlowConfig,

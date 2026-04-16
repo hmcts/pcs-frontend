@@ -16,7 +16,7 @@ import {
   isWelshProperty,
 } from '../utils';
 
-import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -44,14 +44,15 @@ function getContactByTelephoneAnswer(
 function getConfirmNoticeGivenAnswer(
   req: Request,
   currentStepData: Record<string, unknown> = {}
-): 'yes' | 'no' | 'imNotSure' | undefined {
-  const currentAnswer = currentStepData.confirmNoticeGiven;
-  if (currentAnswer === 'yes' || currentAnswer === 'no' || currentAnswer === 'imNotSure') {
+): 'YES' | 'NO' | 'NOT_SURE' | undefined {
+  const currentAnswer = currentStepData.possessionNoticeReceived;
+  if (currentAnswer === 'YES' || currentAnswer === 'NO' || currentAnswer === 'NOT_SURE') {
     return currentAnswer;
   }
 
-  const ccdAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
-  if (ccdAnswer === 'yes' || ccdAnswer === 'no' || ccdAnswer === 'imNotSure') {
+  const ccdAnswer =
+    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived;
+  if (ccdAnswer === 'YES' || ccdAnswer === 'NO' || ccdAnswer === 'NOT_SURE') {
     return ccdAnswer;
   }
 
@@ -269,7 +270,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven !== 'yes') {
+            if (confirmNoticeGiven !== 'YES') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -284,7 +285,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven !== 'yes') {
+            if (confirmNoticeGiven !== 'YES') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -299,9 +300,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            // Treat any non-yes value as "not yes" to avoid falling through
-            // to notice-date pages when CCD returns an unexpected string.
-            if (confirmNoticeGiven === 'yes') {
+            if (confirmNoticeGiven === 'YES') {
               return false;
             }
             const rentArrears = await hasAnyRentArrearsGround(req);
@@ -316,9 +315,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            // Treat any non-yes value as "not yes" to avoid falling through
-            // to notice-date pages when CCD returns an unexpected string.
-            if (confirmNoticeGiven === 'yes') {
+            if (confirmNoticeGiven === 'YES') {
               return false;
             }
             const rentArrears = await hasAnyRentArrearsGround(req);

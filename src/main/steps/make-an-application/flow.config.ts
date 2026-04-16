@@ -1,8 +1,7 @@
 import type { Request } from 'express';
 
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-
 import { getFormData } from '@modules/steps';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const MAKE_AN_APPLICATION_ROUTE = '/case/:caseReference/make-an-application';
 
@@ -68,7 +67,7 @@ function getTypeOfApplication(req: Request): string {
 }
 
 function isHearingInNext14Days(req: Request): boolean {
-  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').courtHearingInNext14Days === 'YES';
+  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').courtHearingInNext14Days === 'yes';
 }
 
 function needHelpPayingTheFee(req: Request): boolean {

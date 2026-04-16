@@ -4,8 +4,8 @@ export enum CaseState {
 }
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
+export type YesNoValue = 'YES' | 'NO' | null;
 export type TenancyTypeCorrectValue = YesNoNotSureValue;
-export type YesNoValue = 'YES' | 'NO' | 'Yes' | 'No' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 export enum YesNoEnum {
@@ -62,6 +62,16 @@ export interface HouseholdCircumstances {
   clothing?: IncomeExpenseDetails;
   otherExpenses?: IncomeExpenseDetails;
 }
+
+export type PaymentAgreement = {
+  anyPaymentsMade?: YesNoValue;
+  paymentDetails?: string;
+  repaymentPlanAgreed?: YesNoNotSureValue;
+  repaymentAgreedDetails?: string;
+  repayArrearsInstalments?: YesNoValue;
+  additionalRentContribution?: unknown;
+  additionalContributionFrequency?: string;
+};
 
 export interface CcdUserCase {
   id: string;
@@ -129,7 +139,7 @@ export interface CcdDefendantParty {
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
-  tenancyTypeCorrect?: TenancyTypeCorrectValue;
+  tenancyTypeCorrect?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
   confirmNoticeGiven?: string;
@@ -150,14 +160,10 @@ export interface CcdDefendantResponses {
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
   disputeClaimDetails?: string;
-  paymentAgreement?: {
-    repaymentPlanAgreed?: YesNoNotSureValue;
-    repaymentAgreedDetails?: string;
-    repayArrearsInstalments?: YesNoValue;
-    additionalRentContribution?: unknown;
-    additionalContributionFrequency?: string;
-  };
+  paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
+  possessionNoticeReceived?: YesNoNotSureValue;
+  noticeReceivedDate?: string;
 }
 
 export interface PossessionClaimResponse {
@@ -250,4 +256,5 @@ export enum GenAppType {
 
 export interface CitizenGenAppRequest {
   applicationType: GenAppType;
+  within14Days?: YesNoValue;
 }

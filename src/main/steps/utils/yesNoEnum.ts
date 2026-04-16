@@ -3,21 +3,21 @@
  * Used for CCD API integration where boolean choices are represented as enum strings.
  */
 
-import type { VerticalYesNoValue, YesNoValue } from '../../interfaces/ccdCase.interface';
+import type { VerticalYesNoValue, YesNoValue } from '@services/ccdCase.interface';
 
 /**
- * Converts frontend 'yes'/'no' to backend 'Yes'/'No' enum.
- * Used for household circumstances fields.
- * @example toYesNoEnum('yes') // returns 'Yes'
+ * Converts frontend 'yes'/'no' string to backend CCD enum 'YES'/'NO'
+ * @param value - Frontend radio button value ('yes' or 'no')
+ * @returns CCD enum value ('YES' or 'NO')
  */
 export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
-  return value.toLowerCase() === 'yes' ? 'Yes' : 'No';
+  return value === 'yes' ? 'YES' : 'NO';
 }
 
 /**
- * Converts backend 'Yes'/'No' enum to frontend 'yes'/'no'.
- * Case-insensitive for backward compatibility.
- * @example fromYesNoEnum('Yes') // returns 'yes'
+ * Converts backend CCD enum to frontend 'yes'/'no' string, with case-insensitive matching
+ * @param value - CCD enum value
+ * @returns Frontend radio button value ('yes' or 'no'), or undefined if value is null/invalid
  */
 export function fromYesNoEnum(value: YesNoValue | string | null | undefined): 'yes' | 'no' | undefined {
   if (!value) {
