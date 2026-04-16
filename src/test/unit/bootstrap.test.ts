@@ -25,6 +25,8 @@ const loadBootstrapModule = async (): Promise<void> => {
   jest.doMock('../../main/server', () => ({}));
 
   await import('../../main/bootstrap');
+  // bootstrap runs `void main()` on load; yield until that async chain settles
+  await new Promise(resolve => setImmediate(resolve));
 };
 
 describe('bootstrap', () => {
