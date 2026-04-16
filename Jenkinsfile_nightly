@@ -23,10 +23,10 @@ properties([
       defaultValue: false,
       description: 'Tick the checkbox to run E2E tests in Desktop Edge.'
     ),
-    booleanParam(
+    choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to enable page functional tests (content, errors, navigation).'
+      choices: ['true', 'false'],
+      description: 'Enable page functional tests (content, errors, navigation). Default true.'
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
@@ -83,7 +83,7 @@ def setFunctionalTestEnvVars() {
   def tag = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
   env.FUNCTIONAL_TEST_SCOPE = (tag == '(all tests)') ? '' : tag
   env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
-  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = (params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS != false) ? 'true' : 'false'
+  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = (params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS == 'true') ? 'true' : 'false'
 }
 
 def runE2ETests(yarnBuilder) {

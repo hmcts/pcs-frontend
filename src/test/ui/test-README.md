@@ -232,6 +232,6 @@ Runs only the scheduled nightly job; it does **not** drive PR or **master** buil
 - **Jenkins parameters (relevant to Playwright):**
   - **`PLAYWRIGHT_GREP_TAG`** — `@nightly` (default), `(all tests)`, `@smoke`, `@regression`, or `@accessibility`. Maps to `FUNCTIONAL_TEST_SCOPE`.
   - **`PLAYWRIGHT_SPEC`** — Optional; sets **`E2E_SPEC`**. Empty = all spec files (subject to grep).
-- **Other parameters:** **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`** (default **true**). Nightly always uses **AAT** (`TEST_URL`).
+- **Other parameters:** **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`** — Jenkins **choice** `true` / `false` (default **true**). Nightly always uses **AAT** (`TEST_URL`).
 - **Slack:** Notifications to `#hdp-qa-e2e-test-results` (per stage configuration).
 - **Stage behaviour:** A failing browser stage can be marked unstable while later stages still run (see Jenkins job logs).
