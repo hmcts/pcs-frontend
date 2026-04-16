@@ -6,7 +6,6 @@ const BLOCKED_MEDIA_PREFIXES = ['audio/', 'video/'] as const;
 const BLOCKED_EXTENSIONS = new Set(['.mp3', '.m4a', '.mp4', '.mpeg', '.mpg']);
 
 const ALLOWED_MIME_TYPES = new Set([
-  // Documents
   'application/pdf',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -19,12 +18,10 @@ const ALLOWED_MIME_TYPES = new Set([
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'application/vnd.openxmlformats-officedocument.presentationml.template',
   'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
-  // Text
   'text/plain',
   'text/csv',
   'application/rtf',
   'text/rtf',
-  // Images
   'image/jpeg',
   'image/png',
   'image/bmp',
@@ -104,7 +101,6 @@ export function validateFileType(mimetype: string, originalname: string): FileVa
     return 'ok';
   }
 
-  // Browsers may send empty MIME or application/octet-stream for unknown types -- fall back to extension
   if (isUnknownMimeType(mime)) {
     return ALLOWED_EXTENSIONS.has(ext) ? 'ok' : 'invalid_type';
   }
