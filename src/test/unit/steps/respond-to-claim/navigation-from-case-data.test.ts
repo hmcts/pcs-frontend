@@ -48,7 +48,6 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
   it('routes confirmation of notice step from current step answer when provided', async () => {
     const req = createReq({
-      defendantResponsesConfirmNoticeGiven: 'yes',
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
       data: {
@@ -57,20 +56,30 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(
-      getNextStep(req, 'confirmation-of-notice-given', flowConfig, {}, { confirmNoticeGiven: 'imNotSure' })
+      getNextStep(req, 'confirmation-of-notice-given', flowConfig, {}, { possessionNoticeReceived: 'NOT_SURE' })
     ).resolves.toBe('rent-arrears-dispute');
   });
 
   it('routes confirmation of notice step from validated case data when current step answer is unavailable', async () => {
     const noticeDateProvidedReq = createReq({
-      defendantResponsesConfirmNoticeGiven: 'yes',
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            possessionNoticeReceived: 'YES',
+          },
+        },
+      },
     });
     const rentArrearsReq = createReq({
-      defendantResponsesConfirmNoticeGiven: 'imNotSure',
       noticeServed: 'YES',
       data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            possessionNoticeReceived: 'NOT_SURE',
+          },
+        },
         claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
       },
     });
@@ -85,10 +94,14 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
   it('routes unexpected confirmNoticeGiven values to arrears branches (not notice-date pages)', async () => {
     const unexpectedValueReq = createReq({
-      defendantResponsesConfirmNoticeGiven: 'NOT SURE',
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
       data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            possessionNoticeReceived: 'NOT SURE',
+          },
+        },
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
       },
     });

@@ -15,6 +15,13 @@ services:
     networks:
       - pcs-frontend-network
 
+  wiremock:
+    image: 'hmctsprod.azurecr.io/imported/wiremock/wiremock:latest'
+    ports:
+      - '8180:8080'
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
+
 networks:
   pcs-frontend-network:
     driver: bridge
