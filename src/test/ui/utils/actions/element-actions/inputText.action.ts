@@ -9,11 +9,15 @@ export class InputTextAction implements IAction {
     if (typeof fieldParams === 'string') {
       locator = await this.getStringFieldLocator(page, fieldParams);
     } else {
-      //STRICT checkbox container
-      const container = page.locator(`.govuk-checkboxes__item:has(label:has-text("${fieldParams.text}"))`);
+      //STRICT checkbox container using EXACT match
+      const container = page.locator('.govuk-checkboxes__item').filter({
+        has: page.getByText(fieldParams.text as string, { exact: true }),
+      });
 
-      //ONLY search INSIDE this container (no page-wide scan)
-      locator = container.locator('input[type="text"]:not([disabled]), textarea:not([disabled])').first();
+      // ONLY search INSIDE this container (no page-wide scan)
+      const conditional = container.locator(':scope + .govuk-checkboxes__conditional');
+
+      locator = conditional.locator('input[type="text"]:not([disabled]), textarea:not([disabled])').first();
     }
 
     await locator.fill(value);
