@@ -20,7 +20,7 @@ export const STATUS_MAP: Record<TaskStatus, TaskStatusPresentation> = {
   AVAILABLE: { tag: { text: 'Available', classes: 'govuk-tag--blue' }, linkable: true },
   IN_PROGRESS: { tag: { text: 'In progress', classes: 'govuk-tag--red' }, linkable: true },
   COMPLETED: { tag: { text: 'Completed', classes: 'govuk-tag--green' }, linkable: true },
-  NOT_STARTED: { tag: { text: 'Not started', classes: 'govuk-tag--red' }, linkable: true },
+  NOT_STARTED: { tag: { text: 'Not Started', classes: 'govuk-tag--red' }, linkable: true },
   NOT_AVAILABLE: { linkable: false },
 };
 
