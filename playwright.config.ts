@@ -35,7 +35,7 @@ function splitE2eSpecKeywords(raw: string | undefined): string[] {
   }
   return raw
     .split(/[,;]/)
-    .map((k) => k.trim())
+    .map(k => k.trim())
     .filter(Boolean);
 }
 
@@ -49,11 +49,11 @@ function resolveE2eSpecTestMatch(raw: string | undefined): string[] | undefined 
   const specFiles = globSync('**/*.spec.ts', { cwd: testRoot, nodir: true });
   const patterns: string[] = [];
   for (const keyword of keywords) {
-    const hasMatch = specFiles.some((f) => f.includes(keyword));
+    const hasMatch = specFiles.some(f => f.includes(keyword));
     if (!hasMatch) {
       // eslint-disable-next-line no-console -- intentional operator-facing warning when spec filter matches nothing
       console.warn(
-        `[playwright] E2E_SPEC keyword "${keyword}" matched no *.spec.ts files under src/test/ui — skipping.`,
+        `[playwright] E2E_SPEC keyword "${keyword}" matched no *.spec.ts files under src/test/ui — skipping.`
       );
       continue;
     }
