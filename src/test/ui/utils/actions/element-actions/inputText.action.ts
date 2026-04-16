@@ -34,8 +34,8 @@ export class InputTextAction implements IAction {
       .locator(
         `
       :has-text("${fieldParams}") ~ input:visible:enabled,
-      label:has-text("${fieldParams}") ~ textarea,
-      label:has-text("${fieldParams}") + div input,
+      label:text-is("${fieldParams}") ~ textarea,
+      label:text-is("${fieldParams}") + div input,
       :text-is("${fieldParams}") ~ textarea:visible:enabled
     `
       )
