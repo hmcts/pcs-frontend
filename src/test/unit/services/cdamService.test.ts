@@ -14,8 +14,12 @@ const mockCaseTypeId = 'PCS';
 const userToken = 'user-access-token';
 
 (config.get as jest.Mock).mockImplementation((key: string) => {
-  if (key === 'cdam.url') {return mockCdamUrl;}
-  if (key === 'ccd.caseTypeId') {return mockCaseTypeId;}
+  if (key === 'cdam.url') {
+    return mockCdamUrl;
+  }
+  if (key === 'ccd.caseTypeId') {
+    return mockCaseTypeId;
+  }
   return '';
 });
 
