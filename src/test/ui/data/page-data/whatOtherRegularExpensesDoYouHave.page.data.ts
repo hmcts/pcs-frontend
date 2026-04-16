@@ -1,80 +1,80 @@
-export const otherRegularExpenses = {
+export const whatOtherRegularExpensesDoYouHave = {
   mainHeader: `What other regular expenses do you have? (Optional)`,
   respondToClaimParagraph: `Respond to a property possession claim`,
   selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.`,
 
   // Household Bills
   householdBillsParagraph: `Household bills (for example, council tax, gas, electricity, water, internet)`,
-  householdBillsAmountPaidLabel: `Amount paid`,
+  householdBillsAmountPaidHiddenLabel: `Amount paid`,
   householdBillsTotalAmountInput: `450.00`,
-  householdBillsPaidEveryLabel: `Paid every:`,
-  householdBillsWeekRadioOption: `Week`,
-  householdBillsMonthRadioOption: `Month`,
+  householdBillsPaidEveryHiddenLabel: `Paid every:`,
+  householdBillsWeekHiddenRadioOption: `Week`,
+  householdBillsMonthHiddenRadioOption: `Month`,
   amountReceivedHiddenTextLabel: 'Amount paid',
 
   // Loan Payments
   loanPaymentsParagraph: `Loan payments`,
-  loanPaymentsAmountPaidLabel: `Amount paid`,
+  loanPaymentsAmountPaidHiddenLabel: `Amount paid`,
   loanPaymentsTotalAmountInput: `200.00`,
-  loanPaymentsPaidEveryLabel: `Paid every:`,
-  loanPaymentsWeekRadioOption: `Week`,
-  loanPaymentsMonthRadioOption: `Month`,
+  loanPaymentsPaidEveryHiddenLabel: `Paid every:`,
+  loanPaymentsWeekHiddenRadioOption: `Week`,
+  loanPaymentsMonthHiddenRadioOption: `Month`,
 
   // Child or Spousal Maintenance
   childSpousalMaintenanceParagraph: `Child or spousal maintenance`,
-  childSpousalMaintenanceAmountPaidLabel: `Amount paid`,
+  childSpousalMaintenanceAmountHiddenPaidLabel: `Amount paid`,
   childSpousalMaintenanceTotalAmountInput: `150.00`,
-  childSpousalMaintenancePaidEveryLabel: `Paid every:`,
-  childSpousalMaintenanceWeekRadioOption: `Week`,
-  childSpousalMaintenanceMonthRadioOption: `Month`,
+  childSpousalMaintenancePaidHiddenEveryLabel: `Paid every:`,
+  childSpousalMaintenanceWeekHiddenRadioOption: `Week`,
+  childSpousalMaintenanceMonthHiddenRadioOption: `Month`,
 
   // Mobile Phone
   mobilePhoneParagraph: `Mobile phone`,
-  mobilePhoneAmountPaidLabel: `Amount paid`,
+  mobilePhoneAmountPaidHiddenLabel: `Amount paid`,
   mobilePhoneTotalAmountInput: `50.00`,
-  mobilePhonePaidEveryLabel: `Paid every:`,
-  mobilePhoneWeekRadioOption: `Week`,
-  mobilePhoneMonthRadioOption: `Month`,
+  mobilePhonePaidEveryHiddenLabel: `Paid every:`,
+  mobilePhoneWeekHiddenRadioOption: `Week`,
+  mobilePhoneMonthHiddenRadioOption: `Month`,
 
   // Grocery Shopping
   groceryShoppingParagraph: `Grocery shopping`,
-  groceryShoppingAmountPaidLabel: `Amount paid`,
+  groceryShoppingAmountPaidHiddenLabel: `Amount paid`,
   groceryShoppingTotalAmountInput: `300.00`,
-  groceryShoppingPaidEveryLabel: `Paid every:`,
-  groceryShoppingWeekRadioOption: `Week`,
-  groceryShoppingMonthRadioOption: `Month`,
+  groceryShoppingPaidEveryHiddenLabel: `Paid every:`,
+  groceryShoppingWeekHiddenRadioOption: `Week`,
+  groceryShoppingMonthHiddenRadioOption: `Month`,
 
   // Fuel, Parking and Transport
   fuelParkingTransportParagraph: `Fuel, parking and transport`,
-  fuelParkingTransportAmountPaidLabel: `Amount paid`,
+  fuelParkingTransportAmountPaidHiddenLabel: `Amount paid`,
   fuelParkingTransportTotalAmountInput: `250.00`,
-  fuelParkingTransportPaidEveryLabel: `Paid every:`,
-  fuelParkingTransportWeekRadioOption: `Week`,
-  fuelParkingTransportMonthRadioOption: `Month`,
+  fuelParkingTransportPaidEveryHiddenLabel: `Paid every:`,
+  fuelParkingTransportWeekHiddenRadioOption: `Week`,
+  fuelParkingTransportMonthHiddenRadioOption: `Month`,
 
   // School Costs
   schoolCostsParagraph: `School costs (for example, uniform and school dinners)`,
-  schoolCostsAmountPaidLabel: `Amount paid`,
+  schoolCostsAmountPaidHiddenLabel: `Amount paid`,
   schoolCostsTotalAmountInput: `180.00`,
-  schoolCostsPaidEveryLabel: `Paid every:`,
-  schoolCostsWeekRadioOption: `Week`,
-  schoolCostsMonthRadioOption: `Month`,
+  schoolCostsPaidEveryHiddenLabel: `Paid every:`,
+  schoolCostsWeekHiddenRadioOption: `Week`,
+  schoolCostsMonthHiddenRadioOption: `Month`,
 
   // Clothing
   clothingParagraph: `Clothing`,
-  clothingAmountPaidLabel: `Amount paid`,
+  clothingAmountPaidHiddenLabel: `Amount paid`,
   clothingTotalAmountInput: `100.00`,
-  clothingPaidEveryLabel: `Paid every:`,
-  clothingWeekRadioOption: `Week`,
-  clothingMonthRadioOption: `Month`,
+  clothingPaidEveryHiddenLabel: `Paid every:`,
+  clothingWeekHiddenRadioOption: `Week`,
+  clothingMonthHiddenRadioOption: `Month`,
 
   // Other
   otherExpensesParagraph: `Other`,
-  otherExpensesAmountPaidLabel: `Amount paid`,
+  otherExpensesAmountPaidHiddenLabel: `Amount paid`,
   otherExpensesTotalAmountInput: `75.00`,
-  otherExpensesPaidEveryLabel: `Paid every:`,
-  otherExpensesWeekRadioOption: `Week`,
-  otherExpensesMonthRadioOption: `Month`,
+  otherExpensesPaidEveryHiddenLabel: `Paid every:`,
+  otherExpensesWeekHiddenRadioOption: `Week`,
+  otherExpensesMonthHiddenRadioOption: `Month`,
 
   errorValidationHeader: `There is a problem`,
   // Mandatory Field Errors - Amount Missing

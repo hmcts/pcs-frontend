@@ -23,7 +23,6 @@ import {
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
-  otherRegularExpenses,
   paymentInterstitial,
   rentArrears,
   repaymentsAgreed,
@@ -31,6 +30,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  whatOtherRegularExpensesDoYouHave,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
   yourCircumstances,
@@ -527,7 +527,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
-      await performAction('clickButton', otherRegularExpenses.saveAndContinueButton);
+      await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
       return;
     }
 
@@ -535,19 +535,19 @@ export class RespondToClaimAction implements IAction {
       const [option, value, frequency] = income;
 
       await performAction('check', {
-        question: otherRegularExpenses.mainHeader,
+        question: whatOtherRegularExpensesDoYouHave.mainHeader,
         option,
       });
       console.log('option' + option);
       if (!value || !frequency) {
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
-      await performAction('inputText', otherRegularExpenses.amountReceivedHiddenTextLabel, value);
+      await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
       console.log('input' + value);
       await performAction('clickRadioButton', frequency);
       console.log('frequency' + frequency);
     }
-    await performAction('clickButton', otherRegularExpenses.saveAndContinueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

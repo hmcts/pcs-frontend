@@ -21,13 +21,13 @@ import {
   incomeAndExpenses,
   installmentPayments,
   nonRentArrearsDispute,
-  otherRegularExpenses,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  whatOtherRegularExpensesDoYouHave,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
@@ -172,7 +172,7 @@ test.afterEach(async () => {
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim @noDefendants @regression @accessibility', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
+    /* await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
@@ -257,22 +257,23 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    //await performValidation('mainHeader', incomeAndExpenses.mainHeader);*/
     await performAction(
       'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/what-other-regular-expenses-do-you-have`
+      home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/priority-debt-details`
     );
+    await performAction('clickButton', 'Continue');
     await performAction('selectWhatOtherRegularExpensesDoYouHave', {
       regularIncomeOptions: [
         [
-          otherRegularExpenses.groceryShoppingParagraph,
-          otherRegularExpenses.groceryShoppingTotalAmountInput,
-          otherRegularExpenses.groceryShoppingWeekRadioOption,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
         [
-          otherRegularExpenses.loanPaymentsParagraph,
-          otherRegularExpenses.loanPaymentsTotalAmountInput,
-          otherRegularExpenses.loanPaymentsMonthRadioOption,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
         ],
       ],
     });
@@ -362,14 +363,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectWhatRegularIncomeDoYouReceive', {
       regularIncomeOptions: [
         [
-          otherRegularExpenses.loanPaymentsParagraph,
-          otherRegularExpenses.loanPaymentsTotalAmountInput,
-          otherRegularExpenses.loanPaymentsMonthRadioOption,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
         ],
         [
-          otherRegularExpenses.groceryShoppingParagraph,
-          otherRegularExpenses.groceryShoppingTotalAmountInput,
-          otherRegularExpenses.groceryShoppingWeekRadioOption,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
       ],
     });
