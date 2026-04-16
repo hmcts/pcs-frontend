@@ -30,13 +30,13 @@ properties([
     ),
     choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
-      choices: ['true', 'false'],
-      description: 'Enable page functional tests (content, errors, navigation). Default true.'
+      choices: ['false','true'],
+      description: 'Enable page functional tests (content, errors, navigation). Default false.'
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '(all tests)', '@smoke', '@regression', '@accessibility'],
-      description: 'Title tag. Default @nightly. (all tests) = no tag filter.'
+      choices: ['@smoke', '@e2e', '@regression', '@accessibility','@nightly','@crossbrowser','(all tests)','@prod'],
+      description: 'Title tag. Default @smoke. (all tests) = no tag filter.'
     ),
     string(
       name: 'PLAYWRIGHT_SPEC',
