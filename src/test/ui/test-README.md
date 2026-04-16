@@ -139,11 +139,6 @@ await performValidationGroup(
 - PCS_API_CHANGE_ID
 - DATA_STORE_URL_BASE
 
-**Playwright grep and file scope (CI or local):**
-
-- **`FUNCTIONAL_TEST_SCOPE`** — Playwright `grep` in `playwright.config.ts` (test titles). **Empty** = no grep. **`yarn test:E2e`** uses `FUNCTIONAL_TEST_SCOPE` default `@nightly` when unset (`PLAYWRIGHT_PROJECT` required). **`yarn test:functional`** defaults to `@regression` via CLI if unset. PR builds default `@PR` unless labels override (below).
-- **`E2E_SPEC`** — Optional filename keyword(s) under `src/test/ui`. Each becomes `**/*<keyword>*.spec.ts` (multiple keywords are **OR**). Use **comma or semicolon** to list several, e.g. `respondToAClaim,makeAnApplication`. **Empty** = all specs. Keywords that match no file are skipped (with a warning); if none match, all specs are used.
-
 ```bash
 yarn test:functional
 ```
@@ -199,39 +194,15 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 ## 10. CI Pipeline Stages
 
-### PR & Master (`Jenkinsfile_CNP`)
+### PR & Master (Jenkinsfile_CNP)
 
-**Functional UI tests** use `yarn test:functional` (Chrome). Jenkins sets env vars consumed by Playwright as above.
+- **PR:** Runs functional tests (`@PR` scope) on Chrome. Optional full functional test if `enable_full_functional_tests` label is added.
+- **Master:** Runs functional tests (`@regression` scope) on Chrome. Sends Slack notification to `#hdp-qa-e2e-test-results` on failure.
 
-| Branch     | Default `--grep` (`FUNCTIONAL_TEST_SCOPE`) | Notes                                                                                |
-| ---------- | ------------------------------------------ | ------------------------------------------------------------------------------------ |
-| **PR**     | `@PR`                                      | Preview app URL from `CHANGE_ID`.                                                    |
-| **Master** | `@regression`                              | AAT URL. On failure, Allure summary may be sent to Slack `#hdp-qa-e2e-test-results`. |
+### Nightly (Jenkinsfile_nightly)
 
-**Optional GitHub labels on PRs**
-
-| Label pattern                      | Effect                                                                                                                                                    |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `e2e-tag:<value>`                  | Non-empty value sets `FUNCTIONAL_TEST_SCOPE`; else default **`@PR`**.                                                                                     |
-| `e2e-spec:<keyword>`               | If the label exists **and** the value is non-empty, sets **`E2E_SPEC`** (narrow to `*<keyword>*.spec.ts`). If no label or empty value, no spec narrowing. |
-| `enable_all_page_functional_tests` | Turns on broad page validation flags used by the framework.                                                                                               |
-| `enable_content_validation`        | Enables content validation.                                                                                                                               |
-| `enable_error_messages_validation` | Enables error-message validation.                                                                                                                         |
-| `enable_navigation_tests`          | Enables navigation tests.                                                                                                                                 |
-
-You can combine `e2e-tag:` and `e2e-spec:` to narrow files and filter by title tag.
-
-**API preview:** A label like `pcs-api-pr:<id>` still rewires PCS/CCD URLs for that API PR (unchanged).
-
-### Nightly (`Jenkinsfile_nightly`)
-
-Runs only the scheduled nightly job; it does **not** drive PR or **master** builds (`Jenkinsfile_CNP`).
-
-- **Schedule:** Mon–Fri at ~07:00 (cron `H`).
-- **E2E:** Toggles + `PLAYWRIGHT_PROJECT` run **`yarn test:E2e`** (e.g. `chrome`, `firefox`, `webkit`, `MicrosoftEdge`). Default: **Desktop Chrome** only, tag **`@nightly`**, spec blank = all files.
-- **Jenkins parameters (relevant to Playwright):**
-  - **`PLAYWRIGHT_GREP_TAG`** — `@nightly` (default), `(all tests)`, `@smoke`, `@regression`, or `@accessibility`. Maps to `FUNCTIONAL_TEST_SCOPE`.
-  - **`PLAYWRIGHT_SPEC`** — Optional; sets **`E2E_SPEC`**. Comma/semicolon-separated keywords (see above). Empty = all spec files (subject to grep).
-- **Other parameters:** **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`** — Jenkins **choice** `true` / `false` (default **true**). Nightly always uses **AAT** (`TEST_URL`).
-- **Slack:** Notifications to `#hdp-qa-e2e-test-results` (per stage configuration).
-- **Stage behaviour:** A failing browser stage can be marked unstable while later stages still run (see Jenkins job logs).
+- **Schedule:** Mon–Fri at ~07:00.
+- **E2E tests:** Runs per-browser stages (Chrome, Firefox, Safari) with separate Allure reports for each.
+- **Accessibility:** Runs `@accessibility` tests on Chrome.
+- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` with links to all 4 reports (Chrome, Firefox, Safari, Accessibility).
+- **Stage behaviour:** If a browser fails, the stage shows red but the pipeline continues to the next browser. All stages always run.
