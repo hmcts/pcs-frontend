@@ -57,7 +57,6 @@ automatically (via the `deps:up` script) on first run and reuses the
 `pcs-redis` container on subsequent runs. If you prefer to manage it yourself:
 
 ```bash
-docker run -d --name pcs-redis -p 6379:6379 redis
 > docker compose up -d
  ✔ Network pcs-frontend_default       Created                                                                                                                     0.0s
  ✔ Container pcs-frontend-cache-1     Started                                                                                                                     0.2s
