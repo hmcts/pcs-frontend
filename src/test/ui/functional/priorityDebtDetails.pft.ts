@@ -11,6 +11,23 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
     message3: priorityDebtDetails.selectHowFrequentlyErrorMessage,
   });
 
+  // Radio option not selected
+  await performAction(
+    'inputText',
+    priorityDebtDetails.whatIsTheTotalAmountQuestion,
+    priorityDebtDetails.totalAmountTextInput
+  );
+  await performAction(
+    'inputText',
+    priorityDebtDetails.howMuchDoYouPayQuestion,
+    priorityDebtDetails.amountYouPayTextInput
+  );
+  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
+    message: priorityDebtDetails.selectHowFrequentlyErrorMessage,
+  });
+
   //Total Amount missing
   await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, ' ');
   await performAction(
@@ -37,23 +54,6 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.enterTheAmountYouPayErrorMessage,
-  });
-
-  // Radio option not selected
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.totalAmountTextInput
-  );
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.amountYouPayTextInput
-  );
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
-  await performValidation('errorMessage', {
-    header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
-    message: priorityDebtDetails.selectHowFrequentlyErrorMessage,
   });
 
   //Total amount exceeding max allowed value
@@ -107,7 +107,7 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
   await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
-    message: priorityDebtDetails.enterAmountInTheCorrectFormatErrorMessage,
+    message: priorityDebtDetails.enterTotalAmountInTheCorrectFormatErrorMessage,
   });
 
   //Amount you pay exceeding max allowed value
@@ -153,7 +153,7 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
   await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
-    message: priorityDebtDetails.enterAmountInTheCorrectFormatErrorMessage,
+    message: priorityDebtDetails.enterAmountYouPayInTheCorrectFormatErrorMessage,
   });
 
   //Total Amount and Radio option both missing
@@ -182,7 +182,7 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message1: priorityDebtDetails.enterTheTotalAmountErrorMessage,
-    message2: priorityDebtDetails.enterAmountInTheCorrectFormatErrorMessage,
+    message2: priorityDebtDetails.enterAmountYouPayInTheCorrectFormatErrorMessage,
   });
 }
 

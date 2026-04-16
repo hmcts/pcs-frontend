@@ -12,7 +12,7 @@ export const priorityDebts = {
   paymentsList: `payments for goods bought on hire purchase or conditional sale`,
   unpaidIncomeTaxList: `unpaid income tax, National Insurance or VAT`,
   unpaidChildList: `unpaid child maintenance`,
-  readGuidanceLink: `Read guidance from Citizens Advice on what counts as a priority debt (opens in new tab).`,
+  readGuidanceLink: `Read guidance from Citizens Advice on what counts as a priority debt (opens in new tab)`,
   doYouHaveAnyPriorityDebtsQuestion: `Do you have any priority debts?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

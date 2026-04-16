@@ -23,10 +23,6 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   });
 
   //This error message will trigger if day is missing
-  await performAction('clickRadioButton', {
-    question: haveYouAppliedForUniversalCredit.mainHeader,
-    option: haveYouAppliedForUniversalCredit.yesRadioOption,
-  });
   await performAction('inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, ' ');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, '2022');
@@ -37,10 +33,6 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   });
 
   //This error message will trigger if month is missing
-  await performAction('clickRadioButton', {
-    question: haveYouAppliedForUniversalCredit.mainHeader,
-    option: haveYouAppliedForUniversalCredit.yesRadioOption,
-  });
   await performAction('inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, '12');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, ' ');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, '2022');
@@ -51,10 +43,6 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   });
 
   //This error message will trigger if year is missing
-  await performAction('clickRadioButton', {
-    question: haveYouAppliedForUniversalCredit.mainHeader,
-    option: haveYouAppliedForUniversalCredit.yesRadioOption,
-  });
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, ' ');
@@ -65,10 +53,6 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   });
 
   //This error message will trigger if invalid date is provided
-  await performAction('clickRadioButton', {
-    question: haveYouAppliedForUniversalCredit.mainHeader,
-    option: haveYouAppliedForUniversalCredit.yesRadioOption,
-  });
   await performAction('inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, '32');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, '2025');
@@ -79,10 +63,6 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   });
 
   //This error message will trigger if future date is provided
-  await performAction('clickRadioButton', {
-    question: haveYouAppliedForUniversalCredit.mainHeader,
-    option: haveYouAppliedForUniversalCredit.yesRadioOption,
-  });
   await performAction('inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, '20');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, '2030');

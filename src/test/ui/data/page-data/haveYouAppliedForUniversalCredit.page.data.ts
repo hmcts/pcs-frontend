@@ -11,7 +11,7 @@ export const haveYouAppliedForUniversalCredit = {
   saveForLaterButton: `Save for later`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `have-you-applied-for-universal-credit`,
-  forExampleHintText: 'For example, 27 9 2022',
+  forExampleHiddenHintText: `For example, 27 9 2022`,
   backLink: `Back`,
   cymraegLink: `Cymraeg`,
   errorValidationHeader: `There is a problem`,
