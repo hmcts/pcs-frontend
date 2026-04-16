@@ -63,13 +63,13 @@ function mapTaskGroup(taskGroup: DashboardTaskGroup, caseReference: string): Map
     title: TASK_GROUP_MAP[taskGroup.groupId] ?? taskGroup.groupId,
     tasks: taskGroup.tasks.map((task): MappedTask => {
       const hint = resolveTaskHint(task.templateId, task.templateValues);
-      const knownStatus = STATUS_MAP[task.status as TaskStatus];
+      const presentation = STATUS_MAP[task.status as TaskStatus];
 
       return {
         title: { html: resolveTaskTitle(task.templateId) },
         hint,
-        href: knownStatus ? `/dashboard/${caseReference}/${taskGroupId}/${task.templateId}` : undefined,
-        status: knownStatus ?? {},
+        href: presentation?.linkable ? `/dashboard/${caseReference}/${taskGroupId}/${task.templateId}` : undefined,
+        status: presentation?.tag ? { tag: presentation.tag } : {},
       };
     }),
   };

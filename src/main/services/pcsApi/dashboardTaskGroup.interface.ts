@@ -9,12 +9,19 @@ export interface DashboardTask {
   status: string;
 }
 
-export type TaskStatus = 'AVAILABLE' | 'IN_PROGRESS' | 'COMPLETED';
+export type TaskStatus = 'AVAILABLE' | 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED' | 'NOT_AVAILABLE';
 
-export const STATUS_MAP: Record<TaskStatus, { tag: { text: string; classes: string } }> = {
-  AVAILABLE: { tag: { text: 'Available', classes: 'govuk-tag--blue' } },
-  IN_PROGRESS: { tag: { text: 'In progress', classes: 'govuk-tag--red' } },
-  COMPLETED: { tag: { text: 'Completed', classes: 'govuk-tag--green' } },
+export interface TaskStatusPresentation {
+  tag?: { text: string; classes: string };
+  linkable: boolean;
+}
+
+export const STATUS_MAP: Record<TaskStatus, TaskStatusPresentation> = {
+  AVAILABLE: { tag: { text: 'Available', classes: 'govuk-tag--blue' }, linkable: true },
+  IN_PROGRESS: { tag: { text: 'In progress', classes: 'govuk-tag--red' }, linkable: true },
+  COMPLETED: { tag: { text: 'Completed', classes: 'govuk-tag--green' }, linkable: true },
+  NOT_STARTED: { tag: { text: 'Not started', classes: 'govuk-tag--red' }, linkable: true },
+  NOT_AVAILABLE: { linkable: false },
 };
 
 export const TASK_GROUP_MAP: Record<DashboardTaskGroup['groupId'], string> = {
