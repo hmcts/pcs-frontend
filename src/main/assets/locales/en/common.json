@@ -74,7 +74,7 @@
     },
     "documentUpload": {
       "wrongFileTypeDocStore": "The selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
-      "fileTooLargeDocStore": "The selected file must be smaller than {{maxSize}}MB",
+      "fileTooLargeDocStore": "The selected file must be smaller than 1GB",
       "noFileSelected": "Select a file to upload",
       "uploadFailed": "The file could not be uploaded – try again",
       "fileDeleteFailed": "The file could not be removed – try again",
