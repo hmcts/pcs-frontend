@@ -357,7 +357,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     whatRegularIncomeDoYouReceive.tooManyCharTextInput
   );
   console.log(`entered text 501 char length`);
-
+  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
     message: whatRegularIncomeDoYouReceive.tooManyCharErrorMessage,
@@ -375,7 +375,6 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     generateRandomString(500)
   );
   console.log(`entered text 500 char length`);
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   await performValidation('text', { elementType: 'hintText', text: whatRegularIncomeDoYouReceive.limitHiddenHintText });
   console.log(`verified hint text for limit hint text`);
 
