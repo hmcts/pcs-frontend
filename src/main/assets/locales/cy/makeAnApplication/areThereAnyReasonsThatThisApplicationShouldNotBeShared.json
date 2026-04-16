@@ -10,7 +10,7 @@
   "itIsUrgent": "cyit is so urgent that there is not enough time to give notice",
   "couldUndermineTheOrder": "cygiving someone notice could undermine the order you want the court to grant.",
   "youBelieveYouAreAtRisk": "cyyou believe you are at risk from the other party",
-  "weWillAskYouToProvideTheReason": "cyWarning text: We will ask you to provide the reason. The court will consider your reason, and you may not be successful.",
+  "weWillAskYouToProvideTheReason": "cyWe will ask you to provide the reason. The court will consider your reason, and you may not be successful.",
   "errors": {
     "confirmIfThereIsAReason": "cyConfirm whether there is a reason why this application should not be shared with the other parties",
     "provideAReason": "cyConfirm why the other parties shoud not be informed"
