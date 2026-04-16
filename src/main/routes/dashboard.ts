@@ -7,8 +7,8 @@ import { oidcMiddleware } from '../middleware/oidc';
 import { Logger } from '@modules/logger';
 import type { CcdCase, CcdCaseAddress } from '@services/ccdCase.interface';
 import {
-  type DashboardTaskGroup,
   type DashboardTask,
+  type DashboardTaskGroup,
   STATUS_MAP,
   TASK_GROUP_MAP,
   getDashboardNotifications,
@@ -103,7 +103,7 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
   return `${DASHBOARD_ROUTE}/${sanitised}`;
 };
 
-//temporary hard coded statuses while logic is implemented in the backend
+// Temporary: hardcoded statuses until backend logic implemented (HDPI-4573)
 const TASK_STATUS_OVERRIDES: Record<string, DashboardTask['status']> = {
   'Task.AAA6.Applications.Contact': 'AVAILABLE',
   'Task.AAA6.Applications.ViewApplications': 'AVAILABLE',
