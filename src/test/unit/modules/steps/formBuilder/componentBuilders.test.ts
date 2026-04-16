@@ -120,4 +120,83 @@ describe('componentBuilders', () => {
 
     expect(result.componentType).toBe('input');
   });
+
+  describe('file type', () => {
+    it('builds fileUpload component with correct properties', () => {
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+        accept: '.pdf,.doc',
+        maxFileSize: 50,
+      };
+
+      const result = buildComponentConfig(buildArgs(field, { fieldValue: [] }));
+
+      expect(result.componentType).toBe('fileUpload');
+      expect(result.component.accept).toBe('.pdf,.doc');
+      expect(result.component.maxFileSize).toBe(50);
+      expect(result.component.value).toEqual([]);
+      expect(result.component.classes).toBe('govuk-file-upload');
+    });
+
+    it('uses default accept and maxFileSize when not provided', () => {
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+      };
+
+      const result = buildComponentConfig(buildArgs(field));
+
+      expect(result.componentType).toBe('fileUpload');
+      expect(result.component.accept).toBeTruthy();
+      expect(result.component.maxFileSize).toBe(1024);
+    });
+
+    it('sets translated error messages and button text', () => {
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+      };
+
+      const result = buildComponentConfig(buildArgs(field));
+
+      expect(result.component.errorWrongType).toBe('common:errors.documentUpload.wrongFileTypeDocStore');
+      expect(result.component.errorFileTooLarge).toBeTruthy();
+      expect(result.component.errorDelete).toBe('common:errors.documentUpload.fileDeleteFailed');
+      expect(result.component.uploadButtonText).toBe('uploadButton');
+      expect(result.component.filesAddedHeading).toBe('filesAddedHeading');
+      expect(result.component.deleteButtonText).toBe('deleteButton');
+    });
+
+    it('sets empty uploadUrl and deleteUrl as defaults', () => {
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+      };
+
+      const result = buildComponentConfig(buildArgs(field));
+
+      expect(result.component.uploadUrl).toBe('');
+      expect(result.component.deleteUrl).toBe('');
+    });
+
+    it('preserves existing documents as field value', () => {
+      const existingDocs = [
+        { document_url: 'http://dm/doc/1', document_binary_url: 'http://dm/doc/1/binary', document_filename: 'a.pdf' },
+      ];
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+      };
+
+      const result = buildComponentConfig(buildArgs(field, { fieldValue: existingDocs }));
+
+      expect(result.component.value).toEqual(existingDocs);
+    });
+  });
 });

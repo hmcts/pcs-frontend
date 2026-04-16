@@ -121,6 +121,29 @@ describe('cdamService', () => {
       await expect(uploadDocument(createMockFile(), userToken)).rejects.toThrow();
     });
 
+    it('uses file size when CDAM returns no size', async () => {
+      const response = {
+        data: {
+          documents: [
+            {
+              originalDocumentName: 'doc.pdf',
+              mimeType: 'application/pdf',
+              size: undefined,
+              _links: {
+                self: { href: 'http://dm-store/documents/size-test' },
+                binary: { href: 'http://dm-store/documents/size-test/binary' },
+              },
+            },
+          ],
+        },
+      };
+      mockPost.mockResolvedValue(response);
+
+      const result = await uploadDocument(createMockFile({ size: 2048 }), userToken);
+
+      expect(result.size).toBe(2048);
+    });
+
     it('uses file mimetype when CDAM returns empty mimeType', async () => {
       const response = {
         data: {
