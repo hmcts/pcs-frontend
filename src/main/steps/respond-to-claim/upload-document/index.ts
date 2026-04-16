@@ -3,31 +3,24 @@ import type { Request } from 'express';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { CcdCollectionItem, CcdDocumentReference } from '@interfaces/ccdCase.interface';
+import type { CcdCollectionItem, CcdDefendantDocument } from '@interfaces/ccdCase.interface';
 import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
 import type { CdamDocument } from '@interfaces/documentUpload.interface';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
-function mapCcdDocToCdamDoc(v: CcdDocumentReference): CdamDocument {
+function mapCcdDocToCdamDoc(v: CcdDefendantDocument): CdamDocument {
   const doc: CdamDocument = {
-    document_url: v.document_url,
-    document_binary_url: v.document_binary_url,
-    document_filename: v.document_filename,
+    document_url: v.document.document_url,
+    document_binary_url: v.document.document_binary_url,
+    document_filename: v.document.document_filename,
   };
-  if (v.category_id) {
-    try {
-      const meta = JSON.parse(v.category_id);
-      if (meta.mimeType) {
-        doc.content_type = meta.mimeType;
-      }
-      if (typeof meta.size === 'number') {
-        doc.size = meta.size;
-      }
-    } catch {
-      // category_id is not JSON metadata -- ignore
-    }
+  if (v.contentType) {
+    doc.content_type = v.contentType;
+  }
+  if (typeof v.size === 'number') {
+    doc.size = v.size;
   }
   return doc;
 }
@@ -67,19 +60,17 @@ function parseUploadedDocuments(body: Record<string, unknown>): CdamDocument[] {
   return documents;
 }
 
-function toCcdDocumentCollection(docs: CdamDocument[]): CcdCollectionItem<CcdDocumentReference>[] {
+function toCcdDocumentCollection(docs: CdamDocument[]): CcdCollectionItem<CcdDefendantDocument>[] {
   return docs.map(doc => {
-    const value: CcdDocumentReference = {
-      document_url: doc.document_url,
-      document_binary_url: doc.document_binary_url,
-      document_filename: doc.document_filename,
+    const value: CcdDefendantDocument = {
+      document: {
+        document_url: doc.document_url,
+        document_binary_url: doc.document_binary_url,
+        document_filename: doc.document_filename,
+      },
+      contentType: doc.content_type,
+      size: doc.size,
     };
-    if (doc.content_type || doc.size) {
-      value.category_id = JSON.stringify({
-        mimeType: doc.content_type || '',
-        size: doc.size || 0,
-      });
-    }
     return { value };
   });
 }
@@ -121,7 +112,7 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
     return {
-      documents: existingDocs.map((item: CcdCollectionItem<CcdDocumentReference>) => mapCcdDocToCdamDoc(item.value)),
+      documents: existingDocs.map((item: CcdCollectionItem<CcdDefendantDocument>) => mapCcdDocToCdamDoc(item.value)),
     };
   },
   extendGetContent: (req, formContent) => {

@@ -93,14 +93,20 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
-/** Defendant responses (e.g. receivedFreeLegalAdvice). */
+/** CCD SDK Document type -- flat reference with URLs. */
 export interface CcdDocumentReference {
   document_url: string;
   document_binary_url: string;
   document_filename: string;
   document_hash?: string;
-  /** Backend reads mimeType/size from this JSON string: {"mimeType":"...","size":123} */
   category_id?: string;
+}
+
+/** Wraps CCD Document with metadata fields (matches backend DefendantDocument). */
+export interface CcdDefendantDocument {
+  document: CcdDocumentReference;
+  contentType?: string;
+  size?: number;
 }
 
 export interface CcdCollectionItem<T> {
@@ -138,7 +144,7 @@ export interface CcdDefendantResponses {
     additionalContributionFrequency?: string;
   };
   householdCircumstances?: HouseholdCircumstances;
-  uploadedDocuments?: CcdCollectionItem<CcdDocumentReference>[];
+  uploadedDocuments?: CcdCollectionItem<CcdDefendantDocument>[];
 }
 
 export interface PossessionClaimResponse {

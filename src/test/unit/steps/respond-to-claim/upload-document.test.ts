@@ -79,13 +79,15 @@ describe('upload-document step', () => {
       expect(result).toEqual({});
     });
 
-    it('maps CCD documents to CdamDocument format', () => {
+    it('maps CCD DefendantDocument to CdamDocument format', () => {
       const docs = [
         {
           value: {
-            document_url: 'http://dm-store/documents/abc-123',
-            document_binary_url: 'http://dm-store/documents/abc-123/binary',
-            document_filename: 'evidence.pdf',
+            document: {
+              document_url: 'http://dm-store/documents/abc-123',
+              document_binary_url: 'http://dm-store/documents/abc-123/binary',
+              document_filename: 'evidence.pdf',
+            },
           },
         },
       ];
@@ -103,14 +105,17 @@ describe('upload-document step', () => {
       });
     });
 
-    it('parses category_id JSON for content_type and size', () => {
+    it('reads contentType and size from DefendantDocument fields', () => {
       const docs = [
         {
           value: {
-            document_url: 'http://dm-store/documents/abc-123',
-            document_binary_url: 'http://dm-store/documents/abc-123/binary',
-            document_filename: 'photo.jpg',
-            category_id: '{"mimeType":"image/jpeg","size":976397}',
+            document: {
+              document_url: 'http://dm-store/documents/abc-123',
+              document_binary_url: 'http://dm-store/documents/abc-123/binary',
+              document_filename: 'photo.jpg',
+            },
+            contentType: 'image/jpeg',
+            size: 976397,
           },
         },
       ];
@@ -125,14 +130,15 @@ describe('upload-document step', () => {
       ]);
     });
 
-    it('handles invalid category_id JSON gracefully', () => {
+    it('handles missing contentType and size gracefully', () => {
       const docs = [
         {
           value: {
-            document_url: 'http://dm-store/documents/abc-123',
-            document_binary_url: 'http://dm-store/documents/abc-123/binary',
-            document_filename: 'doc.pdf',
-            category_id: 'not-json',
+            document: {
+              document_url: 'http://dm-store/documents/abc-123',
+              document_binary_url: 'http://dm-store/documents/abc-123/binary',
+              document_filename: 'doc.pdf',
+            },
           },
         },
       ];
@@ -187,7 +193,7 @@ describe('upload-document step', () => {
   });
 
   describe('beforeRedirect', () => {
-    it('saves uploaded documents to CCD via buildCcdCaseForPossessionClaimResponse', async () => {
+    it('saves uploaded documents as nested DefendantDocument structure', async () => {
       const req = {
         body: {
           'uploadedDocuments[]': [
@@ -204,23 +210,23 @@ describe('upload-document step', () => {
 
       await testedStep.beforeRedirect(req);
 
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-        req,
-        expect.objectContaining({
-          defendantResponses: {
-            uploadedDocuments: [
-              {
-                value: expect.objectContaining({
+      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
+        defendantResponses: {
+          uploadedDocuments: [
+            {
+              value: {
+                document: {
                   document_url: 'http://dm-store/documents/abc-123',
                   document_binary_url: 'http://dm-store/documents/abc-123/binary',
                   document_filename: 'evidence.pdf',
-                  category_id: '{"mimeType":"application/pdf","size":1024}',
-                }),
+                },
+                contentType: 'application/pdf',
+                size: 1024,
               },
-            ],
-          },
-        })
-      );
+            },
+          ],
+        },
+      });
     });
 
     it('saves empty array when no documents submitted', async () => {
@@ -264,29 +270,21 @@ describe('upload-document step', () => {
 
       await testedStep.beforeRedirect(req);
 
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-        req,
-        expect.objectContaining({
-          defendantResponses: {
-            uploadedDocuments: [
-              {
-                value: expect.objectContaining({
-                  document_filename: 'single.pdf',
-                }),
-              },
-            ],
-          },
-        })
-      );
+      const call = (buildCcdCaseForPossessionClaimResponse as jest.Mock).mock.calls[0][1];
+      const doc = call.defendantResponses.uploadedDocuments[0].value;
+
+      expect(doc.document.document_filename).toBe('single.pdf');
     });
 
-    it('encodes category_id only when content_type or size exists', async () => {
+    it('sends contentType and size as direct fields not category_id', async () => {
       const req = {
         body: {
           'uploadedDocuments[]': JSON.stringify({
             document_url: 'http://dm-store/documents/abc-123',
             document_binary_url: 'http://dm-store/documents/abc-123/binary',
-            document_filename: 'no-meta.pdf',
+            document_filename: 'doc.pdf',
+            content_type: 'application/pdf',
+            size: 5000,
           }),
         },
       };
@@ -296,7 +294,9 @@ describe('upload-document step', () => {
       const call = (buildCcdCaseForPossessionClaimResponse as jest.Mock).mock.calls[0][1];
       const doc = call.defendantResponses.uploadedDocuments[0].value;
 
-      expect(doc).not.toHaveProperty('category_id');
+      expect(doc.contentType).toBe('application/pdf');
+      expect(doc.size).toBe(5000);
+      expect(doc.document).not.toHaveProperty('category_id');
     });
   });
 });
