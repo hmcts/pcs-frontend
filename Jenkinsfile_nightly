@@ -23,6 +23,11 @@ properties([
       defaultValue: false,
       description: 'Tick the checkbox to run E2E tests in Desktop Edge.'
     ),
+    booleanParam(
+      name: 'SAUCE_CROSSBROWSER',
+      defaultValue: false,
+      description: 'Tick to run cross-browser tests on Sauce Labs. Runs tests as per the .sauce/config.yaml'
+    ),
     choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
       choices: ['true', 'false'],
@@ -37,11 +42,6 @@ properties([
       name: 'PLAYWRIGHT_SPEC',
       defaultValue: '',
       description: 'Spec path substring (exact case) ex: respondToAClaim. Blank = all specs.'
-    ),
-    booleanParam(
-      name: 'SAUCE_CROSSBROWSER',
-      defaultValue: false,
-      description: 'Tick to run cross-browser tests on Sauce Labs (saucectl). Requires SAUCE_* credentials and .sauce config in repo.'
     ),
   ])
 ])
