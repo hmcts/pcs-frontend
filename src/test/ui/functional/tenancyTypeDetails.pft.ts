@@ -1,9 +1,4 @@
-import {
-  dashboard,
-  disputeClaimInterstitial,
-  tenancyTypeDetails,
-  writtenTerms,
-} from '../data/page-data';
+import { dashboard, disputeClaimInterstitial, tenancyTypeDetails, writtenTerms } from '../data/page-data';
 import { claimantsName } from '../utils/actions/custom-actions';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
