@@ -50,10 +50,6 @@ function getBaseUrl(): string {
   return config.get('ccd.url');
 }
 
-function getApiUrl(): string {
-  return config.get('api.url');
-}
-
 function getCaseTypeId(): string {
   return config.get('ccd.caseTypeId');
 }
@@ -77,14 +73,22 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
+  const responseData = axiosError.response?.data as
+    | { callbackErrors?: string[]; callbackWarnings?: string[] }
+    | undefined;
 
   logger.error(`Error in ${context}: ${axiosError.message}`);
-  if (axiosError.response?.data) {
-    logger.error(`Error response data: ${JSON.stringify(axiosError.response.data, null, 2)}`);
+  if (responseData) {
+    logger.error(`Error response data: ${JSON.stringify(responseData, null, 2)}`);
   }
 
   if (status === 403) {
     return new HTTPError('Not authorised to access CCD case service', 403);
+  }
+
+  const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
+  if (callbackMessages.length > 0) {
+    return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
   }
 
   return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500);
@@ -320,20 +324,27 @@ export const ccdCaseService = {
       throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
     }
 
-    const url = `${getApiUrl()}/callbacks/mid-event?page=respondToPossessionDraftSavePage`;
+    const eventId = 'respondPossessionClaim';
+    const pageId = 'respondToPossessionDraftSavePage';
+    const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/validate?pageId=${pageId}`;
 
     const payload = {
-      event_id: 'respondPossessionClaim',
-      case_details: {
-        id: caseId,
-        case_type_id: getCaseTypeId(),
-        data,
+      event: {
+        id: eventId,
+        summary: `Citizen ${eventId} draft save summary`,
+        description: `Citizen ${eventId} draft save description`,
       },
+      case_reference: caseId,
+      data,
+      ignore_warning: false,
     };
 
     try {
-      const response = await http.post<CcdCase>(url, payload, getCaseHeaders(accessToken || ''));
-      return response.data;
+      const response = await http.post<{ data: CcdCaseData }>(url, payload, getCaseHeaders(accessToken || ''));
+      return {
+        id: caseId,
+        data: response.data?.data ?? {},
+      };
     } catch (error) {
       throw convertAxiosErrorToHttpError(error, 'save draft response to claim');
     }
