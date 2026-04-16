@@ -67,7 +67,7 @@ function getTypeOfApplication(req: Request): string {
 }
 
 function isHearingInNext14Days(req: Request): boolean {
-  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').courtHearingInNext14Days === 'YES';
+  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').courtHearingInNext14Days === 'yes';
 }
 
 function needHelpPayingTheFee(req: Request): boolean {
