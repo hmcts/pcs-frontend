@@ -1,14 +1,15 @@
 import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
+import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { flowConfig } from '../flow.config';
+
 import type { CcdCaseAddress } from '@interfaces/ccdCase.interface';
+import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
 import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
 import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '@modules/steps';
 import { arrayToString } from '@utils/arrayToString';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
 
 const STEP_NAME = 'correspondence-address';
 
@@ -303,7 +304,7 @@ function getAddressData(
 
 function getExistingAddress(req: Request): { formattedAddress: string } {
   const caseData = req.res?.locals.validatedCase?.data;
-  const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address ;
+  const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address;
 
   if (originalAddress?.AddressLine1) {
     const formattedAddress =
