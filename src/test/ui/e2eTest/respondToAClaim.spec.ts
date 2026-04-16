@@ -360,7 +360,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
-    await performAction('selectWhatRegularIncomeDoYouReceive', {
+    await performAction('selectWhatOtherRegularExpensesDoYouHave', {
       regularIncomeOptions: [
         [
           whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
