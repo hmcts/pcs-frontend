@@ -29,6 +29,16 @@ export interface HouseholdCircumstances {
   otherTenantsDetails?: string;
 }
 
+export type PaymentAgreement = {
+  anyPaymentsMade?: YesNoValue;
+  paymentDetails?: string;
+  repaymentPlanAgreed?: YesNoNotSureValue;
+  repaymentAgreedDetails?: string;
+  repayArrearsInstalments?: YesNoValue;
+  additionalRentContribution?: unknown;
+  additionalContributionFrequency?: string;
+};
+
 export interface CcdUserCase {
   id: string;
   state: CaseState;
@@ -95,7 +105,7 @@ export interface CcdDefendantParty {
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
-  tenancyTypeCorrect?: TenancyTypeCorrectValue;
+  tenancyTypeCorrect?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
   confirmNoticeGiven?: string;
@@ -116,14 +126,10 @@ export interface CcdDefendantResponses {
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
   disputeClaimDetails?: string;
-  paymentAgreement?: {
-    repaymentPlanAgreed?: YesNoNotSureValue;
-    repaymentAgreedDetails?: string;
-    repayArrearsInstalments?: YesNoValue;
-    additionalRentContribution?: unknown;
-    additionalContributionFrequency?: string;
-  };
+  paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
+  possessionNoticeReceived?: YesNoNotSureValue;
+  noticeReceivedDate?: string;
 }
 
 export interface PossessionClaimResponse {
@@ -160,6 +166,7 @@ export interface CcdCaseData {
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
+  otherLicenceTypeDetails?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
@@ -216,4 +223,5 @@ export enum GenAppType {
 
 export interface CitizenGenAppRequest {
   applicationType: GenAppType;
+  within14Days?: YesNoValue;
 }
