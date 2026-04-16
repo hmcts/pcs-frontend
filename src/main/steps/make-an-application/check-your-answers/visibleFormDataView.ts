@@ -1,10 +1,10 @@
 import type { Request } from 'express';
 
 import { shouldShowStep } from '../../';
-import { GenAppType } from '../../../interfaces/ccdCase.interface';
 import { flowConfig } from '../flow.config';
 
 import { getFormData } from '@modules/steps';
+import { GenAppType } from '@services/ccdCase.interface';
 
 export type FieldDetails<T> = {
   stepName: string;

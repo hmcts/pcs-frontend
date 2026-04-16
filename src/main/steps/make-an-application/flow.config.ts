@@ -1,8 +1,7 @@
 import type { Request } from 'express';
 
-import type { JourneyFlowConfig } from '../../interfaces/stepFlow.interface';
-
 import { getFormData } from '@modules/steps';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const MAKE_AN_APPLICATION_ROUTE = '/case/:caseReference/make-an-application';
 

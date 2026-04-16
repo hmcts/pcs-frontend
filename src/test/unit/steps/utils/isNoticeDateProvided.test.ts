@@ -1,7 +1,8 @@
 import { Request } from 'express';
 
-import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
 import { isNoticeDateProvided } from '../../../../main/steps/utils/isNoticeDateProvided';
+
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 describe('isNoticeDateProvided', () => {
   describe('when notice date is provided', () => {
