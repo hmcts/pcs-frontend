@@ -1,19 +1,18 @@
 import type { Request } from 'express';
 
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
-import type {
-  FrequencyValue,
-  HouseholdCircumstances,
-  IncomeExpenseDetails,
-  PossessionClaimResponse,
-} from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type {
+  FrequencyValue,
+  HouseholdCircumstances,
+  IncomeExpenseDetails,
+  PossessionClaimResponse,
+} from '@services/ccdCase.interface';
 
 const createAmountValidator =
   (largeAmountErrorKey: string, negativeErrorKey: string) =>
