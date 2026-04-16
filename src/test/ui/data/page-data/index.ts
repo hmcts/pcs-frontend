@@ -36,3 +36,8 @@ export * from './yourCircumstances.page.data';
 export * from './exceptionalHardship.page.data';
 export * from './incomeAndExpenses.page.data';
 export * from './yourHouseholdAndCircumstances.page.data';
+export * from './haveYouAppliedForUniversalCredit.page.data';
+export * from './priorityDebtDetails.page.data';
+export * from './priorityDebts.page.data';
+export * from './regularIncome.page.data';
+export * from './regularExpenses.page.data';

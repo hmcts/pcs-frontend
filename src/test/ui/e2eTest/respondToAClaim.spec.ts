@@ -17,10 +17,15 @@ import {
   doYouHaveAnyOtherDependants,
   exceptionalHardship,
   freeLegalAdvice,
+  haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
   incomeAndExpenses,
   installmentPayments,
   nonRentArrearsDispute,
+  priorityDebtDetails,
+  priorityDebts,
+  regularExpenses,
+  regularIncome,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
@@ -255,6 +260,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performValidation('mainHeader', regularIncome.mainHeader);
+    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('selectUniversalCredit', {
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.monthRadioOption,
+    });
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
@@ -338,6 +358,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performValidation('mainHeader', regularIncome.mainHeader);
+    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('selectUniversalCredit', {
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
@@ -419,6 +454,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performValidation('mainHeader', regularIncome.mainHeader);
+    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('selectUniversalCredit', {
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      option: priorityDebts.noRadioOption,
+    });
+    await performValidation('mainHeader', regularExpenses.mainHeader);
   });
 
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -502,6 +547,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performValidation('mainHeader', regularIncome.mainHeader);
+    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('selectUniversalCredit', {
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('selectPriorityDebts', {
+      option: priorityDebts.noRadioOption,
+    });
+    await performValidation('mainHeader', regularExpenses.mainHeader);
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -579,6 +635,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performValidation('mainHeader', regularIncome.mainHeader);
+    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('selectUniversalCredit', {
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.monthRadioOption,
+    });
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -657,6 +728,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performValidation('mainHeader', regularIncome.mainHeader);
+    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('selectUniversalCredit', {
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      option: priorityDebts.noRadioOption,
+    });
+    await performValidation('mainHeader', regularExpenses.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
@@ -739,6 +820,22 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performValidation('mainHeader', regularIncome.mainHeader);
+    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('selectUniversalCredit', {
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('selectPriorityDebts', {
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
@@ -825,6 +922,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performValidation('mainHeader', regularIncome.mainHeader);
+    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('selectUniversalCredit', {
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      option: priorityDebts.noRadioOption,
+    });
+    await performValidation('mainHeader', regularExpenses.mainHeader);
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
@@ -904,5 +1011,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performValidation('mainHeader', regularIncome.mainHeader);
+    await performAction('clickButton', regularIncome.saveAndContinueButton);
+    await performAction('selectUniversalCredit', {
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('selectPriorityDebts', {
+      option: priorityDebts.noRadioOption,
+    });
+    await performValidation('mainHeader', regularExpenses.mainHeader);
   });
 });

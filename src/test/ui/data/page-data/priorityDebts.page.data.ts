@@ -22,5 +22,6 @@ export const priorityDebts = {
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
   cymraegLink: `Cymraeg`,
+  errorValidationHeader: `There is a problem`,
   selectIfYouHaveErrorMessage: `Select if you have any priority debts`,
 };
