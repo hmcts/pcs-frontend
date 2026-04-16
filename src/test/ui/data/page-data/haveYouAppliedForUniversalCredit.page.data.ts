@@ -3,7 +3,7 @@ export const haveYouAppliedForUniversalCredit = {
   mainHeader: `Have you applied for Universal Credit?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  whenDidYouApplyQuestion: `When did you apply?`,
+  whenDidYouApplyHiddenQuestion: `When did you apply?`,
   dayHiddenTextLabel: `Day`,
   monthHiddenTextLabel: `Month`,
   yearHiddenTextLabel: `Year`,
