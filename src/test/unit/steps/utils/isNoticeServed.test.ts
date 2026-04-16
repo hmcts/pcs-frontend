@@ -1,7 +1,8 @@
 import { Request } from 'express';
 
-import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
 import { isNoticeServed } from '../../../../main/steps/utils/isNoticeServed';
+
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 describe('isNoticeServed', () => {
   describe('when notice was served (noticeServed = "Yes")', () => {

@@ -1,11 +1,10 @@
 import { Request } from 'express';
 
-import { FeeType } from '../../../interfaces/feeService.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
-import { getFee } from '@services/feeLookupService';
+import { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { FeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'ask-the-court-to-set-aside-the-order',
