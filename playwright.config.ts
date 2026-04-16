@@ -45,7 +45,10 @@ function resolveE2eSpecKeyword(raw: string | undefined): string | undefined {
 }
 
 const e2eSpecKeyword = resolveE2eSpecKeyword(process.env.E2E_SPEC);
-const scopeForGrep = process.env.FUNCTIONAL_TEST_SCOPE?.trim();
+/** Unset → @nightly for local E2E; empty string (CI “all tests”) → no title grep. */
+const rawFunctionalScope = process.env.FUNCTIONAL_TEST_SCOPE;
+const resolvedFunctionalScope = rawFunctionalScope === undefined ? '@nightly' : rawFunctionalScope;
+const scopeForGrep = resolvedFunctionalScope.trim();
 const grepFromScope = scopeForGrep ? new RegExp(scopeForGrep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) : undefined;
 
 export default defineConfig({
