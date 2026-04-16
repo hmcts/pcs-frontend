@@ -1,4 +1,3 @@
-import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
@@ -14,6 +13,7 @@ import {
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
+import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -34,9 +34,6 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.afterEach(async () => {
-  if (process.env.CASE_NUMBER) {
-    await performAction('deleteCaseRole', '[CREATOR]');
-  }
   finaliseAllValidations();
 });
 
