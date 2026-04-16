@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express';
 
-import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
 import { step as noticeReceivedDateWhenNotProvidedStep } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-not-provided';
 import { step as noticeReceivedDateWhenProvidedStep } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-provided';
 import { step as contactByEmailOrPostStep } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
@@ -9,7 +8,8 @@ import { step as correspondenceAddressStep } from '../../../../main/steps/respon
 import { step as landlordLicensedStep } from '../../../../main/steps/respond-to-claim/landlord-licensed';
 import { step as tenancyDateDetailsStep } from '../../../../main/steps/respond-to-claim/tenancy-date-details';
 
-import type { CcdCase } from '@interfaces/ccdCase.interface';
+import type { CcdCase } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),

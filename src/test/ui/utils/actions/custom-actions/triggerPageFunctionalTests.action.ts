@@ -7,12 +7,15 @@ import {
   enable_content_validation,
   enable_error_message_validation,
   enable_navigation_tests,
+  enable_visibility_validation,
 } from '../../../../../../playwright.config';
+import { shortUrl, truncateForLog } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
 import {
   ErrorMessageValidation,
   PageContentValidation,
   PageNavigationValidation,
+  VisibilityValidation,
 } from '../../validations/custom-validations';
 
 export class TriggerPageFunctionalTestsAction implements IAction {
@@ -33,14 +36,16 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
     const pageName = await this.getFileNameForPage(page);
-    if (!pageName) {
-      return;
-    }
 
-    // Check lock file before running tests
-    const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-    if (fs.existsSync(lockPath)) {
-      return; // Skip if lock file exists (page already passed all tests)
+    if (!pageName) {
+      if (TriggerPageFunctionalTestsAction.isDashboardUrl(page.url())) {
+        return;
+      }
+      const urlSegment = this.getUrlSegment(page.url());
+      console.warn(
+        `[PFT] WARNING mapping missing in urlToFileMapping.config.ts | test="${truncateForLog(test.info().title, 160)}" | url=${shortUrl(page.url())} | key: ${urlSegment}`
+      );
+      return;
     }
 
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
@@ -71,11 +76,15 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       if (enable_navigation_tests === 'true') {
         PageNavigationValidation.trackMissingNavigationFile(pageName);
       }
+      if (enable_visibility_validation === 'true') {
+        VisibilityValidation.trackMissingMethod(pageName);
+      }
       return;
     }
 
     let errorValidationFailed = false;
     let navigationTestsFailed = false;
+    let visibilityValidationFailed = false;
 
     // Parent step that groups all functional tests for this page
     await test.step(`PFT triggered for page - ${pageName}`, async () => {
@@ -100,10 +109,21 @@ export class TriggerPageFunctionalTestsAction implements IAction {
           }
         });
       }
+
+      if (enable_visibility_validation === 'true') {
+        await test.step(`Visibility validation triggered for page - ${pageName}`, async () => {
+          try {
+            await this.runVisibilityValidation(page, pageName, pftFilePath);
+          } catch (error) {
+            VisibilityValidation.trackValidationError(pageName, error);
+            visibilityValidationFailed = true;
+          }
+        });
+      }
     });
 
     // Update the permanent lock file based on the test outcome
-    const anyTestFailed = errorValidationFailed || navigationTestsFailed;
+    const anyTestFailed = errorValidationFailed || navigationTestsFailed || visibilityValidationFailed;
     if (anyTestFailed) {
       // Failure: ensure lock file is removed (if it existed)
       this.deleteLockFile(pageName);
@@ -200,6 +220,37 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       PageNavigationValidation.trackPagePassed(pageName);
     } else {
       PageNavigationValidation.trackMissingNavigationMethod(pageName);
+    }
+  }
+
+  /** Dashboard is not in url mapping; skip PFT warn. */
+  private static isDashboardUrl(url: string): boolean {
+    try {
+      return new URL(url).pathname.split('/').filter(Boolean)[0] === 'dashboard';
+    } catch {
+      return /\/dashboard(\/|$)/.test(url);
+    }
+  }
+
+  private async runVisibilityValidation(page: Page, pageName: string, pftFilePath: string): Promise<void> {
+    delete require.cache[require.resolve(pftFilePath)];
+    const pftModule = require(pftFilePath);
+
+    const camelCaseName = pageName.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+    const methodName = `${camelCaseName}VisibilityValidationTests`;
+
+    const validationFunction = pftModule[methodName];
+
+    if (typeof validationFunction === 'function') {
+      VisibilityValidation.trackPageWithVisibilityTests(pageName);
+      try {
+        await validationFunction(page);
+      } catch (error) {
+        VisibilityValidation.trackValidationError(pageName, error);
+        throw error;
+      }
+    } else {
+      VisibilityValidation.trackMissingMethod(pageName);
     }
   }
 
