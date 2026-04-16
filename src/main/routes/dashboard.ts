@@ -8,6 +8,7 @@ import { Logger } from '@modules/logger';
 import type { CcdCase, CcdCaseAddress } from '@services/ccdCase.interface';
 import {
   type DashboardTaskGroup,
+  type DashboardTask,
   STATUS_MAP,
   TASK_GROUP_MAP,
   getDashboardNotifications,
@@ -66,6 +67,12 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
+const TASK_URL_MAP: Record<string, (caseReference: string) => string> = {
+  'Task.AAA6.Claim.ViewClaim': caseRef => `/case/${caseRef}/view-the-claim`,
+  'Task.AAA6.Applications.Contact': caseRef => `/case/${caseRef}/apply-for-breathing-space`,
+  'Task.AAA6.Applications.ViewApplications': caseRef => `/case/${caseRef}/view-all-applications`,
+};
+
 function getTaskUrl(
   templateId: string,
   taskStatus: string,
@@ -75,8 +82,10 @@ function getTaskUrl(
   if (taskStatus === 'NOT_AVAILABLE') {
     return undefined;
   }
-  if (templateId === 'Task.AAA6.Claim.ViewClaim') {
-    return `/case/${caseReference}/view-the-claim`;
+
+  const customUrl = TASK_URL_MAP[templateId];
+  if (customUrl) {
+    return customUrl(caseReference);
   }
   return `/dashboard/${caseReference}/${taskGroupId}/${templateId}`;
 }
@@ -92,6 +101,12 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
   }
 
   return `${DASHBOARD_ROUTE}/${sanitised}`;
+};
+
+//temporary hard coded statuses while logic is implemented in the backend
+const TASK_STATUS_OVERRIDES: Record<string, DashboardTask['status']> = {
+  'Task.AAA6.Applications.Contact': 'AVAILABLE',
+  'Task.AAA6.Applications.ViewApplications': 'AVAILABLE',
 };
 
 function mapTaskGroups(app: Application, caseReference: string) {
@@ -118,6 +133,9 @@ function mapTaskGroups(app: Application, caseReference: string) {
                   ),
                 }
               : undefined;
+          
+          const taskStatus = TASK_STATUS_OVERRIDES[task.templateId] ?? task.status;
+
 
           return {
             title: {
@@ -127,8 +145,8 @@ function mapTaskGroups(app: Application, caseReference: string) {
               ),
             },
             hint,
-            href: getTaskUrl(task.templateId, task.status, caseReference, taskGroupId),
-            status: STATUS_MAP[task.status],
+            href: getTaskUrl(task.templateId, taskStatus, caseReference, taskGroupId),
+            status: STATUS_MAP[taskStatus],
           };
         }),
       };
