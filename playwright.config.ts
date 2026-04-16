@@ -28,23 +28,46 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
-function resolveE2eSpecKeyword(raw: string | undefined): string | undefined {
-  const keyword = raw?.trim();
-  if (!keyword) {
+/** Split PLAYWRIGHT_SPEC / E2E_SPEC: comma or semicolon, trim, drop empties. */
+function splitE2eSpecKeywords(raw: string | undefined): string[] {
+  if (!raw?.trim()) {
+    return [];
+  }
+  return raw
+    .split(/[,;]/)
+    .map((k) => k.trim())
+    .filter(Boolean);
+}
+
+/** Each keyword adds one glob under testDir (OR union). Invalid keywords are skipped with a warning. */
+function resolveE2eSpecTestMatch(raw: string | undefined): string[] | undefined {
+  const keywords = splitE2eSpecKeywords(raw);
+  if (keywords.length === 0) {
     return undefined;
   }
   const testRoot = path.join(__dirname, 'src/test/ui');
   const specFiles = globSync('**/*.spec.ts', { cwd: testRoot, nodir: true });
-  const hasMatch = specFiles.some(f => f.includes(keyword));
-  if (!hasMatch) {
+  const patterns: string[] = [];
+  for (const keyword of keywords) {
+    const hasMatch = specFiles.some((f) => f.includes(keyword));
+    if (!hasMatch) {
+      // eslint-disable-next-line no-console -- intentional operator-facing warning when spec filter matches nothing
+      console.warn(
+        `[playwright] E2E_SPEC keyword "${keyword}" matched no *.spec.ts files under src/test/ui — skipping.`,
+      );
+      continue;
+    }
+    patterns.push(`**/*${keyword}*.spec.ts`);
+  }
+  if (patterns.length === 0) {
     // eslint-disable-next-line no-console -- intentional operator-facing warning when spec filter matches nothing
-    console.warn(`[playwright] E2E_SPEC "${keyword}" matched no *.spec.ts files under src/test/ui — using all specs.`);
+    console.warn('[playwright] E2E_SPEC had no valid keywords — using all specs.');
     return undefined;
   }
-  return keyword;
+  return patterns;
 }
 
-const e2eSpecKeyword = resolveE2eSpecKeyword(process.env.E2E_SPEC);
+const e2eSpecTestMatch = resolveE2eSpecTestMatch(process.env.E2E_SPEC);
 /** Unset → @nightly for local E2E; empty string (CI “all tests”) → no title grep. */
 const rawFunctionalScope = process.env.FUNCTIONAL_TEST_SCOPE;
 const resolvedFunctionalScope = rawFunctionalScope === undefined ? '@nightly' : rawFunctionalScope;
@@ -53,7 +76,7 @@ const grepFromScope = scopeForGrep ? new RegExp(scopeForGrep.replace(/[.*+?^${}(
 
 export default defineConfig({
   testDir: './src/test/ui',
-  ...(e2eSpecKeyword ? { testMatch: [`**/*${e2eSpecKeyword}*.spec.ts`] } : {}),
+  ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
   ...(grepFromScope ? { grep: grepFromScope } : {}),
   /* Run tests in files in parallel */
   fullyParallel: true,

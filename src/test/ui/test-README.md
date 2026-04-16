@@ -142,7 +142,7 @@ await performValidationGroup(
 **Playwright grep and file scope (CI or local):**
 
 - **`FUNCTIONAL_TEST_SCOPE`** — Playwright `grep` in `playwright.config.ts` (test titles). **Empty** = no grep. **`yarn test:E2e`** uses `FUNCTIONAL_TEST_SCOPE` default `@nightly` when unset (`PLAYWRIGHT_PROJECT` required). **`yarn test:functional`** defaults to `@regression` via CLI if unset. PR builds default `@PR` unless labels override (below).
-- **`E2E_SPEC`** — Optional substring of a path under `src/test/ui` (must match at least one `*.spec.ts`; same as `**/*<keyword>*.spec.ts`). **Empty** = all specs. If set but **no file** contains that substring, Playwright falls back to **all specs** and logs a warning.
+- **`E2E_SPEC`** — Optional filename keyword(s) under `src/test/ui`. Each becomes `**/*<keyword>*.spec.ts` (multiple keywords are **OR**). Use **comma or semicolon** to list several, e.g. `respondToAClaim,makeAnApplication`. **Empty** = all specs. Keywords that match no file are skipped (with a warning); if none match, all specs are used.
 
 ```bash
 yarn test:functional
@@ -231,7 +231,7 @@ Runs only the scheduled nightly job; it does **not** drive PR or **master** buil
 - **E2E:** Toggles + `PLAYWRIGHT_PROJECT` run **`yarn test:E2e`** (e.g. `chrome`, `firefox`, `webkit`, `MicrosoftEdge`). Default: **Desktop Chrome** only, tag **`@nightly`**, spec blank = all files.
 - **Jenkins parameters (relevant to Playwright):**
   - **`PLAYWRIGHT_GREP_TAG`** — `@nightly` (default), `(all tests)`, `@smoke`, `@regression`, or `@accessibility`. Maps to `FUNCTIONAL_TEST_SCOPE`.
-  - **`PLAYWRIGHT_SPEC`** — Optional; sets **`E2E_SPEC`**. Empty = all spec files (subject to grep).
+  - **`PLAYWRIGHT_SPEC`** — Optional; sets **`E2E_SPEC`**. Comma/semicolon-separated keywords (see above). Empty = all spec files (subject to grep).
 - **Other parameters:** **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`** — Jenkins **choice** `true` / `false` (default **true**). Nightly always uses **AAT** (`TEST_URL`).
 - **Slack:** Notifications to `#hdp-qa-e2e-test-results` (per stage configuration).
 - **Stage behaviour:** A failing browser stage can be marked unstable while later stages still run (see Jenkins job logs).

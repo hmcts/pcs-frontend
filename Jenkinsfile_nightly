@@ -41,7 +41,7 @@ properties([
     string(
       name: 'PLAYWRIGHT_SPEC',
       defaultValue: '',
-      description: 'Spec path substring (exact case) ex: respondToAClaim. Blank = all specs.'
+      description: 'Spec filename keyword(s), exact case. One pattern: respondToAClaim. Multiple: respondToAClaim,makeAnApplication or use ; between. Blank = all specs.'
     ),
   ])
 ])
