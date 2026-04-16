@@ -53,6 +53,9 @@
     "scope": "OIDC_SCOPE",
     "accessTokenEarlyRefreshSeconds": "OIDC_ACCESS_TOKEN_EARLY_REFRESH_SECONDS"
   },
+  "feeService": {
+    "url": "FEE_SERVICE_URL"
+  },
   "e2e": {
     "testUrl": "TEST_URL",
     "idamTestingSupportUrl": "IDAM_TESTING_SUPPORT_URL",

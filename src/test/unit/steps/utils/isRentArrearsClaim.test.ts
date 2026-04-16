@@ -2,8 +2,8 @@ import { Request } from 'express';
 
 import { isRentArrearsClaim } from '../../../../main/steps/utils/isRentArrearsClaim';
 
-import type { CcdCaseData } from '@interfaces/ccdCase.interface';
-import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
+import type { CcdCaseData } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 /** Build a CcdCaseModel from partial test data (avoids strict CcdCaseData typing in tests). */
 function mockValidatedCase(data: Record<string, unknown> = {}) {

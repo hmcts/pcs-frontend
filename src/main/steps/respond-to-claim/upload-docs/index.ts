@@ -1,7 +1,7 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'upload-docs',
