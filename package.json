@@ -10,6 +10,7 @@
     "start:dev:pcs-local": "USE_VAULT=false NODE_CONFIG_ENV=pcs-local yarn start:dev",
     "start:dev:ssl": "./bin/generate-ssl-options.sh && NODE_ENV=development USE_SSL=true OIDC_REDIRECT_URI=https://localhost:3209/oauth2/callback yarn start:dev",
     "deps:up": "docker compose up -d",
+    "deps:down": "docker compose down",
     "start:dev": "yarn deps:up && node --trace-deprecation --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/bootstrap.ts",
     "start": "NODE_ENV=production node -r module-alias/register dist/main/bootstrap.js",
     "createIdamUser": "./bin/dev/createIdamUser.sh",

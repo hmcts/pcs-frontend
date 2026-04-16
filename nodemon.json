@@ -16,6 +16,9 @@
   "env": {
     "NODE_ENV": "development"
   },
+  "events": {
+    "quit": "yarn deps:down"
+  },
   "verbose": true,
   "legacyWatch": true
 }
