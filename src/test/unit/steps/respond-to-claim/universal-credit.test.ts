@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import type { Environment } from 'nunjucks';
 
 jest.mock('../../../../main/modules/steps/i18n', () => ({
@@ -35,6 +36,8 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
   buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
 }));
 
+import type { SupportedLang } from '../../../../main/modules/steps';
+import { GetController } from '../../../../main/modules/steps';
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/universal-credit';
 
@@ -157,29 +160,27 @@ describe('respond-to-claim universal-credit step', () => {
       possessionClaimResponse: { defendantResponses: { householdCircumstances: hc } },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const render = async (hc: Record<string, unknown> | undefined): Promise<any> => {
+    type UcStepRenderData = Record<string, unknown> & { fieldValues: Record<string, unknown> };
+
+    const render = async (hc: Record<string, unknown> | undefined): Promise<UcStepRenderData> => {
       const req = createReq({
         res: {
           locals: {
             validatedCase: { id: '1234567890123456', data: hc ? hcAt(hc) : {} },
           },
         },
-      });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as Request;
       const res = {
         render: jest.fn(),
-        locals: req.res.locals,
-      } as any;
+        locals: req.res!.locals,
+      } as unknown as Response;
       req.res = res;
 
-      if (!step.getController) {
-        throw new TypeError('expected getController');
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const controller = (step.getController as any)();
+      const gc = step.getController;
+      const controller: GetController =
+        typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
       await controller.get(req, res);
-      return (res.render as jest.Mock).mock.calls[0][1];
+      return (res.render as jest.Mock).mock.calls[0][1] as UcStepRenderData;
     };
 
     it('pre-populates yes + date when saved with a date (came from this screen)', async () => {
