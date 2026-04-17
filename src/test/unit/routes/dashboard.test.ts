@@ -61,6 +61,7 @@ jest.mock('../../../main/middleware/caseReference', () => ({
 jest.mock('../../../main/middleware/caseReference');
 jest.mock('config', () => ({
   get: jest.fn(() => 'mock-secret'),
+  has: jest.fn(() => false),
 }));
 jest.mock('jose', () => ({
   decodeJwt: jest.fn(() => ({ exp: 0, sub: 'user-1' })),
@@ -207,7 +208,7 @@ describe('Dashboard Routes', () => {
 
       const [availableTask, notAvailableTask] = firstGroup.tasks;
 
-      expect(availableTask.title.html).toContain('components/taskGroup/group_one/task-1.njk');
+      expect(availableTask.title.html).toContain('dashboard:tasks.task-1.title');
       expect(availableTask.hint?.html).toContain('components/taskGroup/group_one/task-1-hint.njk');
       expect(availableTask.href).toBe('/dashboard/1234567890123456/group_one/task-1');
 

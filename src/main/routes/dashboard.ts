@@ -1,9 +1,11 @@
+import config from 'config';
 import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
 
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 
+import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import type { CcdCase, CcdCaseAddress } from '@services/ccdCase.interface';
 import {
@@ -17,10 +19,6 @@ import {
 import { arrayToString } from '@utils/arrayToString';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
-import { getTranslationFunction } from '@modules/i18n';
-import config from 'config';
-
-
 
 interface MappedTask {
   title: { html: string };
