@@ -1,7 +1,13 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse, YesNoValue } from '../../../services/ccdCase.interface';
-import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
+import type { PossessionClaimResponse } from '../../../services/ccdCase.interface';
+import {
+  fromYesNoEnum,
+  getValidatedCaseHouseholdCircumstances,
+  isRegularIncomeUcUnticked,
+  setRegularIncomeUcUnticked,
+  toYesNoEnum,
+} from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -22,13 +28,11 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   beforeRedirect: async (req: Request) => {
     const universalCreditSelected = includesUniversalCreditSelection(req.body?.regularIncome);
-    const existingHouseholdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
-      | { universalCredit?: YesNoValue | '' | null; ucApplicationDate?: string | null }
-      | undefined;
+    const existingHouseholdCircumstances = getValidatedCaseHouseholdCircumstances(req);
     const existingUcAnswer = fromYesNoEnum(existingHouseholdCircumstances?.universalCredit);
-    const hasExistingUcDate = Boolean(existingHouseholdCircumstances?.ucApplicationDate);
 
     if (universalCreditSelected) {
+      setRegularIncomeUcUnticked(req, false);
       if (existingUcAnswer === 'yes') {
         return;
       }
@@ -43,21 +47,16 @@ export const step: StepDefinition = createFormStep({
       return;
     }
 
-    if (existingUcAnswer === 'yes' && !hasExistingUcDate) {
-      const possessionClaimResponse: PossessionClaimResponse = {
-        defendantResponses: {
-          householdCircumstances: {
-            universalCredit: '',
-          },
-        },
-      };
-      await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    if (existingUcAnswer === 'yes') {
+      setRegularIncomeUcUnticked(req, true);
     }
   },
   getInitialFormData: req => {
-    const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
-      | { universalCredit?: YesNoValue }
-      | undefined;
+    if (isRegularIncomeUcUnticked(req)) {
+      return {};
+    }
+
+    const householdCircumstances = getValidatedCaseHouseholdCircumstances(req);
 
     if (fromYesNoEnum(householdCircumstances?.universalCredit) === 'yes') {
       return { regularIncome: ['universalCredit'] };
