@@ -1,37 +1,24 @@
 import { Request } from 'express';
 
-import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { createFormStep } from '@modules/steps';
+import { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { FeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'ask-the-court-to-make-an-order',
+  stepName: 'ask-the-court-to-set-aside-the-order',
   journeyFolder: 'makeAnApplication',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: `${__dirname}/askTheCourtToMakeAnOrder.njk`,
+  customTemplate: `${__dirname}/askTheCourtToSetAsideTheOrder.njk`,
   fields: [],
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
     paragraph1: 'paragraph1',
-    examplesIntro: 'examplesIntro',
-    example1: 'example1',
-    example2: 'example2',
-    example3: 'example3',
-    example4: 'example4',
-    forExampleYouCanUseThisTo: 'forExampleYouCanUseThisTo',
-    addAnExtraParty: 'addAnExtraParty',
-    reliefFromSanctions: 'reliefFromSanctions',
-    serveAClaimOutsideEnglandAndWales: 'serveAClaimOutsideEnglandAndWales',
-    transferForEnforcement: 'transferForEnforcement',
-    cannotSuspendOnlineIntro: 'cannotSuspendOnlineIntro',
-    toApplyByPost: 'toApplyByPost',
-    readGuidance: 'readGuidance',
-    fillInFormForSuspend: 'fillInFormForSuspend',
+    paragraph2: 'paragraph2',
     whatYouWillNeedToApply: 'whatYouWillNeedToApply',
     youWillNeedToKnow: 'youWillNeedToKnow',
     ifYouCanPayTheCourtFee: 'ifYouCanPayTheCourtFee',

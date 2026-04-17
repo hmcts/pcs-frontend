@@ -12,8 +12,17 @@ services:
       interval: 3s
       timeout: 2s
       retries: 10
-    networks:
-      - pcs-frontend-network
+
+  service-auth-provider-api:
+    image: hmctsprod.azurecr.io/rpe/service-auth-provider:latest
+    ports:
+      - '${SERVICE_AUTH_PORT}:${SERVICE_AUTH_PORT}'
+    environment:
+      SERVER_PORT: ${SERVICE_AUTH_PORT}
+      AUTH_PROVIDER_SERVICE_SERVER_JWT_KEY: ${AUTH_PROVIDER_SERVICE_SERVER_JWT_KEY}
+      JAVA_TOOL_OPTIONS: -XX:UseSVE=0
+      microserviceKeys_ccd_data: AAAAAAAAAAAAAAAA
+      microserviceKeys_pcs_frontend: AAAAAAAAAAAAAAAA
 
   wiremock:
     image: 'hmctsprod.azurecr.io/imported/wiremock/wiremock:latest'
@@ -21,10 +30,6 @@ services:
       - '8180:8080'
     volumes:
       - ./wiremock/mappings:/home/wiremock/mappings
-
-networks:
-  pcs-frontend-network:
-    driver: bridge
 
 volumes:
   cache-data:
