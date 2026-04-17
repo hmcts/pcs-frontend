@@ -147,7 +147,7 @@
     "playwright": "1.58.2",
     "playwright-core": "1.58.2",
     "postcss": "8.5.10",
-    "prettier": "3.8.1",
+    "prettier": "3.8.3",
     "sass": "1.97.3",
     "sass-loader": "16.0.7",
     "style-loader": "4.0.0",
