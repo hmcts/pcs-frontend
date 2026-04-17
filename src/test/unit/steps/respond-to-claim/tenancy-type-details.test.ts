@@ -1,5 +1,26 @@
 jest.mock('../../../../main/modules/steps', () => ({
   createFormStep: jest.fn(config => config),
+  getTranslationFunction: jest.fn(() =>
+    jest.fn((key: string, options?: Record<string, unknown>) => {
+      if (key === 'tenancyTypeWalesStandard') {
+        return 'The property is let under a standard occupation contract';
+      }
+      if (key === 'tenancyTypeWalesSecure') {
+        return 'The property is let under a secure occupation contract';
+      }
+      if (key === 'tenancyTypeWales') {
+        return `The property is let under ${options?.welshTenancyTypeAgreementType} occupation contract`;
+      }
+      if (key === 'tenancyTypeOther') {
+        return `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${options?.otherTenancyTypeDetails}`;
+      }
+      return key;
+    })
+  ),
+}));
+
+jest.mock('../../../../main/steps/utils/isWalesProperty', () => ({
+  isWalesProperty: jest.fn(),
 }));
 
 jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
@@ -7,6 +28,7 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
 }));
 
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
+import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
 import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 type TenancyTypeDetailsStep = {
@@ -36,8 +58,11 @@ type TenancyTypeDetailsStep = {
                 claimantOrganisations?: { value?: string }[];
                 defendantResponses?: { tenancyTypeCorrect?: string; tenancyType?: string };
               };
+              legislativeCountry?: string;
               tenancy_TypeOfTenancyLicence?: string;
               tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
+              occupationLicenceTypeWales?: string;
+              otherLicenceTypeDetails?: string;
             };
           };
         };
@@ -52,6 +77,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (isWalesProperty as jest.Mock).mockReturnValue(false);
   });
 
   describe('getInitialFormData', () => {
@@ -401,6 +427,109 @@ describe('respond-to-claim tenancy-type-details step', () => {
         );
 
         expect(content.tenancyType).toBe('original tenancy text');
+      });
+    });
+
+    describe('Welsh property (occupation contract types)', () => {
+      beforeEach(() => {
+        (isWalesProperty as jest.Mock).mockReturnValue(true);
+      });
+
+      it.each([
+        ['STANDARD_CONTRACT', 'The property is let under a standard occupation contract'],
+        ['SECURE_CONTRACT', 'The property is let under a secure occupation contract'],
+      ])('sets tenancyType using dedicated Welsh key for %s', async (licenceType, expectedText) => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    legislativeCountry: 'Wales',
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                    occupationLicenceTypeWales: licenceType,
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'ignored' }
+        );
+
+        expect(content.tenancyType).toBe(expectedText);
+      });
+
+      it('calls t(tenancyTypeOther) directly with otherLicenceTypeDetails for OTHER', async () => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    legislativeCountry: 'Wales',
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                    occupationLicenceTypeWales: 'OTHER',
+                    otherLicenceTypeDetails: 'Rolling monthly agreement',
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'ignored' }
+        );
+
+        expect(content.tenancyType).toBe(
+          'The claimant provided the following information about your tenancy, occupation contract or licence agreement type: Rolling monthly agreement'
+        );
+        expect(content.otherTenancyTypeDetails).toBe('Rolling monthly agreement');
+      });
+
+      it('does not use tenancy_DetailsOfOtherTypeOfTenancyLicence for Welsh OTHER', async () => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    legislativeCountry: 'Wales',
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                    occupationLicenceTypeWales: 'OTHER',
+                    otherLicenceTypeDetails: 'Wales-specific detail',
+                    tenancy_DetailsOfOtherTypeOfTenancyLicence: 'England field should be ignored',
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'ignored' }
+        );
+
+        expect(content.otherTenancyTypeDetails).toBe('Wales-specific detail');
+        expect(content.tenancyType).not.toContain('England field should be ignored');
+      });
+
+      it('falls back to formContent.tenancyType when occupationLicenceTypeWales is missing', async () => {
+        const content = await testedStep.extendGetContent(
+          {
+            body: {},
+            res: {
+              locals: {
+                validatedCase: {
+                  data: {
+                    legislativeCountry: 'Wales',
+                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                  },
+                },
+              },
+            },
+          },
+          { detailsHeading: 'Details given by ', tenancyType: 'fallback tenancy text' }
+        );
+
+        expect(content.tenancyType).toBe('fallback tenancy text');
       });
     });
   });

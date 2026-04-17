@@ -1,5 +1,5 @@
 export { isDefendantNameKnown } from './isDefendantNameKnown';
-export { isWelshProperty } from './isWelshProperty';
+export { isWalesProperty } from './isWalesProperty';
 export { isNoticeDateProvided } from './isNoticeDateProvided';
 export { isRentArrearsClaim } from './isRentArrearsClaim';
 export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
