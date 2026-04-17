@@ -130,6 +130,8 @@ export interface CcdDefendantResponses {
   householdCircumstances?: HouseholdCircumstances;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
+  otherConsiderations?: YesNoValue;
+  otherConsiderationsDetails?: string;
 }
 
 export interface PossessionClaimResponse {
