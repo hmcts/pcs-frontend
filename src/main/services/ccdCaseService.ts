@@ -326,7 +326,8 @@ export const ccdCaseService = {
 
     const eventId = 'respondPossessionClaim';
     const pageId = 'respondToPossessionDraftSavePage';
-    const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/validate?pageId=${pageId}`;
+    const ccdPageId = `${eventId}${pageId}`;
+    const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/validate?pageId=${ccdPageId}`;
 
     const payload = {
       event: {
@@ -335,7 +336,7 @@ export const ccdCaseService = {
         description: `Citizen ${eventId} draft save description`,
       },
       case_reference: caseId,
-      data,
+      event_data: data,
       ignore_warning: false,
     };
 
