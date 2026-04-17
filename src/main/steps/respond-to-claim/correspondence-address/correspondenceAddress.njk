@@ -19,6 +19,27 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
+<div class="govuk-error-summary"
+     aria-labelledby="error-summary-title"
+     role="alert"
+     tabindex="-1"
+     hidden>
+  <h2 class="govuk-error-summary__title" id="error-summary-title">
+    There is a problem
+  </h2>
+  <div class="govuk-error-summary__body">
+    <ul class="govuk-list govuk-error-summary__list">
+      {% if clientErrors.lookupPostcode %}
+        <li data-error-id="correspondence-lookup-postcode-error">
+          <a href="#correspondence-lookupPostcode">
+            {{ clientErrors.lookupPostcode }}
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+
   <form method="post" action="{{ url }}" novalidate>
     {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
     {% set hasPrepopulatedAddress = correspondenceAddressLine1 or correspondenceAddressLine2 or correspondenceTownOrCity or correspondenceCounty or correspondencePostcode %}
@@ -36,21 +57,21 @@
             <span class="govuk-visually-hidden">Error:</span> {{ clientErrors.postcodeNotFound }}
           </p>
           <div class="govuk-input__wrapper">
-            <input class="govuk-input govuk-input--width-10" 
-                    id="correspondence-lookupPostcode" 
-                    name="lookupPostcode" 
-                    type="text" 
+            <input class="govuk-input govuk-input--width-10"
+                    id="correspondence-lookupPostcode"
+                    name="lookupPostcode"
+                    type="text"
                     autocomplete="postal-code"
                     aria-describedby="correspondence-lookup-postcode-error correspondence-postcode-error"/>
-            <button class="govuk-button govuk-!-margin-left-2 govuk-!-margin-bottom-0" 
+            <button class="govuk-button govuk-!-margin-left-2 govuk-!-margin-bottom-0"
                     id="correspondence-findAddressBtn"
-                    data-module="govuk-button" 
+                    data-module="govuk-button"
                     type="button">
               {{ buttons.findAddress }}
             </button>
           </div>
         </div>
-        
+
         <div id="correspondence-addressSelectContainer" hidden>
           <div class="govuk-form-group govuk-!-margin-bottom-2" id="correspondence-selectedAddress-form-group">
             <label class="govuk-label" for="correspondence-selectedAddress">
@@ -64,16 +85,15 @@
             </select>
           </div>
         </div>
-        
+
         <input type="hidden" id="correspondence-addressesFoundFlag" name="addressesFoundFlag" value="false" />
-        
+
         {% set manualAddressFieldsHtml %}
           <p class="govuk-body">{{ labels.enterManuallySubText }}</p>
           <div class="address-form" id="correspondence-addressForm">
             <h2 class="govuk-heading-m govuk-!-margin-top-2">{{ labels.addressHeading }}</h2>
-            
+
             {{ govukInput({
-            id: 'correspondence-addressLine1',
             name: 'correspondenceAddressConfirm.addressLine1',
             label: {
               text: labels.addressLine1
@@ -87,7 +107,6 @@
           }) }}
 
           {{ govukInput({
-            id: 'correspondence-addressLine2',
             name: 'correspondenceAddressConfirm.addressLine2',
             label: {
               text: labels.addressLine2
@@ -101,7 +120,6 @@
           }) }}
 
           {{ govukInput({
-            id: 'correspondence-town',
             name: 'correspondenceAddressConfirm.townOrCity',
             label: {
               text: labels.townOrCity
@@ -115,7 +133,6 @@
           }) }}
 
           {{ govukInput({
-            id: 'correspondence-county',
             name: 'correspondenceAddressConfirm.county',
             label: {
               text: labels.county
@@ -128,7 +145,6 @@
           }) }}
 
           {{ govukInput({
-            id: 'correspondence-postcode',
             name: 'correspondenceAddressConfirm.postcode',
             label: {
               text: labels.postcode
@@ -142,7 +158,7 @@
           }) }}
           </div>
         {% endset %}
-        
+
         {{ govukDetails({
           summaryText: labels.enterManually,
           html: manualAddressFieldsHtml,
@@ -152,7 +168,7 @@
       </div>
     {% endset %}
 
-    
+
     <span class="govuk-caption-xl">{{ caption or serviceName }}</span>
     {% if isAddressKnown %}
     {% if subtitle %}<p class="govuk-body">{{ subtitle }}</p>{% endif %}
@@ -197,3 +213,4 @@
 
 
 {% endblock %}
+
