@@ -45,4 +45,75 @@ describe('validateForm', () => {
     const errors = validateForm(req as Request, fields);
     expect(errors).toEqual({});
   });
+
+  describe('special character / emoji validation', () => {
+    const emojiFields: FormFieldConfig[] = [{ name: 'testField', type: 'text' }];
+
+    it('should set special character error using field-specific translation', () => {
+      const req = { body: { testField: 'hello 🎉' }, session: {} } as Partial<Request>;
+      const translations = {
+        'testField.specialCharacter': 'Test field must only include letters a to z',
+      };
+
+      const errors = validateForm(req as Request, emojiFields, translations);
+
+      expect(errors.testField).toBe('Test field must only include letters a to z');
+    });
+
+    it('should set special character error using defaultSpecialCharacter translation with field name interpolated', () => {
+      const req = { body: { testField: 'hello 😀' }, session: {} } as Partial<Request>;
+      const translations = {
+        defaultSpecialCharacter: '{fieldName} must only include letters a to z',
+      };
+
+      const errors = validateForm(req as Request, emojiFields, translations);
+
+      expect(errors.testField).toBe('Test field must only include letters a to z');
+    });
+
+    it('should fall back to hardcoded message when no translations provided', () => {
+      const req = { body: { testField: 'hello 🚀' }, session: {} } as Partial<Request>;
+
+      const errors = validateForm(req as Request, emojiFields, {});
+
+      expect(errors.testField).toBe(
+        'Test field must only include letters a to z, and special characters such as hyphens, spaces and apostrophes'
+      );
+    });
+
+    it('should not overwrite an existing error with special character error', () => {
+      const fields: FormFieldConfig[] = [{ name: 'testField', type: 'text', required: true }];
+      const req = { body: { testField: '' }, session: {} } as Partial<Request>;
+
+      const errors = validateForm(req as Request, fields, {
+        defaultRequired: 'This field is required',
+      });
+
+      expect(errors.testField).toBe('This field is required');
+    });
+
+    it('should not set special character error for valid text', () => {
+      const req = { body: { testField: "valid text with hyphens and apostrophe's" }, session: {} } as Partial<Request>;
+
+      const errors = validateForm(req as Request, emojiFields, {});
+
+      expect(errors.testField).toBeUndefined();
+    });
+
+    it('should validate textarea and character-count fields for special characters', () => {
+      const fields: FormFieldConfig[] = [
+        { name: 'textareaField', type: 'textarea' },
+        { name: 'charCountField', type: 'character-count' },
+      ];
+      const req = {
+        body: { textareaField: '🔥 fire', charCountField: '💯 percent' },
+        session: {},
+      } as Partial<Request>;
+
+      const errors = validateForm(req as Request, fields, {});
+
+      expect(errors.textareaField).toContain('must only include letters a to z');
+      expect(errors.charCountField).toContain('must only include letters a to z');
+    });
+  });
 });

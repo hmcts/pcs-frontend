@@ -14,7 +14,9 @@
   "textAreaLabel": "cyGive details about your circumstances",
   "errors": {
     "shareCircumstances": "cySelect if you’d like to share anything about your circumstances",
-    "circumstancesDetails": "cyGive details about your circumstances",
-    "circumstancesDetailsInvalidCharacters": "cyThe details of your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "shareCircumstances.circumstancesDetails": "cyGive details about your circumstances",
+    "circumstancesDetails": {
+      "specialCharacter": "cyThe details of your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    }
   }
 }
