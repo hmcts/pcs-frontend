@@ -83,12 +83,12 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   // });
   // console.log(`verified > £1 billion value error message for other benefits`);
   //
-  // //uncheck
-  //
-  // await performAction('uncheck', {
-  //   question: whatRegularIncomeDoYouReceive.mainHeader,
-  //   option: whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-  // });
+  //uncheck
+
+  await performAction('uncheck', {
+    question: whatRegularIncomeDoYouReceive.mainHeader,
+    option: whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
+  });
   // console.log(`unchecked the option`);
   //
   // console.log(`****OTHER BENEFITS VALIDATIONS COMPLETED****`);
