@@ -5,7 +5,6 @@ const t = ((key: string) => {
     // Step translations
     pageTitle: 'Your name',
     heading: 'Whats your name?',
-    caption: 'Respond to a property possession claim',
     contactUs: 'Contact us for help',
     firstNameLabel: 'First name',
     lastNameLabel: 'Last name',
@@ -100,7 +99,6 @@ describe('respond-to-claim defendant-name-capture step', () => {
       expect.objectContaining({
         pageTitle: 'Your name',
         heading: 'Whats your name?',
-        caption: 'Respond to a property possession claim',
         dashboardUrl: null,
         cancel: 'Cancel',
         backUrl: '/previous-step',

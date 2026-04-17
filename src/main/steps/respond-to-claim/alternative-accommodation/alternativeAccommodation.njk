@@ -14,11 +14,7 @@
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-
-  {% if caption %}
-    <span class="govuk-caption-l">{{ caption }}</span>
-  {% endif %}
-
+  
    <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
       {% if field.componentType == 'radios' %}

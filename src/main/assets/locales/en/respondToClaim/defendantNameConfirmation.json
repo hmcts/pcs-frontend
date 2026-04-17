@@ -1,5 +1,4 @@
 {
-  "caption": "Respond to a property possession claim",
   "pageTitle": "Your name",
   "nameConfirmationLabel": "Is your name {{defendantName}}?",
   "nameConfirmationHint": "This is the name provided by {{organisationName}}",

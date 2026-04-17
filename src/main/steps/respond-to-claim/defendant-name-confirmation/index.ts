@@ -61,7 +61,6 @@ export const step: StepDefinition = createFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
     contactUs: 'contactUs',
   },
   getInitialFormData: (req: Request) => {

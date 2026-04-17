@@ -16,7 +16,6 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/writtenTerms.njk`,
   translationKeys: {
-    caption: 'caption',
     pageTitle: 'pageTitle',
     introText: 'introText',
   },

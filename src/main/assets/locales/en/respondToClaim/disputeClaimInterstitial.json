@@ -1,13 +1,13 @@
 {
   "pageTitle": "The claimant’s claim",
-  "caption": "Respond to a property possession claim",
   "heading": "{{claimantName, pluralPossessive}} claim",
   "secondaryHeading": "Respond to a property possession claim",
-  "paragraph1": "When they made their claim, {{claimantName}} had to give information about:",
-  "listItem1": "the tenancy, occupation contract or licence agreement",
+  "paragraph1": "You will now be asked to respond to specific parts of {{claimantName, pluralPossessive}} claim.",
+  "paragraph2": "When they made their claim, they had to give information about:",
+  "listItem1": "the tenancy, occupation contract or licence agreement you signed to rent your property",
   "listItem2": "the notice of their intention to begin possession proceedings, if they served you with one",
   "listItem3": "their grounds for possession (their reasons for making the claim)",
-
-  "paragraph2": "If any of the information is wrong, or you disagree with it, you can dispute their claim or parts of it. ",
-  "paragraph3": "The claimant will be able to see your answers."
+  "paragraph3": "If any of the information they've given is not correct, you can correct it.",
+  "paragraph4": "You will also be asked if you want to make a counterclaim against {{claimantName}}. If you do, you will need to explain what your counterclaim is and why you’re making it. You will also need to pay a fee.",
+  "paragraph5": "The claimant will be able to see your answers."
 }

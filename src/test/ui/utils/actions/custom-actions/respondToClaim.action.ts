@@ -203,9 +203,10 @@ export class RespondToClaimAction implements IAction {
       claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     }
     const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
-    const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
+    const youWillNowBeAskedToRespondParagraph =
+      disputeClaimInterstitial.getYouWillNowBeAskedToRespondParagraph(claimantsName);
     await performValidation('text', { elementType: 'heading', text: mainHeader });
-    await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
+    await performValidation('text', { elementType: 'paragraph', text: youWillNowBeAskedToRespondParagraph });
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
@@ -402,7 +403,7 @@ export class RespondToClaimAction implements IAction {
     });
     await performValidation('text', {
       elementType: 'paragraph',
-      text: `When making their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
+      text: `When they made their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
     const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {

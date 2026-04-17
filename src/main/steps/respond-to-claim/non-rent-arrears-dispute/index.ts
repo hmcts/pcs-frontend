@@ -17,7 +17,6 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
   },
   beforeRedirect: async req => {
     const disputeOtherParts = req.body?.disputeOtherParts as 'yes' | 'no' | undefined;

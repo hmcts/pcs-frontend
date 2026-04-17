@@ -42,7 +42,6 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     // On-page H1
     heading: 'heading',
-    caption: 'caption',
     contactUs: 'contactUs',
   },
   getInitialFormData: req => {
