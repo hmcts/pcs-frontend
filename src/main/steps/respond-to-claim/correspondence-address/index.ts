@@ -142,7 +142,6 @@ export const step: StepDefinition = createFormStep({
       possessionClaimResponse = {
         defendantContactDetails: {
           party: {
-            addressKnown: 'YES',
             address: prepopulateAddress,
           },
         },
@@ -158,7 +157,6 @@ export const step: StepDefinition = createFormStep({
       possessionClaimResponse = {
         defendantContactDetails: {
           party: {
-            addressKnown: 'NO',
             address: {
               AddressLine1: addressLine1,
               ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
