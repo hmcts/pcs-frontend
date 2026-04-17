@@ -98,36 +98,34 @@ export default defineConfig({
             },
           },
           {
-            name: 'MobileChrome',
+            /** Chromium with Pixel 5 device profile (Android Chrome–class behaviour). */
+            name: 'mobile-android',
             use: {
               ...devices['Pixel 5'],
-              channel: 'MobileChrome',
               screenshot: 'only-on-failure' as const,
               video: 'retain-on-failure' as const,
               trace: 'on-first-retry' as const,
               javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
             },
           },
           {
-            name: 'MobileSafari',
+            /** WebKit with iPhone 12 device profile (mobile Safari–class behaviour). */
+            name: 'mobile-ios',
             use: {
               ...devices['iPhone 12'],
-              channel: 'MobileSafari',
               screenshot: 'only-on-failure' as const,
               video: 'retain-on-failure' as const,
               trace: 'on-first-retry' as const,
               javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
             },
           },
           {
-            name: 'MicrosoftEdge',
+            name: 'edge',
             use: {
               ...devices['Desktop Edge'],
-              channel: 'MicrosoftEdge',
+              channel: 'msedge',
               screenshot: 'only-on-failure' as const,
               video: 'retain-on-failure' as const,
               trace: 'on-first-retry' as const,

@@ -27,7 +27,22 @@ properties([
     booleanParam(
       name: 'WEBKIT_TESTS',
       defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Webkit.'
+      description: 'Tick the checkbox to run E2E tests in Webkit (desktop Safari engine).'
+    ),
+    booleanParam(
+      name: 'EDGE_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests in Microsoft Edge.'
+    ),
+    booleanParam(
+      name: 'MOBILE_ANDROID_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests on the Android (Pixel 5) emulator profile.'
+    ),
+    booleanParam(
+      name: 'MOBILE_IOS_TESTS',
+      defaultValue: true,
+      description: 'Tick the checkbox to run E2E tests on the iOS (iPhone 12) WebKit emulator profile.'
     ),
     booleanParam(
       name: 'ACCESSIBILITY_TESTS',
@@ -107,6 +122,15 @@ def runE2ETests(yarnBuilder) {
   }
   if (params.WEBKIT_TESTS) {
     runE2ETestsForBrowser(yarnBuilder, 'Safari')
+  }
+  if (params.EDGE_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'Edge')
+  }
+  if (params.MOBILE_ANDROID_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'MobileAndroid')
+  }
+  if (params.MOBILE_IOS_TESTS) {
+    runE2ETestsForBrowser(yarnBuilder, 'MobileIos')
   }
 }
 
