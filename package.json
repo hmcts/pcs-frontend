@@ -84,7 +84,7 @@
     "luxon": "3.7.2",
     "module-alias": "2.3.4",
     "nunjucks": "3.2.4",
-    "openid-client": "6.8.2",
+    "openid-client": "6.8.3",
     "serve-favicon": "2.5.1",
     "totp-generator": "1.0.0",
     "tsconfig-paths": "4.2.0",

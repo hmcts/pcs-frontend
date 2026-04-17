@@ -10057,10 +10057,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:6.1.3, jose@npm:^6.1.3":
+"jose@npm:6.1.3":
   version: 6.1.3
   resolution: "jose@npm:6.1.3"
   checksum: 10/9626c51e8c3792b505e954f3094698c182208617b62dfb27269230f31e57560b083985ed8128b8a9753aa92daf18d3a2341cc826d149503f14569abe87d42389
+  languageName: node
+  linkType: hard
+
+"jose@npm:^6.2.2":
+  version: 6.2.2
+  resolution: "jose@npm:6.2.2"
+  checksum: 10/fd66f24916d2507dbde0ca77ede86377e7d7eae42c7f94db0dfd014b0c6ce5041365dc8e757a44e54cd7606ea5e9c757aa544b51e55cb8a736e83320db1b8258
   languageName: node
   linkType: hard
 
@@ -11320,7 +11327,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oauth4webapi@npm:^3.8.4":
+"oauth4webapi@npm:^3.8.5":
   version: 3.8.5
   resolution: "oauth4webapi@npm:3.8.5"
   checksum: 10/5c39d4dbd95b795438e79444a1d710631b3f8311e8b8913150b385b5815857b32f617a49d4869a4476b2318f614adfbc9d19510360df198719973f6f69a2e75b
@@ -11481,13 +11488,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:6.8.2":
-  version: 6.8.2
-  resolution: "openid-client@npm:6.8.2"
+"openid-client@npm:6.8.3":
+  version: 6.8.3
+  resolution: "openid-client@npm:6.8.3"
   dependencies:
-    jose: "npm:^6.1.3"
-    oauth4webapi: "npm:^3.8.4"
-  checksum: 10/5d30ff2419c4847d0037c43cf136dd7189b16399aaee98faaad5bcea105c4e1e4e43d2dac1141ea77049b446b50d1b26f2bb882f717b3e38a5f996645abfc1d0
+    jose: "npm:^6.2.2"
+    oauth4webapi: "npm:^3.8.5"
+  checksum: 10/4936fd338c65387921ab4f1d8bc9da18bf9b78f56f4d4a17e8cd9731cc992ab99daa47e051e800c5a68d236a08737303d520984138ae797385c0131e71705248
   languageName: node
   linkType: hard
 
@@ -11817,7 +11824,7 @@ __metadata:
     module-alias: "npm:2.3.4"
     nodemon: "npm:3.1.14"
     nunjucks: "npm:3.2.4"
-    openid-client: "npm:6.8.2"
+    openid-client: "npm:6.8.3"
     playwright: "npm:1.58.2"
     playwright-core: "npm:1.58.2"
     postcss: "npm:8.5.10"
