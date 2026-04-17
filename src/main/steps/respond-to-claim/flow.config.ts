@@ -388,7 +388,44 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'counter-claim': {
-      defaultNext: 'payment-interstitial',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.makeCounterClaim === 'YES',
+          nextStep: 'what-are-you-claiming-for',
+        },
+        {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            if (currentStepData.makeCounterClaim !== 'NO') {
+              return false;
+            }
+            const rentArrearsClaim = await hasAnyRentArrearsGround(req);
+            return !rentArrearsClaim;
+          },
+          nextStep: 'your-household-and-circumstances',
+        },
+        {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
+            if (currentStepData.makeCounterClaim !== 'NO') {
+              return false;
+            }
+            const rentArrearsClaim = await hasAnyRentArrearsGround(req);
+            return rentArrearsClaim;
+          },
+          nextStep: 'payment-interstitial',
+        },
+      ],
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
@@ -497,6 +534,10 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
+      defaultNext: 'end-now',
+    },
+    'what-are-you-claiming-for': {
+      previousStep: 'counter-claim',
       defaultNext: 'end-now',
     },
   },

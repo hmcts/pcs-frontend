@@ -1,16 +1,53 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% block pageTitle %}Counterclaim &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Counterclaim (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for the counterclaim step.</p>
-  <form method="post" action="{{ url }}">
+
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+
+  <h2 class="govuk-heading-m">{{ whatCounterclaimIsHeading }}</h2>
+  <p class="govuk-body">{{ whatCounterclaimIsParagraph1 }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ whatCounterclaimIsBullet1 }}</li>
+    <li>{{ whatCounterclaimIsBullet2 }}</li>
+  </ul>
+  <p class="govuk-body">{{ whatCounterclaimIsParagraph2 }}</p>
+  <p class="govuk-body">{{ whatCounterclaimIsParagraph3 }}</p>
+  <p class="govuk-body">
+      {{ whatCounterclaimIsLinkText | safe }}
+  </p>
+
+  <h2 class="govuk-heading-m">{{ whenMakeCounterclaimHeading }}</h2>
+  <p class="govuk-body">{{ whenMakeCounterclaimParagraph1 }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ whenMakeCounterclaimBullet1 }}</li>
+    <li>{{ whenMakeCounterclaimBullet2 }}</li>
+  </ul>
+  <p class="govuk-body">{{ whenMakeCounterclaimParagraph2 }}</p>
+  <p class="govuk-body">{{ whenMakeCounterclaimParagraph3 | safe  }}</p>
+  <h2 class="govuk-heading-m">{{ counterclaimFeesHeading }}</h2>
+  <p class="govuk-body">
+    {{ counterclaimFeesParagraph1 | safe }}
+  </p>
+  <p class="govuk-body">{{ counterclaimFeesParagraph2 }}</p>
+  <p class="govuk-body">
+      {{ counterclaimFeesCourtFeesLinkText | safe  }}
+  </p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
     {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>

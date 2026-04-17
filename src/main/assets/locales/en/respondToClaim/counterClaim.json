@@ -1,1 +1,28 @@
-{}
+{
+  "pageTitle": "Counterclaim",
+  "whatCounterclaimIsHeading": "What a counterclaim is",
+  "whatCounterclaimIsParagraph1": "A counterclaim is a separate claim that you can make alongside your response. You can make it against:",
+  "whatCounterclaimIsBullet1": "a party in the case",
+  "whatCounterclaimIsBullet2": "a party and someone else that can be considered as part of the same case",
+  "whatCounterclaimIsParagraph2": "It's separate from the questions you've already answered, where you responded to specific information Treetops Housing provided. In a counterclaim, you say that a party owes you something. This can be money or something else.",
+  "whatCounterclaimIsParagraph3": "You can make a counterclaim at any time, but if you do it after you've submitted your response, you will have to ask a judge for permission to make it.",
+  "whatCounterclaimIsLinkText": "<a href=\"https://england.shelter.org.uk/professional_resources/legal/possession_and_eviction/tenant_defences_to_possession/tenant_defence_and_counterclaim_process\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Read guidance on counterclaims from Shelter (opens in new tab)</a>",
+  "whenMakeCounterclaimHeading": "When you can make a counterclaim",
+  "whenMakeCounterclaimParagraph1": "You can make a counterclaim if you believe a party has done something wrong or failed to act. For example, if they:",
+  "whenMakeCounterclaimBullet1": "left the property in a state of disrepair",
+  "whenMakeCounterclaimBullet2": "did not protect your tenancy deposit",
+  "whenMakeCounterclaimParagraph2": "You must have a valid legal reason to make a counterclaim.",
+  "whenMakeCounterclaimParagraph3": "If you're not sure whether you have a valid reason, you can get free legal advice through the Housing Loss Prevention Advice Service.You can find a provider near you using the <a href=\"https://find-legal-advice.justice.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> find a legal adviser service (opens in new tab)</a>.",
+  "counterclaimFeesHeading": "Fees for making a counterclaim",
+  "counterclaimFeesParagraph1": "You will have to pay a fee to make a counterclaim, unless you're eligible for help with fees.<a href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Check if you can get help with court fees (opens in new tab)</a>",
+  "counterclaimFeesParagraph2": "The amount you pay depends on what you’re claiming. If it’s a claim for an amount of money, the fee depends on the value of your claim. If your claim is about something else, the fee is £X.",
+  "counterclaimFeesCourtFeesLinkText": "<a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about court fees (opens in new tab)</a>",
+  "question": "Do you want to make a counterclaim?",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "makeCounterClaim": "Select if you're planning to make a counterclaim"
+  }
+}

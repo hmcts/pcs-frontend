@@ -37,6 +37,7 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
+import { step as whatAreYouClaimingFor } from './what-are-you-claiming-for';
 import { step as writtenTerms } from './written-terms';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -64,6 +65,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'counter-claim': counterClaim,
+  'what-are-you-claiming-for': whatAreYouClaimingFor,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
