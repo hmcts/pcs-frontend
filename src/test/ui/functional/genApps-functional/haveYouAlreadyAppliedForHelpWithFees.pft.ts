@@ -16,6 +16,6 @@ export async function haveYouAlreadyAppliedForHelpWithFeesErrorValidation(): Pro
     inputArray: haveYouAlreadyAppliedForHelpWithFees.errorValidationField.errorTextField,
     header: haveYouAlreadyAppliedForHelpWithFees.thereIsAProblemErrorMessageHeader,
     label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
-    button: haveYouAlreadyAppliedForHelpWithFees.continueButton
+    button: haveYouAlreadyAppliedForHelpWithFees.continueButton,
   });
 }

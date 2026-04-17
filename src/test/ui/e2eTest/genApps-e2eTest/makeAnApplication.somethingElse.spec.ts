@@ -55,7 +55,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
       option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
       label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
-      input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput
+      input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
     await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);

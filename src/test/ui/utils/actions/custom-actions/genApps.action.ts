@@ -1,6 +1,11 @@
 import { Page } from '@playwright/test';
 
-import { chooseAnApplication, doYouNeedHelpPayingTheFee, haveYouAlreadyAppliedForHelpWithFees, isTheCourtHearingInTheNext14Days } from '../../../data/page-data/genApps-page-data';
+import {
+  chooseAnApplication,
+  doYouNeedHelpPayingTheFee,
+  haveYouAlreadyAppliedForHelpWithFees,
+  isTheCourtHearingInTheNext14Days,
+} from '../../../data/page-data/genApps-page-data';
 import { generateRandomString } from '../../common/string.utils';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -57,11 +62,7 @@ export class GenAppsAction implements IAction {
       option: confirmFeeHelp.option,
     });
     if (confirmFeeHelp.option === 'Yes') {
-      await performAction(
-        'inputText',
-        confirmFeeHelp.label,
-        confirmFeeHelp.input
-      );
+      await performAction('inputText', confirmFeeHelp.label, confirmFeeHelp.input);
     } else {
       FieldsStore.delete(confirmFeeHelp.label as string);
     }
@@ -83,13 +84,12 @@ export class GenAppsAction implements IAction {
           await performAction('clickRadioButton', { question: validationArr.question, option: validationArr.option });
           break;
 
-        case 'textField':          
+        case 'textField':
           await performAction('inputText', validationArr.label, generateRandomString(item.input));
           await performAction('clickButton', validationArr.button);
           await performValidation('errorMessage', validationArr.label, item.errMessage);
           break;
-      };
-      
+      }
     }
   }
 }

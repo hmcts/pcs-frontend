@@ -198,11 +198,8 @@ export class PageContentValidation implements IValidation {
   }
 
   private loadPageDataFile(fileName: string): object | null {
-    const filePath = this.resolveDataFilePath(
-      PageContentValidation.PAGE_DATA_DIR,
-      `${fileName}.page.data.ts`
-    );
-    
+    const filePath = this.resolveDataFilePath(PageContentValidation.PAGE_DATA_DIR, `${fileName}.page.data.ts`);
+
     if (!filePath || !fs.existsSync(filePath)) {
       console.warn(`Path not found for the file ${fileName}`);
       return null;
@@ -230,7 +227,7 @@ export class PageContentValidation implements IValidation {
     }
   }
 
-   private resolveDataFilePath(baseDir: string, pageName: string): string | null {
+  private resolveDataFilePath(baseDir: string, pageName: string): string | null {
     if (!fs.existsSync(baseDir)) {
       throw new Error(`Base directory does not exist: ${baseDir}`);
     }
