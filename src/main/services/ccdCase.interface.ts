@@ -223,4 +223,7 @@ export enum GenAppType {
 export interface CitizenGenAppRequest {
   applicationType: GenAppType;
   within14Days?: YesNoValue;
+  needHwf?: YesNoValue;
+  appliedForHwf?: YesNoValue;
+  hwfReference?: string;
 }
