@@ -263,17 +263,16 @@ function getAddressData(
   partyAddress?: CcdCaseAddress,
   correspondenceAddressConfirmed?: string
 ) {
-
-const addressConfirmedRadioSelection =
-  req.body?.correspondenceAddressConfirm !== undefined
-    ? req.body.correspondenceAddressConfirm
-    : stepData?.correspondenceAddressConfirm !== undefined
-    ? stepData.correspondenceAddressConfirm
-    : correspondenceAddressConfirmed === 'YES'
-    ? 'yes'
-    : correspondenceAddressConfirmed === 'NO'
-    ? 'no'
-    : undefined;
+  const addressConfirmedRadioSelection =
+    req.body?.correspondenceAddressConfirm !== undefined
+      ? req.body.correspondenceAddressConfirm
+      : stepData?.correspondenceAddressConfirm !== undefined
+        ? stepData.correspondenceAddressConfirm
+        : correspondenceAddressConfirmed === 'YES'
+          ? 'yes'
+          : correspondenceAddressConfirmed === 'NO'
+            ? 'no'
+            : undefined;
 
   const fieldMap: Record<string, keyof CcdCaseAddress> = {
     addressLine1: 'AddressLine1',
