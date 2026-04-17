@@ -230,6 +230,7 @@ describe('Dashboard Routes', () => {
       dashboardRoutes(app);
 
       const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         req: any,
         res: Response
       ) => Promise<void>;
@@ -256,14 +257,13 @@ describe('Dashboard Routes', () => {
       const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
       configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
       configMock.get.mockImplementation((key: string) =>
-        key === 'dashboard.taskRoutes'
-          ? { 'task-1': '/case/:caseReference/task-one' }
-          : 'mock-secret'
+        key === 'dashboard.taskRoutes' ? { 'task-1': '/case/:caseReference/task-one' } : 'mock-secret'
       );
 
       dashboardRoutes(app);
 
       const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         req: any,
         res: Response
       ) => Promise<void>;
@@ -312,8 +312,6 @@ describe('Dashboard Routes', () => {
       };
       const [task] = renderArgs.taskGroups[0].tasks;
 
-      // getDashboardTaskRoutes returns {} when config value is not an object,
-      // so getTaskUrl falls back to the default pattern
       expect(task.href).toBe('/dashboard/1234567890123456/group_one/task-1');
     });
 
@@ -344,8 +342,6 @@ describe('Dashboard Routes', () => {
       };
       const [, notAvailableTask] = renderArgs.taskGroups[0].tasks;
 
-      // getTaskStatusOverrides returns {} when config value is not an object,
-      // so task-2 keeps its API status (NOT_AVAILABLE) and has no href
       expect(notAvailableTask.href).toBeUndefined();
       expect(notAvailableTask.status).toEqual({ text: 'Not available' });
     });
