@@ -204,6 +204,7 @@ export class PageContentValidation implements IValidation {
     );
     
     if (!filePath || !fs.existsSync(filePath)) {
+      console.warn(`Path not found for the file ${fileName}`);
       return null;
     }
     try {
