@@ -6,7 +6,7 @@
     "submitApplication": "Submit application"
   },
   "answers": {
-    "chooseAnApplication": {
+    "typeOfApplication": {
       "label": "Type of application",
       "changeHint": "Change type of application",
       "options": {
@@ -14,6 +14,10 @@
         "SET_ASIDE": "Ask the court to change (set aside) their decision to evict you",
         "SOMETHING_ELSE": "Something else"
       }
+    },
+    "courtHearingInNext14Days": {
+      "label": "Is the court hearing in the next 14 days?",
+      "changeHint": "Change whether the court hearing is in the next 14 days"
     }
   }
 }

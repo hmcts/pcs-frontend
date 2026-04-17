@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
+import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
 import { performAction } from '../../controller';
 import { IValidation, validationRecord } from '../../interfaces';
 
@@ -140,8 +141,12 @@ export class PageNavigationValidation implements IValidation {
 
         if (validationData.pageSlug) {
           try {
-            expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=respond-to-claim/${validationData.pageSlug}`;
             actualUrl = page.url();
+            if (actualUrl.includes('respond-to-claim')) {
+              expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=respond-to-claim/${validationData.pageSlug}`;
+            } else if (actualUrl.includes('make-an-application')) {
+              expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=make-an-application/${validationData.pageSlug}`;
+            }
             if (actualUrl !== expectedUrlPattern) {
               urlPassed = false;
               urlError = `URL mismatch. Expected: ${expectedUrlPattern}, Actual: ${actualUrl}`;
@@ -161,7 +166,12 @@ export class PageNavigationValidation implements IValidation {
 
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
       const hasPFTFile = await PageNavigationValidation.hasPFTFile(pageName);
+
       const overallPassed = elementPassed && urlPassed;
+
+      if (!overallPassed) {
+        await takeValidationFailureScreenshot(page, 'page-navigation', pageName);
+      }
 
       if (!elementPassed) {
         PageNavigationValidation.navigationResults.push({
@@ -213,6 +223,7 @@ export class PageNavigationValidation implements IValidation {
       }
     } catch (error) {
       const pageName = await PageNavigationValidation.getPageNameFromUrl(page.url(), page);
+      await takeValidationFailureScreenshot(page, 'page-navigation', pageName);
       const actualText = await page
         .locator('h1')
         .first()

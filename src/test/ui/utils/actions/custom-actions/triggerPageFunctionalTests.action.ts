@@ -9,6 +9,7 @@ import {
   enable_navigation_tests,
   enable_visibility_validation,
 } from '../../../../../../playwright.config';
+import { shortUrl, truncateForLog } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
 import {
   ErrorMessageValidation,
@@ -35,7 +36,15 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
     const pageName = await this.getFileNameForPage(page);
+
     if (!pageName) {
+      if (TriggerPageFunctionalTestsAction.isDashboardUrl(page.url())) {
+        return;
+      }
+      const urlSegment = this.getUrlSegment(page.url());
+      console.warn(
+        `[PFT] WARNING mapping missing in urlToFileMapping.config.ts | test="${truncateForLog(test.info().title, 160)}" | url=${shortUrl(page.url())} | key: ${urlSegment}`
+      );
       return;
     }
 
@@ -211,6 +220,15 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       PageNavigationValidation.trackPagePassed(pageName);
     } else {
       PageNavigationValidation.trackMissingNavigationMethod(pageName);
+    }
+  }
+
+  /** Dashboard is not in url mapping; skip PFT warn. */
+  private static isDashboardUrl(url: string): boolean {
+    try {
+      return new URL(url).pathname.split('/').filter(Boolean)[0] === 'dashboard';
+    } catch {
+      return /\/dashboard(\/|$)/.test(url);
     }
   }
 
