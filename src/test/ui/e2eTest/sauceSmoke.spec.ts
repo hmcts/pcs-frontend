@@ -24,7 +24,6 @@ test.describe('Sauce smoke', () => {
   test('Manage  test PREVIEW  @pcssaucelab', async ({ page }) => {
     const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-solicitor-automation@test.com';
     const password = resolveIdamPassword();
-    test.skip(!password);
     await page.goto('https://xui-pcs-api-pr-1683.preview.platform.hmcts.net', { waitUntil: 'domcontentloaded' });
     await page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await page.getByRole('textbox', { name: 'Password' }).fill(password);
@@ -43,23 +42,26 @@ test.describe('Sauce smoke', () => {
   });
 
   test('Respond to claim FRONTEND AAT @pcssaucelab', async ({ page }) => {
-    const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-citizen-user@test.com';
+    const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-citizen-user1@test.com';
     const password = resolveIdamPassword();
-    test.skip(!password);
     await page.goto('https://pcs.aat.platform.hmcts.net');
     await page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await page.getByRole('textbox', { name: 'Password' }).fill(password);
     await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page.locator('h1.govuk-heading-xl'))
+      .toHaveText('Welcome to the PCS home page');
   });
 
   test('Respond to claim FRONTEND PREVIEW  @pcssaucelab', async ({ page }) => {
-    const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-citizen-user@test.com';
+    const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-citizen-user1@test.com';
     const password = resolveIdamPassword();
     test.skip(!password);
-    await page.goto('https://pcs.aat.platform.hmcts.net');
+    await page.goto('https://pcs-frontend-pr-989.preview.platform.hmcts.net/');
     await page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await page.getByRole('textbox', { name: 'Password' }).fill(password);
     await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page.locator('h1.govuk-heading-xl'))
+      .toHaveText('Welcome to the PCS home page');
   });
 
   test('Service Token s2s - 200 @pcssaucelab', async ({ request }) => {
@@ -68,5 +70,6 @@ test.describe('Sauce smoke', () => {
       { headers: { 'Content-Type': 'application/json' }, data: { microservice: 'pcs_api' } }
     );
     expect(res.status()).toBe(200);
+
   });
 });
