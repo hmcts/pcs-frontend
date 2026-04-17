@@ -8,6 +8,7 @@ import { oidcMiddleware } from '../middleware/oidc';
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { getTagClasses, isLinkableStatus } from '@services/pcsApi/dashboardTaskGroup.interface';
 import type { DashboardTaskGroup } from '@services/pcsApi/dashboardTaskGroup.interface';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
@@ -41,13 +42,6 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
-
-const TAG_CLASSES: Record<string, string | undefined> = {
-  AVAILABLE: 'govuk-tag--blue',
-  IN_PROGRESS: 'govuk-tag--red',
-  COMPLETED: 'govuk-tag--green',
-  NOT_STARTED: 'govuk-tag--red',
-};
 
 export const getDashboardUrl = (caseReference?: string | number): string | null => {
   if (!caseReference) {
@@ -83,8 +77,8 @@ export default function dashboardRoutes(app: Application): void {
             return null;
           }
 
-          const linkable = task.status !== 'NOT_AVAILABLE' && task.status !== 'COMPLETED';
-          const classes = TAG_CLASSES[task.status];
+          const linkable = isLinkableStatus(task.status);
+          const classes = getTagClasses(task.status);
           const tagText = classes ? lookup(t, `dashboard:tasks.statuses.${task.status}`) : null;
 
           return {
