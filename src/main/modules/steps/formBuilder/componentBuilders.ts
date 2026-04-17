@@ -10,6 +10,7 @@ import type {
   FormFieldConfig,
   FormFieldOption,
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
 function createFieldsetLegend(
   label: string,
@@ -195,6 +196,25 @@ export function buildComponentConfig({
         }) || [];
 
       componentType = 'checkboxes';
+      break;
+    }
+    case 'file': {
+      component.value = fieldValue || [];
+      component.accept = field.accept || ACCEPT_ATTRIBUTE_EXTENSIONS;
+      component.maxFileSize = field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB;
+      component.uploadUrl = field.uploadUrl || '';
+      component.deleteUrl = field.deleteUrl || '';
+      component.classes = field.classes || 'govuk-file-upload';
+      component.errorWrongType = t('common:errors.documentUpload.wrongFileTypeDocStore');
+      component.errorFileTooLarge = t('common:errors.documentUpload.fileTooLargeDocStore', {
+        maxSize: String(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
+      });
+      component.errorDelete = t('common:errors.documentUpload.fileDeleteFailed');
+      component.errorSummaryTitle = t('common:errors.documentUpload.errorSummaryTitle');
+      component.uploadButtonText = t('uploadButton');
+      component.filesAddedHeading = t('filesAddedHeading');
+      component.deleteButtonText = t('deleteButton');
+      componentType = 'fileUpload';
       break;
     }
     case 'date': {

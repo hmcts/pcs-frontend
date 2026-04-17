@@ -87,6 +87,8 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-not-provided',
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
+    'upload-document',
+    'support-needs',
     'your-household-and-circumstances',
     'do-you-have-any-dependant-children',
     'do-you-have-any-other-dependants',
@@ -424,7 +426,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> =>
             currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
-          nextStep: 'your-household-and-circumstances',
+          nextStep: 'upload-document',
         },
       ],
       previousStep: 'repayments-made',
@@ -441,14 +443,22 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'how-much-afford-to-pay',
         },
       ],
-      defaultNext: 'your-household-and-circumstances',
+      defaultNext: 'upload-document',
     },
     'how-much-afford-to-pay': {
       previousStep: 'installment-payments',
+      defaultNext: 'upload-document',
+    },
+    'upload-document': {
+      previousStep: (req: Request) => getPreviousStepForYourHouseholdAndCircumstances(req),
+      defaultNext: 'support-needs',
+    },
+    'support-needs': {
+      previousStep: 'upload-document',
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
-      previousStep: (req: Request) => getPreviousStepForYourHouseholdAndCircumstances(req),
+      previousStep: 'support-needs',
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {

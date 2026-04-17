@@ -33,10 +33,12 @@ import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
+import { step as supportNeeds } from './support-needs';
 import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
+import { step as uploadDocument } from './upload-document';
 import { step as writtenTerms } from './written-terms';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -63,6 +65,8 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
+  'upload-document': uploadDocument,
+  'support-needs': supportNeeds,
   'counter-claim': counterClaim,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
