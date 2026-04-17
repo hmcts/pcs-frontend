@@ -12,7 +12,7 @@
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
   <p class="govuk-body">{{ hint }}</p>
   <form method="post" action="{{ url }}">
-    {% set selectedRegularIncome = (formData and formData.regularIncome) or [] %}
+    {% set selectedRegularIncome = regularIncome or (fieldValues and fieldValues.regularIncome) or [] %}
     <div class="govuk-form-group">
       <fieldset class="govuk-fieldset">
         <legend class="govuk-visually-hidden">{{ fieldsetLegend }}</legend>
