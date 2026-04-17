@@ -1,0 +1,17 @@
+{% extends "stepsTemplate.njk" %}
+{% from "macros/stepButtons.njk" import stepButtons %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% block pageTitle %}Universal Credit &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+  <h1 class="govuk-heading-l">What are you claiming for? (placeholder)</h1>
+  <p class="govuk-body">This is a placeholder for What are you claiming for step.</p>
+  <form method="post" action="{{ url }}">
+    {{ stepButtons(continue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
+  </form>
+{% endblock %}
