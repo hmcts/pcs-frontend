@@ -1,0 +1,64 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyRegular income",
+  "heading": "cyWhat regular income do you receive? (Optional)",
+  "hintText": "cySelect all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.",
+  "options": {
+    "incomeFromJobs": "cyIncome from all jobs you do",
+    "pension": "cyPension – state and private",
+    "universalCredit": "cyUniversal Credit",
+    "otherBenefits": "cyOther benefits and credits",
+    "moneyFromElsewhere": "cyMoney from somewhere else (for example, child maintenance payments or someone in your household gives you money)"
+  },
+  "subFields": {
+    "amount": "cyTotal amount received",
+    "frequency": "cyReceived every:",
+    "moneyFromElsewhereDetailsLabel": "cyGive details",
+    "moneyFromElsewhereDetailsHint": "cyGive details about the other sources of income and how much you usually receive"
+  },
+  "frequency": {
+    "week": "cyWeek",
+    "month": "cyMonth"
+  },
+  "errors": {
+    "incomeFromJobsAmount": {
+      "required": "cyEnter the total amount you receive from all jobs you do",
+      "negative": "cyThe total amount you receive from all jobs you do each week or month must be £0.00 or above",
+      "largeAmount": "cyThe total amount you receive from all jobs you do each week or month must be less than £1 billion"
+    },
+    "incomeFromJobsFrequency": {
+      "required": "cySelect how frequently you receive income from all jobs you do"
+    },
+    "pensionAmount": {
+      "required": "cyEnter the total amount you receive from a state or private pension",
+      "negative": "cyThe total amount you receive from pension (state and private) each week or month must be £0.00 or above",
+      "largeAmount": "cyThe total amount you receive from pension (state and private) each week or month must be less than £1 billion"
+    },
+    "pensionFrequency": {
+      "required": "cySelect how frequently you receive income from a state or private pension"
+    },
+    "universalCreditAmount": {
+      "required": "cyEnter the total amount you receive from Universal Credit",
+      "negative": "cyThe total amount you receive from Universal Credit each week or month must be £0.00 or above",
+      "largeAmount": "cyThe total amount you receive from Universal Credit each week or month must be less than £1 billion"
+    },
+    "universalCreditFrequency": {
+      "required": "cySelect how frequently you receive Universal Credit"
+    },
+    "otherBenefitsAmount": {
+      "required": "cyEnter the total amount you receive from other benefits and credits",
+      "negative": "cyThe total amount you receive from other benefits and credit each week or month must be £0.00 or above",
+      "largeAmount": "cyThe total amount you receive from other benefits and credit each week or month must be less than £1 billion"
+    },
+    "otherBenefitsFrequency": {
+      "required": "cySelect how frequently you receive income from other benefits and credits"
+    },
+    "moneyFromElsewhereDetails": {
+      "required": "cyEnter details about the money you receive from somewhere else and how much you usually receive",
+      "invalidCharacters": "cyGive details about the other sources of income and how much you usually receive must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    },
+    "amount": {
+      "invalidFormat": "cyEnter an amount in the correct format, for example 148.00 or 148.50"
+    }
+  }
+}

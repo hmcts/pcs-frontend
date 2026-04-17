@@ -50,7 +50,7 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
     'your-circumstances',
     'exceptional-hardship',
-    'income-and-expenditure',
+    'income-and-expenses',
     'what-regular-income-do-you-receive',
     'have-you-applied-for-universal-credit',
     'priority-debts',
@@ -382,14 +382,14 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     },
     'exceptional-hardship': {
       previousStep: 'your-circumstances',
-      defaultNext: 'income-and-expenditure',
+      defaultNext: 'income-and-expenses',
     },
-    'income-and-expenditure': {
+    'income-and-expenses': {
       previousStep: 'exceptional-hardship',
       defaultNext: 'what-regular-income-do-you-receive',
     },
     'what-regular-income-do-you-receive': {
-      previousStep: 'income-and-expenditure',
+      previousStep: 'income-and-expenses',
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
