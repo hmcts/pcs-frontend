@@ -15,10 +15,10 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  {% if list|length %}
+  {% if contentList|length %}
     <p class="govuk-body">{{ listHeading }}</p>
     <ul class="govuk-list govuk-list--bullet">
-      {% for item in list %}
+      {% for item in contentList %}
         <li>{{ item }}</li>
       {% endfor %}
     </ul>

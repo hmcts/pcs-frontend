@@ -5,15 +5,17 @@ import { flowConfig } from '../flow.config';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
+const STEP_NAME = 'what-order-do-you-want-the-court-to-make-and-why';
+
 export const step: StepDefinition = createFormStep({
-  stepName: 'what-order-do-you-want-the-court-to-make-and-why',
+  stepName: STEP_NAME,
   journeyFolder: 'makeAnApplication',
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/whatOrderDoYouWant.njk`,
   fields: [
     {
-      name: 'whatOrderDoYouWant',
+      name: 'whatOrderWanted',
       type: 'character-count',
       required: true,
       maxLength: 6800,
@@ -33,16 +35,16 @@ export const step: StepDefinition = createFormStep({
   extendGetContent: (req: Request) => {
     const typeOfApplication = req.session.formData?.['choose-an-application']?.['typeOfApplication'] ?? '';
 
-    let list: string[] = [];
-    const t = getTranslationFunction(req, 'what-order-do-you-want-the-court-to-make-and-why', ['common']);
+    let contentList: string[] = [];
+    const t = getTranslationFunction(req, STEP_NAME, ['common']);
 
     if (typeOfApplication === 'ADJOURN' || typeOfApplication === 'SOMETHING_ELSE') {
-      list = t(`list.${typeOfApplication}`, { returnObjects: true }) as unknown as string[];
+      contentList = t(`list.${typeOfApplication}`, { returnObjects: true }) as unknown as string[];
     }
 
     return {
       typeOfApplication,
-      list,
+      contentList,
     };
   },
 });
