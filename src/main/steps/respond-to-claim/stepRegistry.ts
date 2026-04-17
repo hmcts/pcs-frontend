@@ -14,19 +14,21 @@ import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
 import { step as doYouHaveAnyDependantChildren } from './dependant-children';
 import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
+import { step as endNow } from './end-now';
 import { step as exceptionalHardship } from './exceptional-hardship';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as howMuchAffordToPay } from './how-much-afford-to-pay';
-import { step as incomeAndExpenditure } from './income-and-expenditure';
+import { step as incomeAndExpenses } from './income-and-expenditure';
 import { step as installmentPayments } from './installment-payments';
 import { step as landlordLicensed } from './landlord-licensed';
 import { step as landlordRegistered } from './landlord-registered';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
+import { step as otherConsiderations } from './other-considerations';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
-import { step as whatOtherRegularExpensesDoYouHave } from './regular-expenses';
+import { step as regularExpenses } from './regular-expenses';
 import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
@@ -37,6 +39,7 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
+import { step as uploadDocs } from './upload-docs';
 import { step as writtenTerms } from './written-terms';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -52,6 +55,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'contact-preferences-telephone': contactPreferencesTelephone,
   'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
+  'end-now': endNow,
   'landlord-registered': landlordRegistered,
   'landlord-licensed': landlordLicensed,
   'written-terms': writtenTerms,
@@ -77,10 +81,12 @@ export const stepRegistry: Record<string, StepDefinition> = {
     wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   'your-circumstances': yourCircumstances,
   'exceptional-hardship': exceptionalHardship,
-  'income-and-expenditure': incomeAndExpenditure,
+  'income-and-expenses': incomeAndExpenses,
   'what-regular-income-do-you-receive': whatRegularIncomeDoYouReceive,
   'have-you-applied-for-universal-credit': haveYouAppliedForUniversalCredit,
   'priority-debts': priorityDebts,
   'priority-debt-details': priorityDebtDetails,
-  'what-other-regular-expenses-do-you-have': whatOtherRegularExpensesDoYouHave,
+  'what-other-regular-expenses-do-you-have': regularExpenses,
+  'other-considerations': otherConsiderations,
+  'upload-docs': uploadDocs,
 };

@@ -37,6 +37,10 @@
   "change": "cyChange",
   "chooseOption": "cyChoose an option",
   "back": "cyBack",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
   "date": {
     "day": "cyDay",
     "month": "cyMonth",

@@ -70,6 +70,9 @@ export function buildComponentConfig({
       if (field.prefix) {
         component.prefix = field.prefix;
       }
+      if (field.suffix) {
+        component.suffix = field.suffix;
+      }
       componentType = 'input';
       break;
     }
