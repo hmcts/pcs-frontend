@@ -152,6 +152,64 @@ describe('respond-to-claim universal-credit step', () => {
     });
   });
 
+  describe('pre-population via getController', () => {
+    const hcAt = (hc: Record<string, unknown>) => ({
+      possessionClaimResponse: { defendantResponses: { householdCircumstances: hc } },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const render = async (hc: Record<string, unknown> | undefined): Promise<any> => {
+      const req = createReq({
+        res: {
+          locals: {
+            validatedCase: { id: '1234567890123456', data: hc ? hcAt(hc) : {} },
+          },
+        },
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res = {
+        render: jest.fn(),
+        locals: req.res.locals,
+      } as any;
+      req.res = res;
+
+      if (!step.getController) {
+        throw new TypeError('expected getController');
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const controller = (step.getController as any)();
+      await controller.get(req, res);
+      return (res.render as jest.Mock).mock.calls[0][1];
+    };
+
+    it('pre-populates yes + date when saved with a date (came from this screen)', async () => {
+      const data = await render({ universalCredit: 'YES', ucApplicationDate: '2024-02-10' });
+      expect(data.fieldValues.haveAppliedForUniversalCredit).toBe('yes');
+      expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toEqual({
+        day: '10',
+        month: '02',
+        year: '2024',
+      });
+    });
+
+    it('pre-populates no when NO is saved (came from this screen)', async () => {
+      const data = await render({ universalCredit: 'NO' });
+      expect(data.fieldValues.haveAppliedForUniversalCredit).toBe('no');
+      expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toBeFalsy();
+    });
+
+    it('does not pre-populate when YES is saved without a date (implicit from regular-income)', async () => {
+      const data = await render({ universalCredit: 'YES' });
+      expect(data.fieldValues.haveAppliedForUniversalCredit).toBeFalsy();
+      expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toBeFalsy();
+    });
+
+    it('does not pre-populate when nothing is saved', async () => {
+      const data = await render(undefined);
+      expect(data.fieldValues.haveAppliedForUniversalCredit).toBeFalsy();
+    });
+  });
+
   it('throws when selection is yes and date fields are missing', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
