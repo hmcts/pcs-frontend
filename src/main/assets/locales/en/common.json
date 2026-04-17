@@ -101,6 +101,27 @@
     "second": "second",
     "seconds": "seconds"
   },
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "You have %{count} character remaining",
+      "other": "You have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "You have 0 characters remaining",
+    "charactersOverLimitText": {
+      "one": "You have %{count} character too many",
+      "other": "You have %{count} characters too many"
+    },
+    "wordsUnderLimitText": {
+      "one": "You have %{count} word remaining",
+      "other": "You have %{count} words remaining"
+    },
+    "wordsAtLimitText": "You have 0 words remaining",
+    "wordsOverLimitText": {
+      "one": "You have %{count} word too many",
+      "other": "You have %{count} words too many"
+    },
+    "textareaDescriptionText": "You can enter up to %{count} characters"
+  },
   "errorPages": {
     "403": {
       "title": "Not Authorised",
