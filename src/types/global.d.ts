@@ -40,6 +40,7 @@ interface CustomSessionData extends SessionData {
   noticeDate?: string;
   noticeServed?: boolean;
   rentarrears?: boolean;
+  respondToClaimCaseOverrides?: Record<string, { regularIncomeUcUnticked?: boolean }>;
   destroy(callback: (err?: Error) => void): void;
   returnTo?: string;
 }

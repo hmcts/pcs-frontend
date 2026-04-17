@@ -13,6 +13,7 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
+export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
@@ -27,6 +28,12 @@ export interface HouseholdCircumstances {
   alternativeAccommodationTransferDate?: string;
   otherTenants?: YesNoValue;
   otherTenantsDetails?: string;
+  universalCredit?: YesNoValue;
+  ucApplicationDate?: string | null;
+  priorityDebts?: YesNoValue;
+  debtTotal?: string;
+  debtContribution?: string;
+  debtContributionFrequency?: FrequencyValue;
 }
 
 export type PaymentAgreement = {

@@ -1,6 +1,8 @@
 import { type Request } from 'express';
 
 import {
+  getPreviousStepForPriorityDebts,
+  getPreviousStepForWhatOtherRegularExpenses,
   getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
@@ -10,6 +12,10 @@ import {
   isNoticeServed,
   isTenancyStartDateKnown,
   isWelshProperty,
+  shouldRouteToOtherRegularExpenses,
+  shouldRouteToPriorityDebtDetails,
+  shouldRouteToPriorityDebts,
+  shouldRouteToUniversalCreditQuestion,
 } from '../utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
@@ -481,6 +487,16 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-regular-income-do-you-receive': {
       previousStep: 'income-and-expenditure',
+      routes: [
+        {
+          condition: shouldRouteToPriorityDebts,
+          nextStep: 'priority-debts',
+        },
+        {
+          condition: shouldRouteToUniversalCreditQuestion,
+          nextStep: 'have-you-applied-for-universal-credit',
+        },
+      ],
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
@@ -488,15 +504,25 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
-      previousStep: 'have-you-applied-for-universal-credit',
-      defaultNext: 'priority-debt-details',
+      previousStep: getPreviousStepForPriorityDebts,
+      routes: [
+        {
+          condition: shouldRouteToPriorityDebtDetails,
+          nextStep: 'priority-debt-details',
+        },
+        {
+          condition: shouldRouteToOtherRegularExpenses,
+          nextStep: 'what-other-regular-expenses-do-you-have',
+        },
+      ],
+      defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'priority-debt-details': {
       previousStep: 'priority-debts',
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
-      previousStep: 'priority-debt-details',
+      previousStep: getPreviousStepForWhatOtherRegularExpenses,
       defaultNext: 'end-now',
     },
   },

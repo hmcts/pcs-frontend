@@ -10,7 +10,22 @@ export { getPreviousPageForArrears } from './journeyHelpers';
 export { getStepBeforeDisputePages } from './journeyHelpers';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
-export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
+export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
+export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';
+export { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
+export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
+export {
+  shouldRouteToPriorityDebts,
+  shouldRouteToUniversalCreditQuestion,
+  shouldRouteToPriorityDebtDetails,
+  shouldRouteToOtherRegularExpenses,
+} from './respondToClaimRouteConditions';
+export {
+  poundsStringToPence,
+  ccdPenceToPoundsString,
+  additionalRentContributionToPoundsString,
+} from './moneyAmountTransforms';
 export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
+export { isRegularIncomeUcUnticked, setRegularIncomeUcUnticked } from './respondToClaimCaseOverrides';
