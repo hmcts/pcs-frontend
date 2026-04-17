@@ -7,6 +7,7 @@ import { oidcMiddleware } from '../middleware/oidc';
 import { Logger } from '@modules/logger';
 import type { CcdCase, CcdCaseAddress } from '@services/ccdCase.interface';
 import {
+  type DashboardTask,
   type DashboardTaskGroup,
   STATUS_MAP,
   TASK_GROUP_MAP,
@@ -66,6 +67,29 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
+const TASK_URL_MAP: Record<string, (caseReference: string) => string> = {
+  'Task.AAA6.Claim.ViewClaim': caseRef => `/case/${caseRef}/view-the-claim`,
+  'Task.AAA6.Applications.Contact': caseRef => `/case/${caseRef}/apply-for-breathing-space`,
+  'Task.AAA6.Applications.ViewApplications': caseRef => `/case/${caseRef}/view-all-applications`,
+};
+
+function getTaskUrl(
+  templateId: string,
+  taskStatus: string,
+  caseReference: string,
+  taskGroupId: string
+): string | undefined {
+  if (taskStatus === 'NOT_AVAILABLE') {
+    return undefined;
+  }
+
+  const customUrl = TASK_URL_MAP[templateId];
+  if (customUrl) {
+    return customUrl(caseReference);
+  }
+  return `/dashboard/${caseReference}/${taskGroupId}/${templateId}`;
+}
+
 export const getDashboardUrl = (caseReference?: string | number): string | null => {
   if (!caseReference) {
     return null;
@@ -77,6 +101,12 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
   }
 
   return `${DASHBOARD_ROUTE}/${sanitised}`;
+};
+
+// Temporary: hardcoded statuses until backend logic implemented (HDPI-4573)
+const TASK_STATUS_OVERRIDES: Record<string, DashboardTask['status']> = {
+  'Task.AAA6.Applications.Contact': 'AVAILABLE',
+  'Task.AAA6.Applications.ViewApplications': 'AVAILABLE',
 };
 
 function mapTaskGroups(app: Application, caseReference: string) {
@@ -104,6 +134,8 @@ function mapTaskGroups(app: Application, caseReference: string) {
                 }
               : undefined;
 
+          const taskStatus = TASK_STATUS_OVERRIDES[task.templateId] ?? task.status;
+
           return {
             title: {
               html: app.locals.nunjucksEnv.render(
@@ -112,12 +144,8 @@ function mapTaskGroups(app: Application, caseReference: string) {
               ),
             },
             hint,
-            // Absolute internal link is more robust than a relative one
-            href:
-              task.status === 'NOT_AVAILABLE'
-                ? undefined
-                : `/dashboard/${caseReference}/${taskGroupId}/${task.templateId}`,
-            status: STATUS_MAP[task.status],
+            href: getTaskUrl(task.templateId, taskStatus, caseReference, taskGroupId),
+            status: STATUS_MAP[taskStatus],
           };
         }),
       };
