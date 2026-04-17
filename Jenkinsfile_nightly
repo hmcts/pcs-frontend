@@ -1,38 +1,47 @@
 #!groovy
 
 properties([
-  // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
-    choice(
-      name: 'ENVIRONMENT',
-      choices: ['aat', 'preview'],
-      description: 'Environment to run the test.'
-    ),
-    string(
-      name: 'PR_NUMBER',
-      defaultValue: '',
-      description: 'PR number (REQUIRED if environment is preview, leave blank otherwise).'
-    ),
     booleanParam(
       name: 'CHROME_TESTS',
       defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Chrome.'
+      description: 'Tick the checkbox to run E2E tests in Desktop Chrome.'
     ),
     booleanParam(
       name: 'FIREFOX_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Firefox.'
+      defaultValue: false,
+      description: 'Tick the checkbox to run E2E tests in Desktop Firefox.'
     ),
     booleanParam(
       name: 'WEBKIT_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Webkit.'
+      defaultValue: false,
+      description: 'Tick the checkbox to run E2E tests in Desktop WebKit (Safari).'
     ),
     booleanParam(
-      name: 'ACCESSIBILITY_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run Accessibility tests.'
+      name: 'MICROSOFT_EDGE_TESTS',
+      defaultValue: false,
+      description: 'Tick the checkbox to run E2E tests in Desktop Edge.'
+    ),
+    booleanParam(
+      name: 'SAUCE_CROSSBROWSER',
+      defaultValue: false,
+      description: 'Tick to run cross-browser tests on Sauce Labs'
+    ),
+    choice(
+      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
+      choices: ['false','true'],
+      description: 'Enable page functional tests (content, errors, navigation). Default false.'
+    ),
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@smoke', '@e2e', '@regression', '@accessibility','@nightly','@crossbrowser','(all tests)','@prod'],
+      description: 'Title tag. Default @smoke. (all tests) = no tag filter.'
+    ),
+    string(
+      name: 'PLAYWRIGHT_SPEC',
+      defaultValue: '',
+      description: 'Spec filename keyword(s), exact case seperated by comma. One pattern: respondToAClaim. Multiple: respondToAClaim,makeAnApplication. Blank = all specs.'
     ),
   ])
 ])
@@ -61,62 +70,86 @@ def secrets = [
 ]
 
 withNightlyPipeline(type, product, component) {
-  validateInputs()
-  enableSlackNotifications('#pcs-tech')
+  enableSlackNotifications('#qa-pipeline-status')
   loadVaultSecrets(secrets)
-  handleEnvironmentSetting()
   setFunctionalTestEnvVars()
   enableFortifyScan()
 
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
-    if (params.ACCESSIBILITY_TESTS) {
-      runAccessibilityTests(yarnBuilder)
+    if (shouldRunSauceCrossBrowser()) {
+      runSauceCrossBrowser(yarnBuilder)
     }
   }
 }
 
-def validateInputs() {
-  if (params.ENVIRONMENT == 'preview' && (!params.PR_NUMBER?.trim())) {
-    error("Validation Failed: PR number is required when environment is 'preview'")
+/** Checkbox param may be Boolean or string depending on Jenkins / job age. */
+def shouldRunSauceCrossBrowser() {
+  try {
+    def v = params.SAUCE_CROSSBROWSER
+    return v == true || v?.toString() == 'true'
+  } catch (ignored) {
+    return false
   }
-  if (params.ENVIRONMENT == 'preview' && !params.PR_NUMBER.trim().matches("^\\d+\$")) {
-    error("Validation Failed: PR number must contain only numerical values")
-  }
-}
-
-def handleEnvironmentSetting() {
-  env.TEST_URL = (params.ENVIRONMENT == 'preview')
-    ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
-    : "https://pcs.${params.ENVIRONMENT}.platform.hmcts.net/"
 }
 
 def setFunctionalTestEnvVars() {
+  env.TEST_URL = 'https://pcs.aat.platform.hmcts.net/'
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  def tag = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
+  env.FUNCTIONAL_TEST_SCOPE = (tag == '(all tests)') ? '' : tag
+  env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
+  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = (params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS == 'true') ? 'true' : 'false'
 }
 
 def runE2ETests(yarnBuilder) {
-  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
-  if (params.CHROME_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Chrome')
-  }
-  if (params.FIREFOX_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Firefox')
-  }
-  if (params.WEBKIT_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Safari')
+  [
+    [flag: 'CHROME_TESTS', playwrightProject: 'chrome', stageLabel: 'Desktop Chrome'],
+    [flag: 'FIREFOX_TESTS', playwrightProject: 'firefox', stageLabel: 'Desktop Firefox'],
+    [flag: 'WEBKIT_TESTS', playwrightProject: 'webkit', stageLabel: 'Desktop WebKit'],
+    [flag: 'MICROSOFT_EDGE_TESTS', playwrightProject: 'MicrosoftEdge', stageLabel: 'Desktop Edge'],
+  ].each { row ->
+    if (params[row.flag]) {
+      runE2eStage(yarnBuilder, row.playwrightProject, row.stageLabel)
+    }
   }
 }
 
-def runE2ETestsForBrowser(yarnBuilder, String browser) {
-  stage("Full E2E Test - ${browser}") {
+/** Optional Sauce Labs run via saucectl (credentials + tunnel must be configured on the agent). */
+def runSauceCrossBrowser(yarnBuilder) {
+  stage('Sauce cross-browser') {
+    node {
+      checkout scm
+      def sauceConfig = '.sauce/config-matrix.yml'
+      def hasConfig = sh(script: "test -f '${sauceConfig}'", returnStatus: true) == 0
+      if (!hasConfig) {
+        echo "Skipping Sauce cross-browser: ${sauceConfig} not in workspace (commit it or disable SAUCE_CROSSBROWSER)."
+        return
+      }
+      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+        def tunnel = env.SAUCE_TUNNEL_NAME?.trim() ? env.SAUCE_TUNNEL_NAME.trim() : 'reformtunnel'
+        withEnv([
+          'SAUCE_GREP=@crossbrowser',
+          "SAUCE_TUNNEL_NAME=${tunnel}",
+        ]) {
+          yarnBuilder.yarn('test:sauce:crossbrowser')
+        }
+      }
+    }
+  }
+}
+
+def runE2eStage(yarnBuilder, String playwrightProject, String stageLabel) {
+  stage("${stageLabel}") {
     node {
       checkout scm
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        yarnBuilder.yarn("test:E2e${browser}")
+        withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
+          yarnBuilder.yarn('test:E2e')
+        }
       }
       publishHTML([
         allowMissing: true,
@@ -124,35 +157,13 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
         keepAll: true,
         reportDir: "allure-report",
         reportFiles: 'index.html',
-        reportName: "Full ${browser} E2E Test Report"
+        reportName: "${stageLabel} E2E Report"
       ])
       steps.archiveArtifacts(
         allowEmptyArchive: true,
         artifacts: 'definitions/test/playwright-report/**'
       )
-      sendAllureReportToSlack(browser, "Full_20${browser}_20E2E_20Test_20Report/")
-    }
-  }
-}
-
-def runAccessibilityTests(yarnBuilder) {
-  stage("Full Accessibility Test") {
-    node {
-      checkout scm
-      sh 'rm -rf allure-results allure-report'
-      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        yarnBuilder.yarn("test:accessibility")
-      }
-      publishHTML([
-        allowMissing         : true,
-        alwaysLinkToLastBuild: true,
-        keepAll              : true,
-        reportDir            : "allure-report",
-        reportFiles          : 'index.html',
-        reportName           : 'Accessibility Test Report'
-      ])
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
-      sendAllureReportToSlack('Chrome', 'Accessibility_20Test_20Report/')
+      sendAllureReportToSlack(stageLabel, "Full_20${playwrightProject}_20E2E_20Test_20Report/")
     }
   }
 }
@@ -163,7 +174,7 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
   def msg = sh(script: "yarn exec ts-node src/test/ui/utils/common/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
-    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    slackSend(channel: '#qa-pipeline-status', message: msg)
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }

@@ -37,6 +37,14 @@ withPipeline(type, product, component) {
   env.CASE_TYPE_ID = "PCS"
   onPR() {
     env.FUNCTIONAL_TEST_SCOPE = '@PR'
+    def e2eTag = prLabelSuffix(githubApi, 'e2e-tag:')
+    if (e2eTag?.trim()) {
+      env.FUNCTIONAL_TEST_SCOPE = e2eTag.trim()
+    }
+    def e2eSpec = prLabelSuffix(githubApi, 'e2e-spec:')
+    if (e2eSpec?.trim()) {
+      env.E2E_SPEC = e2eSpec.trim()
+    }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_all_page_functional_tests").size() > 0) {
       env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
     }
@@ -107,6 +115,12 @@ withPipeline(type, product, component) {
       }
     }
   }
+}
+
+/** First PR label matching prefix → value after prefix (e.g. e2e-tag:@smoke → @smoke), or null if none. */
+def prLabelSuffix(githubApi, String prefix) {
+  def labels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, prefix)
+  return (labels && labels.size() > 0) ? labels[0].replaceFirst('^' + prefix, '') : null
 }
 
 def archiveFunctionalTestReports() {
