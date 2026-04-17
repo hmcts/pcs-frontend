@@ -20,6 +20,7 @@ import {
 
 export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly LOCK_DIR = path.join(process.cwd(), 'test-results', 'pft-locks');
+  private static readonly FAILED_LOCK_DIR = path.join(process.cwd(), 'test-results', 'pft-locks', 'failed');
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
@@ -78,9 +79,15 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     // Skip lock check for excluded pages
     if (!excludedFromLock.has(pageName)) {
-      const lockFilePath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-      if (fs.existsSync(lockFilePath)) {
-        return;
+      const failedLockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, `${pageName}.lock`);
+
+      // If failed lock exists, always run tests (don't skip)
+      if (!fs.existsSync(failedLockPath)) {
+        const mainLockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
+        // Skip only if main lock exists AND no failed lock
+        if (fs.existsSync(mainLockPath)) {
+          return;
+        }
       }
     }
 
@@ -154,10 +161,19 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       }
     });
 
-    // Only create lock file if all enabled validations passed AND page is not excluded
+    // Handle lock files based on test outcome
     const anyTestFailed = errorValidationFailed || navigationTestsFailed || visibilityValidationFailed;
-    if (!anyTestFailed && !excludedFromLock.has(pageName)) {
-      this.createLockFile(pageName);
+
+    if (!excludedFromLock.has(pageName)) {
+      const failedLockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, `${pageName}.lock`);
+
+      if (anyTestFailed) {
+        // Create failed lock (never create main lock)
+        this.createFailedLockFile(pageName);
+      } else if (!fs.existsSync(failedLockPath)) {
+        // Only create main lock if no failed lock exists
+        this.createLockFile(pageName);
+      }
     }
   }
 
@@ -189,9 +205,21 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         fs.mkdirSync(TriggerPageFunctionalTestsAction.LOCK_DIR, { recursive: true });
       }
       const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-      fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'wx' });
+      fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'w' });
     } catch {
       // Ignore lock file creation errors (e.g., file already exists)
+    }
+  }
+
+  private createFailedLockFile(pageName: string): void {
+    try {
+      if (!fs.existsSync(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR)) {
+        fs.mkdirSync(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, { recursive: true });
+      }
+      const failedLockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, `${pageName}.lock`);
+      fs.writeFileSync(failedLockPath, process.pid.toString(), { flag: 'w' });
+    } catch {
+      // Ignore failed lock file creation errors
     }
   }
 
