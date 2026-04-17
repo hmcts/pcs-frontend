@@ -12,7 +12,7 @@ export const flowConfig: JourneyFlowConfig = {
   stepOrder: [
     'choose-an-application',
     'ask-to-adjourn-the-court-hearing',
-    'ask-to-set-aside-the-decision-to-evict-you',
+    'ask-the-court-to-set-aside-the-order',
     'ask-the-court-to-make-an-order',
     'is-the-court-hearing-in-the-next-14-days',
     'do-you-need-help-paying-the-fee',
@@ -31,7 +31,7 @@ export const flowConfig: JourneyFlowConfig = {
     'ask-to-adjourn-the-court-hearing': {
       showCondition: (req: Request) => getTypeOfApplication(req) === 'ADJOURN',
     },
-    'ask-to-set-aside-the-decision-to-evict-you': {
+    'ask-the-court-to-set-aside-the-order': {
       showCondition: (req: Request) => getTypeOfApplication(req) === 'SET_ASIDE',
     },
     'ask-the-court-to-make-an-order': {
