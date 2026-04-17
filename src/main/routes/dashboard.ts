@@ -7,6 +7,7 @@ import { oidcMiddleware } from '../middleware/oidc';
 import { Logger } from '@modules/logger';
 import type { CcdCase, CcdCaseAddress } from '@services/ccdCase.interface';
 import {
+  type DashboardTask,
   type DashboardTaskGroup,
   STATUS_MAP,
   TASK_GROUP_MAP,
@@ -16,6 +17,10 @@ import {
 import { arrayToString } from '@utils/arrayToString';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
+import { getTranslationFunction } from '@modules/i18n';
+import config from 'config';
+
+
 
 interface MappedTask {
   title: { html: string };
@@ -66,6 +71,29 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
+function getDashboardTaskRoutes(): Record<string, string> {
+  if (!config.has('dashboard.taskRoutes')) {
+    return {};
+  }
+  const taskRoutes = config.get('dashboard.taskRoutes');
+  if (taskRoutes && typeof taskRoutes === 'object') {
+    return taskRoutes as Record<string, string>;
+  }
+  return {};
+}
+
+// Overrides for task statuses that must be fixed regardless of what the API returns.
+function getTaskStatusOverrides(): Record<string, DashboardTask['status']> {
+  if (!config.has('dashboard.taskStatusOverrides')) {
+    return {};
+  }
+  const overrides = config.get('dashboard.taskStatusOverrides');
+  if (overrides && typeof overrides === 'object') {
+    return overrides as Record<string, DashboardTask['status']>;
+  }
+  return {};
+}
+
 function getTaskUrl(
   templateId: string,
   taskStatus: string,
@@ -75,8 +103,9 @@ function getTaskUrl(
   if (taskStatus === 'NOT_AVAILABLE') {
     return undefined;
   }
-  if (templateId === 'Task.AAA6.Claim.ViewClaim') {
-    return `/case/${caseReference}/view-the-claim`;
+  const pattern = getDashboardTaskRoutes()[templateId];
+  if (pattern) {
+    return pattern.replace(/:caseReference/g, caseReference);
   }
   return `/dashboard/${caseReference}/${taskGroupId}/${templateId}`;
 }
@@ -94,8 +123,11 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
   return `${DASHBOARD_ROUTE}/${sanitised}`;
 };
 
-function mapTaskGroups(app: Application, caseReference: string) {
+function mapTaskGroups(app: Application, req: Request, caseReference: string) {
   return (taskGroups: DashboardTaskGroup[]): MappedTaskGroup[] => {
+    const t = getTranslationFunction(req, ['dashboard']);
+    const statusOverrides = getTaskStatusOverrides();
+
     return taskGroups.map(taskGroup => {
       const mappedTitle = TASK_GROUP_MAP[taskGroup.groupId];
 
@@ -108,6 +140,7 @@ function mapTaskGroups(app: Application, caseReference: string) {
           }
 
           const taskGroupId = taskGroup.groupId.toLowerCase();
+          const taskStatus = statusOverrides[task.templateId] ?? task.status;
 
           const hint =
             task.templateValues.dueDate || task.templateValues.deadline
@@ -121,14 +154,11 @@ function mapTaskGroups(app: Application, caseReference: string) {
 
           return {
             title: {
-              html: app.locals.nunjucksEnv.render(
-                `components/taskGroup/${taskGroupId}/${task.templateId}.njk`,
-                task.templateValues
-              ),
+              html: t(`dashboard:tasks.${task.templateId}.title`),
             },
             hint,
-            href: getTaskUrl(task.templateId, task.status, caseReference, taskGroupId),
-            status: STATUS_MAP[task.status],
+            href: getTaskUrl(task.templateId, taskStatus, caseReference, taskGroupId),
+            status: STATUS_MAP[taskStatus],
           };
         }),
       };
@@ -175,7 +205,7 @@ export default function dashboardRoutes(app: Application): void {
     try {
       const [notifications, taskGroups] = await Promise.all([
         getDashboardNotifications(caseReferenceNumber),
-        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, validatedCase.id)),
+        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, req, validatedCase.id)),
       ]);
 
       return res.render('dashboard', {
