@@ -23,11 +23,33 @@ export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
+  private static readonly LOCK_EXCLUSIONS_PATH = path.join(__dirname, '../../../config/lock-exclusions.config.ts');
+
+  private static excludedFromLock: Set<string> | null = null;
 
   private static pagesTestedInCurrentRun = new Set<string>();
 
   static resetTestedPages(): void {
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.clear();
+  }
+
+  private static getExcludedFromLock(): Set<string> {
+    if (TriggerPageFunctionalTestsAction.excludedFromLock !== null) {
+      return TriggerPageFunctionalTestsAction.excludedFromLock;
+    }
+
+    try {
+      if (fs.existsSync(TriggerPageFunctionalTestsAction.LOCK_EXCLUSIONS_PATH)) {
+        const config = require(TriggerPageFunctionalTestsAction.LOCK_EXCLUSIONS_PATH);
+        TriggerPageFunctionalTestsAction.excludedFromLock = new Set(config.default || config.excludedPages || []);
+      } else {
+        TriggerPageFunctionalTestsAction.excludedFromLock = new Set<string>();
+      }
+    } catch {
+      TriggerPageFunctionalTestsAction.excludedFromLock = new Set<string>();
+    }
+
+    return TriggerPageFunctionalTestsAction.excludedFromLock;
   }
 
   async execute(page: Page): Promise<void> {
@@ -50,6 +72,16 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
       return;
+    }
+
+    const excludedFromLock = TriggerPageFunctionalTestsAction.getExcludedFromLock();
+
+    // Skip lock check for excluded pages
+    if (!excludedFromLock.has(pageName)) {
+      const lockFilePath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
+      if (fs.existsSync(lockFilePath)) {
+        return;
+      }
     }
 
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.add(pageName);
@@ -122,13 +154,9 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       }
     });
 
-    // Update the permanent lock file based on the test outcome
+    // Only create lock file if all enabled validations passed AND page is not excluded
     const anyTestFailed = errorValidationFailed || navigationTestsFailed || visibilityValidationFailed;
-    if (anyTestFailed) {
-      // Failure: ensure lock file is removed (if it existed)
-      this.deleteLockFile(pageName);
-    } else {
-      // Success: create/keep lock file
+    if (!anyTestFailed && !excludedFromLock.has(pageName)) {
       this.createLockFile(pageName);
     }
   }
@@ -164,17 +192,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'wx' });
     } catch {
       // Ignore lock file creation errors (e.g., file already exists)
-    }
-  }
-
-  private deleteLockFile(pageName: string): void {
-    try {
-      const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-      if (fs.existsSync(lockPath)) {
-        fs.unlinkSync(lockPath);
-      }
-    } catch (_error) {
-      console.error(_error);
     }
   }
 

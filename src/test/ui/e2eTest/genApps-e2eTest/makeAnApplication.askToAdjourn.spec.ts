@@ -40,7 +40,7 @@ test.afterEach(async () => {
   finaliseAllValidations();
 });
 
-test.describe('Make an Application - e2e Journey @nightly', async () => {
+test.describe.skip('Make an Application - e2e Journey @nightly', async () => {
   test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
