@@ -48,8 +48,7 @@ test.describe('Sauce smoke', () => {
     await page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await page.getByRole('textbox', { name: 'Password' }).fill(password);
     await page.getByRole('button', { name: 'Sign in' }).click();
-    await expect(page.locator('h1.govuk-heading-xl'))
-      .toHaveText('Welcome to the PCS home page');
+    await expect(page.locator('h1.govuk-heading-xl')).toHaveText('Welcome to the PCS home page');
   });
 
   test('Respond to claim FRONTEND PREVIEW  @pcssaucelab', async ({ page }) => {
@@ -60,8 +59,7 @@ test.describe('Sauce smoke', () => {
     await page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await page.getByRole('textbox', { name: 'Password' }).fill(password);
     await page.getByRole('button', { name: 'Sign in' }).click();
-    await expect(page.locator('h1.govuk-heading-xl'))
-      .toHaveText('Welcome to the PCS home page');
+    await expect(page.locator('h1.govuk-heading-xl')).toHaveText('Welcome to the PCS home page');
   });
 
   test('Service Token s2s - 200 @pcssaucelab', async ({ request }) => {
@@ -70,6 +68,5 @@ test.describe('Sauce smoke', () => {
       { headers: { 'Content-Type': 'application/json' }, data: { microservice: 'pcs_api' } }
     );
     expect(res.status()).toBe(200);
-
   });
 });
