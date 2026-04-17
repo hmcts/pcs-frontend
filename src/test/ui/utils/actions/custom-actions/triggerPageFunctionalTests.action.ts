@@ -125,43 +125,52 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     let navigationTestsFailed = false;
     let visibilityValidationFailed = false;
 
-    // Parent step that groups all functional tests for this page
-    await test.step(`PFT triggered for page - ${pageName}`, async () => {
-      if (enable_error_message_validation === 'true') {
-        await test.step(`EMV triggered for page - ${pageName}`, async () => {
-          try {
-            await this.runErrorMessageValidation(page, pageName, pftFilePath);
-          } catch (error) {
-            ErrorMessageValidation.trackValidationError(pageName, error);
-            errorValidationFailed = true;
-          }
-        });
-      }
+    try {
+      // Parent step that groups all functional tests for this page
+      await test.step(`PFT triggered for page - ${pageName}`, async () => {
+        if (enable_error_message_validation === 'true') {
+          await test.step(`EMV triggered for page - ${pageName}`, async () => {
+            try {
+              await this.runErrorMessageValidation(page, pageName, pftFilePath);
+            } catch (error) {
+              ErrorMessageValidation.trackValidationError(pageName, error);
+              errorValidationFailed = true;
+              throw error;
+            }
+          });
+        }
 
-      if (enable_navigation_tests === 'true') {
-        await test.step(`Navigation tests triggered for page - ${pageName}`, async () => {
-          try {
-            await this.runNavigationTests(page, pageName, pftFilePath);
-          } catch (error) {
-            PageNavigationValidation.trackNavigationFailure(pageName, error);
-            navigationTestsFailed = true;
-          }
-        });
-      }
+        if (enable_navigation_tests === 'true') {
+          await test.step(`Navigation tests triggered for page - ${pageName}`, async () => {
+            try {
+              await this.runNavigationTests(page, pageName, pftFilePath);
+            } catch (error) {
+              PageNavigationValidation.trackNavigationFailure(pageName, error);
+              navigationTestsFailed = true;
+              throw error;
+            }
+          });
+        }
 
-      if (enable_visibility_validation === 'true') {
-        await test.step(`Visibility validation triggered for page - ${pageName}`, async () => {
-          try {
-            await this.runVisibilityValidation(page, pageName, pftFilePath);
-          } catch (error) {
-            VisibilityValidation.trackValidationError(pageName, error);
-            visibilityValidationFailed = true;
-          }
-        });
-      }
-    });
+        if (enable_visibility_validation === 'true') {
+          await test.step(`Visibility validation triggered for page - ${pageName}`, async () => {
+            try {
+              await this.runVisibilityValidation(page, pageName, pftFilePath);
+            } catch (error) {
+              VisibilityValidation.trackValidationError(pageName, error);
+              visibilityValidationFailed = true;
+              throw error;
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      // Catch any error from the test.step to ensure lock creation still runs
+      // The error will be propagated to the test runner
+    }
 
-    // Handle lock files based on test outcome
+    // Handle lock files based on test outcome - THIS MUST RUN EVEN IF TESTS FAIL
     const anyTestFailed = errorValidationFailed || navigationTestsFailed || visibilityValidationFailed;
 
     if (!excludedFromLock.has(pageName)) {
@@ -174,6 +183,11 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         // Only create main lock if no failed lock exists
         this.createLockFile(pageName);
       }
+    }
+
+    // If any test failed, re-throw the error to fail the test
+    if (anyTestFailed) {
+      throw new Error(`Functional tests failed for page: ${pageName}`);
     }
   }
 
@@ -207,7 +221,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
       fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'w' });
     } catch {
-      // Ignore lock file creation errors (e.g., file already exists)
+      // Ignore lock file creation errors
     }
   }
 
