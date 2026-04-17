@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 
-import { step as noticeDateWhenNotProvidedStep } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-not-provided';
-import { step as noticeDateWhenProvidedStep } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-provided';
+import { step as noticeReceivedDateWhenNotProvidedStep } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-not-provided';
+import { step as noticeReceivedDateWhenProvidedStep } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-provided';
 import { step as contactByEmailOrPostStep } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
 import { step as contactByTelephoneStep } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
 import { step as correspondenceAddressStep } from '../../../../main/steps/respond-to-claim/correspondence-address';
@@ -217,25 +217,25 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            noticeDate: '2024-09-27',
+            noticeReceivedDate: '2024-09-27',
           },
         },
       },
     } as CcdCase);
     const { req, res } = createReqRes(validatedCase, {
       'confirmation-of-notice-date-when-not-provided': {
-        noticeDate: { day: '1', month: '1', year: '2020' },
+        noticeReceivedDate: { day: '1', month: '1', year: '2020' },
       },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const controller = (noticeDateWhenNotProvidedStep.getController as any)();
+    const controller = (noticeReceivedDateWhenNotProvidedStep.getController as any)();
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues.noticeDate).toEqual({
+    expect(renderData.fieldValues.noticeReceivedDate).toEqual({
       day: '27',
-      month: '9',
+      month: '09',
       year: '2024',
     });
   });
@@ -244,16 +244,16 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     const validatedCase = new CcdCaseModel({ id: '1771325608502536', data: {} } as CcdCase);
     const { req, res } = createReqRes(validatedCase, {
       'confirmation-of-notice-date-when-provided': {
-        noticeDate: { day: '1', month: '1', year: '2020' },
+        noticeReceivedDate: { day: '1', month: '1', year: '2020' },
       },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const controller = (noticeDateWhenProvidedStep.getController as any)();
+    const controller = (noticeReceivedDateWhenProvidedStep.getController as any)();
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues.noticeDate).toEqual({
+    expect(renderData.fieldValues.noticeReceivedDate).toEqual({
       day: '',
       month: '',
       year: '',
