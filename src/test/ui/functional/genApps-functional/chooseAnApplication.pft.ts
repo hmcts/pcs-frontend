@@ -7,7 +7,7 @@ export async function chooseAnApplicationErrorValidation(): Promise<void> {
     inputArray: chooseAnApplication.errorValidationField.errorRadioOption,
     header: chooseAnApplication.thereIsAProblemErrorMessageHeader,
     question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-    option: chooseAnApplication.delayRadioOption,
+    option: chooseAnApplication.adjournTheHearingRadioOption,
     button: chooseAnApplication.continueButton,
   });
 }
