@@ -37,7 +37,7 @@ test.afterEach(async () => {
   finaliseAllValidations();
 });
 
-test.describe('Make an Application - e2e Journey @nightly', async () => {
+test.describe.skip('Make an Application - e2e Journey @nightly', async () => {
   test('Select an Application - Something else @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,

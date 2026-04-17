@@ -20,14 +20,61 @@ import {
 
 export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly LOCK_DIR = path.join(process.cwd(), 'test-results', 'pft-locks');
+  private static readonly FAILED_LOCK_DIR = path.join(process.cwd(), 'test-results', 'pft-locks', 'failed');
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
+  private static readonly LOCK_EXCLUSIONS_PATH = path.join(__dirname, '../../../config/lock-exclusions.config.ts');
 
+  private static excludedFromLock: Set<string> | null = null;
   private static pagesTestedInCurrentRun = new Set<string>();
 
   static resetTestedPages(): void {
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.clear();
+  }
+
+  static prepareForRetry(): void {
+    TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.clear();
+  }
+
+  private static getExcludedFromLock(): Set<string> {
+    if (TriggerPageFunctionalTestsAction.excludedFromLock !== null) {
+      return TriggerPageFunctionalTestsAction.excludedFromLock;
+    }
+
+    try {
+      if (fs.existsSync(TriggerPageFunctionalTestsAction.LOCK_EXCLUSIONS_PATH)) {
+        const config = require(TriggerPageFunctionalTestsAction.LOCK_EXCLUSIONS_PATH);
+        TriggerPageFunctionalTestsAction.excludedFromLock = new Set(config.default || config.excludedPages || []);
+      } else {
+        TriggerPageFunctionalTestsAction.excludedFromLock = new Set<string>();
+      }
+    } catch {
+      TriggerPageFunctionalTestsAction.excludedFromLock = new Set<string>();
+    }
+
+    return TriggerPageFunctionalTestsAction.excludedFromLock;
+  }
+
+  private shouldSkipPage(pageName: string): boolean {
+    const excludedFromLock = TriggerPageFunctionalTestsAction.getExcludedFromLock();
+
+    // Never skip excluded pages
+    if (excludedFromLock.has(pageName)) {
+      return false;
+    }
+
+    const failedLockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, `${pageName}.lock`);
+
+    // If failed lock exists, never skip (always run)
+    if (fs.existsSync(failedLockPath)) {
+      return false;
+    }
+
+    const mainLockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
+
+    // Skip only if main lock exists
+    return fs.existsSync(mainLockPath);
   }
 
   async execute(page: Page): Promise<void> {
@@ -48,7 +95,13 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       return;
     }
 
+    // Skip if already tested in current attempt (prevents duplicate runs in same journey)
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
+      return;
+    }
+
+    // Check lock files to see if we should skip entirely
+    if (this.shouldSkipPage(pageName)) {
       return;
     }
 
@@ -122,14 +175,20 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       }
     });
 
-    // Update the permanent lock file based on the test outcome
+    // Handle lock files based on test outcome
     const anyTestFailed = errorValidationFailed || navigationTestsFailed || visibilityValidationFailed;
-    if (anyTestFailed) {
-      // Failure: ensure lock file is removed (if it existed)
-      this.deleteLockFile(pageName);
-    } else {
-      // Success: create/keep lock file
-      this.createLockFile(pageName);
+    const excludedFromLock = TriggerPageFunctionalTestsAction.getExcludedFromLock();
+
+    if (!excludedFromLock.has(pageName)) {
+      if (anyTestFailed) {
+        this.createFailedLockFile(pageName);
+        this.deleteMainLockFile(pageName);
+      } else {
+        const failedLockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, `${pageName}.lock`);
+        if (!fs.existsSync(failedLockPath)) {
+          this.createLockFile(pageName);
+        }
+      }
     }
   }
 
@@ -161,20 +220,32 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         fs.mkdirSync(TriggerPageFunctionalTestsAction.LOCK_DIR, { recursive: true });
       }
       const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-      fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'wx' });
+      fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'w' });
     } catch {
-      // Ignore lock file creation errors (e.g., file already exists)
+      // Ignore lock file creation errors
     }
   }
 
-  private deleteLockFile(pageName: string): void {
+  private createFailedLockFile(pageName: string): void {
+    try {
+      if (!fs.existsSync(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR)) {
+        fs.mkdirSync(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, { recursive: true });
+      }
+      const failedLockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, `${pageName}.lock`);
+      fs.writeFileSync(failedLockPath, process.pid.toString(), { flag: 'w' });
+    } catch {
+      // Ignore failed lock file creation errors
+    }
+  }
+
+  private deleteMainLockFile(pageName: string): void {
     try {
       const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
       if (fs.existsSync(lockPath)) {
         fs.unlinkSync(lockPath);
       }
-    } catch (_error) {
-      console.error(_error);
+    } catch {
+      // Ignore deletion errors
     }
   }
 

@@ -1,4 +1,4 @@
-import { defendantNameConfirmation, feedback, freeLegalAdvice } from '../data/page-data';
+import { defendantNameConfirmation, feedback } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 import { defendantNameCaptureInputValuesPrePopulated } from './defendantNameCapture.pft';
@@ -50,7 +50,7 @@ export async function defendantNameConfirmationNavigationTests(): Promise<void> 
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: defendantNameConfirmation.pageSlug,
   });
-  await performValidation('pageNavigation', defendantNameConfirmation.backLink, freeLegalAdvice.mainHeader);
+  await performValidation('pageNavigation', defendantNameConfirmation.backLink, 'issue 5');
   await performAction('clickRadioButton', {
     question: defendantNameConfirmation.mainHeader,
     option: defendantNameConfirmation.noRadioOption,

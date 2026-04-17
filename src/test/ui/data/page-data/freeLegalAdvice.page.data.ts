@@ -1,6 +1,6 @@
 export const freeLegalAdvice = {
   mainHeader: `You’re entitled to free legal advice before you submit your response`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
+  respondToClaimParagraph: `issue 1 Respond to a property possession claim`,
   helpAvailableSubHeader: `Help available now online`,
   housingExpertsParagraph: `Housing experts are ready and waiting to help you, and it takes just minutes to find one in your area.`,
   visitTheLegalAdviserList: `Visit the `,
@@ -23,7 +23,7 @@ export const freeLegalAdvice = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
-  youMustSayAboutFreeLegalAdviceErrorMessage: `You must say if you've had any free legal advice`,
+  youMustSayAboutFreeLegalAdviceErrorMessage: `You must say if you've had any222 free legal advice`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `free-legal-advice`,
