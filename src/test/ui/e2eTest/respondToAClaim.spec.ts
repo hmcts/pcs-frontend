@@ -277,7 +277,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      options: [contactPreferenceEmailOrPost.byEmailRadioOption, contactPreferenceEmailOrPost.byPostRadioOption],
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
