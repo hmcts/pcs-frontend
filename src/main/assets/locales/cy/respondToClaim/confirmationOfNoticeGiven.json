@@ -10,6 +10,6 @@
     "imNotSure": "cyI’m not sure"
   },
   "errors": {
-    "confirmNoticeGiven": "cySelect if {{claimantName}} gave you notice of their intention to begin possession proceedings"
+    "possessionNoticeReceived": "cySelect if {{claimantName}} gave you notice of their intention to begin possession proceedings"
   }
 }
