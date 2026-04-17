@@ -5,7 +5,7 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   correspondenceAddress,
   dashboard,
-  dateOfBirth,
+  defendantDateOfBirth,
   defendantNameConfirmation,
   freeLegalAdvice,
   startNow,
@@ -49,9 +49,9 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: dateOfBirth.dayInputText,
-      dobMonth: dateOfBirth.monthInputText,
-      dobYear: dateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {

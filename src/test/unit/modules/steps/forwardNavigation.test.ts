@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
-import type { JourneyFlowConfig } from '../../../../main/interfaces/stepFlow.interface';
-import { getNextStep } from '../../../../main/modules/steps/flow';
+import { getNextStep } from '@modules/steps/flow';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 describe('getNextStep Algorithm', () => {
   const mockReq = {
