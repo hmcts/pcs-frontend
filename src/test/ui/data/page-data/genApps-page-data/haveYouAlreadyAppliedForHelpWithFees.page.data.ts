@@ -5,7 +5,6 @@ export const haveYouAlreadyAppliedForHelpWithFees = {
   hwfReferenceHiddenTextLabel: `Enter your Help with Fees reference number`,
   hwfReferenceTextInput: `ReferenceTest123`,
   noRadioOption: `No`,
-  placeholderParagraph: `Placeholder page`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,

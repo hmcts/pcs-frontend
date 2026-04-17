@@ -4,11 +4,16 @@ import config from 'config';
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
   askToAdjournTheCourtHearing,
+  checkYourAnswers,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
+  doYouWantToUploadDocumentToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  uploadDocumentsToSupportYourApplication,
+  whatOrderDoYouWantTheCourtToMakeAndWhy,
+  whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
 import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
@@ -60,20 +65,20 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput
     });
-    // await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-    // await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
-    // await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
-    // await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
-    // await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
-    // await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-    // await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
-    // await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
-    // await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
-    // await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    // await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
-    // await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
-    // await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+    await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
+    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
+    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
+    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
+    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
+    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 
   test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression', async () => {

@@ -3,7 +3,7 @@ export const doYouNeedHelpPayingTheFee = {
   doYouNeedHelpPayingTheFeeQuestion: `Do you need help paying the fee for this application?`,
   iNeedHelpPayingTheFeeRadioOption: `I need help paying the fee`,
   iDoNotNeedHelpPayingTheFeeRadioOption: `I do not need help paying the fee`,
-  itUsuallyCostParagraph: `It usually costs £123 to apply. The fee will increase to £3 if:`,
+  itUsuallyCostParagraph: `It usually costs £123 to apply. The fee will increase to £313 if:`,
   youHaveAlreadyToldList: `you have already told the other party that you are making this application, and`,
   theyDidNotAgreeList: `they did not agree to it (this means that they have objected to it)`,
   youSeeFinalApplicationFeeParagraph: `You’ll see the final application fee before you pay.`,

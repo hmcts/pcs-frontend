@@ -9,7 +9,7 @@ import {
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
-  haveYouAlreadyAppliedForHelp,
+  haveYouAlreadyAppliedForHelpWithFees,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
@@ -43,20 +43,20 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.somethingElseRadioOption,
     });
-    //The below are placeholder pages
     await performValidation('mainHeader', askTheCourtToMakeAnOrder.mainHeader);
     await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
-    await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
-    await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
-    await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
-    await performAction(
-      'inputText',
-      haveYouAlreadyAppliedForHelp.hwfReferenceHiddenTextLabel,
-      haveYouAlreadyAppliedForHelp.hwfReferenceTextInput
-    );
-    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
+    await performAction('doYouNeedHelpPayingFee', {
+      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+    });
+    await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
+    await performAction('confirmYouHaveAppliedForFeeHelp', {
+      question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+      option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
+      label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
+      input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput
+    });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
     await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
     await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
