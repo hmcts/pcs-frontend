@@ -121,7 +121,9 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        correspondenceAddressConfirmation: addressConfirmedRadioSelection.toUpperCase() ?? '',
+        correspondenceAddressConfirmation: addressConfirmedRadioSelection
+          ? addressConfirmedRadioSelection.toUpperCase()
+          : '',
       },
       ...(addressConfirmedRadioSelection === 'no' && {
         defendantContactDetails: {
