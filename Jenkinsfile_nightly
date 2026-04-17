@@ -17,37 +17,37 @@ properties([
     booleanParam(
       name: 'CHROME_TESTS',
       defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Chrome.'
+      description: 'Run E2E tests in Chrome (on by default).'
     ),
     booleanParam(
       name: 'FIREFOX_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Firefox.'
+      defaultValue: false,
+      description: 'Run E2E tests in Firefox (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'WEBKIT_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Webkit (desktop Safari engine).'
+      defaultValue: false,
+      description: 'Run E2E tests in WebKit / desktop Safari (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'EDGE_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Microsoft Edge.'
+      defaultValue: false,
+      description: 'Run E2E tests in Microsoft Edge (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'MOBILE_ANDROID_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests on the Android (Pixel 5) emulator profile.'
+      defaultValue: false,
+      description: 'Run E2E tests on the Android (Pixel 5) profile (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'MOBILE_IOS_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests on the iOS (iPhone 12) WebKit emulator profile.'
+      defaultValue: false,
+      description: 'Run E2E tests on the iOS (iPhone 12) WebKit profile (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'MOBILE_IPAD_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests on the iPad (iPad Pro 11) WebKit emulator profile.'
+      defaultValue: false,
+      description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
   ])
 ])
