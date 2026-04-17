@@ -35,4 +35,6 @@ export const taskTemplates: Record<string, TaskTemplate> = {
   'Defendant.ViewClaim': { title: 'View the claim' },
   'Defendant.RespondToClaim': { title: 'Respond to the claim' },
   'Defendant.ViewDocuments': { title: 'View documents' },
+  'Defendant.ReviewResponse': { title: 'Review the response' },
+  'Defendant.SubmitResponse': { title: 'Submit the response' },
 };
