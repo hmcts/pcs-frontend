@@ -54,12 +54,12 @@ export interface CcdUserCases {
 
 /** Address shape used in CCD case data (property, defendant, etc.). */
 export interface CcdCaseAddress {
-  AddressLine1: string;
+  AddressLine1?: string;
   AddressLine2?: string;
   AddressLine3?: string;
-  PostTown: string;
+  PostTown?: string;
   County?: string;
-  PostCode: string;
+  PostCode?: string;
   Country?: string;
 }
 
@@ -88,6 +88,8 @@ export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
   firstName?: string;
   lastName?: string;
+  address?: CcdCaseAddress | Record<string, never>;
+  addressKnown?: YesNoValue;
 }
 
 /** Defendant party contact details (name/address known flags and values). */
@@ -105,6 +107,7 @@ export interface CcdDefendantParty {
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
+  correspondenceAddressConfirmation?: YesNoValue;
   tenancyTypeCorrect?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
