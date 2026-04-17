@@ -1,4 +1,4 @@
-import { dashboard, feedback, haveYouAppliedForUniversalCredit, priorityDebts } from '../data/page-data';
+import { dashboard, feedback, haveYouAppliedForUniversalCredit, priorityDebts, regularIncome } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function priorityDebtsErrorValidation(): Promise<void> {
@@ -14,7 +14,11 @@ export async function priorityDebtsNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: priorityDebts.pageSlug,
   });
-  await performValidation('pageNavigation', priorityDebts.backLink, haveYouAppliedForUniversalCredit.mainHeader);
+  if (process.env.REGULAR_INCOME === 'UNIVERSAL_CREDIT') {
+    await performValidation('pageNavigation', priorityDebts.backLink, regularIncome.mainHeader);
+  } else {
+    await performValidation('pageNavigation', priorityDebts.backLink, haveYouAppliedForUniversalCredit.mainHeader);
+  }
   await performAction('clickRadioButton', priorityDebts.noRadioOption);
   await performValidation('pageNavigation', priorityDebts.saveForLaterButton, dashboard.mainHeader);
 }

@@ -1,4 +1,4 @@
-import { dashboard, feedback, priorityDebtDetails, priorityDebts } from '../data/page-data';
+import { dashboard, feedback, priorityDebtDetails, priorityDebts, regularIncome } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function priorityDebtDetailsErrorValidation(): Promise<void> {
@@ -191,7 +191,11 @@ export async function priorityDebtDetailsNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: priorityDebtDetails.pageSlug,
   });
-  await performValidation('pageNavigation', priorityDebtDetails.backLink, priorityDebts.mainHeader);
+  if (process.env.PRIORITY_DEBTS === 'YES') {
+    await performValidation('pageNavigation', priorityDebtDetails.backLink, priorityDebts.mainHeader);
+  } else {
+    await performValidation('pageNavigation', priorityDebtDetails.backLink, regularIncome.mainHeader);
+  }
   await performAction(
     'inputText',
     priorityDebtDetails.whatIsTheTotalAmountQuestion,
