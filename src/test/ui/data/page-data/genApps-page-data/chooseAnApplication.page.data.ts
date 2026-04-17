@@ -7,7 +7,7 @@ export const chooseAnApplication = {
   findYourLocalCourtLink: `find your local court`,
   sendTheCompletedFormList: `send the completed form to the court, or deliver it by hand`,
   whatDoYouWantToApplyForQuestion: `What do you want to apply for?`,
-  delayRadioOption: `Ask to adjourn the hearing (move it to a later time or date)`,
+  adjournTheHearingRadioOption: `Ask to adjourn the hearing (move it to a later time or date)`,
   youCanApplyToChangeHintText: `You can apply to change the court hearing until a later time or date`,
   setAsideRadioOption: `Ask the court to set aside (cancel) a decision the court has made`,
   youCanAskTheCourtToSetAsideHintText: `You can ask the court to set aside its order if you have good reason. For example, if you were unable to attend the court hearing because you were ill`,
