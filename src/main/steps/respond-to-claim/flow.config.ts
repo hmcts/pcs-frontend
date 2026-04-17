@@ -390,12 +390,19 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim': {
       routes: [
         {
-          condition: async (_req, _formData, currentStepData: Record<string, unknown>): Promise<boolean> =>
-            currentStepData.makeCounterClaim === 'YES',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.makeCounterClaim === 'YES',
           nextStep: 'what-are-you-claiming-for',
         },
         {
-          condition: async (req, _formData, currentStepData: Record<string, unknown>): Promise<boolean> => {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
             if (currentStepData.makeCounterClaim !== 'NO') {
               return false;
             }
@@ -405,7 +412,11 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'your-household-and-circumstances',
         },
         {
-          condition: async (req, _formData, currentStepData: Record<string, unknown>): Promise<boolean> => {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => {
             if (currentStepData.makeCounterClaim !== 'NO') {
               return false;
             }
