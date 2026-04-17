@@ -8739,10 +8739,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-fs-backend@npm:2.6.1":
-  version: 2.6.1
-  resolution: "i18next-fs-backend@npm:2.6.1"
-  checksum: 10/2c93cab111cee0472a2ff462cdaa3cac32a1d464fb7d8cb7a6c7171ac2fdaf39a6ba9e82a2700334389519cb228f2aef29dc44871635320140da65b5dfaadcbe
+"i18next-fs-backend@npm:2.6.3":
+  version: 2.6.3
+  resolution: "i18next-fs-backend@npm:2.6.3"
+  checksum: 10/6d4ce0edeb6f79c6763b83a5208ab2ac2045b122f1a846161616ff2f6879ec7bfe8880c1fb6d1f2391c3e1601c09bc6819e5336dfd70b1327d4b355ebf252fe8
   languageName: node
   linkType: hard
 
@@ -10057,10 +10057,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:6.1.3, jose@npm:^6.1.3":
+"jose@npm:6.1.3":
   version: 6.1.3
   resolution: "jose@npm:6.1.3"
   checksum: 10/9626c51e8c3792b505e954f3094698c182208617b62dfb27269230f31e57560b083985ed8128b8a9753aa92daf18d3a2341cc826d149503f14569abe87d42389
+  languageName: node
+  linkType: hard
+
+"jose@npm:^6.2.2":
+  version: 6.2.2
+  resolution: "jose@npm:6.2.2"
+  checksum: 10/fd66f24916d2507dbde0ca77ede86377e7d7eae42c7f94db0dfd014b0c6ce5041365dc8e757a44e54cd7606ea5e9c757aa544b51e55cb8a736e83320db1b8258
   languageName: node
   linkType: hard
 
@@ -10901,15 +10908,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mini-css-extract-plugin@npm:2.10.0":
-  version: 2.10.0
-  resolution: "mini-css-extract-plugin@npm:2.10.0"
+"mini-css-extract-plugin@npm:2.10.2":
+  version: 2.10.2
+  resolution: "mini-css-extract-plugin@npm:2.10.2"
   dependencies:
     schema-utils: "npm:^4.0.0"
     tapable: "npm:^2.2.1"
   peerDependencies:
     webpack: ^5.0.0
-  checksum: 10/bae5350ab82171c6c9a22a4397df14aa69280f5ff0e1ff4d2429ea841bc096927b1e27ba7b75a9c3dd77bd44bab449d6197bd748381f1326cbc8befcb10d1a9e
+  checksum: 10/d2b01f25e229d04263274fceccfcb3ec0937a448859e4cb65e32652e26dde46ae6ecf7d15a52a4bb700bea6e47675db88691d3abc418901ec8542e1cfdc62b85
   languageName: node
   linkType: hard
 
@@ -11320,7 +11327,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oauth4webapi@npm:^3.8.4":
+"oauth4webapi@npm:^3.8.5":
   version: 3.8.5
   resolution: "oauth4webapi@npm:3.8.5"
   checksum: 10/5c39d4dbd95b795438e79444a1d710631b3f8311e8b8913150b385b5815857b32f617a49d4869a4476b2318f614adfbc9d19510360df198719973f6f69a2e75b
@@ -11481,13 +11488,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:6.8.2":
-  version: 6.8.2
-  resolution: "openid-client@npm:6.8.2"
+"openid-client@npm:6.8.3":
+  version: 6.8.3
+  resolution: "openid-client@npm:6.8.3"
   dependencies:
-    jose: "npm:^6.1.3"
-    oauth4webapi: "npm:^3.8.4"
-  checksum: 10/5d30ff2419c4847d0037c43cf136dd7189b16399aaee98faaad5bcea105c4e1e4e43d2dac1141ea77049b446b50d1b26f2bb882f717b3e38a5f996645abfc1d0
+    jose: "npm:^6.2.2"
+    oauth4webapi: "npm:^3.8.5"
+  checksum: 10/4936fd338c65387921ab4f1d8bc9da18bf9b78f56f4d4a17e8cd9731cc992ab99daa47e051e800c5a68d236a08737303d520984138ae797385c0131e71705248
   languageName: node
   linkType: hard
 
@@ -11720,9 +11727,9 @@ __metadata:
   linkType: hard
 
 "path-to-regexp@npm:^8.4.0":
-  version: 8.4.0
-  resolution: "path-to-regexp@npm:8.4.0"
-  checksum: 10/6864561ceacaece330a2213c6eb21505519673a65b4249e0e5d518984528f93b302b8bf85ccafc4f9d7f359f919d8b118dc00fdb0b26ded3d21e8802cffdfcb8
+  version: 8.4.2
+  resolution: "path-to-regexp@npm:8.4.2"
+  checksum: 10/70fd2cbce0b962cbcf4d312af07818bfce2bae11c09cf3bd86be99c0e30168238a1a7b02b18b452e73f075897df04597d30d63e56da7be41eecfc37998693389
   languageName: node
   linkType: hard
 
@@ -11802,7 +11809,7 @@ __metadata:
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
     i18next: "npm:25.10.10"
-    i18next-fs-backend: "npm:2.6.1"
+    i18next-fs-backend: "npm:2.6.3"
     i18next-http-middleware: "npm:3.9.2"
     ioredis: "npm:5.9.3"
     jest: "npm:29.7.0"
@@ -11813,11 +11820,11 @@ __metadata:
     lint-staged: "npm:15.5.2"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
-    mini-css-extract-plugin: "npm:2.10.0"
+    mini-css-extract-plugin: "npm:2.10.2"
     module-alias: "npm:2.3.4"
     nodemon: "npm:3.1.14"
     nunjucks: "npm:3.2.4"
-    openid-client: "npm:6.8.2"
+    openid-client: "npm:6.8.3"
     playwright: "npm:1.58.2"
     playwright-core: "npm:1.58.2"
     postcss: "npm:8.5.10"
