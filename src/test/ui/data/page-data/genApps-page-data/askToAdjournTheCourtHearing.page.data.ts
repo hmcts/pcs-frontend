@@ -7,7 +7,7 @@ export const askToAdjournTheCourtHearing = {
   youNeedToKnowParagraph: `You’ll need to know:`,
   ifYouCanPayTheCourtFeeList: `if you can pay the court fee, or if you need help with fees (help to pay court fees)`,
   whyYouAreAskingTheCourtList: `why you are asking the court to delay the hearing`,
-  whenYourAreProposingList:`when you are proposing the hearing be moved to (if applicable)`,
+  whenYourAreProposingList: `when you are proposing the hearing be moved to (if applicable)`,
   youMayNeedToProvideSomeEvidenceParagraph: `You may need to provide some evidence to the court.`,
   beforeYouStartHeader: `Before you start`,
   makeSureParagraph: `Make sure that you have all of the evidence you need to apply.`,
@@ -15,7 +15,7 @@ export const askToAdjournTheCourtHearing = {
   thisMeansThatIfYouLeaveYourApplicationParagraph: `This means that if you leave your application before submitting, we will not save your answers so that you can return to them later.`,
   howLongItTakesHeader: `How long it takes`,
   itsFreeToApplyParagraph: `It’s free to apply if your court hearing is at least 14 days away.`,
-  ifYourCourtHearingIsSoonerParagraph:`If your court hearing is sooner, you will need to pay £123.`,
+  ifYourCourtHearingIsSoonerParagraph: `If your court hearing is sooner, you will need to pay £123.`,
   theFeeWillIncreaseParagraph: `The fee will increase to £313 if:`,
   youHaveAlreadyToldList: `you have already told the other party that you are making this application, and`,
   theyDidNotAgreeList: `they did not agree to it (this means that they have objected to it)`,
@@ -34,9 +34,4 @@ export const askToAdjournTheCourtHearing = {
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `ask-to-adjourn-the-court-hearing`,
-
-
-
-
-
 };
