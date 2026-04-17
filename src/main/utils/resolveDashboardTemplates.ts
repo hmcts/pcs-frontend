@@ -1,26 +1,54 @@
-import { escapeHtml, notificationTemplates, taskTemplates } from './dashboardTemplates';
+import type { TFunction } from 'i18next';
 
 export interface ResolvedNotification {
   title: string;
   body: string;
 }
 
-export function resolveNotification(templateId: string, params: Record<string, unknown>): ResolvedNotification {
-  const template = notificationTemplates[templateId];
-  if (template) {
-    return { title: template.title, body: template.render(params) };
-  }
-  return { title: templateId, body: escapeHtml(JSON.stringify(params)) };
+export interface ResolvedTask {
+  title: string;
+  hint?: { html: string };
 }
 
-export function resolveTaskTitle(templateId: string): string {
-  return taskTemplates[templateId]?.title ?? templateId;
+const MISSING_TRANSLATION_KEY_VALUE = '__MISSING_TRANSLATION__';
+
+export function lookup(t: TFunction, key: string, values: Record<string, unknown> = {}, escape = false): string | null {
+  const translated = t(key, {
+    defaultValue: MISSING_TRANSLATION_KEY_VALUE,
+    interpolation: { escapeValue: escape },
+    ...values,
+  }) as string;
+  return translated === MISSING_TRANSLATION_KEY_VALUE ? null : translated;
 }
 
-export function resolveTaskHint(templateId: string, params: Record<string, unknown>): { html: string } | undefined {
-  const template = taskTemplates[templateId];
-  if (template?.hintRender && Object.keys(params).length > 0) {
-    return { html: template.hintRender(params) };
+const withCaseRef = (values: Record<string, unknown>, caseReference: string) => ({ caseReference, ...values });
+
+export function resolveNotification(
+  t: TFunction,
+  templateId: string,
+  values: Record<string, unknown>,
+  caseReference: string
+): ResolvedNotification | null {
+  const merged = withCaseRef(values, caseReference);
+  const title = lookup(t, `dashboard:notifications.${templateId}.title`);
+  const body = lookup(t, `dashboard:notifications.${templateId}.body`, merged, true);
+  if (!title || !body) {
+    return null;
   }
-  return undefined;
+  return { title, body };
+}
+
+export function resolveTask(
+  t: TFunction,
+  templateId: string,
+  values: Record<string, unknown>,
+  caseReference: string
+): ResolvedTask | null {
+  const merged = withCaseRef(values, caseReference);
+  const title = lookup(t, `dashboard:tasks.${templateId}.title`);
+  if (!title) {
+    return null;
+  }
+  const hint = lookup(t, `dashboard:tasks.${templateId}.hint`, merged, true);
+  return { title, hint: hint ? { html: hint } : undefined };
 }

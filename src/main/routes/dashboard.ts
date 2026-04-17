@@ -1,15 +1,16 @@
 import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
+import type { TFunction } from 'i18next';
 
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 
+import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
-import type { DashboardTaskGroup, TaskStatus } from '@services/pcsApi/dashboardTaskGroup.interface';
-import { STATUS_MAP, TASK_GROUP_MAP } from '@services/pcsApi/dashboardTaskGroup.interface';
+import type { DashboardTaskGroup } from '@services/pcsApi/dashboardTaskGroup.interface';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
-import { resolveNotification, resolveTaskHint, resolveTaskTitle } from '@utils/resolveDashboardTemplates';
+import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 interface MappedTask {
@@ -17,8 +18,7 @@ interface MappedTask {
   hint?: { html: string };
   href?: string;
   status: {
-    text?: string;
-    tag?: { text: string; classes?: string };
+    tag?: { text: string; classes: string };
   };
 }
 
@@ -42,6 +42,13 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
+const TAG_CLASSES: Record<string, string | undefined> = {
+  AVAILABLE: 'govuk-tag--blue',
+  IN_PROGRESS: 'govuk-tag--red',
+  COMPLETED: 'govuk-tag--green',
+  NOT_STARTED: 'govuk-tag--red',
+};
+
 export const getDashboardUrl = (caseReference?: string | number): string | null => {
   if (!caseReference) {
     return null;
@@ -55,28 +62,41 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
   return `${DASHBOARD_ROUTE}/${sanitised}`;
 };
 
-function mapTaskGroup(taskGroup: DashboardTaskGroup, caseReference: string): MappedTaskGroup {
-  const taskGroupId = taskGroup.groupId.toLowerCase();
-
-  return {
-    groupId: taskGroup.groupId,
-    title: TASK_GROUP_MAP[taskGroup.groupId] ?? taskGroup.groupId,
-    tasks: taskGroup.tasks.map((task): MappedTask => {
-      const hint = resolveTaskHint(task.templateId, task.templateValues);
-      const presentation = STATUS_MAP[task.status as TaskStatus];
-
-      return {
-        title: { html: resolveTaskTitle(task.templateId) },
-        hint,
-        href: presentation?.linkable ? `/dashboard/${caseReference}/${taskGroupId}/${task.templateId}` : undefined,
-        status: presentation?.tag ? { tag: presentation.tag } : {},
-      };
-    }),
-  };
-}
-
 export default function dashboardRoutes(app: Application): void {
   const logger = Logger.getLogger('dashboard');
+
+  function mapTaskGroup(tg: DashboardTaskGroup, t: TFunction, caseReference: string): MappedTaskGroup {
+    const groupIdLower = tg.groupId.toLowerCase();
+    const groupTitle = lookup(t, `dashboard:taskGroups.${tg.groupId}`);
+    if (!groupTitle) {
+      logger.warn(`No dashboard translation for task group ${tg.groupId}`);
+    }
+
+    return {
+      groupId: tg.groupId,
+      title: groupTitle ?? tg.groupId,
+      tasks: tg.tasks
+        .map((task): MappedTask | null => {
+          const resolved = resolveTask(t, task.templateId, task.templateValues, caseReference);
+          if (!resolved) {
+            logger.warn(`No dashboard translation for task templateId=${task.templateId}`);
+            return null;
+          }
+
+          const linkable = task.status !== 'NOT_AVAILABLE' && task.status !== 'COMPLETED';
+          const classes = TAG_CLASSES[task.status];
+          const tagText = classes ? lookup(t, `dashboard:tasks.statuses.${task.status}`) : null;
+
+          return {
+            title: { html: resolved.title },
+            hint: resolved.hint,
+            href: linkable ? `/dashboard/${caseReference}/${groupIdLower}/${task.templateId}` : undefined,
+            status: tagText && classes ? { tag: { text: tagText, classes } } : {},
+          };
+        })
+        .filter((x): x is MappedTask => x !== null),
+    };
+  }
 
   // Create dedicated router for dashboard routes
   const dashboardRouter = Router({ mergeParams: true });
@@ -119,11 +139,25 @@ export default function dashboardRoutes(app: Application): void {
       console.log('[dashboard route] Fetching dashboardView for case:', validatedCase.id);
       const dashboardData = await ccdCaseService.getDashboardView(accessToken, validatedCase.id);
 
-      const notifications = dashboardData.notifications.map(n =>
-        resolveNotification(n.templateId, n.templateValues as Record<string, unknown>)
-      );
+      const t = getTranslationFunction(req, ['dashboard', 'common']);
+      const caseReference = validatedCase.id;
 
-      const taskGroups = dashboardData.taskGroups.map(tg => mapTaskGroup(tg, validatedCase.id));
+      const notifications = dashboardData.notifications
+        .map(n => {
+          const resolved = resolveNotification(
+            t,
+            n.templateId,
+            n.templateValues as Record<string, unknown>,
+            caseReference
+          );
+          if (!resolved) {
+            logger.warn(`No dashboard translation for notification templateId=${n.templateId}`);
+          }
+          return resolved;
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null);
+
+      const taskGroups = dashboardData.taskGroups.map(tg => mapTaskGroup(tg, t, caseReference));
 
       const propertyAddress = dashboardData.propertyAddress ?? null;
 
