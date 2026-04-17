@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
-import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
 import { validateForm } from '@modules/steps';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 describe('validateForm', () => {
   it('should return error for missing required radio field', () => {

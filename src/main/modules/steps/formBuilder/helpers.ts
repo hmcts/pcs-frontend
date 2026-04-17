@@ -6,9 +6,9 @@ import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
 import type { FormError } from './errorUtils';
 
-import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
-import type { StepFormData } from '@interfaces/stepFormData.interface';
 import { Logger } from '@modules/logger';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepFormData } from '@modules/steps/stepFormData.interface';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
@@ -477,7 +477,13 @@ export function validateForm(
 
           if (!allowedCharsRegex.test(text)) {
             if (!errors[fieldName]) {
-              const displayName = toSentenceCase(fieldName);
+              const translationLabelKey =
+                typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
+
+              const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
+
+              const displayName = resolvedLabel ?? toSentenceCase(fieldName);
+
               const fieldSpecificSpecialCharacterMessage = translations?.[`${fieldName}.specialCharacter`]?.replace(
                 '{fieldName}',
                 displayName

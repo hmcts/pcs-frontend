@@ -2,8 +2,8 @@ import config from 'config';
 
 import { HTTPError } from '../../../main/HttpError';
 
-import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '@interfaces/ccdCase.interface';
 import { http } from '@modules/http';
+import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('config');

@@ -16,6 +16,7 @@ import {
   ErrorMessageValidation,
   PageContentValidation,
   PageNavigationValidation,
+  VisibilityValidation,
 } from './validations/custom-validations';
 
 let testExecutor: { page: Page };
@@ -191,6 +192,12 @@ export function finaliseAllValidations(): void {
 
   try {
     PageContentValidation.finaliseTest();
+  } catch (error) {
+    errors.push(error as Error);
+  }
+
+  try {
+    VisibilityValidation.finaliseTest();
   } catch (error) {
     errors.push(error as Error);
   }

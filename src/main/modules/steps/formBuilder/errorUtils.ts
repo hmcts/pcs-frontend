@@ -7,7 +7,11 @@ import { getTranslationFunction } from '../i18n';
 import { parseNestedFieldName } from './conditionalFields';
 import type { DateFieldError } from './dateValidation';
 
-import type { FormFieldConfig, FormFieldType, TranslationKeys } from '@interfaces/formFieldConfig.interface';
+import type {
+  FormFieldConfig,
+  FormFieldType,
+  TranslationKeys,
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 
 export interface ErrorSummaryData {
