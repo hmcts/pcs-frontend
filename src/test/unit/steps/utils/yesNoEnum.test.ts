@@ -24,6 +24,16 @@ describe('yesNoEnum utilities', () => {
       expect(result).toBe('no');
     });
 
+    it('should handle uppercase "YES" case-insensitively', () => {
+      const result = fromYesNoEnum('YES');
+      expect(result).toBe('yes');
+    });
+
+    it('should handle uppercase "NO" case-insensitively', () => {
+      const result = fromYesNoEnum('NO');
+      expect(result).toBe('no');
+    });
+
     it('should return undefined for undefined', () => {
       const result = fromYesNoEnum(undefined);
       expect(result).toBeUndefined();
