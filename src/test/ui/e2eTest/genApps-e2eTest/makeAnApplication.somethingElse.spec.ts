@@ -43,10 +43,9 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.somethingElseRadioOption,
     });
-    //The below are placeholder pages
-    await performValidation('mainHeader', askTheCourtToMakeAnOrder.mainHeader);
     await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    //The below are placeholder pages
     await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
     await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
