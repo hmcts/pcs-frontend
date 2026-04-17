@@ -23,25 +23,36 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async (req: Request) => {
     const universalCreditSelected = includesUniversalCreditSelection(req.body?.regularIncome);
     const existingHouseholdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
-      | { universalCredit?: YesNoValue; ucApplicationDate?: string | null }
+      | { universalCredit?: YesNoValue | null; ucApplicationDate?: string | null }
       | undefined;
-    const hasExistingUcAnswer = fromYesNoEnum(existingHouseholdCircumstances?.universalCredit) === 'yes';
+    const existingUcAnswer = fromYesNoEnum(existingHouseholdCircumstances?.universalCredit);
     const hasExistingUcDate = Boolean(existingHouseholdCircumstances?.ucApplicationDate);
 
-    if (!universalCreditSelected && !hasExistingUcAnswer && !hasExistingUcDate) {
+    if (universalCreditSelected) {
+      if (existingUcAnswer === 'yes') {
+        return;
+      }
+      const possessionClaimResponse: PossessionClaimResponse = {
+        defendantResponses: {
+          householdCircumstances: {
+            universalCredit: toYesNoEnum('yes'),
+          },
+        },
+      };
+      await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
       return;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          universalCredit: toYesNoEnum(universalCreditSelected ? 'yes' : 'no'),
-          ucApplicationDate: universalCreditSelected ? undefined : null,
+    if (existingUcAnswer === 'yes' && !hasExistingUcDate) {
+      const possessionClaimResponse: PossessionClaimResponse = {
+        defendantResponses: {
+          householdCircumstances: {
+            universalCredit: null,
+          },
         },
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      };
+      await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    }
   },
   getInitialFormData: req => {
     const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
