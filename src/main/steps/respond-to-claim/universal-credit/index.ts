@@ -25,7 +25,7 @@ export const step: StepDefinition = createFormStep({
         defendantResponses: {
           householdCircumstances: {
             universalCredit: toYesNoEnum('no'),
-            ucApplicationDate: undefined,
+            ucApplicationDate: null,
           },
         },
       };
