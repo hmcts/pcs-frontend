@@ -24,6 +24,7 @@ import { IAction } from '../interfaces';
 export class ActionRegistry {
   private static actions: Map<string, IAction> = new Map<string, IAction>([
     ['check', new CheckAction()],
+    ['uncheck', new CheckAction()],
     ['clickButton', new ClickButtonAction()],
     ['clickSummary', new ClickSummaryAction()],
     ['clickLink', new ClickLinkAction()],
@@ -81,6 +82,7 @@ export class ActionRegistry {
     ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
+    ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
