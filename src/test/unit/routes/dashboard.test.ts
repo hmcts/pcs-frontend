@@ -61,6 +61,7 @@ jest.mock('../../../main/middleware/caseReference', () => ({
 jest.mock('../../../main/middleware/caseReference');
 jest.mock('config', () => ({
   get: jest.fn(() => 'mock-secret'),
+  has: jest.fn(() => false),
 }));
 jest.mock('jose', () => ({
   decodeJwt: jest.fn(() => ({ exp: 0, sub: 'user-1' })),
@@ -121,6 +122,10 @@ describe('Dashboard Routes', () => {
     (getDashboardTaskGroups as jest.Mock).mockClear();
     logger = (Logger.getLogger as jest.Mock)();
     logger.error.mockClear();
+
+    const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+    configMock.has.mockReturnValue(false);
+    configMock.get.mockReturnValue('mock-secret');
 
     app = {
       locals: {
@@ -207,12 +212,138 @@ describe('Dashboard Routes', () => {
 
       const [availableTask, notAvailableTask] = firstGroup.tasks;
 
-      expect(availableTask.title.html).toContain('components/taskGroup/group_one/task-1.njk');
+      expect(availableTask.title.html).toContain('dashboard:tasks.task-1.title');
       expect(availableTask.hint?.html).toContain('components/taskGroup/group_one/task-1-hint.njk');
       expect(availableTask.href).toBe('/dashboard/1234567890123456/group_one/task-1');
 
       expect(notAvailableTask.hint).toBeUndefined();
       expect(notAvailableTask.href).toBeUndefined();
+    });
+
+    it('should apply task status override from config, activating a previously unavailable task', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskStatusOverrides');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskStatusOverrides' ? { 'task-2': 'AVAILABLE' } : 'mock-secret'
+      );
+
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456', data: {} },
+        },
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string; status: unknown }[] }[];
+      };
+      const [, overriddenTask] = renderArgs.taskGroups[0].tasks;
+
+      expect(overriddenTask.href).toBe('/dashboard/1234567890123456/group_one/task-2');
+      expect(overriddenTask.status).toEqual({ text: 'Available' });
+    });
+
+    it('should use config-driven route pattern for task href when configured', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskRoutes' ? { 'task-1': '/case/:caseReference/task-one' } : 'mock-secret'
+      );
+
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456', data: {} },
+        },
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+      const [configuredTask] = renderArgs.taskGroups[0].tasks;
+
+      expect(configuredTask.href).toBe('/case/1234567890123456/task-one');
+    });
+
+    it('should fall back to default task href when config taskRoutes value is not an object', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskRoutes' ? 'not-an-object' : 'mock-secret'
+      );
+
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: { validatedCase: { id: '1234567890123456', data: {} } },
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+      const [task] = renderArgs.taskGroups[0].tasks;
+
+      expect(task.href).toBe('/dashboard/1234567890123456/group_one/task-1');
+    });
+
+    it('should fall back to api status when config taskStatusOverrides value is not an object', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskStatusOverrides');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskStatusOverrides' ? 'not-an-object' : 'mock-secret'
+      );
+
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: { validatedCase: { id: '1234567890123456', data: {} } },
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string; status: unknown }[] }[];
+      };
+      const [, notAvailableTask] = renderArgs.taskGroups[0].tasks;
+
+      expect(notAvailableTask.href).toBeUndefined();
+      expect(notAvailableTask.status).toEqual({ text: 'Not available' });
     });
 
     it('should log and rethrow when dashboard data fetch fails', async () => {

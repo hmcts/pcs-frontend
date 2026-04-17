@@ -7,5 +7,10 @@
   "whatToExpectAtTheHearing": "What to expect at a hearing",
   "representMyselfAtTheHearing": "Represent myself at a hearing",
   "findLegalAdvice": "Find legal advice",
-  "findInformation": "Find information about my court"
+  "findInformation": "Find information about my court",
+  "tasks": {
+    "Defendant": {
+      "ViewClaim": {"title": "View the claim"}
+    }
+  }
 }
