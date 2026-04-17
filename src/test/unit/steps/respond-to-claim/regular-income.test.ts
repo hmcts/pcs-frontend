@@ -182,7 +182,7 @@ describe('respond-to-claim regular-income step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: null,
+          universalCredit: '',
         },
       },
     });

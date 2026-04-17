@@ -23,7 +23,7 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async (req: Request) => {
     const universalCreditSelected = includesUniversalCreditSelection(req.body?.regularIncome);
     const existingHouseholdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
-      | { universalCredit?: YesNoValue | null; ucApplicationDate?: string | null }
+      | { universalCredit?: YesNoValue | '' | null; ucApplicationDate?: string | null }
       | undefined;
     const existingUcAnswer = fromYesNoEnum(existingHouseholdCircumstances?.universalCredit);
     const hasExistingUcDate = Boolean(existingHouseholdCircumstances?.ucApplicationDate);
@@ -47,7 +47,7 @@ export const step: StepDefinition = createFormStep({
       const possessionClaimResponse: PossessionClaimResponse = {
         defendantResponses: {
           householdCircumstances: {
-            universalCredit: null,
+            universalCredit: '',
           },
         },
       };

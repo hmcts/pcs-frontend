@@ -28,7 +28,7 @@ export interface HouseholdCircumstances {
   alternativeAccommodationTransferDate?: string;
   otherTenants?: YesNoValue;
   otherTenantsDetails?: string;
-  universalCredit?: YesNoValue | null;
+  universalCredit?: YesNoValue | '' | null;
   ucApplicationDate?: string | null;
   priorityDebts?: YesNoValue;
   debtTotal?: string;
