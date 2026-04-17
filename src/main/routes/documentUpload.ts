@@ -4,9 +4,8 @@ import multer from 'multer';
 import { oidcMiddleware } from '../middleware';
 
 import { Logger } from '@modules/logger';
-import { getTranslationFunction, loadStepNamespace } from '@modules/steps';
 import { deleteDocument, uploadDocument } from '@services/cdamService';
-import { UPLOAD_MAX_FILE_SIZE_BYTES, UPLOAD_MAX_FILE_SIZE_MB, validateFileType } from '@utils/documentUploadValidation';
+import { UPLOAD_MAX_FILE_SIZE_BYTES, validateFileType } from '@utils/documentUploadValidation';
 
 const logger = Logger.getLogger('document-upload');
 
@@ -26,28 +25,27 @@ function getUserToken(req: Request): string {
   return req.session?.user?.accessToken || '';
 }
 
-async function getErrorTranslations(req: Request) {
-  await loadStepNamespace(req, 'upload-document', 'respondToClaim');
-  const t = getTranslationFunction(req, 'upload-document', ['common']);
+function getErrorTranslations(req: Request) {
+  const t = req.t;
   return {
-    wrongType: t('common:errors.documentUpload.wrongFileTypeDocStore'),
-    tooLarge: t('common:errors.documentUpload.fileTooLargeDocStore', { maxSize: String(UPLOAD_MAX_FILE_SIZE_MB) }),
-    noFile: t('common:errors.documentUpload.noFileSelected'),
-    uploadFailed: t('common:errors.documentUpload.uploadFailed'),
-    deleteFailed: t('common:errors.documentUpload.fileDeleteFailed'),
-    documentUrlRequired: t('common:errors.documentUpload.documentUrlRequired'),
-    uploadSuccess: (filename: string) => t('common:errors.documentUpload.uploadSuccess', { filename }),
+    wrongType: t('errors.documentUpload.wrongFileTypeDocStore'),
+    tooLarge: t('errors.documentUpload.fileTooLargeDocStore'),
+    noFile: t('errors.documentUpload.noFileSelected'),
+    uploadFailed: t('errors.documentUpload.uploadFailed'),
+    deleteFailed: t('errors.documentUpload.fileDeleteFailed'),
+    documentUrlRequired: t('errors.documentUpload.documentUrlRequired'),
+    uploadSuccess: (filename: string) => t('errors.documentUpload.uploadSuccess', { filename }),
   };
 }
 
 export default function documentUploadRoutes(app: Application): void {
   app.post(
-    '/case/:caseReference/respond-to-claim/upload-document/upload',
+    '/case/:caseReference/:journey/:step/upload',
     oidcMiddleware,
     (req: Request, res: Response, next) => {
       upload.single('documents')(req, res, async err => {
         if (err) {
-          const errors = await getErrorTranslations(req);
+          const errors = getErrorTranslations(req);
           if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({ error: { message: errors.tooLarge } });
           }
@@ -60,7 +58,7 @@ export default function documentUploadRoutes(app: Application): void {
       });
     },
     async (req: Request, res: Response) => {
-      const errors = await getErrorTranslations(req);
+      const errors = getErrorTranslations(req);
       try {
         if (!req.file) {
           return res.status(400).json({ error: { message: errors.noFile } });
@@ -97,27 +95,23 @@ export default function documentUploadRoutes(app: Application): void {
     }
   );
 
-  app.post(
-    '/case/:caseReference/respond-to-claim/upload-document/delete',
-    oidcMiddleware,
-    async (req: Request, res: Response) => {
-      const errors = await getErrorTranslations(req);
-      try {
-        const documentUrl = (req.body as Record<string, string>).delete || '';
-        if (!documentUrl) {
-          return res.status(400).json({ error: { message: errors.documentUrlRequired } });
-        }
-
-        const userToken = getUserToken(req);
-        await deleteDocument(documentUrl, userToken);
-
-        return res.json({ success: true, documentUrl });
-      } catch (error) {
-        logger.error('Failed to delete document from CDAM', {
-          error: error instanceof Error ? error.message : String(error),
-        });
-        return res.status(502).json({ error: { message: errors.deleteFailed } });
+  app.post('/case/:caseReference/:journey/:step/delete', oidcMiddleware, async (req: Request, res: Response) => {
+    const errors = getErrorTranslations(req);
+    try {
+      const documentUrl = (req.body as Record<string, string>).delete || '';
+      if (!documentUrl) {
+        return res.status(400).json({ error: { message: errors.documentUrlRequired } });
       }
+
+      const userToken = getUserToken(req);
+      await deleteDocument(documentUrl, userToken);
+
+      return res.json({ success: true, documentUrl });
+    } catch (error) {
+      logger.error('Failed to delete document from CDAM', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return res.status(502).json({ error: { message: errors.deleteFailed } });
     }
-  );
+  });
 }

@@ -3,11 +3,6 @@ jest.mock('../../../main/modules/logger', () => {
   return { Logger: { getLogger: jest.fn(() => loggerInstance) } };
 });
 
-jest.mock('../../../main/modules/steps', () => ({
-  getTranslationFunction: jest.fn(() => (key: string) => key),
-  loadStepNamespace: jest.fn(),
-}));
-
 jest.mock('../../../main/services/cdamService', () => ({
   uploadDocument: jest.fn(),
   deleteDocument: jest.fn(),
@@ -26,31 +21,29 @@ import { deleteDocument, uploadDocument } from '@services/cdamService';
 const mockUploadDocument = uploadDocument as jest.Mock;
 const mockDeleteDocument = deleteDocument as jest.Mock;
 
+const mockT = (key: string) => key;
+
 describe('documentUploadRoutes', () => {
-  let registeredRoutes: Record<string, (...args: unknown[]) => void>;
   let mockApp: Application;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    registeredRoutes = {};
     mockApp = {
-      post: jest.fn((path: string, ...handlers: ((...args: unknown[]) => void)[]) => {
-        registeredRoutes[path] = handlers[handlers.length - 1];
-      }),
+      post: jest.fn(),
     } as unknown as Application;
 
     documentUploadRoutes(mockApp);
   });
 
-  it('registers upload and delete routes', () => {
+  it('registers journey-agnostic upload and delete routes', () => {
     expect(mockApp.post).toHaveBeenCalledWith(
-      '/case/:caseReference/respond-to-claim/upload-document/upload',
+      '/case/:caseReference/:journey/:step/upload',
       expect.anything(),
       expect.anything(),
       expect.anything()
     );
     expect(mockApp.post).toHaveBeenCalledWith(
-      '/case/:caseReference/respond-to-claim/upload-document/delete',
+      '/case/:caseReference/:journey/:step/delete',
       expect.anything(),
       expect.anything()
     );
@@ -66,7 +59,7 @@ describe('documentUploadRoutes', () => {
     });
 
     it('returns 400 when no file uploaded', async () => {
-      const req = { file: undefined, session: { user: { accessToken: 'token' } }, i18n: {} } as unknown as Request;
+      const req = { file: undefined, session: { user: { accessToken: 'token' } }, t: mockT } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -87,7 +80,7 @@ describe('documentUploadRoutes', () => {
       const req = {
         file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 1024 },
         session: { user: { accessToken: 'token' } },
-        i18n: {},
+        t: mockT,
       } as unknown as Request;
       const res = { json: jest.fn() } as unknown as Response;
 
@@ -108,7 +101,7 @@ describe('documentUploadRoutes', () => {
       const req = {
         file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 1024 },
         session: { user: { accessToken: 'token' } },
-        i18n: {},
+        t: mockT,
       } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
@@ -128,7 +121,7 @@ describe('documentUploadRoutes', () => {
     });
 
     it('returns error when no document URL provided', async () => {
-      const req = { body: {}, session: { user: { accessToken: 'token' } }, i18n: {} } as unknown as Request;
+      const req = { body: {}, session: { user: { accessToken: 'token' } }, t: mockT } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -142,7 +135,7 @@ describe('documentUploadRoutes', () => {
       const req = {
         body: { delete: 'http://dm/doc/123' },
         session: { user: { accessToken: 'token' } },
-        i18n: {},
+        t: mockT,
       } as unknown as Request;
       const res = { json: jest.fn() } as unknown as Response;
 
@@ -158,7 +151,7 @@ describe('documentUploadRoutes', () => {
       const req = {
         body: { delete: 'http://dm/doc/123' },
         session: { user: { accessToken: 'token' } },
-        i18n: {},
+        t: mockT,
       } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
