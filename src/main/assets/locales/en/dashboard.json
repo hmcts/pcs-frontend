@@ -7,5 +7,43 @@
   "whatToExpectAtTheHearing": "What to expect at a hearing",
   "representMyselfAtTheHearing": "Represent myself at a hearing",
   "findLegalAdvice": "Find legal advice",
-  "findInformation": "Find information about my court"
+  "findInformation": "Find information about my court",
+
+  "taskGroups": {
+    "CLAIM": "The claim",
+    "HEARING": "Hearing",
+    "JUDGEMENT": "Judgement from the court",
+    "NOTICE": "Orders and notices from the court",
+    "RESPONSE": "The response",
+    "APPLICATIONS": "Applications"
+  },
+
+  "notifications": {
+    "Defendant": {
+      "CaseIssued": {
+        "title": "Case issued",
+        "body": "Your case has been issued. <a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/claim/Defendant.ViewClaim\">View the claim</a>. Respond by {{responseEndDate}}."
+      },
+      "ResponseToClaim": {
+        "title": "Response to claim",
+        "body": "<a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/response/Defendant.RespondToClaim\">{{ctaLabel}}</a>"
+      }
+    }
+  },
+
+  "tasks": {
+    "statuses": {
+      "AVAILABLE": "Available",
+      "IN_PROGRESS": "In progress",
+      "COMPLETED": "Completed",
+      "NOT_STARTED": "Not started"
+    },
+    "Defendant": {
+      "ViewClaim": { "title": "View the claim" },
+      "RespondToClaim": { "title": "Respond to the claim" },
+      "ViewDocuments": { "title": "View documents" },
+      "ReviewResponse": { "title": "Review the response" },
+      "SubmitResponse": { "title": "Submit the response" }
+    }
+  }
 }

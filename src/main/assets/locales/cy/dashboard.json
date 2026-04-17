@@ -8,5 +8,43 @@
   "whatToExpectAtTheHearing": "cyWhat to expect at a hearing",
   "representMyselfAtTheHearing": "cyRepresent myself at a hearing",
   "findLegalAdvice": "cyFind legal advice",
-  "findInformation": "cyFind information about my court"
+  "findInformation": "cyFind information about my court",
+
+  "taskGroups": {
+    "CLAIM": "cyThe claim",
+    "HEARING": "cyHearing",
+    "JUDGEMENT": "cyJudgement from the court",
+    "NOTICE": "cyOrders and notices from the court",
+    "RESPONSE": "cyThe response",
+    "APPLICATIONS": "cyApplications"
+  },
+
+  "notifications": {
+    "Defendant": {
+      "CaseIssued": {
+        "title": "cyCase issued",
+        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/claim/Defendant.ViewClaim\">View the claim</a>. Respond by {{responseEndDate}}."
+      },
+      "ResponseToClaim": {
+        "title": "cyResponse to claim",
+        "body": "<a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/response/Defendant.RespondToClaim\">{{ctaLabel}}</a>"
+      }
+    }
+  },
+
+  "tasks": {
+    "statuses": {
+      "AVAILABLE": "cyAvailable",
+      "IN_PROGRESS": "cyIn progress",
+      "COMPLETED": "cyCompleted",
+      "NOT_STARTED": "cyNot started"
+    },
+    "Defendant": {
+      "ViewClaim": { "title": "cyView the claim" },
+      "RespondToClaim": { "title": "cyRespond to the claim" },
+      "ViewDocuments": { "title": "cyView documents" },
+      "ReviewResponse": { "title": "cyReview the response" },
+      "SubmitResponse": { "title": "cySubmit the response" }
+    }
+  }
 }
