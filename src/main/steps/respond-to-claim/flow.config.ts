@@ -395,8 +395,23 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'what-are-you-claiming-for',
         },
         {
-          condition: async (_req, _formData, currentStepData: Record<string, unknown>): Promise<boolean> =>
-            currentStepData.makeCounterClaim === 'NO',
+          condition: async (req, _formData, currentStepData: Record<string, unknown>): Promise<boolean> => {
+            if (currentStepData.makeCounterClaim !== 'NO') {
+              return false;
+            }
+            const rentArrearsClaim = await hasAnyRentArrearsGround(req);
+            return !rentArrearsClaim;
+          },
+          nextStep: 'your-household-and-circumstances',
+        },
+        {
+          condition: async (req, _formData, currentStepData: Record<string, unknown>): Promise<boolean> => {
+            if (currentStepData.makeCounterClaim !== 'NO') {
+              return false;
+            }
+            const rentArrearsClaim = await hasAnyRentArrearsGround(req);
+            return rentArrearsClaim;
+          },
           nextStep: 'payment-interstitial',
         },
       ],

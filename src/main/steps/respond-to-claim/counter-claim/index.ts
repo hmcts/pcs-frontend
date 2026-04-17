@@ -2,6 +2,11 @@ import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import type {
+  PossessionClaimResponse,
+  YesNoValue,
+} from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim',
@@ -48,4 +53,26 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+    beforeRedirect: async req => {
+    const makeCounterClaim: YesNoValue= req.body?.makeCounterClaim;
+
+    if (!makeCounterClaim) {
+      return;
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim,
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+    getInitialFormData: req => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    console.log('caseData in counter-claim getInitialFormData', JSON.stringify(caseData, null, 2));
+    const makeCounterClaim: YesNoValue | undefined = caseData?.possessionClaimResponse?.defendantResponses?.makeCounterClaim;
+
+    return makeCounterClaim !== undefined ? { makeCounterClaim } : {};
+  },
 });

@@ -55,6 +55,11 @@ function hasInstalmentAmountOrFrequency(paymentAgreement: PaymentAgreementShape 
 }
 
 export async function getPreviousStepForYourHouseholdAndCircumstances(req: Request): Promise<string> {
+  const rentArrearsClaim = await isRentArrearsClaim(req);
+  if (!rentArrearsClaim) {
+    return 'counter-claim';
+  }
+
   const paymentAgreement = getPaymentAgreementFromCase(req);
   const repaymentPlanAgreed = paymentAgreement?.repaymentPlanAgreed;
 
@@ -63,11 +68,6 @@ export async function getPreviousStepForYourHouseholdAndCircumstances(req: Reque
   }
 
   if (repaymentPlanAgreed !== 'NO') {
-    return 'repayments-agreed';
-  }
-
-  const rentArrearsClaim = await isRentArrearsClaim(req);
-  if (!rentArrearsClaim) {
     return 'repayments-agreed';
   }
 
