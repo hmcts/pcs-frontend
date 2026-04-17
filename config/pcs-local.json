@@ -1,0 +1,17 @@
+{
+  "api": {
+    "url": "http://localhost:3206"
+  },
+  "ccd": {
+    "url": "http://localhost:4452"
+  },
+  "s2s": {
+    "url": "http://localhost:8489"
+  },
+  "oidc": {
+    "issuer": "http://localhost:5062/o"
+  },
+  "xui": {
+    "uri": "http://localhost:3000"
+  }
+}

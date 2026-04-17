@@ -1,3 +1,18 @@
+export function truncateForLog(text: string, maxLen = 200): string {
+  return text.length <= maxLen ? text : `${text.slice(0, maxLen)}…`;
+}
+
+export function shortUrl(url: string, maxLen = 120): string {
+  let s = url;
+  try {
+    const u = new URL(url);
+    s = u.pathname + u.search;
+  } catch {
+    /* keep raw string when URL is relative or invalid */
+  }
+  return s.length <= maxLen ? s : `${s.slice(0, maxLen)}…`;
+}
+
 export function escapeForRegex(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
