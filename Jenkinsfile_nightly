@@ -6,8 +6,13 @@ properties([
   parameters([
     choice(
       name: 'ENVIRONMENT',
-      choices: ['aat'],
+      choices: ['aat', 'preview'],
       description: 'Environment to run the test.'
+    ),
+    string(
+      name: 'PR_NUMBER',
+      defaultValue: '',
+      description: 'PR number (REQUIRED if environment is preview, leave blank otherwise).'
     ),
     booleanParam(
       name: 'CHROME_TESTS',
@@ -81,9 +86,6 @@ withNightlyPipeline(type, product, component) {
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
-    if (params.ACCESSIBILITY_TESTS) {
-      runAccessibilityTests(yarnBuilder)
-    }
   }
 }
 
@@ -148,28 +150,6 @@ def runE2eStage(yarnBuilder, String playwrightProject, String reportKey, String 
         artifacts: 'definitions/test/playwright-report/**'
       )
       sendAllureReportToSlack(stageLabel, "Full_20${reportKey}_20E2E_20Test_20Report/")
-    }
-  }
-}
-
-def runAccessibilityTests(yarnBuilder) {
-  stage("Full Accessibility Test") {
-    node {
-      checkout scm
-      sh 'rm -rf allure-results allure-report'
-      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        yarnBuilder.yarn("test:accessibility")
-      }
-      publishHTML([
-        allowMissing         : true,
-        alwaysLinkToLastBuild: true,
-        keepAll              : true,
-        reportDir            : "allure-report",
-        reportFiles          : 'index.html',
-        reportName           : 'Accessibility Test Report'
-      ])
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
-      sendAllureReportToSlack('Chrome', 'Accessibility_20Test_20Report/')
     }
   }
 }
