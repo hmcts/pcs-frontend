@@ -69,72 +69,80 @@ export default defineConfig({
         headless: !!process.env.CI,
       },
     },
-    ...(process.env.CI
-      ? [
-          {
-            name: 'firefox',
-            use: {
-              ...devices['Desktop Firefox'],
-              channel: 'firefox',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'webkit',
-            use: {
-              ...devices['Desktop Safari'],
-              channel: 'webkit',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            /** Chromium with Pixel 5 device profile (Android Chrome–class behaviour). */
-            name: 'mobile-android',
-            use: {
-              ...devices['Pixel 5'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
-              javaScriptEnabled: true,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            /** WebKit with iPhone 12 device profile (mobile Safari–class behaviour). */
-            name: 'mobile-ios',
-            use: {
-              ...devices['iPhone 12'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
-              javaScriptEnabled: true,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'edge',
-            use: {
-              ...devices['Desktop Edge'],
-              channel: 'msedge',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-        ]
-      : []),
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        channel: 'firefox',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+        trace: 'on-first-retry',
+        javaScriptEnabled: true,
+        viewport: DEFAULT_VIEWPORT,
+        headless: !!process.env.CI,
+      },
+    },
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        channel: 'webkit',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+        trace: 'on-first-retry',
+        javaScriptEnabled: true,
+        viewport: DEFAULT_VIEWPORT,
+        headless: !!process.env.CI,
+      },
+    },
+    {
+      name: 'edge',
+      use: {
+        ...devices['Desktop Edge'],
+        channel: 'msedge',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+        trace: 'on-first-retry',
+        javaScriptEnabled: true,
+        viewport: DEFAULT_VIEWPORT,
+        headless: !!process.env.CI,
+      },
+    },
+    {
+      /** Chromium with Pixel 5 profile (Android Chrome–class behaviour). */
+      name: 'mobile-android',
+      use: {
+        ...devices['Pixel 5'],
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+        trace: 'on-first-retry',
+        javaScriptEnabled: true,
+        headless: !!process.env.CI,
+      },
+    },
+    {
+      /** WebKit with iPhone 12 profile (mobile Safari–class behaviour). */
+      name: 'mobile-ios',
+      use: {
+        ...devices['iPhone 12'],
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+        trace: 'on-first-retry',
+        javaScriptEnabled: true,
+        headless: !!process.env.CI,
+      },
+    },
+    {
+      /** WebKit with iPad Pro 11 profile (tablet Safari–class behaviour). */
+      name: 'mobile-ipad',
+      use: {
+        ...devices['iPad Pro 11'],
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+        trace: 'on-first-retry',
+        javaScriptEnabled: true,
+        headless: !!process.env.CI,
+      },
+    },
   ],
 });

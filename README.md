@@ -204,9 +204,8 @@ By default, the tests will run against http://localhost:3209/, please update the
 There are also several custom test scripts available:
 
 - `yarn test:changed` - runs only changed spec files
-- `test:E2eChrome` - runs the full E2E suite in Chrome
-- `test:E2eFirefox` - runs the full E2E suite in Firefox
-- `test:E2eSafari` - runs the full E2E suite in Safari
+- `yarn test:E2e` - runs the full Playwright suite for one project; set `PLAYWRIGHT_PROJECT` to `chrome` (default), `firefox`, `webkit`, `edge`, `mobile-android`, `mobile-ios`, or `mobile-ipad`
+- `yarn test:E2eChrome` / `test:E2eFirefox` / `test:E2eSafari` / `test:E2eEdge` / `test:E2eMobileAndroid` / `test:E2eMobileIos` / `test:E2eMobileIpad` - same as `test:E2e` with the matching project
 
 Running accessibility tests:
 
