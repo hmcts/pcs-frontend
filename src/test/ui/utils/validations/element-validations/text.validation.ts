@@ -30,6 +30,9 @@ export class TextValidation implements IValidation {
       case 'summaryText':
         data.elementType = '.govuk-details__text';
         break;
+      case 'hintText':
+        data.elementType = 'div';
+        break;
     }
     const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
     await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(String(data.text))}\\s*$`));

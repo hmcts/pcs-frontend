@@ -17,16 +17,20 @@ import {
   doYouHaveAnyOtherDependants,
   exceptionalHardship,
   freeLegalAdvice,
+  haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
   incomeAndExpenses,
   installmentPayments,
   nonRentArrearsDispute,
+  otherConsiderations,
+  priorityDebts,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
@@ -169,6 +173,7 @@ test.afterEach(async () => {
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
+  //Income and expenses - yes - Only Universal CREDIT - Priority debt
   test('Respond to a claim @noDefendants @regression @accessibility', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -256,10 +261,23 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceive.universalCreditParagraph,
+          whatRegularIncomeDoYouReceive.universalCreditTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+      ],
+    });
+    await performValidation('mainHeader', priorityDebts.mainHeader);
   });
 
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
+    //incomeAndExpenses - no - Upload docs
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -315,6 +333,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
+    //include missing steps
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -339,10 +358,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
+    });
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
+    //Income and expenses - yes - no option On regular Income - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -420,10 +443,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
   });
 
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
+    //Income and expenses - yes - all options except Universal Credit - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -503,7 +531,33 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
+          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
+          whatRegularIncomeDoYouReceive.pensionTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
+          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
+          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
+        ],
+      ],
+    });
+    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
@@ -580,10 +634,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
+    //universal credit with all other options - priority debts
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -635,6 +694,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
+    //include missing steps
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -658,7 +718,38 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
+          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.universalCreditParagraph,
+          whatRegularIncomeDoYouReceive.universalCreditTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
+          whatRegularIncomeDoYouReceive.pensionTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
+          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
+          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
+        ],
+      ],
+    });
+    await performValidation('mainHeader', priorityDebts.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
@@ -740,7 +831,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
@@ -826,7 +921,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
@@ -905,6 +1004,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
   });
 });
