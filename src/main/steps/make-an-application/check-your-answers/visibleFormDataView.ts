@@ -4,7 +4,7 @@ import { shouldShowStep } from '../../';
 import { flowConfig } from '../flow.config';
 
 import { getFormData } from '@modules/steps';
-import { GenAppType } from '@services/ccdCase.interface';
+import { GenAppType, LanguageUsed } from '@services/ccdCase.interface';
 
 export type FieldDetails<T> = {
   stepName: string;
@@ -62,6 +62,10 @@ export default class VisibleFormDataView {
     } else {
       return undefined;
     }
+  }
+
+  getWhichLanguageField(): FieldDetails<LanguageUsed> | undefined {
+    return this.getField('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
   }
 
   private getField<T>(stepName: string, fieldName: string): FieldDetails<T> | undefined {

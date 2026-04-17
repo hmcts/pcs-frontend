@@ -226,6 +226,31 @@ describe('buildSummaryListRows', () => {
 
     expect(summaryListRows).toEqual([expected]);
   });
+
+  it('creates summary list row for reason for which language field', () => {
+    (mockVisibleFormDataView.getWhichLanguageField as jest.Mock).mockReturnValue({
+      stepName: 'which-language',
+      fieldValue: 'WELSH',
+    });
+
+    const summaryListRows = buildSummaryListRows(req, t);
+
+    const expected = {
+      actions: {
+        items: [
+          {
+            href: './which-language',
+            text: 'translation for: change',
+            visuallyHiddenText: 'translation for: answers.whichLanguage.changeHint',
+          },
+        ],
+      },
+      key: { text: 'translation for: answers.whichLanguage.label' },
+      value: { text: 'translation for: answers.whichLanguage.options.WELSH' },
+    };
+
+    expect(summaryListRows).toEqual([expected]);
+  });
 });
 
 function createMockVisibleFormDataView() {
@@ -238,6 +263,7 @@ function createMockVisibleFormDataView() {
     getOtherPartiesAgreedField: jest.fn(),
     getAnyReasonsNotToShareField: jest.fn(),
     getReasonForNotSharingField: jest.fn(),
+    getWhichLanguageField: jest.fn(),
   };
 }
 
@@ -250,4 +276,5 @@ function resetMockVisibleFormDataView() {
   (mockVisibleFormDataView.getOtherPartiesAgreedField as jest.Mock).mockReset();
   (mockVisibleFormDataView.getAnyReasonsNotToShareField as jest.Mock).mockReset();
   (mockVisibleFormDataView.getReasonForNotSharingField as jest.Mock).mockReset();
+  (mockVisibleFormDataView.getWhichLanguageField as jest.Mock).mockReset();
 }
