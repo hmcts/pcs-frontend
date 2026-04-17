@@ -94,6 +94,23 @@ export function buildComponentConfig({
         classes: field.labelClasses,
       };
 
+      const charCountKeys = [
+        'charactersUnderLimitText',
+        'charactersAtLimitText',
+        'charactersOverLimitText',
+        'wordsUnderLimitText',
+        'wordsAtLimitText',
+        'wordsOverLimitText',
+        'textareaDescriptionText',
+      ] as const;
+
+      for (const key of charCountKeys) {
+        const translation = t(`characterCount.${key}`, { returnObjects: true, defaultValue: '' }) as unknown;
+        if (translation && translation !== '') {
+          component[key] = translation;
+        }
+      }
+
       componentType = 'characterCount';
       break;
     }
