@@ -324,7 +324,7 @@ describe('updateCase', () => {
     const result = await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, mockData);
 
     expect(mockPost).toHaveBeenCalledWith(
-      `${mockUrl}/case-types/PCS/validate?pageId=respondToPossessionDraftSavePage`,
+      `${mockUrl}/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,
       {
         event: {
           id: 'respondPossessionClaim',
@@ -332,7 +332,7 @@ describe('updateCase', () => {
           description: 'Citizen respondPossessionClaim draft save description',
         },
         case_reference: caseId,
-        data: mockData,
+        event_data: mockData,
         ignore_warning: false,
       },
       expect.objectContaining({
