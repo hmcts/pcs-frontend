@@ -3,6 +3,21 @@
 properties([
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
+    string(
+      name: 'PLAYWRIGHT_SPEC',
+      defaultValue: '',
+      description: 'Spec filename keyword(s), exact case seperated by comma. One pattern: respondToAClaim. Multiple: respondToAClaim,makeAnApplication. Blank = all specs.'
+    ),
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@smoke', '@e2e', '@regression', '@accessibility','@nightly','@crossbrowser','(all tests)','@prod'],
+      description: 'Title tag. Default @smoke. (all tests) = no tag filter.'
+    ),
+    choice(
+      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
+      choices: ['false','true'],
+      description: 'Enable page functional tests (content, errors, navigation). Default false.'
+    ),
     booleanParam(
       name: 'CHROME_TESTS',
       defaultValue: true,
@@ -27,21 +42,6 @@ properties([
       name: 'SAUCE_CROSSBROWSER',
       defaultValue: false,
       description: 'Tick to run cross-browser tests on Sauce Labs'
-    ),
-    choice(
-      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
-      choices: ['false','true'],
-      description: 'Enable page functional tests (content, errors, navigation). Default false.'
-    ),
-    choice(
-      name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@smoke', '@e2e', '@regression', '@accessibility','@nightly','@crossbrowser','(all tests)','@prod'],
-      description: 'Title tag. Default @smoke. (all tests) = no tag filter.'
-    ),
-    string(
-      name: 'PLAYWRIGHT_SPEC',
-      defaultValue: '',
-      description: 'Spec filename keyword(s), exact case seperated by comma. One pattern: respondToAClaim. Multiple: respondToAClaim,makeAnApplication. Blank = all specs.'
     ),
   ])
 ])
