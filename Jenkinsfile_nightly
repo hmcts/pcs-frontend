@@ -112,22 +112,22 @@ def setFunctionalTestEnvVars() {
 def runE2ETests(yarnBuilder) {
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
   def e2eMatrix = [
-    [flag: 'CHROME_TESTS', project: 'chrome', reportKey: 'Chrome', label: 'Desktop Chrome'],
-    [flag: 'FIREFOX_TESTS', project: 'firefox', reportKey: 'Firefox', label: 'Desktop Firefox'],
-    [flag: 'WEBKIT_TESTS', project: 'webkit', reportKey: 'Safari', label: 'Desktop Safari (WebKit)'],
-    [flag: 'EDGE_TESTS', project: 'edge', reportKey: 'Edge', label: 'Desktop Edge'],
-    [flag: 'MOBILE_ANDROID_TESTS', project: 'mobile-android', reportKey: 'MobileAndroid', label: 'Mobile Android (Pixel 5)'],
-    [flag: 'MOBILE_IOS_TESTS', project: 'mobile-ios', reportKey: 'MobileIos', label: 'Mobile iOS (WebKit)'],
-    [flag: 'MOBILE_IPAD_TESTS', project: 'mobile-ipad', reportKey: 'MobileIpad', label: 'Mobile iPad (WebKit)'],
+    [flag: 'CHROME_TESTS', project: 'chrome', browser: 'Chrome', label: 'Desktop Chrome'],
+    [flag: 'FIREFOX_TESTS', project: 'firefox', browser: 'Firefox', label: 'Desktop Firefox'],
+    [flag: 'WEBKIT_TESTS', project: 'webkit', browser: 'Safari', label: 'Desktop Safari (WebKit)'],
+    [flag: 'EDGE_TESTS', project: 'edge', browser: 'Edge', label: 'Desktop Edge'],
+    [flag: 'MOBILE_ANDROID_TESTS', project: 'mobile-android', browser: 'MobileAndroid', label: 'Mobile Android (Pixel 5)'],
+    [flag: 'MOBILE_IOS_TESTS', project: 'mobile-ios', browser: 'MobileIos', label: 'Mobile iOS (WebKit)'],
+    [flag: 'MOBILE_IPAD_TESTS', project: 'mobile-ipad', browser: 'MobileIpad', label: 'Mobile iPad (WebKit)'],
   ]
   e2eMatrix.each { row ->
     if (params[row.flag]) {
-      runE2eStage(yarnBuilder, row.project, row.reportKey, row.label)
+      runE2eStage(yarnBuilder, row.project, row.browser, row.label)
     }
   }
 }
 
-def runE2eStage(yarnBuilder, String playwrightProject, String reportKey, String stageLabel) {
+def runE2eStage(yarnBuilder, String playwrightProject, String browser, String stageLabel) {
   stage("E2E - ${stageLabel}") {
     node {
       checkout scm
@@ -143,13 +143,13 @@ def runE2eStage(yarnBuilder, String playwrightProject, String reportKey, String 
         keepAll: true,
         reportDir: "allure-report",
         reportFiles: 'index.html',
-        reportName: "Full ${reportKey} E2E Test Report"
+        reportName: "Full ${browser} E2E Test Report"
       ])
       steps.archiveArtifacts(
         allowEmptyArchive: true,
         artifacts: 'definitions/test/playwright-report/**'
       )
-      sendAllureReportToSlack(stageLabel, "Full_20${reportKey}_20E2E_20Test_20Report/")
+      sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
     }
   }
 }
