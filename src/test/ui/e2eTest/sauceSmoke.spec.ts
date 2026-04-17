@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import { resolveIdamPassword } from '../utils/idamPassword';
 
 test.describe('Sauce smoke', () => {
-  test('Manage case exui test @pcssaucelab', async ({ page }) => {
+  test('Manage case exui test AAT @pcssaucelab', async ({ page }) => {
     const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-solicitor-automation@test.com';
     const password = resolveIdamPassword();
     test.skip(!password);
@@ -23,7 +23,7 @@ test.describe('Sauce smoke', () => {
     await page.getByRole('button', { name: 'Save and continue' }).click();
   });
 
-  test('Manage case exui test @pcssaucelab', async ({ page }) => {
+  test('Manage case exui test PREVIEW @pcssaucelab', async ({ page }) => {
     const email = process.env.IDAM_PCS_USER_EMAIL?.trim() || 'pcs-solicitor-automation@test.com';
     const password = resolveIdamPassword();
     test.skip(!password);
