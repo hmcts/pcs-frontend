@@ -49,6 +49,21 @@ properties([
       defaultValue: false,
       description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
+    choice(
+      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
+      choices: ['true', 'false'],
+      description: 'Enable page functional tests (content, errors, navigation). Default true for nightly.'
+    ),
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@nightly', '@smoke', '@e2e', '@regression', '@accessibility', '@crossbrowser', '(all tests)', '@prod'],
+      description: 'Title tag filter. Default @nightly. (all tests) = no tag filter.'
+    ),
+    string(
+      name: 'PLAYWRIGHT_SPEC',
+      defaultValue: '',
+      description: 'Spec filename keyword(s), exact case, comma-separated (e.g. respondToAClaim,makeAnApplication). Blank = all specs.'
+    ),
   ])
 ])
 
@@ -77,7 +92,7 @@ def secrets = [
 
 withNightlyPipeline(type, product, component) {
   validateInputs()
-  enableSlackNotifications('#pcs-tech')
+  enableSlackNotifications('#qa-pipeline-status')
   loadVaultSecrets(secrets)
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
@@ -107,10 +122,15 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  def tag = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
+  env.FUNCTIONAL_TEST_SCOPE = (tag == '(all tests)') ? '' : tag
+  env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
+  // New job parameters: older job definitions may omit these — default to previous nightly behaviour (all page tests on).
+  def allPage = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
+  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = (allPage == null || allPage == 'true') ? 'true' : 'false'
 }
 
 def runE2ETests(yarnBuilder) {
-  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
   def e2eMatrix = [
     [flag: 'CHROME_TESTS', project: 'chrome', browser: 'Chrome', label: 'Desktop Chrome'],
     [flag: 'FIREFOX_TESTS', project: 'firefox', browser: 'Firefox', label: 'Desktop Firefox'],
@@ -160,7 +180,7 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
   def msg = sh(script: "yarn exec ts-node src/test/ui/utils/common/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
-    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    slackSend(channel: '#qa-pipeline-status', message: msg)
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }
