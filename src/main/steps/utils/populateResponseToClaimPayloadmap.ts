@@ -48,7 +48,8 @@ export const buildCcdCaseForPossessionClaimResponse = async (
   if (req.res?.locals) {
     const existingData = (existingValidatedCase?.data ?? {}) as PlainRecord;
     const updatedData = (updatedCase.data ?? {}) as PlainRecord;
-    const mergedData = mergeRecords(existingData, updatedData);
+    const mergedFromApi = mergeRecords(existingData, updatedData);
+    const mergedData = mergeRecords(mergedFromApi, (ccdCase.data ?? {}) as PlainRecord);
 
     req.res.locals.validatedCase = new CcdCaseModel({
       id: updatedCase.id || caseId,
