@@ -123,6 +123,11 @@ describe('Dashboard Routes', () => {
     logger = (Logger.getLogger as jest.Mock)();
     logger.error.mockClear();
 
+    // Reset config mock to defaults so implementations don't leak between tests
+    const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+    configMock.has.mockReturnValue(false);
+    configMock.get.mockReturnValue('mock-secret');
+
     app = {
       locals: {
         nunjucksEnv: {
@@ -214,6 +219,76 @@ describe('Dashboard Routes', () => {
 
       expect(notAvailableTask.hint).toBeUndefined();
       expect(notAvailableTask.href).toBeUndefined();
+    });
+
+    it('should apply task status override from config, activating a previously unavailable task', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskStatusOverrides');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskStatusOverrides' ? { 'task-2': 'AVAILABLE' } : 'mock-secret'
+      );
+
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456', data: {} },
+        },
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string; status: unknown }[] }[];
+      };
+      const [, overriddenTask] = renderArgs.taskGroups[0].tasks;
+
+      // task-2 was NOT_AVAILABLE from the API but the config override forces AVAILABLE,
+      // so it should now have an active href and the Available status
+      expect(overriddenTask.href).toBe('/dashboard/1234567890123456/group_one/task-2');
+      expect(overriddenTask.status).toEqual({ text: 'Available' });
+    });
+
+    it('should use config-driven route pattern for task href when configured', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskRoutes'
+          ? { 'task-1': '/case/:caseReference/task-one' }
+          : 'mock-secret'
+      );
+
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: {
+          validatedCase: { id: '1234567890123456', data: {} },
+        },
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+      const [configuredTask] = renderArgs.taskGroups[0].tasks;
+
+      // task-1 has a config-driven route pattern, so :caseReference should be substituted
+      expect(configuredTask.href).toBe('/case/1234567890123456/task-one');
     });
 
     it('should log and rethrow when dashboard data fetch fails', async () => {
