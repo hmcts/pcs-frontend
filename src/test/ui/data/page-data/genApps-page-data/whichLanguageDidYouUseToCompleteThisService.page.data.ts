@@ -9,7 +9,7 @@ export const whichLanguageDidYouUseToCompleteThisService = {
   backLink: `Back`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
-  feedbackLink: `Feedback`,
+  feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `which-language-did-you-use-to-complete-this-service`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },

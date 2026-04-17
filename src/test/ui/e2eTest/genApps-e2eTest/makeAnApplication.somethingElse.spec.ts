@@ -47,7 +47,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', askTheCourtToMakeAnOrder.mainHeader);
     await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.needHelpRadioOption);
+    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption);
     await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
     await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
