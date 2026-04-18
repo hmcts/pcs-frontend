@@ -6,18 +6,14 @@ import { IdamUtils, ServiceAuthUtils } from '@hmcts/playwright-common';
 import { accessTokenApiData, s2STokenApiData } from '../data/api-data';
 import { user } from '../data/user-data';
 
-async function globalSetupConfig(): Promise<void> {
-  if (!process.env.CI) {
-    clearEmvLocks();
+/** Clears PFT lock dir when not on CI (local runs). Used by the Playwright `setup` project. */
+export function clearEmvLocksIfLocal(): void {
+  if (process.env.CI) {
+    return;
   }
-  await getS2SToken();
-  await getAccessToken();
-}
-
-const clearEmvLocks = (): void => {
   const lockDir = path.join(process.cwd(), 'test-results', 'pft-locks');
   fs.rmSync(lockDir, { recursive: true, force: true });
-};
+}
 
 export const getS2SToken = async (): Promise<void> => {
   process.env.S2S_URL = s2STokenApiData.s2sUrl;
@@ -38,5 +34,3 @@ export const getAccessToken = async (): Promise<void> => {
     scope: 'profile openid roles',
   });
 };
-
-export default globalSetupConfig;

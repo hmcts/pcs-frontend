@@ -49,6 +49,7 @@ version
 /allure-results/
 /blob-report/
 /playwright/.cache/
+/src/test/ui/.auth/setup-env.json
 /.yarn/cache/
 /.yarn/unplugged/
 /pact/

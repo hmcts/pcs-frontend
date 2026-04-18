@@ -1,5 +1,4 @@
 import { test } from '@playwright/test';
-import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
@@ -34,7 +33,7 @@ import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from
 import { getRelativeDate } from '../utils/common/string.utils';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
