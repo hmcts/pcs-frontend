@@ -3,7 +3,6 @@ import path from 'path';
 
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
-import { globSync } from 'glob';
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
@@ -28,50 +27,17 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
-/** Split PLAYWRIGHT_SPEC / E2E_SPEC: comma or semicolon, trim, drop empties. */
-function splitE2eSpecKeywords(raw: string | undefined): string[] {
-  if (!raw?.trim()) {
-    return [];
-  }
-  return raw
-    .split(/[,;]/)
+/** E2E_SPEC / PLAYWRIGHT_SPEC: comma- or semicolon-separated keywords → one glob per keyword under testDir (unset = all specs). */
+function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
+  const keys = raw
+    ?.split(/[,;]/)
     .map(k => k.trim())
     .filter(Boolean);
+  return keys?.length ? keys.map(k => `**/*${k}*.spec.ts`) : undefined;
 }
 
-/** Each keyword adds one glob under testDir (OR union). Invalid keywords are skipped with a warning. */
-function resolveE2eSpecTestMatch(raw: string | undefined): string[] | undefined {
-  const keywords = splitE2eSpecKeywords(raw);
-  if (keywords.length === 0) {
-    return undefined;
-  }
-  const testRoot = path.join(__dirname, 'src/test/ui');
-  const specFiles = globSync('**/*.spec.ts', { cwd: testRoot, nodir: true });
-  const patterns: string[] = [];
-  for (const keyword of keywords) {
-    const hasMatch = specFiles.some(f => f.includes(keyword));
-    if (!hasMatch) {
-      // eslint-disable-next-line no-console -- intentional operator-facing warning when spec filter matches nothing
-      console.warn(
-        `[playwright] E2E_SPEC keyword "${keyword}" matched no *.spec.ts files under src/test/ui — skipping.`
-      );
-      continue;
-    }
-    patterns.push(`**/*${keyword}*.spec.ts`);
-  }
-  if (patterns.length === 0) {
-    // eslint-disable-next-line no-console -- intentional operator-facing warning when spec filter matches nothing
-    console.warn('[playwright] E2E_SPEC had no valid keywords — using all specs.');
-    return undefined;
-  }
-  return patterns;
-}
-
-const e2eSpecTestMatch = resolveE2eSpecTestMatch(process.env.E2E_SPEC);
-/** Unset → @nightly for local E2E; empty string (CI “all tests”) → no title grep. */
-const rawE2eTestScope = process.env.E2E_TEST_SCOPE;
-const resolvedE2eTestScope = rawE2eTestScope === undefined ? '@nightly' : rawE2eTestScope;
-const scopeForGrep = resolvedE2eTestScope.trim();
+const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
+const scopeForGrep = (process.env.E2E_TEST_SCOPE ?? '@nightly').trim();
 const grepFromScope = scopeForGrep ? new RegExp(scopeForGrep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) : undefined;
 
 export default defineConfig({
