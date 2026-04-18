@@ -672,6 +672,78 @@ describe('stepFlow', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
+    it('redirects to nearest visible step when requested step is hidden by show condition', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/steps/test-journey',
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {},
+          step2: {
+            showCondition: () => false,
+          },
+          step3: {},
+        },
+      };
+
+      const middleware = stepDependencyCheckMiddleware(config);
+      const req = {
+        path: '/steps/test-journey/step2',
+        session: {
+          formData: {},
+        },
+        res: {
+          locals: {
+            validatedCase: {
+              id: '1234567890123456',
+            },
+          },
+        },
+      } as unknown as Request;
+      const res = {
+        redirect: jest.fn(),
+      } as unknown as Response;
+      const next = jest.fn();
+
+      await middleware(req, res, next);
+
+      expect(res.redirect).toHaveBeenCalledWith(303, '/steps/test-journey/step1');
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('redirects hidden deeplink to journey start even when previous step is visible', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/steps/test-journey',
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3', 'step4'],
+        steps: {
+          step1: {},
+          step2: {},
+          step3: {
+            showCondition: () => false,
+          },
+          step4: {},
+        },
+      };
+
+      const middleware = stepDependencyCheckMiddleware(config);
+      const req = {
+        path: '/steps/test-journey/step3',
+        session: {
+          formData: {},
+        },
+      } as unknown as Request;
+      const res = {
+        redirect: jest.fn(),
+      } as unknown as Response;
+      const next = jest.fn();
+
+      await middleware(req, res, next);
+
+      expect(res.redirect).toHaveBeenCalledWith(303, '/steps/test-journey/step1');
+      expect(next).not.toHaveBeenCalled();
+    });
+
     it('should call next() when step name cannot be extracted from path', async () => {
       const middleware = stepDependencyCheckMiddleware(mockFlowConfig);
       const req = {

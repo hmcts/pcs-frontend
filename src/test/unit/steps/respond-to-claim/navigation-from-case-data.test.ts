@@ -1,6 +1,10 @@
 import type { Request } from 'express';
 
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
+import {
+  shouldShowHowMuchAffordToPayStep,
+  shouldShowInstallmentPaymentsStep,
+} from '../../../../main/steps/respond-to-claim/flowConditions';
 
 import { getNextStep, getPreviousStep } from '@modules/steps/flow';
 
@@ -129,5 +133,81 @@ describe('respond-to-claim navigation from CCD case data', () => {
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
       'repayments-agreed'
     );
+  });
+
+  const rentArrearsData = {
+    claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+  };
+
+  const noRentArrearsData = {
+    claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+  };
+
+  it('routes repayments-agreed forward like legacy routes (installment path only when no + rent arrears)', async () => {
+    const rentArrearsReq = createReq({ data: rentArrearsData });
+    const noArrearsReq = createReq({ data: noRentArrearsData });
+
+    await expect(
+      getNextStep(rentArrearsReq, 'repayments-agreed', flowConfig, {}, { repaymentsAgreed: 'no' })
+    ).resolves.toBe('installment-payments');
+
+    await expect(
+      getNextStep(noArrearsReq, 'repayments-agreed', flowConfig, {}, { repaymentsAgreed: 'no' })
+    ).resolves.toBe('your-household-and-circumstances');
+
+    await expect(
+      getNextStep(rentArrearsReq, 'repayments-agreed', flowConfig, {}, { repaymentsAgreed: 'yes' })
+    ).resolves.toBe('your-household-and-circumstances');
+  });
+
+  it('routes installment-payments forward like legacy routes (how-much only when offer is yes)', async () => {
+    const req = createReq({});
+
+    await expect(
+      getNextStep(req, 'installment-payments', flowConfig, {}, { confirmInstallmentOffer: 'yes' })
+    ).resolves.toBe('how-much-afford-to-pay');
+
+    await expect(
+      getNextStep(req, 'installment-payments', flowConfig, {}, { confirmInstallmentOffer: 'no' })
+    ).resolves.toBe('your-household-and-circumstances');
+  });
+
+  it('show helpers fall back to CCD when current-step answers are absent (GET / deep link)', async () => {
+    const installmentVisibleReq = createReq({
+      data: {
+        ...rentArrearsData,
+        possessionClaimResponse: {
+          defendantResponses: {
+            paymentAgreement: { repaymentPlanAgreed: 'NO' },
+          },
+        },
+      },
+    });
+    const installmentHiddenReq = createReq({
+      data: {
+        ...rentArrearsData,
+        possessionClaimResponse: {
+          defendantResponses: {
+            paymentAgreement: { repaymentPlanAgreed: 'YES' },
+          },
+        },
+      },
+    });
+
+    await expect(shouldShowInstallmentPaymentsStep(installmentVisibleReq, {})).resolves.toBe(true);
+    await expect(shouldShowInstallmentPaymentsStep(installmentHiddenReq, {})).resolves.toBe(false);
+
+    const howMuchReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            paymentAgreement: { repayArrearsInstalments: 'YES' },
+          },
+        },
+      },
+    });
+
+    expect(shouldShowHowMuchAffordToPayStep(howMuchReq, {})).toBe(true);
+    expect(shouldShowHowMuchAffordToPayStep(createReq({}), {})).toBe(false);
   });
 });

@@ -24,13 +24,19 @@ export async function getNextStep(
   currentStepData: Record<string, unknown> = {}
 ): Promise<string | null> {
   if (flowConfig.useShowConditions) {
-    return getNextStepByShowCondition(req, currentStepName, flowConfig);
+    return getNextStepByShowCondition(req, currentStepName, flowConfig, formData, currentStepData);
   } else {
     return getNextStepByRouteConditions(req, currentStepName, flowConfig, formData, currentStepData);
   }
 }
 
-async function getNextStepByShowCondition(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+async function getNextStepByShowCondition(
+  req: Request,
+  currentStepName: string,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown>,
+  currentStepData: Record<string, unknown>
+) {
   const currentIndex = getStepIndex(flowConfig, currentStepName);
 
   for (let stepIndex = currentIndex + 1; stepIndex < flowConfig.stepOrder.length; stepIndex++) {
@@ -42,7 +48,7 @@ async function getNextStepByShowCondition(req: Request, currentStepName: string,
       return candidateNextStepName;
     }
 
-    if (candidateNextStep.showCondition(req)) {
+    if (await Promise.resolve(candidateNextStep.showCondition(req, formData, currentStepData))) {
       // Show condition matches
       return candidateNextStepName;
     }
@@ -93,14 +99,19 @@ export async function getPreviousStep(
   if (flowConfig.useShowConditions) {
     // Rule deprecated: https://eslint.org/docs/latest/rules/no-return-await
     // eslint-disable-next-line no-return-await
-    return await getPreviousStepByShowConditions(req, currentStepName, flowConfig);
+    return await getPreviousStepByShowConditions(req, currentStepName, flowConfig, formData);
   } else {
     // eslint-disable-next-line no-return-await
     return await getPreviousStepByRouteConditions(req, currentStepName, flowConfig, formData);
   }
 }
 
-async function getPreviousStepByShowConditions(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+async function getPreviousStepByShowConditions(
+  req: Request,
+  currentStepName: string,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown>
+) {
   const currentStepConfig = flowConfig.steps[currentStepName];
   if (currentStepConfig?.preventBack) {
     return null;
@@ -117,7 +128,10 @@ async function getPreviousStepByShowConditions(req: Request, currentStepName: st
       return candidatePreviousStepName;
     }
 
-    if (candidatePreviousStep.showCondition(req) && !candidatePreviousStep.preventBack) {
+    if (
+      (await Promise.resolve(candidatePreviousStep.showCondition(req, formData, {}))) &&
+      !candidatePreviousStep.preventBack
+    ) {
       // Show condition matches
       return candidatePreviousStepName;
     }
@@ -257,6 +271,19 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
 
     const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
     const formData = req.session?.formData || {};
+
+    if (flowConfig.useShowConditions && flowConfig.steps[stepName]?.showCondition) {
+      const canShowStep = await Promise.resolve(flowConfig.steps[stepName].showCondition(req, formData, {}));
+      if (!canShowStep) {
+        logger.debug(`Step ${stepName} is hidden by showCondition`);
+        const caseReference = req.res?.locals.validatedCase?.id;
+        const journeyStartStep = await getFirstVisibleStep(req, flowConfig, formData);
+        if (journeyStartStep) {
+          return res.redirect(303, getStepUrl(journeyStartStep, flowConfig, caseReference));
+        }
+      }
+    }
+
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
     if (missingDependency) {
@@ -267,6 +294,25 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
 
     next();
   };
+}
+
+async function getFirstVisibleStep(
+  req: Request,
+  flowConfig: JourneyFlowConfig,
+  formData: Record<string, unknown>
+): Promise<string | null> {
+  for (const stepName of flowConfig.stepOrder) {
+    const stepConfig = flowConfig.steps[stepName];
+    if (!stepConfig?.showCondition) {
+      return stepName;
+    }
+
+    if (await Promise.resolve(stepConfig.showCondition(req, formData, {}))) {
+      return stepName;
+    }
+  }
+
+  return null;
 }
 
 function getStepIndex(flowConfig: JourneyFlowConfig, stepName: string) {

@@ -12,52 +12,23 @@ import {
   isWelshProperty,
 } from '../utils';
 
+import {
+  getConfirmNoticeGivenAnswer,
+  getContactByTelephoneAnswer,
+  isNoticeDateConfirmedAndNotProvided,
+  isNoticeDateConfirmedAndProvided,
+  shouldShowHowMuchAffordToPayStep,
+  shouldShowInstallmentPaymentsStep,
+} from './flowConditions';
+
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
-function getContactByTelephoneAnswer(
-  req: Request,
-  currentStepData: Record<string, unknown> = {}
-): 'yes' | 'no' | undefined {
-  const currentAnswer = currentStepData.contactByTelephone;
-  if (currentAnswer === 'yes' || currentAnswer === 'no') {
-    return currentAnswer;
-  }
-
-  // Back-navigation fallback must always come from CCD data.
-  const fromCcd = req.res?.locals?.validatedCase?.isDefendantContactByPhone;
-  if (fromCcd === true) {
-    return 'yes';
-  }
-  if (fromCcd === false) {
-    return 'no';
-  }
-
-  return undefined;
-}
-
-function getConfirmNoticeGivenAnswer(
-  req: Request,
-  currentStepData: Record<string, unknown> = {}
-): 'YES' | 'NO' | 'NOT_SURE' | undefined {
-  const currentAnswer = currentStepData.possessionNoticeReceived;
-  if (currentAnswer === 'YES' || currentAnswer === 'NO' || currentAnswer === 'NOT_SURE') {
-    return currentAnswer;
-  }
-
-  const ccdAnswer =
-    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived;
-  if (ccdAnswer === 'YES' || ccdAnswer === 'NO' || ccdAnswer === 'NOT_SURE') {
-    return ccdAnswer;
-  }
-
-  return undefined;
-}
-
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
+  useShowConditions: true,
   useSessionFormData: false,
   stepOrder: [
     'start-now',
@@ -65,12 +36,6 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-confirmation',
     'defendant-name-capture',
     'defendant-date-of-birth',
-    'counter-claim',
-    'payment-interstitial',
-    'repayments-made',
-    'repayments-agreed',
-    'installment-payments',
-    'how-much-afford-to-pay',
     'correspondence-address',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
@@ -87,6 +52,12 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-not-provided',
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
+    'counter-claim',
+    'payment-interstitial',
+    'repayments-made',
+    'repayments-agreed',
+    'installment-payments',
+    'how-much-afford-to-pay',
     'your-household-and-circumstances',
     'do-you-have-any-dependant-children',
     'do-you-have-any-other-dependants',
@@ -101,7 +72,6 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'end-now',
-    'installment-payments',
   ],
   steps: {
     'start-now': {
@@ -123,9 +93,11 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'defendant-name-capture',
     },
     'defendant-name-confirmation': {
+      showCondition: async (req: Request) => isDefendantNameKnown(req),
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-name-capture': {
+      showCondition: async (req: Request) => !(await isDefendantNameKnown(req)),
       defaultNext: 'defendant-date-of-birth',
     },
     'defendant-date-of-birth': {
@@ -165,6 +137,8 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'contact-preferences-email-or-post',
     },
     'contact-preferences-text-message': {
+      showCondition: async (req: Request, _formData, currentStepData) =>
+        getContactByTelephoneAnswer(req, currentStepData) === 'yes',
       defaultNext: 'dispute-claim-interstitial',
     },
     'dispute-claim-interstitial': {
@@ -181,13 +155,16 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'tenancy-type-details',
     },
     'landlord-registered': {
+      showCondition: async (req: Request) => isWelshProperty(req),
       defaultNext: 'landlord-licensed',
       previousStep: 'dispute-claim-interstitial',
     },
     'landlord-licensed': {
+      showCondition: async (req: Request) => isWelshProperty(req),
       defaultNext: 'written-terms',
     },
     'written-terms': {
+      showCondition: async (req: Request) => isWelshProperty(req),
       defaultNext: 'tenancy-type-details',
       previousStep: 'landlord-licensed',
     },
@@ -211,6 +188,7 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'tenancy-date-unknown': {
+      showCondition: async (req: Request) => !(await isTenancyStartDateKnown(req)),
       routes: [
         {
           condition: async (req: Request) => isNoticeServed(req),
@@ -234,6 +212,7 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'tenancy-type-details',
     },
     'tenancy-date-details': {
+      showCondition: async (req: Request) => isTenancyStartDateKnown(req),
       routes: [
         {
           condition: async (req: Request) => isNoticeServed(req),
@@ -257,6 +236,7 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'tenancy-type-details',
     },
     'confirmation-of-notice-given': {
+      showCondition: async (req: Request) => isNoticeServed(req),
       routes: [
         {
           condition: async (
@@ -265,7 +245,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven !== 'YES') {
+            if (confirmNoticeGiven !== 'yes') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -280,7 +260,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven !== 'YES') {
+            if (confirmNoticeGiven !== 'yes') {
               return false;
             }
             const noticeDateProvided = await isNoticeDateProvided(req);
@@ -295,7 +275,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven === 'YES') {
+            if (confirmNoticeGiven === 'yes') {
               return false;
             }
             const rentArrears = await hasAnyRentArrearsGround(req);
@@ -310,7 +290,7 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> => {
             const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven === 'YES') {
+            if (confirmNoticeGiven === 'yes') {
               return false;
             }
             const rentArrears = await hasAnyRentArrearsGround(req);
@@ -326,6 +306,8 @@ export const flowConfig: JourneyFlowConfig = {
     },
 
     'confirmation-of-notice-date-when-provided': {
+      showCondition: async (req: Request, _formData, currentStepData) =>
+        isNoticeDateConfirmedAndProvided(req, currentStepData),
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
@@ -345,6 +327,8 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'confirmation-of-notice-given',
     },
     'confirmation-of-notice-date-when-not-provided': {
+      showCondition: async (req: Request, _formData, currentStepData) =>
+        isNoticeDateConfirmedAndNotProvided(req, currentStepData),
       routes: [
         {
           condition: async (req: Request): Promise<boolean> => {
@@ -364,6 +348,7 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'confirmation-of-notice-given',
     },
     'rent-arrears-dispute': {
+      showCondition: async (req: Request) => hasAnyRentArrearsGround(req),
       defaultNext: 'counter-claim',
       previousStep: (req: Request) => getStepBeforeDisputePages(req),
       routes: [
@@ -378,6 +363,7 @@ export const flowConfig: JourneyFlowConfig = {
       ],
     },
     'non-rent-arrears-dispute': {
+      showCondition: async (req: Request) => !(await hasOnlyRentArrearsGrounds(req)),
       defaultNext: 'counter-claim',
       previousStep: async (req: Request) => {
         const rentArrearsClaim = await hasAnyRentArrearsGround(req);
@@ -430,6 +416,8 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'repayments-made',
     },
     'installment-payments': {
+      showCondition: async (req: Request, _formData, currentStepData) =>
+        shouldShowInstallmentPaymentsStep(req, currentStepData),
       previousStep: 'repayments-agreed',
       routes: [
         {
@@ -444,6 +432,8 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'your-household-and-circumstances',
     },
     'how-much-afford-to-pay': {
+      showCondition: async (req: Request, _formData, currentStepData) =>
+        shouldShowHowMuchAffordToPayStep(req, currentStepData),
       previousStep: 'installment-payments',
       defaultNext: 'your-household-and-circumstances',
     },
