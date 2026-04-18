@@ -69,9 +69,9 @@ function resolveE2eSpecTestMatch(raw: string | undefined): string[] | undefined 
 
 const e2eSpecTestMatch = resolveE2eSpecTestMatch(process.env.E2E_SPEC);
 /** Unset → @nightly for local E2E; empty string (CI “all tests”) → no title grep. */
-const rawFunctionalScope = process.env.FUNCTIONAL_TEST_SCOPE;
-const resolvedFunctionalScope = rawFunctionalScope === undefined ? '@nightly' : rawFunctionalScope;
-const scopeForGrep = resolvedFunctionalScope.trim();
+const rawE2eTestScope = process.env.E2E_TEST_SCOPE;
+const resolvedE2eTestScope = rawE2eTestScope === undefined ? '@nightly' : rawE2eTestScope;
+const scopeForGrep = resolvedE2eTestScope.trim();
 const grepFromScope = scopeForGrep ? new RegExp(scopeForGrep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) : undefined;
 
 export default defineConfig({

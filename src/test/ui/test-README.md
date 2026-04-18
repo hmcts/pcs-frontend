@@ -202,7 +202,7 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 ### Nightly (Jenkinsfile_nightly)
 
 - **Schedule:** Mon–Fri at ~07:00; the job can also be run on demand via **Build with Parameters** (e.g. release verification).
-- **E2E tests:** One stage per enabled platform — Desktop Chrome, Firefox, Safari (WebKit), Edge, Mobile Android (Pixel 5 profile), Mobile iOS (iPhone 12 WebKit profile), Mobile iPad (iPad Pro 11 WebKit profile). Each runs `yarn test:E2e` with `PLAYWRIGHT_PROJECT` set; the Jenkins **PLAYWRIGHT_GREP_TAG** choice filters tests (`@smoke`, `@e2e`, `@crossbrowser`, or `(all tests)` for no grep) and publishes a separate Allure report (`Full <Platform> E2E Test Report`).
+- **E2E tests:** One stage per enabled platform — Desktop Chrome, Firefox, Safari (WebKit), Edge, Mobile Android (Pixel 5 profile), Mobile iOS (iPhone 12 WebKit profile), Mobile iPad (iPad Pro 11 WebKit profile). Each runs `yarn test:E2e` with `PLAYWRIGHT_PROJECT` set; the Jenkins **PLAYWRIGHT_GREP_TAG** choice sets **`E2E_TEST_SCOPE`** for the Playwright title grep (`@smoke`, `@e2e`, `@crossbrowser`, or `(all tests)` for no grep) and publishes a separate Allure report (`Full <Platform> E2E Test Report`).
 - **By default only Chrome is enabled;** tick the other platform checkboxes when you need those runs.
 - **Slack:** Sends notification to `#hdp-qa-e2e-test-results` per stage with the matching report link.
 - **Stage behaviour:** If a platform fails, that stage is marked failed but the pipeline continues; remaining stages still run.
