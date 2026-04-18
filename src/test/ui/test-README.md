@@ -192,7 +192,7 @@ Missing elements: Submit button, Continue link
 
 Please follow this confluence page for detailed instructions and guidelines- https://tools.hmcts.net/confluence/x/14FLd
 
-## 10. CI (Jenkins)
+## 10. CI Pipeline Stages
 
 Jenkins sets env vars such as **`E2E_TEST_SCOPE`**, **`E2E_SPEC`**, **`ENABLE_*`**, and **`PLAYWRIGHT_PROJECT`**. **`yarn test:E2e`** only passes the browser project; **title grep** and **spec file filter** come from **`playwright.config.ts`** (grep from `E2E_TEST_SCOPE`, testMatch from `E2E_SPEC`). **`test:functional`** passes `--grep` on the command line instead, with default **`@regression`**.
 

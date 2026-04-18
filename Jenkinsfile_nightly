@@ -7,67 +7,67 @@ properties([
     choice(
       name: 'ENVIRONMENT',
       choices: ['aat', 'preview'],
-      description: 'Where to run tests. Default: aat.'
+      description: 'Environment to run the test.'
     ),
     string(
       name: 'PR_NUMBER',
       defaultValue: '',
-      description: 'PR number (preview only). Default: empty.'
+      description: 'PR number (REQUIRED if environment is preview, leave blank otherwise).'
     ),
     booleanParam(
       name: 'CHROME_TESTS',
       defaultValue: true,
-      description: 'Chrome E2E. Default: on.'
+      description: 'Run E2E tests in Chrome (on by default).'
     ),
     booleanParam(
       name: 'FIREFOX_TESTS',
       defaultValue: false,
-      description: 'Firefox E2E. Default: off.'
+      description: 'Run E2E tests in Firefox (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'WEBKIT_TESTS',
       defaultValue: false,
-      description: 'WebKit (Safari) desktop E2E. Default: off.'
+      description: 'Run E2E tests in WebKit / desktop Safari (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'EDGE_TESTS',
       defaultValue: false,
-      description: 'Edge E2E. Default: off.'
+      description: 'Run E2E tests in Microsoft Edge (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'MOBILE_ANDROID_TESTS',
       defaultValue: false,
-      description: 'Android (Pixel 5) E2E. Default: off.'
+      description: 'Run E2E tests on the Android (Pixel 5) profile (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'MOBILE_IOS_TESTS',
       defaultValue: false,
-      description: 'iOS (iPhone 12) E2E. Default: off.'
+      description: 'Run E2E tests on the iOS (iPhone 12) WebKit profile (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'MOBILE_IPAD_TESTS',
       defaultValue: false,
-      description: 'iPad E2E. Default: off.'
+      description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
     string(
       name: 'PLAYWRIGHT_SPEC',
       defaultValue: '',
-      description: 'Spec keywords, comma-separated; blank = all specs. Default: empty.'
+      description: 'Spec file filter: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate keywords with comma or semicolon. Ex.: respondToAClaim | respondToAClaim,makeAnApplication. Blank = all specs. Default: empty.'
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
       choices: ['@nightly', '@smoke', '@e2e', '@crossbrowser', '(all tests)'],
-      description: 'Title grep. (all tests) = no grep. Default: @nightly.'
+      description: 'Test title grep. (all tests) = no grep. Default: @nightly.'
     ),
     choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
       choices: ['true', 'false'],
-      description: 'Page functional tests (content, errors, navigation). Default: true.'
+      description: 'Run page functional tests (content, errors, navigation). Default: true.'
     ),
     choice(
       name: 'ENABLE_AXE_AUDIT',
       choices: ['true', 'false'],
-      description: 'Axe audits during E2E. Default: true.'
+      description: 'Run axe audits during E2E. Default: true.'
     ),
   ])
 ])
