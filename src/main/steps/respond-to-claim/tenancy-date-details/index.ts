@@ -1,11 +1,11 @@
 import { format, parseISO } from 'date-fns';
 
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 function getTenancyStartDate(caseData: Record<string, unknown> | undefined): string | undefined {
@@ -130,7 +130,7 @@ export const step: StepDefinition = createFormStep({
 
     await ccdCaseService.saveDraftDefendantResponse(
       req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id,
+      req.res?.locals.validatedCase?.id || '',
       response
     );
   },

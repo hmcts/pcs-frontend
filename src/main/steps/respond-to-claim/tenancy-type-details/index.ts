@@ -1,12 +1,12 @@
 import type { Request } from 'express';
 
-import type { TenancyTypeCorrectValue } from '@services/ccdCase.interface';
-import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { TenancyTypeCorrectValue } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
@@ -143,7 +143,7 @@ export const step: StepDefinition = createFormStep({
 
     await ccdCaseService.saveDraftDefendantResponse(
       req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id,
+      req.res?.locals.validatedCase?.id || '',
       response
     );
   },

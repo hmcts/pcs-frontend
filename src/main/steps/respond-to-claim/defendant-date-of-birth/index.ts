@@ -1,10 +1,10 @@
 import { DateTime } from 'luxon';
 
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
@@ -42,7 +42,7 @@ export const step: StepDefinition = createFormStep({
 
     await ccdCaseService.saveDraftDefendantResponse(
       req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id,
+      req.res?.locals.validatedCase?.id || '',
       response
     );
   },

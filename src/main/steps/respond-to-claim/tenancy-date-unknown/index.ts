@@ -1,9 +1,9 @@
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { flowConfig } from '../flow.config';
 
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 const STEP_NAME = 'tenancy-date-unknown';
@@ -51,7 +51,7 @@ export const step: StepDefinition = createFormStep({
 
     await ccdCaseService.saveDraftDefendantResponse(
       req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id,
+      req.res?.locals.validatedCase?.id || '',
       response
     );
   },

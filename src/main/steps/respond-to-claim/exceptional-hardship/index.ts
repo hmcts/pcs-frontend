@@ -1,9 +1,9 @@
-import type { YesNoValue } from '@services/ccdCase.interface';
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { YesNoValue } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
@@ -75,7 +75,7 @@ export const step: StepDefinition = createFormStep({
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const exceptionalHardshipValue = req.body?.exceptionalHardship as string | undefined;
-    const ccdMapping: Record<string, YesNoValue> = { yes: 'Yes', no: 'No' };
+    const ccdMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
 
     if (exceptionalHardshipValue && ccdMapping[exceptionalHardshipValue]) {
       response.defendantResponses.householdCircumstances.exceptionalHardship = ccdMapping[exceptionalHardshipValue];
@@ -93,8 +93,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id,
+      req.session?.user?.accessToken || '',
+      req.res?.locals.validatedCase?.id || '',
       response
     );
   },
@@ -103,7 +103,7 @@ export const step: StepDefinition = createFormStep({
     const householdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     const existingAnswer = householdCircumstances?.exceptionalHardship as string | undefined;
 
-    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
+    const mapping: Record<string, string> = { YES: 'yes', NO: 'no' };
     const exceptionalHardshipValue = existingAnswer ? mapping[existingAnswer] : undefined;
 
     if (!exceptionalHardshipValue) {

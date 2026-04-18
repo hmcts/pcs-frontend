@@ -118,7 +118,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
       expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
         undefined, // accessToken
-        undefined, // caseId
+        '', // caseId (empty string fallback)
         expect.objectContaining({
           defendantResponses: expect.objectContaining({
             tenancyTypeCorrect,
@@ -136,7 +136,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
         expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
           undefined, // accessToken
-          undefined, // caseId
+          '', // caseId (empty string fallback)
           {
             defendantResponses: {},
             defendantContactDetails: { party: {} },

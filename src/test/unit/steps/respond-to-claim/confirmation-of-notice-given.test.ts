@@ -3,17 +3,13 @@ import type { Request, Response } from 'express';
 import { step } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-given';
 import * as populateModule from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
-import type { CcdCase } from '@services/ccdCase.interface';
-
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),
   loadStepNamespace: jest.fn(),
 }));
 
 describe('confirmation-of-notice-given step', () => {
-  const buildCcdSpy = jest
-    .spyOn(populateModule, 'saveDraftDefendantResponse')
-    .mockResolvedValue({} as CcdCase);
+  const buildCcdSpy = jest.spyOn(populateModule, 'saveDraftDefendantResponse').mockResolvedValue(undefined);
 
   const createBaseReqRes = () => {
     const req = {

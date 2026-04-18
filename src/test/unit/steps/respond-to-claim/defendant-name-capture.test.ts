@@ -183,7 +183,8 @@ describe('respond-to-claim defendant-name-capture step', () => {
         }),
       })
     );
-    expect(req.session.formData?.['defendant-name-capture']).toEqual({ firstName: 'Jane', lastName: 'Doe' });
+    // useSessionFormData is false for respond-to-claim, so session formData is not updated
+    expect(req.session.formData?.['defendant-name-capture']).toBeUndefined();
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 });

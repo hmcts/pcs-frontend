@@ -1,9 +1,9 @@
-import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccdCase.interface';
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
@@ -22,7 +22,7 @@ export const step: StepDefinition = createFormStep({
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const dependantChildren: string = req.body?.dependantChildren;
-    const enumMapping: Record<string, YesNoValue> = { yes: 'Yes', no: 'No' };
+    const enumMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
     const dependantChildrenCcd = enumMapping[dependantChildren];
 
     if (dependantChildrenCcd) {
@@ -41,8 +41,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id,
+      req.session?.user?.accessToken || '',
+      req.res?.locals.validatedCase?.id || '',
       response
     );
   },
@@ -56,7 +56,7 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
 
-    if (dependantChildrenCcd === 'Yes') {
+    if (dependantChildrenCcd === 'YES') {
       const dependantChildrenDetails: string | undefined = householdCircumstances?.dependantChildrenDetails;
       return {
         dependantChildren: 'yes',
