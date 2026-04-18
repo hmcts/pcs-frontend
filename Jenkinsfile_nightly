@@ -55,9 +55,14 @@ properties([
       description: 'Enable page functional tests (content, errors, navigation). Default true for nightly.'
     ),
     choice(
+      name: 'ENABLE_AXE_AUDIT',
+      choices: ['true', 'false'],
+      description: 'Run axe accessibility audits during E2E (default on).'
+    ),
+    choice(
       name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@regression', '@accessibility', '@crossbrowser', '(all tests)', '@prod'],
-      description: 'Title tag filter. Default @nightly. (all tests) = no tag filter.'
+      choices: ['@nightly', '@smoke', '@e2e', '@crossbrowser', '(all tests)'],
+      description: 'Title tag filter (Playwright grep). Default @smoke. (all tests) = no tag filter.'
     ),
     string(
       name: 'PLAYWRIGHT_SPEC',
@@ -125,9 +130,8 @@ def setFunctionalTestEnvVars() {
   def tag = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
   env.FUNCTIONAL_TEST_SCOPE = (tag == '(all tests)') ? '' : tag
   env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
-  // New job parameters: older job definitions may omit these — default to previous nightly behaviour (all page tests on).
-  def allPage = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
-  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = (allPage == null || allPage == 'true') ? 'true' : 'false'
+  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
+  env.ENABLE_AXE_AUDIT = params.ENABLE_AXE_AUDIT
 }
 
 def runE2ETests(yarnBuilder) {
