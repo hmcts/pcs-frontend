@@ -37,6 +37,14 @@ withPipeline(type, product, component) {
   env.CASE_TYPE_ID = "PCS"
   onPR() {
     env.E2E_TEST_SCOPE = '@PR'
+    def e2eTag = prLabelSuffix(githubApi, 'e2e-tag:')
+    if (e2eTag?.trim()) {
+      env.E2E_TEST_SCOPE = e2eTag.trim()
+    }
+    def e2eSpec = prLabelSuffix(githubApi, 'e2e-spec:')
+    if (e2eSpec?.trim()) {
+      env.E2E_SPEC = e2eSpec.trim()
+    }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_all_page_functional_tests").size() > 0) {
       env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
     }
@@ -109,6 +117,12 @@ withPipeline(type, product, component) {
   }
 }
 
+/** First PR label matching prefix → value after prefix (e.g. e2e-tag:@smoke → @smoke) */
+def prLabelSuffix(githubApi, String prefix) {
+  def labels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, prefix)
+  return (labels && labels.size() > 0) ? labels[0].replaceFirst('^' + prefix, '') : null
+}
+
 def archiveFunctionalTestReports() {
   archiveAllureReport('Frontend Functional Test Report')
 }
@@ -137,7 +151,7 @@ def sendAllureReportToSlack(String pipelineType, String allureReportPathSuffix) 
   def msg = sh(script: "yarn exec ts-node src/test/ui/utils/common/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
-    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    slackSend(channel: '#qa-pipeline-status', message: msg)
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }

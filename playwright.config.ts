@@ -27,18 +27,30 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
+/** Build test file globs from E2E_SPEC (comma or semicolon keywords). Empty = run all specs. */
+function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
+  const keys = raw
+    ?.split(/[,;]/)
+    .map(k => k.trim())
+    .filter(Boolean);
+  return keys?.length ? keys.map(k => `**/*${k}*.spec.ts`) : undefined;
+}
+
+const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
+// Tags come from Jenkins choices or PR labels. Unset -> @nightly; empty -> no grep.
+const e2eTag = process.env.E2E_TEST_SCOPE ?? '@nightly';
+
 export default defineConfig({
   testDir: './src/test/ui',
-  /* Run tests in files in parallel */
+  ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
+  ...(e2eTag ? { grep: new RegExp(e2eTag) } : {}),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
   retries: process.env.CI ? 1 : 0,
   workers: 4,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
   use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
-  /* Report slow tests if they take longer than 5 mins */
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
