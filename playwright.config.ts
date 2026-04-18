@@ -27,7 +27,7 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
-/** E2E_SPEC / PLAYWRIGHT_SPEC: comma- or semicolon-separated keywords → one glob per keyword under testDir (unset = all specs). */
+/** Build test file globs from E2E_SPEC (comma or semicolon keywords). Empty = run all specs. */
 function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
   const keys = raw
     ?.split(/[,;]/)
@@ -44,16 +44,13 @@ export default defineConfig({
   testDir: './src/test/ui',
   ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
   ...(grepFromScope ? { grep: grepFromScope } : {}),
-  /* Run tests in files in parallel */
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
   retries: process.env.CI ? 1 : 0,
   workers: 4,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
   use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
-  /* Report slow tests if they take longer than 5 mins */
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
@@ -126,7 +123,6 @@ export default defineConfig({
             },
           },
           {
-            /** Chromium with Pixel 5 profile (Android Chrome–class behaviour). */
             name: 'mobile-android',
             use: {
               ...devices['Pixel 5'],
@@ -138,7 +134,6 @@ export default defineConfig({
             },
           },
           {
-            /** WebKit with iPhone 12 profile (mobile Safari–class behaviour). */
             name: 'mobile-ios',
             use: {
               ...devices['iPhone 12'],
@@ -150,7 +145,6 @@ export default defineConfig({
             },
           },
           {
-            /** WebKit with iPad Pro 11 profile (tablet Safari–class behaviour). */
             name: 'mobile-ipad',
             use: {
               ...devices['iPad Pro 11'],
