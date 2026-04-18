@@ -49,6 +49,16 @@ properties([
       defaultValue: false,
       description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
+    string(
+      name: 'PLAYWRIGHT_SPEC',
+      defaultValue: '',
+      description: 'Spec filename keyword(s), exact case, comma-separated (e.g. respondToAClaim,makeAnApplication). Blank = all specs.'
+    ),
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@nightly', '@smoke', '@e2e', '@crossbrowser', '(all tests)'],
+      description: 'Title tag filter (Playwright grep). Default @smoke. (all tests) = no tag filter.'
+    ),
     choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
       choices: ['true', 'false'],
@@ -58,16 +68,6 @@ properties([
       name: 'ENABLE_AXE_AUDIT',
       choices: ['true', 'false'],
       description: 'Run axe accessibility audits during E2E (default on).'
-    ),
-    choice(
-      name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@crossbrowser', '(all tests)'],
-      description: 'Title tag filter (Playwright grep). Default @smoke. (all tests) = no tag filter.'
-    ),
-    string(
-      name: 'PLAYWRIGHT_SPEC',
-      defaultValue: '',
-      description: 'Spec filename keyword(s), exact case, comma-separated (e.g. respondToAClaim,makeAnApplication). Blank = all specs.'
     ),
   ])
 ])
