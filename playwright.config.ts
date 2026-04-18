@@ -37,13 +37,13 @@ function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
 }
 
 const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
-const scopeForGrep = (process.env.E2E_TEST_SCOPE ?? '@nightly').trim();
-const grepFromScope = scopeForGrep ? new RegExp(scopeForGrep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) : undefined;
+// Tags come from Jenkins choices or PR labels. Unset -> @nightly; empty -> no grep.
+const e2eTag = process.env.E2E_TEST_SCOPE ?? '@nightly';
 
 export default defineConfig({
   testDir: './src/test/ui',
   ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
-  ...(grepFromScope ? { grep: grepFromScope } : {}),
+  ...(e2eTag ? { grep: new RegExp(e2eTag) } : {}),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

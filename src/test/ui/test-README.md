@@ -194,7 +194,7 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 ## 10. CI (Jenkins)
 
-Playwright reads **`E2E_TEST_SCOPE`** (title grep), **`E2E_SPEC`** (spec keywords), **`ENABLE_*`**, and **`PLAYWRIGHT_PROJECT`**. Jenkins sets these in the pipelines below.
+Jenkins sets env vars such as **`E2E_TEST_SCOPE`**, **`E2E_SPEC`**, **`ENABLE_*`**, and **`PLAYWRIGHT_PROJECT`**. **`yarn test:E2e`** only passes the browser project; **title grep** and **spec file filter** come from **`playwright.config.ts`** (grep from `E2E_TEST_SCOPE`, testMatch from `E2E_SPEC`). **`test:functional`** passes `--grep` on the command line instead, with default **`@regression`**.
 
 ### PR and master (`Jenkinsfile_CNP`)
 
