@@ -1,4 +1,4 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 

@@ -4,6 +4,7 @@ import {
   GenAppsAction,
   LoginAction,
   NavigateToUrlAction,
+  RecordAnswers,
   RespondToClaimAction,
   TriggerPageFunctionalTestsAction,
 } from '../actions/custom-actions';
@@ -70,12 +71,16 @@ export class ActionRegistry {
     ['readYourHouseholdAndCircumstances', new RespondToClaimAction()],
     ['doYouHaveAnyDependantChildren', new RespondToClaimAction()],
     ['doYouHaveAnyOtherDependants', new RespondToClaimAction()],
+    ['installmentPayments', new RespondToClaimAction()],
+    ['selectHowMuchAffordToPay', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
+    ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
+    ['recordUserEntry', new RecordAnswers()],
   ]);
 
   static getAction(actionName: string): IAction {

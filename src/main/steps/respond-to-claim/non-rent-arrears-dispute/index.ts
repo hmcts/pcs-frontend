@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';

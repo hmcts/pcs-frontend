@@ -1,5 +1,5 @@
-import type { CaseData, HouseholdCircumstances, YesNoValue } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccdCase.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 

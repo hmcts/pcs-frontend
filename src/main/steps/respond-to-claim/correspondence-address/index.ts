@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { arrayToString } from '../../../utils/arrayToString';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';

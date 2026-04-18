@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 
-import type { TenancyTypeCorrectValue } from '../../../interfaces/ccdCase.interface';
-import type { FormFieldConfig } from '../../../interfaces/formFieldConfig.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { TenancyTypeCorrectValue } from '@services/ccdCase.interface';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';

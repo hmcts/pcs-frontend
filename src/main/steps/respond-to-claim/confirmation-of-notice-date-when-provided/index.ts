@@ -1,9 +1,17 @@
+import type { Request } from 'express';
 import { DateTime } from 'luxon';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import { formatDatePartsToISODate } from '../../utils/dateUtils';
+import { getClaimantName } from '../../utils/getClaimantName';
+import { saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
+import { Logger } from '@modules/logger';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CaseData, PossessionClaimResponse } from '@services/ccdCase.interface';
+
+const logger = Logger.getLogger('confirmation-of-notice-date-when-provided');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'confirmation-of-notice-date-when-provided',
@@ -23,7 +31,7 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'noticeDate',
+      name: 'noticeReceivedDate',
       type: 'date',
       required: false,
       noFutureDate: true,
@@ -35,18 +43,61 @@ export const step: StepDefinition = createFormStep({
       },
     },
   ],
-  extendGetContent: req => {
-    // Read from CCD (fresh data from START callback via res.locals.validatedCase)
-    // Same pattern as free-legal-advice - no session dependency
-    const caseData = req.res?.locals.validatedCase?.data;
-    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
+  getInitialFormData: req => {
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
+    const noticeReceivedDateRaw: unknown = caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
 
-    // Check all possible notice date fields (different service methods use different fields)
-    const noticeDateRaw =
-      caseData?.notice_NoticeHandedOverDateTime || // Hand delivered
-      caseData?.notice_NoticePostedDate || // Posted
-      caseData?.notice_NoticeOtherElectronicDateTime || // Electronic
-      '';
+    if (!noticeReceivedDateRaw) {
+      return {};
+    }
+
+    if (typeof noticeReceivedDateRaw !== 'string') {
+      logger.warn('Unexpected noticeReceivedDate type in case data', {
+        type: typeof noticeReceivedDateRaw,
+        value: noticeReceivedDateRaw,
+      });
+      return {};
+    }
+
+    const dateTime: DateTime = DateTime.fromISO(noticeReceivedDateRaw);
+    if (!dateTime.isValid) {
+      logger.warn('Invalid noticeReceivedDate format in case data', {
+        value: noticeReceivedDateRaw,
+        reason: dateTime.invalidReason,
+      });
+      return {};
+    }
+
+    return {
+      noticeReceivedDate: {
+        day: dateTime.toFormat('dd'),
+        month: dateTime.toFormat('MM'),
+        year: dateTime.toFormat('yyyy'),
+      },
+    };
+  },
+
+  beforeRedirect: async (req: Request) => {
+    const dateObject: { day?: string; month?: string; year?: string } | undefined = req.body?.noticeReceivedDate;
+    const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
+    const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
+    const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
+    const noticeReceivedDate = formatDatePartsToISODate(day, month, year);
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        ...(noticeReceivedDate && { noticeReceivedDate }),
+      },
+    };
+
+    await saveDraftDefendantResponse(req, possessionClaimResponse);
+  },
+
+  extendGetContent: req => {
+    const validatedCase = req.res?.locals?.validatedCase;
+    const claimantName = getClaimantName(req);
+
+    const noticeDateRaw = validatedCase?.noticeDate || '';
 
     // Format the date for display (e.g., "1 January 2024")
     const noticeDate = noticeDateRaw

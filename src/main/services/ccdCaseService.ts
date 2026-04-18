@@ -34,13 +34,13 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { HTTPError } from '../HttpError';
-import { CaseState } from '../interfaces/ccdCase.interface';
+import { CaseState } from '@services/ccdCase.interface';
 import type {
   CcdCase,
   CcdUserCases,
   PossessionClaimResponse,
   StartCallbackData,
-} from '../interfaces/ccdCase.interface';
+} from '@services/ccdCase.interface';
 import { http } from '../modules/http';
 
 import { Logger } from '@modules/logger';

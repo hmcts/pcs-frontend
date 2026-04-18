@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns';
 
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';

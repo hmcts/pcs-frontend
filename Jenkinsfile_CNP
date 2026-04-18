@@ -33,6 +33,7 @@ withPipeline(type, product, component) {
   env.NODE_CONFIG_ENV = 'test'
   env.PCS_API_URL = "http://pcs-api-aat.service.core-compute-aat.internal"
   env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+  env.XUI_BASE_URI = "https://manage-case.aat.platform.hmcts.net"
   env.CASE_TYPE_ID = "PCS"
   onPR() {
     env.FUNCTIONAL_TEST_SCOPE = '@PR'
@@ -41,6 +42,9 @@ withPipeline(type, product, component) {
     }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_content_validation").size() > 0) {
       env.ENABLE_CONTENT_VALIDATION = 'true'
+    }
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_visibility_validation").size() > 0) {
+      env.ENABLE_VISIBILITY_VALIDATION = 'true'
     }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_error_messages_validation").size() > 0) {
       env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
@@ -55,12 +59,22 @@ withPipeline(type, product, component) {
         env.PCS_API_CHANGE_ID = labelName.replace("pcs-api-pr:", "")
         env.DATA_STORE_URL_BASE = "https://ccd-data-store-api-pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
         env.PCS_API_URL = "https://pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
+        env.XUI_BASE_URI = "https://xui-pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
         env.CASE_TYPE_ID = "PCS-${env.PCS_API_CHANGE_ID}"
     }
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    before('functionalTest:preview') {
+      sh 'rm -rf allure-results allure-report'
+    }
+    before('fullFunctionalTest:preview') {
+      sh 'rm -rf allure-results allure-report'
+    }
+    afterAlways('smoketest:preview') {
+      archiveSmokeTestReports()
+    }
     afterAlways('functionalTest:preview') {
       archiveFunctionalTestReports()
     }
@@ -77,16 +91,33 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    before('functionalTest:aat') {
+      sh 'rm -rf allure-results allure-report'
+    }
+    afterAlways('smoketest:aat') {
+      archiveSmokeTestReports()
+      if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
+        sendAllureReportToSlack('master', 'Frontend_20Smoke_20Test_20Report/')
+      }
+    }
     afterAlways('functionalTest:aat') {
       archiveFunctionalTestReports()
       if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-          sendAllureReportToSlack('master')
+          sendAllureReportToSlack('master', 'Frontend_20Functional_20Test_20Report/')
       }
     }
   }
 }
 
 def archiveFunctionalTestReports() {
+  archiveAllureReport('Frontend Functional Test Report')
+}
+
+def archiveSmokeTestReports() {
+  archiveAllureReport('Frontend Smoke Test Report')
+}
+
+def archiveAllureReport(String reportName) {
   try {
     publishHTML([
       allowMissing: true,
@@ -94,16 +125,16 @@ def archiveFunctionalTestReports() {
       keepAll: true,
       reportDir: "allure-report",
       reportFiles: 'index.html',
-      reportName: 'PCS Frontend Functional Test Report'
+      reportName: reportName
     ])
   } catch (Error) {
       unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
   }
 }
 
-def sendAllureReportToSlack(String pipelineType = 'master') {
-  env.ALLURE_REPORT_PATH_SUFFIX = 'PCS_20Frontend_20Functional_20Test_20Report/'
-  def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
+def sendAllureReportToSlack(String pipelineType, String allureReportPathSuffix) {
+  env.ALLURE_REPORT_PATH_SUFFIX = allureReportPathSuffix
+  def msg = sh(script: "yarn exec ts-node src/test/ui/utils/common/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
     slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
