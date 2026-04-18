@@ -2,6 +2,7 @@ import { IdamUtils } from '@hmcts/playwright-common';
 import { Page } from '@playwright/test';
 
 import { performAction } from '../../controller';
+import { resolveIdamPassword } from '../../idamPassword';
 import { IAction, actionData } from '../../interfaces';
 
 export class LoginAction implements IAction {
@@ -20,13 +21,13 @@ export class LoginAction implements IAction {
 
   private async login() {
     await performAction('inputText', 'Email address', process.env.IDAM_PCS_USER_EMAIL);
-    await performAction('inputText', 'Password', process.env.IDAM_PCS_USER_PASSWORD);
+    await performAction('inputText', 'Password', resolveIdamPassword());
     await performAction('clickButton', 'Sign in');
   }
 
   private async createUser(userType: string, roles: string[]): Promise<void> {
     const token = process.env.BEARER_TOKEN as string;
-    const password = process.env.IDAM_PCS_USER_PASSWORD as string;
+    const password = resolveIdamPassword();
     const random7Digit = Math.floor(1000000 + Math.random() * 9000000);
     const email = (process.env.IDAM_PCS_USER_EMAIL = `TEST_PCS_USER.${userType}.${random7Digit}@test.test`);
     const forename = 'fn_' + random7Digit;
@@ -47,7 +48,7 @@ export class LoginAction implements IAction {
   private async generateCitizenAccessToken(): Promise<void> {
     process.env.CITIZEN_ACCESS_TOKEN = await new IdamUtils().generateIdamToken({
       username: process.env.IDAM_PCS_USER_EMAIL,
-      password: process.env.IDAM_PCS_USER_PASSWORD,
+      password: resolveIdamPassword(),
       grantType: 'password',
       clientId: 'pcs-frontend',
       clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,

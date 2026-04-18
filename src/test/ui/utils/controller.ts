@@ -1,5 +1,9 @@
-import { AxeUtils } from '@hmcts/playwright-common';
 import { Page, test } from '@playwright/test';
+
+/* eslint-disable import/order -- setup-env before playwright.config (CommonJS order). */
+import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
+
+loadPlaywrightSetupEnvIntoProcess();
 
 import {
   enable_axe_audit,
@@ -8,6 +12,7 @@ import {
   enable_navigation_tests,
 } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
+/* eslint-enable import/order */
 
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
@@ -60,6 +65,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
     if (pageNavigated) {
       if (startAxeAudit && enable_axe_audit === 'true') {
         try {
+          const { AxeUtils } = await import('@hmcts/playwright-common');
           await test.step('Running Accessibility Scan', async () => {
             await new AxeUtils(executor.page).audit({
               exclude: axe_exclusions,

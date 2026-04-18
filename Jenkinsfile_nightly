@@ -34,6 +34,22 @@ properties([
       defaultValue: true,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
+    booleanParam(
+      name: 'RUN_SAUCE_LABS',
+      defaultValue: false,
+      description: 'Run Sauce Labs cross-browser (saucectl). Requires Sauce credentials and tunnel on the agent (e.g. SAUCE_TUNNEL_NAME). Note: Jenkins cannot show the matrix dropdown only when this is ticked — the Sauce matrix choice below is ignored when this is unticked.'
+    ),
+    choice(
+      name: 'SAUCE_LABS_MATRIX',
+      choices: [
+        'macOS 15 - Chrome (latest)',
+        'macOS 15 - Firefox (latest)',
+        'Windows 11 - Chrome (latest)',
+        'Windows 11 - Microsoft Edge (latest)',
+        'Windows 11 - Firefox (latest)',
+      ].join('\n'),
+      description: 'One OS + one browser per Sauce run (when "Run Sauce Labs" is ticked). See .sauce/config-sauce-*.yml (macOS 15 / Windows 11, Playwright 1.58.2).'
+    ),
   ])
 ])
 
@@ -74,6 +90,9 @@ withNightlyPipeline(type, product, component) {
     if (params.ACCESSIBILITY_TESTS) {
       runAccessibilityTests(yarnBuilder)
     }
+    if (params.RUN_SAUCE_LABS) {
+      runSauceLabsMatrix(yarnBuilder)
+    }
   }
 }
 
@@ -89,7 +108,7 @@ def validateInputs() {
 def handleEnvironmentSetting() {
   env.TEST_URL = (params.ENVIRONMENT == 'preview')
     ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
-    : "https://pcs.${params.ENVIRONMENT}.platform.hmcts.net/"
+    : "https://pcs.${params.ENVIRONMENT}.platform.hmcts.net"
 }
 
 def setFunctionalTestEnvVars() {
@@ -131,6 +150,38 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
         artifacts: 'definitions/test/playwright-report/**'
       )
       sendAllureReportToSlack(browser, "Full_20${browser}_20E2E_20Test_20Report/")
+    }
+  }
+}
+
+/** Maps nightly choice to package.json script (see .sauce/*.yml). */
+def sauceMatrixToYarnScript(String matrixChoice) {
+  switch (matrixChoice) {
+    case 'macOS 15 - Chrome (latest)':
+      return 'test:sauce:mac15-chrome'
+    case 'macOS 15 - Firefox (latest)':
+      return 'test:sauce:mac15-firefox'
+    case 'Windows 11 - Chrome (latest)':
+      return 'test:sauce:win11-chrome'
+    case 'Windows 11 - Microsoft Edge (latest)':
+      return 'test:sauce:win11-edge'
+    case 'Windows 11 - Firefox (latest)':
+      return 'test:sauce:win11-firefox'
+    default:
+      echo "WARNING: Unknown SAUCE_LABS_MATRIX='${matrixChoice}', defaulting to macOS 15 Chrome."
+      return 'test:sauce:mac15-chrome'
+  }
+}
+
+def runSauceLabsMatrix(yarnBuilder) {
+  def yarnScript = sauceMatrixToYarnScript(params.SAUCE_LABS_MATRIX)
+  stage("Sauce Labs — ${params.SAUCE_LABS_MATRIX}") {
+    node {
+      checkout scm
+      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+        echo 'Sauce: ensure SAUCE_USERNAME / SAUCE_ACCESS_KEY (or saucectl env) and tunnel SAUCE_TUNNEL_NAME are available on this node.'
+        yarnBuilder.yarn(yarnScript)
+      }
     }
   }
 }
