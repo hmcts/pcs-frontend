@@ -1,4 +1,6 @@
-# Five desktop suites (mac15 + win11). CLI only (not Jenkins matrix). yarn test:sauce:desktop-all-five
+# Single Sauce Playwright config: all desktop suites. Pick one with:
+#   yarn exec saucectl run -c .sauce/config-sauce-nightly.yml --select-suite "pcs-frontend-mac15-chrome"
+# Run all five (no --select-suite): yarn test:sauce:all-desktops
 apiVersion: v1alpha
 kind: playwright
 
@@ -9,7 +11,7 @@ sauce:
     name: $SAUCE_TUNNEL_NAME
   metadata:
     tags:
-      - pcs-frontend-desktop-all-five
+      - pcs-frontend-nightly-matrix
 
 defaults:
   timeout: 30m

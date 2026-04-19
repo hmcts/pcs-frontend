@@ -37,18 +37,32 @@ properties([
     booleanParam(
       name: 'RUN_SAUCE_LABS',
       defaultValue: false,
-      description: 'Run Sauce Labs cross-browser (saucectl). Requires Sauce credentials and tunnel on the agent (e.g. SAUCE_TUNNEL_NAME). Note: Jenkins cannot show the matrix dropdown only when this is ticked — the Sauce matrix choice below is ignored when this is unticked.'
+      description: 'Tick to run Sauce Labs cross-browser tests (tunnel + yarn test:crossbrowser). Off by default; enable when manually triggering.'
     ),
-    choice(
-      name: 'SAUCE_LABS_MATRIX',
-      choices: [
-        'macOS 15 - Chrome (latest)',
-        'macOS 15 - Firefox (latest)',
-        'Windows 11 - Chrome (latest)',
-        'Windows 11 - Microsoft Edge (latest)',
-        'Windows 11 - Firefox (latest)',
-      ].join('\n'),
-      description: 'One OS + one browser per Sauce run (when "Run Sauce Labs" is ticked). See .sauce/config-sauce-*.yml (macOS 15 / Windows 11, Playwright 1.58.2).'
+    booleanParam(
+      name: 'SAUCE_MAC15_CHROME',
+      defaultValue: false,
+      description: 'Sauce: macOS 15 — Chrome (when Run Sauce Labs is enabled).'
+    ),
+    booleanParam(
+      name: 'SAUCE_MAC15_FIREFOX',
+      defaultValue: false,
+      description: 'Sauce: macOS 15 — Firefox (when Run Sauce Labs is enabled).'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_CHROME',
+      defaultValue: false,
+      description: 'Sauce: Windows 11 — Chrome (when Run Sauce Labs is enabled).'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_EDGE',
+      defaultValue: false,
+      description: 'Sauce: Windows 11 — Microsoft Edge (when Run Sauce Labs is enabled).'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_FIREFOX',
+      defaultValue: false,
+      description: 'Sauce: Windows 11 — Firefox (when Run Sauce Labs is enabled).'
     ),
   ])
 ])
@@ -72,7 +86,8 @@ static Map secret(String secretName, String envVariable) {
 def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')
+    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
+    secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64')
   ]
 ]
 
@@ -83,6 +98,12 @@ withNightlyPipeline(type, product, component) {
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
   enableFortifyScan()
+  if (params.RUN_SAUCE_LABS) {
+    // One Infrastructure stage: yarn test:crossbrowser runs saucectl once per selected suite (sequential).
+    def suites = selectedSauceSuites()
+    env.SAUCE_SUITE_NAMES = suites.join(' ')
+    enableCrossBrowserTest()
+  }
 
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
@@ -90,10 +111,28 @@ withNightlyPipeline(type, product, component) {
     if (params.ACCESSIBILITY_TESTS) {
       runAccessibilityTests(yarnBuilder)
     }
-    if (params.RUN_SAUCE_LABS) {
-      runSauceLabsMatrix(yarnBuilder)
-    }
   }
+}
+
+/** Suite `name` values in .sauce/config-sauce-nightly.yml, from Jenkins checkboxes (order stable for logs). */
+def selectedSauceSuites() {
+  def suites = []
+  if (params.SAUCE_MAC15_CHROME) {
+    suites.add('pcs-frontend-mac15-chrome')
+  }
+  if (params.SAUCE_MAC15_FIREFOX) {
+    suites.add('pcs-frontend-mac15-firefox')
+  }
+  if (params.SAUCE_WIN11_CHROME) {
+    suites.add('pcs-frontend-win11-chrome')
+  }
+  if (params.SAUCE_WIN11_EDGE) {
+    suites.add('pcs-frontend-win11-edge')
+  }
+  if (params.SAUCE_WIN11_FIREFOX) {
+    suites.add('pcs-frontend-win11-firefox')
+  }
+  return suites
 }
 
 def validateInputs() {
@@ -102,6 +141,9 @@ def validateInputs() {
   }
   if (params.ENVIRONMENT == 'preview' && !params.PR_NUMBER.trim().matches("^\\d+\$")) {
     error("Validation Failed: PR number must contain only numerical values")
+  }
+  if (params.RUN_SAUCE_LABS && selectedSauceSuites().isEmpty()) {
+    error('Validation Failed: When Run Sauce Labs is enabled, select at least one Sauce desktop browser checkbox.')
   }
 }
 
@@ -114,6 +156,7 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  env.SAUCE_GREP = env.SAUCE_GREP ?: '@crossbrowser'
 }
 
 def runE2ETests(yarnBuilder) {
@@ -150,38 +193,6 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
         artifacts: 'definitions/test/playwright-report/**'
       )
       sendAllureReportToSlack(browser, "Full_20${browser}_20E2E_20Test_20Report/")
-    }
-  }
-}
-
-/** Maps nightly choice to package.json script (see .sauce/*.yml). */
-def sauceMatrixToYarnScript(String matrixChoice) {
-  switch (matrixChoice) {
-    case 'macOS 15 - Chrome (latest)':
-      return 'test:sauce:mac15-chrome'
-    case 'macOS 15 - Firefox (latest)':
-      return 'test:sauce:mac15-firefox'
-    case 'Windows 11 - Chrome (latest)':
-      return 'test:sauce:win11-chrome'
-    case 'Windows 11 - Microsoft Edge (latest)':
-      return 'test:sauce:win11-edge'
-    case 'Windows 11 - Firefox (latest)':
-      return 'test:sauce:win11-firefox'
-    default:
-      echo "WARNING: Unknown SAUCE_LABS_MATRIX='${matrixChoice}', defaulting to macOS 15 Chrome."
-      return 'test:sauce:mac15-chrome'
-  }
-}
-
-def runSauceLabsMatrix(yarnBuilder) {
-  def yarnScript = sauceMatrixToYarnScript(params.SAUCE_LABS_MATRIX)
-  stage("Sauce Labs — ${params.SAUCE_LABS_MATRIX}") {
-    node {
-      checkout scm
-      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        echo 'Sauce: ensure SAUCE_USERNAME / SAUCE_ACCESS_KEY (or saucectl env) and tunnel SAUCE_TUNNEL_NAME are available on this node.'
-        yarnBuilder.yarn(yarnScript)
-      }
     }
   }
 }
