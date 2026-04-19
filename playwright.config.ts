@@ -1,7 +1,7 @@
 import * as process from 'node:process';
 import path from 'path';
 
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices, type ReporterDescription } from '@playwright/test';
 import dotenv from 'dotenv';
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
@@ -27,6 +27,22 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 
+// junit-result.xml matches the shared library JUnit glob (path must end with result.xml).
+const reporters: ReporterDescription[] = [
+  ['list'],
+  ...(process.env.CI ? [['junit', { outputFile: 'functional-output/junit-result.xml' }] as const] : []),
+  [
+    'allure-playwright',
+    {
+      resultsDir: 'allure-results',
+      suiteTitle: false,
+      environmentInfo: {
+        os_version: process.version,
+      },
+    },
+  ],
+];
+
 export default defineConfig({
   testDir: './src/test/ui',
   /* Run tests in files in parallel */
@@ -42,19 +58,7 @@ export default defineConfig({
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
-  reporter: [
-    ['list'],
-    [
-      'allure-playwright',
-      {
-        resultsDir: 'allure-results',
-        suiteTitle: false,
-        environmentInfo: {
-          os_version: process.version,
-        },
-      },
-    ],
-  ],
+  reporter: reporters,
   projects: [
     {
       name: 'chrome',
