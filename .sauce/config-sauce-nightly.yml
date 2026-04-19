@@ -1,8 +1,17 @@
 # Single Sauce Playwright config: all desktop suites. Pick one with:
 #   yarn exec saucectl run -c .sauce/config-sauce-nightly.yml --select-suite "pcs-frontend-mac15-chrome"
 # Run all five (no --select-suite): yarn test:sauce:all-desktops
+# Allure: download raw results after each run (often under ./artifacts/<suite>/); bin/sauce-crossbrowser-run.sh merges them.
 apiVersion: v1alpha
 kind: playwright
+
+artifacts:
+  cleanup: true
+  download:
+    when: always
+    match:
+      - 'allure-results/**'
+    directory: ./artifacts
 
 sauce:
   region: eu-central-1

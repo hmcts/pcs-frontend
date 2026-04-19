@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
 # Jenkins enableCrossBrowserTest() → yarn test:crossbrowser.
-# Multi-suite: SAUCE_SUITE_NAMES → sequential saucectl; merge allure-results → allure-report.
+# Multi-suite: SAUCE_SUITE_NAMES → sequential saucectl; merge Allure raw results → allure-report.
+# Results may be ./allure-results or ./artifacts/<suite>/allure-results (see .sauce/config-sauce-nightly.yml artifacts.download).
 set -euo pipefail
 
 MERGED="${PWD}/allure-results-sauce-merge"
 
-merge_allure_into_merged() {
+append_last_sauce_allure() {
+  mkdir -p "$MERGED"
   if [[ -d allure-results ]] && [[ -n "$(ls -A allure-results 2>/dev/null || true)" ]]; then
-    mkdir -p "$MERGED"
     cp -R allure-results/. "$MERGED"/
+    return 0
+  fi
+  if [[ -d artifacts ]]; then
+    while IFS= read -r -d '' dir; do
+      [[ -n "$(ls -A "$dir" 2>/dev/null || true)" ]] || continue
+      cp -R "$dir"/. "$MERGED"/
+    done < <(find artifacts -type d -name allure-results -print0 2>/dev/null || true)
   fi
 }
 
@@ -31,7 +39,7 @@ if [[ -n "${SAUCE_SUITE_NAMES:-}" ]]; then
     if ! SAUCE_SUITE_NAME="${suite}" yarn test:sauce:nightly; then
       exit_code=1
     fi
-    merge_allure_into_merged
+    append_last_sauce_allure
   done
   sauce_allure_finalize "$MERGED"
   exit "$exit_code"
@@ -60,5 +68,8 @@ set +e
 yarn test:sauce:nightly
 exit_code=$?
 set -e
-sauce_allure_finalize allure-results
+rm -rf "$MERGED"
+mkdir -p "$MERGED"
+append_last_sauce_allure
+sauce_allure_finalize "$MERGED"
 exit "$exit_code"

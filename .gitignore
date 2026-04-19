@@ -48,6 +48,8 @@ version
 /allure-report/
 /allure-results/
 /allure-results-sauce-merge/
+# saucectl artifact download (see .sauce/config-sauce-nightly.yml)
+/artifacts/
 /blob-report/
 /playwright/.cache/
 /src/test/ui/.auth/setup-env.json
