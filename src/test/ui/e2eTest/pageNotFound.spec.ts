@@ -3,7 +3,6 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
-import { counterClaim } from '../data/page-data';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -21,7 +20,7 @@ test.afterEach(async () => {
 test.describe('Error page to indicate Page Not Found error @nightly', () => {
   test('Content Validation on Page not found page @PR', async () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
-    await performValidation('mainHeader', 'Sorry, we’re having technical problems');
+    await performValidation('mainHeader', 'Sorry, we’re having technical XXXXX problems');
   });
 
   // This test was written as part of the story HDPI-3883. A new story will update the error message screen with a “Contact Us” link.
@@ -29,7 +28,6 @@ test.describe('Error page to indicate Page Not Found error @nightly', () => {
   test.skip('Invalid caseId validation', async () => {
     await performAction('navigateToUrl', home_url + '/case/1234567891234567/respond-to-claim/start-now');
     await performValidation('mainHeader', 'Sorry, we’re having technical problems');
-    await performValidation('mainHeader', counterClaim.mainHeader);
   });
 
   // This test was written as part of the story HDPI-3883. A new story will update the error message screen with a “Contact Us” link.
