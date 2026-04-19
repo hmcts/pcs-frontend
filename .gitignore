@@ -47,6 +47,7 @@ version
 /playwright-report/
 /allure-report/
 /allure-results/
+/allure-results-sauce-merge/
 /blob-report/
 /playwright/.cache/
 /src/test/ui/.auth/setup-env.json

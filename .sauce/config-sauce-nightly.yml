@@ -28,10 +28,11 @@ npm:
   packages:
     '@hmcts/playwright-common': '1.1.2'
     config: '^4.1.1'
+    allure-js-commons: '3.5.0'
+    allure-playwright: '3.5.0'
 
 env:
   PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
-  PLAYWRIGHT_SKIP_ALLURE: 'true'
   CI: 'true'
   NODE_CONFIG_ENV: test
 

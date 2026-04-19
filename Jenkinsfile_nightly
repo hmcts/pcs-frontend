@@ -99,10 +99,12 @@ withNightlyPipeline(type, product, component) {
   setFunctionalTestEnvVars()
   enableFortifyScan()
   if (params.RUN_SAUCE_LABS) {
-    // One Infrastructure stage: yarn test:crossbrowser runs saucectl once per selected suite (sequential).
+    // One Infrastructure stage: yarn test:crossbrowser runs saucectl once per selected suite (sequential),
+    // then generates allure-report (see bin/sauce-crossbrowser-run.sh).
     def suites = selectedSauceSuites()
     env.SAUCE_SUITE_NAMES = suites.join(' ')
     enableCrossBrowserTest()
+    publishSauceAllureReport()
   }
 
   afterAlways('fortify-scan') {
@@ -195,6 +197,30 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
       sendAllureReportToSlack(browser, "Full_20${browser}_20E2E_20Test_20Report/")
     }
   }
+}
+
+/** After enableCrossBrowserTest(): HTML report from bin/sauce-crossbrowser-run.sh if present in workspace. */
+def publishSauceAllureReport() {
+  try {
+    if (fileExists('allure-report/index.html')) {
+      publishHTML([
+        allowMissing         : true,
+        alwaysLinkToLastBuild: true,
+        keepAll              : true,
+        reportDir            : 'allure-report',
+        reportFiles          : 'index.html',
+        reportName           : 'Sauce Labs Cross-Browser Allure Report'
+      ])
+    } else {
+      echo 'Sauce Allure: allure-report/index.html not found; skipping HTML publisher.'
+    }
+  } catch (Exception e) {
+    echo "WARNING: Sauce Allure HTML publish failed: ${e.message}"
+  }
+  steps.archiveArtifacts(
+    allowEmptyArchive: true,
+    artifacts: 'allure-report/**/*,allure-results/**/*,allure-results-sauce-merge/**/*'
+  )
 }
 
 def runAccessibilityTests(yarnBuilder) {

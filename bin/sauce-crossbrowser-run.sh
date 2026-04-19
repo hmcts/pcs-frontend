@@ -1,14 +1,40 @@
 #!/usr/bin/env bash
 # Jenkins enableCrossBrowserTest() → yarn test:crossbrowser.
-# One pipeline step: if SAUCE_SUITE_NAMES is set (space-separated), runs saucectl once per suite; else single SAUCE_SUITE_NAME.
+# Multi-suite: SAUCE_SUITE_NAMES → sequential saucectl; merge allure-results → allure-report.
 set -euo pipefail
 
+MERGED="${PWD}/allure-results-sauce-merge"
+
+merge_allure_into_merged() {
+  if [[ -d allure-results ]] && [[ -n "$(ls -A allure-results 2>/dev/null || true)" ]]; then
+    mkdir -p "$MERGED"
+    cp -R allure-results/. "$MERGED"/
+  fi
+}
+
+sauce_allure_finalize() {
+  local src="$1"
+  if [[ ! -d "$src" ]] || [[ -z "$(ls -A "$src" 2>/dev/null || true)" ]]; then
+    echo "No Allure raw results under ${src}; skip Allure HTML for Sauce." >&2
+    return 0
+  fi
+  yarn exec allure generate "$src" --clean -o allure-report
+  yarn exec ts-node src/test/ui/config/clean-attachments.config.ts
+}
+
 if [[ -n "${SAUCE_SUITE_NAMES:-}" ]]; then
+  rm -rf "$MERGED" allure-report
+  mkdir -p "$MERGED"
+  exit_code=0
   for suite in ${SAUCE_SUITE_NAMES}; do
     echo "Sauce suite: ${suite}"
-    SAUCE_SUITE_NAME="${suite}" yarn test:sauce:nightly
+    if ! SAUCE_SUITE_NAME="${suite}" yarn test:sauce:nightly; then
+      exit_code=1
+    fi
+    merge_allure_into_merged
   done
-  exit 0
+  sauce_allure_finalize "$MERGED"
+  exit "$exit_code"
 fi
 
 if [[ -z "${SAUCE_SUITE_NAME:-}" && -n "${BROWSER_GROUP:-}" ]]; then
@@ -29,4 +55,10 @@ if [[ -z "${SAUCE_SUITE_NAME:-}" && -n "${BROWSER_GROUP:-}" ]]; then
 fi
 
 export SAUCE_SUITE_NAME="${SAUCE_SUITE_NAME:-pcs-frontend-mac15-chrome}"
-exec yarn test:sauce:nightly
+rm -rf allure-report
+set +e
+yarn test:sauce:nightly
+exit_code=$?
+set -e
+sauce_allure_finalize allure-results
+exit "$exit_code"
