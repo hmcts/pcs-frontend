@@ -1,12 +1,13 @@
 import config from 'config';
 
 import { HTTPError } from '../../../main/HttpError';
-import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '../../../main/interfaces/ccdCase.interface';
-import { http } from '../../../main/modules/http';
-import { ccdCaseService } from '../../../main/services/ccdCaseService';
+
+import { http } from '@modules/http';
+import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('config');
-jest.mock('../../../main/modules/http');
+jest.mock('@modules/http');
 
 const mockPost = http.post as jest.Mock;
 const mockGet = http.get as jest.Mock;
@@ -20,9 +21,6 @@ const mockUrl = 'http://ccd.example.com';
   }
   if (key === 'ccd.caseTypeId') {
     return 'PCS';
-  }
-  if (key === 'api.url') {
-    return mockUrl;
   }
 });
 
@@ -315,42 +313,40 @@ describe('updateCase', () => {
     );
   });
 
-  it('should call mid-event draft save endpoint and return response data', async () => {
+  it('should call CCD validate endpoint and return merged data with caller-supplied id', async () => {
     const caseId = '1234567890123456';
     const mockData = { defendantName: 'John Doe' };
 
-    const mockResponse = {
-      id: caseId,
-      data: mockData,
-    };
-
     mockPost.mockResolvedValue({
-      data: mockResponse,
+      data: { data: mockData, _links: { self: { href: 'self' } } },
     });
 
     const result = await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, mockData);
 
     expect(mockPost).toHaveBeenCalledWith(
-      `${mockUrl}/callbacks/mid-event?page=respondToPossessionDraftSavePage`,
+      `${mockUrl}/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,
       {
-        event_id: 'respondPossessionClaim',
-        case_details: {
-          id: caseId,
-          case_type_id: 'PCS',
-          data: mockData,
+        event: {
+          id: 'respondPossessionClaim',
+          summary: 'Citizen respondPossessionClaim draft save summary',
+          description: 'Citizen respondPossessionClaim draft save description',
         },
+        case_reference: caseId,
+        event_data: mockData,
+        ignore_warning: false,
       },
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: `Bearer ${accessToken}`,
+          experimental: true,
         }),
       })
     );
 
-    expect(result).toEqual(mockResponse);
+    expect(result).toEqual({ id: caseId, data: mockData });
   });
 
-  it('should throw HTTPError when draft save fails', async () => {
+  it('should throw HTTPError when draft save fails with a generic error', async () => {
     const caseId = '1234567890123456';
 
     mockPost.mockRejectedValue({
@@ -364,6 +360,22 @@ describe('updateCase', () => {
 
     await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
       'CCD case service error'
+    );
+  });
+
+  it('should surface CCD callback errors when the validate endpoint returns 422', async () => {
+    const caseId = '1234567890123456';
+
+    mockPost.mockRejectedValue({
+      response: {
+        status: 422,
+        data: { callbackErrors: ['Invalid submission: immutable field nameKnown'] },
+      },
+      message: 'Unprocessable Entity',
+    });
+
+    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
+      'CCD callback rejected request: Invalid submission: immutable field nameKnown'
     );
   });
 });

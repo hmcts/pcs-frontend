@@ -1,15 +1,20 @@
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { CitizenGenAppRequest } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { createGetController, createStepNavigation, getTranslationFunction } from '../../../modules/steps';
-import { getDashboardUrl } from '../../../routes/dashboard';
+import { createGetController, createStepNavigation, getFormData, getTranslationFunction } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
+import { toYesNoEnum } from '../../utils/yesNoEnum';
 import { MAKE_AN_APPLICATION_ROUTE, flowConfig } from '../flow.config';
+
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { CitizenGenAppRequest } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'check-your-answers';
 const stepNavigation = createStepNavigation(flowConfig);
+
+function isHearingInNext14Days(req: Request): 'yes' | 'no' | undefined {
+  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').courtHearingInNext14Days as 'yes' | 'no';
+}
 
 export const step: StepDefinition = {
   url: `${MAKE_AN_APPLICATION_ROUTE}/check-your-answers`,
@@ -31,23 +36,41 @@ export const step: StepDefinition = {
         }
 
         const typeOfApplication = formData['choose-an-application']['typeOfApplication'];
+        const courtHearingInNext14Days = isHearingInNext14Days(req);
 
         return {
           summaryData: {
             rows: [
               {
                 key: {
-                  text: t('answers.chooseAnApplication.label'),
+                  text: t('answers.typeOfApplication.label'),
                 },
                 value: {
-                  text: t(`answers.chooseAnApplication.options.${typeOfApplication}`),
+                  text: t(`answers.typeOfApplication.options.${typeOfApplication}`),
                 },
                 actions: {
                   items: [
                     {
                       href: './choose-an-application',
                       text: t('change'),
-                      visuallyHiddenText: t('answers.chooseAnApplication.changeHint'),
+                      visuallyHiddenText: t('answers.typeOfApplication.changeHint'),
+                    },
+                  ],
+                },
+              },
+              {
+                key: {
+                  text: t('answers.courtHearingInNext14Days.label'),
+                },
+                value: {
+                  text: t(`options.${courtHearingInNext14Days}`),
+                },
+                actions: {
+                  items: [
+                    {
+                      href: './is-the-court-hearing-in-the-next-14-days',
+                      text: t('change'),
+                      visuallyHiddenText: t('answers.courtHearingInNext14Days.changeHint'),
                     },
                   ],
                 },
@@ -72,8 +95,11 @@ export const step: StepDefinition = {
         throw Error('No existing formData in session');
       }
 
+      const hearingInNext14Days = isHearingInNext14Days(req);
+
       const citizenGenAppRequest: CitizenGenAppRequest = {
         applicationType: formData['choose-an-application']['typeOfApplication'],
+        within14Days: hearingInNext14Days ? toYesNoEnum(hearingInNext14Days) : undefined,
       };
 
       await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
@@ -83,7 +109,9 @@ export const step: StepDefinition = {
         },
       });
 
-      const redirectPath = getDashboardUrl(ccdCase.id);
+      delete req.session.formData;
+
+      const redirectPath = await stepNavigation.getNextStepUrl(req, STEP_NAME, req.body);
 
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');

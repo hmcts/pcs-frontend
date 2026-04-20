@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 
 import { Logger } from '@modules/logger';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { createToken } from '@services/pcq/createToken';
 
@@ -33,8 +34,8 @@ export function pcqRedirectMiddleware() {
       return next();
     }
 
-    if (ccdCase.data?.userPcqIdSet === 'Yes') {
-      logger.debug('User already have PcqId set');
+    if (ccdCase?.userPcqIdSet === 'YES') {
+      logger.debug('User already has PcqId set');
       return next();
     }
 
@@ -74,13 +75,11 @@ export function pcqRedirectMiddleware() {
 
     try {
       const updatedCase = await ccdCaseService.updateDraftRespondToClaim(user.accessToken, ccdCase.id, {
-        data: {
-          ...ccdCase.data,
-          userPcqId: pcqId,
-        },
+        ...ccdCase.data,
+        userPcqId: pcqId,
       });
 
-      res.locals.validatedCase = updatedCase;
+      res.locals.validatedCase = new CcdCaseModel(updatedCase);
     } catch (err) {
       logger.error('Failed to update CCD with PCQ ID:', err);
       return next();

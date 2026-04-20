@@ -1,12 +1,11 @@
 import { z } from 'zod';
 
+import { Logger } from '@modules/logger';
 import type {
   FormBuilderConfig,
   FormFieldConfig,
   FormFieldOption,
-} from '../../../interfaces/formFieldConfig.interface';
-
-import { Logger } from '@modules/logger';
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 const logger = Logger.getLogger('form-builder-schema');
 

@@ -1,8 +1,11 @@
+// import { submitCaseApiData } from '../api-data';
+
 export const noticeDateWhenNotProvided = {
   mainHeader: `Notice date`,
   respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
-  didNotProvideNoticeLabel: `Treetops Housing did not provide the date they served you notice.`,
+  //Need to fix this as part of HDPI-5786
+  //didNotProvideNoticeLabel: `${submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName} did not provide the date they served you notice.`,
   getWhenDidYouReceiveNoticeQuestion: (claimantsName: string) =>
     `When did you receive notice from ${claimantsName} (optional)?`,
   exampleHintText: `For example, 27 9 2022. If you’re not sure of the exact date, you can find it on the notice`,
