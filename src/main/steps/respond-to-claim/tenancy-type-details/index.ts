@@ -172,7 +172,7 @@ export const step: StepDefinition = createFormStep({
 
     return {
       ...formContent,
-      receivedDetailsBy: receivedDetailsBy,
+      receivedDetailsBy,
       tenancyType,
       organisationName: orgName,
       orgname: orgName,
