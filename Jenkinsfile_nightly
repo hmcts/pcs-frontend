@@ -21,47 +21,47 @@ properties([
     ),
     booleanParam(
       name: 'FIREFOX_TESTS',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Tick the checkbox to run E2E tests in Firefox.'
     ),
     booleanParam(
       name: 'WEBKIT_TESTS',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Tick the checkbox to run E2E tests in Webkit.'
     ),
     booleanParam(
       name: 'ACCESSIBILITY_TESTS',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Tick the checkbox to run Accessibility tests.'
     ),
     booleanParam(
       name: 'RUN_SAUCE_LABS',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Tick to run Sauce Labs cross-browser tests (tunnel + yarn test:crossbrowser). Off by default; enable when manually triggering.'
     ),
     booleanParam(
       name: 'SAUCE_MAC15_CHROME',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: macOS 15 — Chrome (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_MAC15_FIREFOX',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: macOS 15 — Firefox (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_CHROME',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: Windows 11 — Chrome (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_EDGE',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: Windows 11 — Microsoft Edge (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_FIREFOX',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: Windows 11 — Firefox (when Run Sauce Labs is enabled).'
     ),
   ])
