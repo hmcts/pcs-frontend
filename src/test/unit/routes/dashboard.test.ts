@@ -7,7 +7,6 @@ import { Logger } from '../../../main/modules/logger';
 import dashboardRoutes, { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
 
-
 jest.mock('../../../main/modules/logger', () => {
   const errorFn = jest.fn();
   const warnFn = jest.fn();
