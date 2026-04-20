@@ -1,4 +1,4 @@
-const BLOCKED_EXTENSIONS = new Set(['.mp3', '.m4a', '.mp4', '.mpeg', '.mpg']);
+export const BLOCKED_EXTENSIONS = new Set(['.mp3', '.m4a', '.mp4', '.mpeg', '.mpg']);
 
 export function getFileExtensionLower(filename: string): string {
   const i = filename.lastIndexOf('.');
