@@ -5440,7 +5440,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.15.1":
+"axios@npm:1.15.1, axios@npm:^1.7.5":
   version: 1.15.1
   resolution: "axios@npm:1.15.1"
   dependencies:
