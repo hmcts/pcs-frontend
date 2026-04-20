@@ -1,3 +1,9 @@
 {
-  "bulletPoint": "cyThe tenancy, occupation contract or licence began on {{tenancyStartDate}}"
+  "bulletPoint": "cyThe tenancy, occupation contract or licence began on {{tenancyStartDate}}",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "notSure": "cyDefendant is not sure"
+  }
 }
