@@ -5421,7 +5421,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.15.0, axios@npm:^1.8.4":
+"axios@npm:1.15.1":
+  version: 1.15.1
+  resolution: "axios@npm:1.15.1"
+  dependencies:
+    follow-redirects: "npm:^1.15.11"
+    form-data: "npm:^4.0.5"
+    proxy-from-env: "npm:^2.1.0"
+  checksum: 10/bfa286e29d1866695426b45c9a25ef21975669e500a8511a01e2fe5b9c4f734906701266d214b562dc525e463bae2bbba24c8e9e10c214f0d4f4c669e9372a7f
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.8.4":
   version: 1.15.0
   resolution: "axios@npm:1.15.0"
   dependencies:
@@ -11794,7 +11805,7 @@ __metadata:
     allure-commandline: "npm:2.37.0"
     allure-js-commons: "npm:3.5.0"
     allure-playwright: "npm:3.5.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:2.2.2"
     config: "npm:3.3.12"
     connect-redis: "npm:7.1.1"
