@@ -1,4 +1,4 @@
-import type { CcdCollectionItem, CcdDashboardNotification, CcdDashboardTaskGroup } from '@interfaces/ccdCase.interface';
+import type { CcdCollectionItem, CcdDashboardNotification, CcdDashboardTaskGroup } from '@services/ccdCase.interface';
 import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
 
 describe('ccdDashboardUtils', () => {

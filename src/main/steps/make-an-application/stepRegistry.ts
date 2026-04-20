@@ -1,10 +1,8 @@
-import type { StepDefinition } from '../../interfaces/stepFormData.interface';
-
 import { step as applicationSubmitted } from './application-submitted';
 import { step as areThereAnyReasonsThatThisApplicationShouldNotBeShared } from './are-there-any-reasons-that-this-application-should-not-be-shared';
 import { step as askToMakeAnOrder } from './ask-the-court-to-make-an-order';
+import { step as askToSetAside } from './ask-the-court-to-set-aside-the-order';
 import { step as askToAdjourn } from './ask-to-adjourn-the-court-hearing';
-import { step as askToSetAside } from './ask-to-set-aside-the-decision-to-evict-you';
 import { step as checkYourAnswers } from './check-your-answers';
 import { step as chooseAnApplication } from './choose-an-application';
 import { step as doYouNeedHelpPayingTheFee } from './do-you-need-help-paying-the-fee';
@@ -17,10 +15,12 @@ import { step as whatOrderDoYouWantTheCourtToMakeAndWhy } from './what-order-do-
 import { step as whichLanguageDidYouUseToCompleteThisService } from './which-language-did-you-use-to-complete-this-service';
 import { step as youNeedToApplyForHelpWithYourApplicationFee } from './you-need-to-apply-for-help-with-your-application-fee';
 
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
 export const stepRegistry: Record<string, StepDefinition> = {
   'choose-an-application': chooseAnApplication,
   'ask-to-adjourn-the-court-hearing': askToAdjourn,
-  'ask-to-set-aside-the-decision-to-evict-you': askToSetAside,
+  'ask-the-court-to-set-aside-the-order': askToSetAside,
   'ask-the-court-to-make-an-order': askToMakeAnOrder,
   'is-the-court-hearing-in-the-next-14-days': isTheCourtHearingInTheNext14Days,
   'do-you-need-help-paying-the-fee': doYouNeedHelpPayingTheFee,

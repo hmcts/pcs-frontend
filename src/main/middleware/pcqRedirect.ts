@@ -3,8 +3,8 @@ import config from 'config';
 import { NextFunction, Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 
-import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
 import { Logger } from '@modules/logger';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { createToken } from '@services/pcq/createToken';
 
@@ -75,10 +75,8 @@ export function pcqRedirectMiddleware() {
 
     try {
       const updatedCase = await ccdCaseService.updateDraftRespondToClaim(user.accessToken, ccdCase.id, {
-        data: {
-          ...ccdCase.data,
-          userPcqId: pcqId,
-        },
+        ...ccdCase.data,
+        userPcqId: pcqId,
       });
 
       res.locals.validatedCase = new CcdCaseModel(updatedCase);

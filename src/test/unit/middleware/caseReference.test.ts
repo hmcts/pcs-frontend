@@ -28,8 +28,9 @@ jest.mock('@services/ccdCaseService', () => ({
 }));
 
 import { HTTPError } from '../../../main/HttpError';
-import { CcdCaseModel } from '../../../main/interfaces/ccdCaseData.model';
 import { caseReferenceParamMiddleware } from '../../../main/middleware/caseReference';
+
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 interface MockSession {
   user?: {

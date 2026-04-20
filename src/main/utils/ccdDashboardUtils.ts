@@ -4,8 +4,8 @@ import type {
   CcdDashboardNotification,
   CcdDashboardTaskGroup,
   CcdTemplateKeyValue,
-} from '@interfaces/ccdCase.interface';
-import type { DashboardNotification, DashboardTask, DashboardTaskGroup } from '@interfaces/dashboard.interface';
+} from '@services/ccdCase.interface';
+import type { DashboardNotification, DashboardTask, DashboardTaskGroup } from '@services/dashboard.interface';
 
 export function formatAddress(addr: CcdCaseAddress | undefined): string | undefined {
   if (!addr) {

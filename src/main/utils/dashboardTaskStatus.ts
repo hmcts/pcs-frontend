@@ -1,4 +1,4 @@
-import type { TaskStatus } from '@interfaces/dashboard.interface';
+import type { TaskStatus } from '@services/dashboard.interface';
 
 const TAG_CLASSES: Partial<Record<TaskStatus, string>> = {
   AVAILABLE: 'govuk-tag--blue',

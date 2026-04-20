@@ -5,10 +5,10 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware/oidc';
 
-import type { DashboardTaskGroup } from '@interfaces/dashboard.interface';
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
+import type { DashboardTaskGroup } from '@services/dashboard.interface';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { getTagClasses, isLinkableStatus } from '@utils/dashboardTaskStatus';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
