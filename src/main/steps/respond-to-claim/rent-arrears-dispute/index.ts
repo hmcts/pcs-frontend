@@ -1,11 +1,12 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
+
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 // Validation constants
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum

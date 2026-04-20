@@ -1,40 +1,16 @@
+import type { Request } from 'express';
 import { DateTime } from 'luxon';
 
+import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
+import { Logger } from '@modules/logger';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
-
-type NoticeDateFormValue = Record<
-  string,
-  {
-    day: string;
-    month: string;
-    year: string;
-  }
->;
-
-function getNoticeDateFormValue(noticeDate?: string): NoticeDateFormValue {
-  if (!noticeDate) {
-    return {};
-  }
-
-  const parsed = DateTime.fromISO(noticeDate);
-  if (!parsed.isValid) {
-    return {};
-  }
-
-  return {
-    noticeDate: {
-      day: parsed.toFormat('d'),
-      month: parsed.toFormat('M'),
-      year: parsed.toFormat('yyyy'),
-    },
-  };
-}
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CaseData, PossessionClaimResponse } from '@services/ccdCase.interface';
+const logger = Logger.getLogger('confirmation-of-notice-date-when-not-provided');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'confirmation-of-notice-date-when-not-provided',
@@ -50,7 +26,7 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'noticeDate',
+      name: 'noticeReceivedDate',
       type: 'date',
       required: false,
       noFutureDate: true,
@@ -63,22 +39,49 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   getInitialFormData: req => {
-    return getNoticeDateFormValue(req.res?.locals?.validatedCase?.defendantResponsesNoticeDate);
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
+    const noticeReceivedDateRaw: unknown = caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
+
+    if (!noticeReceivedDateRaw) {
+      return {};
+    }
+
+    if (typeof noticeReceivedDateRaw !== 'string') {
+      logger.warn('Unexpected noticeReceivedDate type in case data', {
+        type: typeof noticeReceivedDateRaw,
+        value: noticeReceivedDateRaw,
+      });
+      return {};
+    }
+
+    const dateTime: DateTime = DateTime.fromISO(noticeReceivedDateRaw);
+    if (!dateTime.isValid) {
+      logger.warn('Invalid noticeReceivedDate format in case data', {
+        value: noticeReceivedDateRaw,
+        reason: dateTime.invalidReason,
+      });
+      return {};
+    }
+
+    return {
+      noticeReceivedDate: {
+        day: dateTime.toFormat('dd'),
+        month: dateTime.toFormat('MM'),
+        year: dateTime.toFormat('yyyy'),
+      },
+    };
   },
-  beforeRedirect: async req => {
-    const noticeDate = req.body?.noticeDate as { day?: string; month?: string; year?: string } | undefined;
-    const isoNoticeDate =
-      noticeDate?.day && noticeDate?.month && noticeDate?.year
-        ? (DateTime.fromObject({
-            day: Number(noticeDate.day),
-            month: Number(noticeDate.month),
-            year: Number(noticeDate.year),
-          }).toISODate() ?? undefined)
-        : undefined;
+
+  beforeRedirect: async (req: Request) => {
+    const dateObject: { day?: string; month?: string; year?: string } | undefined = req.body?.noticeReceivedDate;
+    const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
+    const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
+    const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
+    const noticeReceivedDate = formatDatePartsToISODate(day, month, year);
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        noticeDate: isoNoticeDate,
+        ...(noticeReceivedDate && { noticeReceivedDate }),
       },
     };
 

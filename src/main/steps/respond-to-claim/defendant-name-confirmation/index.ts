@@ -3,9 +3,9 @@ import type { Request } from 'express';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { PossessionClaimResponse } from '@interfaces/ccdCaseData.model';
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'defendant-name-confirmation',

@@ -1,8 +1,10 @@
 import { getClaimantName } from '../../utils/getClaimantName';
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CaseData, PaymentAgreement, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-made',
@@ -24,7 +26,7 @@ export const step: StepDefinition = createFormStep({
       },
       options: [
         {
-          value: 'yes',
+          value: 'YES',
           translationKey: 'options.yes',
           subFields: {
             repaymentsInfo: {
@@ -40,13 +42,49 @@ export const step: StepDefinition = createFormStep({
             },
           },
         },
-        { value: 'no', translationKey: 'options.no' },
+        { value: 'NO', translationKey: 'options.no' },
       ],
     },
   ],
-  getInitialFormData: () => {
-    // Repayments answers are not currently exposed via validatedCase model getters.
-    return {};
+  beforeRedirect: async req => {
+    const confirmRepaymentsMade: YesNoValue | undefined = req.body?.confirmRepaymentsMade;
+    if (!confirmRepaymentsMade) {
+      return;
+    }
+
+    const paymentDetails: string | undefined =
+      confirmRepaymentsMade === 'YES' ? req.body?.['confirmRepaymentsMade.repaymentsInfo'] : undefined;
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        paymentAgreement: {
+          anyPaymentsMade: confirmRepaymentsMade,
+          paymentDetails: paymentDetails ?? '',
+        },
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  getInitialFormData: req => {
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
+    const paymentAgreement: PaymentAgreement | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+    const confirmRepaymentsMade: YesNoValue | undefined = paymentAgreement?.anyPaymentsMade;
+    if (!confirmRepaymentsMade) {
+      return {};
+    }
+
+    if (confirmRepaymentsMade === 'YES') {
+      const repaymentsInfo: string | undefined = paymentAgreement?.paymentDetails;
+      return {
+        confirmRepaymentsMade: 'YES',
+        'confirmRepaymentsMade.repaymentsInfo': repaymentsInfo ?? '',
+      };
+    }
+    return {
+      confirmRepaymentsMade: 'NO',
+    };
   },
   extendGetContent: req => {
     const validatedCase = req.res?.locals?.validatedCase;

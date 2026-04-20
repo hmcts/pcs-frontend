@@ -3,7 +3,7 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
-  askToSetAsideTheDecisionToEvictYou,
+  askTheCourtToSetAsideTheOrder,
   checkYourAnswers,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
@@ -43,9 +43,8 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
     });
+    await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
     //The below are placeholder pages
-    await performValidation('mainHeader', askToSetAsideTheDecisionToEvictYou.mainHeader);
-    await performAction('clickButton', askToSetAsideTheDecisionToEvictYou.startNowButton);
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
     await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
     await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);

@@ -1,11 +1,11 @@
 import type { Request } from 'express';
 
-import type { PossessionClaimResponse, YesNoNotSureValue } from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'written-terms';
 

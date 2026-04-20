@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 
-import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
 import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('@services/ccdCaseService', () => ({
