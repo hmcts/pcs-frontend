@@ -203,6 +203,28 @@ describe('stepFlow', () => {
       expect(result).toBe('step2');
     });
 
+    it('should fallback to step order when route conditions do not match and no defaultNext', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            routes: [
+              {
+                condition: async () => false,
+                nextStep: 'step3',
+              },
+            ],
+          },
+          step2: {},
+          step3: {},
+        },
+      };
+
+      const result = await getNextStep(mockReq, 'step1', config, {}, {});
+      expect(result).toBe('step2');
+    });
+
     it('should handle Promise condition', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
@@ -420,6 +442,26 @@ describe('stepFlow', () => {
       expect(result).toBe('step1');
     });
 
+    it('should find previous step from route without condition', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        stepOrder: ['step1', 'step2'],
+        steps: {
+          step1: {
+            routes: [
+              {
+                nextStep: 'step2',
+              },
+            ],
+          },
+          step2: {},
+        },
+      };
+
+      const result = await getPreviousStep(mockReq, 'step2', config);
+      expect(result).toBe('step1');
+    });
+
     it('should find previous step from defaultNext', async () => {
       const config: JourneyFlowConfig = {
         basePath: '/test',
@@ -616,6 +658,29 @@ describe('stepFlow', () => {
       const result = navigation.getStepUrl('step1');
       expect(result).toBe('/steps/test-journey/step1');
     });
+
+    it('getStepUrl should throw when config is provided as resolver function', () => {
+      const resolver = async () => mockFlowConfig;
+      const navigation = createStepNavigation(resolver);
+
+      expect(() => navigation.getStepUrl('step1')).toThrow(
+        'getStepUrl requires a static JourneyFlowConfig when a resolver is used'
+      );
+    });
+
+    it('resolver navigation should resolve next and back urls', async () => {
+      const resolver = async () => mockFlowConfig;
+      const navigation = createStepNavigation(resolver);
+      const req = {
+        params: {},
+        session: {
+          formData: {},
+        },
+      } as unknown as Request;
+
+      await expect(navigation.getNextStepUrl(req, 'step1')).resolves.toBe('/steps/test-journey/step2');
+      await expect(navigation.getBackUrl(req, 'step2')).resolves.toBe('/steps/test-journey/step1');
+    });
   });
 
   describe('stepDependencyCheckMiddleware', () => {
@@ -774,6 +839,104 @@ describe('stepFlow', () => {
       await middleware(req, res, next);
 
       expect(next).toHaveBeenCalled();
+    });
+
+    it('calls next when hidden step has no visible fallback step', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/steps/test-journey',
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2'],
+        steps: {
+          step1: {
+            showCondition: () => false,
+          },
+          step2: {
+            showCondition: () => false,
+          },
+        },
+      };
+
+      const middleware = stepDependencyCheckMiddleware(config);
+      const req = {
+        path: '/steps/test-journey/step1',
+        session: {
+          formData: {},
+        },
+      } as unknown as Request;
+      const res = {
+        redirect: jest.fn(),
+      } as unknown as Response;
+      const next = jest.fn();
+
+      await middleware(req, res, next);
+
+      expect(res.redirect).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('calls next when showCondition returns true', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/steps/test-journey',
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2'],
+        steps: {
+          step1: {
+            showCondition: () => true,
+          },
+          step2: {},
+        },
+      };
+
+      const middleware = stepDependencyCheckMiddleware(config);
+      const req = {
+        path: '/steps/test-journey/step1',
+        session: {
+          formData: {},
+        },
+      } as unknown as Request;
+      const res = {
+        redirect: jest.fn(),
+      } as unknown as Response;
+      const next = jest.fn();
+
+      await middleware(req, res, next);
+
+      expect(res.redirect).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('redirects hidden step to first visible step with showCondition=true', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/steps/test-journey',
+        useShowConditions: true,
+        stepOrder: ['step1', 'step2', 'step3'],
+        steps: {
+          step1: {
+            showCondition: () => false,
+          },
+          step2: {
+            showCondition: () => true,
+          },
+          step3: {
+            showCondition: () => false,
+          },
+        },
+      };
+
+      const middleware = stepDependencyCheckMiddleware(config);
+      const req = {
+        path: '/steps/test-journey/step3',
+        session: { formData: {} },
+      } as unknown as Request;
+      const res = {
+        redirect: jest.fn(),
+      } as unknown as Response;
+      const next = jest.fn();
+
+      await middleware(req, res, next);
+
+      expect(res.redirect).toHaveBeenCalledWith(303, '/steps/test-journey/step2');
+      expect(next).not.toHaveBeenCalled();
     });
   });
 });
