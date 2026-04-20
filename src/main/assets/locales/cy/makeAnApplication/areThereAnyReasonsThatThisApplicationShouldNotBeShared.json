@@ -13,6 +13,6 @@
   "weWillAskYouToProvideTheReason": "cyWe will ask you to provide the reason. The court will consider your reason, and you may not be successful.",
   "errors": {
     "confirmIfThereIsAReason": "cyConfirm whether there is a reason why this application should not be shared with the other parties",
-    "provideAReason": "cyConfirm why the other parties shoud not be informed"
+    "provideAReason": "cyConfirm why the other parties should not be informed"
   }
 }
