@@ -22,6 +22,7 @@ const fieldsConfig: FormFieldConfig[] = [
     name: 'correspondenceAddressConfirm',
     type: 'radio',
     required: true,
+    isPageHeading: true,
     translationKey: {
       label: 'legend',
       hint: 'legend.hint',
