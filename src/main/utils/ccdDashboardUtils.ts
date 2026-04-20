@@ -5,8 +5,7 @@ import type {
   CcdDashboardTaskGroup,
   CcdTemplateKeyValue,
 } from '@interfaces/ccdCase.interface';
-import type { DashboardNotification } from '@services/pcsApi/dashboardNotification.interface';
-import type { DashboardTask, DashboardTaskGroup } from '@services/pcsApi/dashboardTaskGroup.interface';
+import type { DashboardNotification, DashboardTask, DashboardTaskGroup } from '@interfaces/dashboard.interface';
 
 export function formatAddress(addr: CcdCaseAddress | undefined): string | undefined {
   if (!addr) {

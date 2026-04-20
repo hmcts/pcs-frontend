@@ -5,12 +5,12 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware/oidc';
 
+import type { DashboardTaskGroup } from '@interfaces/dashboard.interface';
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
-import { getTagClasses, isLinkableStatus } from '@services/pcsApi/dashboardTaskGroup.interface';
-import type { DashboardTaskGroup } from '@services/pcsApi/dashboardTaskGroup.interface';
 import { sanitiseCaseReference } from '@utils/caseReference';
+import { getTagClasses, isLinkableStatus } from '@utils/dashboardTaskStatus';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -90,10 +90,8 @@ export default function dashboardRoutes(app: Application): void {
     };
   }
 
-  // Create dedicated router for dashboard routes.
-  // Note: no caseReferenceParamMiddleware is registered here - the dashboardView
   // event trigger called below performs access validation in the same call that
-  // returns the dashboard data, avoiding a second CCD round trip.
+  // returns the dashboard data, avoiding a second CCD call.
   const dashboardRouter = Router({ mergeParams: true });
 
   dashboardRouter.use(oidcMiddleware);

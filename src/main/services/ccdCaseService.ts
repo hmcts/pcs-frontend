@@ -37,10 +37,9 @@ import { HTTPError } from '../HttpError';
 
 import { CaseState } from '@interfaces/ccdCase.interface';
 import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@interfaces/ccdCase.interface';
+import type { DashboardNotification, DashboardTaskGroup } from '@interfaces/dashboard.interface';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import type { DashboardNotification } from '@services/pcsApi/dashboardNotification.interface';
-import type { DashboardTaskGroup } from '@services/pcsApi/dashboardTaskGroup.interface';
 import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
 
 const logger = Logger.getLogger('ccdCaseService');
