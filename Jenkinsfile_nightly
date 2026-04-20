@@ -101,7 +101,7 @@ withNightlyPipeline(type, product, component) {
   enableFortifyScan()
   if (params.RUN_SAUCE_LABS) {
     // One Infrastructure stage: yarn test:crossbrowser runs saucectl once per selected suite (sequential),
-    // then generates allure-report (see bin/sauce-crossbrowser-run.sh).
+    // then generates allure-report (see src/test/ui/utils/scripts/sauce-crossbrowser-run.sh).
     def suites = selectedSauceSuites()
     env.SAUCE_SUITE_NAMES = suites.join(' ')
     enableCrossBrowserTest()
@@ -190,7 +190,7 @@ def runE2ETestsForBrowser(yarnBuilder, String browser) {
   }
 }
 
-/** After enableCrossBrowserTest(): HTML report from bin/sauce-crossbrowser-run.sh if present in workspace. */
+/** After enableCrossBrowserTest(): HTML report from src/test/ui/utils/scripts/sauce-crossbrowser-run.sh if present in workspace. */
 def publishSauceAllureReport() {
   try {
     if (fileExists('allure-report/index.html')) {
