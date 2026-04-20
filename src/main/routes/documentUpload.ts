@@ -11,16 +11,18 @@ import { UPLOAD_MAX_FILE_SIZE_BYTES, validateFileType } from '@utils/documentUpl
 
 const logger = Logger.getLogger('document-upload');
 
+export function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
+  const result = validateFileType(file.mimetype, file.originalname);
+  if (result === 'ok') {
+    cb(null, true);
+    return;
+  }
+  cb(new Error(result === 'blocked_media' ? 'BLOCKED_MEDIA' : 'INVALID_FILE_TYPE'));
+}
+
 const upload = multer({
   limits: { fileSize: UPLOAD_MAX_FILE_SIZE_BYTES },
-  fileFilter: (_req, file, cb) => {
-    const result = validateFileType(file.mimetype, file.originalname);
-    if (result === 'ok') {
-      cb(null, true);
-      return;
-    }
-    cb(new Error(result === 'blocked_media' ? 'BLOCKED_MEDIA' : 'INVALID_FILE_TYPE'));
-  },
+  fileFilter,
 });
 
 function getUserToken(req: Request): string {
@@ -38,6 +40,28 @@ function getErrorTranslations(req: Request) {
     documentNotFound: t('errors.documentUpload.documentUrlRequired'),
     uploadSuccess: (filename: string) => t('errors.documentUpload.uploadSuccess', { filename }),
   };
+}
+
+export function handleMulterError(
+  err: Error | null | undefined,
+  req: Request,
+  res: Response,
+  next: (err?: unknown) => void
+): void {
+  if (!err) {
+    next();
+    return;
+  }
+  const errors = getErrorTranslations(req);
+  if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+    res.status(400).json({ error: { message: errors.tooLarge } });
+    return;
+  }
+  if (err.message === 'INVALID_FILE_TYPE' || err.message === 'BLOCKED_MEDIA') {
+    res.status(400).json({ error: { message: errors.wrongType } });
+    return;
+  }
+  next(err);
 }
 
 function getExistingDocuments(req: Request): CcdCollectionItem<CcdDefendantDocument>[] {
@@ -64,17 +88,7 @@ export default function documentUploadRoutes(app: Application): void {
     oidcMiddleware,
     (req: Request, res: Response, next) => {
       upload.single('documents')(req, res, async err => {
-        if (err) {
-          const errors = getErrorTranslations(req);
-          if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
-            return res.status(400).json({ error: { message: errors.tooLarge } });
-          }
-          if (err.message === 'INVALID_FILE_TYPE' || err.message === 'BLOCKED_MEDIA') {
-            return res.status(400).json({ error: { message: errors.wrongType } });
-          }
-          return next(err);
-        }
-        next();
+        handleMulterError(err, req, res, next);
       });
     },
     async (req: Request, res: Response) => {

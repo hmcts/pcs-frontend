@@ -19,8 +19,9 @@ jest.mock('../../../main/middleware', () => ({
 }));
 
 import type { Application, Request, Response } from 'express';
+import multer from 'multer';
 
-import documentUploadRoutes from '../../../main/routes/documentUpload';
+import documentUploadRoutes, { fileFilter, handleMulterError } from '../../../main/routes/documentUpload';
 
 import { deleteDocument, uploadDocument } from '@services/cdamService';
 
@@ -85,6 +86,85 @@ describe('documentUploadRoutes', () => {
       expect.anything(),
       expect.anything()
     );
+  });
+
+  describe('fileFilter', () => {
+    it('accepts valid file types', () => {
+      const cb = jest.fn();
+      const file = { mimetype: 'application/pdf', originalname: 'test.pdf' } as Express.Multer.File;
+      fileFilter({} as Request, file, cb);
+      expect(cb).toHaveBeenCalledWith(null, true);
+    });
+
+    it('rejects blocked media with BLOCKED_MEDIA error', () => {
+      const cb = jest.fn();
+      const file = { mimetype: 'video/mp4', originalname: 'video.mp4' } as Express.Multer.File;
+      fileFilter({} as Request, file, cb);
+      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ message: 'BLOCKED_MEDIA' }));
+    });
+
+    it('rejects invalid file types with INVALID_FILE_TYPE error', () => {
+      const cb = jest.fn();
+      const file = { mimetype: 'application/x-executable', originalname: 'malware.exe' } as Express.Multer.File;
+      fileFilter({} as Request, file, cb);
+      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ message: 'INVALID_FILE_TYPE' }));
+    });
+  });
+
+  describe('handleMulterError', () => {
+    it('calls next when no error', () => {
+      const next = jest.fn();
+      handleMulterError(null, {} as Request, {} as Response, next);
+      expect(next).toHaveBeenCalledWith();
+    });
+
+    it('returns 400 with tooLarge for file size limit', () => {
+      const err = new multer.MulterError('LIMIT_FILE_SIZE');
+      const req = { t: mockT } as unknown as Request;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      handleMulterError(err, req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 with wrongType for INVALID_FILE_TYPE', () => {
+      const err = new Error('INVALID_FILE_TYPE');
+      const req = { t: mockT } as unknown as Request;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      handleMulterError(err, req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 with wrongType for BLOCKED_MEDIA', () => {
+      const err = new Error('BLOCKED_MEDIA');
+      const req = { t: mockT } as unknown as Request;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      handleMulterError(err, req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('passes unknown errors to next', () => {
+      const err = new Error('SOMETHING_ELSE');
+      const req = { t: mockT } as unknown as Request;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      handleMulterError(err, req, res, next);
+
+      expect(next).toHaveBeenCalledWith(err);
+      expect(res.status).not.toHaveBeenCalled();
+    });
   });
 
   describe('upload handler', () => {
