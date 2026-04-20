@@ -117,25 +117,15 @@ withNightlyPipeline(type, product, component) {
   }
 }
 
-/** Suite `name` values in .sauce/config-sauce-nightly.yml, from Jenkins checkboxes (order stable for logs). */
+/** Suite `name` values in .sauce/config-sauce-nightly.yml (checkbox order preserved). */
 def selectedSauceSuites() {
-  def suites = []
-  if (params.SAUCE_MAC15_CHROME) {
-    suites.add('pcs-frontend-mac15-chrome')
-  }
-  if (params.SAUCE_MAC15_FIREFOX) {
-    suites.add('pcs-frontend-mac15-firefox')
-  }
-  if (params.SAUCE_WIN11_CHROME) {
-    suites.add('pcs-frontend-win11-chrome')
-  }
-  if (params.SAUCE_WIN11_EDGE) {
-    suites.add('pcs-frontend-win11-edge')
-  }
-  if (params.SAUCE_WIN11_FIREFOX) {
-    suites.add('pcs-frontend-win11-firefox')
-  }
-  return suites
+  [
+    params.SAUCE_MAC15_CHROME ? 'pcs-frontend-mac15-chrome' : null,
+    params.SAUCE_MAC15_FIREFOX ? 'pcs-frontend-mac15-firefox' : null,
+    params.SAUCE_WIN11_CHROME ? 'pcs-frontend-win11-chrome' : null,
+    params.SAUCE_WIN11_EDGE ? 'pcs-frontend-win11-edge' : null,
+    params.SAUCE_WIN11_FIREFOX ? 'pcs-frontend-win11-firefox' : null,
+  ].findAll { it != null }
 }
 
 def validateInputs() {
