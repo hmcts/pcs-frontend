@@ -13,7 +13,11 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
-export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
+export enum LanguageUsed {
+  ENGLISH = 'ENGLISH',
+  WELSH = 'WELSH',
+  ENGLISH_AND_WELSH = 'ENGLISH_AND_WELSH',
+}
 
 export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
@@ -225,12 +229,6 @@ export enum GenAppType {
   SOMETHING_ELSE,
 }
 
-export enum LanguageUsed {
-  ENGLISH,
-  WELSH,
-  ENGLISH_AND_WELSH,
-}
-
 export interface CitizenGenAppRequest {
   applicationType?: GenAppType;
   within14Days?: YesNoValue;
@@ -241,4 +239,5 @@ export interface CitizenGenAppRequest {
   withoutNotice?: YesNoValue;
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
+  whatOrderWanted?: string;
 }
