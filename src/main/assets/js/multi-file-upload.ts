@@ -124,7 +124,7 @@ function initContainer(container: HTMLElement): void {
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
 
-  new MultiFileUpload(container, {
+  void new MultiFileUpload(container, {
     uploadUrl,
     deleteUrl,
     hooks: {
