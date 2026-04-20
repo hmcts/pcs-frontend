@@ -1,11 +1,11 @@
 {
   "pageTitle": "cyDependent children",
   "heading": "cyDo you have any dependent children?",
-  "dependantChildrenParagraph": "cyDependent children are children you look after financially.",
-  "dependantChildrenDetailsLabel": "cyGive details about your dependent children",
-  "dependantChildrenDetailsHint": "cyYou should include details about how many dependent children you have and how old they are",
+  "dependentChildrenParagraph": "cyDependent children are children you look after financially.",
+  "dependentChildrenDetailsLabel": "cyGive details about your dependent children",
+  "dependentChildrenDetailsHint": "cyYou should include details about how many dependent children you have and how old they are",
   "errors": {
-    "dependantChildren": "cySelect if you have any dependent children",
-    "dependantChildrenDetails": "cyGive details about your dependent children"
+    "dependentChildren": "cySelect if you have any dependent children",
+    "dependentChildrenDetails": "cyGive details about your dependent children"
   }
 }

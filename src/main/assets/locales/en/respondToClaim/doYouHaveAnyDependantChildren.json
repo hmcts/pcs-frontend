@@ -1,11 +1,11 @@
 {
   "pageTitle": "Dependent children",
   "heading": "Do you have any dependent children?",
-  "dependantChildrenParagraph": "Dependent children are children you look after financially.",
-  "dependantChildrenDetailsLabel": "Give details about your dependent children",
-  "dependantChildrenDetailsHint": "You should include details about how many dependent children you have and how old they are",
+  "dependentChildrenParagraph": "Dependent children are children you look after financially.",
+  "dependentChildrenDetailsLabel": "Give details about your dependent children",
+  "dependentChildrenDetailsHint": "You should include details about how many dependent children you have and how old they are",
   "errors": {
-    "dependantChildren": "Select if you have any dependent children",
-    "dependantChildrenDetails": "Give details about your dependent children"
+    "dependentChildren": "Select if you have any dependent children",
+    "dependentChildrenDetails": "Give details about your dependent children"
   }
 }

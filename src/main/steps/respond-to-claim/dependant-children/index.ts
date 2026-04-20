@@ -19,7 +19,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    paragraph: 'dependantChildrenParagraph',
+    paragraph: 'dependentChildrenParagraph',
   },
   beforeRedirect: async req => {
     const dependantChildren: string = req.body?.dependantChildren;
@@ -80,7 +80,7 @@ export const step: StepDefinition = createFormStep({
       translationKey: {
         label: 'heading',
       },
-      errorMessage: 'errors.dependantChildren',
+      errorMessage: 'errors.dependentChildren',
       options: [
         {
           value: 'yes',
@@ -92,11 +92,11 @@ export const step: StepDefinition = createFormStep({
               required: true,
               maxLength: 500,
               translationKey: {
-                label: 'dependantChildrenDetailsLabel',
-                hint: 'dependantChildrenDetailsHint',
+                label: 'dependentChildrenDetailsLabel',
+                hint: 'dependentChildrenDetailsHint',
               },
               labelClasses: 'govuk-label--s',
-              errorMessage: 'errors.dependantChildrenDetails',
+              errorMessage: 'errors.dependentChildrenDetails',
             },
           },
         },
