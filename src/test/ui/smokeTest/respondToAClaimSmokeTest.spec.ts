@@ -3,7 +3,7 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { freeLegalAdvice, startNow } from '../data/page-data';
-import { initializeExecutor, performAction } from '../utils/controller';
+import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
@@ -20,5 +20,6 @@ test.describe('Respond to a claim - smoke test @smoke @nightly', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performValidation('text', { text: 'Please try again in a few minutes.', elementType: 'paragraph' });
   });
 });
