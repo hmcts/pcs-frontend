@@ -2,9 +2,8 @@ import { MultiFileUpload } from '@ministryofjustice/frontend';
 
 import { isBlockedExtension } from '@utils/documentUploadValidation';
 
-interface DocumentMeta {
-  document_url: string;
-  document_binary_url: string;
+interface DisplayDocument {
+  index: number;
   document_filename: string;
   content_type?: string;
   size?: number;
@@ -84,7 +83,7 @@ function installCsrfInterceptor(): void {
     ...rest: unknown[]
   ) {
     const urlStr = String(url);
-    if (urlStr.includes('/upload-document/upload') || urlStr.includes('/upload-document/delete')) {
+    if (urlStr.includes('/upload') || urlStr.includes('/delete')) {
       needsCsrf.add(this);
     }
     return originalOpen.call(this, method, url, ...rest);
@@ -145,13 +144,13 @@ function initContainer(container: HTMLElement): void {
         clearErrorSummary(form);
         try {
           const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
-          const doc: DocumentMeta | undefined = response?.document;
-          if (doc?.document_url) {
+          const doc: DisplayDocument | undefined = response?.document;
+          if (doc && typeof doc.index === 'number') {
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'uploadedDocuments[]';
             input.value = JSON.stringify(doc);
-            input.dataset.documentUrl = doc.document_url;
+            input.dataset.documentIndex = String(doc.index);
             hiddenContainer.appendChild(input);
           }
         } catch {
@@ -199,19 +198,15 @@ function initContainer(container: HTMLElement): void {
       deleteHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File | undefined, xhr: XMLHttpRequest) => {
         if (xhr.status >= 200 && xhr.status < 300) {
           clearErrorSummary(form);
+          // Remove hidden input by index - reindex remaining inputs
           try {
             const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
-            const deletedUrl: string | undefined = response?.documentUrl;
-            if (deletedUrl) {
-              const input = hiddenContainer.querySelector<HTMLInputElement>(
-                `input[data-document-url="${CSS.escape(deletedUrl)}"]`
-              );
-              if (input) {
-                input.remove();
-              }
+            if (response?.success) {
+              // Rebuild hidden inputs from remaining file rows
+              rebuildHiddenInputs(hiddenContainer, container);
             }
           } catch {
-            // Cleanup failed; hidden input may remain
+            // Cleanup failed
           }
         } else {
           showErrorSummary(form, deleteFailedMessage, errorSummaryTitle);
@@ -227,6 +222,27 @@ function initContainer(container: HTMLElement): void {
     event.preventDefault();
     const summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
     summary?.focus();
+  });
+}
+
+function rebuildHiddenInputs(hiddenContainer: HTMLElement, uploadContainer: HTMLElement): void {
+  // Remove all existing hidden inputs
+  hiddenContainer.querySelectorAll<HTMLInputElement>('input[name="uploadedDocuments[]"]').forEach(input => {
+    input.remove();
+  });
+
+  // Rebuild from remaining file rows in the MOJ component
+  const rows = uploadContainer.querySelectorAll('.moj-multi-file-upload__row:not(.moj-multi-file-upload__row--error)');
+  rows.forEach((row, index) => {
+    const filenameEl = row.querySelector('.moj-multi-file-upload__filename');
+    if (filenameEl) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'uploadedDocuments[]';
+      input.value = JSON.stringify({ index, document_filename: filenameEl.textContent?.trim() || '' });
+      input.dataset.documentIndex = String(index);
+      hiddenContainer.appendChild(input);
+    }
   });
 }
 

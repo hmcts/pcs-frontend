@@ -1,77 +1,26 @@
 import type { Request } from 'express';
 
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCollectionItem, CcdDefendantDocument } from '@services/ccdCase.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
-import type { CdamDocument } from '@services/documentUpload.interface';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
-function mapCcdDocToCdamDoc(v: CcdDefendantDocument): CdamDocument {
-  const doc: CdamDocument = {
-    document_url: v.document.document_url,
-    document_binary_url: v.document.document_binary_url,
-    document_filename: v.document.document_filename,
-  };
-  if (v.contentType) {
-    doc.content_type = v.contentType;
-  }
-  if (typeof v.size === 'number') {
-    doc.size = v.size;
-  }
-  return doc;
+interface DisplayDocument {
+  index: number;
+  document_filename: string;
+  content_type?: string;
+  size?: number;
 }
 
-function parseUploadedDocuments(body: Record<string, unknown>): CdamDocument[] {
-  const raw = body['uploadedDocuments[]'];
-  if (!raw) {
-    return [];
-  }
-
-  const items = Array.isArray(raw) ? raw : [raw];
-
-  return items.flatMap(item => {
-    try {
-      const parsed = typeof item === 'string' ? JSON.parse(item) : item;
-      if (!parsed?.document_url || !parsed?.document_binary_url || !parsed?.document_filename) {
-        return [];
-      }
-
-      const doc: CdamDocument = {
-        document_url: parsed.document_url,
-        document_binary_url: parsed.document_binary_url,
-        document_filename: parsed.document_filename,
-      };
-      if (typeof parsed.content_type === 'string' && parsed.content_type) {
-        doc.content_type = parsed.content_type;
-      }
-      const sizeNum = typeof parsed.size === 'number' ? parsed.size : Number(parsed.size);
-      if (!Number.isNaN(sizeNum) && sizeNum >= 0) {
-        doc.size = sizeNum;
-      }
-      return [doc];
-    } catch {
-      return [];
-    }
-  });
-}
-
-function toCcdDocumentCollection(docs: CdamDocument[]): CcdCollectionItem<CcdDefendantDocument>[] {
-  return docs.map(doc => {
-    const value: CcdDefendantDocument = {
-      document: {
-        document_url: doc.document_url,
-        document_binary_url: doc.document_binary_url,
-        document_filename: doc.document_filename,
-      },
-      contentType: doc.content_type,
-      size: doc.size,
-    };
-    return { value };
-  });
+function toDisplayDocuments(docs: CcdCollectionItem<CcdDefendantDocument>[]): DisplayDocument[] {
+  return docs.map((item, index) => ({
+    index,
+    document_filename: item.value.document.document_filename,
+    content_type: item.value.contentType,
+    size: item.value.size,
+  }));
 }
 
 export const step: StepDefinition = createFormStep({
@@ -111,7 +60,7 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
     return {
-      documents: existingDocs.map((item: CcdCollectionItem<CcdDefendantDocument>) => mapCcdDocToCdamDoc(item.value)),
+      documents: toDisplayDocuments(existingDocs),
     };
   },
   extendGetContent: (req, formContent) => {
@@ -123,15 +72,5 @@ export const step: StepDefinition = createFormStep({
     }
     return {};
   },
-  beforeRedirect: async req => {
-    const documents = parseUploadedDocuments(req.body);
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        uploadedDocuments: toCcdDocumentCollection(documents),
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
-  },
+  // No beforeRedirect needed - documents are saved to CCD on upload/delete
 });

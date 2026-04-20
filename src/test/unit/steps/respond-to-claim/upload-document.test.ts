@@ -3,17 +3,12 @@ jest.mock('../../../../main/modules/steps', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: jest.fn(),
-}));
-
 import { step } from '../../../../main/steps/respond-to-claim/upload-document';
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 type UploadDocumentStep = {
   getInitialFormData: (req: Record<string, unknown>) => Record<string, unknown>;
   extendGetContent: (req: Record<string, unknown>, formContent: Record<string, unknown>) => Record<string, unknown>;
-  beforeRedirect: (req: Record<string, unknown>) => Promise<void>;
+  beforeRedirect?: (req: Record<string, unknown>) => Promise<void>;
   fields: { name: string; type: string; required: boolean }[];
   stepName: string;
   translationKeys: Record<string, string>;
@@ -54,6 +49,10 @@ describe('upload-document step', () => {
         })
       );
     });
+
+    it('does not have beforeRedirect - documents saved on upload/delete', () => {
+      expect(testedStep.beforeRedirect).toBeUndefined();
+    });
   });
 
   describe('getInitialFormData', () => {
@@ -79,7 +78,7 @@ describe('upload-document step', () => {
       expect(result).toEqual({});
     });
 
-    it('maps CCD DefendantDocument to CdamDocument format', () => {
+    it('returns display-only data with index and filename, no CDAM URLs', () => {
       const docs = [
         {
           value: {
@@ -88,46 +87,54 @@ describe('upload-document step', () => {
               document_binary_url: 'http://dm-store/documents/abc-123/binary',
               document_filename: 'evidence.pdf',
             },
+            contentType: 'application/pdf',
+            size: 1024,
           },
         },
       ];
 
       const result = testedStep.getInitialFormData(makeReq(docs));
+      const documents = result.documents as Record<string, unknown>[];
 
-      expect(result).toEqual({
-        documents: [
-          {
-            document_url: 'http://dm-store/documents/abc-123',
-            document_binary_url: 'http://dm-store/documents/abc-123/binary',
-            document_filename: 'evidence.pdf',
-          },
-        ],
+      expect(documents).toHaveLength(1);
+      expect(documents[0]).toEqual({
+        index: 0,
+        document_filename: 'evidence.pdf',
+        content_type: 'application/pdf',
+        size: 1024,
       });
+      // No CDAM URLs exposed
+      expect(documents[0]).not.toHaveProperty('document_url');
+      expect(documents[0]).not.toHaveProperty('document_binary_url');
     });
 
-    it('reads contentType and size from DefendantDocument fields', () => {
+    it('assigns sequential indexes to multiple documents', () => {
       const docs = [
         {
           value: {
             document: {
-              document_url: 'http://dm-store/documents/abc-123',
-              document_binary_url: 'http://dm-store/documents/abc-123/binary',
-              document_filename: 'photo.jpg',
+              document_url: 'http://dm-store/documents/aaa',
+              document_binary_url: 'http://dm-store/documents/aaa/binary',
+              document_filename: 'first.pdf',
             },
-            contentType: 'image/jpeg',
-            size: 976397,
+          },
+        },
+        {
+          value: {
+            document: {
+              document_url: 'http://dm-store/documents/bbb',
+              document_binary_url: 'http://dm-store/documents/bbb/binary',
+              document_filename: 'second.pdf',
+            },
           },
         },
       ];
 
       const result = testedStep.getInitialFormData(makeReq(docs));
+      const documents = result.documents as Record<string, unknown>[];
 
-      expect(result.documents).toEqual([
-        expect.objectContaining({
-          content_type: 'image/jpeg',
-          size: 976397,
-        }),
-      ]);
+      expect(documents[0].index).toBe(0);
+      expect(documents[1].index).toBe(1);
     });
 
     it('handles missing contentType and size gracefully', () => {
@@ -144,13 +151,11 @@ describe('upload-document step', () => {
       ];
 
       const result = testedStep.getInitialFormData(makeReq(docs));
+      const documents = result.documents as Record<string, unknown>[];
 
-      expect(result.documents).toEqual([
-        expect.objectContaining({
-          document_filename: 'doc.pdf',
-        }),
-      ]);
-      expect((result.documents as Record<string, unknown>[])[0]).not.toHaveProperty('content_type');
+      expect(documents[0].document_filename).toBe('doc.pdf');
+      expect(documents[0].content_type).toBeUndefined();
+      expect(documents[0].size).toBeUndefined();
     });
 
     it('handles missing validatedCase gracefully', () => {
@@ -189,114 +194,6 @@ describe('upload-document step', () => {
       const result = testedStep.extendGetContent(req, formContent);
 
       expect(result).toEqual({});
-    });
-  });
-
-  describe('beforeRedirect', () => {
-    it('saves uploaded documents as nested DefendantDocument structure', async () => {
-      const req = {
-        body: {
-          'uploadedDocuments[]': [
-            JSON.stringify({
-              document_url: 'http://dm-store/documents/abc-123',
-              document_binary_url: 'http://dm-store/documents/abc-123/binary',
-              document_filename: 'evidence.pdf',
-              content_type: 'application/pdf',
-              size: 1024,
-            }),
-          ],
-        },
-      };
-
-      await testedStep.beforeRedirect(req);
-
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-        defendantResponses: {
-          uploadedDocuments: [
-            {
-              value: {
-                document: {
-                  document_url: 'http://dm-store/documents/abc-123',
-                  document_binary_url: 'http://dm-store/documents/abc-123/binary',
-                  document_filename: 'evidence.pdf',
-                },
-                contentType: 'application/pdf',
-                size: 1024,
-              },
-            },
-          ],
-        },
-      });
-    });
-
-    it('saves empty array when no documents submitted', async () => {
-      const req = { body: {} };
-
-      await testedStep.beforeRedirect(req);
-
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-        defendantResponses: {
-          uploadedDocuments: [],
-        },
-      });
-    });
-
-    it('skips malformed JSON entries in hidden inputs', async () => {
-      const req = {
-        body: {
-          'uploadedDocuments[]': ['not-valid-json', JSON.stringify({ document_url: 'only-url' })],
-        },
-      };
-
-      await testedStep.beforeRedirect(req);
-
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-        defendantResponses: {
-          uploadedDocuments: [],
-        },
-      });
-    });
-
-    it('handles single document (non-array hidden input)', async () => {
-      const req = {
-        body: {
-          'uploadedDocuments[]': JSON.stringify({
-            document_url: 'http://dm-store/documents/abc-123',
-            document_binary_url: 'http://dm-store/documents/abc-123/binary',
-            document_filename: 'single.pdf',
-          }),
-        },
-      };
-
-      await testedStep.beforeRedirect(req);
-
-      const call = (buildCcdCaseForPossessionClaimResponse as jest.Mock).mock.calls[0][1];
-      const doc = call.defendantResponses.uploadedDocuments[0].value;
-
-      expect(doc.document.document_filename).toBe('single.pdf');
-    });
-
-    it('sends contentType and size as direct fields not category_id', async () => {
-      const req = {
-        body: {
-          'uploadedDocuments[]': JSON.stringify({
-            document_url: 'http://dm-store/documents/abc-123',
-            document_binary_url: 'http://dm-store/documents/abc-123/binary',
-            document_filename: 'doc.pdf',
-            content_type: 'application/pdf',
-            size: 5000,
-          }),
-        },
-      };
-
-      await testedStep.beforeRedirect(req);
-
-      const call = (buildCcdCaseForPossessionClaimResponse as jest.Mock).mock.calls[0][1];
-      const doc = call.defendantResponses.uploadedDocuments[0].value;
-
-      expect(doc.contentType).toBe('application/pdf');
-      expect(doc.size).toBe(5000);
-      expect(doc.document).not.toHaveProperty('category_id');
     });
   });
 });

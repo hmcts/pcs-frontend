@@ -4,6 +4,8 @@ import multer from 'multer';
 import { oidcMiddleware } from '../middleware';
 
 import { Logger } from '@modules/logger';
+import type { CcdCollectionItem, CcdDefendantDocument } from '@services/ccdCase.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
 import { deleteDocument, uploadDocument } from '@services/cdamService';
 import { UPLOAD_MAX_FILE_SIZE_BYTES, validateFileType } from '@utils/documentUploadValidation';
 
@@ -33,9 +35,27 @@ function getErrorTranslations(req: Request) {
     noFile: t('errors.documentUpload.noFileSelected'),
     uploadFailed: t('errors.documentUpload.uploadFailed'),
     deleteFailed: t('errors.documentUpload.fileDeleteFailed'),
-    documentUrlRequired: t('errors.documentUpload.documentUrlRequired'),
+    documentNotFound: t('errors.documentUpload.documentUrlRequired'),
     uploadSuccess: (filename: string) => t('errors.documentUpload.uploadSuccess', { filename }),
   };
+}
+
+function getExistingDocuments(req: Request): CcdCollectionItem<CcdDefendantDocument>[] {
+  const caseData = req.res?.locals?.validatedCase;
+  return caseData?.possessionClaimResponse?.defendantResponses?.uploadedDocuments ?? [];
+}
+
+async function saveDraftDocuments(req: Request, documents: CcdCollectionItem<CcdDefendantDocument>[]): Promise<void> {
+  const caseId = req.params.caseReference as string;
+  const accessToken = getUserToken(req);
+
+  await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, {
+    possessionClaimResponse: {
+      defendantResponses: {
+        uploadedDocuments: documents,
+      },
+    },
+  });
 }
 
 export default function documentUploadRoutes(app: Application): void {
@@ -65,26 +85,49 @@ export default function documentUploadRoutes(app: Application): void {
         }
 
         const userToken = getUserToken(req);
-        const document = await uploadDocument(req.file, userToken);
+        const cdamDoc = await uploadDocument(req.file, userToken);
 
-        const successMessage = errors.uploadSuccess(document.document_filename);
-        const safeSuccessMessage = errors.uploadSuccess(
-          document.document_filename
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-        );
+        // Build CCD document entry
+        const newEntry: CcdCollectionItem<CcdDefendantDocument> = {
+          value: {
+            document: {
+              document_url: cdamDoc.document_url,
+              document_binary_url: cdamDoc.document_binary_url,
+              document_filename: cdamDoc.document_filename,
+            },
+            contentType: cdamDoc.content_type,
+            size: cdamDoc.size,
+          },
+        };
+
+        // Append to existing documents and save to CCD draft
+        const existingDocs = getExistingDocuments(req);
+        const updatedDocs = [...existingDocs, newEntry];
+        await saveDraftDocuments(req, updatedDocs);
+
+        const newIndex = updatedDocs.length - 1;
+        const filename = cdamDoc.document_filename;
+        const safeFilename = filename
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+
         return res.json({
           success: {
-            messageText: successMessage,
-            messageHtml: safeSuccessMessage,
+            messageText: errors.uploadSuccess(filename),
+            messageHtml: errors.uploadSuccess(safeFilename),
           },
           file: {
-            filename: document.document_url,
-            originalname: document.document_filename,
+            filename: String(newIndex),
+            originalname: filename,
           },
-          document,
+          document: {
+            index: newIndex,
+            document_filename: filename,
+            size: cdamDoc.size,
+            content_type: cdamDoc.content_type,
+          },
         });
       } catch (error) {
         logger.error('Failed to upload document to CDAM', {
@@ -98,15 +141,28 @@ export default function documentUploadRoutes(app: Application): void {
   app.post('/case/:caseReference/:journey/:step/delete', oidcMiddleware, async (req: Request, res: Response) => {
     const errors = getErrorTranslations(req);
     try {
-      const documentUrl = (req.body as Record<string, string>).delete || '';
-      if (!documentUrl) {
-        return res.status(400).json({ error: { message: errors.documentUrlRequired } });
+      const deleteIndex = Number((req.body as Record<string, string>).delete);
+      if (Number.isNaN(deleteIndex) || deleteIndex < 0) {
+        return res.status(400).json({ error: { message: errors.documentNotFound } });
       }
+
+      const existingDocs = getExistingDocuments(req);
+      if (deleteIndex >= existingDocs.length) {
+        return res.status(404).json({ error: { message: errors.documentNotFound } });
+      }
+
+      // Look up the real CDAM URL from CCD data (server-side only)
+      const docToDelete = existingDocs[deleteIndex];
+      const documentUrl = docToDelete.value.document.document_url;
 
       const userToken = getUserToken(req);
       await deleteDocument(documentUrl, userToken);
 
-      return res.json({ success: true, documentUrl });
+      // Remove from list and save updated draft
+      const updatedDocs = existingDocs.filter((_, i) => i !== deleteIndex);
+      await saveDraftDocuments(req, updatedDocs);
+
+      return res.json({ success: true });
     } catch (error) {
       logger.error('Failed to delete document from CDAM', {
         error: error instanceof Error ? error.message : String(error),
