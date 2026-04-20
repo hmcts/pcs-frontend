@@ -1,11 +1,13 @@
 import config from 'config';
 
+import { getFileExtensionLower, isBlockedExtension } from './fileExtensionValidation';
+
+export { getFileExtensionLower, isBlockedExtension };
+
 export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizeMB');
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;
 
 const BLOCKED_MEDIA_PREFIXES = ['audio/', 'video/'] as const;
-
-const BLOCKED_EXTENSIONS = new Set(['.mp3', '.m4a', '.mp4', '.mpeg', '.mpg']);
 
 const ALLOWED_MIME_TYPES = new Set([
   'application/pdf',
@@ -65,14 +67,7 @@ export const ACCEPT_ATTRIBUTE_EXTENSIONS = Array.from(ALLOWED_EXTENSIONS)
   .sort((a, b) => a.localeCompare(b))
   .join(',');
 
-export function getFileExtensionLower(filename: string): string {
-  const i = filename.lastIndexOf('.');
-  return i >= 0 ? filename.slice(i).toLowerCase() : '';
-}
-
-export function isBlockedExtension(filename: string): boolean {
-  return BLOCKED_EXTENSIONS.has(getFileExtensionLower(filename));
-}
+const BLOCKED_EXTENSIONS = new Set(['.mp3', '.m4a', '.mp4', '.mpeg', '.mpg']);
 
 function isBlockedMedia(mime: string, ext: string): boolean {
   if (BLOCKED_EXTENSIONS.has(ext)) {

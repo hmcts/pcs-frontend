@@ -1,6 +1,6 @@
 import { MultiFileUpload } from '@ministryofjustice/frontend';
 
-import { isBlockedExtension } from '@utils/documentUploadValidation';
+import { isBlockedExtension } from '@utils/fileExtensionValidation';
 
 interface DisplayDocument {
   index: number;
