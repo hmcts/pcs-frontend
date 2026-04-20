@@ -13,6 +13,9 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
+export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
+
+export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
@@ -130,6 +133,8 @@ export interface CcdDefendantResponses {
   householdCircumstances?: HouseholdCircumstances;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
+  languageUsed?: LanguageUsed;
+  equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
 }
 
 export interface PossessionClaimResponse {
