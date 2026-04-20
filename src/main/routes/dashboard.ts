@@ -2,7 +2,7 @@ import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { caseReferenceParamMiddleware } from '../middleware/caseReference';
+import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { getTranslationFunction } from '@modules/i18n';
@@ -10,7 +10,7 @@ import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getTagClasses, isLinkableStatus } from '@services/pcsApi/dashboardTaskGroup.interface';
 import type { DashboardTaskGroup } from '@services/pcsApi/dashboardTaskGroup.interface';
-import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
+import { sanitiseCaseReference } from '@utils/caseReference';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -90,14 +90,13 @@ export default function dashboardRoutes(app: Application): void {
     };
   }
 
-  // Create dedicated router for dashboard routes
+  // Create dedicated router for dashboard routes.
+  // Note: no caseReferenceParamMiddleware is registered here - the dashboardView
+  // event trigger called below performs access validation in the same call that
+  // returns the dashboard data, avoiding a second CCD round trip.
   const dashboardRouter = Router({ mergeParams: true });
 
   dashboardRouter.use(oidcMiddleware);
-
-  // Apply param middleware - dashboard owns this dependency
-  // This ensures res.locals.validatedCase is set for routes with :caseReference
-  dashboardRouter.param('caseReference', caseReferenceParamMiddleware);
 
   // Route: /dashboard (redirect to case-specific dashboard)
   dashboardRouter.get('/', (req: Request, res: Response) => {
@@ -106,33 +105,30 @@ export default function dashboardRoutes(app: Application): void {
   });
 
   // Route: /dashboard/:caseReference (main dashboard page)
-  dashboardRouter.get('/:caseReference', async (req: Request, res: Response) => {
-    const validatedCase = res.locals.validatedCase;
-
-    if (!validatedCase) {
-      logger.error('Dashboard: validatedCase is undefined - middleware not executed');
-      return res.status(500).render('error', {
-        error: 'Case validation failed - validatedCase not set',
-      });
+  dashboardRouter.get('/:caseReference', async (req: Request, res: Response, next) => {
+    const rawCaseReference = req.params.caseReference;
+    const caseReference =
+      typeof rawCaseReference === 'string' || typeof rawCaseReference === 'number'
+        ? sanitiseCaseReference(rawCaseReference)
+        : null;
+    if (!caseReference) {
+      logger.error('Invalid case reference format', { caseReference: rawCaseReference });
+      return next(new HTTPError('Invalid case reference format', 404));
     }
 
     const accessToken = req.session.user?.accessToken;
     if (!accessToken) {
       logger.error('Dashboard: user not authenticated - no access token');
-      return res.status(401).render('error', { error: 'Authentication required' });
+      return next(new HTTPError('Authentication required', 401));
     }
 
-    const rawDashboardCaseReference = toCaseReference16(validatedCase.id);
-    const dashboardCaseReference = rawDashboardCaseReference
-      ? rawDashboardCaseReference.replace(/(\d{4})(?=\d)/g, '$1 ')
-      : null;
+    const dashboardCaseReference = caseReference.replace(/(\d{4})(?=\d)/g, '$1 ');
 
     try {
-      console.log('[dashboard route] Fetching dashboardView for case:', validatedCase.id);
-      const dashboardData = await ccdCaseService.getDashboardView(accessToken, validatedCase.id);
+      console.log('[dashboard route] Fetching dashboardView for case:', caseReference);
+      const dashboardData = await ccdCaseService.getDashboardView(accessToken, caseReference);
 
       const t = getTranslationFunction(req, ['dashboard', 'common']);
-      const caseReference = validatedCase.id;
 
       const notifications = dashboardData.notifications
         .map(n => {
@@ -165,8 +161,8 @@ export default function dashboardRoutes(app: Application): void {
         helpSupportLinks: HELP_SUPPORT_LINKS,
       });
     } catch (e) {
-      logger.error(`Failed to fetch dashboard data for case ${validatedCase.id}. Error was: ${String(e)}`);
-      throw e;
+      logger.error(`Failed to fetch dashboard data for case ${caseReference}. Error was: ${String(e)}`);
+      return next(e);
     }
   });
 

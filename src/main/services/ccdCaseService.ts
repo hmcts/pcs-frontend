@@ -364,7 +364,11 @@ export const ccdCaseService = {
 
       return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress) };
     } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'getDashboardView');
+      const httpError = convertAxiosErrorToHttpError(error, 'getDashboardView');
+      if (httpError.status === 400 || httpError.status === 404) {
+        throw new HTTPError('Case not found', 404);
+      }
+      throw httpError;
     }
   },
 };
