@@ -8,7 +8,7 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
     message: contactPreferenceEmailOrPost.selectHowYouWantToReceiveUpdatesErrorMessage,
   });
 
-  await performAction('clickRadioButton', contactPreferenceEmailOrPost.byEmailRadioOption);
+  await performAction('check', contactPreferenceEmailOrPost.byEmailCheckbox);
   await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
