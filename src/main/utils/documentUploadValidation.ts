@@ -1,8 +1,8 @@
 import config from 'config';
 
-import { getFileExtensionLower, isBlockedExtension } from './fileExtensionValidation';
+import { getFileExtensionLower } from './fileExtensionValidation';
 
-export { getFileExtensionLower, isBlockedExtension };
+export { getFileExtensionLower, isBlockedExtension } from './fileExtensionValidation';
 
 export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizeMB');
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;

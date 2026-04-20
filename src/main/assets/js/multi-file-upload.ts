@@ -21,7 +21,7 @@ function getOrCreateErrorSummary(form: HTMLFormElement, title: string): HTMLDivE
 
   summary = document.createElement('div');
   summary.className = 'govuk-error-summary';
-  summary.setAttribute('data-module', 'govuk-error-summary');
+  summary.dataset.module = 'govuk-error-summary';
   summary.setAttribute('role', 'alert');
   summary.setAttribute('tabindex', '-1');
   summary.setAttribute('aria-labelledby', 'upload-error-summary-title');
@@ -116,7 +116,7 @@ function initContainer(container: HTMLElement): void {
     return;
   }
 
-  const maxFileSizeMb = parseInt(container.dataset.maxFileSizeMb || '1024', 10);
+  const maxFileSizeMb = Number.parseInt(container.dataset.maxFileSizeMb || '1024', 10);
   const maxBytes = maxFileSizeMb * 1024 * 1024;
   const wrongTypeMessage = container.dataset.errorWrongType || '';
   const tooLargeMessage = container.dataset.errorFileTooLarge || '';
@@ -124,7 +124,7 @@ function initContainer(container: HTMLElement): void {
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
 
-  void new MultiFileUpload(container, {
+  new MultiFileUpload(container, {
     uploadUrl,
     deleteUrl,
     hooks: {
