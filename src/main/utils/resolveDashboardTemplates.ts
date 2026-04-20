@@ -7,7 +7,6 @@ export interface ResolvedNotification {
 
 export interface ResolvedTask {
   title: string;
-  hint?: { html: string };
 }
 
 const MISSING_TRANSLATION_KEY_VALUE = '__MISSING_TRANSLATION__';
@@ -38,17 +37,10 @@ export function resolveNotification(
   return { title, body };
 }
 
-export function resolveTask(
-  t: TFunction,
-  templateId: string,
-  values: Record<string, unknown>,
-  caseReference: string
-): ResolvedTask | null {
-  const merged = withCaseRef(values, caseReference);
+export function resolveTask(t: TFunction, templateId: string): ResolvedTask | null {
   const title = lookup(t, `dashboard:tasks.${templateId}.title`);
   if (!title) {
     return null;
   }
-  const hint = lookup(t, `dashboard:tasks.${templateId}.hint`, merged, true);
-  return { title, hint: hint ? { html: hint } : undefined };
+  return { title };
 }

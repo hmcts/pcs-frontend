@@ -47,7 +47,6 @@ export function unwrapTaskGroups(raw: CcdCollectionItem<CcdDashboardTaskGroup>[]
       (t): DashboardTask => ({
         templateId: t.templateId,
         status: t.status,
-        templateValues: {},
       })
     ),
   }));

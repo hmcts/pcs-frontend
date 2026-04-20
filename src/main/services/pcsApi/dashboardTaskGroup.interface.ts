@@ -5,7 +5,6 @@ export interface DashboardTaskGroup {
 
 export interface DashboardTask {
   templateId: string;
-  templateValues: Record<string, unknown>;
   status: string;
 }
 

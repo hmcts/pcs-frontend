@@ -16,7 +16,6 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 
 interface MappedTask {
   title: { html: string };
-  hint?: { html: string };
   href?: string;
   status: {
     tag?: { text: string; classes: string };
@@ -71,7 +70,7 @@ export default function dashboardRoutes(app: Application): void {
       title: groupTitle ?? tg.groupId,
       tasks: tg.tasks
         .map((task): MappedTask | null => {
-          const resolved = resolveTask(t, task.templateId, task.templateValues, caseReference);
+          const resolved = resolveTask(t, task.templateId);
           if (!resolved) {
             logger.warn(`No dashboard translation for task templateId=${task.templateId}`);
             return null;
@@ -83,7 +82,6 @@ export default function dashboardRoutes(app: Application): void {
 
           return {
             title: { html: resolved.title },
-            hint: resolved.hint,
             href: linkable ? `/dashboard/${caseReference}/${groupIdLower}/${task.templateId}` : undefined,
             status: tagText && classes ? { tag: { text: tagText, classes } } : {},
           };
