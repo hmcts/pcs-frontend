@@ -30,7 +30,6 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-import { TriggerPageFunctionalTestsAction } from '../utils/actions/custom-actions';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -39,9 +38,6 @@ let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page, testInfo);
-  if (test.info().retry > 0) {
-    TriggerPageFunctionalTestsAction.resetTestedPages();
-  }
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
   process.env.CLAIMANT_NAME = claimantName;
   if (testInfo.title.includes('NoticeServed - No')) {
