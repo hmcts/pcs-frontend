@@ -7,6 +7,7 @@ import { flowConfig } from '../flow.config';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';
+import { isLegalRepresentativeUser } from 'steps/utils/userRole';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -156,7 +157,7 @@ export const step: StepDefinition = createFormStep({
       (req.body?.correctType as string) ||
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
       '';
-
+    const claimantName = req.res?.locals.validatedCase?.data?.claimantName as string;
     const orgName = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
       ?.value as string;
     const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as string;
@@ -164,16 +165,14 @@ export const step: StepDefinition = createFormStep({
       ?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string;
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
 
-    const detailsHeading =
-      typeof formContent.detailsHeading === 'string'
-        ? `${formContent.detailsHeading}${orgName}${':'}`
-        : formContent.detailsHeading;
+    const receivedDetailsBy = isLegalRepresentativeUser(req) ? claimantName : orgName;
+
     const tenancyType =
       tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
 
     return {
       ...formContent,
-      detailsHeading,
+      receivedDetailsBy: receivedDetailsBy,
       tenancyType,
       organisationName: orgName,
       orgname: orgName,
