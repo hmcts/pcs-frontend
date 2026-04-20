@@ -77,5 +77,8 @@
   },
   "cdam": {
     "url": "CDAM_URL"
+  },
+  "documentUpload": {
+    "maxFileSizeMB": "DOCUMENT_UPLOAD_MAX_FILE_SIZE_MB"
   }
 }

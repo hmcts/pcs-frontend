@@ -32,32 +32,31 @@ function parseUploadedDocuments(body: Record<string, unknown>): CdamDocument[] {
   }
 
   const items = Array.isArray(raw) ? raw : [raw];
-  const documents: CdamDocument[] = [];
 
-  for (const item of items) {
+  return items.flatMap(item => {
     try {
       const parsed = typeof item === 'string' ? JSON.parse(item) : item;
-      if (parsed?.document_url && parsed?.document_binary_url && parsed?.document_filename) {
-        const doc: CdamDocument = {
-          document_url: parsed.document_url,
-          document_binary_url: parsed.document_binary_url,
-          document_filename: parsed.document_filename,
-        };
-        if (typeof parsed.content_type === 'string' && parsed.content_type) {
-          doc.content_type = parsed.content_type;
-        }
-        const sizeNum = typeof parsed.size === 'number' ? parsed.size : Number(parsed.size);
-        if (!Number.isNaN(sizeNum) && sizeNum >= 0) {
-          doc.size = sizeNum;
-        }
-        documents.push(doc);
+      if (!parsed?.document_url || !parsed?.document_binary_url || !parsed?.document_filename) {
+        return [];
       }
-    } catch {
-      // Skip malformed entries
-    }
-  }
 
-  return documents;
+      const doc: CdamDocument = {
+        document_url: parsed.document_url,
+        document_binary_url: parsed.document_binary_url,
+        document_filename: parsed.document_filename,
+      };
+      if (typeof parsed.content_type === 'string' && parsed.content_type) {
+        doc.content_type = parsed.content_type;
+      }
+      const sizeNum = typeof parsed.size === 'number' ? parsed.size : Number(parsed.size);
+      if (!Number.isNaN(sizeNum) && sizeNum >= 0) {
+        doc.size = sizeNum;
+      }
+      return [doc];
+    } catch {
+      return [];
+    }
+  });
 }
 
 function toCcdDocumentCollection(docs: CdamDocument[]): CcdCollectionItem<CcdDefendantDocument>[] {
