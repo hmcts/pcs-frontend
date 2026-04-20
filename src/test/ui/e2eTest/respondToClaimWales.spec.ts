@@ -1,4 +1,3 @@
-import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
@@ -40,6 +39,7 @@ import {
   yourCircumstances,
 } from '../data/page-data';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
+import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
