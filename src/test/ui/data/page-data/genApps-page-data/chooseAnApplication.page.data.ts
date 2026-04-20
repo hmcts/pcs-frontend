@@ -1,6 +1,6 @@
 export const chooseAnApplication = {
   mainHeader: `Choose an application`,
-  youCannotApplyToSuspendParagraph: `You cannot apply to suspend (stop or delay) the eviction onlines.`,
+  youCannotApplyToSuspendParagraph: `You cannot apply to suspend (stop or delay) the eviction online.`,
   youMustApplyByPostParagraph: `You must apply by post:`,
   readTheGuidanceLink: `read the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)`,
   fillN244aFormLink: `fill in the N244a form`,
@@ -8,7 +8,7 @@ export const chooseAnApplication = {
   sendTheCompletedFormList: `send the completed form to the court, or deliver it by hand`,
   whatDoYouWantToApplyForQuestion: `What do you want to apply for?`,
   adjournTheHearingRadioOption: `Ask to adjourn the hearing (move it to a later time or date)`,
-  youCanApplyToChangeHintText: `You can apply to change the court hearing until a later time or dates`,
+  youCanApplyToChangeHintText: `You can apply to change the court hearing until a later time or date`,
   setAsideRadioOption: `Ask the court to set aside (cancel) a decision the court has made`,
   youCanAskTheCourtToSetAsideHintText: `You can ask the court to set aside its order if you have good reason. For example, if you were unable to attend the court hearing because you were ill`,
   somethingElseRadioOption: `Something else`,
