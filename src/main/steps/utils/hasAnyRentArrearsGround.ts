@@ -3,7 +3,7 @@ import type { Request } from 'express';
 /**
  * Returns true when ANY selected claim ground is marked as rent arrears.
  */
-export const hasAnyRentArrearsGround = async (req: Request): Promise<boolean> => {
+export const hasAnyRentArrearsGround = (req: Request): boolean => {
   const caseData = req.res?.locals?.validatedCase?.data;
   const claimGroundSummaries = caseData?.claimGroundSummaries;
 

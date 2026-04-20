@@ -11,7 +11,7 @@ import type { Request } from 'express';
  *
  * NOT uppercase "ENGLAND"/"WALES" as might be expected.
  */
-export const isWelshProperty = async (req: Request): Promise<boolean> => {
+export const isWelshProperty = (req: Request): boolean => {
   const { legislativeCountry } = req.res?.locals?.validatedCase ?? { legislativeCountry: '' };
 
   // Case-insensitive comparison to handle any case variations
