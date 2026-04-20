@@ -39,9 +39,8 @@ let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  const retry = test.info().retry;
-  if (retry > 0) {
-    TriggerPageFunctionalTestsAction.prepareForRetry();
+  if (test.info().retry > 0) {
+    TriggerPageFunctionalTestsAction.resetTestedPages();
   }
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
   process.env.CLAIMANT_NAME = claimantName;
@@ -172,7 +171,7 @@ test.afterEach(async () => {
 //@noDefendants(submitCasePayloadNoDefendants) represents all defendant details unknown pages and non-rent arrears
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
-test.describe('@wip Respond to a claim - e2e Journey @nightly', async () => {
+test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim @noDefendants @regression @accessibility', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {

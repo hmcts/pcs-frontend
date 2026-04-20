@@ -29,7 +29,6 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
-import { TriggerPageFunctionalTestsAction } from '../utils/actions/custom-actions';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -37,10 +36,6 @@ const home_url = config.get('e2e.testUrl') as string;
 let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
-  const retry = test.info().retry;
-  if (retry > 0) {
-    TriggerPageFunctionalTestsAction.prepareForRetry();
-  }
   initializeExecutor(page);
   process.env.WALES_POSTCODE = 'YES';
   process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
@@ -62,7 +57,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('@wip Respond to a claim - Wales @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
