@@ -9,7 +9,6 @@ import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import type { CcdCase, CcdCaseAddress } from '@services/ccdCase.interface';
 import {
-  type DashboardTask,
   type DashboardTaskGroup,
   STATUS_MAP,
   TASK_GROUP_MAP,
@@ -80,18 +79,6 @@ function getDashboardTaskRoutes(): Record<string, string> {
   return {};
 }
 
-// Overrides for task statuses that must be fixed regardless of what the API returns.
-function getTaskStatusOverrides(): Record<string, DashboardTask['status']> {
-  if (!config.has('dashboard.taskStatusOverrides')) {
-    return {};
-  }
-  const overrides = config.get('dashboard.taskStatusOverrides');
-  if (overrides && typeof overrides === 'object') {
-    return overrides as Record<string, DashboardTask['status']>;
-  }
-  return {};
-}
-
 function getTaskUrl(
   templateId: string,
   taskStatus: string,
@@ -124,7 +111,6 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
 function mapTaskGroups(app: Application, req: Request, caseReference: string) {
   return (taskGroups: DashboardTaskGroup[]): MappedTaskGroup[] => {
     const t = getTranslationFunction(req, ['dashboard']);
-    const statusOverrides = getTaskStatusOverrides();
 
     return taskGroups.map(taskGroup => {
       const mappedTitle = TASK_GROUP_MAP[taskGroup.groupId];
@@ -138,7 +124,6 @@ function mapTaskGroups(app: Application, req: Request, caseReference: string) {
           }
 
           const taskGroupId = taskGroup.groupId.toLowerCase();
-          const taskStatus = statusOverrides[task.templateId] ?? task.status;
 
           const hint =
             task.templateValues.dueDate || task.templateValues.deadline
@@ -155,8 +140,8 @@ function mapTaskGroups(app: Application, req: Request, caseReference: string) {
               html: t(`dashboard:tasks.${task.templateId}.title`),
             },
             hint,
-            href: getTaskUrl(task.templateId, taskStatus, caseReference, taskGroupId),
-            status: STATUS_MAP[taskStatus],
+            href: getTaskUrl(task.templateId, task.status, caseReference, taskGroupId),
+            status: STATUS_MAP[task.status],
           };
         }),
       };
