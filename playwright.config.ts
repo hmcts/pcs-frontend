@@ -26,6 +26,7 @@ export const enable_visibility_validation = process.env.ENABLE_VISIBILITY_VALIDA
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
+const junit_result_output = process.env.PLAYWRIGHT_JUNIT_OUTPUT || 'functional-output/junit-result.xml';
 
 export default defineConfig({
   testDir: './src/test/ui',
@@ -44,7 +45,7 @@ export default defineConfig({
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
   reporter: [
     ['list'],
-    ...(process.env.CI ? [['junit', { outputFile: 'functional-output/junit-result.xml' }] as const] : []),
+    ...(process.env.CI ? [['junit', { outputFile: junit_result_output }] as const] : []),
     [
       'allure-playwright',
       {
