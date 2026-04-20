@@ -20,18 +20,29 @@ export const setupDev = (app: express.Express, developmentMode: boolean): void =
 
   const viewsRoot = path.join(__dirname, 'views');
   const stepsRoot = path.join(__dirname, 'steps');
+  const localesRoot = path.join(__dirname, 'assets', 'locales');
+
+  const publishSync = () =>
+    hotMiddleware.publish({
+      action: 'sync',
+      hash: Date.now().toString(16),
+      errors: [],
+      warnings: [],
+      modules: {},
+    });
+
   chokidar
-    .watch([viewsRoot, stepsRoot], { ignoreInitial: true, ignored: (p: string) => /node_modules|\.git/.test(p) })
-    .on('all', (_event: string, filePath: string) => {
+    .watch([viewsRoot, stepsRoot, localesRoot], {
+      ignoreInitial: true,
+      ignored: (p: string) => /node_modules|\.git/.test(p),
+    })
+    .on('all', async (_event: string, filePath: string) => {
       if (filePath.endsWith('.njk')) {
-        // force reload for nunjucks
-        hotMiddleware.publish({
-          action: 'sync',
-          hash: Date.now().toString(16),
-          errors: [],
-          warnings: [],
-          modules: {},
-        });
+        publishSync();
+      } else if (filePath.startsWith(localesRoot) && filePath.endsWith('.json')) {
+        const i18next = require('i18next');
+        await i18next.reloadResources();
+        publishSync();
       }
     });
 };
