@@ -6,8 +6,8 @@ import { initializeExecutor, performAction } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
 
-test.describe('Respond to a claim - smoke test @smoke @nightly', async () => {
-  test('Respond to a claim @smoke', async ({ page }) => {
+test.describe('Respond to a claim - smoke test @health', async () => {
+  test('Respond to a claim @health', async ({ page }) => {
     initializeExecutor(page);
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
