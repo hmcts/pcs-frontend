@@ -20,6 +20,5 @@ test.describe('Respond to a claim - smoke test @smoke @nightly', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('clickButton', startNow.startNowButton);
   });
 });
