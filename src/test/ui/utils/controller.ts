@@ -24,9 +24,13 @@ let previousUrl: string = '';
 let startFunctionalTests = false;
 let startAxeAudit = false;
 
-export function initializeExecutor(page: Page): void {
+export function initializeExecutor(page: Page, testInfo?: { retry: number }): void {
   testExecutor = { page };
   previousUrl = page.url();
+
+  if (testInfo && testInfo.retry > 0) {
+    TriggerPageFunctionalTestsAction.resetTestedPages();
+  }
 }
 
 function getExecutor(): { page: Page } {

@@ -36,7 +36,7 @@ const home_url = config.get('e2e.testUrl') as string;
 let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
-  initializeExecutor(page);
+  initializeExecutor(page, testInfo);
   process.env.WALES_POSTCODE = 'YES';
   process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
   claimantName = process.env.CLAIMANT_NAME;

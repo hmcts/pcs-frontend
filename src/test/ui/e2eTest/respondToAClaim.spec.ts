@@ -38,7 +38,7 @@ const home_url = config.get('e2e.testUrl') as string;
 let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
-  initializeExecutor(page);
+  initializeExecutor(page, testInfo);
   if (test.info().retry > 0) {
     TriggerPageFunctionalTestsAction.resetTestedPages();
   }
