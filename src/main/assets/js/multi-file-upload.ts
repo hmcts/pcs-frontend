@@ -2,6 +2,8 @@ import { MultiFileUpload } from '@ministryofjustice/frontend';
 
 import { isBlockedExtension } from '@utils/fileExtensionValidation';
 
+const uploadInstances = new WeakMap<HTMLElement, MultiFileUpload>();
+
 interface DisplayDocument {
   index: number;
   document_filename: string;
@@ -124,7 +126,7 @@ function initContainer(container: HTMLElement): void {
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
 
-  new MultiFileUpload(container, {
+  const instance = new MultiFileUpload(container, {
     uploadUrl,
     deleteUrl,
     hooks: {
@@ -214,6 +216,7 @@ function initContainer(container: HTMLElement): void {
       },
     },
   });
+  uploadInstances.set(container, instance);
 
   form.addEventListener('submit', event => {
     if (!hasVisibleError(container)) {
