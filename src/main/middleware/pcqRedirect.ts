@@ -75,10 +75,8 @@ export function pcqRedirectMiddleware() {
 
     try {
       const updatedCase = await ccdCaseService.updateDraftRespondToClaim(user.accessToken, ccdCase.id, {
-        data: {
-          ...ccdCase.data,
-          userPcqId: pcqId,
-        },
+        ...ccdCase.data,
+        userPcqId: pcqId,
       });
 
       res.locals.validatedCase = new CcdCaseModel(updatedCase);
