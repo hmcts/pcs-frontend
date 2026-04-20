@@ -1,9 +1,9 @@
 import type { Request } from 'express';
 import { DateTime } from 'luxon';
 
+import { saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
-import { saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { Logger } from '@modules/logger';

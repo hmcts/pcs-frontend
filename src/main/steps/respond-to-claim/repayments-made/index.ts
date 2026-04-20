@@ -1,5 +1,5 @@
-import { getClaimantName } from '../../utils/getClaimantName';
 import { saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
