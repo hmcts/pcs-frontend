@@ -2,15 +2,7 @@ import { Request } from 'express';
 
 import { hasAnyRentArrearsGround, isNoticeDateProvided, normalizeYesNoNotSureValue } from '../utils';
 
-export function getContactByTelephoneAnswer(
-  req: Request,
-  currentStepData: Record<string, unknown> = {}
-): 'yes' | 'no' | undefined {
-  const currentAnswer = currentStepData.contactByTelephone;
-  if (currentAnswer === 'yes' || currentAnswer === 'no') {
-    return currentAnswer;
-  }
-
+export function getContactByTelephoneAnswer(req: Request): 'yes' | 'no' | undefined {
   const fromCcd = req.res?.locals?.validatedCase?.isDefendantContactByPhone;
   if (fromCcd === true) {
     return 'yes';
@@ -22,17 +14,7 @@ export function getContactByTelephoneAnswer(
   return undefined;
 }
 
-export function getConfirmNoticeGivenAnswer(
-  req: Request,
-  currentStepData: Record<string, unknown> = {}
-): 'yes' | 'no' | 'imNotSure' | undefined {
-  const currentAnswer = normalizeYesNoNotSureValue(
-    currentStepData.confirmNoticeGiven ?? currentStepData.possessionNoticeReceived
-  );
-  if (currentAnswer) {
-    return currentAnswer;
-  }
-
+export function getConfirmNoticeGivenAnswer(req: Request): 'yes' | 'no' | 'imNotSure' | undefined {
   const ccdAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
   if (ccdAnswer === 'yes' || ccdAnswer === 'no' || ccdAnswer === 'imNotSure') {
     return ccdAnswer;
@@ -49,26 +31,20 @@ export function getConfirmNoticeGivenAnswer(
   return undefined;
 }
 
-export async function isNoticeDateConfirmedAndProvided(
-  req: Request,
-  currentStepData: Record<string, unknown> = {}
-): Promise<boolean> {
-  if (getConfirmNoticeGivenAnswer(req, currentStepData) !== 'yes') {
+export function isNoticeDateConfirmedAndProvided(req: Request): boolean {
+  if (getConfirmNoticeGivenAnswer(req) !== 'yes') {
     return false;
   }
 
   return isNoticeDateProvided(req);
 }
 
-export async function isNoticeDateConfirmedAndNotProvided(
-  req: Request,
-  currentStepData: Record<string, unknown> = {}
-): Promise<boolean> {
-  if (getConfirmNoticeGivenAnswer(req, currentStepData) !== 'yes') {
+export function isNoticeDateConfirmedAndNotProvided(req: Request): boolean {
+  if (getConfirmNoticeGivenAnswer(req) !== 'yes') {
     return false;
   }
 
-  return !(await isNoticeDateProvided(req));
+  return !isNoticeDateProvided(req);
 }
 
 export function hasRejectedRepaymentAgreement(req: Request): boolean {
@@ -85,32 +61,10 @@ export function hasConfirmedInstallmentOffer(req: Request): boolean {
   return ccdAnswer === 'YES';
 }
 
-export async function shouldShowInstallmentPaymentsStep(
-  req: Request,
-  currentStepData: Record<string, unknown> = {}
-): Promise<boolean> {
-  const repaymentsAgreed = currentStepData.repaymentsAgreed;
-
-  if (repaymentsAgreed === 'yes' || repaymentsAgreed === 'imNotSure') {
-    return false;
-  }
-
-  if (repaymentsAgreed === 'no') {
-    return hasAnyRentArrearsGround(req);
-  }
-
+export function shouldShowInstallmentPaymentsStep(req: Request): boolean {
   return hasRejectedRepaymentAgreement(req) && hasAnyRentArrearsGround(req);
 }
 
-export function shouldShowHowMuchAffordToPayStep(req: Request, currentStepData: Record<string, unknown> = {}): boolean {
-  const offer = currentStepData.confirmInstallmentOffer;
-
-  if (offer === 'yes') {
-    return true;
-  }
-  if (offer === 'no') {
-    return false;
-  }
-
+export function shouldShowHowMuchAffordToPayStep(req: Request): boolean {
   return hasConfirmedInstallmentOffer(req);
 }
