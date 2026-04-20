@@ -18,7 +18,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@axe-core/playwright@npm:4.11.1, @axe-core/playwright@npm:^4.11.0":
+"@axe-core/playwright@npm:4.11.2":
+  version: 4.11.2
+  resolution: "@axe-core/playwright@npm:4.11.2"
+  dependencies:
+    axe-core: "npm:~4.11.3"
+  peerDependencies:
+    playwright-core: ">= 1.0.0"
+  checksum: 10/3e4b3d75c56442dadc42717ab28167edcef8df1442bd3b51ddf25947d3be63ff08a2e3e1a382a04a681a1438f81d4685d099d093afa9abb0ec485b535df2a830
+  languageName: node
+  linkType: hard
+
+"@axe-core/playwright@npm:^4.11.0":
   version: 4.11.1
   resolution: "@axe-core/playwright@npm:4.11.1"
   dependencies:
@@ -5385,7 +5396,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axe-core@npm:^4.11.1, axe-core@npm:^4.11.2":
+"axe-core@npm:^4.11.1, axe-core@npm:^4.11.2, axe-core@npm:~4.11.3":
   version: 4.11.3
   resolution: "axe-core@npm:4.11.3"
   checksum: 10/4ef64672117df20f040b245d78b5b38552497bd6a1a84222f8c6a07304e0a374a290504ccd76efc3d1ee3a17c8731a65b625a49bf6701c7bd16093a54fcd5b8d
@@ -5410,7 +5421,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.15.0, axios@npm:^1.8.4":
+"axios@npm:1.15.1":
+  version: 1.15.1
+  resolution: "axios@npm:1.15.1"
+  dependencies:
+    follow-redirects: "npm:^1.15.11"
+    form-data: "npm:^4.0.5"
+    proxy-from-env: "npm:^2.1.0"
+  checksum: 10/bfa286e29d1866695426b45c9a25ef21975669e500a8511a01e2fe5b9c4f734906701266d214b562dc525e463bae2bbba24c8e9e10c214f0d4f4c669e9372a7f
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.8.4":
   version: 1.15.0
   resolution: "axios@npm:1.15.0"
   dependencies:
@@ -8606,9 +8628,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-webpack-plugin@npm:5.6.6":
-  version: 5.6.6
-  resolution: "html-webpack-plugin@npm:5.6.6"
+"html-webpack-plugin@npm:5.6.7":
+  version: 5.6.7
+  resolution: "html-webpack-plugin@npm:5.6.7"
   dependencies:
     "@types/html-minifier-terser": "npm:^6.0.0"
     html-minifier-terser: "npm:^6.0.2"
@@ -8623,7 +8645,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10/819ebee079466029a771236fdadcbcfe0aaf110eac1b74c0983a0318a7f99f3c69adcf1d617e218769a8c8e96ea17de2df30759bd950ec391d0c5676d480894e
+  checksum: 10/fc81e1c2d3ef5d709b700b53bb31feef200a08d9b31a819d4623c80dcf412245939a9d6014e574dc5bed7388b3119e29d047d9e712c4889b8d7270dc25990a8d
   languageName: node
   linkType: hard
 
@@ -11744,7 +11766,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "pcs-frontend@workspace:."
   dependencies:
-    "@axe-core/playwright": "npm:4.11.1"
+    "@axe-core/playwright": "npm:4.11.2"
     "@azure/monitor-opentelemetry": "npm:1.16.0"
     "@eslint/compat": "npm:2.0.5"
     "@eslint/eslintrc": "npm:3.3.5"
@@ -11783,7 +11805,7 @@ __metadata:
     allure-commandline: "npm:2.37.0"
     allure-js-commons: "npm:3.5.0"
     allure-playwright: "npm:3.5.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:2.2.2"
     config: "npm:3.3.12"
     connect-redis: "npm:7.1.1"
@@ -11805,7 +11827,7 @@ __metadata:
     globals: "npm:16.5.0"
     govuk-frontend: "npm:5.13.0"
     helmet: "npm:8.1.0"
-    html-webpack-plugin: "npm:5.6.6"
+    html-webpack-plugin: "npm:5.6.7"
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
     i18next: "npm:25.10.10"
