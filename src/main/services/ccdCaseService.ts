@@ -349,17 +349,12 @@ export const ccdCaseService = {
 
   async getDashboardView(accessToken: string, caseId: string): Promise<TransformedDashboardData> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/dashboardView?ignore-warning=false`;
-    console.log('[getDashboardView] Calling CCD dashboardView event trigger:', eventUrl);
     try {
       const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
       const raw = response.data.case_details?.case_data?.dashboardData ?? {};
-      console.log('[getDashboardView] Raw dashboardData from CCD:', JSON.stringify(raw, null, 2));
 
       const notifications = unwrapNotifications(raw.notifications);
       const taskGroups = unwrapTaskGroups(raw.taskGroups);
-
-      console.log('[getDashboardView] Transformed notifications:', JSON.stringify(notifications, null, 2));
-      console.log('[getDashboardView] Transformed taskGroups:', JSON.stringify(taskGroups, null, 2));
 
       return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress) };
     } catch (error) {

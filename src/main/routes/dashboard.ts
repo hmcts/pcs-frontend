@@ -123,7 +123,6 @@ export default function dashboardRoutes(app: Application): void {
     const dashboardCaseReference = caseReference.replace(/(\d{4})(?=\d)/g, '$1 ');
 
     try {
-      console.log('[dashboard route] Fetching dashboardView for case:', caseReference);
       const dashboardData = await ccdCaseService.getDashboardView(accessToken, caseReference);
 
       const t = getTranslationFunction(req, ['dashboard', 'common']);
@@ -146,10 +145,6 @@ export default function dashboardRoutes(app: Application): void {
       const taskGroups = dashboardData.taskGroups.map(tg => mapTaskGroup(tg, t, caseReference));
 
       const propertyAddress = dashboardData.propertyAddress ?? null;
-
-      console.log('[dashboard route] Resolved notifications for view:', JSON.stringify(notifications, null, 2));
-      console.log('[dashboard route] Resolved taskGroups for view:', JSON.stringify(taskGroups, null, 2));
-      console.log('[dashboard route] Property address:', propertyAddress);
 
       return res.render('dashboard', {
         notifications,
