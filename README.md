@@ -196,8 +196,33 @@ Note: An auto-generated password will be output when the script runs.
 UI tests use [Playwright](https://playwright.dev/).
 
 - **`yarn test:functional`** — Chrome regression scope (see script / `E2E_TEST_SCOPE`). Point tests at your app with env (e.g. **`TEST_URL`** in `.env`).
-- **`yarn test:E2e`** — same Playwright config as nightly: tag filter and optional spec keywords come from **`E2E_TEST_SCOPE`** and **`E2E_SPEC`** (Jenkins maps **`PLAYWRIGHT_GREP_TAG`** / **`PLAYWRIGHT_SPEC`**). Browser: **`PLAYWRIGHT_PROJECT`** (default `chrome`). With `CI=true`, extra projects exist: `firefox`, `webkit`, `edge`, `mobile-android`, `mobile-ios`, `mobile-ipad`.
+- **`yarn test:E2e`** — Playwright reads **`E2E_TEST_SCOPE`** (title `grep`) and **`E2E_SPEC`** (optional path keywords → `testMatch` globs) from the environment. **`PLAYWRIGHT_PROJECT`** picks the browser (default `chrome`). With `CI=true`, extra projects exist: `firefox`, `webkit`, `edge`, `mobile-android`, `mobile-ios`, `mobile-ipad`. Jenkins nightly and PR pipelines set `E2E_*` for you; locally you can set the same vars or rely on config defaults in `playwright.config.ts`.
 - **`yarn test:changed`** — changed specs only.
+
+**Nightly (`Jenkinsfile_nightly`)** — `setFunctionalTestEnvVars()` copies job parameters onto `env` for Playwright:
+
+| Jenkins parameter | Maps to | Behaviour |
+|-------------------|---------|-----------|
+| `PLAYWRIGHT_SPEC` | `E2E_SPEC` | Optional. Comma- or semicolon-separated **keywords**; each must appear **verbatim** in the path of a `*.spec.ts` under `src/test/ui` (see parameter description in the job). Blank = all specs. |
+| `PLAYWRIGHT_GREP_TAG` | `E2E_TEST_SCOPE` | Fixed dropdown. Any choice except **`(all tests)`** is passed through as the title filter. **`(all tests)`** clears the tag filter (no `grep`). |
+| `ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`, `ENABLE_AXE_AUDIT` | same names | Passed through to Playwright / helpers. |
+| Per-browser matrix | `PLAYWRIGHT_PROJECT` | Set only for each `yarn test:E2e` stage (`chrome`, `firefox`, …). |
+
+**PR (`Jenkinsfile_CNP`)** — optional GitHub labels (first label matching each prefix wins). Values after the colon are trimmed and passed to `env` as below.
+
+| Label | Effect |
+|-------|--------|
+| `e2e-tag:<value>` | Sets `E2E_TEST_SCOPE` to `<value>` for Playwright title `grep`, unless `<value>` is **`ALL`** or **`(all tests)`** (matched case-insensitively) → no tag filter. If **no** `e2e-tag:` label → `E2E_TEST_SCOPE` is **`@PR`**. |
+| `e2e-spec:<keywords>` | Sets `E2E_SPEC` (same comma/semicolon keyword rules as nightly). |
+| `enable_all_page_functional_tests` | Turns on the bundled page functional checks (same as before). |
+| `enable_content_validation`, `enable_visibility_validation`, `enable_error_messages_validation`, `enable_navigation_tests` | Set the matching `ENABLE_*` env flags when present. |
+
+If none of the E2E labels above are used, PR E2E uses **`@PR`** grep, no spec filter, and page functional flags stay **off** unless you add the granular `enable_*` labels. Axe is not set from PR Jenkins config; it follows **`playwright.config.ts`** (default on unless `ENABLE_AXE_AUDIT` is set elsewhere).
+
+**Case sensitivity and matching**
+
+- **Spec path keywords** (`PLAYWRIGHT_SPEC` / `e2e-spec:` → `E2E_SPEC`): **case-sensitive**. Each keyword must match the **exact** spelling and casing of the substring in the spec file path (e.g. `respondToAClaim` vs `respondtoaclaim` are not interchangeable). Separate multiple keywords with **comma** or **semicolon**.
+- **Tag / title filter** (`PLAYWRIGHT_GREP_TAG` / `e2e-tag:` → `E2E_TEST_SCOPE`): passed into Playwright as a **regular expression** over test titles. Use the **exact** characters that appear in titles (e.g. **`@smoke`** not **`@Smoke`**). Nightly tags are fixed by the dropdown; on PR, anything you type after `e2e-tag:` is used as-is, except the two **“run all tests”** sentinels **`ALL`** and **`(all tests)`**, which are detected case-insensitively and mean “no tag grep”.
 
 ### Stubbing Wiremock for local development
 
