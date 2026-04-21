@@ -1,10 +1,10 @@
 import { normalizeYesNoValue } from '../../utils';
-import { saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { YesNoValue } from '@services/ccdCase.interface';
 
 function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): YesNoValue | undefined {
   if (value === 'yes') {
@@ -23,20 +23,19 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/instalmentOffer.njk`,
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
     const repayArrearsInstalments = repayArrearsInstalmentsFromConfirmOffer(
       req.body?.confirmInstallmentOffer as string | undefined
     );
-    if (repayArrearsInstalments === undefined) {
-      return;
+
+    if (repayArrearsInstalments) {
+      response.defendantResponses.paymentAgreement.repayArrearsInstalments = repayArrearsInstalments;
+    } else {
+      delete response.defendantResponses.paymentAgreement.repayArrearsInstalments;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        paymentAgreement: { repayArrearsInstalments },
-      },
-    };
-
-    await saveDraftDefendantResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data as

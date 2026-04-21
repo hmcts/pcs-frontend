@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import { DateTime } from 'luxon';
 
-import { saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
@@ -9,7 +9,7 @@ import { flowConfig } from '../flow.config';
 import { Logger } from '@modules/logger';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CaseData, PossessionClaimResponse } from '@services/ccdCase.interface';
+import type { CaseData } from '@services/ccdCase.interface';
 
 const logger = Logger.getLogger('confirmation-of-notice-date-when-provided');
 
@@ -78,19 +78,20 @@ export const step: StepDefinition = createFormStep({
   },
 
   beforeRedirect: async (req: Request) => {
+    const response = buildDraftDefendantResponse(req);
     const dateObject: { day?: string; month?: string; year?: string } | undefined = req.body?.noticeReceivedDate;
     const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
     const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
     const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
     const noticeReceivedDate = formatDatePartsToISODate(day, month, year);
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        ...(noticeReceivedDate && { noticeReceivedDate }),
-      },
-    };
+    if (noticeReceivedDate) {
+      response.defendantResponses.noticeReceivedDate = noticeReceivedDate;
+    } else {
+      delete response.defendantResponses.noticeReceivedDate;
+    }
 
-    await saveDraftDefendantResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 
   extendGetContent: req => {

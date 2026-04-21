@@ -1,10 +1,9 @@
 import { additionalRentContributionToPoundsString, poundsStringToPence } from '../../utils';
-import { saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'how-much-afford-to-pay',
@@ -12,34 +11,28 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
     const installmentAmount = req.body?.installmentAmount as string | undefined;
     const installmentFrequency = req.body?.installmentFrequency as string | undefined;
-
-    const paymentAgreement: Record<string, unknown> = {};
 
     if (typeof installmentAmount === 'string' && installmentAmount.trim()) {
       const amountInPence = poundsStringToPence(installmentAmount);
       if (amountInPence !== undefined) {
         // pcs-api MoneyGBP JSON is a pence string (see MoneyGBPDeserializer), not { amount: ... }.
-        paymentAgreement.additionalRentContribution = String(amountInPence);
+        response.defendantResponses.paymentAgreement.additionalRentContribution = String(amountInPence);
       }
+    } else {
+      delete response.defendantResponses.paymentAgreement.additionalRentContribution;
     }
 
     if (typeof installmentFrequency === 'string' && installmentFrequency.trim()) {
-      paymentAgreement.additionalContributionFrequency = installmentFrequency.trim();
+      response.defendantResponses.paymentAgreement.additionalContributionFrequency = installmentFrequency.trim();
+    } else {
+      delete response.defendantResponses.paymentAgreement.additionalContributionFrequency;
     }
 
-    if (Object.keys(paymentAgreement).length === 0) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        paymentAgreement,
-      },
-    };
-
-    await saveDraftDefendantResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   translationKeys: {
     pageTitle: 'pageTitle',
