@@ -1,10 +1,5 @@
 import { Page, test } from '@playwright/test';
 
-/* eslint-disable import/order -- setup-env before playwright.config (CommonJS order). */
-import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
-
-loadPlaywrightSetupEnvIntoProcess();
-
 import {
   enable_axe_audit,
   enable_content_validation,
@@ -12,8 +7,9 @@ import {
   enable_navigation_tests,
 } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
-/* eslint-enable import/order */
+import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
 
+loadPlaywrightSetupEnvIntoProcess();
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
