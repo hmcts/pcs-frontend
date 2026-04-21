@@ -5,6 +5,7 @@ import {
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
+  hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
   isNoticeDateProvided,
   isNoticeServed,
@@ -102,6 +103,10 @@ export const flowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have',
     'other-considerations',
     'upload-docs',
+    'equality-and-diversity-start',
+    'equality-and-diversity-end',
+    'language-used',
+    'check-your-answers',
     'end-now',
     'installment-payments',
   ],
@@ -507,6 +512,35 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'upload-docs': {
       previousStep: 'other-considerations',
+      defaultNext: 'equality-and-diversity-start',
+    },
+    'equality-and-diversity-start': {
+      previousStep: 'what-other-regular-expenses-do-you-have',
+      routes: [
+        {
+          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
+            currentStepData.equalityStartChoice === 'skip',
+          nextStep: 'language-used',
+        },
+        {
+          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
+            currentStepData.equalityStartChoice === 'continue',
+          nextStep: 'equality-and-diversity-end',
+        },
+      ],
+      defaultNext: 'equality-and-diversity-end',
+    },
+    'equality-and-diversity-end': {
+      previousStep: 'equality-and-diversity-start',
+      defaultNext: 'language-used',
+    },
+    'language-used': {
+      previousStep: (req: Request) =>
+        hasSkippedEqualityAndDiversityQuestions(req) ? 'equality-and-diversity-start' : 'equality-and-diversity-end',
+      defaultNext: 'check-your-answers',
+    },
+    'check-your-answers': {
+      previousStep: 'language-used',
       defaultNext: 'end-now',
     },
   },

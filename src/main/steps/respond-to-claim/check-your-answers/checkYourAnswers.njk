@@ -1,0 +1,14 @@
+{% extends "stepsTemplate.njk" %}
+{% from "macros/stepButtons.njk" import stepButtons %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+  <h1 class="govuk-heading-l">Check your answers (placeholder)</h1>
+  <p class="govuk-body">This is a placeholder for Check your answers step.</p>
+  <form method="post" action="{{ url }}">
+    {{ csrfProtection(csrfToken) }}
+  </form>
+{% endblock %}
