@@ -12,22 +12,22 @@
     "Task": {
       "AAA6": {
         "Claim": {
-          "ViewClaim": {"title": "View the claim"},
-          "Adjustments": {"title": "Support or adjustments during your hearing"},
-          "Equality": {"title": "Equality"},
-          "Information": {"title": "Claim information"}
+          "ViewClaim": { "title": "View the claim" },
+          "Adjustments": { "title": "Support or adjustments during your hearing" },
+          "Equality": { "title": "Equality" },
+          "Information": { "title": "Claim information" }
         },
         "Response": {
-          "ViewResponse": {"title": "View the response"},
-          "Information": {"title": "Response information"}
+          "ViewResponse": { "title": "View the response" },
+          "Information": { "title": "Response information" }
         },
         "Hearing": {
-          "ViewHearing": {"title": "View the hearing"},
-          "UploadDocuments": {"title": "Upload documents"},
-          "ViewDocuments": {"title": "View documents"},
-          "TrialArrangments": {"title": "Trial arrangements"},
-          "PayFee": {"title": "Pay the hearing fee"},
-          "ViewBundle": {"title": "View the hearing bundle"}
+          "ViewHearing": { "title": "View the hearing" },
+          "UploadDocuments": { "title": "Upload documents" },
+          "ViewDocuments": { "title": "View documents" },
+          "TrialArrangments": { "title": "Trial arrangements" },
+          "PayFee": { "title": "Pay the hearing fee" },
+          "ViewBundle": { "title": "View the hearing bundle" }
         }
       }
     }

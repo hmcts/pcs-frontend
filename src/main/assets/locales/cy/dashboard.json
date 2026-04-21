@@ -13,22 +13,22 @@
     "Task": {
       "AAA6": {
         "Claim": {
-          "ViewClaim": {"title": "cyView the claim"},
-          "Adjustments": {"title": "cySupport or adjustments during your hearing"},
-          "Equality": {"title": "cyEquality"},
-          "Information": {"title": "cyClaim information"}
+          "ViewClaim": { "title": "cyView the claim" },
+          "Adjustments": { "title": "cySupport or adjustments during your hearing" },
+          "Equality": { "title": "cyEquality" },
+          "Information": { "title": "cyClaim information" }
         },
         "Response": {
-          "ViewResponse": {"title": "cyView the response"},
-          "Information": {"title": "cyResponse information"}
+          "ViewResponse": { "title": "cyView the response" },
+          "Information": { "title": "cyResponse information" }
         },
         "Hearing": {
-          "ViewHearing": {"title": "cyView the hearing"},
-          "UploadDocuments": {"title": "cyUpload documents"},
-          "ViewDocuments": {"title": "cyView documents"},
-          "TrialArrangments": {"title": "cyTrial arrangements"},
-          "PayFee": {"title": "cyPay the hearing fee"},
-          "ViewBundle": {"title": "cyView the hearing bundle"}
+          "ViewHearing": { "title": "cyView the hearing" },
+          "UploadDocuments": { "title": "cyUpload documents" },
+          "ViewDocuments": { "title": "cyView documents" },
+          "TrialArrangments": { "title": "cyTrial arrangements" },
+          "PayFee": { "title": "cyPay the hearing fee" },
+          "ViewBundle": { "title": "cyView the hearing bundle" }
         }
       }
     }
