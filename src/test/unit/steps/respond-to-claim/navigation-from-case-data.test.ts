@@ -34,22 +34,12 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const noticeDateProvidedReq = createReq({
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
-      data: {
-        possessionClaimResponse: {
-          defendantResponses: {
-            possessionNoticeReceived: 'YES',
-          },
-        },
-      },
+      defendantResponsesConfirmNoticeGiven: 'yes',
     });
     const rentArrearsReq = createReq({
       noticeServed: 'YES',
+      defendantResponsesConfirmNoticeGiven: 'imNotSure',
       data: {
-        possessionClaimResponse: {
-          defendantResponses: {
-            possessionNoticeReceived: 'NOT_SURE',
-          },
-        },
         claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
       },
     });
@@ -66,12 +56,8 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const unexpectedValueReq = createReq({
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
+      defendantResponsesConfirmNoticeGiven: 'NOT SURE',
       data: {
-        possessionClaimResponse: {
-          defendantResponses: {
-            possessionNoticeReceived: 'NOT SURE',
-          },
-        },
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
       },
     });

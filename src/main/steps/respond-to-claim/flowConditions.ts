@@ -1,26 +1,9 @@
 import { Request } from 'express';
 
-import { hasAnyRentArrearsGround, isNoticeDateProvided, normalizeYesNoNotSureValue } from '../utils';
-
-export function getConfirmNoticeGivenAnswer(req: Request): 'yes' | 'no' | 'imNotSure' | undefined {
-  const mappedAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
-  if (mappedAnswer === 'yes' || mappedAnswer === 'no' || mappedAnswer === 'imNotSure') {
-    return mappedAnswer;
-  }
-
-  const legacyNestedAnswer = normalizeYesNoNotSureValue(
-    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.confirmNoticeGiven ??
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived
-  );
-  if (legacyNestedAnswer) {
-    return legacyNestedAnswer;
-  }
-
-  return undefined;
-}
+import { hasAnyRentArrearsGround, isNoticeDateProvided } from '../utils';
 
 export function isNoticeDateConfirmedAndProvided(req: Request): boolean {
-  if (getConfirmNoticeGivenAnswer(req) !== 'yes') {
+  if (req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven !== 'yes') {
     return false;
   }
 
@@ -28,7 +11,7 @@ export function isNoticeDateConfirmedAndProvided(req: Request): boolean {
 }
 
 export function isNoticeDateConfirmedAndNotProvided(req: Request): boolean {
-  if (getConfirmNoticeGivenAnswer(req) !== 'yes') {
+  if (req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven !== 'yes') {
     return false;
   }
 
