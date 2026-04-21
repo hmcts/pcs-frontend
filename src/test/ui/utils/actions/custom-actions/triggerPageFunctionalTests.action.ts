@@ -2,7 +2,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Page, test } from '@playwright/test';
-import { error } from 'winston';
 
 import {
   enable_content_validation,
@@ -71,10 +70,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       }
       const urlSegment = this.getUrlSegment(page.url());
       console.warn(
-        `[PFT] WARNING mapping missing in urlToFileMapping.config.ts | test="${truncateForLog(
-          test.info().title,
-          160
-        )}" | url=${shortUrl(page.url())} | key: ${urlSegment}`
+        `[PFT] WARNING mapping missing in urlToFileMapping.config.ts | test="${truncateForLog(test.info().title, 160)}" | url=${shortUrl(page.url())} | key: ${urlSegment}`
       );
       return;
     }
@@ -190,8 +186,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       fs.mkdirSync(TriggerPageFunctionalTestsAction.PASSED_DIR, { recursive: true });
       const lockPath = path.join(TriggerPageFunctionalTestsAction.PASSED_DIR, `${pageName}.lock`);
       fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'w' });
-    } catch {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -200,8 +196,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       fs.mkdirSync(TriggerPageFunctionalTestsAction.FAILED_DIR, { recursive: true });
       const lockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_DIR, `${pageName}.lock`);
       fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'w' });
-    } catch {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -211,8 +207,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       if (fs.existsSync(lockPath)) {
         fs.unlinkSync(lockPath);
       }
-    } catch (_error) {
-      console.error(_error);
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -302,7 +298,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         await validationFunction(page);
       } catch (err) {
         VisibilityValidation.trackValidationError(pageName, err);
-        throw error;
+        throw err;
       }
     } else {
       VisibilityValidation.trackMissingMethod(pageName);
