@@ -1,0 +1,5 @@
+{
+  "question": "When did the defendant receive notice from {{claimantName}} (optional)?",
+  "noticeDateHint": "",
+  "paragraph": "{{claimantName}} did not provide the date they served the defendant notice."
+}
