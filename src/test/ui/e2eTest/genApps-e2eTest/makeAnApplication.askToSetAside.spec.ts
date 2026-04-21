@@ -59,8 +59,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-    await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
-    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performAction('confirmOtherPartiesAgreed', {
+      question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
+      option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption
+    });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
@@ -71,6 +73,8 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
     await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+   // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 });

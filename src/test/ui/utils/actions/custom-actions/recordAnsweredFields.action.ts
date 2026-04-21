@@ -32,6 +32,19 @@ export const FieldsStore = {
   delete(key: string): boolean {
     return fieldsMap.delete(key);
   },
+
+  rename(oldKey: string, newKey: string): boolean {
+    if (!fieldsMap.has(oldKey) || fieldsMap.has(newKey)) {
+      console.log(`Keys ${oldKey} nor ${newKey} is present`);
+      return false;
+    }
+
+    const value = fieldsMap.get(oldKey)!;
+    fieldsMap.set(newKey, value);
+    fieldsMap.delete(oldKey);
+    return true;
+  },
+
 };
 
 export class RecordAnswers implements IAction {
