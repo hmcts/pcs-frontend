@@ -61,10 +61,13 @@ export function buildFormContent(
     }
   }
 
+  const allFieldsHaveOwnFieldset = fields.length > 0 && fields.every(f => f.type === 'radio' || f.type === 'checkbox');
+
   return {
     ...bodyData,
     fieldValues,
     fields: fieldsWithLabels,
+    allFieldsHaveOwnFieldset,
     title: pageTitle,
     ...translatedContent,
     showCancelButton,
