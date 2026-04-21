@@ -201,8 +201,8 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 ### Nightly (Jenkinsfile_nightly)
 
-- **Schedule:** Mon–Fri at ~07:00.
-- **E2E tests:** Runs per-browser stages (Chrome, Firefox, Safari) with separate Allure reports for each.
-- **Accessibility:** Runs `@accessibility` tests on Chrome.
-- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` with links to all 4 reports (Chrome, Firefox, Safari, Accessibility).
-- **Stage behaviour:** If a browser fails, the stage shows red but the pipeline continues to the next browser. All stages always run.
+- **Schedule:** Mon–Fri at ~07:00; the job can also be run on demand via **Build with Parameters** (e.g. release verification).
+- **E2E tests:** One stage per enabled platform — Desktop Chrome, Firefox, Safari (WebKit), Edge, Mobile Android (Pixel 5 profile), Mobile iOS (iPhone 12 WebKit profile), Mobile iPad (iPad Pro 11 WebKit profile).Each runs `yarn test:E2e` with `PLAYWRIGHT_PROJECT` set (tests filtered with `--grep @nightly`) and publishes a separate Allure report (`Full <Platform> E2E Test Report`).
+- **By default only Chrome is enabled;** tick the other platform checkboxes when you need those runs.
+- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` per stage with the matching report link.
+- **Stage behaviour:** If a platform fails, that stage is marked failed but the pipeline continues; remaining stages still run.
