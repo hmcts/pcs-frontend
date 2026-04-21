@@ -14,3 +14,4 @@ export { poundsStringToPence, additionalRentContributionToPoundsString } from '.
 export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
+export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
