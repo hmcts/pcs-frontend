@@ -1,4 +1,8 @@
 {
   "bulletPoint": "The tenancy, occupation contract or licence began on {{tenancyStartDate}}",
-  "notSure": "Defendant is not sure"
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "notSure": "Defendant is not sure"
+  }
 }
