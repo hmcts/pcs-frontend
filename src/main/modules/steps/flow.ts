@@ -258,18 +258,6 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
     const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
     const formData = req.session?.formData || {};
 
-    if (flowConfig.useShowConditions && flowConfig.steps[stepName]?.showCondition) {
-      const canShowStep = flowConfig.steps[stepName].showCondition(req);
-      if (!canShowStep) {
-        logger.debug(`Step ${stepName} is hidden by showCondition`);
-        const caseReference = req.res?.locals.validatedCase?.id;
-        const journeyStartStep = await getFirstVisibleStep(req, flowConfig);
-        if (journeyStartStep) {
-          return res.redirect(303, getStepUrl(journeyStartStep, flowConfig, caseReference));
-        }
-      }
-    }
-
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
     if (missingDependency) {
@@ -280,21 +268,6 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
 
     next();
   };
-}
-
-async function getFirstVisibleStep(req: Request, flowConfig: JourneyFlowConfig): Promise<string | null> {
-  for (const stepName of flowConfig.stepOrder) {
-    const stepConfig = flowConfig.steps[stepName];
-    if (!stepConfig?.showCondition) {
-      return stepName;
-    }
-
-    if (stepConfig.showCondition(req)) {
-      return stepName;
-    }
-  }
-
-  return null;
 }
 
 function getStepIndex(flowConfig: JourneyFlowConfig, stepName: string) {

@@ -14,7 +14,7 @@ export function normalizeYesNoNotSureValue(value: unknown): 'yes' | 'no' | 'imNo
   if (normalized === 'NO') {
     return 'no';
   }
-  if (normalized === 'NOT_SURE' || normalized === 'IM_NOT_SURE' || normalized === 'IMNOTSURE') {
+  if (normalized === 'NOT_SURE') {
     return 'imNotSure';
   }
 

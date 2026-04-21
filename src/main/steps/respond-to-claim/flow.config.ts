@@ -10,7 +10,6 @@ import {
 } from '../utils';
 
 import {
-  getContactByTelephoneAnswer,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
   shouldShowHowMuchAffordToPayStep,
@@ -77,7 +76,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => !isDefendantNameKnown(req),
     },
     'contact-preferences-text-message': {
-      showCondition: (req: Request) => getContactByTelephoneAnswer(req) === 'yes',
+      showCondition: (req: Request) => req.res?.locals?.validatedCase?.isDefendantContactByPhone === true,
     },
     'landlord-registered': {
       showCondition: (req: Request) => isWelshProperty(req),

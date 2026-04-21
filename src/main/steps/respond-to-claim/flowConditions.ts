@@ -2,30 +2,18 @@ import { Request } from 'express';
 
 import { hasAnyRentArrearsGround, isNoticeDateProvided, normalizeYesNoNotSureValue } from '../utils';
 
-export function getContactByTelephoneAnswer(req: Request): 'yes' | 'no' | undefined {
-  const fromCcd = req.res?.locals?.validatedCase?.isDefendantContactByPhone;
-  if (fromCcd === true) {
-    return 'yes';
-  }
-  if (fromCcd === false) {
-    return 'no';
-  }
-
-  return undefined;
-}
-
 export function getConfirmNoticeGivenAnswer(req: Request): 'yes' | 'no' | 'imNotSure' | undefined {
-  const ccdAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
-  if (ccdAnswer === 'yes' || ccdAnswer === 'no' || ccdAnswer === 'imNotSure') {
-    return ccdAnswer;
+  const mappedAnswer = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+  if (mappedAnswer === 'yes' || mappedAnswer === 'no' || mappedAnswer === 'imNotSure') {
+    return mappedAnswer;
   }
 
-  const ccdNestedAnswer = normalizeYesNoNotSureValue(
+  const legacyNestedAnswer = normalizeYesNoNotSureValue(
     req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.confirmNoticeGiven ??
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived
   );
-  if (ccdNestedAnswer) {
-    return ccdNestedAnswer;
+  if (legacyNestedAnswer) {
+    return legacyNestedAnswer;
   }
 
   return undefined;
