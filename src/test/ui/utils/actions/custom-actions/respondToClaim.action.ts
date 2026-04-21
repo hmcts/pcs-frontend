@@ -24,6 +24,7 @@ import {
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
+  otherConsiderations,
   paymentInterstitial,
   rentArrears,
   repaymentsAgreed,
@@ -81,6 +82,7 @@ export class RespondToClaimAction implements IAction {
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
+      ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -528,6 +530,21 @@ export class RespondToClaimAction implements IAction {
       option: languageScreenData.radioOption,
     });
     await performAction('clickButton', languageUsed.saveAndContinueButton);
+  }
+
+  private async otherConsiderations(otherConsiderationsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: otherConsiderationsData.question,
+      option: otherConsiderationsData.option,
+    });
+    if (otherConsiderationsData.option === otherConsiderations.yesRadioOption) {
+      await performAction(
+        'inputText',
+        otherConsiderations.giveDetailsHiddenTextLabel,
+        otherConsiderationsData.courtInfo
+      );
+    }
+    await performAction('clickButton', otherConsiderations.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
