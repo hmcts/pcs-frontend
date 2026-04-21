@@ -4,6 +4,11 @@ properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
+    text(
+      name: 'MANUAL_BUILD_REASON',
+      defaultValue: 'Daily nightly schedule run',
+      description: 'Why this build was triggered. For manual runs, enter a short note (e.g. verify a fix, extra browser coverage). Scheduled runs keep the default.'
+    ),
     choice(
       name: 'ENVIRONMENT',
       choices: ['aat', 'preview'],
@@ -98,6 +103,8 @@ def secrets = [
 
 withNightlyPipeline(type, product, component) {
   validateInputs()
+  recordOriginMasterHeadForReference()
+  echo "Nightly build reason / notes: ${params.MANUAL_BUILD_REASON ?: ''}"
   enableSlackNotifications('#qa-pipeline-status')
   loadVaultSecrets(secrets)
   handleEnvironmentSetting()
@@ -108,6 +115,30 @@ withNightlyPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
   }
+}
+
+/** Latest refs/heads/master on origin (after fetch) — informational only; E2E stages still use checkout scm per matrix node. */
+def recordOriginMasterHeadForReference() {
+  try {
+    node {
+      checkout scm
+      def fetchRc = sh(
+        script: 'git fetch --no-tags --depth=1 origin +refs/heads/master:refs/remotes/origin/master',
+        returnStatus: true
+      )
+      if (fetchRc != 0) {
+        echo 'WARNING: git fetch origin master failed; reference SHA may be missing or stale'
+      }
+      env.ORIGIN_MASTER_HEAD_SHA = sh(
+        script: 'git rev-parse refs/remotes/origin/master 2>/dev/null || echo unknown',
+        returnStdout: true
+      ).trim()
+    }
+  } catch (Exception e) {
+    echo "WARNING: Could not resolve origin/master: ${e.message}"
+    env.ORIGIN_MASTER_HEAD_SHA = 'unknown'
+  }
+  echo "Reference — origin/master at build start: ${env.ORIGIN_MASTER_HEAD_SHA}"
 }
 
 def validateInputs() {

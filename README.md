@@ -199,7 +199,7 @@ UI tests use [Playwright](https://playwright.dev/).
 - **`yarn test:E2e`** — Multi-browser nightly script; **`PLAYWRIGHT_PROJECT`** + **`playwright.config.ts`** (from **`E2E_TEST_SCOPE`**, **`E2E_SPEC`**). With **`CI=true`**, extra browser projects are available.
 - **`yarn test:changed`** — runs only changed specs.
 
-**CI (PR, master, nightly):** how Jenkins maps parameters and labels, and **case-sensitive** tag/spec keywords, are summarised in **[src/test/ui/test-README.md § CI pipeline](src/test/ui/test-README.md#10-ci-pipeline-stages)**.
+**CI:** On **PR**s, GitHub labels **`e2e-tag:`** and **`e2e-spec:`** set **`E2E_TEST_SCOPE`** (title grep) and **`E2E_SPEC`** (optional spec path filter) in Jenkins before **`yarn test:functional`**. On **nightly**, job parameters **`PLAYWRIGHT_GREP_TAG`** and **`PLAYWRIGHT_SPEC`** are copied to the same env vars in **`setFunctionalTestEnvVars()`** for **`yarn test:E2e`**. Master still pins scope to **`@regression`**. Case-sensitive tags/paths and the rest of the pipeline are in **[src/test/ui/test-README.md § 10](src/test/ui/test-README.md#10-ci-pipeline-stages)**.
 
 ### Stubbing Wiremock for local development
 

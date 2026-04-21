@@ -194,6 +194,10 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 ## 10. CI pipeline stages
 
+**New PR labels (optional):** **`e2e-tag:`** — value becomes **`E2E_TEST_SCOPE`** (default without the label: **`@PR`**). **`e2e-spec:`** — value becomes **`E2E_SPEC`** (comma or semicolon keywords in spec paths). **`E2E_TEST_SCOPE`** updates which tests match by title; **`E2E_SPEC`** narrows which `*.spec.ts` files are included.
+
+**Nightly Jenkins parameters:** **`PLAYWRIGHT_GREP_TAG`** → **`E2E_TEST_SCOPE`** (dropdown, including **`(all tests)`** for no grep), **`PLAYWRIGHT_SPEC`** → **`E2E_SPEC`**, plus **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`** and **`ENABLE_AXE_AUDIT`** passed through as env vars in **`setFunctionalTestEnvVars()`** before the browser matrix runs **`yarn test:E2e`**.
+
 **How the two Playwright entrypoints differ**
 
 | Script | Grep / spec filter |
@@ -211,5 +215,5 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 ### `Jenkinsfile_nightly`
 
 - **Schedule:** Weekday morning timer; also **Build with Parameters**. After a manual run, Jenkins may **reuse** the last parameter set — reset in the job UI if you want defaults again.
-- **Flow:** Fortify, then one E2E stage per **ticked** browser (Chrome on by default). A failed stage does not stop the others; Allure per stage; Slack **`#qa-pipeline-status`** (see Jenkinsfile).
-- **Parameters (names in the job):** **`PLAYWRIGHT_GREP_TAG`** → **`E2E_TEST_SCOPE`** (dropdown; **`(all tests)`** means no title grep). **`PLAYWRIGHT_SPEC`** → **`E2E_SPEC`**. **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`**, **`ENABLE_AXE_AUDIT`** copied to the same env names. **`ENVIRONMENT`** / **`PR_NUMBER`** when using preview.
+- **Flow:** Fortify, then one E2E stage per **ticked** browser (Chrome on by default). A failed stage does not stop the others; Allure per stage; Slack **`#qa-pipeline-status`** (see Jenkinsfile). At the start of the run the pipeline **fetches `origin/master`** and logs **`ORIGIN_MASTER_HEAD_SHA`** (reference only — which commit was at the tip of master when the build started; each E2E node still checks out per **`checkout scm`**).
+- **Parameters (names in the job):** **`MANUAL_BUILD_REASON`** (free text at the top; default **`Daily nightly schedule run`** for timer — change it when you run manually to record why). **`PLAYWRIGHT_GREP_TAG`** → **`E2E_TEST_SCOPE`** (dropdown; **`(all tests)`** means no title grep). **`PLAYWRIGHT_SPEC`** → **`E2E_SPEC`**. **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`**, **`ENABLE_AXE_AUDIT`** copied to the same env names. **`ENVIRONMENT`** / **`PR_NUMBER`** when using preview.
