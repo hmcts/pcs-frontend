@@ -3,6 +3,7 @@
   "options": {
     "yes": "cyYes",
     "no": "cyNo",
+    "or": " ",
     "notSure": "cyDefendant is not sure"
   }
 }

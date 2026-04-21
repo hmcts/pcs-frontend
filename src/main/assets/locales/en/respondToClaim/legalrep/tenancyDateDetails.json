@@ -3,6 +3,7 @@
   "options": {
     "yes": "Yes",
     "no": "No",
+    "or": " ",
     "notSure": "Defendant is not sure"
   }
 }
