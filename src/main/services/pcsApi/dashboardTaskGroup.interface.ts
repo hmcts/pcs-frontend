@@ -14,7 +14,7 @@ export const STATUS_MAP: Record<DashboardTask['status'], { text?: string; tag?: 
     NOT_AVAILABLE: { tag: { text: 'Not available yet', classes: 'govuk-tag--grey' } },
     AVAILABLE: { tag: { text: 'Available', classes: 'govuk-tag--blue' } },
     ACTION_NEEDED: { tag: { text: 'Action needed', classes: 'govuk-tag--red' } },
-    IN_PROGRESS: { tag: { text: 'In progress', classes: 'govuk-tag--yellow' } },
+    IN_PROGRESS: { tag: { text: 'In progress', classes: 'govuk-tag--red' } },
     OPTIONAL: { tag: { text: 'Optional', classes: 'govuk-tag--blue' } },
     COMPLETED: { text: 'Completed' },
   };

@@ -1,13 +1,18 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import { buildComponentConfig } from '../../../../../main/modules/steps/formBuilder/componentBuilders';
+import {
+  buildComponentConfig,
+  buildConditionalItemContent,
+  buildSelectionItems,
+} from '../../../../../main/modules/steps/formBuilder/componentBuilders';
 
-import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { FormFieldConfig, FormFieldOption } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 describe('componentBuilders', () => {
+  const mockRender = jest.fn(() => '<div>Rendered subfields</div>');
   const mockNunjucksEnv = {
-    render: jest.fn(() => '<div>subfields</div>'),
+    render: mockRender,
   } as unknown as Environment;
 
   const buildArgs = (field: FormFieldConfig, overrides: Partial<Parameters<typeof buildComponentConfig>[0]> = {}) => ({
@@ -27,6 +32,66 @@ describe('componentBuilders', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('buildConditionalItemContent', () => {
+    it('should return undefined when there is no conditional content', () => {
+      expect(buildConditionalItemContent({ value: 'yes', text: 'Yes' }, mockNunjucksEnv)).toBeUndefined();
+    });
+
+    it('should combine conditional text and rendered subfields', () => {
+      const option: FormFieldOption = {
+        value: 'yes',
+        conditionalText: '<p>Please provide details below</p>',
+        subFields: {
+          details: {
+            name: 'details',
+            type: 'text',
+            component: {},
+            componentType: 'input',
+          },
+        },
+      };
+
+      const result = buildConditionalItemContent(option, mockNunjucksEnv);
+
+      expect(mockRender).toHaveBeenCalledWith('components/subFields.njk', {
+        subFields: [option.subFields?.details],
+      });
+      expect(result).toBe('<p>Please provide details below</p>\n<div>Rendered subfields</div>');
+    });
+  });
+
+  describe('buildSelectionItems', () => {
+    it('should build selection items with translated text, hints and checked state', () => {
+      const result = buildSelectionItems(
+        [{ value: 'yes', text: 'Yes', hint: 'fallback hint' }, { divider: 'or' }, { value: 'no' }],
+        [
+          { value: 'yes', text: 'Translated yes', hint: 'Translated hint' },
+          { divider: 'or' },
+          { value: 'no', text: 'Translated no' },
+        ],
+        option => option.value === 'yes',
+        mockNunjucksEnv
+      );
+
+      expect(result).toEqual([
+        { value: 'yes', text: 'Yes', hint: { text: 'Translated hint' }, checked: true },
+        { divider: 'or' },
+        { value: 'no', text: 'Translated no', checked: false },
+      ]);
+    });
+
+    it('should fall back to option values when translated options are missing', () => {
+      const result = buildSelectionItems(
+        [{ value: 'maybe', hint: 'Fallback hint' }],
+        undefined,
+        () => false,
+        mockNunjucksEnv
+      );
+
+      expect(result).toEqual([{ value: 'maybe', text: 'maybe', hint: { text: 'Fallback hint' }, checked: false }]);
+    });
   });
 
   it('builds character-count field with componentType and maxlength', () => {
@@ -77,7 +142,7 @@ describe('componentBuilders', () => {
     expect(result.componentType).toBe('radios');
     expect(items[0].checked).toBe(true);
     expect(items[0].conditional).toEqual({
-      html: '<p>Help text</p>\n<div>subfields</div>',
+      html: '<p>Help text</p>\n<div>Rendered subfields</div>',
     });
     expect(items[1]).toEqual({ divider: 'or' });
     expect(mockNunjucksEnv.render).toHaveBeenCalled();
