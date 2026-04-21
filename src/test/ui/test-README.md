@@ -219,3 +219,8 @@ Jenkins sets env vars such as **`E2E_TEST_SCOPE`**, **`E2E_SPEC`**, **`ENABLE_*`
 - **Parameters:** **`PLAYWRIGHT_GREP_TAG`** → **`E2E_TEST_SCOPE`** (`(all tests)` = no grep). **`PLAYWRIGHT_SPEC`** → **`E2E_SPEC`**. **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`**, **`ENABLE_AXE_AUDIT`** passed through. Each parameter shows a short **Default:** in Jenkins.
 - **After a manual run:** Jenkins may reuse the same parameter values on the next run (including the timer); set them back to match **Default:** if you want the usual nightly setup.
 - **Flow:** Fortify, then E2E stages. One browser failing does not stop the others. Allure per stage; Slack **`#qa-pipeline-status`** per script.
+- **Schedule:** Mon–Fri at ~07:00; the job can also be run on demand via **Build with Parameters** (e.g. release verification).
+- **E2E tests:** One stage per enabled platform — Desktop Chrome, Firefox, Safari (WebKit), Edge, Mobile Android (Pixel 5 profile), Mobile iOS (iPhone 12 WebKit profile), Mobile iPad (iPad Pro 11 WebKit profile).Each runs `yarn test:E2e` with `PLAYWRIGHT_PROJECT` set (tests filtered with `--grep @nightly`) and publishes a separate Allure report (`Full <Platform> E2E Test Report`).
+- **By default only Chrome is enabled;** tick the other platform checkboxes when you need those runs.
+- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` per stage with the matching report link.
+- **Stage behaviour:** If a platform fails, that stage is marked failed but the pipeline continues; remaining stages still run.
