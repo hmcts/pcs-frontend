@@ -12,6 +12,18 @@
     <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% endif %}
   <p class="govuk-body">{{ paragraph1 }}</p>
+
+  {% if uploadedFiles and uploadedFiles.length > 0 %}
+    <h2 class="govuk-heading-m">Uploaded documents</h2>
+    <ul class="govuk-list">
+      {% for file in uploadedFiles %}
+        <li>
+          <a href="{{ file.downloadUrl }}" class="govuk-link" target="_blank">{{ file.filename }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
   <form method="post" action="{{ url }}">
     <div class="govuk-button-group">
       {{ govukButton({

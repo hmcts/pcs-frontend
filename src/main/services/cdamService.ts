@@ -66,3 +66,21 @@ export async function deleteDocument(documentUrl: string, userToken: string): Pr
 
   logger.info('Document deleted from CDAM', { documentId });
 }
+
+export async function getDocumentBinary(
+  binaryUrl: string,
+  userToken: string
+): Promise<{ stream: NodeJS.ReadableStream; contentType: string }> {
+  const cdamUrl = getCdamUrl();
+  const cdamPath = binaryUrl.replace(/.*\/documents/, '/cases/documents');
+  const response = await http.get(`${cdamUrl}${cdamPath}`, {
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+    },
+    responseType: 'stream',
+  });
+
+  const contentType = (response.headers?.['content-type'] as string) || 'application/octet-stream';
+
+  return { stream: response.data as NodeJS.ReadableStream, contentType };
+}

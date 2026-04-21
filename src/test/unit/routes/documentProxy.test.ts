@@ -33,6 +33,7 @@ jest.mock('../../../main/modules/logger', () => {
 jest.mock('../../../main/services/cdamService', () => ({
   uploadDocument: jest.fn(),
   deleteDocument: jest.fn(),
+  getDocumentBinary: jest.fn(),
 }));
 
 jest.mock('../../../main/services/ccdCaseService', () => ({
@@ -48,7 +49,7 @@ jest.mock('../../../main/middleware', () => ({
 import type { Application, Request, Response } from 'express';
 import multer from 'multer';
 
-import documentUploadRoutes, { fileFilter, handleMulterError } from '../../../main/routes/documentUpload';
+import documentProxyRoutes, { fileFilter, handleMulterError } from '../../../main/routes/documentProxy';
 
 import { deleteDocument, uploadDocument } from '@services/cdamService';
 
@@ -90,19 +91,25 @@ const existingDoc = {
   },
 };
 
-describe('documentUploadRoutes', () => {
+describe('documentProxyRoutes', () => {
   let mockApp: Application;
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockApp = {
+      get: jest.fn(),
       post: jest.fn(),
     } as unknown as Application;
 
-    documentUploadRoutes(mockApp);
+    documentProxyRoutes(mockApp);
   });
 
-  it('registers journey-agnostic upload and delete routes', () => {
+  it('registers journey-agnostic upload, delete and document download routes', () => {
+    expect(mockApp.get).toHaveBeenCalledWith(
+      '/case/:caseReference/:journey/:step/document/:index',
+      expect.anything(),
+      expect.anything()
+    );
     expect(mockApp.post).toHaveBeenCalledWith(
       '/case/:caseReference/:journey/:step/upload',
       expect.anything(),
@@ -114,6 +121,68 @@ describe('documentUploadRoutes', () => {
       expect.anything(),
       expect.anything()
     );
+  });
+
+  describe('document download handler', () => {
+    let handler: (req: Request, res: Response) => Promise<void>;
+
+    beforeEach(() => {
+      const getCalls = (mockApp.get as jest.Mock).mock.calls;
+      const downloadCall = getCalls.find((c: unknown[]) => (c[0] as string).includes('/document/:index'));
+      handler = downloadCall[downloadCall.length - 1];
+    });
+
+    it('returns 404 for invalid index', async () => {
+      const req = makeReqWithDocs({ params: { caseReference: '123456', index: 'abc' } });
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('returns 404 when index out of range', async () => {
+      const req = makeReqWithDocs({ params: { caseReference: '123456', index: '5' } }, [existingDoc]);
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it('streams document with security headers using server-side CDAM URL', async () => {
+      const { getDocumentBinary } = require('@services/cdamService');
+      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+      (getDocumentBinary as jest.Mock).mockResolvedValue({ stream: mockStream, contentType: 'application/pdf' });
+
+      const req = makeReqWithDocs({ params: { caseReference: '123456', index: '0' } }, [existingDoc]);
+      const res = {
+        setHeader: jest.fn(),
+        headersSent: false,
+      } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm/doc/existing-uuid/binary', 'token');
+      expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
+      expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', 'attachment; filename="existing.pdf"');
+      expect(res.setHeader).toHaveBeenCalledWith('Content-Security-Policy', 'sandbox');
+      expect(res.setHeader).toHaveBeenCalledWith('X-Content-Type-Options', 'nosniff');
+      expect(mockStream.on).toHaveBeenCalledWith('error', expect.any(Function));
+      expect(mockStream.pipe).toHaveBeenCalledWith(res);
+    });
+
+    it('returns 502 when CDAM fails', async () => {
+      const { getDocumentBinary } = require('@services/cdamService');
+      (getDocumentBinary as jest.Mock).mockRejectedValue(new Error('CDAM down'));
+
+      const req = makeReqWithDocs({ params: { caseReference: '123456', index: '0' } }, [existingDoc]);
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(502);
+    });
   });
 
   describe('fileFilter', () => {
@@ -342,13 +411,13 @@ describe('documentUploadRoutes', () => {
       handler = deleteCall[deleteCall.length - 1];
     });
 
-    it('returns 400 when no index provided', async () => {
+    it('returns 404 when no index provided', async () => {
       const req = makeReqWithDocs({ body: {} });
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(404);
     });
 
     it('returns 404 when index out of range', async () => {
@@ -393,13 +462,13 @@ describe('documentUploadRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(502);
     });
 
-    it('returns 400 when delete index is negative', async () => {
+    it('returns 404 when delete index is negative', async () => {
       const req = makeReqWithDocs({ body: { delete: '-1' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(404);
     });
 
     it('logs non-Error rejections with String()', async () => {
