@@ -461,7 +461,9 @@ export class PageNavigationValidation implements IValidation {
     console.log(`   Number of pages passed: ${passedPages.size}`);
     console.log(`   Number of pages failed: ${failedPages.size}`);
     console.log(
-      `   Missing navigation methods: ${PageNavigationValidation.missingNavigationMethods.size + PageNavigationValidation.missingNavigationFiles.size}`
+      `   Missing navigation methods: ${
+        PageNavigationValidation.missingNavigationMethods.size + PageNavigationValidation.missingNavigationFiles.size
+      }`
     );
 
     if (passedPages.size > 0) {
