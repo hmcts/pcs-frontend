@@ -1,0 +1,1 @@
+{"value":"protobufjs","children":{"ID":1116832,"Issue":"Arbitrary code execution in protobufjs","URL":"https://github.com/advisories/GHSA-xq3m-2v4x-88gg","Severity":"critical","Vulnerable Versions":">= 8.0.0, < 8.0.1","Tree Versions":["7.5.4"],"Dependents":["@opentelemetry/otlp-transformer@npm:0.208.0"]}}
