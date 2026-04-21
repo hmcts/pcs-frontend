@@ -7,7 +7,7 @@ import { initializeExecutor, performAction } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
 
-test.describe.skip('Respond to a claim - smoke test @smoke @nightly', async () => {
+test.describe('Respond to a claim - smoke test @health', async () => {
   test('Respond to a claim @health', async ({ page }) => {
     initializeExecutor(page);
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
