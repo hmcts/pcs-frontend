@@ -50,12 +50,12 @@ properties([
       description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
     booleanParam(
-      name: 'SAUCE_MAC15_CHROME',
+      name: 'SAUCE_MAC13_CHROME',
       defaultValue: true,
-      description: 'Sauce: macOS 13 — Chrome (param name SAUCE_MAC15_* kept for existing jobs).'
+      description: 'Sauce: macOS 13 — Chrome.'
     ),
     booleanParam(
-      name: 'SAUCE_MAC15_FIREFOX',
+      name: 'SAUCE_MAC13_FIREFOX',
       defaultValue: true,
       description: 'Sauce: macOS 13 — Firefox.'
     ),
@@ -128,8 +128,8 @@ withNightlyPipeline(type, product, component) {
 
 def selectedSauceSuites() {
   [
-    params.SAUCE_MAC15_CHROME ? 'pcs-frontend-mac13-chrome' : null,
-    params.SAUCE_MAC15_FIREFOX ? 'pcs-frontend-mac13-firefox' : null,
+    params.SAUCE_MAC13_CHROME ? 'pcs-frontend-mac13-chrome' : null,
+    params.SAUCE_MAC13_FIREFOX ? 'pcs-frontend-mac13-firefox' : null,
     params.SAUCE_MAC_SAFARI ? 'pcs-frontend-mac13-webkit' : null,
     params.SAUCE_WIN11_CHROME ? 'pcs-frontend-win11-chrome' : null,
     params.SAUCE_WIN11_EDGE ? 'pcs-frontend-win11-edge' : null,
@@ -182,17 +182,8 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
       checkout scm
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        if (playwrightProject == 'chrome') {
-          withEnv([
-            "PLAYWRIGHT_PROJECT=${playwrightProject}",
-            'PLAYWRIGHT_GREP=@crossbrowser',
-          ]) {
-            yarnBuilder.yarn('test:E2e')
-          }
-        } else {
-          withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
-            yarnBuilder.yarn('test:E2e')
-          }
+        withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
+          yarnBuilder.yarn('test:E2e')
         }
       }
       publishHTML([

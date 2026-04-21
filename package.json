@@ -34,7 +34,7 @@
     "test:changed": "yarn playwright install && ts-node ./src/test/functional/helpers/runChangedTestHelper.ts; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:crossbrowser": "bash src/test/ui/utils/scripts/sauce-crossbrowser-run.sh",
     "test:sauce:nightly": "SAUCE_TUNNEL_NAME=${SAUCE_TUNNEL_NAME:-reformtunnel} SAUCE_GREP=${SAUCE_GREP:-@crossbrowser} yarn exec saucectl run -c .sauce/config-sauce-nightly.yml --select-suite \"${SAUCE_SUITE_NAME:-pcs-frontend-mac13-chrome}\"",
-    "test:E2e": "yarn playwright install && yarn playwright install msedge && yarn playwright test --project \"${PLAYWRIGHT_PROJECT:-chrome}\" --grep \"${PLAYWRIGHT_GREP:-@nightly}\"; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
+    "test:E2e": "yarn playwright install && yarn playwright install msedge && yarn playwright test --project \"${PLAYWRIGHT_PROJECT:-chrome}\" --grep \"@nightly\"; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:pact": "jest -c jest.pact.config.ts --runInBand",
     "pact:publish": "ts-node src/test/contract/publish/*.ts",
     "test:pact:run-and-publish": "yarn test:pact && yarn pact:publish",
