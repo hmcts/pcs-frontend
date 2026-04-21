@@ -1,0 +1,5 @@
+{
+  "heading": "{{claimantName}} claim",
+  "disputeOtherPartsQuestion": "Does the defendant dispute any other parts of the claim?",
+  "caseNumber": "Case number: {{caseNumber}}"
+}
