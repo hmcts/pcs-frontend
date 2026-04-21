@@ -100,9 +100,6 @@
   "dashboard": {
     "taskRoutes": {
       "Task.AAA6.Claim.ViewClaim": "/case/:caseReference/view-the-claim"
-    },
-    "taskStatusOverrides": {
-      "Task.AAA6.Claim.ViewClaim": "AVAILABLE"
     }
   }
 }
