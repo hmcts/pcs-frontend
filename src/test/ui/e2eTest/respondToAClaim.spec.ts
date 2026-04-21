@@ -265,7 +265,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-     await performAction('selectIncomeAndExpenses', {
+    await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive', {
@@ -371,7 +371,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-     await performAction('selectIncomeAndExpenses', {
+    await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
     });
     await performValidation('mainHeader', otherConsiderations.mainHeader);
@@ -463,12 +463,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-     await performAction('selectIncomeAndExpenses', {
+    await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
@@ -588,7 +588,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
     });
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
@@ -679,7 +679,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
@@ -895,7 +895,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
@@ -995,7 +995,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
@@ -1088,7 +1088,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
