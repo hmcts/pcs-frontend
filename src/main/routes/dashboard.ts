@@ -56,13 +56,13 @@ export const DASHBOARD_ROUTE = '/dashboard';
 
 const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'helpWithFees', href: 'https://www.gov.uk/get-help-with-court-fees' },
-  { key: 'findOutAboutMediation', href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation' },
   {
     key: 'whatToExpectAtTheHearing',
     href: 'https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal',
   },
   { key: 'representMyselfAtTheHearing', href: 'https://www.gov.uk/represent-yourself-in-court' },
   { key: 'findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
+  { key: 'getDebtRespite', href: 'https://www.gov.uk/options-for-dealing-with-your-debts/breathing-space ' },
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
