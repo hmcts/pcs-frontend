@@ -3895,12 +3895,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express-session@npm:*, @types/express-session@npm:1.18.2":
+"@types/express-session@npm:*":
   version: 1.18.2
   resolution: "@types/express-session@npm:1.18.2"
   dependencies:
     "@types/express": "npm:*"
   checksum: 10/c1711976d089fd6da58c0262e2b21b71ee64d508ee0f9f1b90e7658b712fc59874e03f799757843d2300c1dd127813cd16ce806c208bc4975f0f7ed700f2db94
+  languageName: node
+  linkType: hard
+
+"@types/express-session@npm:1.19.0":
+  version: 1.19.0
+  resolution: "@types/express-session@npm:1.19.0"
+  dependencies:
+    "@types/express": "npm:*"
+  checksum: 10/cc2d693a3a40a1c5d0739acec811b5a5d1e6be3fcb7513d920e6d0f604e7f8a6ac54509d604c6d32bde6a2ca57aa84d5dee067433a5ac9859ab47b7f2a855010
   languageName: node
   linkType: hard
 
@@ -5130,12 +5139,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-commandline@npm:2.37.0":
-  version: 2.37.0
-  resolution: "allure-commandline@npm:2.37.0"
+"allure-commandline@npm:2.38.1":
+  version: 2.38.1
+  resolution: "allure-commandline@npm:2.38.1"
   bin:
     allure: bin/allure
-  checksum: 10/cfaa9edf1ae1c41495f59560aec8d7c6a1908d057893ac36834293bfc80f6870397e73479d9f8f693cf3e559b43507dd426f5472c17afc5d02a04bfbe85d0b8d
+  checksum: 10/b7c16344e7b4e524e6e6c5b63dbfc9de43a8283f0de179c227d29c63db097285d8f00dfb0eefa11dc1990da5aa3fbe0f79be83ddc96b2610ef6807b0463bfe4d
   languageName: node
   linkType: hard
 
@@ -11887,7 +11896,7 @@ __metadata:
     "@types/connect-redis": "npm:0.0.23"
     "@types/cookie-parser": "npm:1.4.10"
     "@types/express": "npm:5.0.6"
-    "@types/express-session": "npm:1.18.2"
+    "@types/express-session": "npm:1.19.0"
     "@types/git-rev-sync": "npm:2.0.2"
     "@types/glob": "npm:8.1.0"
     "@types/jest": "npm:29.5.14"
@@ -11902,7 +11911,7 @@ __metadata:
     "@types/webpack-env": "npm:1.18.8"
     "@typescript-eslint/eslint-plugin": "npm:8.56.1"
     "@typescript-eslint/parser": "npm:8.56.1"
-    allure-commandline: "npm:2.37.0"
+    allure-commandline: "npm:2.38.1"
     allure-js-commons: "npm:3.5.0"
     allure-playwright: "npm:3.5.0"
     axios: "npm:1.15.1"
