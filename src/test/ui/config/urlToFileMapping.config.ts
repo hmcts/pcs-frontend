@@ -37,7 +37,7 @@ export default {
   'choose-an-application': 'chooseAnApplication',
   'check-your-answers': 'checkYourAnswers',
   'ask-to-adjourn-the-court-hearing': 'askToAdjournTheCourtHearing',
-  'ask-to-set-aside-the-decision-to-evict-you': 'askToSetAsideTheDecisionToEvictYou',
+  'ask-the-court-to-set-aside-the-order': 'askTheCourtToSetAsideTheOrder',
   'ask-the-court-to-make-an-order': 'askTheCourtToMakeAnOrder',
   'is-the-court-hearing-in-the-next-14-days': 'isTheCourtHearingInTheNext14Days',
   'do-you-need-help-paying-the-fee': 'doYouNeedHelpPayingTheFee',
@@ -51,4 +51,5 @@ export default {
   'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
+  'language-used': 'languageUsed',
 };
