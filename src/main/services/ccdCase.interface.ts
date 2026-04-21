@@ -5,7 +5,6 @@ export enum CaseState {
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 export enum YesNoEnum {
@@ -13,6 +12,13 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
+export enum LanguageUsed {
+  ENGLISH = 'ENGLISH',
+  WELSH = 'WELSH',
+  ENGLISH_AND_WELSH = 'ENGLISH_AND_WELSH',
+}
+
+export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
@@ -130,6 +136,8 @@ export interface CcdDefendantResponses {
   householdCircumstances?: HouseholdCircumstances;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
+  languageUsed?: LanguageUsed;
+  equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
 }
 
 export interface PossessionClaimResponse {
@@ -218,12 +226,6 @@ export enum GenAppType {
   ADJOURN,
   SET_ASIDE,
   SOMETHING_ELSE,
-}
-
-export enum LanguageUsed {
-  ENGLISH,
-  WELSH,
-  ENGLISH_AND_WELSH,
 }
 
 export interface CitizenGenAppRequest {

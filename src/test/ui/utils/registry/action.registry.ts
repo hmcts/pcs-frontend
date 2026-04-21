@@ -39,6 +39,7 @@ export class ActionRegistry {
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
@@ -82,6 +83,7 @@ export class ActionRegistry {
     ['inputErrorValidationGenApp', new GenAppsAction()],
     ['selectLanguageUsedToComplete', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
+    ['languageUsed', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
