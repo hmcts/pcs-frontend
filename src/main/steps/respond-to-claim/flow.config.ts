@@ -11,9 +11,9 @@ import {
 } from '../utils';
 
 import {
+  hasConfirmedInstallmentOffer,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
-  shouldShowHowMuchAffordToPayStep,
   shouldShowInstallmentPaymentsStep,
 } from './flowConditions';
 
@@ -118,7 +118,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
     },
     'how-much-afford-to-pay': {
-      showCondition: (req: Request) => shouldShowHowMuchAffordToPayStep(req),
+      showCondition: (req: Request) => hasConfirmedInstallmentOffer(req),
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),

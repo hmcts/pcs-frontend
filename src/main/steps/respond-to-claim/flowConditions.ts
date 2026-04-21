@@ -52,7 +52,3 @@ export function hasConfirmedInstallmentOffer(req: Request): boolean {
 export function shouldShowInstallmentPaymentsStep(req: Request): boolean {
   return hasRejectedRepaymentAgreement(req) && hasAnyRentArrearsGround(req);
 }
-
-export function shouldShowHowMuchAffordToPayStep(req: Request): boolean {
-  return hasConfirmedInstallmentOffer(req);
-}

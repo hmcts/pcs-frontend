@@ -2,7 +2,7 @@ import type { Request } from 'express';
 
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import {
-  shouldShowHowMuchAffordToPayStep,
+  hasConfirmedInstallmentOffer,
   shouldShowInstallmentPaymentsStep,
 } from '../../../../main/steps/respond-to-claim/flowConditions';
 
@@ -202,7 +202,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    expect(shouldShowHowMuchAffordToPayStep(howMuchReq)).toBe(true);
-    expect(shouldShowHowMuchAffordToPayStep(createReq({}))).toBe(false);
+    expect(hasConfirmedInstallmentOffer(howMuchReq)).toBe(true);
+    expect(hasConfirmedInstallmentOffer(createReq({}))).toBe(false);
   });
 });
