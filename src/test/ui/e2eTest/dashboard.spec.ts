@@ -1,9 +1,9 @@
-import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
+import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
