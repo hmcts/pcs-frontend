@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Page, test } from '@playwright/test';
+import { error } from 'winston';
 
 import {
   enable_content_validation,
@@ -9,6 +10,7 @@ import {
   enable_navigation_tests,
   enable_visibility_validation,
 } from '../../../../../../playwright.config';
+import { excludedPages } from '../../../config/lock-exclusions.config';
 import { shortUrl, truncateForLog } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
 import {
@@ -20,42 +22,44 @@ import {
 
 export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly LOCK_DIR = path.join(process.cwd(), 'test-results', 'pft-locks');
-  private static readonly FAILED_LOCK_DIR = path.join(process.cwd(), 'test-results', 'pft-locks', 'failed');
+  private static readonly PASSED_DIR = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, 'passed');
+  private static readonly FAILED_DIR = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, 'failed');
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
-  private static readonly LOCK_EXCLUSIONS_PATH = path.join(__dirname, '../../../config/lock-exclusions.config.ts');
 
-  private static excludedFromLock: Set<string> | null = null;
   private static pagesTestedInCurrentRun = new Set<string>();
-  private static failedPagesInCurrentRun = new Set<string>();
 
   static resetTestedPages(): void {
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.clear();
-    TriggerPageFunctionalTestsAction.failedPagesInCurrentRun.clear();
-  }
-
-  private static getExcludedFromLock(): Set<string> {
-    if (TriggerPageFunctionalTestsAction.excludedFromLock !== null) {
-      return TriggerPageFunctionalTestsAction.excludedFromLock;
-    }
-
-    try {
-      if (fs.existsSync(TriggerPageFunctionalTestsAction.LOCK_EXCLUSIONS_PATH)) {
-        const config = require(TriggerPageFunctionalTestsAction.LOCK_EXCLUSIONS_PATH);
-        TriggerPageFunctionalTestsAction.excludedFromLock = new Set(config.default || config.excludedPages || []);
-      } else {
-        TriggerPageFunctionalTestsAction.excludedFromLock = new Set<string>();
-      }
-    } catch {
-      TriggerPageFunctionalTestsAction.excludedFromLock = new Set<string>();
-    }
-
-    return TriggerPageFunctionalTestsAction.excludedFromLock;
   }
 
   async execute(page: Page): Promise<void> {
     await this.triggerPageFunctionalTests(page);
+  }
+
+  private shouldSkipPage(pageName: string): boolean {
+    // Excluded pages: never skip
+    if (excludedPages.includes(pageName)) {
+      return false;
+    }
+
+    // Already tested in this run (in-memory): skip regardless of lock state
+    if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
+      return true;
+    }
+
+    // Failed lock exists: never skip (always re-run across runs/retries)
+    if (this.hasFailedLock(pageName)) {
+      return false;
+    }
+
+    // Passed lock exists: skip
+    if (this.hasPassedLock(pageName)) {
+      return true;
+    }
+
+    return false;
   }
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
@@ -72,27 +76,11 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       return;
     }
 
-    const excludedFromLock = TriggerPageFunctionalTestsAction.getExcludedFromLock();
-    const failedLockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, `${pageName}.lock`);
-    const hasFailedLock = fs.existsSync(failedLockPath);
-
-    // If failed lock exists, ALWAYS run - check this FIRST before anything else
-    if (!hasFailedLock) {
-      // Skip if already tested in current attempt (prevents duplicate runs in same journey)
-      if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
-        return;
-      }
-
-      // Skip lock check for excluded pages
-      if (!excludedFromLock.has(pageName)) {
-        const mainLockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-        // Skip only if main lock exists
-        if (fs.existsSync(mainLockPath)) {
-          return;
-        }
-      }
+    if (this.shouldSkipPage(pageName)) {
+      return;
     }
 
+    // Mark as tested in this run immediately to prevent duplicate runs within same test
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.add(pageName);
 
     const pageDataFilePath = this.resolveFilePath(
@@ -107,6 +95,11 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       } else {
         PageContentValidation.trackMissingDataFile(pageName);
       }
+      // Write failed lock immediately if content validation found failures
+      if (PageContentValidation.hasErrorForPage(pageName)) {
+        this.createFailedLock(pageName);
+        this.deletePassedLock(pageName);
+      }
     }
 
     const pftFilePath = this.resolveFilePath(TriggerPageFunctionalTestsAction.PFT_DIR, `${pageName}.pft.ts`);
@@ -120,70 +113,107 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       if (enable_visibility_validation === 'true') {
         VisibilityValidation.trackMissingMethod(pageName);
       }
+      if (!this.hasFailedLock(pageName)) {
+        this.createPassedLock(pageName);
+      }
       return;
     }
 
-    let pageFailed = false;
+    let errorValidationFailed = false;
+    let navigationTestsFailed = false;
+    let visibilityValidationFailed = false;
 
-    // Parent step that groups all functional tests for this page
-    await test
-      .step(`PFT triggered for page - ${pageName}`, async () => {
-        if (enable_error_message_validation === 'true') {
-          await test.step(`EMV triggered for page - ${pageName}`, async () => {
-            try {
-              await this.runErrorMessageValidation(page, pageName, pftFilePath);
-            } catch (error) {
-              ErrorMessageValidation.trackValidationError(pageName, error);
-              pageFailed = true;
-              throw error;
-            }
-          });
-        }
-
-        if (enable_navigation_tests === 'true') {
-          await test.step(`Navigation tests triggered for page - ${pageName}`, async () => {
-            try {
-              await this.runNavigationTests(page, pageName, pftFilePath);
-            } catch (error) {
-              PageNavigationValidation.trackNavigationFailure(pageName, error);
-              pageFailed = true;
-              throw error;
-            }
-          });
-        }
-
-        if (enable_visibility_validation === 'true') {
-          await test.step(`Visibility validation triggered for page - ${pageName}`, async () => {
-            try {
-              await this.runVisibilityValidation(page, pageName, pftFilePath);
-            } catch (error) {
-              VisibilityValidation.trackValidationError(pageName, error);
-              pageFailed = true;
-              throw error;
-            }
-          });
-        }
-      })
-      .catch(() => {
-        pageFailed = true;
-      });
-
-    if (pageFailed) {
-      TriggerPageFunctionalTestsAction.failedPagesInCurrentRun.add(pageName);
-    }
-
-    if (!excludedFromLock.has(pageName)) {
-      if (pageFailed) {
-        this.createFailedLockFile(pageName);
-        this.deleteMainLockFile(pageName);
-      } else {
-        const failedLockPathAfter = path.join(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, `${pageName}.lock`);
-        if (!fs.existsSync(failedLockPathAfter)) {
-          this.createLockFile(pageName);
-        }
+    await test.step(`PFT triggered for page - ${pageName}`, async () => {
+      if (enable_error_message_validation === 'true') {
+        await test.step(`EMV triggered for page - ${pageName}`, async () => {
+          try {
+            await this.runErrorMessageValidation(page, pageName, pftFilePath);
+          } catch (err) {
+            ErrorMessageValidation.trackValidationError(pageName, err);
+            errorValidationFailed = true;
+            this.createFailedLock(pageName);
+            this.deletePassedLock(pageName);
+          }
+        });
       }
+
+      if (enable_navigation_tests === 'true') {
+        await test.step(`Navigation tests triggered for page - ${pageName}`, async () => {
+          try {
+            await this.runNavigationTests(page, pageName, pftFilePath);
+          } catch (err) {
+            PageNavigationValidation.trackNavigationFailure(pageName, err);
+            navigationTestsFailed = true;
+            this.createFailedLock(pageName);
+            this.deletePassedLock(pageName);
+          }
+        });
+      }
+
+      if (enable_visibility_validation === 'true') {
+        await test.step(`Visibility validation triggered for page - ${pageName}`, async () => {
+          try {
+            await this.runVisibilityValidation(page, pageName, pftFilePath);
+          } catch (err) {
+            VisibilityValidation.trackValidationError(pageName, err);
+            visibilityValidationFailed = true;
+            this.createFailedLock(pageName);
+            this.deletePassedLock(pageName);
+          }
+        });
+      }
+    });
+
+    const anyTestFailed = errorValidationFailed || navigationTestsFailed || visibilityValidationFailed;
+
+    // Write passed lock only if nothing failed across all 4 types
+    if (!anyTestFailed && !this.hasFailedLock(pageName)) {
+      this.createPassedLock(pageName);
     }
   }
+
+  // ── Lock helpers ──────────────────────────────────────────────────────────
+
+  private hasPassedLock(pageName: string): boolean {
+    return fs.existsSync(path.join(TriggerPageFunctionalTestsAction.PASSED_DIR, `${pageName}.lock`));
+  }
+
+  private hasFailedLock(pageName: string): boolean {
+    return fs.existsSync(path.join(TriggerPageFunctionalTestsAction.FAILED_DIR, `${pageName}.lock`));
+  }
+
+  private createPassedLock(pageName: string): void {
+    try {
+      fs.mkdirSync(TriggerPageFunctionalTestsAction.PASSED_DIR, { recursive: true });
+      const lockPath = path.join(TriggerPageFunctionalTestsAction.PASSED_DIR, `${pageName}.lock`);
+      fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'w' });
+    } catch {
+      console.log(error);
+    }
+  }
+
+  private createFailedLock(pageName: string): void {
+    try {
+      fs.mkdirSync(TriggerPageFunctionalTestsAction.FAILED_DIR, { recursive: true });
+      const lockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_DIR, `${pageName}.lock`);
+      fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'w' });
+    } catch {
+      console.log(error);
+    }
+  }
+
+  private deletePassedLock(pageName: string): void {
+    try {
+      const lockPath = path.join(TriggerPageFunctionalTestsAction.PASSED_DIR, `${pageName}.lock`);
+      if (fs.existsSync(lockPath)) {
+        fs.unlinkSync(lockPath);
+      }
+    } catch (_error) {
+      console.error(_error);
+    }
+  }
+
+  // ── File resolution ───────────────────────────────────────────────────────
 
   private resolveFilePath(baseDir: string, pageName: string): string | null {
     if (!fs.existsSync(baseDir)) {
@@ -207,40 +237,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     return null;
   }
 
-  private createLockFile(pageName: string): void {
-    try {
-      if (!fs.existsSync(TriggerPageFunctionalTestsAction.LOCK_DIR)) {
-        fs.mkdirSync(TriggerPageFunctionalTestsAction.LOCK_DIR, { recursive: true });
-      }
-      const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-      fs.writeFileSync(lockPath, process.pid.toString(), { flag: 'w' });
-    } catch {
-      // Ignore lock file creation errors
-    }
-  }
-
-  private createFailedLockFile(pageName: string): void {
-    try {
-      if (!fs.existsSync(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR)) {
-        fs.mkdirSync(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, { recursive: true });
-      }
-      const failedLockPath = path.join(TriggerPageFunctionalTestsAction.FAILED_LOCK_DIR, `${pageName}.lock`);
-      fs.writeFileSync(failedLockPath, process.pid.toString(), { flag: 'w' });
-    } catch {
-      // Ignore failed lock file creation errors
-    }
-  }
-
-  private deleteMainLockFile(pageName: string): void {
-    try {
-      const lockPath = path.join(TriggerPageFunctionalTestsAction.LOCK_DIR, `${pageName}.lock`);
-      if (fs.existsSync(lockPath)) {
-        fs.unlinkSync(lockPath);
-      }
-    } catch {
-      // Ignore deletion errors
-    }
-  }
+  // ── Validation runners ────────────────────────────────────────────────────
 
   private async runPageContentValidation(page: Page, pageName: string): Promise<void> {
     try {
@@ -248,8 +245,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         const validation = new PageContentValidation();
         await validation.validateCurrentPage(page, pageName);
       });
-    } catch (error) {
-      PageContentValidation.trackValidationError(pageName, error);
+    } catch (err) {
+      PageContentValidation.trackValidationError(pageName, err);
     }
   }
 
@@ -287,15 +284,6 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
   }
 
-  /** Dashboard is not in url mapping; skip PFT warn. */
-  private static isDashboardUrl(url: string): boolean {
-    try {
-      return new URL(url).pathname.split('/').filter(Boolean)[0] === 'dashboard';
-    } catch {
-      return /\/dashboard(\/|$)/.test(url);
-    }
-  }
-
   private async runVisibilityValidation(page: Page, pageName: string, pftFilePath: string): Promise<void> {
     delete require.cache[require.resolve(pftFilePath)];
     const pftModule = require(pftFilePath);
@@ -309,12 +297,22 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       VisibilityValidation.trackPageWithVisibilityTests(pageName);
       try {
         await validationFunction(page);
-      } catch (error) {
-        VisibilityValidation.trackValidationError(pageName, error);
+      } catch (err) {
+        VisibilityValidation.trackValidationError(pageName, err);
         throw error;
       }
     } else {
       VisibilityValidation.trackMissingMethod(pageName);
+    }
+  }
+
+  // ── URL helpers ───────────────────────────────────────────────────────────
+
+  private static isDashboardUrl(url: string): boolean {
+    try {
+      return new URL(url).pathname.split('/').filter(Boolean)[0] === 'dashboard';
+    } catch {
+      return /\/dashboard(\/|$)/.test(url);
     }
   }
 

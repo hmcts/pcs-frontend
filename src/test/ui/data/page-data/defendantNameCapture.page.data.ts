@@ -1,6 +1,6 @@
 export const defendantNameCapture = {
   mainHeader: `What’s your name?`,
-  respondToClaimParagraph: `issue2 Respond to a property possession claim`,
+  respondToClaimParagraph: `issue 2 Respond to a property possession claim`,
   backLink: `Back`,
   firstNameTextLabel: `First name`,
   lastNameTextLabel: `Last name`,
@@ -9,8 +9,8 @@ export const defendantNameCapture = {
   cymraegLink: `Cymraeg`,
   firstNameTextInput: `John`,
   lastNameTextInput: `Doe`,
-  thereIsAProblemErrorMessageHeader: `issue 3 There is a problem`,
-  enterYourFirstNameErrorMessage: `Enter your first name`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  enterYourFirstNameErrorMessage: `issue 7 Enter your first name`,
   enterYourLastNameErrorMessage: `Enter your last name`,
   enterFirstNameMaxLengthErrorMessage: `issue 4 First name must be 60 characters or less`,
   enterLastNameMaxLengthErrorMessage: `Last name must be 60 characters or less`,

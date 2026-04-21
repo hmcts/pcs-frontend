@@ -36,6 +36,7 @@ export class PageContentValidation implements IValidation {
   private static missingDataFiles = new Set<string>();
   private static testCounter = 0;
   private static pageToHeaderTextMap = new Map<string, string>();
+  private static pagesWithErrors = new Set<string>();
 
   private readonly locatorPatterns = {
     Button: (page: Page, value: string) =>
@@ -167,11 +168,11 @@ export class PageContentValidation implements IValidation {
 
       PageContentValidation.validationResults.set(pageUrl, pageResults);
       if (pageResults.some(r => r.status === 'fail')) {
+        PageContentValidation.pagesWithErrors.add(pageName);
         await takeValidationFailureScreenshot(page, 'page-content', pageName);
       }
     } catch (error) {
       await takeValidationFailureScreenshot(page, 'page-content', pageName);
-      // Add the error as a validation failure
       pageResults.push({
         element: 'SectionData',
         expected: error instanceof Error ? error.message : String(error),
@@ -179,6 +180,7 @@ export class PageContentValidation implements IValidation {
       });
       PageContentValidation.pagesValidated.add(pageName);
       PageContentValidation.validationResults.set(pageUrl, pageResults);
+      PageContentValidation.pagesWithErrors.add(pageName);
     }
   }
 
@@ -255,6 +257,11 @@ export class PageContentValidation implements IValidation {
 
   static trackValidationError(pageName: string, _error?: unknown): void {
     PageContentValidation.missingDataFiles.add(pageName);
+    PageContentValidation.pagesWithErrors.add(pageName);
+  }
+
+  static hasErrorForPage(pageName: string): boolean {
+    return PageContentValidation.pagesWithErrors.has(pageName);
   }
 
   static finaliseTest(): void {
@@ -344,7 +351,6 @@ export class PageContentValidation implements IValidation {
 
     PageContentValidation.clearValidationResults();
 
-    // Throw after clearing so failures don't cascade into subsequent tests
     if (failedPages.size > 0) {
       throw new Error(`Page content validation failed: ${failedPages.size} pages have missing elements`);
     }
@@ -366,5 +372,6 @@ export class PageContentValidation implements IValidation {
     PageContentValidation.pagesValidated.clear();
     PageContentValidation.pageToHeaderTextMap.clear();
     PageContentValidation.validationExecuted = false;
+    PageContentValidation.pagesWithErrors.clear();
   }
 }
