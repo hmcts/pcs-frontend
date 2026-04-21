@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-import { IdamUtils, ServiceAuthUtils } from '@hmcts/playwright-common';
-
 import { accessTokenApiData, s2STokenApiData } from '../data/api-data';
 import { user } from '../data/user-data';
 
@@ -16,6 +14,7 @@ export function clearEmvLocksIfLocal(): void {
 }
 
 export const getS2SToken = async (): Promise<void> => {
+  const { ServiceAuthUtils } = await import('@hmcts/playwright-common');
   process.env.S2S_URL = s2STokenApiData.s2sUrl;
   process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
     microservice: s2STokenApiData.microservice,
@@ -23,6 +22,7 @@ export const getS2SToken = async (): Promise<void> => {
 };
 
 export const getAccessToken = async (): Promise<void> => {
+  const { IdamUtils } = await import('@hmcts/playwright-common');
   process.env.IDAM_WEB_URL = accessTokenApiData.idamUrl;
   process.env.IDAM_TESTING_SUPPORT_URL = accessTokenApiData.idamTestingSupportUrl;
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({

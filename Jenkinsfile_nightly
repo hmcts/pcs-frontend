@@ -27,56 +27,41 @@ properties([
     booleanParam(
       name: 'WEBKIT_TESTS',
       defaultValue: false,
-      description: 'Run E2E tests in WebKit / desktop Safari (off by default; enable when needed).'
+      description: 'Tick the checkbox to run E2E tests in Webkit.'
     ),
     booleanParam(
-      name: 'EDGE_TESTS',
+      name: 'ACCESSIBILITY_TESTS',
       defaultValue: false,
-      description: 'Run E2E tests in Microsoft Edge (off by default; enable when needed).'
-    ),
-    booleanParam(
-      name: 'MOBILE_ANDROID_TESTS',
-      defaultValue: false,
-      description: 'Run E2E tests on the Android (Pixel 5) profile (off by default; enable when needed).'
-    ),
-    booleanParam(
-      name: 'MOBILE_IOS_TESTS',
-      defaultValue: false,
-      description: 'Run E2E tests on the iOS (iPhone 12) WebKit profile (off by default; enable when needed).'
-    ),
-    booleanParam(
-      name: 'MOBILE_IPAD_TESTS',
-      defaultValue: false,
-      description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
+      description: 'Tick the checkbox to run Accessibility tests.'
     ),
     booleanParam(
       name: 'RUN_SAUCE_LABS',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Tick to run Sauce Labs cross-browser tests (tunnel + yarn test:crossbrowser). Off by default; enable when manually triggering.'
     ),
     booleanParam(
       name: 'SAUCE_MAC15_CHROME',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: macOS 15 — Chrome (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_MAC15_FIREFOX',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: macOS 15 — Firefox (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_CHROME',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: Windows 11 — Chrome (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_EDGE',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: Windows 11 — Microsoft Edge (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_FIREFOX',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Sauce: Windows 11 — Firefox (when Run Sauce Labs is enabled).'
     ),
   ])
@@ -224,13 +209,13 @@ def publishSauceAllureReport() {
     } else {
       echo 'Sauce Allure: allure-report/index.html not found; skipping HTML publisher.'
     }
+    steps.archiveArtifacts(
+      allowEmptyArchive: true,
+      artifacts: 'allure-report/**/*,allure-results/**/*,allure-results-sauce-merge/**/*'
+    )
   } catch (Exception e) {
-    echo "WARNING: Sauce Allure HTML publish failed: ${e.message}"
+    echo "WARNING: Sauce Allure publish/archive skipped: ${e.message}"
   }
-  steps.archiveArtifacts(
-    allowEmptyArchive: true,
-    artifacts: 'allure-report/**/*,allure-results/**/*,allure-results-sauce-merge/**/*'
-  )
 }
 
 def runAccessibilityTests(yarnBuilder) {

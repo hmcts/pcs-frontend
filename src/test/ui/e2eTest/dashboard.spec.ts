@@ -1,5 +1,3 @@
-import { test } from '@playwright/test';
-
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
