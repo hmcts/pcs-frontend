@@ -81,7 +81,7 @@ export const step: StepDefinition = createFormStep({
               translationKey: {
                 label: 'otherConsiderationsDetailsLabel',
               },
-              labelClasses: 'govuk-label',
+              labelClasses: 'govuk-label govuk-!-font-weight-bold',
               errorMessage: 'errors.otherConsiderationsDetails',
               validator: (value: unknown) => {
                 const text = (value as string)?.trim();
