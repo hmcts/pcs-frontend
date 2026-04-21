@@ -17,6 +17,7 @@ export interface FeeLookupParams {
 export enum FeeType {
   genAppStandardFee,
   genAppMaxFee,
+  counterClaimFlatFeeFEE0450,
 }
 
 interface FeeLookupResponse {

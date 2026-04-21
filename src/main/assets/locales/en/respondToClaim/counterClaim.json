@@ -15,7 +15,7 @@
   "whenMakeCounterclaimParagraph3": "If you're not sure whether you have a valid reason, you can get free legal advice through the Housing Loss Prevention Advice Service.You can find a provider near you using the <a href=\"https://find-legal-advice.justice.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> find a legal adviser service (opens in new tab)</a>.",
   "counterclaimFeesHeading": "Fees for making a counterclaim",
   "counterclaimFeesParagraph1": "You will have to pay a fee to make a counterclaim, unless you're eligible for help with fees.<a href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Check if you can get help with court fees (opens in new tab)</a>",
-  "counterclaimFeesParagraph2": "The amount you pay depends on what you’re claiming. If it’s a claim for an amount of money, the fee depends on the value of your claim. If your claim is about something else, the fee is £X.",
+  "counterclaimFeesParagraph2": "The amount you pay depends on what you’re claiming. If it’s a claim for an amount of money, the fee depends on the value of your claim. If your claim is about something else, the fee is {{counterClaimFlatFeeFEE0450, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}.",
   "counterclaimFeesCourtFeesLinkText": "<a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about court fees (opens in new tab)</a>",
   "question": "Do you want to make a counterclaim?",
   "options": {

@@ -4,6 +4,7 @@ import { flowConfig } from '../flow.config';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import { FeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim',
@@ -52,6 +53,8 @@ export const step: StepDefinition = createFormStep({
   ],
   beforeRedirect: async req => {
     const makeCounterClaim: YesNoValue = req.body?.makeCounterClaim;
+    const sessionUserId = req.session?.user?.uid;
+    const userId = typeof sessionUserId === 'string' ? sessionUserId : undefined;
 
     if (!makeCounterClaim) {
       return;
@@ -60,6 +63,14 @@ export const step: StepDefinition = createFormStep({
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         makeCounterClaim,
+        ...(makeCounterClaim === 'YES' && userId
+          ? {
+              counterClaim: {
+                createdBy: userId,
+                claimSubmittedDate: new Date().toISOString().slice(0, 10)
+              },
+            }
+          : {}),
       },
     };
 
@@ -71,5 +82,9 @@ export const step: StepDefinition = createFormStep({
       caseData?.possessionClaimResponse?.defendantResponses?.makeCounterClaim;
 
     return makeCounterClaim !== undefined ? { makeCounterClaim } : {};
+  },
+  extendGetContent: async () => {
+    const counterClaimFlatFeeFEE0450 = await getFee(FeeType.counterClaimFlatFeeFEE0450);
+    return { counterClaimFlatFeeFEE0450 };
   },
 });
