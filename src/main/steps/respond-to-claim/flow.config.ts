@@ -3,6 +3,7 @@ import { type Request } from 'express';
 import {
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
+  hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
   isNoticeServed,
   isTenancyStartDateKnown,
@@ -66,6 +67,10 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
+    'equality-and-diversity-start',
+    'equality-and-diversity-end',
+    'language-used',
+    'check-your-answers',
     'end-now',
   ],
   steps: {
@@ -114,6 +119,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'how-much-afford-to-pay': {
       showCondition: (req: Request) => shouldShowHowMuchAffordToPayStep(req),
+    },
+    'equality-and-diversity-end': {
+      showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
     },
   },
 };
