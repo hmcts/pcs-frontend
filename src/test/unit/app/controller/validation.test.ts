@@ -49,17 +49,6 @@ describe('validateForm', () => {
   describe('special character / emoji validation', () => {
     const emojiFields: FormFieldConfig[] = [{ name: 'testField', type: 'text' }];
 
-    it('should set special character error using field-specific translation', () => {
-      const req = { body: { testField: 'hello 🎉' }, session: {} } as Partial<Request>;
-      const translations = {
-        'testField.specialCharacter': 'Test field must only include letters a to z',
-      };
-
-      const errors = validateForm(req as Request, emojiFields, translations);
-
-      expect(errors.testField).toBe('Test field must only include letters a to z');
-    });
-
     it('should set special character error using defaultSpecialCharacter translation with field name interpolated', () => {
       const req = { body: { testField: 'hello 😀' }, session: {} } as Partial<Request>;
       const translations = {

@@ -173,7 +173,7 @@ export function getTranslationErrors(
 export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
   const stepSpecificErrors: Record<string, string> = {};
 
-  const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate', 'specialCharacter'];
+  const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate'];
   const commonErrorKeys = ['defaultRequired', 'defaultInvalid', 'defaultMaxLength', 'defaultSpecialCharacter'];
 
   for (const key of commonErrorKeys) {
@@ -484,16 +484,11 @@ export function validateForm(
 
               const displayName = resolvedLabel ?? toSentenceCase(fieldName);
 
-              const fieldSpecificSpecialCharacterMessage = translations?.[`${fieldName}.specialCharacter`]?.replace(
-                '{fieldName}',
-                displayName
-              );
               const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
                 '{fieldName}',
                 displayName
               );
               errors[fieldName] =
-                fieldSpecificSpecialCharacterMessage ||
                 defaultSpecialCharacterMsg ||
                 `${displayName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`;
             }
