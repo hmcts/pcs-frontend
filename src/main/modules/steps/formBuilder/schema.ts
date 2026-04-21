@@ -92,6 +92,7 @@ export const FormFieldOptionSchema: z.ZodType<FormFieldOption> = z.lazy(() =>
     value: z.string().optional(),
     // Backward compatible properties
     text: z.string().optional(),
+    hint: z.string().optional(),
     // Divider text for visual separation of options
     divider: z.string().optional(),
     translationKey: z.string().optional(),
