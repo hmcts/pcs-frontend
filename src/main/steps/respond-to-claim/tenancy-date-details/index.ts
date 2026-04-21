@@ -71,10 +71,10 @@ export const step: StepDefinition = createFormStep({
       existingDateIsCorrect === 'YES'
         ? 'yes'
         : existingDateIsCorrect === 'NO'
-          ? 'no'
-          : existingDateIsCorrect === 'NOT_SURE'
-            ? 'notSure'
-            : undefined;
+        ? 'no'
+        : existingDateIsCorrect === 'NOT_SURE'
+        ? 'notSure'
+        : undefined;
 
     if (!formValue) {
       return {};

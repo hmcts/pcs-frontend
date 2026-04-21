@@ -107,8 +107,8 @@ export const step: StepDefinition = createFormStep({
           emailAddress: emailSelected
             ? (emailForm['contactByEmailOrPost.email'] as string | undefined)
             : existingEmailAddress
-              ? ''
-              : undefined,
+            ? ''
+            : undefined,
         },
       },
       defendantResponses: {

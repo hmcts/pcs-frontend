@@ -133,8 +133,8 @@ export async function performValidation(
     inputFieldName === undefined
       ? ['', undefined]
       : typeof inputFieldName === 'string'
-        ? [inputFieldName, inputData]
-        : ['', inputFieldName];
+      ? [inputFieldName, inputData]
+      : ['', inputFieldName];
 
   const validationInstance = ValidationRegistry.getValidation(validation);
   await test.step(`Validated ${validation}${

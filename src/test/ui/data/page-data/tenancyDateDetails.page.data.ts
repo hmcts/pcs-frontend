@@ -7,7 +7,11 @@ export const tenancyDateDetails = {
   getDetailsGivenByParagraph: (claimantName: string): string => {
     return `Details given by ${claimantName}:`;
   },
-  yourTenancyOccupationContractOrLicenceDateList: `Your tenancy, occupation contract or licence began on ${process.env.WALES_POSTCODE === 'YES' ? convertDateFormatTenancyDate(submitCaseApiDataWales.submitCasePayload.licenceStartDate) : convertDateFormatTenancyDate(submitCaseApiData.submitCasePayload.tenancy_TenancyLicenceDate)}`,
+  yourTenancyOccupationContractOrLicenceDateList: `Your tenancy, occupation contract or licence began on ${
+    process.env.WALES_POSTCODE === 'YES'
+      ? convertDateFormatTenancyDate(submitCaseApiDataWales.submitCasePayload.licenceStartDate)
+      : convertDateFormatTenancyDate(submitCaseApiData.submitCasePayload.tenancy_TenancyLicenceDate)
+  }`,
   isTheTenancyLicenceOrOccupationContractQuestion: `Is the tenancy, licence or occupation contract start date correct?`,
   backLink: `Back`,
   yesRadioOption: `Yes`,
@@ -44,10 +48,10 @@ export function convertDateFormatTenancyDate(dateString: string): string {
     day % 10 === 1 && day !== 11
       ? `st`
       : day % 10 === 2 && day !== 12
-        ? `nd`
-        : day % 10 === 3 && day !== 13
-          ? `rd`
-          : `th`;
+      ? `nd`
+      : day % 10 === 3 && day !== 13
+      ? `rd`
+      : `th`;
 
   return `${day}${suffix} ${month} ${year}`;
 }

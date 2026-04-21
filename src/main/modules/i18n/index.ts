@@ -88,7 +88,7 @@ function discoverNamespaces(localesDir: string, lang = 'en'): string[] {
 /** Creates a fallback translation function. */
 export function createFallbackTFunction(): TFunction {
   return ((key: string | string[], defaultValue?: string) =>
-    Array.isArray(key) ? key[0] : (defaultValue ?? key)) as unknown as TFunction;
+    Array.isArray(key) ? key[0] : defaultValue ?? key) as unknown as TFunction;
 }
 
 /** Validates and returns the language from the request. */

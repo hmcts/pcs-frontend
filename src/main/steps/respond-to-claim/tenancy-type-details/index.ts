@@ -130,8 +130,8 @@ export const step: StepDefinition = createFormStep({
       tenancyTypeConfirm === 'no'
         ? correctedTenancyTypeText || undefined
         : existingCorrectedTenancyType
-          ? ''
-          : undefined;
+        ? ''
+        : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {

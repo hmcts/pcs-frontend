@@ -115,8 +115,8 @@ export const step: StepDefinition = createFormStep({
             contactByTelephone === 'yes'
               ? (telephoneForm['contactByTelephone.phoneNumber'] as string | undefined)
               : existingPhoneNumber
-                ? ''
-                : undefined,
+              ? ''
+              : undefined,
         },
       },
       defendantResponses: {
