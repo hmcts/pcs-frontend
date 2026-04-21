@@ -68,6 +68,19 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
+function getIWantToLinks(caseId: string): { key: string; href: string }[] {
+  return [
+    {
+      key: 'askCourtToMakeOrder',
+      href: `/case/${caseId}/make-an-application/ask-the-court-to-make-an-order`,
+    },
+    {
+      key: 'uploadAdditionalDocuments',
+      href: `/case/${caseId}/upload-additional-documents`,
+    },
+  ];
+}
+
 function getDashboardTaskRoutes(): Record<string, string> {
   if (!config.has('dashboard.taskRoutes')) {
     return {};
@@ -196,6 +209,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
         propertyAddress,
         dashboardCaseReference,
+        iWantToLinks: getIWantToLinks(validatedCase.id),
         helpSupportLinks: HELP_SUPPORT_LINKS,
       });
     } catch (e) {

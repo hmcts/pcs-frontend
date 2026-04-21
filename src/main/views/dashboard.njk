@@ -36,6 +36,16 @@
         <div class="govuk-grid-column-one-third">
           <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible section-border"/>
             <aside class="app-related-items" role="complementary">
+              <h2 class="govuk-heading-m">{{ t('dashboard:iWantToHeading') }}</h2>
+              <nav class="govuk-!-margin-bottom-6" role="navigation" aria-label="{{ t('dashboard:iWantToAriaLabel') }}">
+                <ul class="govuk-list">
+                  {% for link in iWantToLinks %}
+                    <li>
+                      <a class="govuk-link" href="{{ link.href }}">{{ t('dashboard:' ~ link.key) }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </nav>
               <h2 class="govuk-heading-m">{{ t('dashboard:helpAndSupportHeading') }}</h2>
               <nav role="navigation" aria-label="{{ t('dashboard:helpAndSupportAriaLabel') }}">
                 <ul class="govuk-list">

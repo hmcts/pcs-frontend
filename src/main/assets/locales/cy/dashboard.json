@@ -1,5 +1,9 @@
 {
   "caseReferenceLabel": "cyCase number:",
+  "iWantToHeading": "cyI want to...",
+  "iWantToAriaLabel": "cyI want to",
+  "askCourtToMakeOrder": "cyAsk the court to make an order (make a general application)",
+  "uploadAdditionalDocuments": "cyUpload additional documents",
   "helpAndSupportHeading": "cyHelp and support",
   "helpAndSupportAriaLabel": "cyHelp and support",
   "contactInformationAriaLabel": "cySupport and contact information",
