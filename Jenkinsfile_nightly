@@ -52,37 +52,37 @@ properties([
     booleanParam(
       name: 'RUN_SAUCE_LABS',
       defaultValue: true,
-      description: 'Tick to run Sauce Labs cross-browser tests (tunnel + yarn test:crossbrowser).'
+      description: 'Run Sauce Labs cross-browser tests (yarn test:crossbrowser).'
     ),
     booleanParam(
       name: 'SAUCE_MAC15_CHROME',
       defaultValue: true,
-      description: 'Sauce: macOS 13 — Chrome (HDPI-5349 POC matrix; param name unchanged for Jenkins compatibility).'
+      description: 'Sauce: macOS 13 — Chrome (param name SAUCE_MAC15_* kept for existing jobs).'
     ),
     booleanParam(
       name: 'SAUCE_MAC15_FIREFOX',
       defaultValue: true,
-      description: 'Sauce: macOS 13 — Firefox (HDPI-5349 POC matrix; param name unchanged for Jenkins compatibility).'
+      description: 'Sauce: macOS 13 — Firefox.'
     ),
     booleanParam(
       name: 'SAUCE_MAC_SAFARI',
       defaultValue: true,
-      description: 'Sauce: macOS 13 — Safari / WebKit (suite pcs-frontend-mac13-webkit; armRequired).'
+      description: 'Sauce: macOS 13 — WebKit (Safari engine).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_CHROME',
       defaultValue: true,
-      description: 'Sauce: Windows 11 — Chrome (when Run Sauce Labs is enabled).'
+      description: 'Sauce: Windows 11 — Chrome.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_EDGE',
       defaultValue: true,
-      description: 'Sauce: Windows 11 — Microsoft Edge (when Run Sauce Labs is enabled).'
+      description: 'Sauce: Windows 11 — Edge.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_FIREFOX',
       defaultValue: true,
-      description: 'Sauce: Windows 11 — Firefox (when Run Sauce Labs is enabled).'
+      description: 'Sauce: Windows 11 — Firefox.'
     ),
   ])
 ])
@@ -120,7 +120,6 @@ withNightlyPipeline(type, product, component) {
   setFunctionalTestEnvVars()
   enableFortifyScan()
   if (params.RUN_SAUCE_LABS) {
-    // One Infrastructure stage: yarn test:crossbrowser → saucectl per selected suite (see sauce-crossbrowser-run.sh).
     def suites = selectedSauceSuites()
     env.SAUCE_SUITE_NAMES = suites.join(' ')
     enableCrossBrowserTest()
@@ -132,7 +131,6 @@ withNightlyPipeline(type, product, component) {
   }
 }
 
-/** Suite `name` values in .sauce/config-sauce-nightly.yml (checkbox order preserved). */
 def selectedSauceSuites() {
   [
     params.SAUCE_MAC15_CHROME ? 'pcs-frontend-mac13-chrome' : null,

@@ -1,12 +1,5 @@
-# Nightly Sauce Playwright — OS/browser combos aligned with proven
-# `nightly-dev-HDPI-5349-POC-Sauce-Playwright` `.sauce/config-matrix.yml` (eu-central-1).
-# macOS 13 + 1440x900 for Chrome/Firefox; macOS 14 + ARM for Safari (WebKit); Windows 11 + 1920x1080 for Chrome/Edge/Firefox.
-#
-# Pick one suite:
-#   yarn exec saucectl run -c .sauce/config-sauce-nightly.yml --select-suite "pcs-frontend-mac13-chrome"
-# Multiple suites: Jenkins sets SAUCE_SUITE_NAMES → yarn test:crossbrowser (runs test:sauce:nightly per suite).
-#
-# Ref: https://docs.saucelabs.com/web-apps/automated-testing/playwright/
+# Sauce Playwright (eu-central-1). Suites must match Jenkins selectedSauceSuites() names.
+# https://docs.saucelabs.com/web-apps/automated-testing/playwright/
 apiVersion: v1alpha
 kind: playwright
 
@@ -22,7 +15,6 @@ sauce:
 defaults:
   timeout: 30m
 
-# POC matrix used 1.58.1 successfully on subscription; keep in sync with Sauce docs for that line.
 playwright:
   version: 1.58.1
   configFile: playwright.config.ts
@@ -81,7 +73,6 @@ suites:
       headless: true
       grep: $SAUCE_GREP
 
-  # Safari = WebKit on Mac; HDPI-5349 POC: macOS 14 + armRequired (Premium tier may be required).
   - name: 'pcs-frontend-mac13-webkit'
     platformName: macOS 13
     armRequired: true
