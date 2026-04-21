@@ -32,9 +32,9 @@ const junit_result_output =
   (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
 
 const skipAllureReporter = process.env.PLAYWRIGHT_SKIP_ALLURE === 'true';
-const sauceRichCapture = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
+const sauceFullJourneyArtifacts = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
 
-const captureSettings = sauceRichCapture
+const captureSettings = sauceFullJourneyArtifacts
   ? {
       screenshot: 'on' as const,
       video: 'on' as const,
@@ -130,7 +130,7 @@ export default defineConfig({
             name: 'MicrosoftEdge',
             use: {
               ...devices['Desktop Edge'],
-              ...(sauceRichCapture ? {} : { channel: 'msedge' as const }),
+              ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,

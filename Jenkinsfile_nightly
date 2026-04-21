@@ -50,11 +50,6 @@ properties([
       description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
     booleanParam(
-      name: 'RUN_SAUCE_LABS',
-      defaultValue: true,
-      description: 'Run Sauce Labs cross-browser tests (yarn test:crossbrowser).'
-    ),
-    booleanParam(
       name: 'SAUCE_MAC15_CHROME',
       defaultValue: true,
       description: 'Sauce: macOS 13 — Chrome (param name SAUCE_MAC15_* kept for existing jobs).'
@@ -119,9 +114,9 @@ withNightlyPipeline(type, product, component) {
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
   enableFortifyScan()
-  if (params.RUN_SAUCE_LABS) {
-    def suites = selectedSauceSuites()
-    env.SAUCE_SUITE_NAMES = suites.join(' ')
+  def sauceSuites = selectedSauceSuites()
+  if (!sauceSuites.isEmpty()) {
+    env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
     enableCrossBrowserTest()
   }
 
@@ -148,9 +143,6 @@ def validateInputs() {
   }
   if (params.ENVIRONMENT == 'preview' && !params.PR_NUMBER.trim().matches("^\\d+\$")) {
     error("Validation Failed: PR number must contain only numerical values")
-  }
-  if (params.RUN_SAUCE_LABS && selectedSauceSuites().isEmpty()) {
-    error('Validation Failed: When Run Sauce Labs is enabled, select at least one Sauce desktop browser checkbox.')
   }
 }
 

@@ -1,11 +1,9 @@
-# Sauce Playwright (eu-central-1). Suites must match Jenkins selectedSauceSuites() names.
-# https://docs.saucelabs.com/web-apps/automated-testing/playwright/
 apiVersion: v1alpha
 kind: playwright
 
 sauce:
   region: eu-central-1
-  concurrency: 1
+  concurrency: 3
   tunnel:
     name: $SAUCE_TUNNEL_NAME
   metadata:
