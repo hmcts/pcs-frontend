@@ -17,9 +17,6 @@
   "textAreaLabel": "cyGive details about the exceptional hardship you’d experience",
   "errors": {
     "exceptionalHardship": "cySelect if you’d experience exceptional hardship if you were asked to leave your home",
-    "exceptionalHardship.exceptionalHardshipDetails": "cyGive details about the exceptional hardship you’d experience",
-    "exceptionalHardshipDetails": {
-      "specialCharacter": "cyThe details of the exceptional hardship you’d experience must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
-    }
+    "exceptionalHardship.exceptionalHardshipDetails": "cyGive details about the exceptional hardship you’d experience"
   }
 }
