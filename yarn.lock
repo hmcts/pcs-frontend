@@ -4187,6 +4187,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/webpack-env@npm:1.18.8":
+  version: 1.18.8
+  resolution: "@types/webpack-env@npm:1.18.8"
+  checksum: 10/f3932f3d6c2530f644cfc898eda1ab8182d6ae57f555c2f0179d813549b639078671b71e4041831fc306c5ebe61f5cdac794fe4ceae281fce8bf67e23661a488
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.3
   resolution: "@types/yargs-parser@npm:21.0.3"
@@ -5155,6 +5162,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ansi-html-community@npm:0.0.8":
+  version: 0.0.8
+  resolution: "ansi-html-community@npm:0.0.8"
+  bin:
+    ansi-html: bin/ansi-html
+  checksum: 10/08df3696720edacd001a8d53b197bb5728242c55484680117dab9f7633a6320e961a939bddd88ee5c71d4a64f3ddb49444d1c694bd0668adbb3f95ba114f2386
+  languageName: node
+  linkType: hard
+
 "ansi-regex@npm:^5.0.1":
   version: 5.0.1
   resolution: "ansi-regex@npm:5.0.1"
@@ -5953,7 +5969,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:^3.5.2":
+"chokidar@npm:3.6.0, chokidar@npm:^3.5.2":
   version: 3.6.0
   resolution: "chokidar@npm:3.6.0"
   dependencies:
@@ -8594,6 +8610,13 @@ __metadata:
   dependencies:
     whatwg-encoding: "npm:^3.1.1"
   checksum: 10/e86efd493293a5671b8239bd099d42128433bb3c7b0fdc7819282ef8e118a21f5dead0ad6f358e024a4e5c84f17ebb7a9b36075220fac0a6222b207248bede6f
+  languageName: node
+  linkType: hard
+
+"html-entities@npm:^2.1.0":
+  version: 2.6.0
+  resolution: "html-entities@npm:2.6.0"
+  checksum: 10/06d4e7a3ba6243bba558af176e56f85e09894b26d911bc1ef7b2b9b3f18b46604360805b32636f080e954778e9a34313d1982479a05a5aa49791afd6a4229346
   languageName: node
   linkType: hard
 
@@ -11800,6 +11823,7 @@ __metadata:
     "@types/totp-generator": "npm:0.0.8"
     "@types/uuid": "npm:10.0.0"
     "@types/validator": "npm:13.15.10"
+    "@types/webpack-env": "npm:1.18.8"
     "@typescript-eslint/eslint-plugin": "npm:8.56.1"
     "@typescript-eslint/parser": "npm:8.56.1"
     allure-commandline: "npm:2.37.0"
@@ -11807,6 +11831,7 @@ __metadata:
     allure-playwright: "npm:3.5.0"
     axios: "npm:1.15.1"
     body-parser: "npm:2.2.2"
+    chokidar: "npm:3.6.0"
     config: "npm:3.3.12"
     connect-redis: "npm:7.1.1"
     cookie-parser: "npm:1.4.7"
@@ -11865,10 +11890,11 @@ __metadata:
     tsconfig-paths: "npm:4.2.0"
     typescript: "npm:5.9.3"
     uuid: "npm:13.0.0"
-    validator: "npm:13.15.26"
+    validator: "npm:13.15.35"
     webpack: "npm:5.106.2"
     webpack-cli: "npm:6.0.1"
     webpack-dev-middleware: "npm:7.4.5"
+    webpack-hot-middleware: "npm:2.26.1"
     winston: "npm:3.19.0"
     zod: "npm:3.25.76"
     zod-i18n-map: "npm:2.27.0"
@@ -11923,10 +11949,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"picomatch@npm:^4.0.2, picomatch@npm:^4.0.3":
-  version: 4.0.3
-  resolution: "picomatch@npm:4.0.3"
-  checksum: 10/57b99055f40b16798f2802916d9c17e9744e620a0db136554af01d19598b96e45e2f00014c91d1b8b13874b80caa8c295b3d589a3f72373ec4aaf54baa5962d5
+"picomatch@npm:^4.0.2, picomatch@npm:^4.0.3, picomatch@npm:^4.0.4":
+  version: 4.0.4
+  resolution: "picomatch@npm:4.0.4"
+  checksum: 10/f6ef80a3590827ce20378ae110ac78209cc4f74d39236370f1780f957b7ee41c12acde0e4651b90f39983506fd2f5e449994716f516db2e9752924aff8de93ce
   languageName: node
   linkType: hard
 
@@ -12367,7 +12393,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"protobufjs@npm:^7.3.0, protobufjs@npm:^7.5.3":
+"protobufjs@npm:^7.5.5":
   version: 7.5.5
   resolution: "protobufjs@npm:7.5.5"
   dependencies:
@@ -14069,12 +14095,12 @@ __metadata:
   linkType: hard
 
 "tinyglobby@npm:^0.2.12, tinyglobby@npm:^0.2.14, tinyglobby@npm:^0.2.15":
-  version: 0.2.15
-  resolution: "tinyglobby@npm:0.2.15"
+  version: 0.2.16
+  resolution: "tinyglobby@npm:0.2.16"
   dependencies:
     fdir: "npm:^6.5.0"
-    picomatch: "npm:^4.0.3"
-  checksum: 10/d72bd826a8b0fa5fa3929e7fe5ba48fceb2ae495df3a231b6c5408cd7d8c00b58ab5a9c2a76ba56a62ee9b5e083626f1f33599734bed1ffc4b792406408f0ca2
+    picomatch: "npm:^4.0.4"
+  checksum: 10/5c2c41b572ada38449e7c86a5fe034f204a1dbba577225a761a14f29f48dc3f2fc0d81a6c56fcc67c5a742cc3aa9fb5e2ca18dbf22b610b0bc0e549b34d5a0f8
   languageName: node
   linkType: hard
 
@@ -14731,10 +14757,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"validator@npm:13.15.26":
-  version: 13.15.26
-  resolution: "validator@npm:13.15.26"
-  checksum: 10/22488ae718ca724eda81b7c8bf505005d4d70cb6ff9a319f48fd897a31d40fd9a2971af4a3288667a04c56b4f95912555495519d54a5d8d63c2572bf4970081a
+"validator@npm:13.15.35":
+  version: 13.15.35
+  resolution: "validator@npm:13.15.35"
+  checksum: 10/62f25728064d5dedaabb10a53647cbb4f9aa762a2a53e16642469d4839ad235e467e9f18d0992c492ec1d35e1d5034956fdc680953fc7d8f764cc6d4c83cf2ae
   languageName: node
   linkType: hard
 
@@ -14840,6 +14866,17 @@ __metadata:
     webpack:
       optional: true
   checksum: 10/50e9b162d740b81f14c0926beb5fa01fc6d2ae16740bab709320dd5ea1a52ebcc48b66f3db5a7262fc4dc31a7e18590db766cef5da90e77a39e3a26d3b5b1001
+  languageName: node
+  linkType: hard
+
+"webpack-hot-middleware@npm:2.26.1":
+  version: 2.26.1
+  resolution: "webpack-hot-middleware@npm:2.26.1"
+  dependencies:
+    ansi-html-community: "npm:0.0.8"
+    html-entities: "npm:^2.1.0"
+    strip-ansi: "npm:^6.0.0"
+  checksum: 10/69fa1a25284eeba386c99b0b159d61b0cf800d21379ae7b03203c52e5d58d9082d96ca9f98ebbd8436165cd105de496a0356a8191064b277abff4d3c56825843
   languageName: node
   linkType: hard
 
