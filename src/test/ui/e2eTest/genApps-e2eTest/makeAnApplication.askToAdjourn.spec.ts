@@ -20,8 +20,8 @@ import { finaliseAllValidations, initializeExecutor, performAction, performValid
 
 const home_url = config.get('e2e.testUrl') as string;
 
-test.beforeEach(async ({ page }) => {
-  initializeExecutor(page);
+test.beforeEach(async ({ page }, testInfo) => {
+  initializeExecutor(page, testInfo);
   FieldsStore.clear();
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });

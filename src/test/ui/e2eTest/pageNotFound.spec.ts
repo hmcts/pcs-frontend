@@ -6,8 +6,8 @@ import { finaliseAllValidations, initializeExecutor, performAction, performValid
 
 const home_url = config.get('e2e.testUrl') as string;
 
-test.beforeEach(async ({ page }) => {
-  initializeExecutor(page);
+test.beforeEach(async ({ page }, testInfo) => {
+  initializeExecutor(page, testInfo);
   await performAction('navigateToUrl', home_url);
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('login');
