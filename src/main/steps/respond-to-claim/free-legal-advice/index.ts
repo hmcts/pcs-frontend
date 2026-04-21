@@ -61,10 +61,10 @@ export const step: StepDefinition = createFormStep({
       existingAnswer === 'YES'
         ? 'yes'
         : existingAnswer === 'NO'
-        ? 'no'
-        : existingAnswer === 'PREFER_NOT_TO_SAY'
-        ? 'preferNotToSay'
-        : undefined;
+          ? 'no'
+          : existingAnswer === 'PREFER_NOT_TO_SAY'
+            ? 'preferNotToSay'
+            : undefined;
 
     return formValue ? { hadLegalAdvice: formValue } : {};
   },

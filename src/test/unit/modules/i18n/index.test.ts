@@ -123,7 +123,7 @@ describe('i18n module', () => {
     const req = {
       language: 'cy',
       i18n: { changeLanguage },
-      t: (key: string | string[], def?: string) => (Array.isArray(key) ? def ?? key[0] : def ?? key),
+      t: (key: string | string[], def?: string) => (Array.isArray(key) ? (def ?? key[0]) : (def ?? key)),
       app: { locals: { nunjucksEnv: { addGlobal } } },
       session: { user: { name: 'Alice' } },
     } as unknown as Parameters<typeof langMw>[0];

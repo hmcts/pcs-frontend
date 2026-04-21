@@ -267,7 +267,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     if (/^\d+$/.test(urlSegment)) {
       const headerText = await this.getHeaderText(page);
-      return headerText ? mapping[headerText] ?? null : null;
+      return headerText ? (mapping[headerText] ?? null) : null;
     }
 
     return mapping[urlSegment] ?? null;
