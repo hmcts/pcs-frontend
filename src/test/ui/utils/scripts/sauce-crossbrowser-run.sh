@@ -10,7 +10,6 @@ dir_nonempty() {
   [[ -d "$1" ]] && [[ -n "$(ls -A "$1" 2>/dev/null || true)" ]]
 }
 
-# Copy latest Sauce Allure raw results into MERGED (prefers ./allure-results, else artifacts/**/allure-results).
 append_last_sauce_allure() {
   mkdir -p "$MERGED"
   if dir_nonempty allure-results; then
@@ -26,7 +25,7 @@ append_last_sauce_allure() {
 }
 
 sauce_allure_finalize() {
-  local src=$1
+  local src="$1"
   if ! dir_nonempty "$src"; then
     echo "No Allure raw results under ${src}; skip Allure HTML for Sauce." >&2
     return 0
@@ -35,48 +34,44 @@ sauce_allure_finalize() {
   yarn exec ts-node src/test/ui/config/clean-attachments.config.ts
 }
 
-# If SAUCE_SUITE_NAME is unset, map BROWSER_GROUP (Jenkins) to a suite from config-sauce-nightly.yml.
-map_browser_group() {
-  [[ -n "${SAUCE_SUITE_NAME:-}" || -z "${BROWSER_GROUP:-}" ]] && return 0
-  local bg
-  bg=$(printf '%s' "$BROWSER_GROUP" | tr '[:upper:]' '[:lower:]')
-  case "$bg" in
-    chrome) SAUCE_SUITE_NAME=pcs-frontend-mac15-chrome ;;
-    firefox) SAUCE_SUITE_NAME=pcs-frontend-mac15-firefox ;;
-    microsoft|edge) SAUCE_SUITE_NAME=pcs-frontend-win11-edge ;;
-    safari|webkit)
-      echo "No webkit suite in config-sauce-nightly.yml; set SAUCE_SUITE_NAME." >&2
-      return 1
-      ;;
-    *)
-      echo "Unknown BROWSER_GROUP=${BROWSER_GROUP}; set SAUCE_SUITE_NAME or SAUCE_SUITE_NAMES." >&2
-      return 1
-      ;;
-  esac
-}
-
-suites=()
 if [[ -n "${SAUCE_SUITE_NAMES:-}" ]]; then
-  read -ra suites <<< "${SAUCE_SUITE_NAMES}"
-else
-  map_browser_group || exit 1
-  suites=("${SAUCE_SUITE_NAME:-pcs-frontend-mac15-chrome}")
+  rm -rf "$MERGED" allure-report allure-results artifacts
+  mkdir -p "$MERGED"
+  exit_code=0
+  for suite in ${SAUCE_SUITE_NAMES}; do
+    rm -rf allure-results allure-report artifacts
+    echo "Sauce suite: ${suite}"
+    if ! SAUCE_SUITE_NAME="${suite}" yarn test:sauce:nightly; then
+      exit_code=1
+    fi
+    append_last_sauce_allure
+  done
+  sauce_allure_finalize "$MERGED"
+  exit "$exit_code"
 fi
 
-rm -rf "$MERGED" allure-report allure-results artifacts
+if [[ -z "${SAUCE_SUITE_NAME:-}" && -n "${BROWSER_GROUP:-}" ]]; then
+  bg=$(printf '%s' "$BROWSER_GROUP" | tr '[:upper:]' '[:lower:]')
+  case "$bg" in
+    chrome) export SAUCE_SUITE_NAME=pcs-frontend-mac13-chrome ;;
+    firefox) export SAUCE_SUITE_NAME=pcs-frontend-mac13-firefox ;;
+    microsoft|edge) export SAUCE_SUITE_NAME=pcs-frontend-win11-edge ;;
+    safari|webkit) export SAUCE_SUITE_NAME=pcs-frontend-mac14-webkit ;;
+    *)
+      echo "Unknown BROWSER_GROUP=${BROWSER_GROUP}; set SAUCE_SUITE_NAME or SAUCE_SUITE_NAMES." >&2
+      exit 1
+      ;;
+  esac
+fi
+
+export SAUCE_SUITE_NAME="${SAUCE_SUITE_NAME:-pcs-frontend-mac13-chrome}"
+rm -rf allure-report allure-results artifacts
+set +e
+yarn test:sauce:nightly
+exit_code=$?
+set -e
+rm -rf "$MERGED"
 mkdir -p "$MERGED"
-
-exit_code=0
-for suite in "${suites[@]}"; do
-  rm -rf allure-results allure-report artifacts
-  echo "Sauce suite: ${suite}"
-  set +e
-  SAUCE_SUITE_NAME="${suite}" yarn test:sauce:nightly
-  rc=$?
-  set -e
-  [[ $rc -eq 0 ]] || exit_code=1
-  append_last_sauce_allure
-done
-
+append_last_sauce_allure
 sauce_allure_finalize "$MERGED"
 exit "$exit_code"

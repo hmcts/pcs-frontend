@@ -50,29 +50,39 @@ properties([
       description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
     booleanParam(
+      name: 'RUN_SAUCE_LABS',
+      defaultValue: true,
+      description: 'Tick to run Sauce Labs cross-browser tests (tunnel + yarn test:crossbrowser).'
+    ),
+    booleanParam(
       name: 'SAUCE_MAC15_CHROME',
       defaultValue: true,
-      description: 'Sauce: macOS 15 — Chrome.'
+      description: 'Sauce: macOS 13 — Chrome (HDPI-5349 POC matrix; param name unchanged for Jenkins compatibility).'
     ),
     booleanParam(
       name: 'SAUCE_MAC15_FIREFOX',
       defaultValue: true,
-      description: 'Sauce: macOS 15 — Firefox.'
+      description: 'Sauce: macOS 13 — Firefox (HDPI-5349 POC matrix; param name unchanged for Jenkins compatibility).'
+    ),
+    booleanParam(
+      name: 'SAUCE_MAC_SAFARI',
+      defaultValue: true,
+      description: 'Sauce: macOS 14 — Safari / WebKit (ARM; HDPI-5349 POC matrix; may need Premium).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_CHROME',
       defaultValue: true,
-      description: 'Sauce: Windows 11 — Chrome.'
+      description: 'Sauce: Windows 11 — Chrome (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_EDGE',
       defaultValue: true,
-      description: 'Sauce: Windows 11 — Microsoft Edge.'
+      description: 'Sauce: Windows 11 — Microsoft Edge (when Run Sauce Labs is enabled).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_FIREFOX',
       defaultValue: true,
-      description: 'Sauce: Windows 11 — Firefox.'
+      description: 'Sauce: Windows 11 — Firefox (when Run Sauce Labs is enabled).'
     ),
   ])
 ])
@@ -109,11 +119,11 @@ withNightlyPipeline(type, product, component) {
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
   enableFortifyScan()
-  def sauceSuites = selectedSauceSuites()
-  if (sauceSuites) {
+  if (params.RUN_SAUCE_LABS) {
     // One Infrastructure stage: yarn test:crossbrowser runs saucectl once per selected suite (sequential),
     // then generates allure-report (see src/test/ui/utils/scripts/sauce-crossbrowser-run.sh).
-    env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
+    def suites = selectedSauceSuites()
+    env.SAUCE_SUITE_NAMES = suites.join(' ')
     enableCrossBrowserTest()
     publishSauceAllureReport()
   }
@@ -127,8 +137,9 @@ withNightlyPipeline(type, product, component) {
 /** Suite `name` values in .sauce/config-sauce-nightly.yml (checkbox order preserved). */
 def selectedSauceSuites() {
   [
-    params.SAUCE_MAC15_CHROME ? 'pcs-frontend-mac15-chrome' : null,
-    params.SAUCE_MAC15_FIREFOX ? 'pcs-frontend-mac15-firefox' : null,
+    params.SAUCE_MAC15_CHROME ? 'pcs-frontend-mac13-chrome' : null,
+    params.SAUCE_MAC15_FIREFOX ? 'pcs-frontend-mac13-firefox' : null,
+    params.SAUCE_MAC_SAFARI ? 'pcs-frontend-mac14-webkit' : null,
     params.SAUCE_WIN11_CHROME ? 'pcs-frontend-win11-chrome' : null,
     params.SAUCE_WIN11_EDGE ? 'pcs-frontend-win11-edge' : null,
     params.SAUCE_WIN11_FIREFOX ? 'pcs-frontend-win11-firefox' : null,
@@ -141,6 +152,9 @@ def validateInputs() {
   }
   if (params.ENVIRONMENT == 'preview' && !params.PR_NUMBER.trim().matches("^\\d+\$")) {
     error("Validation Failed: PR number must contain only numerical values")
+  }
+  if (params.RUN_SAUCE_LABS && selectedSauceSuites().isEmpty()) {
+    error('Validation Failed: When Run Sauce Labs is enabled, select at least one Sauce desktop browser checkbox.')
   }
 }
 

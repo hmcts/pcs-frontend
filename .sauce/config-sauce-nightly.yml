@@ -1,7 +1,13 @@
-# Single Sauce Playwright config: all desktop suites. Pick one with:
-#   yarn exec saucectl run -c .sauce/config-sauce-nightly.yml --select-suite "pcs-frontend-mac15-chrome"
-# Run all five (no --select-suite): yarn test:sauce:all-desktops
-# Allure: download raw results after each run (often under ./artifacts/<suite>/); src/test/ui/utils/scripts/sauce-crossbrowser-run.sh merges them.
+# Nightly Sauce Playwright — OS/browser combos aligned with proven
+# `nightly-dev-HDPI-5349-POC-Sauce-Playwright` `.sauce/config-matrix.yml` (eu-central-1).
+# macOS 13 + 1440x900 for Chrome/Firefox; macOS 14 + ARM for Safari (WebKit); Windows 11 + 1920x1080 for Chrome/Edge/Firefox.
+#
+# Pick one suite:
+#   yarn exec saucectl run -c .sauce/config-sauce-nightly.yml --select-suite "pcs-frontend-mac13-chrome"
+# Multiple suites: Jenkins sets SAUCE_SUITE_NAMES → yarn test:crossbrowser (runs test:sauce:nightly per suite, merges Allure).
+# Allure: download under ./artifacts/<suite>/ — see src/test/ui/utils/scripts/sauce-crossbrowser-run.sh
+#
+# Ref: https://docs.saucelabs.com/web-apps/automated-testing/playwright/
 apiVersion: v1alpha
 kind: playwright
 
@@ -25,8 +31,9 @@ sauce:
 defaults:
   timeout: 30m
 
+# POC matrix used 1.58.1 successfully on subscription; keep in sync with Sauce docs for that line.
 playwright:
-  version: 1.58.2
+  version: 1.58.1
   configFile: playwright.config.ts
 
 nodeVersion: v22
@@ -60,8 +67,8 @@ env:
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
 suites:
-  - name: 'pcs-frontend-mac15-chrome'
-    platformName: macOS 15
+  - name: 'pcs-frontend-mac13-chrome'
+    platformName: macOS 13
     screenResolution: 1440x900
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
@@ -72,8 +79,8 @@ suites:
       headless: true
       grep: $SAUCE_GREP
 
-  - name: 'pcs-frontend-mac15-firefox'
-    platformName: macOS 15
+  - name: 'pcs-frontend-mac13-firefox'
+    platformName: macOS 13
     screenResolution: 1440x900
     testMatch:
       - ".*src/test/ui/.*\\.spec\\.ts$"
@@ -81,6 +88,20 @@ suites:
     params:
       browserName: firefox
       project: firefox
+      headless: true
+      grep: $SAUCE_GREP
+
+  # Safari = WebKit on Mac; HDPI-5349 POC: macOS 14 + armRequired (Premium tier may be required).
+  - name: 'pcs-frontend-mac13-webkit'
+    platformName: macOS 13
+    armRequired: true
+    screenResolution: 1440x900
+    testMatch:
+      - ".*src/test/ui/.*\\.spec\\.ts$"
+      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
+    params:
+      browserName: webkit
+      project: webkit
       headless: true
       grep: $SAUCE_GREP
 
