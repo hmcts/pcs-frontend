@@ -205,13 +205,13 @@ def publishSauceAllureReport() {
     } else {
       echo 'Sauce Allure: allure-report/index.html not found; skipping HTML publisher.'
     }
+    steps.archiveArtifacts(
+      allowEmptyArchive: true,
+      artifacts: 'allure-report/**/*,allure-results/**/*,allure-results-sauce-merge/**/*'
+    )
   } catch (Exception e) {
-    echo "WARNING: Sauce Allure HTML publish failed: ${e.message}"
+    echo "WARNING: Sauce Allure publish/archive skipped: ${e.message}"
   }
-  steps.archiveArtifacts(
-    allowEmptyArchive: true,
-    artifacts: 'allure-report/**/*,allure-results/**/*,allure-results-sauce-merge/**/*'
-  )
 }
 
 def runAccessibilityTests(yarnBuilder) {
