@@ -4,7 +4,7 @@ import path from 'path';
 import { accessTokenApiData, s2STokenApiData } from '../data/api-data';
 import { user } from '../data/user-data';
 
-/** Clears PFT lock dir when not on CI (local runs). Used by the Playwright `setup` project. */
+/** Clears PFT lock dir on local runs only (skipped when CI is set). */
 export function clearEmvLocksIfLocal(): void {
   if (process.env.CI) {
     return;
@@ -34,3 +34,9 @@ export const getAccessToken = async (): Promise<void> => {
     scope: 'profile openid roles',
   });
 };
+
+async function globalSetupConfig(): Promise<void> {
+  clearEmvLocksIfLocal();
+}
+
+export default globalSetupConfig;

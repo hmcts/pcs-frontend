@@ -1,4 +1,4 @@
-/** Prefer `IDAM_PCS_USER_PASSWORD_B64` when the plain password is mangled (e.g. `$` in shells). */
+// Prefer base64 env when the plain password breaks in shells (e.g. `$`).
 export function resolveIdamPassword(): string {
   const b64 = process.env.IDAM_PCS_USER_PASSWORD_B64?.trim();
   if (b64) {

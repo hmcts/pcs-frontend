@@ -3,9 +3,9 @@ import path from 'path';
 
 import { test as setup } from '@playwright/test';
 
-import { clearEmvLocksIfLocal, getAccessToken, getS2SToken } from './config/global-setup.config';
+import { clearEmvLocksIfLocal, getAccessToken, getS2SToken } from '../config/global-setup.config';
 
-const SETUP_ENV_PATH = path.join(__dirname, '.auth/setup-env.json');
+const SETUP_ENV_PATH = path.join(__dirname, '../.auth/setup-env.json');
 
 const KEYS_TO_SNAPSHOT = [
   'S2S_URL',
@@ -17,7 +17,7 @@ const KEYS_TO_SNAPSHOT = [
 
 setup.describe.configure({ mode: 'serial' });
 
-setup('S2S and IDAM tokens for test workers', async () => {
+setup('S2S and IDAM tokens for API helpers', async () => {
   clearEmvLocksIfLocal();
   await getS2SToken();
   await getAccessToken();
@@ -26,7 +26,7 @@ setup('S2S and IDAM tokens for test workers', async () => {
   const snapshot: Record<string, string> = {};
   for (const key of KEYS_TO_SNAPSHOT) {
     const value = process.env[key];
-    if (value !== undefined) {
+    if (typeof value === 'string') {
       snapshot[key] = value;
     }
   }

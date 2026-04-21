@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-/** Written by the `setup` project (`auth.setup.ts`); applied before UI tests use API helpers. */
+// Optional snapshot written by the setup project (auth.setup.ts) for worker process.env.
 const SETUP_ENV_PATH = path.join(__dirname, '../.auth/setup-env.json');
 
 export function loadPlaywrightSetupEnvIntoProcess(): void {
