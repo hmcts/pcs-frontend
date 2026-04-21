@@ -17,22 +17,37 @@ properties([
     booleanParam(
       name: 'CHROME_TESTS',
       defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Chrome.'
+      description: 'Run E2E tests in Chrome (on by default).'
     ),
     booleanParam(
       name: 'FIREFOX_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Firefox.'
+      defaultValue: false,
+      description: 'Run E2E tests in Firefox (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'WEBKIT_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run E2E tests in Webkit.'
+      defaultValue: false,
+      description: 'Run E2E tests in WebKit / desktop Safari (off by default; enable when needed).'
     ),
     booleanParam(
-      name: 'ACCESSIBILITY_TESTS',
-      defaultValue: true,
-      description: 'Tick the checkbox to run Accessibility tests.'
+      name: 'EDGE_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests in Microsoft Edge (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'MOBILE_ANDROID_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests on the Android (Pixel 5) profile (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'MOBILE_IOS_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests on the iOS (iPhone 12) WebKit profile (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'MOBILE_IPAD_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'RUN_SAUCE_LABS',
@@ -111,9 +126,6 @@ withNightlyPipeline(type, product, component) {
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
-    if (params.ACCESSIBILITY_TESTS) {
-      runAccessibilityTests(yarnBuilder)
-    }
   }
 }
 
@@ -154,24 +166,31 @@ def setFunctionalTestEnvVars() {
 
 def runE2ETests(yarnBuilder) {
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
-  if (params.CHROME_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Chrome')
-  }
-  if (params.FIREFOX_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Firefox')
-  }
-  if (params.WEBKIT_TESTS) {
-    runE2ETestsForBrowser(yarnBuilder, 'Safari')
+  def e2eMatrix = [
+    [flag: 'CHROME_TESTS', project: 'chrome', browser: 'Chrome', label: 'Desktop Chrome'],
+    [flag: 'FIREFOX_TESTS', project: 'firefox', browser: 'Firefox', label: 'Desktop Firefox'],
+    [flag: 'WEBKIT_TESTS', project: 'webkit', browser: 'Safari', label: 'Desktop Safari (WebKit)'],
+    [flag: 'EDGE_TESTS', project: 'edge', browser: 'Edge', label: 'Desktop Edge'],
+    [flag: 'MOBILE_ANDROID_TESTS', project: 'mobile-android', browser: 'MobileAndroid', label: 'Mobile Android (Pixel 5)'],
+    [flag: 'MOBILE_IOS_TESTS', project: 'mobile-ios', browser: 'MobileIos', label: 'Mobile iOS (WebKit)'],
+    [flag: 'MOBILE_IPAD_TESTS', project: 'mobile-ipad', browser: 'MobileIpad', label: 'Mobile iPad (WebKit)'],
+  ]
+  e2eMatrix.each { row ->
+    if (params[row.flag]) {
+      runE2eStage(yarnBuilder, row.project, row.browser, row.label)
+    }
   }
 }
 
-def runE2ETestsForBrowser(yarnBuilder, String browser) {
-  stage("Full E2E Test - ${browser}") {
+def runE2eStage(yarnBuilder, String playwrightProject, String browser, String stageLabel) {
+  stage("E2E - ${stageLabel}") {
     node {
       checkout scm
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        yarnBuilder.yarn("test:E2e${browser}")
+        withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
+          yarnBuilder.yarn('test:E2e')
+        }
       }
       publishHTML([
         allowMissing: true,
@@ -232,6 +251,7 @@ def runAccessibilityTests(yarnBuilder) {
       ])
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
       sendAllureReportToSlack('Chrome', 'Accessibility_20Test_20Report/')
+      sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
     }
   }
 }
