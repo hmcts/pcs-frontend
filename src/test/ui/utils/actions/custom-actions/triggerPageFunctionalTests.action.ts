@@ -39,14 +39,14 @@ export class TriggerPageFunctionalTestsAction implements IAction {
   }
 
   private shouldSkipPage(pageName: string): boolean {
-    // Excluded pages: never skip
-    if (excludedPages.includes(pageName)) {
-      return false;
-    }
-
-    // Already tested in this run (in-memory): skip regardless of lock state
+    // Already tested in this run (in-memory): skip regardless of exclusion or lock state
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
       return true;
+    }
+
+    // Excluded pages: never skip (but still respect in-memory guard above)
+    if (excludedPages.includes(pageName)) {
+      return false;
     }
 
     // Failed lock exists: never skip (always re-run across runs/retries)
