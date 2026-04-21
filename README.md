@@ -193,18 +193,11 @@ yarn createIdamUser -r=citizen -e=test2@test.com
 
 Note: An auto-generated password will be output when the script runs.
 
-The functional UI tests use [Playwright](https://playwright.dev/), and the pr suite can be run with the following command:
+UI tests use [Playwright](https://playwright.dev/).
 
-```bash
-yarn test:functional
-```
-
-By default, the tests will run against http://localhost:3209/, please update the value on line 7 of src/test/config.ts to change this.
-
-There are also several custom test scripts available:
-
-- `yarn test:changed` - runs only changed spec files
-- `yarn test:E2e` - runs Playwright tests tagged `@nightly` for one browser/device project. Set `PLAYWRIGHT_PROJECT` (defaults to `chrome` if unset), for example: `PLAYWRIGHT_PROJECT=firefox yarn test:E2e`. Projects: `chrome`, `firefox`, `webkit`, `edge`, `mobile-android`, `mobile-ios`, `mobile-ipad`.
+- **`yarn test:functional`** — Chrome regression scope (see script / `E2E_TEST_SCOPE`). Point tests at your app with env (e.g. **`TEST_URL`** in `.env`).
+- **`yarn test:E2e`** — same Playwright config as nightly: tag filter and optional spec keywords come from **`E2E_TEST_SCOPE`** and **`E2E_SPEC`** (Jenkins maps **`PLAYWRIGHT_GREP_TAG`** / **`PLAYWRIGHT_SPEC`**). Browser: **`PLAYWRIGHT_PROJECT`** (default `chrome`). With `CI=true`, extra projects exist: `firefox`, `webkit`, `edge`, `mobile-android`, `mobile-ios`, `mobile-ipad`.
+- **`yarn test:changed`** — changed specs only.
 
 ### Stubbing Wiremock for local development
 
