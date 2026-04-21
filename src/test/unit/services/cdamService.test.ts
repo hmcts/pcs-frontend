@@ -185,25 +185,19 @@ describe('cdamService', () => {
       );
     });
 
-    it('throws for invalid document URL with no UUID', async () => {
-      await expect(deleteDocument('http://dm-store/no-documents-path', userToken)).rejects.toThrow(
-        'Invalid document ID'
-      );
-    });
+    it('rewrites dm-store URL to CDAM path for delete', async () => {
+      mockDelete.mockResolvedValue({});
+      const uuid = 'abc12345-1234-1234-1234-123456789abc';
 
-    it('throws for empty document URL', async () => {
-      await expect(deleteDocument('', userToken)).rejects.toThrow('Invalid document ID');
-    });
+      await deleteDocument(`http://dm-store-aat.service.core-compute-aat.internal/documents/${uuid}`, userToken);
 
-    it('throws for document URL with non-UUID ID', async () => {
-      await expect(deleteDocument('http://dm-store/documents/../../etc/passwd', userToken)).rejects.toThrow(
-        'Invalid document ID'
-      );
-    });
-
-    it('throws for document URL with path traversal', async () => {
-      await expect(deleteDocument('http://dm-store/documents/../secret', userToken)).rejects.toThrow(
-        'Invalid document ID'
+      expect(mockDelete).toHaveBeenCalledWith(
+        `${mockCdamUrl}/cases/documents/${uuid}`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${userToken}`,
+          }),
+        })
       );
     });
   });

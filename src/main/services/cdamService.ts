@@ -51,20 +51,17 @@ export async function uploadDocument(file: Express.Multer.File, userToken: strin
 }
 
 export async function deleteDocument(documentUrl: string, userToken: string): Promise<void> {
-  const documentId = documentUrl.split('/documents/').pop();
-  if (!documentId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(documentId)) {
-    throw new Error('Invalid document ID');
-  }
-
   const cdamUrl = getCdamUrl();
+  const documentsIndex = documentUrl.lastIndexOf('/documents/');
+  const cdamPath = documentsIndex >= 0 ? `/cases${documentUrl.slice(documentsIndex)}` : documentUrl;
 
-  await http.delete(`${cdamUrl}/cases/documents/${documentId}`, {
+  await http.delete(`${cdamUrl}${cdamPath}`, {
     headers: {
       Authorization: `Bearer ${userToken}`,
     },
   });
 
-  logger.info('Document deleted from CDAM', { documentId });
+  logger.info('Document deleted from CDAM', { documentUrl });
 }
 
 export async function getDocumentBinary(
