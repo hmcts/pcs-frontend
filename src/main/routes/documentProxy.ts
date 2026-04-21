@@ -27,8 +27,14 @@ const upload = multer({
 });
 
 function getUserToken(req: Request): string {
-  return req.session?.user?.accessToken || '';
+  const token = req.session?.user?.accessToken;
+  if (!token) {
+    throw new Error('User not authenticated');
+  }
+  return token;
 }
+
+type ErrorTranslations = ReturnType<typeof getErrorTranslations>;
 
 function getErrorTranslations(req: Request) {
   const t = req.t;
@@ -39,7 +45,7 @@ function getErrorTranslations(req: Request) {
     uploadFailed: t('errors.documentUpload.uploadFailed'),
     deleteFailed: t('errors.documentUpload.fileDeleteFailed'),
     documentNotFound: t('errors.documentUpload.documentUrlRequired'),
-    downloadFailed: t('errors.documentUpload.uploadFailed'),
+    downloadFailed: t('errors.documentUpload.downloadFailed'),
     uploadSuccess: (filename: string) => t('errors.documentUpload.uploadSuccess', { filename }),
   };
 }
@@ -113,15 +119,17 @@ async function removeDraftDocument(
   const docToDelete = existingDocs[index];
   const documentUrl = docToDelete.value.document.document_url;
 
-  const userToken = getUserToken(req);
-  await deleteDocument(documentUrl, userToken);
-
+  // Save draft first (remove reference), then delete from CDAM.
+  // If CDAM delete fails, orphaned document in CDAM is harmless.
+  // If draft save fails, document reference remains valid.
   const updatedDocs = existingDocs.filter((_, i) => i !== index);
   await saveDraftDocuments(req, updatedDocs);
+
+  const userToken = getUserToken(req);
+  await deleteDocument(documentUrl, userToken);
 }
 
-function formatUploadSuccess(req: Request, cdamDoc: CdamDocument, index: number) {
-  const errors = getErrorTranslations(req);
+function buildUploadResponse(errors: ErrorTranslations, cdamDoc: CdamDocument, index: number): Record<string, unknown> {
   const filename = cdamDoc.document_filename;
   const safeFilename = filename
     .replace(/&/g, '&amp;')
@@ -153,7 +161,7 @@ function sanitiseFilename(filename: string): string {
 
 function validateDocumentIndex(indexParam: string, docs: CcdCollectionItem<CcdDefendantDocument>[]): number | null {
   const docIndex = Number(indexParam);
-  if (Number.isNaN(docIndex) || docIndex < 0 || docIndex >= docs.length) {
+  if (Number.isNaN(docIndex) || !Number.isInteger(docIndex) || docIndex < 0 || docIndex >= docs.length) {
     return null;
   }
   return docIndex;
@@ -219,7 +227,7 @@ export default function documentProxyRoutes(app: Application): void {
 
         const cdamDoc = await uploadDocument(req.file, getUserToken(req));
         const index = await saveDraftWithNewDocument(req, toCcdDocument(cdamDoc));
-        return res.json(formatUploadSuccess(req, cdamDoc, index));
+        return res.json(buildUploadResponse(errors, cdamDoc, index));
       } catch (error) {
         logger.error('Failed to upload document to CDAM', {
           error: error instanceof Error ? error.message : String(error),

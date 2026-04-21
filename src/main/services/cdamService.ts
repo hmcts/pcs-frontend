@@ -72,7 +72,8 @@ export async function getDocumentBinary(
   userToken: string
 ): Promise<{ stream: NodeJS.ReadableStream; contentType: string }> {
   const cdamUrl = getCdamUrl();
-  const cdamPath = binaryUrl.replace(/.*\/documents/, '/cases/documents');
+  const documentsIndex = binaryUrl.lastIndexOf('/documents');
+  const cdamPath = documentsIndex >= 0 ? `/cases${binaryUrl.slice(documentsIndex)}` : binaryUrl;
   const response = await http.get(`${cdamUrl}${cdamPath}`, {
     headers: {
       Authorization: `Bearer ${userToken}`,

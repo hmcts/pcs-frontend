@@ -516,24 +516,17 @@ describe('documentProxyRoutes', () => {
       expect(body.success.messageHtml).toContain('a&amp;b&lt;c&gt;d&quot;e.pdf');
     });
 
-    it('upload: treats missing session as empty access token', async () => {
-      mockUploadDocument.mockResolvedValue({
-        document_url: 'http://dm/doc/u',
-        document_binary_url: 'http://dm/doc/u/binary',
-        document_filename: 'test.pdf',
-        content_type: 'application/pdf',
-        size: 10,
-      });
-
+    it('upload: returns 502 when user not authenticated', async () => {
       const req = makeReqWithDocs({
         session: undefined,
         file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 10 },
       });
-      const res = { json: jest.fn() } as unknown as Response;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await uploadHandler(req, res);
 
-      expect(mockUploadDocument).toHaveBeenCalledWith(expect.anything(), '');
+      expect(res.status).toHaveBeenCalledWith(502);
+      expect(mockUploadDocument).not.toHaveBeenCalled();
     });
 
     it('upload: handles missing validatedCase (empty existing docs)', async () => {
