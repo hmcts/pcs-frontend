@@ -115,8 +115,8 @@ export interface CcdDocumentReference {
   category_id?: string;
 }
 
-/** Wraps CCD Document with metadata fields (matches backend DefendantDocument). */
-export interface CcdDefendantDocument {
+/** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
+export interface CcdUploadedDocument {
   document: CcdDocumentReference;
   contentType?: string;
   size?: number;
@@ -153,7 +153,8 @@ export interface CcdDefendantResponses {
   householdCircumstances?: HouseholdCircumstances;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
-  uploadedDocuments?: CcdCollectionItem<CcdDefendantDocument>[];
+  defendantDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
+  counterClaimDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   languageUsed?: LanguageUsed;
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
 }

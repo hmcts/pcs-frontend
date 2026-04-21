@@ -4,7 +4,7 @@ import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CcdCollectionItem, CcdDefendantDocument } from '@services/ccdCase.interface';
+import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
 interface DisplayDocument {
@@ -14,7 +14,7 @@ interface DisplayDocument {
   size?: number;
 }
 
-function toDisplayDocuments(docs: CcdCollectionItem<CcdDefendantDocument>[]): DisplayDocument[] {
+function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[]): DisplayDocument[] {
   return docs.map((item, index) => ({
     index,
     document_filename: item.value.document.document_filename,
@@ -55,7 +55,8 @@ export const step: StepDefinition = createFormStep({
     deleteButton: 'deleteButton',
   },
   getInitialFormData: (req: Request) => {
-    const existingDocs = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.uploadedDocuments;
+    const existingDocs =
+      req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.defendantDocuments;
     if (!existingDocs?.length) {
       return {};
     }

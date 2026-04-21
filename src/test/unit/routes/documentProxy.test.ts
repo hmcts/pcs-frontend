@@ -69,7 +69,7 @@ function makeReqWithDocs(overrides: Record<string, unknown>, docs: unknown[] = [
         validatedCase: {
           possessionClaimResponse: {
             defendantResponses: {
-              uploadedDocuments: docs,
+              defendantDocuments: docs,
             },
           },
         },
@@ -376,7 +376,7 @@ describe('documentProxyRoutes', () => {
       expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith('token', '123456', {
         possessionClaimResponse: {
           defendantResponses: {
-            uploadedDocuments: expect.arrayContaining([
+            defendantDocuments: expect.arrayContaining([
               existingDoc,
               expect.objectContaining({ value: expect.any(Object) }),
             ]),
@@ -445,7 +445,7 @@ describe('documentProxyRoutes', () => {
       expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith('token', '123456', {
         possessionClaimResponse: {
           defendantResponses: {
-            uploadedDocuments: [],
+            defendantDocuments: [],
           },
         },
       });

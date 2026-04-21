@@ -4,7 +4,7 @@ import multer from 'multer';
 import { oidcMiddleware } from '../middleware';
 
 import { Logger } from '@modules/logger';
-import type { CcdCollectionItem, CcdDefendantDocument } from '@services/ccdCase.interface';
+import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 import type { CdamDocument } from '@services/documentUpload.interface';
@@ -72,25 +72,25 @@ export function handleMulterError(
   next(err);
 }
 
-function getExistingDocuments(req: Request): CcdCollectionItem<CcdDefendantDocument>[] {
+function getExistingDocuments(req: Request): CcdCollectionItem<CcdUploadedDocument>[] {
   const caseData = req.res?.locals?.validatedCase;
-  return caseData?.possessionClaimResponse?.defendantResponses?.uploadedDocuments ?? [];
+  return caseData?.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [];
 }
 
-async function saveDraftDocuments(req: Request, documents: CcdCollectionItem<CcdDefendantDocument>[]): Promise<void> {
+async function saveDraftDocuments(req: Request, documents: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
   const caseId = req.params.caseReference as string;
   const accessToken = getUserToken(req);
 
   await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, {
     possessionClaimResponse: {
       defendantResponses: {
-        uploadedDocuments: documents,
+        defendantDocuments: documents,
       },
     },
   });
 }
 
-function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdDefendantDocument> {
+function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocument> {
   return {
     value: {
       document: {
@@ -104,7 +104,7 @@ function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdDefendantDoc
   };
 }
 
-async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<CcdDefendantDocument>): Promise<number> {
+async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<CcdUploadedDocument>): Promise<number> {
   const existingDocs = getExistingDocuments(req);
   const updatedDocs = [...existingDocs, entry];
   await saveDraftDocuments(req, updatedDocs);
@@ -114,7 +114,7 @@ async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<C
 async function removeDraftDocument(
   req: Request,
   index: number,
-  existingDocs: CcdCollectionItem<CcdDefendantDocument>[]
+  existingDocs: CcdCollectionItem<CcdUploadedDocument>[]
 ): Promise<void> {
   const docToDelete = existingDocs[index];
   const documentUrl = docToDelete.value.document.document_url;
@@ -159,7 +159,7 @@ function sanitiseFilename(filename: string): string {
   return filename.replace(/["\\\n\r]/g, '_');
 }
 
-function validateDocumentIndex(indexParam: string, docs: CcdCollectionItem<CcdDefendantDocument>[]): number | null {
+function validateDocumentIndex(indexParam: string, docs: CcdCollectionItem<CcdUploadedDocument>[]): number | null {
   const docIndex = Number(indexParam);
   if (Number.isNaN(docIndex) || !Number.isInteger(docIndex) || docIndex < 0 || docIndex >= docs.length) {
     return null;

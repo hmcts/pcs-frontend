@@ -56,12 +56,12 @@ describe('upload-document step', () => {
   });
 
   describe('getInitialFormData', () => {
-    const makeReq = (uploadedDocuments?: unknown[]) => ({
+    const makeReq = (defendantDocuments?: unknown[]) => ({
       res: {
         locals: {
           validatedCase: {
             possessionClaimResponse: {
-              defendantResponses: { uploadedDocuments },
+              defendantResponses: { defendantDocuments },
             },
           },
         },
