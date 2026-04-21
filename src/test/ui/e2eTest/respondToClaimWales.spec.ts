@@ -23,7 +23,7 @@ import {
   landlordLicensed,
   landlordRegistered,
   languageUsed,
-  nonRentArrearsDispute,
+  nonRentArrearsDispute, otherConsiderations,
   priorityDebtDetails,
   priorityDebts,
   rentArrears,
@@ -31,7 +31,7 @@ import {
   repaymentsMade,
   startNow,
   tenancyDateDetails,
-  tenancyTypeDetails,
+  tenancyTypeDetails, uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -161,6 +161,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
