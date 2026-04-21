@@ -1,3 +1,4 @@
+import config from 'config';
 import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
@@ -42,6 +43,33 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
+function getDashboardTaskRoutes(): Record<string, string> {
+  if (!config.has('dashboard.taskRoutes')) {
+    return {};
+  }
+  const taskRoutes = config.get('dashboard.taskRoutes');
+  if (taskRoutes && typeof taskRoutes === 'object') {
+    return taskRoutes as Record<string, string>;
+  }
+  return {};
+}
+
+function getTaskUrl(
+  templateId: string,
+  taskStatus: string,
+  caseReference: string,
+  taskGroupId: string
+): string | undefined {
+  if (taskStatus === 'NOT_AVAILABLE') {
+    return undefined;
+  }
+  const pattern = getDashboardTaskRoutes()[templateId];
+  if (pattern) {
+    return pattern.replace(/:caseReference/g, caseReference);
+  }
+  return `/dashboard/${caseReference}/${taskGroupId}/${templateId}`;
+}
+
 export const getDashboardUrl = (caseReference?: string | number): string | null => {
   if (!caseReference) {
     return null;
@@ -82,7 +110,7 @@ export default function dashboardRoutes(app: Application): void {
 
           return {
             title: { html: resolved.title },
-            href: linkable ? `/dashboard/${caseReference}/${groupIdLower}/${task.templateId}` : undefined,
+            href: linkable ? getTaskUrl(task.templateId, task.status, caseReference, groupIdLower) : undefined,
             status: tagText && classes ? { tag: { text: tagText, classes } } : {},
           };
         })

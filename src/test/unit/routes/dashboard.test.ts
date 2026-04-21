@@ -60,6 +60,7 @@ jest.mock('express', () => {
 
 jest.mock('config', () => ({
   get: jest.fn(() => 'mock-secret'),
+  has: jest.fn(() => false),
 }));
 jest.mock('jose', () => ({
   decodeJwt: jest.fn(() => ({ exp: 0, sub: 'user-1' })),
@@ -82,6 +83,7 @@ jest.mock('@modules/i18n', () => ({
       'dashboard:taskGroups.CLAIM': 'Claim section',
       'dashboard:tasks.Defendant.ViewClaim.title': 'View claim title',
       'dashboard:tasks.Defendant.SubmitResponse.title': 'Submit response title',
+      'dashboard:tasks.task-1.title': 'Task one title',
       'dashboard:tasks.statuses.AVAILABLE': 'Available',
       'dashboard:tasks.statuses.NOT_AVAILABLE': 'Not available',
       'dashboard:notifications.Defendant.CaseIssued.title': 'Case issued title',
@@ -219,6 +221,90 @@ describe('Dashboard Routes', () => {
       expect(notAvailableTask.title.html).toBe('Submit response title');
       expect(notAvailableTask.href).toBeUndefined();
       expect(notAvailableTask.status).toEqual({});
+    });
+
+    it('should use config-driven route pattern for task href when configured', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskRoutes' ? { 'task-1': '/case/:caseReference/task-one' } : 'mock-secret'
+      );
+
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [],
+        taskGroups: [
+          {
+            groupId: 'CLAIM',
+            tasks: [{ templateId: 'task-1', status: 'AVAILABLE' }],
+          },
+        ],
+        propertyAddress: null,
+      });
+
+      dashboardRoutes(app);
+
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+      const [configuredTask] = renderArgs.taskGroups[0].tasks;
+
+      expect(configuredTask.href).toBe('/case/1234567890123456/task-one');
+    });
+
+    it('should fall back to default task href when config taskRoutes value is not an object', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskRoutes' ? 'not-an-object' : 'mock-secret'
+      );
+
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [],
+        taskGroups: [
+          {
+            groupId: 'GROUP_ONE',
+            tasks: [{ templateId: 'task-1', status: 'AVAILABLE' }],
+          },
+        ],
+        propertyAddress: null,
+      });
+
+      dashboardRoutes(app);
+
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+      const [task] = renderArgs.taskGroups[0].tasks;
+
+      expect(task.href).toBe('/dashboard/1234567890123456/group_one/task-1');
     });
 
     it('should omit notifications when translation is missing and log a warning', async () => {
