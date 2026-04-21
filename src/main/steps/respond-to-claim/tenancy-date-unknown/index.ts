@@ -75,7 +75,7 @@ export const step: StepDefinition = createFormStep({
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: async req => {
-    const claimantName = getClaimantName(req)
+    const claimantName = getClaimantName(req);
     const orgName = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
       ?.value as string;
 
