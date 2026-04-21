@@ -4,20 +4,11 @@
 #
 # Pick one suite:
 #   yarn exec saucectl run -c .sauce/config-sauce-nightly.yml --select-suite "pcs-frontend-mac13-chrome"
-# Multiple suites: Jenkins sets SAUCE_SUITE_NAMES → yarn test:crossbrowser (runs test:sauce:nightly per suite, merges Allure).
-# Allure: download under ./artifacts/<suite>/ — see src/test/ui/utils/scripts/sauce-crossbrowser-run.sh
+# Multiple suites: Jenkins sets SAUCE_SUITE_NAMES → yarn test:crossbrowser (runs test:sauce:nightly per suite).
 #
 # Ref: https://docs.saucelabs.com/web-apps/automated-testing/playwright/
 apiVersion: v1alpha
 kind: playwright
-
-artifacts:
-  cleanup: true
-  download:
-    when: always
-    match:
-      - 'allure-results/**'
-    directory: ./artifacts
 
 sauce:
   region: eu-central-1
@@ -44,11 +35,10 @@ npm:
   packages:
     '@hmcts/playwright-common': '1.1.2'
     config: '^4.1.1'
-    allure-js-commons: '3.5.0'
-    allure-playwright: '3.5.0'
 
 env:
   PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
+  PLAYWRIGHT_SKIP_ALLURE: 'true'
   CI: 'true'
   NODE_CONFIG_ENV: test
 

@@ -31,6 +31,9 @@ const junit_result_output =
   process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
   (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
 
+// Sauce bundle omits allure-playwright; `.sauce/config-sauce-nightly.yml` sets PLAYWRIGHT_SKIP_ALLURE=true.
+const skipAllureReporter = process.env.PLAYWRIGHT_SKIP_ALLURE === 'true';
+
 // `.sauce/*.yml` sets PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS=true for full video/screenshots/trace on Sauce.
 const sauceRichCapture = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
 
@@ -64,16 +67,20 @@ export default defineConfig({
   reporter: [
     ['list'],
     ...(process.env.CI ? [['junit', { outputFile: junit_result_output }] as const] : []),
-    [
-      'allure-playwright',
-      {
-        resultsDir: 'allure-results',
-        suiteTitle: false,
-        environmentInfo: {
-          os_version: process.version,
-        },
-      },
-    ],
+    ...(skipAllureReporter
+      ? []
+      : ([
+          [
+            'allure-playwright',
+            {
+              resultsDir: 'allure-results',
+              suiteTitle: false,
+              environmentInfo: {
+                os_version: process.version,
+              },
+            },
+          ],
+        ] as const)),
   ],
   projects: [
     {

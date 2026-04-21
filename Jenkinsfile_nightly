@@ -67,7 +67,7 @@ properties([
     booleanParam(
       name: 'SAUCE_MAC_SAFARI',
       defaultValue: true,
-      description: 'Sauce: macOS 14 — Safari / WebKit (ARM; HDPI-5349 POC matrix; may need Premium).'
+      description: 'Sauce: macOS 13 — Safari / WebKit (suite pcs-frontend-mac13-webkit; armRequired).'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_CHROME',
@@ -120,12 +120,10 @@ withNightlyPipeline(type, product, component) {
   setFunctionalTestEnvVars()
   enableFortifyScan()
   if (params.RUN_SAUCE_LABS) {
-    // One Infrastructure stage: yarn test:crossbrowser runs saucectl once per selected suite (sequential),
-    // then generates allure-report (see src/test/ui/utils/scripts/sauce-crossbrowser-run.sh).
+    // One Infrastructure stage: yarn test:crossbrowser → saucectl per selected suite (see sauce-crossbrowser-run.sh).
     def suites = selectedSauceSuites()
     env.SAUCE_SUITE_NAMES = suites.join(' ')
     enableCrossBrowserTest()
-    publishSauceAllureReport()
   }
 
   afterAlways('fortify-scan') {
@@ -139,7 +137,7 @@ def selectedSauceSuites() {
   [
     params.SAUCE_MAC15_CHROME ? 'pcs-frontend-mac13-chrome' : null,
     params.SAUCE_MAC15_FIREFOX ? 'pcs-frontend-mac13-firefox' : null,
-    params.SAUCE_MAC_SAFARI ? 'pcs-frontend-mac14-webkit' : null,
+    params.SAUCE_MAC_SAFARI ? 'pcs-frontend-mac13-webkit' : null,
     params.SAUCE_WIN11_CHROME ? 'pcs-frontend-win11-chrome' : null,
     params.SAUCE_WIN11_EDGE ? 'pcs-frontend-win11-edge' : null,
     params.SAUCE_WIN11_FIREFOX ? 'pcs-frontend-win11-firefox' : null,
@@ -221,30 +219,6 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
       )
       sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
     }
-  }
-}
-
-/** After enableCrossBrowserTest(): HTML report from src/test/ui/utils/scripts/sauce-crossbrowser-run.sh if present in workspace. */
-def publishSauceAllureReport() {
-  try {
-    if (fileExists('allure-report/index.html')) {
-      publishHTML([
-        allowMissing         : true,
-        alwaysLinkToLastBuild: true,
-        keepAll              : true,
-        reportDir            : 'allure-report',
-        reportFiles          : 'index.html',
-        reportName           : 'Sauce Labs Cross-Browser Allure Report'
-      ])
-    } else {
-      echo 'Sauce Allure: allure-report/index.html not found; skipping HTML publisher.'
-    }
-    steps.archiveArtifacts(
-      allowEmptyArchive: true,
-      artifacts: 'allure-report/**/*,allure-results/**/*,allure-results-sauce-merge/**/*'
-    )
-  } catch (Exception e) {
-    echo "WARNING: Sauce Allure publish/archive skipped: ${e.message}"
   }
 }
 
