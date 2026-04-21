@@ -37,7 +37,7 @@ export async function defendantNameCaptureNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: defendantNameCapture.pageSlug,
   });
-  await performValidation('pageNavigation', defendantNameCapture.backLink, 'issue 6');
+  await performValidation('pageNavigation', defendantNameCapture.backLink, freeLegalAdvice.mainHeader);
   await defendantNameCaptureInputValuesPrePopulated();
 }
 

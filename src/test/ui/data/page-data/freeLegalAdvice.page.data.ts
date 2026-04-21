@@ -1,6 +1,6 @@
 export const freeLegalAdvice = {
   mainHeader: `You’re entitled to free legal advice before you submit your response`,
-  respondToClaimParagraph: `issue 1 Respond to a property possession claim`,
+  respondToClaimParagraph: `Respond to a property possession claim`,
   helpAvailableSubHeader: `Help available now online`,
   housingExpertsParagraph: `Housing experts are ready and waiting to help you, and it takes just minutes to find one in your area.`,
   visitTheLegalAdviserList: `Visit the `,
