@@ -27,42 +27,52 @@ properties([
     booleanParam(
       name: 'WEBKIT_TESTS',
       defaultValue: false,
-      description: 'Tick the checkbox to run E2E tests in Webkit.'
+      description: 'Run E2E tests in WebKit / desktop Safari (off by default; enable when needed).'
     ),
     booleanParam(
-      name: 'ACCESSIBILITY_TESTS',
+      name: 'EDGE_TESTS',
       defaultValue: false,
-      description: 'Tick the checkbox to run Accessibility tests.'
+      description: 'Run E2E tests in Microsoft Edge (off by default; enable when needed).'
     ),
     booleanParam(
-      name: 'RUN_SAUCE_LABS',
-      defaultValue: true,
-      description: 'Tick to run Sauce Labs cross-browser tests (tunnel + yarn test:crossbrowser). Off by default; enable when manually triggering.'
+      name: 'MOBILE_ANDROID_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests on the Android (Pixel 5) profile (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'MOBILE_IOS_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests on the iOS (iPhone 12) WebKit profile (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'MOBILE_IPAD_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
     booleanParam(
       name: 'SAUCE_MAC15_CHROME',
       defaultValue: true,
-      description: 'Sauce: macOS 15 — Chrome (when Run Sauce Labs is enabled).'
+      description: 'Sauce: macOS 15 — Chrome.'
     ),
     booleanParam(
       name: 'SAUCE_MAC15_FIREFOX',
       defaultValue: true,
-      description: 'Sauce: macOS 15 — Firefox (when Run Sauce Labs is enabled).'
+      description: 'Sauce: macOS 15 — Firefox.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_CHROME',
       defaultValue: true,
-      description: 'Sauce: Windows 11 — Chrome (when Run Sauce Labs is enabled).'
+      description: 'Sauce: Windows 11 — Chrome.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_EDGE',
       defaultValue: true,
-      description: 'Sauce: Windows 11 — Microsoft Edge (when Run Sauce Labs is enabled).'
+      description: 'Sauce: Windows 11 — Microsoft Edge.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_FIREFOX',
       defaultValue: true,
-      description: 'Sauce: Windows 11 — Firefox (when Run Sauce Labs is enabled).'
+      description: 'Sauce: Windows 11 — Firefox.'
     ),
   ])
 ])
@@ -99,11 +109,11 @@ withNightlyPipeline(type, product, component) {
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
   enableFortifyScan()
-  if (params.RUN_SAUCE_LABS) {
+  def sauceSuites = selectedSauceSuites()
+  if (sauceSuites) {
     // One Infrastructure stage: yarn test:crossbrowser runs saucectl once per selected suite (sequential),
     // then generates allure-report (see src/test/ui/utils/scripts/sauce-crossbrowser-run.sh).
-    def suites = selectedSauceSuites()
-    env.SAUCE_SUITE_NAMES = suites.join(' ')
+    env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
     enableCrossBrowserTest()
     publishSauceAllureReport()
   }
@@ -132,15 +142,12 @@ def validateInputs() {
   if (params.ENVIRONMENT == 'preview' && !params.PR_NUMBER.trim().matches("^\\d+\$")) {
     error("Validation Failed: PR number must contain only numerical values")
   }
-  if (params.RUN_SAUCE_LABS && selectedSauceSuites().isEmpty()) {
-    error('Validation Failed: When Run Sauce Labs is enabled, select at least one Sauce desktop browser checkbox.')
-  }
 }
 
 def handleEnvironmentSetting() {
   env.TEST_URL = (params.ENVIRONMENT == 'preview')
     ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
-    : "https://pcs.${params.ENVIRONMENT}.platform.hmcts.net"
+    : "https://pcs.${params.ENVIRONMENT}.platform.hmcts.net/"
 }
 
 def setFunctionalTestEnvVars() {
@@ -173,8 +180,17 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
       checkout scm
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
-          yarnBuilder.yarn('test:E2e')
+        if (playwrightProject == 'chrome') {
+          withEnv([
+            "PLAYWRIGHT_PROJECT=${playwrightProject}",
+            'PLAYWRIGHT_GREP=@crossbrowser',
+          ]) {
+            yarnBuilder.yarn('test:E2e')
+          }
+        } else {
+          withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
+            yarnBuilder.yarn('test:E2e')
+          }
         }
       }
       publishHTML([
@@ -189,7 +205,7 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
         allowEmptyArchive: true,
         artifacts: 'definitions/test/playwright-report/**'
       )
-      sendAllureReportToSlack(browser, "Full_20${browser}_20E2E_20Test_20Report/")
+      sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
     }
   }
 }
@@ -215,29 +231,6 @@ def publishSauceAllureReport() {
     )
   } catch (Exception e) {
     echo "WARNING: Sauce Allure publish/archive skipped: ${e.message}"
-  }
-}
-
-def runAccessibilityTests(yarnBuilder) {
-  stage("Full Accessibility Test") {
-    node {
-      checkout scm
-      sh 'rm -rf allure-results allure-report'
-      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        yarnBuilder.yarn("test:accessibility")
-      }
-      publishHTML([
-        allowMissing         : true,
-        alwaysLinkToLastBuild: true,
-        keepAll              : true,
-        reportDir            : "allure-report",
-        reportFiles          : 'index.html',
-        reportName           : 'Accessibility Test Report'
-      ])
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/tests-results/ManageCasesFunctional/*'
-      sendAllureReportToSlack('Chrome', 'Accessibility_20Test_20Report/')
-      sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
-    }
   }
 }
 

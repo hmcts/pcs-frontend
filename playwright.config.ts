@@ -31,18 +31,6 @@ const junit_result_output =
   process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
   (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
 
-// Skip Allure when explicitly disabled, or when allure-playwright is not installed (e.g. some local runs).
-function isAllurePlaywrightInstalled(): boolean {
-  try {
-    require.resolve('allure-playwright');
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-const useAllureReporter = process.env.PLAYWRIGHT_SKIP_ALLURE !== 'true' && isAllurePlaywrightInstalled();
-
 // `.sauce/*.yml` sets PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS=true for full video/screenshots/trace on Sauce.
 const sauceRichCapture = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
 
@@ -71,33 +59,25 @@ export default defineConfig({
   use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
   /* Report slow tests if they take longer than 5 mins */
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
+  globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
-  reporter: useAllureReporter
-    ? [
-        ['list'],
-        [
-          'allure-playwright',
-          {
-            resultsDir: 'allure-results',
-            suiteTitle: false,
-            environmentInfo: {
-              os_version: process.version,
-            },
-          },
-        ],
-      ]
-    : [['list']],
+  reporter: [
+    ['list'],
+    ...(process.env.CI ? [['junit', { outputFile: junit_result_output }] as const] : []),
+    [
+      'allure-playwright',
+      {
+        resultsDir: 'allure-results',
+        suiteTitle: false,
+        environmentInfo: {
+          os_version: process.version,
+        },
+      },
+    ],
+  ],
   projects: [
     {
-      name: 'setup',
-      testMatch: /auth\.setup\.ts$/,
-      fullyParallel: false,
-      workers: 1,
-      use: sauceRichCapture ? { ...captureSettings } : {},
-    },
-    {
       name: 'chrome',
-      dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
@@ -111,10 +91,9 @@ export default defineConfig({
       ? [
           {
             name: 'firefox',
-            dependencies: ['setup'],
             use: {
               ...devices['Desktop Firefox'],
-              browserName: 'firefox' as const,
+              channel: 'firefox',
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
@@ -123,10 +102,9 @@ export default defineConfig({
           },
           {
             name: 'webkit',
-            dependencies: ['setup'],
             use: {
               ...devices['Desktop Safari'],
-              browserName: 'webkit' as const,
+              channel: 'webkit',
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
@@ -134,37 +112,32 @@ export default defineConfig({
             },
           },
           {
-            name: 'MobileChrome',
-            dependencies: ['setup'],
-            use: {
-              ...devices['Pixel 5'],
-              channel: 'chrome',
-              ...captureSettings,
             name: 'edge',
             use: {
               ...devices['Desktop Edge'],
               channel: 'msedge',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
               headless: !!process.env.CI,
             },
           },
           {
-            name: 'MobileSafari',
-            dependencies: ['setup'],
+            name: 'MicrosoftEdge',
             use: {
-              ...devices['iPhone 12'],
-              browserName: 'webkit' as const,
+              ...devices['Desktop Edge'],
+              ...(sauceRichCapture ? {} : { channel: 'msedge' as const }),
               ...captureSettings,
+              javaScriptEnabled: true,
+              viewport: DEFAULT_VIEWPORT,
+              headless: !!process.env.CI,
+            },
+          },
+          {
             name: 'mobile-android',
             use: {
               ...devices['Pixel 5'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               headless: !!process.env.CI,
             },
@@ -173,26 +146,16 @@ export default defineConfig({
             name: 'mobile-ios',
             use: {
               ...devices['iPhone 12'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               headless: !!process.env.CI,
             },
           },
           {
-            name: 'MicrosoftEdge',
-            dependencies: ['setup'],
-            use: {
-              ...devices['Desktop Edge'],
-              ...(sauceRichCapture ? {} : { channel: 'msedge' as const }),
-              ...captureSettings,
             name: 'mobile-ipad',
             use: {
               ...devices['iPad Pro 11'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               headless: !!process.env.CI,
             },
