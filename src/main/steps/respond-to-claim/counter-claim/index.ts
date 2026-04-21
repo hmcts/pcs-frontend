@@ -67,7 +67,7 @@ export const step: StepDefinition = createFormStep({
           ? {
               counterClaim: {
                 createdBy: userId,
-                claimSubmittedDate: new Date().toISOString().slice(0, 10)
+                claimSubmittedDate: new Date().toISOString().slice(0, 10),
               },
             }
           : {}),
