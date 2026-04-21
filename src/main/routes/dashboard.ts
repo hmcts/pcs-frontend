@@ -72,7 +72,7 @@ function getIWantToLinks(caseId: string): { key: string; href: string }[] {
   return [
     {
       key: 'askCourtToMakeOrder',
-      href: `/case/${caseId}/make-an-application/ask-the-court-to-make-an-order`,
+      href: `/case/${caseId}/make-an-application/choose-an-application`,
     },
     {
       key: 'uploadAdditionalDocuments',
