@@ -1,5 +1,3 @@
-import { test } from '@playwright/test';
-
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
