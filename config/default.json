@@ -104,5 +104,10 @@
   },
   "xui": {
     "uri": "https://manage-case.aat.platform.hmcts.net"
+  },
+  "dashboard": {
+    "taskRoutes": {
+      "Task.AAA6.Claim.ViewClaim": "/case/:caseReference/view-the-claim"
+    }
   }
 }

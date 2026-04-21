@@ -26,6 +26,49 @@ function createFieldsetLegend(
   };
 }
 
+export function buildConditionalItemContent(option: FormFieldOption, nunjucksEnv: Environment): string | undefined {
+  const conditionalParts: string[] = [];
+
+  if (option.conditionalText && typeof option.conditionalText === 'string') {
+    conditionalParts.push(option.conditionalText);
+  }
+
+  if (option.subFields) {
+    const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
+    if (subFieldsHTML) {
+      conditionalParts.push(subFieldsHTML);
+    }
+  }
+
+  return conditionalParts.length > 0 ? conditionalParts.join('\n') : undefined;
+}
+
+export function buildSelectionItems(
+  options: FormFieldOption[] | undefined,
+  translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined,
+  isChecked: (option: FormFieldOption) => boolean,
+  nunjucksEnv: Environment
+): Record<string, unknown>[] {
+  return (
+    options?.map((option: FormFieldOption, optionIndex: number) => {
+      if (option.divider) {
+        return translatedOptions?.[optionIndex] || { divider: option.divider };
+      }
+
+      const itemHint = translatedOptions?.[optionIndex]?.hint || option.hint;
+      const conditionalHtml = buildConditionalItemContent(option, nunjucksEnv);
+
+      return {
+        value: option.value,
+        text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
+        checked: isChecked(option),
+        ...(itemHint ? { hint: { text: itemHint } } : {}),
+        ...(conditionalHtml ? { conditional: { html: conditionalHtml } } : {}),
+      };
+    }) || []
+  );
+}
+
 export function buildComponentConfig({
   field,
   label,
@@ -43,7 +86,7 @@ export function buildComponentConfig({
   label: string;
   hint: string | undefined;
   fieldValue: unknown;
-  translatedOptions: { value?: string; text?: string; divider?: string }[] | undefined;
+  translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined;
   hasError: boolean;
   errorText: string | undefined;
   index: number;
@@ -100,51 +143,12 @@ export function buildComponentConfig({
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
       component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
-
-      // Build items with conditional content and subFields support
-      component.items =
-        field.options?.map((option: FormFieldOption, optionIndex: number) => {
-          if (option.divider) {
-            return translatedOptions?.[optionIndex];
-          }
-
-          const item: Record<string, unknown> = {
-            value: option.value,
-            text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
-            checked: radioValue === option.value,
-          };
-
-          if (option.hint) {
-            item.hint = {
-              text: option.hint,
-            };
-          }
-
-          // Build conditional HTML from conditionalText and subFields
-          const conditionalParts: string[] = [];
-
-          // Add conditional text if provided (already processed in fieldTranslation)
-          if (option.conditionalText && typeof option.conditionalText === 'string') {
-            conditionalParts.push(option.conditionalText);
-          }
-
-          // Build and add subFields HTML
-          if (option.subFields) {
-            const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
-            if (subFieldsHTML) {
-              conditionalParts.push(subFieldsHTML);
-            }
-          }
-
-          // Set conditional HTML if we have any content
-          if (conditionalParts.length > 0) {
-            item.conditional = {
-              html: conditionalParts.join('\n'),
-            };
-          }
-
-          return item;
-        }) || [];
+      component.items = buildSelectionItems(
+        field.options,
+        translatedOptions,
+        option => radioValue === option.value,
+        nunjucksEnv
+      );
 
       componentType = 'radios';
       break;
@@ -154,45 +158,12 @@ export function buildComponentConfig({
       // This ensures checkbox values are always in the correct format for rendering
       const checkboxArray = normalizeCheckboxValue(fieldValue);
       component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
-
-      // Build items with conditional content and subFields support
-      component.items =
-        field.options?.map((option: FormFieldOption, optionIndex: number) => {
-          if (option.divider) {
-            return translatedOptions?.[optionIndex];
-          }
-
-          const item: Record<string, unknown> = {
-            value: option.value,
-            text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
-            checked: option.value ? checkboxArray.includes(option.value) : false,
-          };
-
-          // Build conditional HTML from conditionalText and subFields
-          const conditionalParts: string[] = [];
-
-          // Add conditional text if provided (already processed in fieldTranslation)
-          if (option.conditionalText && typeof option.conditionalText === 'string') {
-            conditionalParts.push(option.conditionalText);
-          }
-
-          // Build and add subFields HTML
-          if (option.subFields) {
-            const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
-            if (subFieldsHTML) {
-              conditionalParts.push(subFieldsHTML);
-            }
-          }
-
-          // Set conditional HTML if we have any content
-          if (conditionalParts.length > 0) {
-            item.conditional = {
-              html: conditionalParts.join('\n'),
-            };
-          }
-
-          return item;
-        }) || [];
+      component.items = buildSelectionItems(
+        field.options,
+        translatedOptions,
+        option => (option.value ? checkboxArray.includes(option.value) : false),
+        nunjucksEnv
+      );
 
       componentType = 'checkboxes';
       break;
