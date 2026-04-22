@@ -48,6 +48,9 @@ env:
 
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
+# macOS 14 is not used across all browsers because it requires ARM support, which is not enabled in our Sauce Labs subscription.
+# Using macOS 13 ensures compatibility and prevents job failures, though it runs on Intel rather than Apple Silicon.
+
 suites:
   - name: 'pcs-frontend-mac13-chrome'
     platformName: macOS 13
