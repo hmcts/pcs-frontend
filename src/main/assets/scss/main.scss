@@ -58,9 +58,11 @@
   }
 }
 
-.govuk-footer__meta-item .govuk-footer__link {
-  display: inline-block;
-  line-height: 1.5;
-  padding-top: 4px;
-  padding-bottom: 4px;
+@include govuk-media-query($until: tablet) {
+  .govuk-footer__meta-item .govuk-footer__link {
+    display: inline-block;
+    line-height: 1.5;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
 }
