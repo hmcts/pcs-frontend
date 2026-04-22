@@ -35,7 +35,7 @@ export default {
   'do-you-have-any-dependant-children': 'doYouHaveAnyDependantChildren',
   'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
   'choose-an-application': 'chooseAnApplication',
-  'check-your-answers': 'checkYourAnswers',
+  /* 'check-your-answers': 'checkYourAnswers', */
   'ask-to-adjourn-the-court-hearing': 'askToAdjournTheCourtHearing',
   'ask-the-court-to-set-aside-the-order': 'askTheCourtToSetAsideTheOrder',
   'ask-the-court-to-make-an-order': 'askTheCourtToMakeAnOrder',

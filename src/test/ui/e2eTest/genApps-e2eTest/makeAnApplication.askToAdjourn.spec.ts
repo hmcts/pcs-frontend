@@ -44,7 +44,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
   test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-      option: chooseAnApplication.delayRadioOption,
+      option: chooseAnApplication.adjournTheHearingRadioOption,
     });
     await performValidation('mainHeader', askToAdjournTheCourtHearing.mainHeader);
     await performAction('clickButton', askToAdjournTheCourtHearing.startNowButton);
@@ -84,7 +84,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
   test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-      option: chooseAnApplication.delayRadioOption,
+      option: chooseAnApplication.adjournTheHearingRadioOption,
     });
     await performValidation('mainHeader', askToAdjournTheCourtHearing.mainHeader);
     await performAction('clickButton', askToAdjournTheCourtHearing.startNowButton);

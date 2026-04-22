@@ -3,7 +3,6 @@ export const doYouNeedHelpPayingTheFee = {
   doYouNeedHelpPayingTheFeeQuestion: `Do you need help paying the fee for this application?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  placeholderParagraph: `Placeholder page`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
 };
