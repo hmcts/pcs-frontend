@@ -36,7 +36,7 @@ export const step: StepDefinition = createFormStep({
       required: false,
       accept: ACCEPT_ATTRIBUTE_EXTENSIONS,
       maxFileSize: UPLOAD_MAX_FILE_SIZE_MB,
-      labelClasses: 'govuk-label--m',
+      labelClasses: 'govuk-label--s',
       translationKey: {
         label: 'uploadLabel',
       },
