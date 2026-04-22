@@ -196,13 +196,17 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 ### PR & Master (Jenkinsfile_CNP)
 
-- **PR:** Runs functional tests (`@PR` scope) on Chrome. Optional full functional test if `enable_full_functional_tests` label is added.
-- **Master:** Runs functional tests (`@regression` scope) on Chrome. Sends Slack notification to `#hdp-qa-e2e-test-results` on failure.
+- **PR:** Runs `yarn test:functional` on Chrome.
+- **PR default scope:** `E2E_TEST_SCOPE=@PR`.
+- **PR label overrides:**
+  - `e2e-tag:<tag>` sets `E2E_TEST_SCOPE` (for example `e2e-tag:@smoke`).
+  - `e2e-spec:<specFilter>` sets `E2E_SPEC` (spec path filter, case-sensitive).
+- **Master:** Keeps `E2E_TEST_SCOPE=@regression`.
 
 ### Nightly (Jenkinsfile_nightly)
 
-- **Schedule:** Mon–Fri at ~07:00; the job can also be run on demand via **Build with Parameters** (e.g. release verification).
-- **E2E tests:** One stage per enabled platform — Desktop Chrome, Firefox, Safari (WebKit), Edge, Mobile Android (Pixel 5 profile), Mobile iOS (iPhone 12 WebKit profile), Mobile iPad (iPad Pro 11 WebKit profile).Each runs `yarn test:E2e` with `PLAYWRIGHT_PROJECT` set (tests filtered with `--grep @nightly`) and publishes a separate Allure report (`Full <Platform> E2E Test Report`).
-- **By default only Chrome is enabled;** tick the other platform checkboxes when you need those runs.
-- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` per stage with the matching report link.
-- **Stage behaviour:** If a platform fails, that stage is marked failed but the pipeline continues; remaining stages still run.
+- **Runs:** `yarn test:E2e` for each selected browser/device stage.
+- **Tag/scope logic:** `PLAYWRIGHT_GREP_TAG` maps to `E2E_TEST_SCOPE` (`(all tests)` clears the grep).
+- **Spec logic:** `PLAYWRIGHT_SPEC` maps to `E2E_SPEC` (path filter, case-sensitive).
+- **Defaults:** Chrome is enabled by default; other platforms are optional.
+- **Reporting:** Each stage publishes its own Allure report and Slack message. Failed stages do not stop later stages.

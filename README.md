@@ -193,13 +193,18 @@ yarn createIdamUser -r=citizen -e=test2@test.com
 
 Note: An auto-generated password will be output when the script runs.
 
-UI tests use [Playwright](https://playwright.dev/).
+The functional UI tests use [Playwright](https://playwright.dev/), and the pr suite can be run with the following command:
 
-- **`yarn test:functional`** — Chrome; title filter from **`E2E_TEST_SCOPE`** (script default **`@regression`** if unset). Needs **`TEST_URL`** (e.g. `.env`).
-- **`yarn test:E2e`** — Multi-browser nightly script; **`PLAYWRIGHT_PROJECT`** + **`playwright.config.ts`** (from **`E2E_TEST_SCOPE`**, **`E2E_SPEC`**). With **`CI=true`**, extra browser projects are available.
-- **`yarn test:changed`** — runs only changed specs.
+```bash
+yarn test:functional
+```
 
-**CI:** On **PR**s, GitHub labels **`e2e-tag:`** and **`e2e-spec:`** set **`E2E_TEST_SCOPE`** (title grep) and **`E2E_SPEC`** (optional spec path filter) in Jenkins before **`yarn test:functional`**. On **nightly**, job parameters **`PLAYWRIGHT_GREP_TAG`** and **`PLAYWRIGHT_SPEC`** are copied to the same env vars in **`setFunctionalTestEnvVars()`** for **`yarn test:E2e`**. Master still pins scope to **`@regression`**. Case-sensitive tags/paths and the rest of the pipeline are in **[src/test/ui/test-README.md § 10](src/test/ui/test-README.md#10-ci-pipeline-stages)**.
+By default, the tests will run against http://localhost:3209/, please update the value on line 7 of src/test/config.ts to change this.
+
+There are also several custom test scripts available:
+
+- `yarn test:changed` - runs only changed spec files
+- `yarn test:E2e` - runs Playwright tests tagged `@nightly` for one browser/device project. Set `PLAYWRIGHT_PROJECT` (defaults to `chrome` if unset), for example: `PLAYWRIGHT_PROJECT=firefox yarn test:E2e`. Projects: `chrome`, `firefox`, `webkit`, `edge`, `mobile-android`, `mobile-ios`, `mobile-ipad`.
 
 ### Stubbing Wiremock for local development
 
