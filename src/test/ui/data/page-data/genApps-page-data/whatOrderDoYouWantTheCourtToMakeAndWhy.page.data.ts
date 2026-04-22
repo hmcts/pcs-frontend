@@ -6,7 +6,7 @@ export const whatOrderDoYouWantTheCourtToMakeAndWhy = {
   youAreAttendingList: `you are attending a funeral`,
   includeDetailsOfAnyFactsParagraph: `Include details of any facts or evidence that you think the court should consider when it makes a decision. You can upload your evidence on the next page.`,
   explainWhatYouWantTextLabel: `Explain what you want the court to do, and why`,
-  whyYouWantToAddSomeoneList:` why you want to add someone to your claim`,
+  whyYouWantToAddSomeoneList: ` why you want to add someone to your claim`,
   whyYouShouldNotBeSanctionedList: `why you should not be sanctioned (punished)`,
   whyYouWantToTransferList: `why you want to transfer to the High Court for enforcement`,
   youHave600CharactersHiddenHintText: `You have 6,800 characters remaining`,
