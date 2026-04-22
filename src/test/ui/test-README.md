@@ -143,6 +143,8 @@ await performValidationGroup(
 yarn test:functional
 ```
 
+**Sauce Labs (`saucectl`):** uses [`playwright.sauce.config.ts`](../../../playwright.sauce.config.ts) — adds a **`setup`** project and [`global-setup-sauce.config.ts`](../../../src/test/ui/config/global-setup-sauce.config.ts) (locks only); S2S/IDAM run in [`setup/auth.setup.ts`](setup/auth.setup.ts). **Jenkins / local** use [`playwright.config.ts`](../../../playwright.config.ts) with **no** setup project; tokens come only from [`global-setup.config.ts`](../../../src/test/ui/config/global-setup.config.ts).
+
 ### PFT test-env debug logging
 
 In [`playwright.config.ts`](../../../playwright.config.ts), `enable_pft_debug_log` is **`false` by default**. Set it to **`true`** if you want environment variables to be printed in the console while you debug.

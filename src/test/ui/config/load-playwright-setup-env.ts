@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-// Optional snapshot written by the setup project (auth.setup.ts) for worker process.env.
+// Optional snapshot: Jenkins/local — tokens from global-setup only (no setup project). Sauce — auth.setup writes after token fetch.
 const SETUP_ENV_PATH = path.join(__dirname, '../.auth/setup-env.json');
 
 export function loadPlaywrightSetupEnvIntoProcess(): void {

@@ -3,8 +3,9 @@ import path from 'path';
 
 import { test as setup } from '@playwright/test';
 
-import { clearEmvLocksIfLocal, getAccessToken, getS2SToken } from '../config/global-setup.config';
-
+/**
+ * Only referenced from `playwright.sauce.config.ts` (setup project). Not part of default Jenkins/local projects.
+ */
 const SETUP_ENV_PATH = path.join(__dirname, '../.auth/setup-env.json');
 
 const KEYS_TO_SNAPSHOT = [
@@ -17,10 +18,9 @@ const KEYS_TO_SNAPSHOT = [
 
 setup.describe.configure({ mode: 'serial' });
 
-setup('S2S and IDAM tokens for API helpers', async () => {
-  clearEmvLocksIfLocal();
-  await getS2SToken();
-  await getAccessToken();
+setup('S2S and IDAM for API helpers (Sauce)', async () => {
+  const { fetchSauceAuthTokens } = await import('../utils/sauce-auth-tokens');
+  await fetchSauceAuthTokens();
 
   fs.mkdirSync(path.dirname(SETUP_ENV_PATH), { recursive: true });
   const snapshot: Record<string, string> = {};
