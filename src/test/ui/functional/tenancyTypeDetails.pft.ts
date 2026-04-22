@@ -2,6 +2,12 @@ import { dashboard, disputeClaimInterstitial, tenancyTypeDetails, writtenTerms }
 import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
+let _backNavigationHeader: string | null = null;
+
+export function setTenancyTypeDetailsBackNavigation(header: string): void {
+  _backNavigationHeader = header;
+}
+
 export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
   //mandatory radio button selection
   await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);

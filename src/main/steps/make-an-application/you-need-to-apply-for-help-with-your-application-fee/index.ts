@@ -14,10 +14,6 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
-    youNeedToApplyBeforeContinuing: 'youNeedToApplyBeforeContinuing',
-    enterCourtFormNumber: 'enterCourtFormNumber',
-    afterYouHaveApplied: 'afterYouHaveApplied',
-    ifYouReceiveAnyBenefit: 'ifYouReceiveAnyBenefit',
-    ifYouHaveYourHWFReference: 'ifYouHaveYourHWFReference',
+    paragraph1: 'paragraph1',
   },
 });

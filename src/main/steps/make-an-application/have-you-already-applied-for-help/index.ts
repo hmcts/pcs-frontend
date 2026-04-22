@@ -4,7 +4,7 @@ import { flowConfig } from '../flow.config';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'have-you-already-applied-for-help-with-fees',
+  stepName: 'have-you-already-applied-for-help',
   journeyFolder: 'makeAnApplication',
   stepDir: __dirname,
   flowConfig,
@@ -16,28 +16,24 @@ export const step: StepDefinition = createFormStep({
       required: true,
       translationKey: { label: 'question' },
       legendClasses: 'govuk-fieldset__legend--m',
-      errorMessage: 'errors.haveYouAlreadyApplied',
       options: [
         {
-          value: 'yes',
+          value: 'YES',
           translationKey: 'options.yes',
           subFields: {
             hwfReference: {
               name: 'hwfReference',
               type: 'text',
               required: true,
-              maxLength: 60,
               labelClasses: 'govuk-!-font-weight-bold',
               translationKey: {
-                label: 'revealedHwfQuestion.label',
-                hint: 'revealedHwfQuestion.hint',
+                label: 'labels.hwfReference',
               },
-              errorMessage: 'errors.hwfReference',
             },
           },
         },
         {
-          value: 'no',
+          value: 'NO',
           translationKey: 'options.no',
         },
       ],

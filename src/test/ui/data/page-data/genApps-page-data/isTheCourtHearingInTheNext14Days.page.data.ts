@@ -3,6 +3,7 @@ export const isTheCourtHearingInTheNext14Days = {
   isTheCourtHearingInTheNext14DaysQuestion: `Is the court hearing in the next 14 days?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
+  placeholderParagraph: `Placeholder page`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,

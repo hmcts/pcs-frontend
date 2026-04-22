@@ -1,8 +1,9 @@
+/*import { submitCaseApiData } from '../data/api-data';*/
 import { confirmationOfNoticeGiven, dashboard, feedback, tenancyDateUnknown } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
-/*FYI : Below code is disabled due to https://tools.hmcts.net/jira/browse/HDPI-6087
-let claimantName = '';
+// Regression Bug raised - HDPI-6087, The code related to error validation on the “Notice details” page has been temporarily commented out
+/*let claimantName = '';
 
 if (process.env.CLAIMANT_NAME_OVERRIDDEN === 'YES') {
   claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;

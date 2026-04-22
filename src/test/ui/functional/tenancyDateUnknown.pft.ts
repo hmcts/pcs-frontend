@@ -37,9 +37,6 @@ export async function tenancyDateUnknownErrorValidation(): Promise<void> {
     header: tenancyDateUnknown.thereIsAProblemErrorMessageHeader,
     message: tenancyDateUnknown.realDateErrorMessage,
   });
-  await performAction('inputText', tenancyDateUnknown.dayTextLabel, '');
-  await performAction('inputText', tenancyDateUnknown.monthTextLabel, '');
-  await performAction('inputText', tenancyDateUnknown.yearTextLabel, '');
 }
 
 export async function tenancyDateUnknownNavigationTests(): Promise<void> {

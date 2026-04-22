@@ -16,7 +16,7 @@ export const flowConfig: JourneyFlowConfig = {
     'ask-the-court-to-make-an-order',
     'is-the-court-hearing-in-the-next-14-days',
     'do-you-need-help-paying-the-fee',
-    'have-you-already-applied-for-help-with-fees',
+    'have-you-already-applied-for-help',
     'you-need-to-apply-for-help-with-your-application-fee',
     'have-the-other-parties-agreed-to-this-application',
     'are-there-any-reasons-that-this-application-should-not-be-shared',
@@ -43,7 +43,7 @@ export const flowConfig: JourneyFlowConfig = {
     'do-you-need-help-paying-the-fee': {
       showCondition: (req: Request) => doesFeeApply(req),
     },
-    'have-you-already-applied-for-help-with-fees': {
+    'have-you-already-applied-for-help': {
       showCondition: (req: Request) => doesFeeApply(req) && needHelpPayingTheFee(req),
     },
     'you-need-to-apply-for-help-with-your-application-fee': {
@@ -71,11 +71,11 @@ function isHearingInNext14Days(req: Request): boolean {
 }
 
 function needHelpPayingTheFee(req: Request): boolean {
-  return getFormData(req, 'do-you-need-help-paying-the-fee').helpWithFeesNeeded === 'yes';
+  return getFormData(req, 'do-you-need-help-paying-the-fee').helpWithFeesNeeded === 'YES';
 }
 
 function alreadyAppliedForHelpWithFees(req: Request): boolean {
-  return getFormData(req, 'have-you-already-applied-for-help-with-fees').alreadyAppliedForHelp === 'yes';
+  return getFormData(req, 'have-you-already-applied-for-help').alreadyAppliedForHelp === 'YES';
 }
 
 function doesFeeApply(req: Request): boolean {

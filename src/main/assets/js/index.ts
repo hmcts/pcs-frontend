@@ -1,4 +1,3 @@
-/// <reference types="webpack-env" />
 import '../scss/main.scss';
 import { initAll } from 'govuk-frontend';
 
@@ -10,7 +9,3 @@ initAll();
 initPostcodeSelection();
 initPostcodeLookup();
 initSessionTimeout();
-
-if (module.hot) {
-  module.hot.accept();
-}

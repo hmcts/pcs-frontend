@@ -77,13 +77,6 @@ function gracefulShutdownHandler(signal: string) {
   // stop the server from accepting new connections
   app.locals.shutdown = true;
 
-  if (app.locals.ENV === 'development') {
-    // In dev, skip the graceful path — nodemon's quit hook tears down compose
-    // services in parallel, which would kill Redis underneath the callbacks
-    // below and leave us hanging.
-    process.exit(0);
-  }
-
   setTimeout(async () => {
     logger.info('Shutting down application');
 
@@ -113,10 +106,16 @@ function gracefulShutdownHandler(signal: string) {
       }
       logger.info('Redis client quit');
 
-      await httpTerminator?.terminate();
-      logger.info('HTTP terminator terminated');
       if (app.locals.ENV === 'development') {
-        process.exit(0);
+        // For HTTPS server, close it directly
+        server?.close(() => {
+          logger.info('HTTPS server closed');
+          process.exit(0);
+        });
+      } else {
+        // For HTTP server, use the terminator
+        await httpTerminator?.terminate();
+        logger.info('HTTP terminator terminated');
       }
     });
   }, 500);

@@ -204,7 +204,15 @@ By default, the tests will run against http://localhost:3209/, please update the
 There are also several custom test scripts available:
 
 - `yarn test:changed` - runs only changed spec files
-- `yarn test:E2e` - runs Playwright tests tagged `@nightly` for one browser/device project. Set `PLAYWRIGHT_PROJECT` (defaults to `chrome` if unset), for example: `PLAYWRIGHT_PROJECT=firefox yarn test:E2e`. Projects: `chrome`, `firefox`, `webkit`, `edge`, `mobile-android`, `mobile-ios`, `mobile-ipad`.
+- `test:E2eChrome` - runs the full E2E suite in Chrome
+- `test:E2eFirefox` - runs the full E2E suite in Firefox
+- `test:E2eSafari` - runs the full E2E suite in Safari
+
+Running accessibility tests:
+
+```bash
+yarn test:accessibility
+```
 
 ### Stubbing Wiremock for local development
 
