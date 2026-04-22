@@ -201,6 +201,7 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 - **PR label overrides:**
   - `e2e-tag:<tag>` sets `E2E_TEST_SCOPE` (for example `e2e-tag:@smoke`).
   - `e2e-spec:<specFilter>` sets `E2E_SPEC` (spec path filter, case-sensitive).
+- **Important:** Do not add the `enable_full_functional_tests` label when you need `e2e-tag:` / `e2e-spec:` (including any newly added tags) to take effect. That label runs the full functional pipeline instead of the scoped PR run, so those overrides will not apply as intended.
 - **Master:** Keeps `E2E_TEST_SCOPE=@regression`.
 
 ### Nightly (Jenkinsfile_nightly)
