@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Jenkins: SAUCE_SUITE_NAMES → one yarn test:sauce:nightly per suite; else single suite via SAUCE_SUITE_NAME.
+# SAUCE_GREP: Jenkins string param SAUCE_GREP → env (setFunctionalTestEnvVars); default here matches Jenkins default.
 set -euo pipefail
+
+export SAUCE_GREP="${SAUCE_GREP:-@crossbrowser}"
 
 if [[ -n "${SAUCE_SUITE_NAMES:-}" ]]; then
   exit_code=0

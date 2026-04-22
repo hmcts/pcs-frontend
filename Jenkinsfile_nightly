@@ -49,6 +49,11 @@ properties([
       defaultValue: false,
       description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
+    string(
+      name: 'SAUCE_GREP',
+      defaultValue: '@crossbrowser',
+      description: 'Playwright grep pattern for Sauce cross-browser runs (tags, e.g. @crossbrowser). Passed to saucectl as SAUCE_GREP.'
+    ),
     booleanParam(
       name: 'SAUCE_MAC13_CHROME',
       defaultValue: true,
@@ -155,7 +160,7 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
-  env.SAUCE_GREP = env.SAUCE_GREP ?: '@crossbrowser'
+  env.SAUCE_GREP = (params.SAUCE_GREP?.trim()) ?: '@crossbrowser'
 }
 
 def runE2ETests(yarnBuilder) {
