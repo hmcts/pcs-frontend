@@ -46,6 +46,7 @@
     "yes": "cyYes",
     "no": "cyNo"
   },
+  "warningHiddenText": "cyWarning",
   "errors": {
     "title": "cyThere is a problem",
     "required": "cyEnter a value",
@@ -102,8 +103,28 @@
     "minute": "cyminute",
     "minutes": "cyminutes",
     "second": "cysecond",
-    "seconds": "cyseconds",
-    "remaining": "cyremaining"
+    "seconds": "cyseconds"
+  },
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "cyYou have %{count} character remaining",
+      "other": "cyYou have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "cyYou have 0 characters remaining",
+    "charactersOverLimitText": {
+      "one": "cyYou have %{count} character too many",
+      "other": "cyYou have %{count} characters too many"
+    },
+    "wordsUnderLimitText": {
+      "one": "cyYou have %{count} word remaining",
+      "other": "cyYou have %{count} words remaining"
+    },
+    "wordsAtLimitText": "cyYou have 0 words remaining",
+    "wordsOverLimitText": {
+      "one": "cyYou have %{count} word too many",
+      "other": "cyYou have %{count} words too many"
+    },
+    "textareaDescriptionText": "cyYou can enter up to %{count} characters"
   },
   "errorPages": {
     "403": {

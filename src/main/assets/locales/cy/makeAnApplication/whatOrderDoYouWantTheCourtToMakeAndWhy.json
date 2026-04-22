@@ -1,5 +1,22 @@
 {
-  "pageTitle": "cyWhat order do you want the court to make and why?",
+  "pageTitle": "cyWhat order do you want the court to make, and why?",
   "caption": "cyMake an application",
-  "heading": "cyWhat order do you want the court to make and why?"
+  "heading": "cyWhat order do you want the court to make, and why?",
+  "includeApplicationDetails": "cyInclude details of any facts or evidence that you think the court should consider when it makes a decision. You can upload your evidence on the next page.",
+  "whatOrderDoYouWantLabel": "cyExplain what you want the court to do, and why",
+  "list": {
+    "heading": "cyFor example, tell the court:",
+    "SOMETHING_ELSE": [
+      "cywhy you want to add someone to your claim",
+      "cywhy you should not be sanctioned (punished)",
+      "cywhy you want to transfer to the High Court for enforcement"
+    ],
+    "ADJOURN": [
+      "cyyou are unable to attend the hearing due a pre-existing medical appointment ",
+      "cyyou are attending a funeral"
+    ]
+  },
+  "errors": {
+    "whatOrderDoYouWant": "cyConfirm the order you want the court to make, and why"
+  }
 }
