@@ -12,5 +12,6 @@ const eventIdMappings: { path: string; eventId: string }[] = [
 ];
 
 export const getEventIdFromPath = (req: Request): string | undefined => {
-  return eventIdMappings.find(mapping => req.originalUrl.includes(mapping.path))?.eventId;
+  const segments = req.path.split('/');
+  return eventIdMappings.find(mapping => segments.includes(mapping.path))?.eventId;
 };

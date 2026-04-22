@@ -2,7 +2,7 @@ import { Request } from 'express';
 
 import { getEventIdFromPath } from '@utils/getEventIdFromPath';
 
-const createMockRequest = (originalUrl: string): Request => ({ originalUrl }) as unknown as Request;
+const createMockRequest = (path: string): Request => ({ path }) as unknown as Request;
 
 describe('getEventIdFromPath', () => {
   describe('valid path mappings', () => {
@@ -21,9 +21,21 @@ describe('getEventIdFromPath', () => {
       expect(getEventIdFromPath(req)).toBe('citizenCreateGenApp');
     });
 
-    it('should match when path has query parameters', () => {
-      const req = createMockRequest('/case/1234567890123456/respond-to-claim?lang=en');
+    it('should match regardless of trailing slash', () => {
+      const req = createMockRequest('/case/1234567890123456/respond-to-claim/');
       expect(getEventIdFromPath(req)).toBe('respondPossessionClaim');
+    });
+  });
+
+  describe('segment matching', () => {
+    it('should not match a mapping as a substring of another segment', () => {
+      const req = createMockRequest('/respond-to-claim/i-want-to-make-an-application');
+      expect(getEventIdFromPath(req)).toBe('respondPossessionClaim');
+    });
+
+    it('should not match when mapping path is embedded in a longer segment', () => {
+      const req = createMockRequest('/case/1234567890123456/pre-make-an-application-suffix');
+      expect(getEventIdFromPath(req)).toBeUndefined();
     });
   });
 
