@@ -178,8 +178,13 @@ export class GenAppsAction implements IAction {
     }
 
     await test.step('Retrieved CYA values', async () => {
+      console.log('\nThe Data Retrieved From Check Your Answers Page Are As Follows');
+      const lines: string[] = [];
       for (const [key, value] of cyaMap.entries()) {
-        console.log(`Data retrieved  → ${key}: ${value}`);
+        const line = `• Key from CYA page: "${key}" → Value: ${value}`;
+        console.log('============================================================');
+        console.log(line);
+        lines.push(line);
       }
     });
   }
@@ -189,14 +194,15 @@ export class GenAppsAction implements IAction {
 
     await test.step('CYA Validation Started', async () => {
       if (misMatchMap.size > 0) {
-        console.log(`❌ Differences found: ${misMatchMap.size}`);
+        console.log(`\n❌ Differences found: ${misMatchMap.size}`);
         for (const [key, val] of misMatchMap) {
           const expectedValue = val.a === undefined ? '<missing>' : String(val.a);
           const actualValue = val.b === undefined ? '<missing>' : String(val.b);
           console.log('============================================================');
           console.log(`• key: "${String(key)}" → Expected: ${expectedValue} | Actual: ${actualValue}`);
         }
-        throw new Error('CYA validations failed');
+        console.log(`\n**********  END OF CYA FAILURE LIST. ***************`);
+        throw new Error(`CYA validations failed for ${misMatchMap.size} items`);
       } else {
         console.log('\n✅ CHECK YOUR ANSWERS VALIDATION PASSED!\n');
       }
