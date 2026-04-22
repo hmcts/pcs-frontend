@@ -61,8 +61,8 @@ properties([
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@crossbrowser', '(all tests)'],
-      description: 'Test title grep. (all tests) = no grep. Default: @nightly.'
+      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
+      description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
     ),
     choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
@@ -133,8 +133,8 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
-  def tag = params.PLAYWRIGHT_GREP_TAG ?: '@nightly'
-  env.E2E_TEST_SCOPE = (tag == '(all tests)') ? '' : tag
+  def tag = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@nightly'
+  env.E2E_TEST_SCOPE = tag
   env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
   env.ENABLE_AXE_AUDIT = params.ENABLE_AXE_AUDIT
