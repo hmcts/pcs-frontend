@@ -106,11 +106,6 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
-export interface CcdCounterClaim {
-  claimSubmittedDate?: string;
-  createdBy?: string;
-}
-
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
   tenancyTypeCorrect?: YesNoNotSureValue;
@@ -141,7 +136,6 @@ export interface CcdDefendantResponses {
   languageUsed?: LanguageUsed;
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
   makeCounterClaim?: YesNoValue;
-  counterClaim?: CcdCounterClaim;
 }
 
 export interface PossessionClaimResponse {

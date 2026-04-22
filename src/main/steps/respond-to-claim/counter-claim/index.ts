@@ -53,9 +53,6 @@ export const step: StepDefinition = createFormStep({
   ],
   beforeRedirect: async req => {
     const makeCounterClaim: YesNoValue = req.body?.makeCounterClaim;
-    const sessionUserId = req.session?.user?.uid;
-    const userId = typeof sessionUserId === 'string' ? sessionUserId : undefined;
-
     if (!makeCounterClaim) {
       return;
     }
@@ -63,14 +60,6 @@ export const step: StepDefinition = createFormStep({
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         makeCounterClaim,
-        ...(makeCounterClaim === 'YES' && userId
-          ? {
-              counterClaim: {
-                createdBy: userId,
-                claimSubmittedDate: new Date().toISOString().slice(0, 10),
-              },
-            }
-          : {}),
       },
     };
 
