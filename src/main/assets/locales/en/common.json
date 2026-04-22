@@ -41,10 +41,6 @@
     "month": "Month",
     "year": "Year"
   },
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
   "warningHiddenText": "Warning",
   "errors": {
     "title": "There is a problem",

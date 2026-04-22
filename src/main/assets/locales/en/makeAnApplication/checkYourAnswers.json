@@ -3,12 +3,13 @@
   "caption": "Make an application",
   "heading": "Check your answers",
   "buttons": {
-    "submitApplication": "Submit application"
+    "submit": "Submit",
+    "continueToPayment": "Continue to payment"
   },
   "answers": {
     "typeOfApplication": {
-      "label": "Type of application",
-      "changeHint": "Change type of application",
+      "label": "What do you want to apply for?",
+      "changeHint": "Change what you want to apply for",
       "options": {
         "ADJOURN": "Ask to adjourn (delay) the hearing",
         "SET_ASIDE": "Ask the court to change (set aside) their decision to evict you",
@@ -32,7 +33,7 @@
       "changeHint": "Change whether you have already applied for help with your application fee"
     },
     "hwfReference": {
-      "label": "Enter your Help with Fees reference number",
+      "label": "What is your Help with Fees reference number?",
       "changeHint": "Change your Help with Fees reference number"
     },
     "otherPartiesAgreed": {
@@ -47,6 +48,14 @@
       "label": "Provide a reason this application should not be shared with the other party",
       "changeHint": "Change the reason this application should not be shared with the other party"
     },
+    "whatOrderWanted": {
+      "label": "What order do you want the judge to make and why?",
+      "changeHint": "Change what order do you want the judge to make and why"
+    },
+    "hasSupportingDocuments": {
+      "label": "Do you want to upload documents to support your application?",
+      "changeHint": "Change whether you want to upload documents to support your application"
+    },
     "whichLanguage": {
       "label": "Which language did you use to complete this service?",
       "changeHint": "Change which language you used to complete this service",
@@ -56,5 +65,19 @@
         "ENGLISH_AND_WELSH": "English and Welsh"
       }
     }
+  },
+  "statementOfTruth": {
+    "subheading": "Statement of truth",
+    "theInformationFormsYourApplication": "The information on this page forms your application.",
+    "whenYouAreSatisfied": "When you’re satisfied that your answers are correct, you should tick the box below and write your name to “sign” this statement of truth.",
+    "checkbox": {
+      "fieldLabel": "Statement of truth",
+      "value": "I believe that the facts stated in this form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth."
+    },
+    "yourFullName": "Your full name"
+  },
+  "errors": {
+    "agreeToTheStatementOfTruth": "Agree to the statement of truth",
+    "youMustSignYourName": "You must sign your name"
   }
 }

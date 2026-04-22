@@ -1,11 +1,12 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
-{# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
-{% block pageTitle %}{{ t('pageTitle') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
   {% if errorSummary %}
@@ -15,20 +16,30 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  <div class="govuk-notification-banner" role="region" aria-labelledby="experimental-banner">
-    <div class="govuk-notification-banner__content">
-      <p class="govuk-notification-banner__heading" id="experimental-banner">
-        Placeholder page
-      </p>
-    </div>
-  </div>
-
   {{ govukSummaryList(summaryData) }}
 
   <form method="post" action="{{ url }}" novalidate>
+
+    <h2 class="govuk-heading-m">{{ statementOfTruthSubheading }}</h2>
+
+    <p class="govuk-body">
+    {{ theInformationFormsYourApplication }}
+    </p>
+    <p class="govuk-body">
+    {{ whenYouAreSatisfied }}
+    </p>
+
+    {% for field in fields %}
+      {% if field.componentType == 'checkboxes' %}
+        {{ govukCheckboxes(field.component) }}
+      {% elif field.componentType == 'input' %}
+        {{ govukInput(field.component) }}
+      {% endif %}
+    {% endfor %}
+
     <div class="govuk-button-group">
       {{ govukButton({
-        text: buttons.submitApplication,
+        text: buttonLabel,
         attributes: { type: 'submit', name: 'action', value: 'submit' }
       }) }}
     </div>
