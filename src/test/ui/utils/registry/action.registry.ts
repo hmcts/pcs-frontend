@@ -80,6 +80,8 @@ export class ActionRegistry {
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
     ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
+    ['doYouNeedHelpPayingFee', new GenAppsAction()],
+    ['confirmYouHaveAppliedForFeeHelp', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
     ['selectLanguageUsedToComplete', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
