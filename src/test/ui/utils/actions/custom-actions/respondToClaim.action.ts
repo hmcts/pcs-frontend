@@ -167,7 +167,7 @@ export class RespondToClaimAction implements IAction {
           question: contactPreferenceData.question,
           option,
         });
-        if (option === contactPreferenceEmailOrPost.byEmailRadioOption && contactPreferenceData.emailAddress) {
+        if (option === contactPreferenceEmailOrPost.byEmailCheckbox && contactPreferenceData.emailAddress) {
           await performAction(
             'inputText',
             contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
@@ -183,7 +183,7 @@ export class RespondToClaimAction implements IAction {
         option: contactPreferenceData.radioOption,
       });
 
-      if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailRadioOption) {
+      if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailCheckbox) {
         await performAction(
           'inputText',
           contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
