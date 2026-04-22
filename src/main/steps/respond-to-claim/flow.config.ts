@@ -7,7 +7,7 @@ import {
   isDefendantNameKnown,
   isNoticeServed,
   isTenancyStartDateKnown,
-  isWelshProperty,
+  isWalesProperty,
 } from '../utils';
 
 import {
@@ -84,13 +84,13 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => req.res?.locals?.validatedCase?.isDefendantContactByPhone === true,
     },
     'landlord-registered': {
-      showCondition: (req: Request) => isWelshProperty(req),
+      showCondition: (req: Request) => isWalesProperty(req),
     },
     'landlord-licensed': {
-      showCondition: (req: Request) => isWelshProperty(req),
+      showCondition: (req: Request) => isWalesProperty(req),
     },
     'written-terms': {
-      showCondition: (req: Request) => isWelshProperty(req),
+      showCondition: (req: Request) => isWalesProperty(req),
     },
     'tenancy-date-unknown': {
       showCondition: (req: Request) => !isTenancyStartDateKnown(req),
