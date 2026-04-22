@@ -55,7 +55,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     });
     //The below are placeholder pages
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
+    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption);
     await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
     await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
@@ -75,8 +75,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
-    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performAction('selectLanguageUsedToComplete', {
+      question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
+      option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
+    });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
