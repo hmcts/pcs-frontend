@@ -1,11 +1,23 @@
 {
   "watch": ["src", "config", "webpack"],
-  "ext": "ts,js,json,scss,css,njk",
-  "ignore": ["src/**/*.spec.ts", "**/*.test.ts", "**/*.test.js", "dist", "node_modules"],
-  "exec": "ts-node -r tsconfig-paths/register --files src/main/bootstrap.ts",
+  "ext": "ts,js,json",
+  "ignore": [
+    "src/**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.test.js",
+    "src/main/assets/**",
+    "src/main/views/**",
+    "src/main/steps/**/*.njk",
+    "dist",
+    "node_modules"
+  ],
+  "exec": "node --trace-deprecation --env-file-if-exists=.env -r ts-node/register -r tsconfig-paths/register src/main/bootstrap.ts",
   "delay": "500",
   "env": {
-    "NODE_ENV": "dev"
+    "NODE_ENV": "development"
+  },
+  "events": {
+    "quit": "yarn deps:down"
   },
   "verbose": true,
   "legacyWatch": true
