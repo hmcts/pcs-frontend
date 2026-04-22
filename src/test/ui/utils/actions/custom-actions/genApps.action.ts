@@ -80,7 +80,7 @@ export class GenAppsAction implements IAction {
           ? generateRandomString(confirmFeeHelp.input)
           : (confirmFeeHelp.input as string);
       await performAction('inputText', confirmFeeHelp.label, userInput);
-      FieldsStore.update(confirmFeeHelp.label as string, confirmFeeHelp.input as string);
+      FieldsStore.update(confirmFeeHelp.label as string, userInput);
     } else {
       FieldsStore.delete(confirmFeeHelp.label as string);
     }
@@ -201,7 +201,7 @@ export class GenAppsAction implements IAction {
           console.log(`• key: "${String(key)}" → Expected: ${expectedValue} | Actual: ${actualValue}`);
         }
         console.log(`\n**********  END OF CYA FAILURE LIST. ***************`);
-        throw new Error(`CYA validations failed for ${misMatchMap.size} items`);
+        throw new Error(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`);
       } else {
         console.log('\n✅ CHECK YOUR ANSWERS VALIDATION PASSED!\n');
       }
