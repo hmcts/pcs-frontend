@@ -6,7 +6,9 @@ export const correspondenceAddress = {
   correspondenceAddressUnKnownMainHeader: `What’s your correspondence address?`,
   correspondenceAddressUnKnownParagraph: `Your correspondence address is your postal address.`,
   respondToClaimParagraph: `Respond to a property possession claim`,
-  correspondenceAddressConfirmHintText: `This is the address provided by Treetops Housing`,
+  correspondenceAddressConfirmHintText(claimantName: string): string {
+    return `This is the address provided by ${claimantName}`;
+  },
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   backLink: `Back`,
