@@ -24,7 +24,6 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'counter-claim',
-    'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
     'correspondence-address',
@@ -319,18 +318,14 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
       },
     },
     'counter-claim': {
-      defaultNext: 'payment-interstitial',
+      defaultNext: 'repayments-made',
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
-    'payment-interstitial': {
-      previousStep: 'counter-claim',
-      defaultNext: 'repayments-made',
-    },
     'repayments-made': {
-      previousStep: 'payment-interstitial',
+      previousStep: 'counter-claim',
       defaultNext: 'repayments-agreed',
     },
     'repayments-agreed': {
