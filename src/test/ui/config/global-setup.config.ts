@@ -15,10 +15,24 @@ export function clearEmvLocksIfLocal(): void {
 
 export const getS2SToken = async (): Promise<void> => {
   const { ServiceAuthUtils } = await import('@hmcts/playwright-common');
-  process.env.S2S_URL = s2STokenApiData.s2sUrl;
-  process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
-    microservice: s2STokenApiData.microservice,
-  });
+  process.env.S2S_URL = process.env.S2S_URL || s2STokenApiData.s2sUrl;
+
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
+        microservice: s2STokenApiData.microservice,
+      });
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt === 2) {
+        break;
+      }
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+  throw lastError;
 };
 
 export const getAccessToken = async (): Promise<void> => {
