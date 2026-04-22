@@ -1,4 +1,3 @@
-import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
@@ -9,13 +8,14 @@ import {
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
-  haveYouAlreadyAppliedForHelp,
+  haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
 import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
+import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -41,7 +41,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] @regression', async () => {
+  test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] @regression @smoke', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.delayRadioOption,
@@ -53,18 +53,18 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
       option: isTheCourtHearingInTheNext14Days.yesRadioOption,
     });
-    //The below are placeholder pages
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
-    await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
-    await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
-    await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
-    await performAction(
-      'inputText',
-      haveYouAlreadyAppliedForHelp.hwfReferenceHiddenTextLabel,
-      haveYouAlreadyAppliedForHelp.hwfReferenceTextInput
-    );
-    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
+    await performAction('doYouNeedHelpPayingFee', {
+      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+    });
+    await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
+    await performAction('confirmYouHaveAppliedForFeeHelp', {
+      question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+      option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
+      label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
+      input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
+    });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
     await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
     await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
