@@ -29,12 +29,12 @@ function firstExistingPath(paths: string[]): string | null {
 export async function findLocalesDir(): Promise<string | null> {
   const candidates = [
     process.env.LOCALES_DIR || '',
-    path.resolve(__dirname, '../../public/locales'),
-    path.resolve(__dirname, '../../../public/locales'),
-    path.resolve(process.cwd(), 'src/main/public/locales'),
     path.resolve(__dirname, '../../assets/locales'),
     path.resolve(__dirname, '../../../assets/locales'),
     path.resolve(process.cwd(), 'src/main/assets/locales'),
+    path.resolve(__dirname, '../../public/locales'),
+    path.resolve(__dirname, '../../../public/locales'),
+    path.resolve(process.cwd(), 'src/main/public/locales'),
   ].filter(Boolean);
 
   for (const candidate of candidates) {
@@ -188,12 +188,12 @@ export class I18n {
   public enableFor(app: Express): void {
     const candidates = [
       process.env.LOCALES_DIR || '',
-      path.resolve(__dirname, '../../public/locales'),
-      path.resolve(__dirname, '../../../public/locales'),
-      path.resolve(process.cwd(), 'src/main/public/locales'),
       path.resolve(__dirname, '../../assets/locales'),
       path.resolve(__dirname, '../../../assets/locales'),
       path.resolve(process.cwd(), 'src/main/assets/locales'),
+      path.resolve(__dirname, '../../public/locales'),
+      path.resolve(__dirname, '../../../public/locales'),
+      path.resolve(process.cwd(), 'src/main/public/locales'),
     ].filter(Boolean);
 
     const localesDir = firstExistingPath(candidates);
