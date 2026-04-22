@@ -9,8 +9,11 @@ sauce:
   tunnel:
     name: $SAUCE_TUNNEL_NAME
   metadata:
+    build: jenkins-$BUILD_TAG
     tags:
       - pcs-frontend-nightly-matrix
+      - jenkins-build-$BUILD_NUMBER
+      - jenkins-build-tag-$BUILD_TAG
 
 defaults:
   timeout: 30m
