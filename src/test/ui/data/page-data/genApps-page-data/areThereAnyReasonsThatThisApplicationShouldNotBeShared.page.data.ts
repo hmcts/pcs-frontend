@@ -16,7 +16,7 @@ export const areThereAnyReasonsThatThisApplicationShouldNotBeShared = {
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   provideReasonHiddenTextLabel: `Provide a reason this application should not be shared with the other party`,
-  provideReasonTextInput: `Provide a reason this application should not be shared with the other party Test input`,
+  provideReasonTextInput: 6000,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
   errorValidationField: {

@@ -72,7 +72,9 @@ export class GenAppsAction implements IAction {
       option: confirmFeeHelp.option,
     });
     if (confirmFeeHelp.option === 'Yes') {
-      await performAction('inputText', confirmFeeHelp.label, confirmFeeHelp.input);
+      const userInput = typeof confirmFeeHelp.input === 'number' ? generateRandomString(confirmFeeHelp.input) : confirmFeeHelp.input as string;
+      await performAction('inputText', confirmFeeHelp.label, userInput);
+      FieldsStore.update(confirmFeeHelp.label as string, confirmFeeHelp.input as string);
     } else {
       FieldsStore.delete(confirmFeeHelp.label as string);
     }
@@ -95,7 +97,9 @@ export class GenAppsAction implements IAction {
       option: reason.option,
     });
     if (reason.option === 'Yes') {
-      await performAction('inputText', reason.label, reason.input);
+      const userInput = typeof reason.input === 'number' ? generateRandomString(reason.input) : reason.input as string;
+      await performAction('inputText', reason.label, userInput);
+      FieldsStore.update(reason.label as string, userInput);
     } else {
       FieldsStore.delete(reason.label as string);
     }
@@ -185,6 +189,7 @@ export class GenAppsAction implements IAction {
         console.log('============================================================');
         console.log(`• key: "${String(key)}" → Expected: ${expectedValue} | Actual: ${actualValue}`);
       }
+      throw new Error('CYA validations failed');
     } else {
       console.log('\n✅ CHECK YOUR ANSWERS VALIDATION PASSED!\n');
     }
