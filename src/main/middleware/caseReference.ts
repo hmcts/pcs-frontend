@@ -6,6 +6,7 @@ import { Logger } from '@modules/logger';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
+import { getEventIdFromPath } from '@utils/getEventIdFromPath';
 
 const logger = Logger.getLogger('caseReferenceMiddleware');
 
@@ -32,7 +33,14 @@ export async function caseReferenceParamMiddleware(
       return next(new HTTPError('Authentication required', 401));
     }
 
-    const validatedCase = await ccdCaseService.getCaseById(accessToken, sanitisedCaseReference);
+    // check incoming request path to determine which event to use
+    const eventId = getEventIdFromPath(req);
+    if (!eventId) {
+      logger.error('Invalid event ID', { caseReference: sanitisedCaseReference, originalUrl: req.originalUrl });
+      return next(new HTTPError('Invalid event ID', 404));
+    }
+
+    const validatedCase = await ccdCaseService.getCaseById(accessToken, sanitisedCaseReference, eventId);
 
     // Store validated case as hydrated CcdCaseModel
     res.locals.validatedCase = new CcdCaseModel(validatedCase);
