@@ -41,7 +41,7 @@ export default {
   'ask-the-court-to-make-an-order': 'askTheCourtToMakeAnOrder',
   'is-the-court-hearing-in-the-next-14-days': 'isTheCourtHearingInTheNext14Days',
   'do-you-need-help-paying-the-fee': 'doYouNeedHelpPayingTheFee',
-  'have-you-already-applied-for-help': 'haveYouAlreadyAppliedForHelp',
+  'have-you-already-applied-for-help-with-fees': 'haveYouAlreadyAppliedForHelpWithFees',
   'have-the-other-parties-agreed-to-this-application': 'haveTheOtherPartiesAgreedToThisApplication',
   'you-need-to-apply-for-help-with-your-application-fee': 'youNeedToApplyForHelpWithYouApplicationFee',
   'what-order-do-you-want-the-court-to-make-and-why': 'whatOrderDoYouWantTheCourtToMakeAndWhy',
