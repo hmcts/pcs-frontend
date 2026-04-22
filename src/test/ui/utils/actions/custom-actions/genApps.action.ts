@@ -154,6 +154,9 @@ export class GenAppsAction implements IAction {
 
       const rows = curTable.locator('.govuk-summary-list__row');
       const rowCount = await rows.count();
+      if (rowCount === 0) {
+        continue;
+      }
 
       for (let j = 0; j < rowCount; j++) {
         const row = rows.nth(j);
@@ -164,10 +167,6 @@ export class GenAppsAction implements IAction {
 
         const keyQns = row.locator('dt.govuk-summary-list__key');
         const valAns = row.locator('dd.govuk-summary-list__value');
-
-        if ((await keyQns.count()) === 0 || (await valAns.count()) === 0) {
-          continue;
-        }
 
         const keyText = (await keyQns.first().innerText()).trim();
         const valText = (await valAns.first().innerText()).trim().replace(/\r?\n+/g, ',');
@@ -181,7 +180,7 @@ export class GenAppsAction implements IAction {
       console.log('\nThe Data Retrieved From Check Your Answers Page Are As Follows');
       const lines: string[] = [];
       for (const [key, value] of cyaMap.entries()) {
-        const line = `• Key from CYA page: "${key}" → Value: ${value}`;
+        const line = `• Key: "${key}" → Value: "${value}"`;
         console.log('============================================================');
         console.log(line);
         lines.push(line);
