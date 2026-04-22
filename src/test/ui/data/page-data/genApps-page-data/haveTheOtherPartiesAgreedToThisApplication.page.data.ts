@@ -3,7 +3,6 @@ export const haveTheOtherPartiesAgreedToThisApplication = {
   haveTheOtherPartiesAgreedQuestion: `Have the other parties agreed to this application?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  placeholderParagraph: `Placeholder page`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
 };
