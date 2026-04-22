@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page, test } from '@playwright/test';
 
 import {
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
@@ -176,31 +176,33 @@ export class GenAppsAction implements IAction {
         }
       }
     }
+
+    await test.step('Retrieved CYA values', async () => {
+      for (const [key, value] of cyaMap.entries()) {
+        console.log(`Data retrieved  → ${key}: ${value}`);
+      }
+    });
+
   }
 
   private async validateCYA() {
-    // console.log('CYA field count is :' + cyaMap.size);
-
-    // for (const [k, v] of cyaMap) {
-    //   console.log(`key from CYA page: "${k}" → value from CYA page: "${v}"`);
-    // }
-    // console.log('User input count is :' + FieldsStore.getAll().size);
 
     const misMatchMap = compareMaps(cyaMap, FieldsStore.getAll());
-    // console.log('mismatch size is '+misMatchMap.size);
-
-    if (misMatchMap.size > 0) {
-      console.log(`❌ Differences found: ${misMatchMap.size}`);
-      for (const [key, val] of misMatchMap) {
-        const expectedValue = val.a === undefined ? '<missing>' : String(val.a);
-        const actualValue = val.b === undefined ? '<missing>' : String(val.b);
-        console.log('============================================================');
-        console.log(`• key: "${String(key)}" → Expected: ${expectedValue} | Actual: ${actualValue}`);
+    
+    await test.step('CYA Validation Started', async () => {
+      if (misMatchMap.size > 0) {
+        console.log(`❌ Differences found: ${misMatchMap.size}`);
+        for (const [key, val] of misMatchMap) {
+          const expectedValue = val.a === undefined ? '<missing>' : String(val.a);
+          const actualValue = val.b === undefined ? '<missing>' : String(val.b);
+          console.log('============================================================');
+          console.log(`• key: "${String(key)}" → Expected: ${expectedValue} | Actual: ${actualValue}`);
+        }
+        throw new Error('CYA validations failed');
+      } else {
+        console.log('\n✅ CHECK YOUR ANSWERS VALIDATION PASSED!\n');
       }
-      throw new Error('CYA validations failed');
-    } else {
-      console.log('\n✅ CHECK YOUR ANSWERS VALIDATION PASSED!\n');
-    }
+    });
     cyaMap.clear();
   }
 }
