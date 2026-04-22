@@ -182,13 +182,11 @@ export class GenAppsAction implements IAction {
         console.log(`Data retrieved  → ${key}: ${value}`);
       }
     });
-
   }
 
   private async validateCYA() {
-
     const misMatchMap = compareMaps(cyaMap, FieldsStore.getAll());
-    
+
     await test.step('CYA Validation Started', async () => {
       if (misMatchMap.size > 0) {
         console.log(`❌ Differences found: ${misMatchMap.size}`);
