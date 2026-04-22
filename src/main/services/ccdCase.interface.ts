@@ -128,8 +128,17 @@ export interface CcdDefendantResponses {
   disputeClaimDetails?: string;
   paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
+  counterClaim?: CcdCounterClaim;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
+}
+
+/** Counter-claim data captured across the counterclaim journey screens. */
+export interface CcdCounterClaim {
+  claimType?: string;
+  specificSum?: string;
+  claimAmount?: string;
+  maxClaimAmount?: string;
 }
 
 export interface PossessionClaimResponse {
