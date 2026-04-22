@@ -218,6 +218,21 @@ function initContainer(container: HTMLElement): void {
   });
   uploadInstances.set(container, instance);
 
+  // Fix accessibility: MOJ creates a second <label for="..."> styled as a button inside the
+  // dropzone, resulting in duplicate labels for the file input. Replace it with an aria-hidden
+  // <span> so only the original govuk-label remains as the accessible label.
+  const dropzone = container.querySelector('.moj-multi-file-upload__dropzone');
+  if (dropzone) {
+    const duplicateLabel = dropzone.querySelector<HTMLLabelElement>('label.govuk-button--secondary');
+    if (duplicateLabel) {
+      const span = document.createElement('span');
+      span.className = duplicateLabel.className;
+      span.setAttribute('aria-hidden', 'true');
+      span.textContent = duplicateLabel.textContent;
+      duplicateLabel.replaceWith(span);
+    }
+  }
+
   form.addEventListener('submit', event => {
     if (!hasVisibleError(container)) {
       return;
