@@ -2,7 +2,7 @@ export const haveYouAlreadyAppliedForHelp = {
   mainHeader: `Have you already applied for help with your application fee?`,
   haveYouAlreadyAppliedForHelpQuestion: `Have you already applied for help with your application fee?`,
   yesRadioOption: `Yes`,
-  hwfReferenceHiddenTextLabel: `hwfReference (placeholder label)`,
+  hwfReferenceHiddenTextLabel: `Enter your Help with Fees reference number`,
   hwfReferenceTextInput: `ReferenceTest123`,
   noRadioOption: `No`,
   placeholderParagraph: `Placeholder page`,
