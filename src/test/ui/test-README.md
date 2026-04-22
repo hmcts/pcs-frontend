@@ -192,29 +192,17 @@ Missing elements: Submit button, Continue link
 
 Please follow this confluence page for detailed instructions and guidelines- https://tools.hmcts.net/confluence/x/14FLd
 
-## 10. CI pipeline stages
+## 10. CI Pipeline Stages
 
-**New PR labels (optional):** **`e2e-tag:`** — value becomes **`E2E_TEST_SCOPE`** (default without the label: **`@PR`**). **`e2e-spec:`** — value becomes **`E2E_SPEC`** (comma or semicolon keywords in spec paths). **`E2E_TEST_SCOPE`** updates which tests match by title; **`E2E_SPEC`** narrows which `*.spec.ts` files are included.
+### PR & Master (Jenkinsfile_CNP)
 
-**Nightly Jenkins parameters:** **`PLAYWRIGHT_GREP_TAG`** → **`E2E_TEST_SCOPE`** (dropdown, including **`(all tests)`** for no grep), **`PLAYWRIGHT_SPEC`** → **`E2E_SPEC`**, plus **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`** and **`ENABLE_AXE_AUDIT`** passed through as env vars in **`setFunctionalTestEnvVars()`** before the browser matrix runs **`yarn test:E2e`**.
+- **PR:** Runs functional tests (`@PR` scope) on Chrome. Optional full functional test if `enable_full_functional_tests` label is added.
+- **Master:** Runs functional tests (`@regression` scope) on Chrome. Sends Slack notification to `#hdp-qa-e2e-test-results` on failure.
 
-**How the two Playwright entrypoints differ**
+### Nightly (Jenkinsfile_nightly)
 
-| Script                                   | Grep / spec filter                                                                                                                                                         |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`yarn test:functional`** (PR / master) | `--grep` from **`E2E_TEST_SCOPE`** (script default **`@regression`** if unset).                                                                                            |
-| **`yarn test:smoke`**                    | Forces **`E2E_SPEC`** and **`E2E_TEST_SCOPE`** empty, then runs `--grep @health` so PR labels/filters cannot hide smoke tests.                                             |
-| **`yarn test:E2e`** (nightly matrix)     | From **`playwright.config.ts`**: **`E2E_TEST_SCOPE`** → title grep, **`E2E_SPEC`** → optional path keywords. Jenkins only adds **`PLAYWRIGHT_PROJECT`** per browser stage. |
-
-**Case sensitivity:** tag strings must match titles; **`E2E_SPEC`** keywords must match substrings in `*.spec.ts` paths — **same spelling and casing** in both cases. Multiple spec keywords: separate with **comma** or **semicolon**.
-
-### `Jenkinsfile_CNP` (PR and master)
-
-- **PR:** **`E2E_TEST_SCOPE`** = **`@PR`**, or the text after **`e2e-tag:`** (e.g. `e2e-tag:@smoke`). Optional **`e2e-spec:`** → **`E2E_SPEC`**. Labels **`enable_all_page_functional_tests`**, **`enable_content_validation`**, **`enable_visibility_validation`**, **`enable_error_messages_validation`**, **`enable_navigation_tests`** turn those checks on. **`pcs-api-pr:`** + number (e.g. `pcs-api-pr:123`) switches API/data-store URLs for preview. **`TEST_URL`** = PR preview.
-- **Master:** **`E2E_TEST_SCOPE`** = **`@regression`**, **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`** = **`false`**, **`TEST_URL`** = PCS AAT. Smoke/functional Allure; failures may Slack **`#qa-pipeline-status`**.
-
-### `Jenkinsfile_nightly`
-
-- **Schedule:** Weekday morning timer; also **Build with Parameters**. After a manual run, Jenkins may **reuse** the last parameter set — reset in the job UI if you want defaults again.
-- **Flow:** Fortify, then one E2E stage per **ticked** browser (Chrome on by default). A failed stage does not stop the others; Allure per stage; Slack **`#qa-pipeline-status`** (see Jenkinsfile). At the start of the run the pipeline **fetches `origin/master`** and logs **`ORIGIN_MASTER_HEAD_SHA`** (reference only — which commit was at the tip of master when the build started; each E2E node still checks out per **`checkout scm`**).
-- **Parameters (names in the job):** **`MANUAL_BUILD_REASON`** (free text at the top; default **`Daily nightly schedule run`** for timer — change it when you run manually to record why). **`PLAYWRIGHT_GREP_TAG`** → **`E2E_TEST_SCOPE`** (dropdown; **`(all tests)`** means no title grep). **`PLAYWRIGHT_SPEC`** → **`E2E_SPEC`**. **`ENABLE_ALL_PAGE_FUNCTIONAL_TESTS`**, **`ENABLE_AXE_AUDIT`** copied to the same env names. **`ENVIRONMENT`** / **`PR_NUMBER`** when using preview.
+- **Schedule:** Mon–Fri at ~07:00; the job can also be run on demand via **Build with Parameters** (e.g. release verification).
+- **E2E tests:** One stage per enabled platform — Desktop Chrome, Firefox, Safari (WebKit), Edge, Mobile Android (Pixel 5 profile), Mobile iOS (iPhone 12 WebKit profile), Mobile iPad (iPad Pro 11 WebKit profile).Each runs `yarn test:E2e` with `PLAYWRIGHT_PROJECT` set (tests filtered with `--grep @nightly`) and publishes a separate Allure report (`Full <Platform> E2E Test Report`).
+- **By default only Chrome is enabled;** tick the other platform checkboxes when you need those runs.
+- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` per stage with the matching report link.
+- **Stage behaviour:** If a platform fails, that stage is marked failed but the pipeline continues; remaining stages still run.
