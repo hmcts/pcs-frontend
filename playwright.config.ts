@@ -26,6 +26,10 @@ export const enable_visibility_validation = process.env.ENABLE_VISIBILITY_VALIDA
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
+const is_smoke_run = process.env.npm_lifecycle_event === 'test:smoke';
+const junit_result_output =
+  process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
+  (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
 
 export default defineConfig({
   testDir: './src/test/ui',
@@ -44,6 +48,7 @@ export default defineConfig({
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
   reporter: [
     ['list'],
+    ...(process.env.CI ? [['junit', { outputFile: junit_result_output }] as const] : []),
     [
       'allure-playwright',
       {
@@ -98,41 +103,48 @@ export default defineConfig({
             },
           },
           {
-            name: 'MobileChrome',
-            use: {
-              ...devices['Pixel 5'],
-              channel: 'MobileChrome',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'MobileSafari',
-            use: {
-              ...devices['iPhone 12'],
-              channel: 'MobileSafari',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'MicrosoftEdge',
+            name: 'edge',
             use: {
               ...devices['Desktop Edge'],
-              channel: 'MicrosoftEdge',
+              channel: 'msedge',
               screenshot: 'only-on-failure' as const,
               video: 'retain-on-failure' as const,
               trace: 'on-first-retry' as const,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
+              headless: !!process.env.CI,
+            },
+          },
+          {
+            name: 'mobile-android',
+            use: {
+              ...devices['Pixel 5'],
+              screenshot: 'only-on-failure' as const,
+              video: 'retain-on-failure' as const,
+              trace: 'on-first-retry' as const,
+              javaScriptEnabled: true,
+              headless: !!process.env.CI,
+            },
+          },
+          {
+            name: 'mobile-ios',
+            use: {
+              ...devices['iPhone 12'],
+              screenshot: 'only-on-failure' as const,
+              video: 'retain-on-failure' as const,
+              trace: 'on-first-retry' as const,
+              javaScriptEnabled: true,
+              headless: !!process.env.CI,
+            },
+          },
+          {
+            name: 'mobile-ipad',
+            use: {
+              ...devices['iPad Pro 11'],
+              screenshot: 'only-on-failure' as const,
+              video: 'retain-on-failure' as const,
+              trace: 'on-first-retry' as const,
+              javaScriptEnabled: true,
               headless: !!process.env.CI,
             },
           },
