@@ -4,11 +4,6 @@
 @use 'service-navigation';
 @use 'timeout-modal';
 
-.sstest {
-  //white-space: pre-line;
-  white-space-collapse: preserve-breaks;
-}
-
 .section-border {
   border: 1px solid govuk-colour('blue');
 }
