@@ -200,10 +200,10 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 **How the two Playwright entrypoints differ**
 
-| Script | Grep / spec filter |
-|--------|---------------------|
-| **`yarn test:functional`** (PR / master) | `--grep` from **`E2E_TEST_SCOPE`** (script default **`@regression`** if unset). |
-| **`yarn test:E2e`** (nightly matrix) | From **`playwright.config.ts`**: **`E2E_TEST_SCOPE`** → title grep, **`E2E_SPEC`** → optional path keywords. Jenkins only adds **`PLAYWRIGHT_PROJECT`** per browser stage. |
+| Script                                   | Grep / spec filter                                                                                                                                                         |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`yarn test:functional`** (PR / master) | `--grep` from **`E2E_TEST_SCOPE`** (script default **`@regression`** if unset).                                                                                            |
+| **`yarn test:E2e`** (nightly matrix)     | From **`playwright.config.ts`**: **`E2E_TEST_SCOPE`** → title grep, **`E2E_SPEC`** → optional path keywords. Jenkins only adds **`PLAYWRIGHT_PROJECT`** per browser stage. |
 
 **Case sensitivity:** tag strings must match titles; **`E2E_SPEC`** keywords must match substrings in `*.spec.ts` paths — **same spelling and casing** in both cases. Multiple spec keywords: separate with **comma** or **semicolon**.
 
