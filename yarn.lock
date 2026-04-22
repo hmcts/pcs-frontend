@@ -1208,6 +1208,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ioredis/commands@npm:1.5.1":
+  version: 1.5.1
+  resolution: "@ioredis/commands@npm:1.5.1"
+  checksum: 10/7efb0339302094aed30903ccbf8ca24d6048cff0d556114f43004c2e02d0808e6619a814ca72d6ea00586972fab7aae6c18892f9feabea56e632fb2db34b09db
+  languageName: node
+  linkType: hard
+
 "@isaacs/fs-minipass@npm:^4.0.0":
   version: 4.0.1
   resolution: "@isaacs/fs-minipass@npm:4.0.1"
@@ -9079,7 +9086,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ioredis@npm:5.9.3, ioredis@npm:^5.3.0":
+"ioredis@npm:5.10.1":
+  version: 5.10.1
+  resolution: "ioredis@npm:5.10.1"
+  dependencies:
+    "@ioredis/commands": "npm:1.5.1"
+    cluster-key-slot: "npm:^1.1.0"
+    debug: "npm:^4.3.4"
+    denque: "npm:^2.1.0"
+    lodash.defaults: "npm:^4.2.0"
+    lodash.isarguments: "npm:^3.1.0"
+    redis-errors: "npm:^1.2.0"
+    redis-parser: "npm:^3.0.0"
+    standard-as-callback: "npm:^2.1.0"
+  checksum: 10/a85786fc17e7180ac342219ebef5c138b82d056c44c00470a1827f7a4b2499041fa13f253b337aeca2ab6681a2bf52b622ca541e9c9a993d81f1b1e6f21ab59a
+  languageName: node
+  linkType: hard
+
+"ioredis@npm:^5.3.0":
   version: 5.9.3
   resolution: "ioredis@npm:5.9.3"
   dependencies:
@@ -11943,7 +11967,7 @@ __metadata:
     i18next: "npm:25.10.10"
     i18next-fs-backend: "npm:2.6.4"
     i18next-http-middleware: "npm:3.9.3"
-    ioredis: "npm:5.9.3"
+    ioredis: "npm:5.10.1"
     jest: "npm:29.7.0"
     jest-environment-jsdom: "npm:30.2.0"
     jest-html-reporter: "npm:4.3.0"
