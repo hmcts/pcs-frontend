@@ -201,6 +201,7 @@ export class PageContentValidation implements IValidation {
     const filePath = this.resolveDataFilePath(PageContentValidation.PAGE_DATA_DIR, `${fileName}.page.data.ts`);
 
     if (!filePath || !fs.existsSync(filePath)) {
+      console.warn(`Path not found for the file ${fileName}`);
       return null;
     }
     try {
