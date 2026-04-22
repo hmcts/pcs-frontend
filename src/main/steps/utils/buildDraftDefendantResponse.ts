@@ -25,12 +25,7 @@ export const buildDraftDefendantResponse = (req: Request): DraftDefendantRespons
       : { party: {} },
   };
 
-  // Strip immutable claimant-entered fields that the backend rejects
-  if (defendantOnly.defendantContactDetails?.party) {
-    delete (defendantOnly.defendantContactDetails.party as Record<string, unknown>).nameKnown;
-    delete (defendantOnly.defendantContactDetails.party as Record<string, unknown>).addressKnown;
-    delete (defendantOnly.defendantContactDetails.party as Record<string, unknown>).addressSameAsProperty;
-  } else {
+  if (!defendantOnly.defendantContactDetails?.party) {
     defendantOnly.defendantContactDetails = { party: {} };
   }
 
