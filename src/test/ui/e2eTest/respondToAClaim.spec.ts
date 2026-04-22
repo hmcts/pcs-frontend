@@ -179,97 +179,93 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim @noDefendants @regression @accessibility', async () => {
-    // await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    // await performAction('inputDefendantDetails', {
-    //   fName: defendantNameCapture.firstNameTextInput,
-    //   lName: defendantNameCapture.lastNameTextInput,
-    // });
-    // await performAction('enterDateOfBirthDetails', {
-    //   dobDay: defendantDateOfBirth.dayInputText,
-    //   dobMonth: defendantDateOfBirth.monthInputText,
-    //   dobYear: defendantDateOfBirth.yearInputText,
-    // });
-    // await performAction('selectCorrespondenceAddressUnKnown', {
-    //   addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-    //   townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-    //   postcode: correspondenceAddress.walesPostcodeTextInput,
-    // });
-    // await performAction('selectContactPreferenceEmailOrPost', {
-    //   question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    //   radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
-    //   emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
-    // });
-    // await performAction('selectContactByTelephone', {
-    //   radioOption: contactPreferencesTelephone.yesRadioOption,
-    //   phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
-    // });
-    // await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
-    // await performAction(
-    //   'disputeClaimInterstitial',
-    //   submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
-    // );
-    // await performAction('tenancyOrContractTypeDetails', {
-    //   tenancyType: submitCaseApiData.submitCasePayloadNoDefendants.tenancy_TypeOfTenancyLicence,
-    //   tenancyOption: tenancyTypeDetails.yesRadioOption,
-    // });
-    // await performAction('enterTenancyStartDetailsUnKnown', {
-    //   tsDay: '15',
-    //   tsMonth: '11',
-    //   tsYear: '2024',
-    // });
-    // await performAction('selectNoticeDetails', {
-    //   option: confirmationOfNoticeGiven.yesRadioOption,
-    // });
-    // await performAction('enterNoticeDateUnknown');
-    // //This is a placeholder page
-    // await performAction('disputingOtherPartsOfTheClaim', {
-    //   disputeOption: nonRentArrearsDispute.noRadioOption,
-    // });
-    // await performValidation('mainHeader', counterClaim.mainHeader);
-    // await performAction('clickButton', counterClaim.saveAndContinueButton);
-    // // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
-    // await performAction('readPaymentInterstitial');
-    // await performAction('repaymentsMade', {
-    //   question: repaymentsMade.getmainHeader(claimantName),
-    //   repaymentOption: repaymentsMade.noRadioOption,
-    // });
-    // await performAction('repaymentsAgreed', {
-    //   question: repaymentsAgreed.getMainHeader(claimantName),
-    //   repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    // });
-    // await performAction('installmentPayments', {
-    //   question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-    //   radioOption: installmentPayments.noRadioOption,
-    // });
-    // await performAction('readYourHouseholdAndCircumstances');
-    // await performAction('doYouHaveAnyDependantChildren', {
-    //   dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
-    //   dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
-    // });
-    // await performAction('doYouHaveAnyOtherDependants', {
-    //   otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
-    // });
-    // await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-    //   radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-    //   details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
-    // });
-    // await performAction('selectAlternativeAccommodation', {
-    //   radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
-    //   ...getRelativeDate(5),
-    // });
-    // await performAction('yourCircumstances', {
-    //   question: yourCircumstances.mainHeader,
-    //   yourCircumstancesOption: yourCircumstances.yesRadioOption,
-    // });
-    // await performAction('exceptionalHardship', {
-    //   question: exceptionalHardship.mainHeader,
-    //   exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
-    // });
+  test('Respond to a claim @noDefendants @regression @accessibility @PR', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
     await performAction(
-      'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/income-and-expenses`
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadNoDefendants.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
+    });
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknown');
+    //This is a placeholder page
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      question: repaymentsAgreed.getMainHeader(claimantName),
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.noRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
+    });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.yesRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
+    });
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -284,9 +280,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
+    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
+    await performAction('clickButton', otherConsiderations.continueButton);
+    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performAction('clickButton', uploadDocuments.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
@@ -393,7 +397,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
+  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression @PR', async () => {
     //Income and expenses - yes - no option On regular Income - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
@@ -478,10 +482,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+    await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
+    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
+    await performAction('clickButton', otherConsiderations.continueButton);
+    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performAction('clickButton', uploadDocuments.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
@@ -618,7 +631,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
+  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression @PR', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -698,10 +711,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+    await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
+    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
+    await performAction('clickButton', otherConsiderations.continueButton);
+    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performAction('clickButton', uploadDocuments.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
@@ -709,7 +731,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression @PR', async () => {
     //universal credit with all other options - priority debts
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
@@ -819,9 +841,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
+    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
+    await performAction('clickButton', otherConsiderations.continueButton);
+    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performAction('clickButton', uploadDocuments.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
@@ -829,7 +859,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression @PR', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -914,10 +944,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+    await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
+    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
+    await performAction('clickButton', otherConsiderations.continueButton);
+    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performAction('clickButton', uploadDocuments.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
