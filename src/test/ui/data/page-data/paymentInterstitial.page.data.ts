@@ -1,7 +1,7 @@
 export const paymentInterstitial = {
   respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   mainHeader: `Payments or agreements since the claim was made`,
-  youWillNowBeAskedParagraph: `You will now be asked questions about any payments or agreements you’ve made since Treetop Housing made their claim.`,
+  youWillNowBeAskedParagraph: (claimantsName: string) => `You will now be asked questions about any payments or agreements you’ve made since ${claimantsName} made their claim.`,
   thisWillHelpParagraph: `This will help a judge understand:`,
   ifAnyArrangementsList: `If any arrangements have already been made to pay off the money you owe in rent payments (rent arrears)`,
   ifYouHavePaidList: `If you’ve paid some or all of the money you owe`,
