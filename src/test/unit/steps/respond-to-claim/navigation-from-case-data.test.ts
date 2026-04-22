@@ -34,11 +34,11 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const noticeDateProvidedReq = createReq({
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
-      defendantResponsesConfirmNoticeGiven: 'yes',
+      defendantResponsesPossessionNoticeReceived: 'yes',
     });
     const rentArrearsReq = createReq({
       noticeServed: 'YES',
-      defendantResponsesConfirmNoticeGiven: 'imNotSure',
+      defendantResponsesPossessionNoticeReceived: 'imNotSure',
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
       },
@@ -52,11 +52,11 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes unexpected confirmNoticeGiven values to arrears branches (not notice-date pages)', async () => {
+  it('routes unexpected possessionNoticeReceived values to arrears branches (not notice-date pages)', async () => {
     const unexpectedValueReq = createReq({
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
-      defendantResponsesConfirmNoticeGiven: 'NOT SURE',
+      defendantResponsesPossessionNoticeReceived: 'NOT SURE',
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
       },

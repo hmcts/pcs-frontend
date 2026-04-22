@@ -1,4 +1,4 @@
-import { CcdCase, CcdCaseAddress, YesNoEnum } from '@services/ccdCase.interface';
+import { CcdCase, CcdCaseAddress, YesNoEnum, YesNoNotSureValue } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 const buildModel = (overrides: Partial<CcdCase> = {}): CcdCaseModel => {
@@ -246,12 +246,12 @@ describe('CcdCaseModel', () => {
       expect(model.isDefendantContactByText).toBe(false);
     });
 
-    it('normalizes confirm notice given answers from CCD values', () => {
+    it('normalizes possessionNoticeReceived answers from CCD values', () => {
       const yesModel = buildModel({
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: ' YES ',
+              possessionNoticeReceived: ' YES ' as unknown as YesNoNotSureValue,
             },
           },
         },
@@ -260,7 +260,7 @@ describe('CcdCaseModel', () => {
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: 'no',
+              possessionNoticeReceived: 'no' as unknown as YesNoNotSureValue,
             },
           },
         },
@@ -269,7 +269,7 @@ describe('CcdCaseModel', () => {
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: 'IM_NOT_SURE',
+              possessionNoticeReceived: 'IM_NOT_SURE' as unknown as YesNoNotSureValue,
             },
           },
         },
@@ -278,18 +278,18 @@ describe('CcdCaseModel', () => {
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: '  maybe-later  ',
+              possessionNoticeReceived: '  maybe-later  ' as unknown as YesNoNotSureValue,
             },
           },
         },
       });
       const missingValueModel = buildModel();
 
-      expect(yesModel.defendantResponsesConfirmNoticeGiven).toBe('yes');
-      expect(noModel.defendantResponsesConfirmNoticeGiven).toBe('no');
-      expect(notSureModel.defendantResponsesConfirmNoticeGiven).toBe('imNotSure');
-      expect(customValueModel.defendantResponsesConfirmNoticeGiven).toBe('maybe-later');
-      expect(missingValueModel.defendantResponsesConfirmNoticeGiven).toBeUndefined();
+      expect(yesModel.defendantResponsesPossessionNoticeReceived).toBe('yes');
+      expect(noModel.defendantResponsesPossessionNoticeReceived).toBe('no');
+      expect(notSureModel.defendantResponsesPossessionNoticeReceived).toBe('imNotSure');
+      expect(customValueModel.defendantResponsesPossessionNoticeReceived).toBe('maybe-later');
+      expect(missingValueModel.defendantResponsesPossessionNoticeReceived).toBeUndefined();
     });
   });
 

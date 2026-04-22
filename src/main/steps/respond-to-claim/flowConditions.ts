@@ -1,9 +1,9 @@
 import { Request } from 'express';
 
-import { hasAnyRentArrearsGround, isNoticeDateProvided } from '../utils';
+import { hasAnyRentArrearsGround, isNoticeDateProvided, normalizeYesNoValue } from '../utils';
 
 export function isNoticeDateConfirmedAndProvided(req: Request): boolean {
-  if (req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven !== 'yes') {
+  if (req.res?.locals?.validatedCase?.defendantResponsesPossessionNoticeReceived !== 'yes') {
     return false;
   }
 
@@ -11,7 +11,7 @@ export function isNoticeDateConfirmedAndProvided(req: Request): boolean {
 }
 
 export function isNoticeDateConfirmedAndNotProvided(req: Request): boolean {
-  if (req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven !== 'yes') {
+  if (req.res?.locals?.validatedCase?.defendantResponsesPossessionNoticeReceived !== 'yes') {
     return false;
   }
 
@@ -22,14 +22,14 @@ export function hasRejectedRepaymentAgreement(req: Request): boolean {
   const ccdAnswer =
     req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
       ?.repaymentPlanAgreed;
-  return ccdAnswer === 'NO';
+  return normalizeYesNoValue(ccdAnswer) === 'NO';
 }
 
 export function hasConfirmedInstallmentOffer(req: Request): boolean {
   const ccdAnswer =
     req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
       ?.repayArrearsInstalments;
-  return ccdAnswer === 'YES';
+  return normalizeYesNoValue(ccdAnswer) === 'YES';
 }
 
 export function shouldShowInstallmentPaymentsStep(req: Request): boolean {
