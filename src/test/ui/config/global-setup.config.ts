@@ -15,10 +15,26 @@ export function clearEmvLocksIfLocal(): void {
 
 export const getS2SToken = async (): Promise<void> => {
   const { ServiceAuthUtils } = await import('@hmcts/playwright-common');
-  process.env.S2S_URL = s2STokenApiData.s2sUrl;
-  process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
-    microservice: s2STokenApiData.microservice,
-  });
+  process.env.S2S_URL = process.env.S2S_URL || s2STokenApiData.s2sUrl;
+
+  const maxAttempts = 4;
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
+        microservice: s2STokenApiData.microservice,
+      });
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt === maxAttempts) {
+        break;
+      }
+      // Intermittent Sauce tunnel/DNS failures happen; retry with small backoff.
+      await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+    }
+  }
+  throw lastError;
 };
 
 export const getAccessToken = async (): Promise<void> => {
