@@ -2,40 +2,10 @@ import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config'
 
 describe('respond-to-claim priority-debts flow routing', () => {
   const previousStep = flowConfig.steps['priority-debts'].previousStep;
-  const routes = flowConfig.steps['priority-debts'].routes || [];
-  const yesRouteCondition = routes[0]?.condition;
-  const noRouteCondition = routes[1]?.condition;
+  const defaultNext = flowConfig.steps['priority-debts'].defaultNext;
 
-  it('routes to priority-debt-details when yes selected', async () => {
-    if (!yesRouteCondition) {
-      throw new Error('expected yes route condition');
-    }
-
-    const result = await yesRouteCondition(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      {} as any,
-      {},
-      { havePriorityDebts: 'yes' }
-    );
-
-    expect(result).toBe(true);
-    expect(routes[0]?.nextStep).toBe('priority-debt-details');
-  });
-
-  it('routes to regular-expenses when no selected', async () => {
-    if (!noRouteCondition) {
-      throw new Error('expected no route condition');
-    }
-
-    const result = await noRouteCondition(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      {} as any,
-      {},
-      { havePriorityDebts: 'no' }
-    );
-
-    expect(result).toBe(true);
-    expect(routes[1]?.nextStep).toBe('what-other-regular-expenses-do-you-have');
+  it('uses priority-debt-details as default next step', () => {
+    expect(defaultNext).toBe('priority-debt-details');
   });
 
   it('uses regular-income as previous step when universal credit selected', async () => {
@@ -94,7 +64,7 @@ describe('respond-to-claim priority-debts flow routing', () => {
     expect(result).toBe('have-you-applied-for-universal-credit');
   });
 
-  it('uses have-you-applied-for-universal-credit as previous step when UC application date exists', async () => {
+  it('uses regular-income as previous step when universalCredit is YES, even if application date exists', async () => {
     if (!previousStep || typeof previousStep === 'string') {
       throw new Error('expected previousStep function');
     }
@@ -120,56 +90,6 @@ describe('respond-to-claim priority-debts flow routing', () => {
     } as any;
 
     const result = await previousStep(req, {});
-    expect(result).toBe('have-you-applied-for-universal-credit');
-  });
-
-  it('routes to priority-debt-details from CCD when havePriorityDebts is absent from step data', async () => {
-    if (!yesRouteCondition) {
-      throw new Error('expected yes route condition');
-    }
-    const req = {
-      res: {
-        locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: { priorityDebts: 'YES' },
-                },
-              },
-            },
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
-
-    const result = await yesRouteCondition(req, {}, {});
-    expect(result).toBe(true);
-  });
-
-  it('routes to other regular expenses from CCD when havePriorityDebts is absent from step data', async () => {
-    if (!noRouteCondition) {
-      throw new Error('expected no route condition');
-    }
-    const req = {
-      res: {
-        locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: { priorityDebts: 'NO' },
-                },
-              },
-            },
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
-
-    const result = await noRouteCondition(req, {}, {});
-    expect(result).toBe(true);
+    expect(result).toBe('what-regular-income-do-you-receive');
   });
 });

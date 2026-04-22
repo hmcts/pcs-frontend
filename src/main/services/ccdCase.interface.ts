@@ -43,7 +43,6 @@ export interface HouseholdCircumstances {
   universalCredit?: YesNoValue;
   universalCreditAmount?: PenceAmount;
   universalCreditFrequency?: FrequencyValue;
-  ucApplicationDate?: string;
   otherBenefits?: YesNoValue;
   otherBenefitsAmount?: PenceAmount;
   otherBenefitsFrequency?: FrequencyValue;

@@ -86,16 +86,19 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        householdCircumstances: {
-          universalCredit: 'YES',
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: {
+          householdCircumstances: expect.objectContaining({
+            universalCredit: 'YES',
+          }),
         },
-      },
-    });
+      })
+    );
   });
 
-  it('POST does not re-write universal credit when already YES in CCD', async () => {
+  it('POST writes latest selection even when CCD already has YES', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -129,7 +132,16 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: {
+          householdCircumstances: expect.objectContaining({
+            universalCredit: 'YES',
+          }),
+        },
+      })
+    );
   });
 
   it('POST does not mutate session state when user re-ticks UC', async () => {
@@ -167,10 +179,19 @@ describe('respond-to-claim regular-income step', () => {
     await step.postController.post(req, res, next);
 
     expect(req.session.formData).toEqual({});
-    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: {
+          householdCircumstances: expect.objectContaining({
+            universalCredit: 'YES',
+          }),
+        },
+      })
+    );
   });
 
-  it('POST does not write anything when selection is absent and no existing UC data', async () => {
+  it('POST writes NO values when selection is absent and no existing UC data', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -187,7 +208,16 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: {
+          householdCircumstances: expect.objectContaining({
+            universalCredit: 'NO',
+          }),
+        },
+      })
+    );
     expect(req.session.formData).toEqual({});
   });
 
@@ -224,7 +254,16 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: {
+          householdCircumstances: expect.objectContaining({
+            universalCredit: 'NO',
+          }),
+        },
+      })
+    );
     expect(req.session.formData).toEqual({});
   });
 
@@ -262,7 +301,16 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: {
+          householdCircumstances: expect.objectContaining({
+            universalCredit: 'NO',
+          }),
+        },
+      })
+    );
     expect(req.session.formData).toEqual({});
   });
 
@@ -299,7 +347,16 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: {
+          householdCircumstances: expect.objectContaining({
+            universalCredit: 'NO',
+          }),
+        },
+      })
+    );
     expect(req.session.formData).toEqual({});
   });
 });
