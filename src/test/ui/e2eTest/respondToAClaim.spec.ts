@@ -33,6 +33,7 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  uploadDocuments,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -375,8 +376,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
     });
     await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', otherConsiderations.continueButton);
+    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performAction('clickButton', uploadDocuments.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
