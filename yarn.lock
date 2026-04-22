@@ -9865,9 +9865,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-html-reporter@npm:4.3.0":
-  version: 4.3.0
-  resolution: "jest-html-reporter@npm:4.3.0"
+"jest-html-reporter@npm:4.4.0":
+  version: 4.4.0
+  resolution: "jest-html-reporter@npm:4.4.0"
   dependencies:
     "@jest/reporters": "npm:^30.0.2"
     "@jest/test-result": "npm:^30.0.2"
@@ -9878,8 +9878,7 @@ __metadata:
     xmlbuilder: "npm:15.0.0"
   peerDependencies:
     jest: 19.x - 30.x
-    typescript: ^3.7.x || ^4.3.x || ^5.x
-  checksum: 10/4cd16891f03880df23a8489091c5d527b13a3aa172ce0f55b65acc1616fa5b9457bac8d566cb4a5e4fe5108dd58c56a40ec41c962f82e174ee4ca1a26a5dab59
+  checksum: 10/6d3b8c3f0658f9614c437bfda96826aa02e5d3fedca5221602edd4148aba4b306195a9a6e87befe47e5853692f3bd9d256ac31675d3a89506fd87911172fc822
   languageName: node
   linkType: hard
 
@@ -12014,7 +12013,7 @@ __metadata:
     ioredis: "npm:5.10.1"
     jest: "npm:29.7.0"
     jest-environment-jsdom: "npm:30.3.0"
-    jest-html-reporter: "npm:4.3.0"
+    jest-html-reporter: "npm:4.4.0"
     jest-pact: "npm:0.13.0"
     jose: "npm:6.1.3"
     lint-staged: "npm:15.5.2"
