@@ -6,15 +6,19 @@
 import type { YesNoValue } from '@services/ccdCase.interface';
 
 /**
- * Converts frontend 'yes'/'no' string to backend CCD enum 'YES'/'NO'
+ * Converts frontend 'yes'/'no' string to backend CCD enum 'Yes'/'No'
  * @param value - Frontend radio button value ('yes' or 'no')
- * @returns CCD enum value ('YES' or 'NO')
+ * @returns CCD enum value ('Yes' or 'No')
  * @example
  * toYesNoEnum('yes') // returns 'Yes'
  * toYesNoEnum('no')  // returns 'No'
+ * toYesNoEnum(undefined)  // returns undefined
  */
-export function toYesNoEnum(value: 'yes' | 'no'): YesNoValue {
-  return value === 'yes' ? 'YES' : 'NO';
+export function toYesNoEnum(value: 'yes' | 'no' | undefined): YesNoValue | undefined {
+  if (!value) {
+    return undefined;
+  }
+  return value.toLowerCase() === 'yes' ? 'YES' : 'NO';
 }
 
 /**
