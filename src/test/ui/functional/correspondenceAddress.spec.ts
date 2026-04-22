@@ -1,5 +1,3 @@
-import { test } from '@playwright/test';
-
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   correspondenceAddress,
@@ -9,6 +7,7 @@ import {
   freeLegalAdvice,
   startNow,
 } from '../data/page-data';
+import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;

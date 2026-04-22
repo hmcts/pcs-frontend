@@ -8,10 +8,11 @@ import { performAction } from '../controller';
  */
 export const test = base;
 
-test.afterEach(async () => {
+test.afterEach(async ({ context }) => {
   if (process.env.CASE_NUMBER) {
     await performAction('deleteCaseRole', '[CREATOR]');
   }
+  await context.close();
 });
 
 export { expect } from '@playwright/test';
