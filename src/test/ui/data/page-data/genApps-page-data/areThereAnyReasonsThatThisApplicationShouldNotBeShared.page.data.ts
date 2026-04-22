@@ -31,5 +31,4 @@ export const areThereAnyReasonsThatThisApplicationShouldNotBeShared = {
       { type: 'moreThanMax', input: 6900, errMessage: 'Must be 6800 characters or fewer' },
     ],
   },
-
 };

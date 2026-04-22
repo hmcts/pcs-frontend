@@ -57,10 +57,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
-     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+    await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
     await performAction('confirmOtherPartiesAgreed', {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
-      option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption
+      option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
     });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
@@ -74,6 +74,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
-   // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 });

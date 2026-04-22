@@ -44,7 +44,6 @@ export const FieldsStore = {
     fieldsMap.delete(oldKey);
     return true;
   },
-
 };
 
 export class RecordAnswers implements IAction {

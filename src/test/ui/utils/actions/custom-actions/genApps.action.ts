@@ -25,7 +25,10 @@ export class GenAppsAction implements IAction {
       ['doYouNeedHelpPayingFee', () => this.doYouNeedHelpPayingFee(fieldName as actionRecord)],
       ['confirmYouHaveAppliedForFeeHelp', () => this.confirmYouHaveAppliedForFeeHelp(fieldName as actionRecord)],
       ['confirmOtherPartiesAgreed', () => this.confirmOtherPartiesAgreed(fieldName as actionRecord)],
-      ['reasonsApplicationShouldNotBeShared', () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord)],
+      [
+        'reasonsApplicationShouldNotBeShared',
+        () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord),
+      ],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
       ['validateCYA', () => this.validateCYA()],
@@ -72,7 +75,10 @@ export class GenAppsAction implements IAction {
       option: confirmFeeHelp.option,
     });
     if (confirmFeeHelp.option === 'Yes') {
-      const userInput = typeof confirmFeeHelp.input === 'number' ? generateRandomString(confirmFeeHelp.input) : confirmFeeHelp.input as string;
+      const userInput =
+        typeof confirmFeeHelp.input === 'number'
+          ? generateRandomString(confirmFeeHelp.input)
+          : (confirmFeeHelp.input as string);
       await performAction('inputText', confirmFeeHelp.label, userInput);
       FieldsStore.update(confirmFeeHelp.label as string, confirmFeeHelp.input as string);
     } else {
@@ -97,7 +103,8 @@ export class GenAppsAction implements IAction {
       option: reason.option,
     });
     if (reason.option === 'Yes') {
-      const userInput = typeof reason.input === 'number' ? generateRandomString(reason.input) : reason.input as string;
+      const userInput =
+        typeof reason.input === 'number' ? generateRandomString(reason.input) : (reason.input as string);
       await performAction('inputText', reason.label, userInput);
       FieldsStore.update(reason.label as string, userInput);
     } else {
@@ -131,34 +138,36 @@ export class GenAppsAction implements IAction {
   }
 
   private async retrieveCYATableData(page: Page) {
-
     const tables = page.locator(`//dl`);
     const tableCount = await tables.count();
 
-    if (tableCount === 0) { throw new Error(`CYA table not found. Exiting...`); }
+    if (tableCount === 0) {
+      throw new Error(`CYA table not found. Exiting...`);
+    }
 
     for (let i = 0; i < tableCount; i++) {
       const curTable = tables.nth(i);
 
-
-      if (!await curTable.isVisible()) {
+      if (!(await curTable.isVisible())) {
         throw new Error('table not found');
       }
-
 
       const rows = curTable.locator('.govuk-summary-list__row');
       const rowCount = await rows.count();
 
-
       for (let j = 0; j < rowCount; j++) {
         const row = rows.nth(j);
 
-        if (!(await row.isVisible())) { continue; }
+        if (!(await row.isVisible())) {
+          continue;
+        }
 
         const keyQns = row.locator('dt.govuk-summary-list__key');
         const valAns = row.locator('dd.govuk-summary-list__value');
 
-        if ((await keyQns.count()) === 0 || (await valAns.count()) === 0) { continue; }
+        if ((await keyQns.count()) === 0 || (await valAns.count()) === 0) {
+          continue;
+        }
 
         const keyText = (await keyQns.first().innerText()).trim();
         const valText = (await valAns.first().innerText()).trim().replace(/\r?\n+/g, ',');
@@ -167,8 +176,7 @@ export class GenAppsAction implements IAction {
         }
       }
     }
-  };
-
+  }
 
   private async validateCYA() {
     // console.log('CYA field count is :' + cyaMap.size);
