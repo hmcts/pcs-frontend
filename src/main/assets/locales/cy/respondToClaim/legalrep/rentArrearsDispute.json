@@ -1,4 +1,5 @@
 {
+  "caseNumber": "cyCase number: {{caseNumber}}",
   "amountOwedHeading": "cyAmount the defendant owes in rent arrears given by {{claimantName}}:",
   "rentArrearsQuestion": "cyDoes the defendant owe this amount in rent arrears?",
   "rentArrearsOptions": {

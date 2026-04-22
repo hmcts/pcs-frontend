@@ -9,6 +9,7 @@ import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 import { isLegalRepresentativeUser } from 'steps/utils/userRole';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 const STEP_NAME = 'tenancy-date-unknown';
 
@@ -80,10 +81,12 @@ export const step: StepDefinition = createFormStep({
       ?.value as string;
 
     const receivedDetailsBy = isLegalRepresentativeUser(req) ? claimantName : orgName;
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
     const t = getTranslationFunction(req, STEP_NAME, ['common']);
     const paragraph = t('paragraph', { receivedDetailsBy });
 
     return {
+      caseNumber: t('caseNumber', { caseNumber }),
       receivedDetailsBy,
       claimantName,
       paragraph,

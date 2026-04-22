@@ -7,6 +7,7 @@ import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCaseModel, PossessionClaimResponse } from '@services/ccdCaseData.model';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 function getTenancyStartDate(validatedCase?: CcdCaseModel): string | undefined {
   return validatedCase?.tenancyStartDate as string | undefined;
@@ -21,6 +22,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     caption: 'caption',
     pageTitle: 'pageTitle',
+    caseNumber: 'caseNumber',
     heading: 'heading',
     question: 'question',
     hintText: 'hintText',
@@ -136,9 +138,11 @@ export const step: StepDefinition = createFormStep({
     const t = getTranslationFunction(req, 'tenancy-date-details', ['common']);
     const bulletPoint = t('bulletPoint', { returnObjects: true, tenancyStartDate });
     const subHeading = t('subHeading', { returnObjects: true, claimantName });
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     return {
       claimantName,
+      caseNumber: t('caseNumber', { caseNumber }),
       tenancyStartDate,
       bulletPoint,
       subHeading,

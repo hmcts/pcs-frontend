@@ -1,4 +1,5 @@
 {
+  "caseNumber": "cyCase number: {{caseNumber}}",
   "hintText": "",
   "options": {
     "yes": "cyYes",

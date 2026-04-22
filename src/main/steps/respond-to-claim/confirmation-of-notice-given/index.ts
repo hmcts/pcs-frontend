@@ -4,9 +4,12 @@ import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+
+const STEP_NAME = 'confirmation-of-notice-given';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'confirmation-of-notice-given',
@@ -16,6 +19,7 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/confirmationOfNoticeGiven.njk`,
   translationKeys: {
     caption: 'caption',
+    caseNumber: 'caseNumber',
     pageTitle: 'pageTitle',
     question: 'question',
     hintText: 'hintText',
@@ -59,9 +63,12 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+    const t = getTranslationFunction(req, STEP_NAME, ['common']);
 
     return {
       claimantName,
+      caseNumber: t('caseNumber', { caseNumber })
     };
   },
 });

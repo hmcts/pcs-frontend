@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -8,6 +8,7 @@ import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';
 import { isLegalRepresentativeUser } from 'steps/utils/userRole';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -84,6 +85,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    caseNumber: 'caseNumber',
     heading: 'heading',
     insetText: 'insetText',
     saveAndContinue: 'saveAndContinue',
@@ -170,8 +172,12 @@ export const step: StepDefinition = createFormStep({
     const tenancyType =
       tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
 
+    const t = getTranslationFunction(req, 'tenancy-type-details', ['common']);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
     return {
       ...formContent,
+      caseNumber: t('caseNumber', {caseNumber}),
       receivedDetailsBy,
       tenancyType,
       organisationName: orgName,
