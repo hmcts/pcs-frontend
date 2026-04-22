@@ -1,9 +1,10 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { YesNoValue } from '@services/ccdCase.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'your-circumstances',
@@ -68,36 +69,38 @@ export const step: StepDefinition = createFormStep({
     };
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const shareCircumstances = req.body?.shareCircumstances as string | undefined;
+    const ccdMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
 
-    if (!shareCircumstances || (shareCircumstances !== 'yes' && shareCircumstances !== 'no')) {
-      return;
+    if (shareCircumstances && ccdMapping[shareCircumstances]) {
+      response.defendantResponses.householdCircumstances.shareAdditionalCircumstances = ccdMapping[shareCircumstances];
+
+      if (shareCircumstances === 'yes') {
+        response.defendantResponses.householdCircumstances.additionalCircumstancesDetails = req.body?.[
+          'shareCircumstances.circumstancesDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.householdCircumstances.additionalCircumstancesDetails;
+      }
+    } else {
+      delete response.defendantResponses.householdCircumstances.shareAdditionalCircumstances;
+      delete response.defendantResponses.householdCircumstances.additionalCircumstancesDetails;
     }
 
-    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
-    const shareAdditionalCircumstances = ccdMapping[shareCircumstances];
-    const additionalCircumstancesDetails =
-      shareCircumstances === 'yes'
-        ? (req.body?.['shareCircumstances.circumstancesDetails'] as string | undefined)
-        : undefined;
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          shareAdditionalCircumstances,
-          additionalCircumstancesDetails,
-        },
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken || '',
+      req.res?.locals.validatedCase?.id || '',
+      response
+    );
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const circumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     const existingAnswer = circumstances?.shareAdditionalCircumstances as string | undefined;
 
-    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
+    const mapping: Record<string, string> = { YES: 'yes', NO: 'no' };
     const shareCircumstances = existingAnswer ? mapping[existingAnswer] : undefined;
 
     if (!shareCircumstances) {

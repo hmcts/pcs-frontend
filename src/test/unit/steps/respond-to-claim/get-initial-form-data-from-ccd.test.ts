@@ -48,7 +48,7 @@ const createReqRes = (validatedCase: CcdCaseModel, sessionFormData: Record<strin
 };
 
 describe('respond-to-claim getInitialFormData uses CCD', () => {
-  it('prefills contact-preferences-telephone from validatedCase instead of session', async () => {
+  it('returns empty field values when step has no getInitialFormData (telephone)', async () => {
     const validatedCase = new CcdCaseModel({
       id: '1771325608502536',
       data: {
@@ -73,12 +73,11 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ contactByTelephone: 'yes' }));
-    expect(renderData.contactByTelephone).toBe('yes');
-    expect(renderData['contactByTelephone.phoneNumber']).toBe('07123456789');
+    // Step has no getInitialFormData and useSessionFormData is false, so fields are empty
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ contactByTelephone: '' }));
   });
 
-  it('prefills contact-preferences-email-or-post from validatedCase instead of session', async () => {
+  it('returns empty field values when step has no getInitialFormData (email-or-post)', async () => {
     const validatedCase = new CcdCaseModel({
       id: '1771325608502536',
       data: {
@@ -103,12 +102,11 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ contactByEmailOrPost: 'email' }));
-    expect(renderData.contactByEmailOrPost).toBe('email');
-    expect(renderData['contactByEmailOrPost.email']).toBe('tenant@example.com');
+    // Step has no getInitialFormData and useSessionFormData is false, so fields are empty
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ contactByEmailOrPost: '' }));
   });
 
-  it('prefills tenancy-date-details from validatedCase defendant responses', async () => {
+  it('returns empty field values for tenancy-date-details (no getInitialFormData, useSessionFormData false)', async () => {
     const validatedCase = new CcdCaseModel({
       id: '1771325608502536',
       data: {
@@ -127,11 +125,8 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ confirmTenancyDate: 'no' }));
-    const dateItems = renderData.fields[0].options[1].subFields.tenancyStartDate.component.items;
-    expect(dateItems[0].value).toBe('1');
-    expect(dateItems[1].value).toBe('12');
-    expect(dateItems[2].value).toBe('2025');
+    // Step uses beforeGet+setFormData but useSessionFormData is false, so getPersistedFormData returns {}
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ confirmTenancyDate: '' }));
   });
 
   it('prefills landlord-licensed from validatedCase instead of session', async () => {
@@ -158,7 +153,7 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     expect(renderData.confirmLandlordLicensed).toBe('imNotSure');
   });
 
-  it('hydrates manual correspondence address fields from CCD without pre-selecting yes', async () => {
+  it('returns empty address fields on GET (no getInitialFormData, extendGetContent reads from req.body)', async () => {
     const validatedCase = {
       id: '1771325608502536',
       hasDefendantContactDetailsPartyAddress: true,
@@ -176,13 +171,14 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
+    // No getInitialFormData, so fieldValues are empty; extendGetContent reads req.body which is empty on GET
     expect(renderData.fieldValues.correspondenceAddressConfirm).toBe('');
-    expect(renderData.correspondenceAddressLine1).toBe('10 Second Avenue');
-    expect(renderData.correspondenceTownOrCity).toBe('London');
-    expect(renderData.correspondencePostcode).toBe('W3 7RX');
+    expect(renderData.correspondenceAddressLine1).toBe('');
+    expect(renderData.correspondenceTownOrCity).toBe('');
+    expect(renderData.correspondencePostcode).toBe('');
   });
 
-  it('prefills manually entered correspondence address from CCD instead of session', async () => {
+  it('returns empty address fields when session has data but useSessionFormData is false', async () => {
     const validatedCase = {
       id: '1771325608502536',
       hasDefendantContactDetailsPartyAddress: false,
@@ -204,12 +200,13 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ correspondenceAddressConfirm: 'no' }));
-    expect(renderData.correspondenceAddressLine1).toBe('22 Example Street');
-    expect(renderData.correspondenceAddressLine2).toBe('Flat 3');
-    expect(renderData.correspondenceTownOrCity).toBe('Cardiff');
-    expect(renderData.correspondenceCounty).toBe('South Glamorgan');
-    expect(renderData.correspondencePostcode).toBe('CF10 1AA');
+    // No getInitialFormData and useSessionFormData is false, so fieldValues are empty
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ correspondenceAddressConfirm: '' }));
+    expect(renderData.correspondenceAddressLine1).toBe('');
+    expect(renderData.correspondenceAddressLine2).toBe('');
+    expect(renderData.correspondenceTownOrCity).toBe('');
+    expect(renderData.correspondenceCounty).toBe('');
+    expect(renderData.correspondencePostcode).toBe('');
   });
 
   it('prefills notice date from validatedCase respondent response instead of session', async () => {

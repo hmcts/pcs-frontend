@@ -1,9 +1,9 @@
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { createFormStep } from '../../../modules/steps';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-telephone',
@@ -74,56 +74,28 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  getInitialFormData: req => {
-    const validatedCase = req.res?.locals?.validatedCase;
-    const contactByPhone = validatedCase?.defendantResponsesContactByPhone;
-    const phoneNumber = validatedCase?.defendantContactDetailsPartyPhoneNumber;
-
-    if (contactByPhone === 'YES') {
-      return {
-        contactByTelephone: 'yes',
-        ...(phoneNumber ? { 'contactByTelephone.phoneNumber': phoneNumber } : {}),
-      };
-    }
-
-    if (contactByPhone === 'NO') {
-      return {
-        contactByTelephone: 'no',
-      };
-    }
-
-    return {};
-  },
 
   beforeRedirect: async req => {
-    const telephoneForm = req.body as Record<string, unknown>;
-    const contactByTelephone = telephoneForm.contactByTelephone as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    // Reads from session for now - session removal is a separate ticket
+    const telephoneForm = req.session.formData?.['contact-preferences-telephone'];
+    if (telephoneForm) {
+      response.defendantResponses.contactByPhone = telephoneForm.contactByTelephone === 'yes' ? 'YES' : 'NO';
 
-    if (!contactByTelephone) {
-      return;
+      if (telephoneForm.contactByTelephone === 'yes') {
+        response.defendantContactDetails.party.phoneNumber = telephoneForm['contactByTelephone.phoneNumber'];
+      } else {
+        delete response.defendantContactDetails.party.phoneNumber;
+      }
+    } else {
+      delete response.defendantResponses.contactByPhone;
+      delete response.defendantContactDetails.party.phoneNumber;
     }
 
-    const existingPhoneNumber = req.res?.locals?.validatedCase?.defendantContactDetailsPartyPhoneNumber as
-      | string
-      | undefined;
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantContactDetails: {
-        party: {
-          phoneNumberProvided: contactByTelephone === 'yes' ? 'YES' : 'NO',
-          phoneNumber:
-            contactByTelephone === 'yes'
-              ? (telephoneForm['contactByTelephone.phoneNumber'] as string | undefined)
-              : existingPhoneNumber
-                ? ''
-                : undefined,
-        },
-      },
-      defendantResponses: {
-        contactByPhone: contactByTelephone === 'yes' ? 'YES' : 'NO',
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id || '',
+      response
+    );
   },
 });

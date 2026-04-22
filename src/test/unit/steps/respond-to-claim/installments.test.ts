@@ -30,9 +30,14 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+const mockSaveDraftDefendantResponse = jest.fn();
+const mockBuildDraftDefendantResponse = jest.fn(() => ({
+  defendantResponses: { paymentAgreement: {} },
+  defendantContactDetails: { party: {} },
+}));
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
 const t = ((key: string) => {
@@ -98,7 +103,7 @@ describe('respond-to-claim installments step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
+    mockSaveDraftDefendantResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
   });
 
   it('exposes correct step url and view', () => {
@@ -178,7 +183,7 @@ describe('respond-to-claim installments step', () => {
     }
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+    expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
       expect.objectContaining({
         body: expect.objectContaining({
           installmentAmount: '123.45',
@@ -192,6 +197,7 @@ describe('respond-to-claim installments step', () => {
             additionalContributionFrequency: 'monthly',
           },
         },
+        defendantContactDetails: { party: {} },
       }
     );
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');

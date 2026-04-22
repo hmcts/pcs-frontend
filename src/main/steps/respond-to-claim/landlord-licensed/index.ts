@@ -1,9 +1,10 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
+import type { YesNoNotSureValue } from '@services/ccdCase.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'landlord-licensed',
@@ -33,28 +34,28 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const confirmValue = req.body?.confirmLandlordLicensed as string | undefined;
+    const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', imNotSure: 'NOT_SURE' };
 
-    const defendantResponses: Record<string, unknown> = {};
-
-    if (confirmValue === 'yes') {
-      defendantResponses.landlordLicensed = 'YES';
-    } else if (confirmValue === 'no') {
-      defendantResponses.landlordLicensed = 'NO';
-    } else if (confirmValue === 'imNotSure') {
-      defendantResponses.landlordLicensed = 'NOT_SURE';
+    if (confirmValue && enumMapping[confirmValue]) {
+      response.defendantResponses.landlordLicensed = enumMapping[confirmValue];
+    } else {
+      delete response.defendantResponses.landlordLicensed;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        ...defendantResponses,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id || '',
+      response
+    );
   },
   getInitialFormData: async req => {
-    const landlordLicensed = req.res?.locals?.validatedCase?.defendantResponsesLandlordLicensed as string | undefined;
+    const caseData = req.res?.locals?.validatedCase?.data;
+
+    const landlordLicensed = caseData?.possessionClaimResponse?.defendantResponses?.landlordLicensed as
+      | string
+      | undefined;
 
     const mapping: Record<string, string> = {
       YES: 'yes',

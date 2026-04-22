@@ -1,20 +1,27 @@
 import type { Request, Response } from 'express';
 
-import { step } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
-import * as populateModule from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
-
-import type { CcdCase } from '@services/ccdCase.interface';
-
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),
   loadStepNamespace: jest.fn(),
 }));
 
-describe('contact-preferences-email-or-post', () => {
-  const buildCcdSpy = jest
-    .spyOn(populateModule, 'buildCcdCaseForPossessionClaimResponse')
-    .mockResolvedValue({} as CcdCase);
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+}));
 
+jest.mock('../../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    saveDraftDefendantResponse: jest.fn(),
+  },
+}));
+
+import { ccdCaseService } from '../../../../main/services/ccdCaseService';
+import { step } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
+
+describe('contact-preferences-email-or-post', () => {
   const createBaseReqRes = () => {
     const req = {
       body: {},
@@ -53,7 +60,7 @@ describe('contact-preferences-email-or-post', () => {
     jest.clearAllMocks();
   });
 
-  it('builds CCD payload from current body when user selects email', async () => {
+  it('saves with fields deleted when session formData is empty (holistic draft save reads from session)', async () => {
     const { req, res, next } = createBaseReqRes();
     req.body = {
       contactByEmailOrPost: 'email',
@@ -64,46 +71,73 @@ describe('contact-preferences-email-or-post', () => {
     expect(post).toBeDefined();
     await post!(req, res, next);
 
-    expect(buildCcdSpy).toHaveBeenCalledWith(
-      req,
-      expect.objectContaining({
-        defendantContactDetails: {
-          party: {
-            emailAddress: 'new@example.com',
-          },
-        },
-        defendantResponses: {
-          contactByEmail: 'YES',
-          contactByPost: 'NO',
-          preferenceType: 'EMAIL',
-        },
-      })
+    // beforeRedirect reads from req.session.formData which is empty,
+    // so the else branch runs, deleting preferenceType and emailAddress
+    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+      undefined, // accessToken
+      '123', // caseId
+      {
+        defendantResponses: {},
+        defendantContactDetails: { party: {} },
+      }
     );
   });
 
-  it('clears existing email when user selects post', async () => {
+  it('builds CCD payload when session formData has email selection', async () => {
     const { req, res, next } = createBaseReqRes();
     req.body = {
-      contactByEmailOrPost: 'post',
+      contactByEmailOrPost: 'email',
+      'contactByEmailOrPost.email': 'new@example.com',
+    };
+    req.session.formData = {
+      'contact-preferences-email-or-post': {
+        contactByEmailOrPost: 'email',
+        'contactByEmailOrPost.email': 'new@example.com',
+      },
     };
 
     const post = step.postController?.post;
     expect(post).toBeDefined();
     await post!(req, res, next);
 
-    expect(buildCcdSpy).toHaveBeenCalledWith(
-      req,
+    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+      undefined, // accessToken
+      '123', // caseId
       expect.objectContaining({
-        defendantContactDetails: {
-          party: {
-            emailAddress: '',
-          },
-        },
-        defendantResponses: {
-          contactByEmail: 'NO',
-          contactByPost: 'YES',
+        defendantContactDetails: expect.objectContaining({
+          party: expect.objectContaining({
+            emailAddress: 'new@example.com',
+          }),
+        }),
+        defendantResponses: expect.objectContaining({
+          preferenceType: 'EMAIL',
+        }),
+      })
+    );
+  });
+
+  it('clears email when session formData has post selection', async () => {
+    const { req, res, next } = createBaseReqRes();
+    req.body = {
+      contactByEmailOrPost: 'post',
+    };
+    req.session.formData = {
+      'contact-preferences-email-or-post': {
+        contactByEmailOrPost: 'post',
+      },
+    };
+
+    const post = step.postController?.post;
+    expect(post).toBeDefined();
+    await post!(req, res, next);
+
+    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+      undefined, // accessToken
+      '123', // caseId
+      expect.objectContaining({
+        defendantResponses: expect.objectContaining({
           preferenceType: 'POST',
-        },
+        }),
       })
     );
   });

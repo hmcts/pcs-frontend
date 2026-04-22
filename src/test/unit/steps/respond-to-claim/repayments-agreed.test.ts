@@ -30,9 +30,17 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+}));
+
+jest.mock('../../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    saveDraftDefendantResponse: jest.fn(),
+  },
 }));
 
 const t = ((key: string) => {
@@ -45,12 +53,12 @@ const t = ((key: string) => {
     'options.or': 'or',
     'options.imNotSure': "I'm not sure",
     textAreaLabel:
-      'Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made',
+      "Give details about how much you've agreed to pay, how often you'll pay and when the agreement was made",
     textAreaHint: 'You can enter up to 500 characters',
     'errors.repaymentsAgreed':
       "Select if you've come to any agreement with Treetops Housing to repay the arrears since 20th May 2025",
     'errors.repaymentsAgreed.repaymentsAgreedDetails':
-      'Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made',
+      "Give details about how much you've agreed to pay, how often you'll pay and when the agreement was made",
     'buttons.saveAndContinue': 'Save and continue',
     'buttons.continue': 'Continue',
     'buttons.saveForLater': 'Save for later',
@@ -68,6 +76,7 @@ const t = ((key: string) => {
 }) as unknown as (key: string, options?: unknown) => string;
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
+import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/repayments-agreed';
 
 describe('respond-to-claim repayments-agreed step', () => {
@@ -102,13 +111,12 @@ describe('respond-to-claim repayments-agreed step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
   });
 
-  it('exposes correct step url and default form view', () => {
+  it('exposes correct step url and custom template view', () => {
     expect(step.name).toBe('repayments-agreed');
     expect(step.url).toBe('/case/:caseReference/respond-to-claim/repayments-agreed');
-    expect(step.view).toContain('formBuilder.njk');
+    expect(step.view).toContain('repaymentsAgreed.njk');
   });
 
   it('POST saves NO with defendantResponses.paymentAgreement', async () => {
@@ -129,14 +137,17 @@ describe('respond-to-claim repayments-agreed step', () => {
     }
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        paymentAgreement: {
-          repaymentPlanAgreed: 'NO',
-          repaymentAgreedDetails: undefined,
-        },
-      },
-    });
+    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+      'token', // accessToken
+      '1234567890123456', // caseId
+      expect.objectContaining({
+        defendantResponses: expect.objectContaining({
+          paymentAgreement: expect.objectContaining({
+            repaymentPlanAgreed: 'NO',
+          }),
+        }),
+      })
+    );
   });
 
   it('POST saves YES with details', async () => {
@@ -146,7 +157,7 @@ describe('respond-to-claim repayments-agreed step', () => {
       body: {
         action: 'continue',
         repaymentsAgreed: 'yes',
-        'repaymentsAgreed.repaymentsAgreedDetails': 'Paid £50 weekly',
+        'repaymentsAgreed.repaymentsAgreedDetails': 'Paid \u00a350 weekly',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -158,13 +169,17 @@ describe('respond-to-claim repayments-agreed step', () => {
     }
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        paymentAgreement: {
-          repaymentPlanAgreed: 'YES',
-          repaymentAgreedDetails: 'Paid £50 weekly',
-        },
-      },
-    });
+    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
+      'token', // accessToken
+      '1234567890123456', // caseId
+      expect.objectContaining({
+        defendantResponses: expect.objectContaining({
+          paymentAgreement: expect.objectContaining({
+            repaymentPlanAgreed: 'YES',
+            repaymentAgreedDetails: 'Paid \u00a350 weekly',
+          }),
+        }),
+      })
+    );
   });
 });

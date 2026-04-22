@@ -1,13 +1,10 @@
-import { format, parseISO } from 'date-fns';
-
-import { formatDatePartsToISODate } from '../../utils';
-import { getClaimantName } from '../../utils/getClaimantName';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 const STEP_NAME = 'tenancy-date-unknown';
 
@@ -19,7 +16,6 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/tenancyDateUnknown.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
-    heading: 'heading',
     caption: 'caption',
     question: 'question',
     hint: 'hint',
@@ -39,25 +35,6 @@ export const step: StepDefinition = createFormStep({
       },
     },
   ],
-  getInitialFormData: req => {
-    const tenancyStartDate = req.res?.locals?.validatedCase?.defendantResponsesTenancyStartDate;
-    if (!tenancyStartDate) {
-      return {};
-    }
-
-    const parsed = parseISO(tenancyStartDate);
-    if (Number.isNaN(parsed.getTime())) {
-      return {};
-    }
-
-    return {
-      tenancyStartDate: {
-        day: format(parsed, 'd'),
-        month: format(parsed, 'M'),
-        year: format(parsed, 'yyyy'),
-      },
-    };
-  },
   beforeRedirect: async req => {
     const dateObject = req.body?.tenancyStartDate;
     const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
@@ -65,16 +42,24 @@ export const step: StepDefinition = createFormStep({
     const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';
     const tenancyStartDateIso = formatDatePartsToISODate(day, month, year);
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        ...(tenancyStartDateIso && { tenancyStartDate: tenancyStartDateIso }),
-      },
-    };
+    const response = buildDraftDefendantResponse(req);
+    if (tenancyStartDateIso) {
+      response.defendantResponses.tenancyStartDate = tenancyStartDateIso;
+    } else {
+      delete response.defendantResponses.tenancyStartDate;
+    }
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id || '',
+      response
+    );
   },
   extendGetContent: async req => {
-    const claimantName = getClaimantName(req);
+    const claimantNameFromValidatedCase = req.res?.locals?.validatedCase?.data?.possessionClaimResponse
+      ?.claimantOrganisations?.[0]?.value as string | undefined;
+    const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
+    const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops Housing';
 
     const t = getTranslationFunction(req, STEP_NAME, ['common']);
     const paragraph = t('paragraph', { claimantName });

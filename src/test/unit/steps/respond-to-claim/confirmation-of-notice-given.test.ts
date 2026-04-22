@@ -1,9 +1,7 @@
 import type { Request, Response } from 'express';
 
 import { step } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-given';
-import * as populateModule from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
-
-import type { CcdCase } from '@services/ccdCase.interface';
+import * as populateModule from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),
@@ -11,9 +9,7 @@ jest.mock('../../../../main/modules/i18n', () => ({
 }));
 
 describe('confirmation-of-notice-given step', () => {
-  const buildCcdSpy = jest
-    .spyOn(populateModule, 'buildCcdCaseForPossessionClaimResponse')
-    .mockResolvedValue({} as CcdCase);
+  const buildCcdSpy = jest.spyOn(populateModule, 'saveDraftDefendantResponse').mockResolvedValue(undefined);
 
   const createBaseReqRes = () => {
     const req = {

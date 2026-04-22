@@ -1,9 +1,9 @@
 import { createFormStep } from '../../../modules/steps';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-text-message',
@@ -40,33 +40,20 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  getInitialFormData: req => {
-    const contactByText = req.res?.locals?.validatedCase?.defendantResponsesContactByText;
-
-    if (contactByText === 'YES') {
-      return { contactByTextMessage: 'yes' };
-    }
-
-    if (contactByText === 'NO') {
-      return { contactByTextMessage: 'no' };
-    }
-
-    return {};
-  },
   beforeRedirect: async req => {
-    const textForm = req.body as Record<string, unknown>;
-    const contactByTextMessage = textForm.contactByTextMessage as string | undefined;
-
-    if (!contactByTextMessage) {
-      return;
+    const response = buildDraftDefendantResponse(req);
+    // Reads from session for now - session removal is a separate ticket
+    const textForm = req.session.formData?.['contact-preferences-text-message'];
+    if (textForm) {
+      response.defendantResponses.contactByText = textForm.contactByTextMessage === 'yes' ? 'YES' : 'NO';
+    } else {
+      delete response.defendantResponses.contactByText;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        contactByText: contactByTextMessage === 'yes' ? 'YES' : 'NO',
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id || '',
+      response
+    );
   },
 });

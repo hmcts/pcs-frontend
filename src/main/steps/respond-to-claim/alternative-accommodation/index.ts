@@ -1,10 +1,11 @@
+import { createFormStep } from '../../../modules/steps';
 import { formatDatePartsToISODate, parseISOToDateParts } from '../../utils';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
+import type { YesNoNotSureValue } from '@services/ccdCase.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
@@ -67,33 +68,38 @@ export const step: StepDefinition = createFormStep({
     return result;
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const confirmValue = req.body?.confirmAlternativeAccommodation as string | undefined;
+    const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', notSure: 'NOT_SURE' };
 
-    const householdCircumstances: Record<string, unknown> = {};
+    if (confirmValue && enumMapping[confirmValue]) {
+      response.defendantResponses.householdCircumstances.alternativeAccommodation = enumMapping[confirmValue];
 
-    if (confirmValue === 'yes') {
-      householdCircumstances.alternativeAccommodation = 'YES';
-      const day =
-        (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-day'] as string | undefined) ?? '';
-      const month =
-        (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-month'] as string | undefined) ?? '';
-      const year =
-        (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-year'] as string | undefined) ?? '';
-      const isoDate = formatDatePartsToISODate(day, month, year);
-      if (isoDate) {
-        householdCircumstances.alternativeAccommodationTransferDate = isoDate;
+      if (confirmValue === 'yes') {
+        const day =
+          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-day'] as string | undefined) ?? '';
+        const month =
+          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-month'] as string | undefined) ??
+          '';
+        const year =
+          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-year'] as string | undefined) ?? '';
+        const isoDate = formatDatePartsToISODate(day, month, year);
+        if (isoDate) {
+          response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate = isoDate;
+        }
+      } else {
+        delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
       }
-    } else if (confirmValue === 'no') {
-      householdCircumstances.alternativeAccommodation = 'NO';
-    } else if (confirmValue === 'notSure') {
-      householdCircumstances.alternativeAccommodation = 'NOT_SURE';
+    } else {
+      delete response.defendantResponses.householdCircumstances.alternativeAccommodation;
+      delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
     }
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances,
-      },
-    };
 
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await ccdCaseService.saveDraftDefendantResponse(
+      req.session?.user?.accessToken,
+      req.res?.locals.validatedCase?.id || '',
+      response
+    );
   },
 });
