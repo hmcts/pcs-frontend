@@ -10254,14 +10254,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:6.1.3":
-  version: 6.1.3
-  resolution: "jose@npm:6.1.3"
-  checksum: 10/9626c51e8c3792b505e954f3094698c182208617b62dfb27269230f31e57560b083985ed8128b8a9753aa92daf18d3a2341cc826d149503f14569abe87d42389
-  languageName: node
-  linkType: hard
-
-"jose@npm:^6.2.2":
+"jose@npm:6.2.2, jose@npm:^6.2.2":
   version: 6.2.2
   resolution: "jose@npm:6.2.2"
   checksum: 10/fd66f24916d2507dbde0ca77ede86377e7d7eae42c7f94db0dfd014b0c6ce5041365dc8e757a44e54cd7606ea5e9c757aa544b51e55cb8a736e83320db1b8258
@@ -12015,7 +12008,7 @@ __metadata:
     jest-environment-jsdom: "npm:30.3.0"
     jest-html-reporter: "npm:4.4.0"
     jest-pact: "npm:0.13.0"
-    jose: "npm:6.1.3"
+    jose: "npm:6.2.2"
     lint-staged: "npm:15.5.2"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
