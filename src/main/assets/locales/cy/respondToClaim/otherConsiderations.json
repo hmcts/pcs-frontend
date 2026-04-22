@@ -4,6 +4,7 @@
   "otherConsiderationsDetailsLabel": "cyGive details about what else you want to tell the court",
   "errors": {
     "otherConsiderations": "cySelect if there is anything else you want to tell the court",
-    "otherConsiderationsDetails": "cyEnter details about what you want to tell the court"
+    "otherConsiderationsDetails": "cyEnter details about what you want to tell the court",
+    "otherConsiderationsInvalid": "cyGive details about what else you want to tell the court must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }
