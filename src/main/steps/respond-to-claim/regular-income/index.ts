@@ -1,13 +1,7 @@
 import type { Request } from 'express';
 
 import type { PossessionClaimResponse } from '../../../services/ccdCase.interface';
-import {
-  fromYesNoEnum,
-  getValidatedCaseHouseholdCircumstances,
-  isRegularIncomeUcUnticked,
-  setRegularIncomeUcUnticked,
-  toYesNoEnum,
-} from '../../utils';
+import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -32,7 +26,6 @@ export const step: StepDefinition = createFormStep({
     const existingUcAnswer = fromYesNoEnum(existingHouseholdCircumstances?.universalCredit);
 
     if (universalCreditSelected) {
-      setRegularIncomeUcUnticked(req, false);
       if (existingUcAnswer === 'yes') {
         return;
       }
@@ -44,18 +37,9 @@ export const step: StepDefinition = createFormStep({
         },
       };
       await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
-      return;
-    }
-
-    if (existingUcAnswer === 'yes') {
-      setRegularIncomeUcUnticked(req, true);
     }
   },
   getInitialFormData: req => {
-    if (isRegularIncomeUcUnticked(req)) {
-      return {};
-    }
-
     const householdCircumstances = getValidatedCaseHouseholdCircumstances(req);
 
     if (fromYesNoEnum(householdCircumstances?.universalCredit) === 'yes') {

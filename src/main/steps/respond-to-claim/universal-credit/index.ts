@@ -5,8 +5,6 @@ import {
   formatDatePartsToISODate,
   fromYesNoEnum,
   getValidatedCaseHouseholdCircumstances,
-  isRegularIncomeUcUnticked,
-  setRegularIncomeUcUnticked,
   toYesNoEnum,
 } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
@@ -22,9 +20,6 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   beforeRedirect: async req => {
     const selection = req.body?.haveAppliedForUniversalCredit as string | undefined;
-    if (selection === 'yes' || selection === 'no') {
-      setRegularIncomeUcUnticked(req, false);
-    }
     if (selection === 'no') {
       const possessionClaimResponse: PossessionClaimResponse = {
         defendantResponses: {
@@ -77,10 +72,6 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   getInitialFormData: req => {
-    if (isRegularIncomeUcUnticked(req)) {
-      return {};
-    }
-
     const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
       | { universalCredit?: string; ucApplicationDate?: string }
       | undefined;

@@ -162,10 +162,7 @@ describe('respond-to-claim universal-credit step', () => {
 
     type UcStepRenderData = Record<string, unknown> & { fieldValues: Record<string, unknown> };
 
-    const render = async (
-      hc: Record<string, unknown> | undefined,
-      sessionOverrides?: Record<string, { regularIncomeUcUnticked?: boolean }>
-    ): Promise<UcStepRenderData> => {
+    const render = async (hc: Record<string, unknown> | undefined): Promise<UcStepRenderData> => {
       const req = createReq({
         res: {
           locals: {
@@ -175,12 +172,12 @@ describe('respond-to-claim universal-credit step', () => {
         session: {
           formData: {},
           ccdCase: { id: '1234567890123456' },
-          respondToClaimCaseOverrides: sessionOverrides,
         },
       }) as Request;
+      const locals = req.res?.locals ?? {};
       const res = {
         render: jest.fn(),
-        locals: req.res!.locals,
+        locals,
       } as unknown as Response;
       req.res = res;
 
@@ -216,15 +213,6 @@ describe('respond-to-claim universal-credit step', () => {
     it('does not pre-populate when nothing is saved', async () => {
       const data = await render(undefined);
       expect(data.fieldValues.haveAppliedForUniversalCredit).toBeFalsy();
-    });
-
-    it('does not pre-populate when the user has unticked UC on the regular-income step', async () => {
-      const data = await render(
-        { universalCredit: 'YES', ucApplicationDate: '2024-02-10' },
-        { '1234567890123456': { regularIncomeUcUnticked: true } }
-      );
-      expect(data.fieldValues.haveAppliedForUniversalCredit).toBeFalsy();
-      expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toBeFalsy();
     });
   });
 

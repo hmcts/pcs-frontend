@@ -41,7 +41,6 @@ import { step } from '../../../../main/steps/respond-to-claim/regular-income';
 type SessionShape = {
   formData: Record<string, unknown>;
   ccdCase: { id: string };
-  respondToClaimCaseOverrides?: Record<string, { regularIncomeUcUnticked?: boolean }>;
 };
 
 describe('respond-to-claim regular-income step', () => {
@@ -133,18 +132,13 @@ describe('respond-to-claim regular-income step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
   });
 
-  it('POST clears the session-level unticked override when the user re-ticks UC', async () => {
+  it('POST does not mutate session state when user re-ticks UC', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
         action: 'continue',
         regularIncome: 'universalCredit',
       },
-      session: {
-        formData: {},
-        ccdCase: { id: caseReference },
-        respondToClaimCaseOverrides: { [caseReference]: { regularIncomeUcUnticked: true } },
-      } as SessionShape,
       res: {
         locals: {
           validatedCase: {
@@ -172,8 +166,7 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    const overrides = (req.session as SessionShape).respondToClaimCaseOverrides?.[caseReference];
-    expect(overrides?.regularIncomeUcUnticked).toBeUndefined();
+    expect(req.session.formData).toEqual({});
     expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
   });
 
@@ -195,11 +188,10 @@ describe('respond-to-claim regular-income step', () => {
     await step.postController.post(req, res, next);
 
     expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
-    const overrides = (req.session as SessionShape).respondToClaimCaseOverrides?.[caseReference];
-    expect(overrides?.regularIncomeUcUnticked).toBeUndefined();
+    expect(req.session.formData).toEqual({});
   });
 
-  it('POST sets session-level unticked override when the user unchecks the UC checkbox over an existing YES', async () => {
+  it('POST does not persist additional state when user unchecks UC over an existing YES', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -233,11 +225,10 @@ describe('respond-to-claim regular-income step', () => {
     await step.postController.post(req, res, next);
 
     expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
-    const overrides = (req.session as SessionShape).respondToClaimCaseOverrides?.[caseReference];
-    expect(overrides?.regularIncomeUcUnticked).toBe(true);
+    expect(req.session.formData).toEqual({});
   });
 
-  it('POST also sets the unticked override when the draft already has a UC date', async () => {
+  it('POST does not persist additional state when draft already has a UC date', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -272,8 +263,7 @@ describe('respond-to-claim regular-income step', () => {
     await step.postController.post(req, res, next);
 
     expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
-    const overrides = (req.session as SessionShape).respondToClaimCaseOverrides?.[caseReference];
-    expect(overrides?.regularIncomeUcUnticked).toBe(true);
+    expect(req.session.formData).toEqual({});
   });
 
   it('POST does not touch an explicit NO when user leaves UC unchecked', async () => {
@@ -310,7 +300,6 @@ describe('respond-to-claim regular-income step', () => {
     await step.postController.post(req, res, next);
 
     expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
-    const overrides = (req.session as SessionShape).respondToClaimCaseOverrides?.[caseReference];
-    expect(overrides?.regularIncomeUcUnticked).toBeUndefined();
+    expect(req.session.formData).toEqual({});
   });
 });
