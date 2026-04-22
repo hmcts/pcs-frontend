@@ -16,6 +16,14 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
+function getCounterclaimFeePreviousStep(req: Request): string {
+  const claimType =
+    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim?.claimType;
+  return claimType === 'PAYMENT_OR_COMPENSATION' || claimType === 'BOTH'
+    ? 'counterclaim-specific-sum'
+    : 'counterclaim-what-are-you-claiming-for';
+}
+
 function getContactByTelephoneAnswer(
   req: Request,
   currentStepData: Record<string, unknown> = {}
@@ -66,6 +74,9 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'counter-claim',
+    'counterclaim-what-are-you-claiming-for',
+    'counterclaim-specific-sum',
+    'counterclaim-fee',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -388,14 +399,33 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'counter-claim': {
-      defaultNext: 'payment-interstitial',
+      defaultNext: 'counterclaim-what-are-you-claiming-for',
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
-    'payment-interstitial': {
+    'counterclaim-what-are-you-claiming-for': {
       previousStep: 'counter-claim',
+      routes: [
+        {
+          condition: (_req: Request, _formData: Record<string, unknown>, currentStepData: Record<string, unknown>) =>
+            Promise.resolve(currentStepData.claimType === 'money' || currentStepData.claimType === 'both'),
+          nextStep: 'counterclaim-specific-sum',
+        },
+      ],
+      defaultNext: 'counterclaim-fee',
+    },
+    'counterclaim-specific-sum': {
+      previousStep: 'counterclaim-what-are-you-claiming-for',
+      defaultNext: 'counterclaim-fee',
+    },
+    'counterclaim-fee': {
+      previousStep: (req: Request) => getCounterclaimFeePreviousStep(req),
+      defaultNext: 'payment-interstitial',
+    },
+    'payment-interstitial': {
+      previousStep: 'counterclaim-fee',
       defaultNext: 'repayments-made',
     },
     'repayments-made': {
