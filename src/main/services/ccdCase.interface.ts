@@ -18,6 +18,8 @@ export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
 
 export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
+export type PenceAmount = string;
+
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
   additionalCircumstancesDetails?: string;
@@ -31,7 +33,22 @@ export interface HouseholdCircumstances {
   alternativeAccommodationTransferDate?: string;
   otherTenants?: YesNoValue;
   otherTenantsDetails?: string;
+  shareIncomeExpenseDetails?: YesNoValue;
+  incomeFromJobs?: YesNoValue;
+  incomeFromJobsAmount?: PenceAmount;
+  incomeFromJobsFrequency?: FrequencyValue;
+  pension?: YesNoValue;
+  pensionAmount?: PenceAmount;
+  pensionFrequency?: FrequencyValue;
   universalCredit?: YesNoValue;
+  universalCreditAmount?: PenceAmount;
+  universalCreditFrequency?: FrequencyValue;
+  ucApplicationDate?: string;
+  otherBenefits?: YesNoValue;
+  otherBenefitsAmount?: PenceAmount;
+  otherBenefitsFrequency?: FrequencyValue;
+  moneyFromElsewhere?: YesNoValue;
+  moneyFromElsewhereDetails?: string;
   ucApplicationDate?: string | null;
   priorityDebts?: YesNoValue;
   debtTotal?: string;

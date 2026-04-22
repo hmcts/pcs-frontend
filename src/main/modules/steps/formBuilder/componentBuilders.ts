@@ -124,6 +124,9 @@ export function buildComponentConfig({
           attributes: {},
         };
       }
+      if (field.suffix) {
+        component.suffix = field.suffix;
+      }
       componentType = 'input';
       break;
     }
