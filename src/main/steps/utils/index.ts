@@ -17,7 +17,6 @@ export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousSt
 export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
 export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';
 export { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
-export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export {
   shouldRouteToPriorityDebts,
   shouldRouteToUniversalCreditQuestion,
