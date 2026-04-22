@@ -176,7 +176,7 @@ export class GenAppsAction implements IAction {
       }
     }
 
-    await test.step('Retrieved CYA values', async () => {
+    await test.step('Retrieved CYA values can be found in the console logs', async () => {
       console.log('\nThe Data Retrieved From Check Your Answers Page Are As Follows');
       const lines: string[] = [];
       for (const [key, value] of cyaMap.entries()) {
