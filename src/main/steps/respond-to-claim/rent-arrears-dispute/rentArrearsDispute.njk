@@ -20,12 +20,13 @@
   {% endif %}
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
-
-  <div class="govuk-inset-text">
-    <p class="govuk-body">{{ insetIntroText }}</p>
-    <p class="govuk-body">{{ insetDetailsText }}</p>
-    <p class="govuk-body">{{ insetConditionalYesText }}</p>
-  </div>
+  {% if not isLegalRepresentative %}
+    <div class="govuk-inset-text">
+      <p class="govuk-body">{{ insetIntroText }}</p>
+      <p class="govuk-body">{{ insetDetailsText }}</p>
+      <p class="govuk-body">{{ insetConditionalYesText }}</p>
+    </div>
+  {% endif %}
 
   <h2 class="govuk-heading-s">{{ amountOwedHeading }}</h2>
 

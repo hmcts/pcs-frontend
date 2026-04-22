@@ -1,0 +1,22 @@
+{
+  "amountOwedHeading": "cyAmount the defendant owes in rent arrears given by {{claimantName}}:",
+  "rentArrearsQuestion": "cyDoes the defendant owe this amount in rent arrears?",
+  "rentArrearsOptions": {
+    "notSure": "cyDefendant is not sure"
+  },
+  "rentArrearsAmountCorrection": {
+    "label": "cyHow much does the defendant believe they owe in rent arrears?"
+  },
+  "errors": {
+    "rentArrears": {
+      "required": "cySelect if the defendant owes this amount in rent arrears"
+    },
+    "rentArrearsAmountCorrection": {
+      "required": "cyEnter the amount the defendant believes they owe in rent arrears",
+      "negativeAmount": "cyThe amount the defendant believes they owe in rent arrears must be £0.00 or above",
+      "largeAmount": "cyThe amount the defendant believes they owe in rent arrears must be less than £1 billion",
+      "invalidFormat": "cyEnter how much the defendant believes they owe in rent arrears, in the correct format (e.g. if the defendant owes £148, please write £148.00)"
+    },
+    "rentArrears.rentArrearsAmountCorrection": "cyHow much does the defendant believe they owe in rent arrears?"
+  }
+}
