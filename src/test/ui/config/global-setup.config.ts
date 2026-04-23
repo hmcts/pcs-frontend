@@ -19,6 +19,13 @@ const clearEmvLocks = (): void => {
   fs.rmSync(lockDir, { recursive: true, force: true });
 };
 
+/** Clears PFT lock dir on local runs only (skipped when `CI` is set). */
+export function clearEmvLocksIfLocal(): void {
+  if (!process.env.CI) {
+    clearEmvLocks();
+  }
+}
+
 export const getS2SToken = async (): Promise<void> => {
   process.env.S2S_URL = s2STokenApiData.s2sUrl;
   process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({

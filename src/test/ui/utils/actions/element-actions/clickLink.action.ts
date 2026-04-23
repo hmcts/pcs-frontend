@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { VERY_SHORT_TIMEOUT } from '../../../../../../playwright.sauce.config';
+import { VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
 import { IAction } from '../../interfaces';
 
 export class ClickLinkAction implements IAction {

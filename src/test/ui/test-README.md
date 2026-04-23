@@ -145,11 +145,7 @@ yarn test:functional
 
 ### PFT test-env debug logging
 
-In [`playwright.sauce.config.ts`](../../../playwright.sauce.config.ts), `enable_pft_debug_log` is **`false` by default**. Set it to **`true`** if you want environment variables to be printed in the console while you debug.
-
-```ts
-export const enable_pft_debug_log = false;
-```
+In root [`playwright.config.ts`](../../../playwright.config.ts), `enable_pft_debug_log` is **`false` by default**. Set it to **`true`** if you want environment variables to be printed in the console while you debug. Sauce runs use [`playwright.sauce.config.ts`](../../../playwright.sauce.config.ts) for discovery only; feature flags still come from `playwright.config` imports in test code.
 
 ## 8. Troubleshooting
 

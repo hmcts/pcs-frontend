@@ -1,3 +1,9 @@
+/**
+ * Sauce Labs / saucectl only (see `.sauce/config-sauce-nightly.yml` → `configFile`).
+ * - `testDir` is limited to cross-browser specs (tunnel: tokens in spec `beforeEach`).
+ * - No `globalSetup`: IDAM/S2S must run from the worker after the tunnel is up.
+ * - Jenkins / local UI tests use root `playwright.config.ts` + `globalSetup` there.
+ */
 import * as process from 'node:process';
 import path from 'path';
 
@@ -7,30 +13,6 @@ import dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
-export const VERY_SHORT_TIMEOUT = 1000;
-export const SHORT_TIMEOUT = 5000;
-export const actionRetries = 10;
-export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
-
-const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
-if (enable_all_page_functional_tests.toLowerCase() === 'true') {
-  process.env.ENABLE_CONTENT_VALIDATION = 'true';
-  process.env.ENABLE_VISIBILITY_VALIDATION = 'true';
-  process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true';
-  process.env.ENABLE_NAVIGATION_TESTS = 'true';
-}
-
-export const enable_pft_debug_log = false;
-export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'false';
-export const enable_visibility_validation = process.env.ENABLE_VISIBILITY_VALIDATION || 'false';
-export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
-export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
-export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
-const is_smoke_run = process.env.npm_lifecycle_event === 'test:smoke';
-const junit_result_output =
-  process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
-  (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
-// Sauce YAML sets these; local/Jenkins VM runs leave them unset.
 const skipAllureReporter = process.env.PLAYWRIGHT_SKIP_ALLURE === 'true';
 const sauceFullJourneyArtifacts = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
 
@@ -46,23 +28,13 @@ const captureSettings = sauceFullJourneyArtifacts
       trace: 'on-first-retry' as const,
     };
 
-/** Build test file globs from E2E_SPEC (comma or semicolon keywords). Empty = run all specs. */
-function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
-  const keys = raw
-    ?.split(/[,;]/)
-    .map(k => k.trim())
-    .filter(Boolean);
-  return keys?.length ? keys.map(k => `**/*${k}*.spec.ts`) : undefined;
-}
-
-const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
-// Tags come from Jenkins choices or PR labels. Unset -> @nightly; empty -> no grep.
-const e2eTag = process.env.E2E_TEST_SCOPE ?? '@smoke';
+const is_smoke_run = process.env.npm_lifecycle_event === 'test:smoke';
+const junit_result_output =
+  process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
+  (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
 
 export default defineConfig({
-  testDir: './src/test/ui',
-  ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
-  ...(e2eTag ? { grep: new RegExp(e2eTag) } : {}),
+  testDir: './src/test/ui/sauceCrossbrowser',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -71,6 +43,7 @@ export default defineConfig({
   expect: { timeout: 10 * 1000 },
   use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
+  globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
   reporter: [
     ['list'],
     ...(process.env.CI ? [['junit', { outputFile: junit_result_output }] as const] : []),
@@ -91,12 +64,7 @@ export default defineConfig({
   ],
   projects: [
     {
-      name: 'setup',
-      testMatch: '**/setup/**/*.setup.ts',
-    },
-    {
       name: 'chrome',
-      dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
@@ -106,87 +74,38 @@ export default defineConfig({
         headless: !!process.env.CI,
       },
     },
-    ...(process.env.CI
-      ? [
-          {
-            name: 'firefox',
-            dependencies: ['setup'],
-            use: {
-              ...devices['Desktop Firefox'],
-              channel: 'firefox',
-              ...captureSettings,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'webkit',
-            dependencies: ['setup'],
-            use: {
-              ...devices['Desktop Safari'],
-              channel: 'webkit',
-              ...captureSettings,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'edge',
-            dependencies: ['setup'],
-            use: {
-              ...devices['Desktop Edge'],
-              channel: 'msedge',
-              ...captureSettings,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'MicrosoftEdge',
-            dependencies: ['setup'],
-            use: {
-              ...devices['Desktop Edge'],
-              ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
-              ...captureSettings,
-              javaScriptEnabled: true,
-              viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'mobile-android',
-            dependencies: ['setup'],
-            use: {
-              ...devices['Pixel 5'],
-              ...captureSettings,
-              javaScriptEnabled: true,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'mobile-ios',
-            dependencies: ['setup'],
-            use: {
-              ...devices['iPhone 12'],
-              ...captureSettings,
-              javaScriptEnabled: true,
-              headless: !!process.env.CI,
-            },
-          },
-          {
-            name: 'mobile-ipad',
-            dependencies: ['setup'],
-            use: {
-              ...devices['iPad Pro 11'],
-              ...captureSettings,
-              javaScriptEnabled: true,
-              headless: !!process.env.CI,
-            },
-          },
-        ]
-      : []),
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        channel: 'firefox',
+        ...captureSettings,
+        javaScriptEnabled: true,
+        viewport: DEFAULT_VIEWPORT,
+        headless: !!process.env.CI,
+      },
+    },
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        channel: 'webkit',
+        ...captureSettings,
+        javaScriptEnabled: true,
+        viewport: DEFAULT_VIEWPORT,
+        headless: !!process.env.CI,
+      },
+    },
+    {
+      name: 'MicrosoftEdge',
+      use: {
+        ...devices['Desktop Edge'],
+        ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
+        ...captureSettings,
+        javaScriptEnabled: true,
+        viewport: DEFAULT_VIEWPORT,
+        headless: !!process.env.CI,
+      },
+    },
   ],
 });

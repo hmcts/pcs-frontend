@@ -1,3 +1,4 @@
+import { getAccessToken, getS2SToken } from '../config/global-setup.config';
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
@@ -22,11 +23,9 @@ import {
   nonRentArrearsDispute,
   priorityDebtDetails,
   priorityDebts,
-  rentArrears,
   repaymentsAgreed,
   repaymentsMade,
   startNow,
-  tenancyDateDetails,
   tenancyTypeDetails,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
@@ -37,7 +36,6 @@ import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
-import { getAccessToken, getS2SToken } from '../config/global-setup.config';
 
 const home_url = process.env.TEST_URL;
 let claimantName: string;

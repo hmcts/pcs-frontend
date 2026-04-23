@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 // eslint-disable-next-line import/no-named-as-default
 import Axios from 'axios';
 
-import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.sauce.config';
+import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
 import { fetchPINsApiData, validateAccessCodeApiData } from '../../../data/api-data';
 import { IAction } from '../../interfaces';
 
