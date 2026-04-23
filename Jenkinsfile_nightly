@@ -4,6 +4,11 @@ properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
+    text(
+      name: 'MANUAL_BUILD_REASON',
+      defaultValue: 'Daily nightly schedule run',
+      description: 'Why this build was triggered. For manual runs, enter a short note (e.g. verify a fix, extra browser coverage). Scheduled runs keep the default.'
+    ),
     choice(
       name: 'ENVIRONMENT',
       choices: ['aat', 'preview'],
@@ -83,6 +88,24 @@ properties([
       name: 'SAUCE_WIN11_FIREFOX',
       defaultValue: true,
       description: 'Sauce: Windows 11 — Firefox.'
+      name: 'PLAYWRIGHT_SPEC',
+      defaultValue: '',
+      description: 'Spec file filter: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate keywords with comma or semicolon. Ex.: respondToAClaim | respondToAClaim,makeAnApplication. Blank = all specs. Default: empty.'
+    ),
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
+      description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
+    ),
+    choice(
+      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
+      choices: ['true', 'false'],
+      description: 'Run page functional tests (content, errors, navigation). Default: true.'
+    ),
+    choice(
+      name: 'ENABLE_AXE_AUDIT',
+      choices: ['true', 'false'],
+      description: 'Run axe audits during E2E. Default: true.'
     ),
   ])
 ])
@@ -161,10 +184,14 @@ def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
   env.SAUCE_GREP = (params.SAUCE_GREP?.trim()) ?: '@crossbrowser'
+  def tag = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@nightly'
+  env.E2E_TEST_SCOPE = tag
+  env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
+  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
+  env.ENABLE_AXE_AUDIT = params.ENABLE_AXE_AUDIT
 }
 
 def runE2ETests(yarnBuilder) {
-  env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
   def e2eMatrix = [
     [flag: 'CHROME_TESTS', project: 'chrome', browser: 'Chrome', label: 'Desktop Chrome'],
     [flag: 'FIREFOX_TESTS', project: 'firefox', browser: 'Firefox', label: 'Desktop Firefox'],
