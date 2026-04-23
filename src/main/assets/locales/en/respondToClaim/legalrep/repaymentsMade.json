@@ -1,5 +1,10 @@
 {
   "caseNumber": "Case number: {{caseNumber}}",
   "heading": "Previous payments",
-  "question": "Has the defendant paid any money to {{claimantName}} since {{claimIssueDate}}?"
+  "question": "Has the defendant paid any money to {{claimantName}} since {{claimIssueDate}}?",
+  "textAreaLabel": "Give details about how much the defendant paid and when",
+  "errors": {
+    "repaymentsInfo": "Give details about how much the defendant paid and when",
+    "confirmRepaymentsMade": "Select if the defendant has paid any money to {{claimantName}} since {{claimIssueDate}}"
+  }
 }
