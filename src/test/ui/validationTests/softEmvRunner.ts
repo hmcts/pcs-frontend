@@ -1,6 +1,6 @@
 import type { TestInfo } from '@playwright/test';
 
-import { enable_error_message_validation } from '../../../../playwright.config';
+import { enable_error_message_validation_new } from '../../../../playwright.config';
 
 function attachmentSlug(step: string): string {
   return `emv-${step.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
@@ -15,7 +15,7 @@ export function createSoftEmvRunner(testInfo: TestInfo) {
 
   /** Runs a PFT when ENABLE_ERROR_MESSAGES_VALIDATION=true; swallows errors and records them for the end assert. */
   async function runSoftPftCheck(step: string, pft: () => Promise<void>): Promise<void> {
-    if (enable_error_message_validation !== 'true') {
+    if (enable_error_message_validation_new !== 'true') {
       return;
     }
     try {
