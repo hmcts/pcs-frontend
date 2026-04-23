@@ -1,0 +1,5 @@
+{
+  "caseNumber": "Case number: {{caseNumber}}",
+  "heading": "Previous payments",
+  "question": "Has the defendant paid any money to {{claimantName}} since {{claimIssueDate}}?"
+}
