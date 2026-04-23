@@ -129,8 +129,9 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
+    console.log(`hint: ` + correspondenceAddress.correspondenceAddressConfirmHintText());
     await performAction('clickRadioButton', {
-      question: correspondenceAddress.correspondenceAddressConfirmHintText,
+      question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
     });
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
@@ -312,6 +313,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
+    console.log(`some label` + noticeDateWhenProvided.noticeGivenDateLabel);
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
