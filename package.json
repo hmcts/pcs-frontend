@@ -101,7 +101,7 @@
     "@eslint/plugin-kit": "0.7.1",
     "@hmcts/playwright-common": "1.1.2",
     "@pact-foundation/pact": "15.0.1",
-    "@pact-foundation/pact-cli": "16.1.7",
+    "@pact-foundation/pact-cli": "18.0.0",
     "@playwright/test": "1.59.1",
     "@types/body-parser": "1.19.6",
     "@types/config": "3.3.5",
@@ -110,7 +110,7 @@
     "@types/express": "5.0.6",
     "@types/express-session": "1.19.0",
     "@types/git-rev-sync": "2.0.2",
-    "@types/glob": "8.1.0",
+    "@types/glob": "9.0.0",
     "@types/jest": "29.5.14",
     "@types/lodash": "4.17.24",
     "@types/luxon": "3.7.1",
@@ -183,5 +183,5 @@
     "*.{js,ts}": "eslint --cache --fix",
     "*.{js,ts,css,md,html,json}": "prettier --write"
   },
-  "packageManager": "yarn@4.12.0"
+  "packageManager": "yarn@4.14.1"
 }
