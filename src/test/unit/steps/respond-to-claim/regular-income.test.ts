@@ -127,4 +127,34 @@ describe('respond-to-claim regular-income step', () => {
     expect(hc.universalCreditAmount).toBeNull();
     expect(hc.universalCreditFrequency).toBeNull();
   });
+
+  it('GET does not preselect UC income when applied-for-UC answer is NO', () => {
+    const req = createReq({
+      res: {
+        locals: {
+          validatedCase: {
+            id: caseReference,
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: {
+                    universalCredit: 'NO',
+                    universalCreditAmount: '20000',
+                    universalCreditFrequency: 'MONTHLY',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const initialData =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (step as any).getInitialFormData ? (step as any).getInitialFormData(req) : {};
+    expect(initialData.regularIncome).toBeUndefined();
+    expect(initialData['regularIncome.universalCreditAmount']).toBeUndefined();
+    expect(initialData['regularIncome.universalCreditFrequency']).toBeUndefined();
+  });
 });

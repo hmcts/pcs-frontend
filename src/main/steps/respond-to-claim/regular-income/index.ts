@@ -109,7 +109,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Universal Credit
-    if (hc.universalCreditAmount || hc.universalCreditFrequency) {
+    const appliedForUniversalCredit = fromYesNoEnum(hc.universalCredit);
+    if ((hc.universalCreditAmount || hc.universalCreditFrequency) && appliedForUniversalCredit !== 'no') {
       selectedIncome.push('universalCredit');
       if (hc.universalCreditAmount) {
         formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);

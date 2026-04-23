@@ -8,6 +8,11 @@ export const getPreviousStepForPriorityDebts = async (
   req: Request,
   _formData?: Record<string, unknown>
 ): Promise<string> => {
+  const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
+  if (selectedUniversalCredit) {
+    return 'what-regular-income-do-you-receive';
+  }
+
   const householdCircumstances = getValidatedCaseHouseholdCircumstances(req);
   const ucApplicationDate = householdCircumstances?.ucApplicationDate;
   const appliedForUc = fromYesNoEnum(householdCircumstances?.universalCredit);
@@ -18,6 +23,5 @@ export const getPreviousStepForPriorityDebts = async (
     return 'have-you-applied-for-universal-credit';
   }
 
-  const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
-  return selectedUniversalCredit ? 'what-regular-income-do-you-receive' : 'have-you-applied-for-universal-credit';
+  return 'have-you-applied-for-universal-credit';
 };
