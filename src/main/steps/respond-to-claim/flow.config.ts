@@ -14,7 +14,7 @@ import {
   isNoticeServed,
   isTenancyStartDateKnown,
   isUniversalCreditSelected,
-  isWelshProperty,
+  isWalesProperty,
 } from '../utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
@@ -180,11 +180,11 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial': {
       routes: [
         {
-          condition: async (req: Request) => isWelshProperty(req),
+          condition: async (req: Request) => isWalesProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !(await isWelshProperty(req)),
+          condition: async (req: Request) => !isWalesProperty(req),
           nextStep: 'tenancy-type-details',
         },
       ],
@@ -213,8 +213,8 @@ export const flowConfig: JourneyFlowConfig = {
         },
       ],
       previousStep: async (req: Request) => {
-        const welshProperty = await isWelshProperty(req);
-        if (welshProperty) {
+        const walesProperty = isWalesProperty(req);
+        if (walesProperty) {
           return 'written-terms';
         }
         return 'dispute-claim-interstitial';
