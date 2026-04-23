@@ -83,8 +83,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Rent arrears introductory — notice date unknown (validation tests) @nightly @error', () => {
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
-    const softEmv = createSoftEmvRunner(test.info());
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async ({
+    page,
+  }) => {
+    const softEmv = createSoftEmvRunner(test.info(), { page });
 
     await softEmv.runSoftPftCheck('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
@@ -180,6 +182,8 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
     );
 
     await softEmv.runSoftPftCheck('languageUsed', languageUsedErrorValidation);
+    //added incorrect error message validation
+    await softEmv.runSoftPftCheck('languageUsed', yourExceptionalHardShipErrorValidation);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
