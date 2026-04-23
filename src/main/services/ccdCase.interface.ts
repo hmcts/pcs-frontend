@@ -193,6 +193,7 @@ export interface CcdCaseData {
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
+  otherLicenceTypeDetails?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
@@ -250,4 +251,7 @@ export enum GenAppType {
 export interface CitizenGenAppRequest {
   applicationType: GenAppType;
   within14Days?: YesNoValue;
+  needHwf?: YesNoValue;
+  appliedForHwf?: YesNoValue;
+  hwfReference?: string;
 }

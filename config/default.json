@@ -102,5 +102,10 @@
   },
   "documentUpload": {
     "maxFileSizeMB": 1024
+  },
+  "dashboard": {
+    "taskRoutes": {
+      "Task.AAA6.Claim.ViewClaim": "/case/:caseReference/view-the-claim"
+    }
   }
 }
