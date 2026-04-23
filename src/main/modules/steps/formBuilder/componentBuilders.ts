@@ -77,6 +77,7 @@ export function buildComponentConfig({
   translatedOptions,
   hasError,
   errorText,
+  erroneousParts,
   index,
   hasTitle,
   t,
@@ -89,6 +90,7 @@ export function buildComponentConfig({
   translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined;
   hasError: boolean;
   errorText: string | undefined;
+  erroneousParts?: ('day' | 'month' | 'year')[];
   index: number;
   hasTitle: boolean;
   t: TFunction;
@@ -177,26 +179,28 @@ export function buildComponentConfig({
       component.namePrefix = field.name;
       component.idPrefix = field.name;
       component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
+      const isPartErroneous = (part: 'day' | 'month' | 'year') =>
+        hasError && (erroneousParts === undefined || erroneousParts.includes(part));
       component.items = [
         {
           name: 'day',
           label: t('date.day', 'Day'),
           value: dateValue.day || '',
-          classes: 'govuk-input--width-2',
+          classes: `govuk-input--width-2${isPartErroneous('day') ? ' govuk-input--error' : ''}`,
           attributes: { maxlength: 2, inputmode: 'numeric' },
         },
         {
           name: 'month',
           label: t('date.month', 'Month'),
           value: dateValue.month || '',
-          classes: 'govuk-input--width-2',
+          classes: `govuk-input--width-2${isPartErroneous('month') ? ' govuk-input--error' : ''}`,
           attributes: { maxlength: 2, inputmode: 'numeric' },
         },
         {
           name: 'year',
           label: t('date.year', 'Year'),
           value: dateValue.year || '',
-          classes: 'govuk-input--width-4',
+          classes: `govuk-input--width-4${isPartErroneous('year') ? ' govuk-input--error' : ''}`,
           attributes: { maxlength: 4, inputmode: 'numeric' },
         },
       ];
