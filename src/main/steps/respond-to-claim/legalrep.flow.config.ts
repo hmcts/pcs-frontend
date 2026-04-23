@@ -42,7 +42,6 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-not-provided',
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
-    'your-household-and-circumstances',
     'do-you-have-any-dependant-children',
     'do-you-have-any-other-dependants',
     'do-any-other-adults-live-in-your-home',
@@ -346,17 +345,13 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> =>
             currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
-          nextStep: 'your-household-and-circumstances',
+          nextStep: 'do-you-have-any-dependant-children',
         },
       ],
       previousStep: 'repayments-made',
     },
-    'your-household-and-circumstances': {
-      previousStep: 'repayments-agreed',
-      defaultNext: 'do-you-have-any-dependant-children',
-    },
     'do-you-have-any-dependant-children': {
-      previousStep: 'your-household-and-circumstances',
+      previousStep: 'repayments-agreed',
       defaultNext: 'do-you-have-any-other-dependants',
     },
     'do-you-have-any-other-dependants': {
