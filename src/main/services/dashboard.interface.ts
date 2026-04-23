@@ -11,7 +11,7 @@ export interface DashboardTask {
 }
 
 export interface DashboardTaskGroup {
-  groupId: 'CLAIM' | 'HEARING' | 'JUDGEMENT' | 'NOTICE' | 'RESPONSE' | 'APPLICATIONS';
+  groupId: 'CLAIM' | 'HEARING' | 'JUDGEMENT' | 'NOTICE' | 'RESPONSE' | 'APPLICATIONS' | 'DOCUMENTS';
   tasks: DashboardTask[];
 }
 
