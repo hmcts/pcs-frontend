@@ -1,6 +1,5 @@
 import type { Page, TestInfo } from '@playwright/test';
-import * as allure from 'allure-js-commons';
-import { Status } from 'allure-js-commons';
+import { Status, type StepContext, step as allureStep, logStep } from 'allure-js-commons';
 
 import { enable_error_message_validation_new } from '../../../../playwright.config';
 import { ErrorMessageValidation, type ErrorMessageValidationSnapshot } from '../utils/validations/custom-validations';
@@ -8,8 +7,11 @@ import { ErrorMessageValidation, type ErrorMessageValidationSnapshot } from '../
 import type { EmvExpectedAssertion, EmvStepReportDetail } from './emvReport.types';
 import { startEmvStepCapture, stopEmvStepCapture } from './emvStepCapture';
 
-function titleCaseStep(step: string): string {
-  const spaced = step.replace(/([A-Z])/g, ' $1').replace(/[-_]/g, ' ');
+const READ_ONLY_SKIP_DEFAULT = 'Read-only / informational screen — no field error validation.';
+const EMV_DISABLED_REASON = 'ENABLE_ERROR_MESSAGES_VALIDATION_NEW is not "true".';
+
+function titleCaseStep(key: string): string {
+  const spaced = key.replace(/([A-Z])/g, ' $1').replace(/[-_]/g, ' ');
   return spaced.replace(/\b\w/g, c => c.toUpperCase()).trim();
 }
 
@@ -66,51 +68,49 @@ function buildAutoReport(
   };
 }
 
-async function applyAllureReport(
-  ctx: { parameter: (n: string, v: string) => void | PromiseLike<void> },
-  d: EmvStepReportDetail
-): Promise<void> {
+async function paramNumbered(ctx: StepContext, name: string, lines: string[] | undefined, maxLen = 4000): Promise<void> {
+  if (!lines?.length) {
+    return;
+  }
+  const body = lines.map((line, i) => `${i + 1}. ${line}`).join('\n').slice(0, maxLen);
+  await ctx.parameter(name, body);
+}
+
+async function applyAllureReport(ctx: StepContext, d: EmvStepReportDetail): Promise<void> {
   await ctx.parameter('Overview', d.intent.slice(0, 500));
   if (d.screenTitle) {
     await ctx.parameter('Screen title', d.screenTitle.slice(0, 500));
   }
-  if (d.actionsOrInputs?.length) {
-    await ctx.parameter(
-      'Actions (performAction)',
-      d.actionsOrInputs
-        .map((a, i) => `${i + 1}. ${a}`)
-        .join('\n')
-        .slice(0, 4000)
-    );
-  }
-  if (d.validationSteps?.length) {
-    await ctx.parameter(
-      'Validations (performValidation)',
-      d.validationSteps
-        .map((v, i) => `${i + 1}. ${v}`)
-        .join('\n')
-        .slice(0, 4000)
-    );
-  }
+  await paramNumbered(ctx, 'Actions (performAction)', d.actionsOrInputs);
+  await paramNumbered(ctx, 'Validations (performValidation)', d.validationSteps);
   if (d.expectedAssertions?.length) {
-    await ctx.parameter(
-      'Error message checks',
-      d.expectedAssertions
-        .map((e, i) => `${i + 1}. ${e.label}${e.messageContains ? ` — ${e.messageContains}` : ''}`)
-        .join('\n')
-        .slice(0, 4000)
-    );
+    const body = d.expectedAssertions
+      .map((e, i) => `${i + 1}. ${e.label}${e.messageContains ? ` — ${e.messageContains}` : ''}`)
+      .join('\n')
+      .slice(0, 4000);
+    await ctx.parameter('Error message checks', body);
   }
+}
+
+async function paramPageKeyAndUrl(ctx: StepContext, pageKey: string, pageUrl: string | undefined, urlParam: string): Promise<void> {
+  await ctx.parameter('PFT / page key', pageKey);
+  if (pageUrl) {
+    await ctx.parameter(urlParam, pageUrl);
+  }
+}
+
+function formatThrown(thrown: unknown): string {
+  return thrown instanceof Error ? `${thrown.message}\n${thrown.stack ?? ''}` : String(thrown);
 }
 
 /**
  * Soft EMV: failures collected; `assertFailedStepsAtEnd` throws once if any failed.
- * Each PFT → one `allure.step`; parameters are auto-filled from `performAction` / `performValidation` capture
+ * Each PFT → one Allure `step`; parameters are auto-filled from `performAction` / `performValidation` capture
  * and `ErrorMessageValidation` rows during the PFT (no extra report objects — write PFTs like on master).
  */
 export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvRunnerOptions) {
   const { page } = options ?? {};
-  const failures: { step: string; error: string }[] = [];
+  const failures: { pageKey: string; error: string }[] = [];
   const journeyRows: EmvJourneyRow[] = [];
 
   function currentUrl(): string | undefined {
@@ -143,48 +143,33 @@ export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvR
     }
   }
 
-  /**
-   * Informational / read-only screen: no field-level EMV. Shows as a skipped Allure step and a row in
-   * `emv-journey-summary.md` so the report does not look like a missing PFT.
-   */
+  /** Read-only screen: no field-level EMV; one skipped Allure step + journey row. */
   async function markReadOnlyNoEmv(pageKey: string, note?: string): Promise<void> {
     const pageUrl = currentUrl();
-    const title = `No EMV — ${titleCaseStep(pageKey)} (read-only)`;
-    const skipReason = note ?? 'Read-only / informational screen — no field error validation.';
-    const report: EmvStepReportDetail = {
-      intent: `**Read-only** — \`${pageKey}\` (no EMV)`,
-    };
+    const skipReason = note ?? READ_ONLY_SKIP_DEFAULT;
+    const report: EmvStepReportDetail = { intent: `**Read-only** — \`${pageKey}\` (no EMV)` };
 
-    await allure.step(title, async ctx => {
-      await ctx.parameter('PFT / page key', pageKey);
+    await allureStep(`No EMV — ${titleCaseStep(pageKey)} (read-only)`, async ctx => {
+      await paramPageKeyAndUrl(ctx, pageKey, pageUrl, 'URL');
       await ctx.parameter('EMV', 'Not applicable');
       await ctx.parameter('Note', skipReason);
-      if (pageUrl) {
-        await ctx.parameter('URL', pageUrl);
-      }
+      await ctx.parameter('Outcome', 'SKIPPED');
       journeyRows.push({ pageKey, pageUrl, outcome: 'SKIPPED', skipReason, report });
-      await allure.logStep('EMV not applicable', Status.SKIPPED);
     });
   }
 
-  async function runSoftPftCheck(step: string, pft: () => Promise<void>): Promise<void> {
+  async function runSoftPftCheck(pageKey: string, pft: () => Promise<void>): Promise<void> {
     const pageUrl = currentUrl();
-    const title = `EMV — ${titleCaseStep(step)}`;
 
-    await allure.step(title, async ctx => {
-      await ctx.parameter('PFT / page key', step);
-      if (pageUrl) {
-        await ctx.parameter('URL before', pageUrl);
-      }
+    await allureStep(`EMV — ${titleCaseStep(pageKey)}`, async ctx => {
+      await paramPageKeyAndUrl(ctx, pageKey, pageUrl, 'URL before');
 
       if (enable_error_message_validation_new !== 'true') {
-        const effective = buildAutoReport(step, [], []);
+        const effective = buildAutoReport(pageKey, [], []);
         await applyAllureReport(ctx, effective);
-        const skipReason = 'ENABLE_ERROR_MESSAGES_VALIDATION_NEW is not "true".';
         await ctx.parameter('Outcome', 'SKIPPED');
-        await ctx.parameter('Note', skipReason);
-        journeyRows.push({ pageKey: step, pageUrl, outcome: 'SKIPPED', skipReason, report: effective });
-        await allure.logStep('EMV skipped', Status.SKIPPED);
+        await ctx.parameter('Note', EMV_DISABLED_REASON);
+        journeyRows.push({ pageKey, pageUrl, outcome: 'SKIPPED', skipReason: EMV_DISABLED_REASON, report: effective });
         return;
       }
 
@@ -201,34 +186,46 @@ export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvR
       }
 
       const errorSlice = ErrorMessageValidation.getResultsSliceSince(resultsStart);
-      const effective = buildAutoReport(step, captured, errorSlice);
+      const effective = buildAutoReport(pageKey, captured, errorSlice);
       await applyAllureReport(ctx, effective);
 
-      if (!thrown) {
-        const after = currentUrl();
+      const after = currentUrl();
+      const errorMessageValidationFailed = errorSlice.some(r => !r.passed);
+
+      if (!thrown && !errorMessageValidationFailed) {
         await ctx.parameter('Outcome', 'PASSED');
         await ctx.parameter('URL after', after ?? '—');
-        journeyRows.push({ pageKey: step, pageUrl, pageUrlAfter: after, outcome: 'PASSED', report: effective });
-      } else {
-        const err = thrown;
-        const msg = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err);
-        const after = currentUrl();
-        failures.push({ step, error: msg });
-        journeyRows.push({
-          pageKey: step,
-          pageUrl,
-          pageUrlAfter: after,
-          outcome: 'FAILED',
-          error: msg,
-          report: effective,
-        });
-        await ctx.parameter('Outcome', 'FAILED');
-        await ctx.parameter('URL after', after ?? '—');
-        await ctx.parameter('Failure (truncated)', msg.slice(0, 4000));
-        await allure.logStep('PFT failed (continues)', Status.FAILED, err instanceof Error ? err : new Error(msg));
-        console.warn(`[EMV] "${step}":\n${msg}`);
+        journeyRows.push({ pageKey, pageUrl, pageUrlAfter: after, outcome: 'PASSED', report: effective });
+        return;
       }
+
+      const msg = thrown
+        ? formatThrown(thrown)
+        : errorSlice
+            .filter(r => !r.passed)
+            .map(r => `${r.pageName || pageKey}: ${r.expected}`)
+            .join('\n');
+      const errForLog = thrown instanceof Error ? thrown : new Error(msg);
+      failures.push({ pageKey, error: msg });
+      journeyRows.push({ pageKey, pageUrl, pageUrlAfter: after, outcome: 'FAILED', error: msg, report: effective });
+      await ctx.parameter('Outcome', 'FAILED');
+      await ctx.parameter('URL after', after ?? '—');
+      await ctx.parameter('Failure (truncated)', msg.slice(0, 4000));
+      await logStep('PFT failed (continues)', Status.FAILED, errForLog);
+      console.warn(`[EMV] "${pageKey}":\n${msg}`);
     });
+  }
+
+  /** `markReadOnlyNoEmv` then one continuation (same ordering as two separate awaits). */
+  async function readOnlyThen(pageKey: string, continueWith: () => Promise<void>, note?: string): Promise<void> {
+    await markReadOnlyNoEmv(pageKey, note);
+    await continueWith();
+  }
+
+  /** `runSoftPftCheck` then one continuation (happy-path action after EMV). */
+  async function emvThen(pageKey: string, pft: () => Promise<void>, continueWith: () => Promise<void>): Promise<void> {
+    await runSoftPftCheck(pageKey, pft);
+    await continueWith();
   }
 
   async function assertFailedStepsAtEnd(): Promise<void> {
@@ -236,7 +233,7 @@ export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvR
     if (failures.length === 0) {
       return;
     }
-    const summary = failures.map(f => `## ${f.step}\n${f.error}`).join('\n\n');
+    const summary = failures.map(f => `## ${f.pageKey}\n${f.error}`).join('\n\n');
     try {
       await testInfo.attach('emv-failures-summary.txt', { body: summary, contentType: 'text/plain' });
     } catch {
@@ -247,5 +244,5 @@ export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvR
     );
   }
 
-  return { runSoftPftCheck, markReadOnlyNoEmv, assertFailedStepsAtEnd };
+  return { runSoftPftCheck, markReadOnlyNoEmv, readOnlyThen, emvThen, assertFailedStepsAtEnd };
 }

@@ -98,129 +98,138 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
   }) => {
     const softEmv = createSoftEmvRunner(test.info(), { page });
 
-    await softEmv.markReadOnlyNoEmv('startNow');
-    await performAction('clickButton', startNow.startNowButton);
+    await softEmv.readOnlyThen('startNow', () => performAction('clickButton', startNow.startNowButton));
 
-    await softEmv.runSoftPftCheck('freeLegalAdvice', freeLegalAdviceErrorValidation);
-    await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await softEmv.emvThen('freeLegalAdvice', freeLegalAdviceErrorValidation, () =>
+      performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption)
+    );
 
-    await softEmv.runSoftPftCheck('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.mainHeader,
-      option: defendantNameConfirmation.noRadioOption,
-      fName: defendantNameConfirmation.firstNameInputText,
-      lName: defendantNameConfirmation.lastNameInputText,
-    });
+    await softEmv.emvThen('defendantNameConfirmation', defendantNameConfirmationErrorValidation, () =>
+      performAction('confirmDefendantDetails', {
+        question: defendantNameConfirmation.mainHeader,
+        option: defendantNameConfirmation.noRadioOption,
+        fName: defendantNameConfirmation.firstNameInputText,
+        lName: defendantNameConfirmation.lastNameInputText,
+      })
+    );
 
-    // EMV-Need to be created(EMV created in this PR)
-    await softEmv.runSoftPftCheck('defendantDateOfBirth', defendantDateOfBirthErrorValidation);
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirth.dayInputText,
-      dobMonth: defendantDateOfBirth.monthInputText,
-      dobYear: defendantDateOfBirth.yearInputText,
-    });
+    await softEmv.emvThen('defendantDateOfBirth', defendantDateOfBirthErrorValidation, () =>
+      performAction('enterDateOfBirthDetails', {
+        dobDay: defendantDateOfBirth.dayInputText,
+        dobMonth: defendantDateOfBirth.monthInputText,
+        dobYear: defendantDateOfBirth.yearInputText,
+      })
+    );
 
-    //EMV-Need to be created(EMV created in this PR)
-    await softEmv.runSoftPftCheck('correspondenceAddressKnown', correspondenceAddressKnownErrorValidation);
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
-    });
+    await softEmv.emvThen('correspondenceAddressKnown', correspondenceAddressKnownErrorValidation, () =>
+      performAction('selectCorrespondenceAddressKnown', {
+        radioOption: correspondenceAddress.yesRadioOption,
+      })
+    );
 
-    await softEmv.runSoftPftCheck('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
-    });
+    await softEmv.emvThen('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation, () =>
+      performAction('selectContactPreferenceEmailOrPost', {
+        question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+        radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      })
+    );
 
-    await softEmv.runSoftPftCheck('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation);
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.noRadioOption,
-    });
+    await softEmv.emvThen('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation, () =>
+      performAction('selectContactByTelephone', {
+        radioOption: contactPreferencesTelephone.noRadioOption,
+      })
+    );
 
-    await softEmv.markReadOnlyNoEmv('disputeClaimInterstitial');
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await softEmv.readOnlyThen('disputeClaimInterstitial', () =>
+      performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect)
+    );
 
-    await softEmv.runSoftPftCheck('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
-    await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetails.noRadioOption,
-      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
-    });
+    await softEmv.emvThen('tenancyTypeDetails', tenancyTypeDetailsErrorValidation, () =>
+      performAction('tenancyOrContractTypeDetails', {
+        tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
+        tenancyOption: tenancyTypeDetails.noRadioOption,
+        tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+      })
+    );
 
-    await softEmv.runSoftPftCheck('tenancyDateDetails', tenancyDateDetailsErrorValidation);
-    await performAction('selectTenancyStartDateKnown', { option: tenancyDateDetails.yesRadioOption });
+    await softEmv.emvThen('tenancyDateDetails', tenancyDateDetailsErrorValidation, () =>
+      performAction('selectTenancyStartDateKnown', { option: tenancyDateDetails.yesRadioOption })
+    );
 
-    //Until https://tools.hmcts.net/jira/browse/HDPI-6087 fixed
-    //await softEmv.runSoftPftCheck('confirmationOfNoticeGiven', confirmationOfNoticeGivenErrorValidation);
+    // confirmationOfNoticeGiven EMV deferred — HDPI-6087
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
-
-    // EMV-Need to be created
     await performAction('enterNoticeDateUnknown');
 
-    await softEmv.runSoftPftCheck('rentArrears', rentArrearsErrorValidation);
-    await performAction('rentArrears', { option: rentArrears.yesRadioOption });
+    await softEmv.emvThen('rentArrears', rentArrearsErrorValidation, () =>
+      performAction('rentArrears', { option: rentArrears.yesRadioOption })
+    );
 
-    // placeholder page
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
 
-    await softEmv.markReadOnlyNoEmv('PaymentInterstitial');
-    await performAction('readPaymentInterstitial');
+    await softEmv.readOnlyThen('PaymentInterstitial', () => performAction('readPaymentInterstitial'));
 
-    await softEmv.runSoftPftCheck('repaymentsMade', repaymentsMadeErrorValidation);
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-
-    await softEmv.runSoftPftCheck('repaymentsAgreed', repaymentsAgreedErrorValidation);
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
-      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
-    });
-
-    await softEmv.markReadOnlyNoEmv('YourHouseholdAndCircumstances');
-    await performAction('readYourHouseholdAndCircumstances');
-
-    await softEmv.runSoftPftCheck('doYouHaveAnyDependantChildren', doYouHaveAnyDependantChildrenErrorValidation);
-    await performAction('doYouHaveAnyDependantChildren', {
-      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
-      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
-    });
-
-    await softEmv.runSoftPftCheck('doYouHaveAnyOtherDependants', doYouHaveAnyOtherDependantsErrorValidation);
-    await performAction('doYouHaveAnyOtherDependants', {
-      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
-      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
-    });
-
-    await softEmv.runSoftPftCheck('doAnyOtherAdultsLiveInYourHome', doAnyOtherAdultsLiveInYourHomeErrorValidation);
-    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
-    });
-
-    await softEmv.runSoftPftCheck(
-      'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
-      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation
+    await softEmv.emvThen('repaymentsMade', repaymentsMadeErrorValidation, () =>
+      performAction('repaymentsMade', {
+        question: repaymentsMade.getmainHeader(claimantName),
+        repaymentOption: repaymentsMade.noRadioOption,
+      })
     );
-    await performAction('selectAlternativeAccommodation', {
-      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
-    });
 
-    await softEmv.runSoftPftCheck('yourCircumstances', yourCircumstancesErrorValidation);
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
+    await softEmv.emvThen('repaymentsAgreed', repaymentsAgreedErrorValidation, () =>
+      performAction('repaymentsAgreed', {
+        question: repaymentsAgreed.getMainHeader(claimantName),
+        repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+        repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
+      })
+    );
 
-    await softEmv.runSoftPftCheck('exceptionalHardship', yourExceptionalHardShipErrorValidation);
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-    });
+    await softEmv.readOnlyThen('YourHouseholdAndCircumstances', () => performAction('readYourHouseholdAndCircumstances'));
+
+    await softEmv.emvThen('doYouHaveAnyDependantChildren', doYouHaveAnyDependantChildrenErrorValidation, () =>
+      performAction('doYouHaveAnyDependantChildren', {
+        dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+        dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+      })
+    );
+
+    await softEmv.emvThen('doYouHaveAnyOtherDependants', doYouHaveAnyOtherDependantsErrorValidation, () =>
+      performAction('doYouHaveAnyOtherDependants', {
+        otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+        otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+      })
+    );
+
+    await softEmv.emvThen('doAnyOtherAdultsLiveInYourHome', doAnyOtherAdultsLiveInYourHomeErrorValidation, () =>
+      performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+        radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+      })
+    );
+
+    await softEmv.emvThen(
+      'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
+      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation,
+      () =>
+        performAction('selectAlternativeAccommodation', {
+          radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
+        })
+    );
+
+    await softEmv.emvThen('yourCircumstances', yourCircumstancesErrorValidation, () =>
+      performAction('yourCircumstances', {
+        question: yourCircumstances.mainHeader,
+        yourCircumstancesOption: yourCircumstances.noRadioOption,
+      })
+    );
+
+    await softEmv.emvThen('exceptionalHardship', yourExceptionalHardShipErrorValidation, () =>
+      performAction('exceptionalHardship', {
+        question: exceptionalHardship.mainHeader,
+        exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+      })
+    );
 
     await performActions(
       'Continue through place holder pages for income, debts, expenses, equality',
@@ -234,11 +243,12 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       ['clickButton', equalityAndDiversityEnd.continueButton]
     );
 
-    await softEmv.runSoftPftCheck('languageUsed', languageUsedErrorValidation);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
-    });
+    await softEmv.emvThen('languageUsed', languageUsedErrorValidation, () =>
+      performAction('languageUsed', {
+        question: languageUsed.mainHeader,
+        radioOption: languageUsed.englishRadioOption,
+      })
+    );
 
     await softEmv.assertFailedStepsAtEnd();
   });

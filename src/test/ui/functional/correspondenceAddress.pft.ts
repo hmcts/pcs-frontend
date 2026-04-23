@@ -1,7 +1,6 @@
 import { correspondenceAddress, dashboard, defendantDateOfBirth } from '../data/page-data';
 import { performAction, performValidation, performValidations } from '../utils/controller';
 
-/** “Is this your correspondence address?” — save without Yes/No (matches CORRESPONDENCE_ADDRESS=KNOWN journeys). */
 export async function correspondenceAddressKnownErrorValidation(): Promise<void> {
   await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   await performValidation('errorMessage', {

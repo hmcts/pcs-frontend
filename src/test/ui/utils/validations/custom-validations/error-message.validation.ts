@@ -16,7 +16,6 @@ type ValidationResult = {
   error?: string;
 };
 
-/** Slice of `results` for soft EMV auto-reporting. */
 export type ErrorMessageValidationSnapshot = {
   pageName: string;
   expected: string;
@@ -350,7 +349,6 @@ export class ErrorMessageValidation implements IValidation {
     ErrorMessageValidation.emvFailed = false;
   }
 
-  /** For soft EMV: index before `runSoftPftCheck` → slice after PFT for new error-message rows. */
   static peekResultsLength(): number {
     return ErrorMessageValidation.results.length;
   }
