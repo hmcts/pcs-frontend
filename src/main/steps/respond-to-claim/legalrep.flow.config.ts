@@ -350,6 +350,20 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
       ],
       previousStep: 'repayments-made',
     },
+    'installment-payments': {
+      previousStep: 'repayments-agreed',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData?.confirmInstallmentOffer === 'yes',
+          nextStep: 'how-much-afford-to-pay',
+        },
+      ],
+      defaultNext: 'do-you-have-any-dependant-children',
+    },
     'do-you-have-any-dependant-children': {
       previousStep: 'repayments-agreed',
       defaultNext: 'do-you-have-any-other-dependants',
@@ -397,10 +411,6 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
-    },
-    'installment-payments': {
-      previousStep: 'repayments-agreed',
-      defaultNext: 'your-household-and-circumstances',
     },
   },
 };
