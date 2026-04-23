@@ -182,7 +182,7 @@ test.afterEach(async () => {
 //@noDefendants(submitCasePayloadNoDefendants) represents all defendant details unknown pages and non-rent arrears
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
-test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () => {
+test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim @noDefendants @regression @accessibility', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -275,9 +275,11 @@ test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () =>
     await performValidation('mainHeader', regularIncome.mainHeader);
     await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
     await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.yesRadioOption,
     });
     await performAction('enterPriorityDebtDetails', {
@@ -375,6 +377,7 @@ test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () =>
     await performAction('check', regularIncome.universalCreditCheckBox);
     await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.yesRadioOption,
     });
     await performAction('enterPriorityDebtDetails', {
@@ -469,9 +472,11 @@ test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () =>
     await performValidation('mainHeader', regularIncome.mainHeader);
     await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
     await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.noRadioOption,
     });
     await performValidation('mainHeader', regularExpenses.mainHeader);
@@ -562,10 +567,12 @@ test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () =>
     await performValidation('mainHeader', regularIncome.mainHeader);
     await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
       ...getRelativeDate(-5),
     });
     await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.noRadioOption,
     });
     await performValidation('mainHeader', regularExpenses.mainHeader);
@@ -650,9 +657,11 @@ test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () =>
     await performValidation('mainHeader', regularIncome.mainHeader);
     await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
     await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.yesRadioOption,
     });
     await performAction('enterPriorityDebtDetails', {
@@ -744,9 +753,11 @@ test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () =>
     await performValidation('mainHeader', regularIncome.mainHeader);
     await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
     await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.noRadioOption,
     });
     await performValidation('mainHeader', regularExpenses.mainHeader);
@@ -836,10 +847,12 @@ test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () =>
     await performValidation('mainHeader', regularIncome.mainHeader);
     await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
       ...getRelativeDate(-3),
     });
     await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.yesRadioOption,
     });
     await performAction('enterPriorityDebtDetails', {
@@ -940,6 +953,7 @@ test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () =>
     await performAction('check', regularIncome.universalCreditCheckBox);
     await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.noRadioOption,
     });
     await performValidation('mainHeader', regularExpenses.mainHeader);
@@ -1026,10 +1040,12 @@ test.describe('Respond to a claim - e2e Journey @nightly @santoshi', async () =>
     await performValidation('mainHeader', regularIncome.mainHeader);
     await performAction('clickButton', regularIncome.continueButton);
     await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
       ...getRelativeDate(-5),
     });
     await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.noRadioOption,
     });
     await performValidation('mainHeader', regularExpenses.mainHeader);

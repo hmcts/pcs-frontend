@@ -54,6 +54,4 @@ export default {
   'have-you-applied-for-universal-credit': 'haveYouAppliedForUniversalCredit',
   'priority-debt-details': 'priorityDebtDetails',
   'priority-debts': 'priorityDebts',
-  'what-regular-income-do-you-receive': 'regularIncome',
-  'what-other-regular-expenses-do-you-have': 'regularExpenses',
 };
