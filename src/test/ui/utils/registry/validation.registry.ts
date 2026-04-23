@@ -3,6 +3,7 @@ import {
   ErrorMessageValidation,
   PageContentValidation,
   PageNavigationValidation,
+  VisibilityValidation,
 } from '../validations/custom-validations';
 import {
   BannerAlertValidation,
@@ -13,7 +14,6 @@ import {
   OptionListValidation,
   RadioButtonValidation,
   TextValidation,
-  VisibilityValidation,
 } from '../validations/element-validations';
 
 export class ValidationRegistry {

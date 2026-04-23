@@ -117,7 +117,7 @@ describe('respond-to-claim installment-payments step', () => {
 
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
-        paymentAgreement: { repayArrearsInstalments: 'Yes' },
+        paymentAgreement: { repayArrearsInstalments: 'YES' },
       },
     });
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');

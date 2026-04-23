@@ -1,15 +1,10 @@
 import type { Request } from 'express';
 
+import { hasOnlyRentArrearsInCaseData } from './rentArrearsGroundsFromCaseData';
+
 /**
- * Returns true when ALL selected claim grounds are marked as rent arrears.
+ * Returns true when ALL selected claim grounds are rent-arrears
  */
-export const hasOnlyRentArrearsGrounds = async (req: Request): Promise<boolean> => {
-  const caseData = req.res?.locals?.validatedCase?.data;
-  const claimGroundSummaries = caseData?.claimGroundSummaries;
-
-  if (!Array.isArray(claimGroundSummaries) || claimGroundSummaries.length === 0) {
-    return false;
-  }
-
-  return claimGroundSummaries.every(ground => ground?.value?.isRentArrears?.toUpperCase() === 'YES');
+export const hasOnlyRentArrearsGrounds = (req: Request): boolean => {
+  return hasOnlyRentArrearsInCaseData(req.res?.locals?.validatedCase?.data);
 };

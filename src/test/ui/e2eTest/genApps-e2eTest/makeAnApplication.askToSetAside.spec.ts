@@ -1,19 +1,19 @@
-import { test } from '@playwright/test';
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
-  askToSetAsideTheDecisionToEvictYou,
+  askTheCourtToSetAsideTheOrder,
   checkYourAnswers,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
-  haveYouAlreadyAppliedForHelp,
+  haveYouAlreadyAppliedForHelpWithFees,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
+import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -43,20 +43,21 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
     });
+    await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
     //The below are placeholder pages
-    await performValidation('mainHeader', askToSetAsideTheDecisionToEvictYou.mainHeader);
-    await performAction('clickButton', askToSetAsideTheDecisionToEvictYou.startNowButton);
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
-    await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
-    await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
-    await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
-    await performAction(
-      'inputText',
-      haveYouAlreadyAppliedForHelp.hwfReferenceHiddenTextLabel,
-      haveYouAlreadyAppliedForHelp.hwfReferenceTextInput
-    );
-    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performAction('doYouNeedHelpPayingFee', {
+      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+    });
+    await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
+    await performAction('confirmYouHaveAppliedForFeeHelp', {
+      question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+      option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
+      label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
+      input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
+    });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
     await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
     await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);

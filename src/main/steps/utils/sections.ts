@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { SectionConfig } from '../../interfaces/stepFlow.interface';
+import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 
 type SectionsMap = Record<string, SectionConfig>;
 

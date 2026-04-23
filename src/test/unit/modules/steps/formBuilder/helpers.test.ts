@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import {
   getCustomErrorTranslations,
   getFormData,

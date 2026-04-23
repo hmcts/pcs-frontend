@@ -5,8 +5,8 @@ import { Session } from 'express-session';
 
 import { pcqRedirectMiddleware } from '../../../main/middleware/pcqRedirect';
 
-import type { CcdCase } from '@interfaces/ccdCase.interface';
-import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
+import type { CcdCase } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import * as createTokenModule from '@services/pcq/createToken';
 
@@ -163,11 +163,11 @@ describe('pcqRedirectMiddleware', () => {
     expect(mockRedirect).not.toHaveBeenCalled();
   });
 
-  it('should not redirect if userPcqIdSet is already Yes', async () => {
+  it('should not redirect if userPcqIdSet is already YES', async () => {
     mockRes.locals!.validatedCase = new CcdCaseModel({
       id: '123456789',
       data: {
-        userPcqIdSet: 'Yes',
+        userPcqIdSet: 'YES',
       },
     });
 

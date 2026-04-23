@@ -1,6 +1,6 @@
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig } from '@interfaces/formFieldConfig.interface';
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import { buildSubFieldsHTML } from '@modules/steps/formBuilder/subFieldsRenderer';
 
 describe('subFieldsRenderer', () => {

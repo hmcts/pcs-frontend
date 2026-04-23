@@ -3,10 +3,10 @@ import type { RequestHandler } from 'express';
 
 import { caseReferenceParamMiddleware, legalRepresentativeHeaderMiddleware, oidcMiddleware } from '../middleware';
 
-import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { Logger } from '@modules/logger';
 import { getValidatedLanguage, stepDependencyCheckMiddleware } from '@modules/steps';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getFlowConfigForJourney, getStepForJourney, getStepsForJourney, journeyRegistry } from '@steps';
 
 const logger = Logger.getLogger('registerSteps');

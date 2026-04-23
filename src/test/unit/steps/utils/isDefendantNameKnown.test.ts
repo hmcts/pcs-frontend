@@ -1,7 +1,8 @@
 import { Request } from 'express';
 
-import { CcdCaseModel } from '../../../../main/interfaces/ccdCaseData.model';
 import { isDefendantNameKnown } from '../../../../main/steps/utils/isDefendantNameKnown';
+
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 describe('isDefendantNameKnown', () => {
   describe('when defendant name is fully present in CCD', () => {

@@ -5,5 +5,4 @@ export * from '../../../utils/validations/element-validations/optionList.validat
 export * from '../../../utils/validations/element-validations/pageHeader.validation';
 export * from '../../../utils/validations/element-validations/radioButton.validation';
 export * from '../../../utils/validations/element-validations/text.validation';
-export * from '../../../utils/validations/element-validations/visibility.validation';
 export * from '../../../utils/validations/element-validations/inputTextValue.validation';

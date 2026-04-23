@@ -22,8 +22,8 @@ import type {
   ExtendGetContent,
   FormFieldConfig,
   TranslationKeys,
-} from '@interfaces/formFieldConfig.interface';
-import type { JourneyFlowConfig } from '@interfaces/stepFlow.interface';
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { safeRedirect303 } from '@utils/safeRedirect';
 

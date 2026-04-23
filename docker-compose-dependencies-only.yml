@@ -1,0 +1,35 @@
+services:
+  cache:
+    image: hmctsprod.azurecr.io/imported/bitnami/redis:8.2.0
+    ports:
+      - '6379:6379'
+    volumes:
+      - cache-data:/bitnami/redis/data
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      timeout: 2s
+      retries: 10
+
+  service-auth-provider-api:
+    image: hmctsprod.azurecr.io/rpe/service-auth-provider:latest
+    ports:
+      - '${SERVICE_AUTH_PORT}:${SERVICE_AUTH_PORT}'
+    environment:
+      SERVER_PORT: ${SERVICE_AUTH_PORT}
+      AUTH_PROVIDER_SERVICE_SERVER_JWT_KEY: ${AUTH_PROVIDER_SERVICE_SERVER_JWT_KEY}
+      JAVA_TOOL_OPTIONS: -XX:UseSVE=0
+      microserviceKeys_ccd_data: AAAAAAAAAAAAAAAA
+      microserviceKeys_pcs_frontend: AAAAAAAAAAAAAAAA
+
+  wiremock:
+    image: 'hmctsprod.azurecr.io/imported/wiremock/wiremock:latest'
+    ports:
+      - '8180:8080'
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
+
+volumes:
+  cache-data:

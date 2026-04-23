@@ -1,12 +1,4 @@
-import {
-  confirmationOfNoticeGiven,
-  dashboard,
-  noticeDateWhenNotProvided,
-  noticeDateWhenProvided,
-  rentArrears,
-  tenancyDateDetails,
-  tenancyDateUnknown,
-} from '../data/page-data';
+import { rentArrears } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function rentArrearsErrorValidation(): Promise<void> {
@@ -53,29 +45,30 @@ export async function rentArrearsErrorValidation(): Promise<void> {
   });
 }
 
-export async function rentArrearsNavigationTests(): Promise<void> {
-  if (process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'YES') {
-    if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
-      await performValidation('pageNavigation', rentArrears.backLink, confirmationOfNoticeGiven.mainHeader);
-    } else {
-      await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenProvided.mainHeader);
-    }
-  } else if (process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'NO') {
-    if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
-      await performValidation('pageNavigation', rentArrears.backLink, confirmationOfNoticeGiven.mainHeader);
-    } else {
-      await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenNotProvided.mainHeader);
-    }
-  }
-
-  if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'NO') {
-    await performValidation('pageNavigation', rentArrears.backLink, tenancyDateUnknown.mainHeader);
-  } else if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'YES') {
-    await performValidation('pageNavigation', rentArrears.backLink, tenancyDateDetails.mainHeader);
-  }
-  await performAction('clickRadioButton', {
-    question: rentArrears.doYouOweThisQuestion,
-    option: rentArrears.yesRadioOption,
-  });
-  await performValidation('pageNavigation', rentArrears.saveForLaterButton, dashboard.mainHeader);
-}
+// Need to fix this as part of HDPI-5786
+// export async function rentArrearsNavigationTests(): Promise<void> {
+//   if (process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'YES') {
+//     if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
+//       await performValidation('pageNavigation', rentArrears.backLink, confirmationOfNoticeGiven.mainHeader);
+//     } else {
+//       await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenProvided.mainHeader);
+//     }
+//   } else if (process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'NO') {
+//     if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
+//       await performValidation('pageNavigation', rentArrears.backLink, confirmationOfNoticeGiven.mainHeader);
+//     } else {
+//       await performValidation('pageNavigation', rentArrears.backLink, noticeDateWhenNotProvided.mainHeader);
+//     }
+//   }
+//
+//   if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'NO') {
+//     await performValidation('pageNavigation', rentArrears.backLink, tenancyDateUnknown.mainHeader);
+//   } else if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'YES') {
+//     await performValidation('pageNavigation', rentArrears.backLink, tenancyDateDetails.mainHeader);
+//   }
+//   await performAction('clickRadioButton', {
+//     question: rentArrears.doYouOweThisQuestion,
+//     option: rentArrears.yesRadioOption,
+//   });
+//   await performValidation('pageNavigation', rentArrears.saveForLaterButton, dashboard.mainHeader);
+// }

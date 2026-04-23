@@ -4,7 +4,7 @@ import { step as telephoneStep } from '../../../../main/steps/respond-to-claim/c
 import { step as textStep } from '../../../../main/steps/respond-to-claim/contact-preferences-text-message';
 import * as populateModule from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
-import type { CcdCase } from '@interfaces/ccdCase.interface';
+import type { CcdCase } from '@services/ccdCase.interface';
 
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),

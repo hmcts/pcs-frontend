@@ -1,4 +1,4 @@
-import { CcdCaseModel } from '@interfaces/ccdCaseData.model';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 
 describe('caseReference utilities', () => {

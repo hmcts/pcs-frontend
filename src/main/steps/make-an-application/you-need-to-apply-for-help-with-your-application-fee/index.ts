@@ -1,6 +1,7 @@
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'you-need-to-apply-for-help-with-your-application-fee',
@@ -13,6 +14,10 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
-    paragraph1: 'paragraph1',
+    youNeedToApplyBeforeContinuing: 'youNeedToApplyBeforeContinuing',
+    enterCourtFormNumber: 'enterCourtFormNumber',
+    afterYouHaveApplied: 'afterYouHaveApplied',
+    ifYouReceiveAnyBenefit: 'ifYouReceiveAnyBenefit',
+    ifYouHaveYourHWFReference: 'ifYouHaveYourHWFReference',
   },
 });

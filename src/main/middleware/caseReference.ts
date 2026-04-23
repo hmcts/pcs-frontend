@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
-import { CcdCaseModel } from '../interfaces/ccdCaseData.model';
 
 import { Logger } from '@modules/logger';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 

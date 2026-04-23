@@ -97,7 +97,6 @@ module.exports = defineConfig([
           },
           pathGroups: [
             { pattern: '@app/**', group: 'internal', position: 'before' },
-            { pattern: '@interfaces/**', group: 'internal', position: 'before' },
             { pattern: '@modules/**', group: 'internal', position: 'before' },
             { pattern: '@router/**', group: 'internal', position: 'before' },
             { pattern: '@routes/**', group: 'internal', position: 'before' },
@@ -175,13 +174,13 @@ module.exports = defineConfig([
   },
   globalIgnores([
     'src/main/views/govuk/**/*',
+    'src/main/views/moj/**/*',
     '**/jest.*.config.*',
     '**/__mocks__/**/*',
     'dist/*',
     'coverage/*',
     '**/*.d.ts',
     'src/main/public/',
-    'src/main/types/',
     '**/jest.*config.js',
     '**/.eslintrc.js',
     'src/test/*/codecept.conf.js',

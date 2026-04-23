@@ -1,14 +1,14 @@
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { flowConfig } from '../flow.config';
+
+import { createFormStep } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type {
   CaseData,
   HouseholdCircumstances,
   PossessionClaimResponse,
   YesNoValue,
-} from '../../../interfaces/ccdCase.interface';
-import type { StepDefinition } from '../../../interfaces/stepFormData.interface';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
-
-import { createFormStep } from '@modules/steps';
+} from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'do-you-have-any-other-dependants',
@@ -30,8 +30,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     const enumMapping: Record<string, YesNoValue> = {
-      yes: 'Yes',
-      no: 'No',
+      yes: 'YES',
+      no: 'NO',
     };
 
     const otherDependantsCcd = enumMapping[otherDependants];
@@ -40,7 +40,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     const otherDependantDetails: string | undefined =
-      otherDependantsCcd === 'Yes' ? req.body?.['otherDependants.otherDependantDetails'] : undefined;
+      otherDependantsCcd === 'YES' ? req.body?.['otherDependants.otherDependantDetails'] : undefined;
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
@@ -62,7 +62,7 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
 
-    if (otherDependantsCcd === 'Yes') {
+    if (otherDependantsCcd === 'YES') {
       const otherDependantDetails: string | undefined = householdCircumstances?.otherDependantDetails;
       return {
         otherDependants: 'yes',

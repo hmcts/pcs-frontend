@@ -23,7 +23,8 @@ static Map < String, Object > secret(String secretName, String envVariable) {
 def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD')
+    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
+    secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID')
   ]
 ]
 
@@ -36,12 +37,23 @@ withPipeline(type, product, component) {
   env.XUI_BASE_URI = "https://manage-case.aat.platform.hmcts.net"
   env.CASE_TYPE_ID = "PCS"
   onPR() {
-    env.FUNCTIONAL_TEST_SCOPE = '@PR'
+    env.E2E_TEST_SCOPE = '@PR'
+    def e2eTag = prLabelSuffix(githubApi, 'e2e-tag:')
+    if (e2eTag?.trim()) {
+      env.E2E_TEST_SCOPE = e2eTag.trim()
+    }
+    def e2eSpec = prLabelSuffix(githubApi, 'e2e-spec:')
+    if (e2eSpec?.trim()) {
+      env.E2E_SPEC = e2eSpec.trim()
+    }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_all_page_functional_tests").size() > 0) {
       env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'true'
     }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_content_validation").size() > 0) {
       env.ENABLE_CONTENT_VALIDATION = 'true'
+    }
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_visibility_validation").size() > 0) {
+      env.ENABLE_VISIBILITY_VALIDATION = 'true'
     }
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_error_messages_validation").size() > 0) {
       env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true'
@@ -63,6 +75,15 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    before('functionalTest:preview') {
+      sh 'rm -rf allure-results allure-report'
+    }
+    before('fullFunctionalTest:preview') {
+      sh 'rm -rf allure-results allure-report'
+    }
+    afterAlways('smoketest:preview') {
+      archiveSmokeTestReports()
+    }
     afterAlways('functionalTest:preview') {
       archiveFunctionalTestReports()
     }
@@ -73,22 +94,45 @@ withPipeline(type, product, component) {
 
   onMaster() {
     env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'false'
-    env.FUNCTIONAL_TEST_SCOPE = '@regression'
+    env.E2E_TEST_SCOPE = '@regression'
     env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    before('functionalTest:aat') {
+      sh 'rm -rf allure-results allure-report'
+    }
+    afterAlways('smoketest:aat') {
+      archiveSmokeTestReports()
+      if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
+        sendAllureReportToSlack('master', 'Frontend_20Smoke_20Test_20Report/')
+      }
+    }
     afterAlways('functionalTest:aat') {
       archiveFunctionalTestReports()
       if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
-          sendAllureReportToSlack('master')
+          sendAllureReportToSlack('master', 'Frontend_20Functional_20Test_20Report/')
       }
     }
   }
 }
 
+/** First PR label matching prefix → value after prefix (e.g. e2e-tag:@smoke → @smoke) */
+def prLabelSuffix(githubApi, String prefix) {
+  def labels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, prefix)
+  return (labels && labels.size() > 0) ? labels[0].replaceFirst('^' + prefix, '') : null
+}
+
 def archiveFunctionalTestReports() {
+  archiveAllureReport('Frontend Functional Test Report')
+}
+
+def archiveSmokeTestReports() {
+  archiveAllureReport('Frontend Smoke Test Report')
+}
+
+def archiveAllureReport(String reportName) {
   try {
     publishHTML([
       allowMissing: true,
@@ -96,16 +140,16 @@ def archiveFunctionalTestReports() {
       keepAll: true,
       reportDir: "allure-report",
       reportFiles: 'index.html',
-      reportName: 'PCS Frontend Functional Test Report'
+      reportName: reportName
     ])
   } catch (Error) {
       unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
   }
 }
 
-def sendAllureReportToSlack(String pipelineType = 'master') {
-  env.ALLURE_REPORT_PATH_SUFFIX = 'PCS_20Frontend_20Functional_20Test_20Report/'
-  def msg = sh(script: "yarn exec ts-node src/test/ui/scripts/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
+def sendAllureReportToSlack(String pipelineType, String allureReportPathSuffix) {
+  env.ALLURE_REPORT_PATH_SUFFIX = allureReportPathSuffix
+  def msg = sh(script: "yarn exec ts-node src/test/ui/utils/common/allure-slack-notifier.ts --print-only --pipeline-type ${pipelineType} 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
     slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)

@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { step } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-given';
 import * as populateModule from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
-import type { CcdCase } from '@interfaces/ccdCase.interface';
+import type { CcdCase } from '@services/ccdCase.interface';
 
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),
@@ -56,7 +56,7 @@ describe('confirmation-of-notice-given step', () => {
     const { req, res, next } = createBaseReqRes();
 
     req.body = {
-      confirmNoticeGiven: 'imNotSure',
+      possessionNoticeReceived: 'NOT_SURE',
     };
 
     const post = step.postController?.post;
@@ -68,8 +68,7 @@ describe('confirmation-of-notice-given step', () => {
       req,
       expect.objectContaining({
         defendantResponses: {
-          confirmNoticeGiven: 'NOT_SURE',
-          noticeDate: '',
+          possessionNoticeReceived: 'NOT_SURE',
         },
       })
     );

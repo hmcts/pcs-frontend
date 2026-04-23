@@ -11,7 +11,7 @@ export const exceptionalHardship = {
   lostJobOrBeenMadeRedundantList: `lost your job or been made redundant`,
   experiencedBereavementOrLongTermIllnessList: `experienced a bereavement or long-term illness`,
   beenDeclaredBankruptList: `been declared bankrupt`,
-  wouldYouExperienceExceptionalHardshipParagraph: `Would you experience exceptional hardship if you had to leave your home?`,
+  wouldYouExperienceExceptionalHardshipParagraph: `Would you experience exceptional hardship if you were asked to leave your home?`,
   detailsTextInput: `mention Exceptional hardship here`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,

@@ -1,13 +1,14 @@
 import { Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
+import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
   correspondenceAddress,
-  dateOfBirth,
+  defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
   disputeClaimInterstitial,
@@ -20,6 +21,7 @@ import {
   installmentPayments,
   landlordLicensed,
   landlordRegistered,
+  languageUsed,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
@@ -79,6 +81,7 @@ export class RespondToClaimAction implements IAction {
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
+      ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -105,12 +108,12 @@ export class RespondToClaimAction implements IAction {
     if (defendantData?.dobDay && defendantData?.dobMonth && defendantData?.dobYear) {
       await performActions(
         'Defendant Date of Birth Entry',
-        ['inputText', dateOfBirth.dayTextLabel, defendantData.dobDay],
-        ['inputText', dateOfBirth.monthTextLabel, defendantData.dobMonth],
-        ['inputText', dateOfBirth.yearTextLabel, defendantData.dobYear]
+        ['inputText', defendantDateOfBirth.dayTextLabel, defendantData.dobDay],
+        ['inputText', defendantDateOfBirth.monthTextLabel, defendantData.dobMonth],
+        ['inputText', defendantDateOfBirth.yearTextLabel, defendantData.dobYear]
       );
     }
-    await performAction('clickButton', dateOfBirth.saveAndContinueButton);
+    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
   }
 
   private async confirmDefendantDetails(defendantData: actionRecord) {
@@ -422,23 +425,41 @@ export class RespondToClaimAction implements IAction {
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
     const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
     const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
-
-    if (
-      tenancyType === 'assured tenancy' ||
-      tenancyType === 'introductory tenancy' ||
-      tenancyType === 'secure tenancy' ||
-      tenancyType === 'flexible tenancy' ||
-      tenancyType === 'demoted tenancy'
-    ) {
-      await performValidation('text', {
-        elementType: 'listItem',
-        text: `The property is let under ${article} ${tenancyType} agreement`,
-      });
-    } else if (tenancyType === 'other') {
-      await performValidation('text', {
-        elementType: 'listItem',
-        text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
-      });
+    if (process.env.WALES_POSTCODE === 'YES') {
+      if (tenancyType === 'secure contract') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under a secure occupation contract`,
+        });
+      } else if (tenancyType === 'standard contract') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under a standard occupation contract`,
+        });
+      } else if (tenancyType === 'other') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiDataWales.submitCaseRentOtherTenancy.otherLicenceTypeDetails}`,
+        });
+      }
+    } else {
+      if (
+        tenancyType === 'assured tenancy' ||
+        tenancyType === 'introductory tenancy' ||
+        tenancyType === 'secure tenancy' ||
+        tenancyType === 'flexible tenancy' ||
+        tenancyType === 'demoted tenancy'
+      ) {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under ${article} ${tenancyType} agreement`,
+        });
+      } else if (tenancyType === 'other') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+        });
+      }
     }
     await performAction('clickRadioButton', {
       question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
@@ -518,6 +539,14 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  }
+
+  private async languageUsed(languageScreenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: languageScreenData.question,
+      option: languageScreenData.radioOption,
+    });
+    await performAction('clickButton', languageUsed.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

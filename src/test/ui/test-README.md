@@ -143,6 +143,14 @@ await performValidationGroup(
 yarn test:functional
 ```
 
+### PFT test-env debug logging
+
+In [`playwright.config.ts`](../../../playwright.config.ts), `enable_pft_debug_log` is **`false` by default**. Set it to **`true`** if you want environment variables to be printed in the console while you debug.
+
+```ts
+export const enable_pft_debug_log = false;
+```
+
 ## 8. Troubleshooting
 
 | Issue                  | Solution                                    |
@@ -188,13 +196,18 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 ### PR & Master (Jenkinsfile_CNP)
 
-- **PR:** Runs functional tests (`@PR` scope) on Chrome. Optional full functional test if `enable_full_functional_tests` label is added.
-- **Master:** Runs functional tests (`@regression` scope) on Chrome. Sends Slack notification to `#hdp-qa-e2e-test-results` on failure.
+- **PR:** Runs `yarn test:functional` on Chrome.
+- **PR default scope:** `E2E_TEST_SCOPE=@PR`.
+- **PR label overrides:**
+  - `e2e-tag:<tag>` sets `E2E_TEST_SCOPE` (for example `e2e-tag:@smoke`).
+  - `e2e-spec:<specFilter>` sets `E2E_SPEC` (spec path filter, case-sensitive).
+- **Important:** Do not add the `enable_full_functional_tests` label when you need `e2e-tag:` / `e2e-spec:` (including any newly added tags) to take effect. That label runs the full functional pipeline instead of the scoped PR run, so those overrides will not apply as intended.
+- **Master:** Keeps `E2E_TEST_SCOPE=@regression`.
 
 ### Nightly (Jenkinsfile_nightly)
 
-- **Schedule:** Mon–Fri at ~07:00.
-- **E2E tests:** Runs per-browser stages (Chrome, Firefox, Safari) with separate Allure reports for each.
-- **Accessibility:** Runs `@accessibility` tests on Chrome.
-- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` with links to all 4 reports (Chrome, Firefox, Safari, Accessibility).
-- **Stage behaviour:** If a browser fails, the stage shows red but the pipeline continues to the next browser. All stages always run.
+- **Runs:** `yarn test:E2e` for each selected browser/device stage.
+- **Tag/scope logic:** `PLAYWRIGHT_GREP_TAG` maps to `E2E_TEST_SCOPE` (`@nightly`, `@smoke`, `@e2e`, or `@regression`).
+- **Spec logic:** `PLAYWRIGHT_SPEC` maps to `E2E_SPEC` (path filter, case-sensitive).
+- **Defaults:** Chrome is enabled by default; other platforms are optional.
+- **Reporting:** Each stage publishes its own Allure report and Slack message. Failed stages do not stop later stages.

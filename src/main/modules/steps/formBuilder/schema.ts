@@ -1,7 +1,11 @@
 import { z } from 'zod';
 
-import type { FormBuilderConfig, FormFieldConfig, FormFieldOption } from '@interfaces/formFieldConfig.interface';
 import { Logger } from '@modules/logger';
+import type {
+  FormBuilderConfig,
+  FormFieldConfig,
+  FormFieldOption,
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 const logger = Logger.getLogger('form-builder-schema');
 
@@ -88,6 +92,7 @@ export const FormFieldOptionSchema: z.ZodType<FormFieldOption> = z.lazy(() =>
     value: z.string().optional(),
     // Backward compatible properties
     text: z.string().optional(),
+    hint: z.string().optional(),
     // Divider text for visual separation of options
     divider: z.string().optional(),
     translationKey: z.string().optional(),

@@ -7,7 +7,7 @@ import type { Request } from 'express';
  * false if they didn't know it. Used to decide whether to show a
  * confirmation page or a capture page to the defendant.
  */
-export const isDefendantNameKnown = async (req: Request): Promise<boolean> => {
+export const isDefendantNameKnown = (req: Request): boolean => {
   const { claimantEnteredDefendantDetailsNameKnown } = req.res?.locals?.validatedCase ?? {
     claimantEnteredDefendantDetailsNameKnown: '',
   };

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
-import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '@interfaces/stepFlow.interface';
 import { Logger } from '@modules/logger';
+import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '@modules/steps/stepFlow.interface';
 
 const logger = Logger.getLogger('stepDependencyCheck');
 
@@ -257,6 +257,7 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
 
     const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
     const formData = req.session?.formData || {};
+
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
     if (missingDependency) {

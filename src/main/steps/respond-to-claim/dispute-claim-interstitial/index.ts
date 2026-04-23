@@ -4,8 +4,8 @@ import { getFlowConfigForJourney } from '../../../steps';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
-import type { StepDefinition } from '@interfaces/stepFormData.interface';
 import { createGetController, createStepNavigation } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 
 const journeyName = 'respondToClaim';

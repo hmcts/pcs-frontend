@@ -4,7 +4,6 @@
     "baseUrl": "../main",
     "paths": {
       "@app/*": ["app/*"],
-      "@interfaces/*": ["interfaces/*"],
       "@router/*": ["router/*"],
       "@routes/*": ["routes/*"],
       "@steps": ["steps/index.ts"],

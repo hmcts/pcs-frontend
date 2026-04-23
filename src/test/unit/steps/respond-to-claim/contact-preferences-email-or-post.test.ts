@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { step } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
 import * as populateModule from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
-import type { CcdCase } from '@interfaces/ccdCase.interface';
+import type { CcdCase } from '@services/ccdCase.interface';
 
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),

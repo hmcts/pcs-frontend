@@ -1,8 +1,9 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import type { FormFieldConfig } from '../../../../../main/interfaces/formFieldConfig.interface';
 import { translateFields } from '../../../../../main/modules/steps/formBuilder/fieldTranslation';
+
+import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 describe('translateFields', () => {
   let mockT: jest.Mock;
@@ -72,5 +73,46 @@ describe('translateFields', () => {
     expect(day.value).toBe('');
     expect(month.value).toBe('');
     expect(year.value).toBe('');
+  });
+
+  it('translates option labels and hints for radio items', () => {
+    mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        question: 'Have you had free legal advice?',
+        'options.yes': 'Yes',
+        'options.yesHint': 'This includes advice from a solicitor.',
+      };
+      return translations[key] || key;
+    });
+
+    const result = translateFields(
+      [
+        {
+          name: 'hadLegalAdvice',
+          type: 'radio',
+          translationKey: {
+            label: 'question',
+          },
+          options: [{ value: 'yes', translationKey: 'options.yes', hint: 'options.yesHint' }],
+        },
+      ],
+      mockT as unknown as TFunction,
+      {},
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+
+    const items = result[0].component?.items as Record<string, unknown>[];
+    expect(items).toEqual([
+      {
+        value: 'yes',
+        text: 'Yes',
+        hint: { text: 'This includes advice from a solicitor.' },
+        checked: false,
+      },
+    ]);
   });
 });

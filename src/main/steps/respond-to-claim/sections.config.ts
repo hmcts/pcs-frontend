@@ -1,4 +1,4 @@
-import type { SectionConfig } from '../../interfaces/stepFlow.interface';
+import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 import { hasAnyRentArrearsGround } from '../utils';
 
 export const respondToClaimSections = {
@@ -49,7 +49,7 @@ export const respondToClaimSections = {
       'installment-payments',
       'how-much-afford-to-pay',
     ],
-    isApplicable: req => hasAnyRentArrearsGround(req),
+    isApplicable: async req => hasAnyRentArrearsGround(req),
   },
   situationAndCircumstances: {
     titleKey: 'taskList.situationAndCircumstances',
@@ -84,7 +84,7 @@ export const respondToClaimSections = {
   checkYourAnswersAndSubmit: {
     titleKey: 'taskList.checkYourAnswersAndSubmit',
     order: 8,
-    steps: [],
+    steps: ['language-used', 'equality-and-diversity-start', 'equality-and-diversity-end', 'check-your-answers'],
   },
 } satisfies Record<string, SectionConfig>;
 

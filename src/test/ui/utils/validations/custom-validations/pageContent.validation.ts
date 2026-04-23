@@ -4,6 +4,7 @@ import * as path from 'path';
 import { Page } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
+import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
@@ -35,6 +36,8 @@ export class PageContentValidation implements IValidation {
   private static missingDataFiles = new Set<string>();
   private static testCounter = 0;
   private static pageToHeaderTextMap = new Map<string, string>();
+
+  private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
 
   private readonly locatorPatterns = {
     Button: (page: Page, value: string) =>
@@ -165,7 +168,11 @@ export class PageContentValidation implements IValidation {
       }
 
       PageContentValidation.validationResults.set(pageUrl, pageResults);
+      if (pageResults.some(r => r.status === 'fail')) {
+        await takeValidationFailureScreenshot(page, 'page-content', pageName);
+      }
     } catch (error) {
+      await takeValidationFailureScreenshot(page, 'page-content', pageName);
       // Add the error as a validation failure
       pageResults.push({
         element: 'SectionData',
@@ -191,8 +198,10 @@ export class PageContentValidation implements IValidation {
   }
 
   private loadPageDataFile(fileName: string): object | null {
-    const filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
-    if (!fs.existsSync(filePath)) {
+    const filePath = this.resolveDataFilePath(PageContentValidation.PAGE_DATA_DIR, `${fileName}.page.data.ts`);
+
+    if (!filePath || !fs.existsSync(filePath)) {
+      console.warn(`Path not found for the file ${fileName}`);
       return null;
     }
     try {
@@ -216,6 +225,28 @@ export class PageContentValidation implements IValidation {
     } catch {
       return null;
     }
+  }
+
+  private resolveDataFilePath(baseDir: string, pageName: string): string | null {
+    if (!fs.existsSync(baseDir)) {
+      throw new Error(`Base directory does not exist: ${baseDir}`);
+    }
+
+    const directPath = path.join(baseDir, pageName);
+    if (fs.existsSync(directPath)) {
+      return directPath;
+    }
+
+    const subDirs = fs.readdirSync(baseDir, { withFileTypes: true }).filter(d => d.isDirectory());
+
+    for (const dir of subDirs) {
+      const subDirPath = path.join(baseDir, dir.name, pageName);
+      if (fs.existsSync(subDirPath)) {
+        return subDirPath;
+      }
+    }
+
+    return null;
   }
 
   private async isElementVisible(page: Page, expectedValue: string, elementType: string): Promise<boolean> {

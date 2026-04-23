@@ -1,8 +1,8 @@
 import axios from 'axios';
 import config from 'config';
 
-import type { Address, OSResponse } from '@interfaces/osPostcodeLookup.interface';
 import { Logger } from '@modules/logger';
+import type { Address, OSResponse } from '@services/osPostcodeLookup.interface';
 
 const logger = Logger.getLogger('osPostcodeLookupService');
 

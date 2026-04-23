@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
+import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
 import { IValidation, validationData, validationRecord } from '../../interfaces';
 
 type ValidationResult = {
@@ -105,6 +106,10 @@ export class ErrorMessageValidation implements IValidation {
 
     const pageUrl = page.url();
     const pageName = await ErrorMessageValidation.getPageNameFromUrl(pageUrl, page);
+
+    if (!passed) {
+      await takeValidationFailureScreenshot(page, 'error-messages', pageName);
+    }
 
     ErrorMessageValidation.results.push({
       pageUrl,

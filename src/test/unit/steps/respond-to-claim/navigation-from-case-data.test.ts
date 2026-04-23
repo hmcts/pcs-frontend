@@ -1,31 +1,33 @@
 import type { Request } from 'express';
 
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
+import {
+  hasConfirmedInstallmentOffer,
+  shouldShowInstallmentPaymentsStep,
+} from '../../../../main/steps/respond-to-claim/flowConditions';
 
 import { getNextStep, getPreviousStep } from '@modules/steps/flow';
 
 describe('respond-to-claim navigation from CCD case data', () => {
-  const createReq = (validatedCase: Record<string, unknown>): Request =>
-    ({
+  const createReq = (validatedCase: Record<string, unknown>): Request => {
+    const includesNestedData =
+      'data' in validatedCase &&
+      typeof validatedCase['data'] === 'object' &&
+      validatedCase['data'] !== null &&
+      !Array.isArray(validatedCase['data']);
+
+    const normalizedValidatedCase = includesNestedData ? validatedCase : { ...validatedCase, data: validatedCase };
+
+    return {
       res: {
         locals: {
-          validatedCase,
+          validatedCase: normalizedValidatedCase,
         },
       },
-    }) as unknown as Request;
+    } as unknown as Request;
+  };
 
-  it('routes contact preferences telephone step from current step answer when provided', async () => {
-    const req = createReq({ isDefendantContactByPhone: false });
-
-    await expect(
-      getNextStep(req, 'contact-preferences-telephone', flowConfig, {}, { contactByTelephone: 'yes' })
-    ).resolves.toBe('contact-preferences-text-message');
-    await expect(
-      getNextStep(req, 'contact-preferences-telephone', flowConfig, {}, { contactByTelephone: 'no' })
-    ).resolves.toBe('dispute-claim-interstitial');
-  });
-
-  it('falls back to validated case data when current step answer is unavailable', async () => {
+  it('routes contact preferences telephone step from validated case data', async () => {
     const optedInReq = createReq({ isDefendantContactByPhone: true });
     const optedOutReq = createReq({ isDefendantContactByPhone: false });
 
@@ -37,30 +39,15 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes confirmation of notice step from current step answer when provided', async () => {
-    const req = createReq({
-      defendantResponsesConfirmNoticeGiven: 'yes',
-      noticeDate: '2026-01-15',
-      noticeServed: 'YES',
-      data: {
-        claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
-      },
-    });
-
-    await expect(
-      getNextStep(req, 'confirmation-of-notice-given', flowConfig, {}, { confirmNoticeGiven: 'imNotSure' })
-    ).resolves.toBe('rent-arrears-dispute');
-  });
-
-  it('routes confirmation of notice step from validated case data when current step answer is unavailable', async () => {
+  it('routes confirmation of notice step from validated case data', async () => {
     const noticeDateProvidedReq = createReq({
-      defendantResponsesConfirmNoticeGiven: 'yes',
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
+      defendantResponsesPossessionNoticeReceived: 'yes',
     });
     const rentArrearsReq = createReq({
-      defendantResponsesConfirmNoticeGiven: 'imNotSure',
       noticeServed: 'YES',
+      defendantResponsesPossessionNoticeReceived: 'imNotSure',
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
       },
@@ -74,11 +61,11 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes unexpected confirmNoticeGiven values to arrears branches (not notice-date pages)', async () => {
+  it('routes unexpected possessionNoticeReceived values to arrears branches (not notice-date pages)', async () => {
     const unexpectedValueReq = createReq({
-      defendantResponsesConfirmNoticeGiven: 'NOT SURE',
       noticeDate: '2026-01-15',
       noticeServed: 'YES',
+      defendantResponsesPossessionNoticeReceived: 'NOT SURE',
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
       },
@@ -116,5 +103,101 @@ describe('respond-to-claim navigation from CCD case data', () => {
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
       'repayments-agreed'
     );
+  });
+
+  const rentArrearsData = {
+    claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+  };
+
+  const noRentArrearsData = {
+    claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+  };
+
+  it('routes repayments-agreed forward from CCD state', async () => {
+    const rentArrearsReq = createReq({
+      data: {
+        ...rentArrearsData,
+        possessionClaimResponse: {
+          defendantResponses: {
+            paymentAgreement: { repaymentPlanAgreed: 'NO' },
+          },
+        },
+      },
+    });
+    const noArrearsReq = createReq({
+      data: {
+        ...noRentArrearsData,
+        possessionClaimResponse: {
+          defendantResponses: {
+            paymentAgreement: { repaymentPlanAgreed: 'NO' },
+          },
+        },
+      },
+    });
+
+    await expect(getNextStep(rentArrearsReq, 'repayments-agreed', flowConfig, {})).resolves.toBe(
+      'installment-payments'
+    );
+
+    await expect(getNextStep(noArrearsReq, 'repayments-agreed', flowConfig, {})).resolves.toBe(
+      'your-household-and-circumstances'
+    );
+  });
+
+  it('routes installment-payments forward from CCD state', async () => {
+    const req = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            paymentAgreement: { repayArrearsInstalments: 'YES' },
+          },
+        },
+      },
+    });
+
+    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
+
+    await expect(getNextStep(createReq({}), 'installment-payments', flowConfig, {})).resolves.toBe(
+      'your-household-and-circumstances'
+    );
+  });
+
+  it('show helpers are derived from CCD (GET / deep link)', async () => {
+    const installmentVisibleReq = createReq({
+      data: {
+        ...rentArrearsData,
+        possessionClaimResponse: {
+          defendantResponses: {
+            paymentAgreement: { repaymentPlanAgreed: 'NO' },
+          },
+        },
+      },
+    });
+    const installmentHiddenReq = createReq({
+      data: {
+        ...rentArrearsData,
+        possessionClaimResponse: {
+          defendantResponses: {
+            paymentAgreement: { repaymentPlanAgreed: 'YES' },
+          },
+        },
+      },
+    });
+
+    expect(shouldShowInstallmentPaymentsStep(installmentVisibleReq)).toBe(true);
+    expect(shouldShowInstallmentPaymentsStep(installmentHiddenReq)).toBe(false);
+
+    const howMuchReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            paymentAgreement: { repayArrearsInstalments: 'YES' },
+          },
+        },
+      },
+    });
+
+    expect(hasConfirmedInstallmentOffer(howMuchReq)).toBe(true);
+    expect(hasConfirmedInstallmentOffer(createReq({}))).toBe(false);
   });
 });

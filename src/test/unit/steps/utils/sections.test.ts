@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { SectionConfig } from '../../../../main/interfaces/stepFlow.interface';
+import type { SectionConfig } from '../../../../main/modules/steps/stepFlow.interface';
 import {
   getFirstStepInSection,
   getSectionCoverage,

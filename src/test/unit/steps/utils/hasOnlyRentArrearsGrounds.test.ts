@@ -13,7 +13,7 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-1',
@@ -39,14 +39,14 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-2',
@@ -74,14 +74,14 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'NUISANCE_OR_IMMORAL_USE',
                     },
                     id: 'ground-2',
@@ -107,21 +107,21 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'NUISANCE_OR_IMMORAL_USE',
                     },
                     id: 'ground-2',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'CRIMINAL_CONVICTION',
                     },
                     id: 'ground-3',
@@ -149,7 +149,7 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'NUISANCE_OR_IMMORAL_USE',
                     },
                     id: 'ground-1',
@@ -175,14 +175,14 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'NUISANCE_OR_IMMORAL_USE',
                     },
                     id: 'ground-1',
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'CRIMINAL_CONVICTION',
                     },
                     id: 'ground-2',
@@ -306,7 +306,7 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'Yes',
+                      isRentArrears: 'YES',
                       code: 'RENT_ARREARS_OR_BREACH_OF_TENANCY',
                     },
                     id: 'ground-1',
@@ -373,7 +373,7 @@ describe('hasOnlyRentArrearsGrounds', () => {
                   },
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'NUISANCE_OR_IMMORAL_USE',
                       description:
                         'Nuisance or annoyance to neighbours, illegal or immoral use of the property, or conviction for an arrestable offence in or near the property',
@@ -401,7 +401,7 @@ describe('hasOnlyRentArrearsGrounds', () => {
                 claimGroundSummaries: [
                   {
                     value: {
-                      isRentArrears: 'No',
+                      isRentArrears: 'NO',
                       code: 'NUISANCE_OR_IMMORAL_USE',
                       description:
                         'Nuisance or annoyance to neighbours, illegal or immoral use of the property, or conviction for an arrestable offence in or near the property',
