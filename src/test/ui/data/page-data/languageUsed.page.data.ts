@@ -8,7 +8,7 @@ export const languageUsed = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  errorHiddenMessage: `Select which language you used to complete this service`,
+  errorHiddenMessage: `Select which language xxxx you used to complete this service`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `start-now`,
   backLink: `Back`,
