@@ -41,11 +41,13 @@ function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
 }
 
 const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
-// Tags come from Jenkins choices or PR labels. Unset -> @nightly; empty -> no grep.
+// Jenkins sets E2E_TEST_SCOPE (e.g. nightly @nightly, CNP @PR / @regression). Local default when unset.
 const e2eTag = process.env.E2E_TEST_SCOPE ?? '@smoke';
 
 export default defineConfig({
   testDir: './src/test/ui',
+  // Sauce-only specs (`playwright.sauce.config.ts` + tunnel `beforeEach` tokens); must not run on Jenkins VM E2E.
+  testIgnore: ['**/sauceCrossbrowser/**'],
   ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
   ...(e2eTag ? { grep: new RegExp(e2eTag) } : {}),
   fullyParallel: true,
