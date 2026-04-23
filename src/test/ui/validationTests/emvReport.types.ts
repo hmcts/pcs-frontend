@@ -13,6 +13,9 @@ export type EmvExpectedAssertion = {
 export type EmvStepReportDetail = {
   intent: string;
   screenTitle?: string;
+  /** Lines from `performAction` only (while EMV capture is on). */
   actionsOrInputs?: string[];
+  /** Lines from `performValidation` only (while EMV capture is on). */
+  validationSteps?: string[];
   expectedAssertions?: EmvExpectedAssertion[];
 };

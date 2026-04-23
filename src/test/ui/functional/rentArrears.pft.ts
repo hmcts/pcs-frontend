@@ -1,30 +1,5 @@
 import { rentArrears } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
-import type { EmvStepReportDetail } from '../validationTests/emvReport.types';
-
-export function rentArrearsErrorValidationEmvReport(): EmvStepReportDetail {
-  return {
-    intent:
-      'Rent arrears: mandatory “do you owe”; when No, amount required; format and cap checks (see nested steps for full list).',
-    screenTitle: rentArrears.mainHeader,
-    actionsOrInputs: [
-      'Save without selecting whether respondent owes the stated arrears.',
-      'Select No, then save without amount; invalid / over-limit amounts per PFT.',
-    ],
-    expectedAssertions: [
-      {
-        label: 'Owe amount — choice required',
-        summaryTitle: rentArrears.thereIsAProblemErrorMessageHeader,
-        messageContains: rentArrears.selectIfYouOweErrorMessage,
-      },
-      {
-        label: 'Amount required when No',
-        summaryTitle: rentArrears.thereIsAProblemErrorMessageHeader,
-        messageContains: rentArrears.enterHowMuchYouBelieveErrorMessage,
-      },
-    ],
-  };
-}
 
 export async function rentArrearsErrorValidation(): Promise<void> {
   // mandatory radio button selection
