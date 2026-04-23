@@ -160,5 +160,6 @@ export async function renderWithErrors(
     dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
     languageToggle: t('languageToggle'),
     showCancelButton,
+    ...(res.locals?.extraHeaders ?? {}),
   });
 }
