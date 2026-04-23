@@ -1,9 +1,10 @@
 import type { Request } from 'express';
 
 import { getTranslationFunction } from '../../../modules/steps';
-import { createRespondToClaimFormStep } from '../formStep';
 import { isWalesProperty } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { createRespondToClaimFormStep } from '../formStep';
+
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';

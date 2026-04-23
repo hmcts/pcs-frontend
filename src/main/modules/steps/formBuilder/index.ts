@@ -7,8 +7,8 @@ import { createGetController } from '../controller';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
-import { buildFormContent } from './formContent';
 import { getStaticBasePath, resolveFormBuilderFlowConfig } from './flowConfig';
+import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
 import { validateConfigInDevelopment } from './schema';

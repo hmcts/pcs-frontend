@@ -139,13 +139,7 @@ describe('PostHandler - Save for Later Fix', () => {
         },
       };
 
-      createPostHandler(
-        fields,
-        'free-legal-advice',
-        'test.njk',
-        'respondToClaim',
-        () => resolvedFlowConfig
-      );
+      createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', () => resolvedFlowConfig);
 
       const createStepNavigationCalls = (flowModule.createStepNavigation as jest.Mock).mock.calls;
       const flowConfigResolver = createStepNavigationCalls[createStepNavigationCalls.length - 1][0] as (
@@ -156,16 +150,10 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('uses request-resolved flow config for session form data persistence', async () => {
-      const { post } = createPostHandler(
-        fields,
-        'free-legal-advice',
-        'test.njk',
-        'respondToClaim',
-        () => ({
-          ...flowConfig,
-          useSessionFormData: false,
-        })
-      );
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', () => ({
+        ...flowConfig,
+        useSessionFormData: false,
+      }));
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',

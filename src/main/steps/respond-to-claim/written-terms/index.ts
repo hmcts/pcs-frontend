@@ -2,6 +2,7 @@ import type { Request } from 'express';
 
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { createRespondToClaimFormStep } from '../formStep';
+
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
 

@@ -4,9 +4,10 @@ import { DateTime } from 'luxon';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { createRespondToClaimFormStep } from '../formStep';
+
 import { Logger } from '@modules/logger';
 import { getTranslationFunction } from '@modules/steps';
-import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse } from '@services/ccdCase.interface';
 const logger = Logger.getLogger('confirmation-of-notice-date-when-not-provided');

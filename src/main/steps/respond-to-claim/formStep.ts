@@ -1,13 +1,13 @@
 import type { Request } from 'express';
 
-import { createFormStep } from '@modules/steps';
-import type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { getUserType } from '../utils';
 
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from './flow.config';
 import { legalrepFlowConfig } from './legalrep.flow.config';
-import { getUserType } from '../utils';
 
+import { createFormStep } from '@modules/steps';
+import type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 type RespondToClaimFormStepConfig = Omit<FormBuilderConfig, 'journeyFolder' | 'flowConfig' | 'basePath'>;
 
 function resolveRespondToClaimFlowConfig(req: Request) {

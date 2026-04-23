@@ -2,8 +2,9 @@ import type { Request } from 'express';
 
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { getTranslationFunction } from '../../../modules/steps';
-import { createRespondToClaimFormStep } from '../formStep';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { createRespondToClaimFormStep } from '../formStep';
+
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 

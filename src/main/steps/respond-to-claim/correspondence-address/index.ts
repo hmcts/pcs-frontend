@@ -2,8 +2,9 @@ import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { getTranslationFunction } from '@modules/steps';
 import { createRespondToClaimFormStep } from '../formStep';
+
+import { getTranslationFunction } from '@modules/steps';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';

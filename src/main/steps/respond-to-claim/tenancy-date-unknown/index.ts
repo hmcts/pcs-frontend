@@ -3,8 +3,9 @@ import { format, parseISO } from 'date-fns';
 import { formatDatePartsToISODate } from '../../utils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { getTranslationFunction } from '@modules/steps';
 import { createRespondToClaimFormStep } from '../formStep';
+
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
