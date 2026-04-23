@@ -8,7 +8,7 @@ describe('respond-to-claim priority-debts flow routing', () => {
     expect(defaultNext).toBe('priority-debt-details');
   });
 
-  it('uses regular-income as previous step when universal credit selected', async () => {
+  it('uses regular-income as previous step when user is receiving UC as income (amount present)', async () => {
     if (!previousStep || typeof previousStep === 'string') {
       throw new Error('expected previousStep function');
     }
@@ -22,6 +22,8 @@ describe('respond-to-claim priority-debts flow routing', () => {
                 defendantResponses: {
                   householdCircumstances: {
                     universalCredit: 'YES',
+                    universalCreditAmount: '20000',
+                    universalCreditFrequency: 'MONTHLY',
                   },
                 },
               },
@@ -36,7 +38,7 @@ describe('respond-to-claim priority-debts flow routing', () => {
     expect(result).toBe('what-regular-income-do-you-receive');
   });
 
-  it('uses have-you-applied-for-universal-credit as previous step when universal credit not selected', async () => {
+  it('uses have-you-applied-for-universal-credit as previous step when universal credit not selected as income', async () => {
     if (!previousStep || typeof previousStep === 'string') {
       throw new Error('expected previousStep function');
     }
@@ -50,6 +52,8 @@ describe('respond-to-claim priority-debts flow routing', () => {
                 defendantResponses: {
                   householdCircumstances: {
                     universalCredit: 'NO',
+                    universalCreditAmount: null,
+                    universalCreditFrequency: null,
                   },
                 },
               },
@@ -62,34 +66,5 @@ describe('respond-to-claim priority-debts flow routing', () => {
 
     const result = await previousStep(req, {});
     expect(result).toBe('have-you-applied-for-universal-credit');
-  });
-
-  it('uses regular-income as previous step when universalCredit is YES, even if application date exists', async () => {
-    if (!previousStep || typeof previousStep === 'string') {
-      throw new Error('expected previousStep function');
-    }
-
-    const req = {
-      res: {
-        locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    universalCredit: 'YES',
-                    ucApplicationDate: '2026-01-15',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
-
-    const result = await previousStep(req, {});
-    expect(result).toBe('what-regular-income-do-you-receive');
   });
 });

@@ -68,12 +68,23 @@ describe('respond-to-claim regular-income step', () => {
     mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: caseReference, data: {} });
   });
 
-  it('POST maps universal credit selection to CCD Yes (no date touched)', async () => {
+  const lastPayload = (): Record<string, unknown> => {
+    const call = mockBuildCcdCaseForPossessionClaimResponse.mock.calls[0];
+    return call[1] as Record<string, unknown>;
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getHouseholdCircumstances = (): any =>
+    (lastPayload().defendantResponses as Record<string, unknown>).householdCircumstances;
+
+  it('POST writes UC=YES, amount and frequency when UC is ticked (implicit applied=YES)', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
         action: 'continue',
         regularIncome: 'universalCredit',
+        'regularIncome.universalCreditAmount': '200.00',
+        'regularIncome.universalCreditFrequency': 'MONTHLY',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,112 +97,15 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        defendantResponses: {
-          householdCircumstances: expect.objectContaining({
-            universalCredit: 'YES',
-          }),
-        },
-      })
-    );
+    const hc = getHouseholdCircumstances();
+    expect(hc.universalCredit).toBe('YES');
+    expect(hc.universalCreditAmount).toBe('20000');
+    expect(hc.universalCreditFrequency).toBe('MONTHLY');
+    // Must NOT touch ucApplicationDate — that's owned by the applied-for-UC screen
+    expect(hc).not.toHaveProperty('ucApplicationDate');
   });
 
-  it('POST writes latest selection even when CCD already has YES', async () => {
-    (validateForm as jest.Mock).mockReturnValue({});
-    const req = createReq({
-      body: {
-        action: 'continue',
-        regularIncome: 'universalCredit',
-      },
-      res: {
-        locals: {
-          validatedCase: {
-            id: caseReference,
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    universalCredit: 'YES',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    const next = jest.fn();
-
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-
-    await step.postController.post(req, res, next);
-
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        defendantResponses: {
-          householdCircumstances: expect.objectContaining({
-            universalCredit: 'YES',
-          }),
-        },
-      })
-    );
-  });
-
-  it('POST does not mutate session state when user re-ticks UC', async () => {
-    (validateForm as jest.Mock).mockReturnValue({});
-    const req = createReq({
-      body: {
-        action: 'continue',
-        regularIncome: 'universalCredit',
-      },
-      res: {
-        locals: {
-          validatedCase: {
-            id: caseReference,
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    universalCredit: 'YES',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    const next = jest.fn();
-
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-
-    await step.postController.post(req, res, next);
-
-    expect(req.session.formData).toEqual({});
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        defendantResponses: {
-          householdCircumstances: expect.objectContaining({
-            universalCredit: 'YES',
-          }),
-        },
-      })
-    );
-  });
-
-  it('POST writes NO values when selection is absent and no existing UC data', async () => {
+  it('POST clears UC income fields when UC is unticked', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -208,155 +122,9 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        defendantResponses: {
-          householdCircumstances: expect.objectContaining({
-            universalCredit: 'NO',
-          }),
-        },
-      })
-    );
-    expect(req.session.formData).toEqual({});
-  });
-
-  it('POST does not persist additional state when user unchecks UC over an existing YES', async () => {
-    (validateForm as jest.Mock).mockReturnValue({});
-    const req = createReq({
-      body: {
-        action: 'continue',
-      },
-      res: {
-        locals: {
-          validatedCase: {
-            id: caseReference,
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    universalCredit: 'YES',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    const next = jest.fn();
-
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-
-    await step.postController.post(req, res, next);
-
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        defendantResponses: {
-          householdCircumstances: expect.objectContaining({
-            universalCredit: 'NO',
-          }),
-        },
-      })
-    );
-    expect(req.session.formData).toEqual({});
-  });
-
-  it('POST does not persist additional state when draft already has a UC date', async () => {
-    (validateForm as jest.Mock).mockReturnValue({});
-    const req = createReq({
-      body: {
-        action: 'continue',
-      },
-      res: {
-        locals: {
-          validatedCase: {
-            id: caseReference,
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    universalCredit: 'YES',
-                    ucApplicationDate: '2024-02-10',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    const next = jest.fn();
-
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-
-    await step.postController.post(req, res, next);
-
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        defendantResponses: {
-          householdCircumstances: expect.objectContaining({
-            universalCredit: 'NO',
-          }),
-        },
-      })
-    );
-    expect(req.session.formData).toEqual({});
-  });
-
-  it('POST does not touch an explicit NO when user leaves UC unchecked', async () => {
-    (validateForm as jest.Mock).mockReturnValue({});
-    const req = createReq({
-      body: {
-        action: 'continue',
-      },
-      res: {
-        locals: {
-          validatedCase: {
-            id: caseReference,
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    universalCredit: 'NO',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    const next = jest.fn();
-
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-
-    await step.postController.post(req, res, next);
-
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        defendantResponses: {
-          householdCircumstances: expect.objectContaining({
-            universalCredit: 'NO',
-          }),
-        },
-      })
-    );
-    expect(req.session.formData).toEqual({});
+    const hc = getHouseholdCircumstances();
+    expect(hc).not.toHaveProperty('universalCredit');
+    expect(hc.universalCreditAmount).toBeNull();
+    expect(hc.universalCreditFrequency).toBeNull();
   });
 });

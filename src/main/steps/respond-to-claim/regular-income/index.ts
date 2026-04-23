@@ -109,7 +109,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Universal Credit
-    if (fromYesNoEnum(hc.universalCredit) === 'yes') {
+    if (hc.universalCreditAmount || hc.universalCreditFrequency) {
       selectedIncome.push('universalCredit');
       if (hc.universalCreditAmount) {
         formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);
@@ -180,8 +180,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Universal Credit
-    householdCircumstances.universalCredit = toYesNoEnum(incomeArray.includes('universalCredit') ? 'yes' : 'no');
     if (incomeArray.includes('universalCredit')) {
+      householdCircumstances.universalCredit = toYesNoEnum('yes');
       const amountRaw = req.body?.['regularIncome.universalCreditAmount'] as string | undefined;
       const frequency = req.body?.['regularIncome.universalCreditFrequency'] as string | undefined;
 
@@ -191,6 +191,9 @@ export const step: StepDefinition = createFormStep({
       if (frequency) {
         householdCircumstances.universalCreditFrequency = frequency;
       }
+    } else {
+      householdCircumstances.universalCreditAmount = null;
+      householdCircumstances.universalCreditFrequency = null;
     }
 
     // Other benefits
