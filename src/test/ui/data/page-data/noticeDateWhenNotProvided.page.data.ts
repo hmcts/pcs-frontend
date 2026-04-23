@@ -4,7 +4,6 @@ export const noticeDateWhenNotProvided = {
   mainHeader: `Notice date`,
   respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
-  //Need to fix this as part of HDPI-5786
   didNotProvideNoticeLabel: () => `${process.env.CLAIMANT_NAME} did not provide the date they served you notice.`,
   getWhenDidYouReceiveNoticeQuestion: () => `When did you receive notice from ${process.env.CLAIMANT_NAME} (optional)?`,
   exampleHintText: `For example, 27 9 2022. If you’re not sure of the exact date, you can find it on the notice`,
