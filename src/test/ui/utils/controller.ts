@@ -8,7 +8,7 @@ import {
   enable_navigation_tests,
 } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
-import { appendEmvStepCaptureLine } from '../validationTests/emvStepCapture';
+import { appendEmvStepCaptureLine } from '../validationTests/softEmvRunner';
 
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
