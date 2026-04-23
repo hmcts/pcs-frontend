@@ -7,19 +7,19 @@ function attachmentSlug(step: string): string {
 }
 
 /**
- * Runs optional error-message validation (EMV) steps without aborting the journey on failure.
- * Failures are logged, attached to the Playwright report, then `assertFailedStepsAtEnd` throws once.
- * Call `performValidation(stepName, async () => { ... })` for each screen (`run` is the same function).
+ * Optional PFT error-message checks that do not stop the journey; failures are collected
+ * and thrown once from `assertFailedStepsAtEnd`.
  */
 export function createSoftEmvRunner(testInfo: TestInfo) {
   const failures: { step: string; error: string }[] = [];
 
-  async function performValidation(step: string, fn: () => Promise<void>): Promise<void> {
+  /** Runs a PFT when ENABLE_ERROR_MESSAGES_VALIDATION=true; swallows errors and records them for the end assert. */
+  async function runSoftPftCheck(step: string, pft: () => Promise<void>): Promise<void> {
     if (enable_error_message_validation !== 'true') {
       return;
     }
     try {
-      await fn();
+      await pft();
     } catch (err) {
       const error = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err);
       failures.push({ step, error });
@@ -47,7 +47,5 @@ export function createSoftEmvRunner(testInfo: TestInfo) {
     );
   }
 
-  const run = performValidation;
-
-  return { performValidation, run, assertFailedStepsAtEnd };
+  return { runSoftPftCheck, assertFailedStepsAtEnd };
 }

@@ -1,7 +1,3 @@
-/**
- * Same journey as e2e "RentArrears - Introductory … Notice date unknown @regression".
- * With ENABLE_ERROR_MESSAGES_VALIDATION=true, `softEmv` runs matching PFT checks; failures surface at the end.
- */
 import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
@@ -47,9 +43,9 @@ import {
   finaliseAllValidations,
   initializeExecutor,
   performAction,
-  performActions,
-  performValidation as checkUi,
+  performActions, performValidation,
 } from '../utils/controller';
+
 import { createSoftEmvRunner } from './softEmvRunner';
 
 const home_url = config.get('e2e.testUrl') as string;
@@ -71,7 +67,9 @@ function introNoticeDateUnknownFixture(): string {
   return name;
 }
 
-async function createCaseLoginAndOpenStartNow(): Promise<void> {
+test.beforeEach(async ({ page }) => {
+  initializeExecutor(page);
+  claimantName = introNoticeDateUnknownFixture();
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   await performAction('fetchPINsAPI');
@@ -81,22 +79,16 @@ async function createCaseLoginAndOpenStartNow(): Promise<void> {
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
-}
-
-test.beforeEach(async ({ page }) => {
-  initializeExecutor(page);
-  claimantName = introNoticeDateUnknownFixture();
-  await createCaseLoginAndOpenStartNow();
 });
 
-test.describe('Rent arrears introductory — notice date unknown (validation tests) @nightly', () => {
+test.describe('Rent arrears introductory — notice date unknown (validation tests) @nightly @error', () => {
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
     const softEmv = createSoftEmvRunner(test.info());
 
-    await softEmv.performValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
+    await softEmv.runSoftPftCheck('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
 
-    await softEmv.performValidation('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
+    await softEmv.runSoftPftCheck('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.noRadioOption,
@@ -121,7 +113,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
     });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
 
-    await softEmv.performValidation('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
+    await softEmv.runSoftPftCheck('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -131,10 +123,10 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
     await performAction('selectNoticeDetails', { option: confirmationOfNoticeGiven.yesRadioOption });
     await performAction('enterNoticeDateUnknown');
 
-    await softEmv.performValidation('rentArrears', rentArrearsErrorValidation);
+    await softEmv.runSoftPftCheck('rentArrears', rentArrearsErrorValidation);
     await performAction('rentArrears', { option: rentArrears.yesRadioOption });
 
-    await checkUi('mainHeader', counterClaim.mainHeader);
+    await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
 
@@ -168,7 +160,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       yourCircumstancesOption: yourCircumstances.noRadioOption,
     });
 
-    await softEmv.performValidation('exceptionalHardship', yourExceptionalHardShipErrorValidation);
+    await softEmv.runSoftPftCheck('exceptionalHardship', yourExceptionalHardShipErrorValidation);
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
@@ -186,7 +178,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       ['clickButton', equalityAndDiversityEnd.continueButton],
     );
 
-    await softEmv.performValidation('languageUsed', languageUsedErrorValidation);
+    await softEmv.runSoftPftCheck('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
