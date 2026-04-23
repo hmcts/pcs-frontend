@@ -1,5 +1,16 @@
 import { dashboard, defendantDateOfBirth, feedback } from '../data/page-data';
-import { performValidation } from '../utils/controller';
+import { performAction, performValidation } from '../utils/controller';
+
+/** Partial date (month + year only) to assert missing-part error; journey then supplies full DOB. */
+export async function defendantDateOfBirthErrorValidation(): Promise<void> {
+  await performAction('inputText', defendantDateOfBirth.monthTextLabel, '6');
+  await performAction('inputText', defendantDateOfBirth.yearTextLabel, '1990');
+  await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantDateOfBirth.thereIsAProblemErrorMessageHeader,
+    message: defendantDateOfBirth.yourDateOfBirthMustIncludeDayErrorMessage,
+  });
+}
 
 export async function defendantDateOfBirthNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', defendantDateOfBirth.feedbackLink, {

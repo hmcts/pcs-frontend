@@ -32,6 +32,10 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import {
+  contactPreferencesTelephoneErrorValidation,
+} from '../functional/contactPreferencesTelephone.pft';
+import { defendantDateOfBirthErrorValidation } from '../functional/defendantDateOfBirth.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
 import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pft';
@@ -48,6 +52,8 @@ import {
 } from '../utils/controller';
 
 import { createSoftEmvRunner } from './softEmvRunner';
+import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
+import { correspondenceAddressErrorValidation } from '../functional/correspondenceAddress.pft';
 
 const home_url = config.get('e2e.testUrl') as string;
 let claimantName: string;
@@ -99,21 +105,35 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       lName: defendantNameConfirmation.lastNameInputText,
     });
 
+    await softEmv.runSoftPftCheck('defendantDateOfBirth', defendantDateOfBirthErrorValidation);
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
+
+    await softEmv.runSoftPftCheck('correspondenceAddressKnown', correspondenceAddressErrorValidation);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
+
+    await softEmv.runSoftPftCheck(
+      'contactPreferenceEmailOrPost',
+      contactPreferenceEmailOrPostErrorValidation
+    );
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
+
+    await softEmv.runSoftPftCheck(
+      'contactPreferencesTelephone',
+      contactPreferencesTelephoneErrorValidation
+    );
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
+
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
 
     await softEmv.runSoftPftCheck('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
@@ -170,7 +190,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
     });
 
     await performActions(
-      'Continue through income, debts, expenses, equality',
+      'Continue through place holder pages for income, debts, expenses, equality',
       ['clickButton', incomeAndExpenses.continueButton],
       ['clickButton', whatRegularIncomeDoYouReceive.continueButton],
       ['clickButton', haveYouAppliedForUniversalCredit.continueButton],

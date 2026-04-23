@@ -27,4 +27,6 @@ export const defendantDateOfBirth = {
   saveForLaterButton: `Save for later`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `defendant-date-of-birth`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  yourDateOfBirthMustIncludeDayErrorMessage: `Your date of birth must include a day`,
 };
