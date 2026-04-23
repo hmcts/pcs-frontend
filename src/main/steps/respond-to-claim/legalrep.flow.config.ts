@@ -26,6 +26,8 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'counter-claim',
     'repayments-made',
     'repayments-agreed',
+    'installment-payments',
+    'how-much-afford-to-pay',
     'correspondence-address',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
@@ -55,7 +57,6 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'end-now',
-    'installment-payments',
   ],
   steps: {
     'start-now': {
@@ -363,6 +364,10 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
         },
       ],
       defaultNext: 'do-you-have-any-dependant-children',
+    },
+    'how-much-afford-to-pay': {
+      previousStep: 'installment-payments',
+      defaultNext: 'your-household-and-circumstances',
     },
     'do-you-have-any-dependant-children': {
       previousStep: 'repayments-agreed',
