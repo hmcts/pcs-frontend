@@ -67,4 +67,34 @@ describe('respond-to-claim priority-debts flow routing', () => {
     const result = await previousStep(req, {});
     expect(result).toBe('have-you-applied-for-universal-credit');
   });
+
+  it('uses have-you-applied-for-universal-credit as previous step when applied-for-UC answer is NO', async () => {
+    if (!previousStep || typeof previousStep === 'string') {
+      throw new Error('expected previousStep function');
+    }
+
+    const req = {
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: {
+                    universalCredit: 'NO',
+                    universalCreditAmount: '20000',
+                    universalCreditFrequency: 'MONTHLY',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const result = await previousStep(req, {});
+    expect(result).toBe('have-you-applied-for-universal-credit');
+  });
 });
