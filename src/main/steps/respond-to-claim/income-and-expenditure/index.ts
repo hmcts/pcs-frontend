@@ -1,13 +1,9 @@
-import { flowConfig } from '../flow.config';
-
-import { createFormStep } from '@modules/steps';
+import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'income-and-expenditure',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   fields: [],
   customTemplate: `${__dirname}/incomeAndExpenditure.njk`,
 });

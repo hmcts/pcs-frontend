@@ -1,9 +1,7 @@
 import type { Request } from 'express';
 
-import { createFormStep } from '../../../modules/steps';
+import { createRespondToClaimFormStep } from '../formStep';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
-
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
@@ -32,12 +30,10 @@ function mapCcdRepaymentPlanToFormValue(
   return undefined;
 }
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-agreed',
-  journeyFolder: 'respondToClaim',
   showCancelButton: false,
   stepDir: __dirname,
-  flowConfig,
   beforeRedirect: async req => {
     const repaymentsForm = req.body as Record<string, unknown>;
     const repaymentsAgreed = repaymentsForm.repaymentsAgreed as string | undefined;

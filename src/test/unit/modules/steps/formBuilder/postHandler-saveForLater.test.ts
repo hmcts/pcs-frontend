@@ -81,6 +81,11 @@ describe('PostHandler - Save for Later Fix', () => {
     (dashboardModule.getDashboardUrl as jest.Mock) = jest.fn(caseId => {
       return `/dashboard/${caseId || '1234567890123456'}`;
     });
+
+    (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
+      getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
+      getNextStepUrl: jest.fn().mockResolvedValue('/next-step'),
+    });
   });
 
   afterEach(() => {
@@ -123,6 +128,60 @@ describe('PostHandler - Save for Later Fix', () => {
         303,
         '/case/1771325608502536/respond-to-claim/contact-preferences'
       );
+    });
+
+    it('resolves navigation flow config from the supplied resolver', async () => {
+      const resolvedFlowConfig: JourneyFlowConfig = {
+        journeyName: 'respondToClaim',
+        stepOrder: ['free-legal-advice', 'legalrep-next'],
+        steps: {
+          'free-legal-advice': { defaultNext: 'legalrep-next' },
+        },
+      };
+
+      createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        () => resolvedFlowConfig
+      );
+
+      const createStepNavigationCalls = (flowModule.createStepNavigation as jest.Mock).mock.calls;
+      const flowConfigResolver = createStepNavigationCalls[createStepNavigationCalls.length - 1][0] as (
+        req: Request
+      ) => Promise<JourneyFlowConfig>;
+
+      await expect(flowConfigResolver(mockRequest as Request)).resolves.toBe(resolvedFlowConfig);
+    });
+
+    it('uses request-resolved flow config for session form data persistence', async () => {
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        () => ({
+          ...flowConfig,
+          useSessionFormData: false,
+        })
+      );
+
+      mockRequest.body = {
+        hadLegalAdvice: 'yes',
+      };
+      mockRequest.res = {
+        locals: {
+          validatedCase: { id: '1771325608502536' },
+        },
+      } as unknown as Response;
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(
+        (mockRequest.session as { formData?: Record<string, unknown> } | undefined)?.formData?.['free-legal-advice']
+      ).toBeUndefined();
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/next-step');
     });
 
     it('should validate form before saving for later', async () => {

@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
+import type { FormBuilderFlowConfig } from './flowConfig';
 
 export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup';
 export type ComponentType =
@@ -114,7 +114,7 @@ export interface FormBuilderConfig {
   translationKeys?: TranslationKeys;
   customTemplate?: string;
   basePath?: string;
-  flowConfig?: JourneyFlowConfig;
+  flowConfig?: FormBuilderFlowConfig;
   showCancelButton?: boolean;
 }
 

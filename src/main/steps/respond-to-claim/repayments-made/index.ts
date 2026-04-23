@@ -1,16 +1,12 @@
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
-
-import { createFormStep } from '@modules/steps';
+import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PaymentAgreement, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-made',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',

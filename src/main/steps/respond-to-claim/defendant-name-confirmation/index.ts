@@ -1,18 +1,13 @@
 import type { Request } from 'express';
 
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
-
-import { createFormStep } from '@modules/steps';
+import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-name-confirmation',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  basePath: '/respond-to-claim',
-  flowConfig,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   beforeRedirect: async req => {
     const nameConfirmation = req.body?.nameConfirmation as string | undefined;
