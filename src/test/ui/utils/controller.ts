@@ -7,9 +7,7 @@ import {
   enable_navigation_tests,
 } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
-import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
 
-loadPlaywrightSetupEnvIntoProcess();
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';

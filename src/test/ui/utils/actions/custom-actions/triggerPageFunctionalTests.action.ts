@@ -8,7 +8,7 @@ import {
   enable_error_message_validation,
   enable_navigation_tests,
   enable_visibility_validation,
-} from '../../../../../../playwright.config';
+} from '../../../../../../playwright.sauce.config';
 import { shortUrl, truncateForLog } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
 import {

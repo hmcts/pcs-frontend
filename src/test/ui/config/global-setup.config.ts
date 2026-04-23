@@ -1,42 +1,32 @@
 import fs from 'fs';
 import path from 'path';
 
+import { IdamUtils, ServiceAuthUtils } from '@hmcts/playwright-common';
+
 import { accessTokenApiData, s2STokenApiData } from '../data/api-data';
 import { user } from '../data/user-data';
 
-/** Clears PFT lock dir on local runs only (skipped when CI is set). */
-export function clearEmvLocksIfLocal(): void {
-  if (process.env.CI) {
-    return;
+async function globalSetupConfig(): Promise<void> {
+  if (!process.env.CI) {
+    clearEmvLocks();
   }
-  const lockDir = path.join(process.cwd(), 'test-results', 'pft-locks');
-  fs.rmSync(lockDir, { recursive: true, force: true });
+  await getS2SToken();
+  await getAccessToken();
 }
 
-export const getS2SToken = async (): Promise<void> => {
-  const { ServiceAuthUtils } = await import('@hmcts/playwright-common');
-  process.env.S2S_URL = process.env.S2S_URL || s2STokenApiData.s2sUrl;
+const clearEmvLocks = (): void => {
+  const lockDir = path.join(process.cwd(), 'test-results', 'pft-locks');
+  fs.rmSync(lockDir, { recursive: true, force: true });
+};
 
-  let lastError: unknown;
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    try {
-      process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
-        microservice: s2STokenApiData.microservice,
-      });
-      return;
-    } catch (error) {
-      lastError = error;
-      if (attempt === 2) {
-        break;
-      }
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-  }
-  throw lastError;
+export const getS2SToken = async (): Promise<void> => {
+  process.env.S2S_URL = s2STokenApiData.s2sUrl;
+  process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
+    microservice: s2STokenApiData.microservice,
+  });
 };
 
 export const getAccessToken = async (): Promise<void> => {
-  const { IdamUtils } = await import('@hmcts/playwright-common');
   process.env.IDAM_WEB_URL = accessTokenApiData.idamUrl;
   process.env.IDAM_TESTING_SUPPORT_URL = accessTokenApiData.idamTestingSupportUrl;
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
@@ -48,9 +38,5 @@ export const getAccessToken = async (): Promise<void> => {
     scope: 'profile openid roles',
   });
 };
-
-async function globalSetupConfig(): Promise<void> {
-  clearEmvLocksIfLocal();
-}
 
 export default globalSetupConfig;

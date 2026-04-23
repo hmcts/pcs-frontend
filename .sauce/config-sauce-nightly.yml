@@ -20,7 +20,7 @@ defaults:
 
 playwright:
   version: 1.58.1
-  configFile: playwright.config.ts
+  configFile: playwright.sauce.config.ts
 
 nodeVersion: v22
 
