@@ -643,6 +643,8 @@ export class RespondToClaimAction implements IAction {
       option: priorityDebtDetailsData.option,
     });
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  }
+
   private async languageUsed(languageScreenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: languageScreenData.question,
