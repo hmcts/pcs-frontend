@@ -5,7 +5,7 @@ export const whatOrderDoYouWantTheCourtToMakeAndWhy = {
   includeDetailsOfAnyFactsParagraph: `Include details of any facts or evidence that you think the court should consider when it makes a decision. You can upload your evidence on the next page.`,
   explainWhatYouWantTextLabel: `Explain what you want the court to do, and why`,
   youHave600CharactersHiddenHintText: `You have 6,800 characters remaining`,
-  whatYouWantTheCourtToDoTextInput: `50000`,
+  whatYouWantTheCourtToDoTextInput: `Include details of any facts or evidence`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
   backLink: `Back`,

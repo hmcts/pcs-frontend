@@ -5,6 +5,7 @@ import {
   doYouNeedHelpPayingTheFee,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
 import { generateRandomString } from '../../common/string.utils';
@@ -22,6 +23,7 @@ export class GenAppsAction implements IAction {
       ['confirmYouHaveAppliedForFeeHelp', () => this.confirmYouHaveAppliedForFeeHelp(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
+      ['confirmOrderDoYouWant', () => this.confirmOrderDoYouWant(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -78,6 +80,17 @@ export class GenAppsAction implements IAction {
       FieldsStore.delete(confirmFeeHelp.label as string);
     }
     await performAction('clickButton', haveYouAlreadyAppliedForHelpWithFees.continueButton);
+  }
+
+  private async confirmOrderDoYouWant(confirmOrder: actionRecord) {
+    await performAction('recordUserEntry', confirmOrder);
+    const userInput =
+      typeof confirmOrder.input === 'number'
+        ? generateRandomString(confirmOrder.input)
+        : (confirmOrder.input as string);
+    await performAction('inputText', confirmOrder.label, userInput);
+    FieldsStore.update(confirmOrder.label as string, userInput);
+    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {

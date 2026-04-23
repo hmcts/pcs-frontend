@@ -7,7 +7,7 @@ export async function whatOrderDoYouWantTheCourtToMakeAndWhyErrorValidation(): P
     validationType: whatOrderDoYouWantTheCourtToMakeAndWhy.errorValidationType.two,
     inputArray: whatOrderDoYouWantTheCourtToMakeAndWhy.errorValidationField.errorTextField,
     header: whatOrderDoYouWantTheCourtToMakeAndWhy.thereIsAProblemErrorMessageHeader,
-    question: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
+    label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
     button: whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton,
   });
 }
