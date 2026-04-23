@@ -35,6 +35,7 @@ export default {
   'do-you-have-any-dependant-children': 'doYouHaveAnyDependantChildren',
   'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
   'choose-an-application': 'chooseAnApplication',
+  'language-used': 'languageUsed',
   /* 'check-your-answers': 'checkYourAnswers', */
   'ask-to-adjourn-the-court-hearing': 'askToAdjournTheCourtHearing',
   'ask-the-court-to-set-aside-the-order': 'askTheCourtToSetAsideTheOrder',
@@ -51,5 +52,4 @@ export default {
   'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
-  'language-used': 'languageUsed',
 };
