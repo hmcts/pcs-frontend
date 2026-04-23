@@ -625,7 +625,7 @@ export class RespondToClaimAction implements IAction {
     }
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   }
-  
+
   private async languageUsed(languageScreenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: languageScreenData.question,
