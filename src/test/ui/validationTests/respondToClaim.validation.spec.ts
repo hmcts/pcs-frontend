@@ -32,40 +32,16 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-import {
-  contactPreferenceEmailOrPostMandatoryChoiceErrorValidation,
-  contactPreferenceEmailOrPostMandatoryChoiceErrorValidationEmvReport,
-} from '../functional/contactPreferenceEmailOrPost.pft';
-import {
-  contactPreferencesTelephoneMandatoryChoiceErrorValidation,
-  contactPreferencesTelephoneMandatoryChoiceErrorValidationEmvReport,
-} from '../functional/contactPreferencesTelephone.pft';
-import {
-  correspondenceAddressKnownErrorValidation,
-  correspondenceAddressKnownErrorValidationEmvReport,
-} from '../functional/correspondenceAddress.pft';
-import {
-  defendantDateOfBirthErrorValidation,
-  defendantDateOfBirthErrorValidationEmvReport,
-} from '../functional/defendantDateOfBirth.pft';
-import {
-  defendantNameConfirmationErrorValidation,
-  defendantNameConfirmationErrorValidationEmvReport,
-} from '../functional/defendantNameConfirmation.pft';
-import {
-  yourExceptionalHardShipErrorValidation,
-  yourExceptionalHardShipErrorValidationEmvReport,
-} from '../functional/exceptionalHardship.pft';
-import {
-  freeLegalAdviceErrorValidation,
-  freeLegalAdviceErrorValidationEmvReport,
-} from '../functional/freeLegalAdvice.pft';
-import { languageUsedErrorValidation, languageUsedErrorValidationEmvReport } from '../functional/languageUsed.pft';
-import { rentArrearsErrorValidation, rentArrearsErrorValidationEmvReport } from '../functional/rentArrears.pft';
-import {
-  tenancyTypeDetailsErrorValidation,
-  tenancyTypeDetailsErrorValidationEmvReport,
-} from '../functional/tenancyTypeDetails.pft';
+import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
+import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
+import { correspondenceAddressKnownErrorValidation } from '../functional/correspondenceAddress.pft';
+import { defendantDateOfBirthErrorValidation } from '../functional/defendantDateOfBirth.pft';
+import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
+import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
+import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pft';
+import { languageUsedErrorValidation } from '../functional/languageUsed.pft';
+import { rentArrearsErrorValidation } from '../functional/rentArrears.pft';
+import { tenancyTypeDetailsErrorValidation } from '../functional/tenancyTypeDetails.pft';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
@@ -115,18 +91,10 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
   }) => {
     const softEmv = createSoftEmvRunner(test.info(), { page });
 
-    await softEmv.runSoftPftCheck(
-      'freeLegalAdvice',
-      freeLegalAdviceErrorValidation,
-      freeLegalAdviceErrorValidationEmvReport()
-    );
+    await softEmv.runSoftPftCheck('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
 
-    await softEmv.runSoftPftCheck(
-      'defendantNameConfirmation',
-      defendantNameConfirmationErrorValidation,
-      defendantNameConfirmationErrorValidationEmvReport()
-    );
+    await softEmv.runSoftPftCheck('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.noRadioOption,
@@ -134,52 +102,32 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       lName: defendantNameConfirmation.lastNameInputText,
     });
 
-    await softEmv.runSoftPftCheck(
-      'defendantDateOfBirth',
-      defendantDateOfBirthErrorValidation,
-      defendantDateOfBirthErrorValidationEmvReport()
-    );
+    await softEmv.runSoftPftCheck('defendantDateOfBirth', defendantDateOfBirthErrorValidation);
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
 
-    await softEmv.runSoftPftCheck(
-      'correspondenceAddressKnown',
-      correspondenceAddressKnownErrorValidation,
-      correspondenceAddressKnownErrorValidationEmvReport()
-    );
+    await softEmv.runSoftPftCheck('correspondenceAddressKnown', correspondenceAddressKnownErrorValidation);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
 
-    await softEmv.runSoftPftCheck(
-      'contactPreferenceEmailOrPost',
-      contactPreferenceEmailOrPostMandatoryChoiceErrorValidation,
-      contactPreferenceEmailOrPostMandatoryChoiceErrorValidationEmvReport()
-    );
+    await softEmv.runSoftPftCheck('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
     });
 
-    await softEmv.runSoftPftCheck(
-      'contactPreferencesTelephone',
-      contactPreferencesTelephoneMandatoryChoiceErrorValidation,
-      contactPreferencesTelephoneMandatoryChoiceErrorValidationEmvReport()
-    );
+    await softEmv.runSoftPftCheck('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation);
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
 
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
 
-    await softEmv.runSoftPftCheck(
-      'tenancyTypeDetails',
-      tenancyTypeDetailsErrorValidation,
-      tenancyTypeDetailsErrorValidationEmvReport()
-    );
+    await softEmv.runSoftPftCheck('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -189,7 +137,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
     await performAction('selectNoticeDetails', { option: confirmationOfNoticeGiven.yesRadioOption });
     await performAction('enterNoticeDateUnknown');
 
-    await softEmv.runSoftPftCheck('rentArrears', rentArrearsErrorValidation, rentArrearsErrorValidationEmvReport());
+    await softEmv.runSoftPftCheck('rentArrears', rentArrearsErrorValidation);
     await performAction('rentArrears', { option: rentArrears.yesRadioOption });
 
     await performValidation('mainHeader', counterClaim.mainHeader);
@@ -226,11 +174,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       yourCircumstancesOption: yourCircumstances.noRadioOption,
     });
 
-    await softEmv.runSoftPftCheck(
-      'exceptionalHardship',
-      yourExceptionalHardShipErrorValidation,
-      yourExceptionalHardShipErrorValidationEmvReport()
-    );
+    await softEmv.runSoftPftCheck('exceptionalHardship', yourExceptionalHardShipErrorValidation);
     await performAction('exceptionalHardship', {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
@@ -248,7 +192,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       ['clickButton', equalityAndDiversityEnd.continueButton]
     );
 
-    await softEmv.runSoftPftCheck('languageUsed', languageUsedErrorValidation, languageUsedErrorValidationEmvReport());
+    await softEmv.runSoftPftCheck('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,

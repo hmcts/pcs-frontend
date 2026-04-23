@@ -16,6 +16,13 @@ type ValidationResult = {
   error?: string;
 };
 
+/** Slice of `results` for soft EMV auto-reporting. */
+export type ErrorMessageValidationSnapshot = {
+  pageName: string;
+  expected: string;
+  passed: boolean;
+};
+
 export class ErrorMessageValidation implements IValidation {
   private static results: ValidationResult[] = [];
   private static testCounter = 0;
@@ -341,5 +348,18 @@ export class ErrorMessageValidation implements IValidation {
     ErrorMessageValidation.pagesPassed.clear();
     ErrorMessageValidation.missingEMVFiles.clear();
     ErrorMessageValidation.emvFailed = false;
+  }
+
+  /** For soft EMV: index before `runSoftPftCheck` → slice after PFT for new error-message rows. */
+  static peekResultsLength(): number {
+    return ErrorMessageValidation.results.length;
+  }
+
+  static getResultsSliceSince(start: number): ErrorMessageValidationSnapshot[] {
+    return ErrorMessageValidation.results.slice(start).map(r => ({
+      pageName: r.pageName,
+      expected: r.expected,
+      passed: r.passed,
+    }));
   }
 }

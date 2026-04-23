@@ -1,24 +1,20 @@
 import type { Page, TestInfo } from '@playwright/test';
 import * as allure from 'allure-js-commons';
-import { ContentType, Status } from 'allure-js-commons';
+import { Status } from 'allure-js-commons';
 
 import { enable_error_message_validation_new } from '../../../../playwright.config';
+import { ErrorMessageValidation, type ErrorMessageValidationSnapshot } from '../utils/validations/custom-validations';
 
-import type { EmvStepReportDetail } from './emvReport.types';
-
-export type { EmvExpectedAssertion, EmvStepReportDetail } from './emvReport.types';
-
-function attachmentSlug(step: string): string {
-  return `emv-${step.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
-}
-
-function escapeMarkdownCell(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
-}
+import type { EmvExpectedAssertion, EmvStepReportDetail } from './emvReport.types';
+import { startEmvStepCapture, stopEmvStepCapture } from './emvStepCapture';
 
 function titleCaseStep(step: string): string {
   const spaced = step.replace(/([A-Z])/g, ' $1').replace(/[-_]/g, ' ');
   return spaced.replace(/\b\w/g, c => c.toUpperCase()).trim();
+}
+
+function mdCell(s: string): string {
+  return s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
 }
 
 export type EmvJourneyRow = {
@@ -32,119 +28,85 @@ export type EmvJourneyRow = {
 };
 
 export type CreateSoftEmvRunnerOptions = {
-  /** When set, each row records the current URL for the Allure / attachment report. */
   page?: Page;
 };
 
-function renderStepMarkdown(
-  step: string,
-  pageUrl: string | undefined,
-  pageUrlAfter: string | undefined,
-  outcome: string,
-  details: EmvStepReportDetail | undefined,
-  error?: string
-): string {
-  const lines: string[] = [];
-  lines.push(`# EMV — ${titleCaseStep(step)}`);
-  lines.push('');
-  lines.push('## Where');
-  lines.push(`- **PFT / page key:** \`${step}\``);
-  lines.push(`- **URL before step:** ${pageUrl ?? '—'}`);
-  lines.push(`- **URL after PFT:** ${pageUrlAfter ?? '—'}`);
-  lines.push(`- **Outcome:** ${outcome}`);
-  lines.push('');
-
-  if (details?.screenTitle) {
-    lines.push('## Screen');
-    lines.push(`- ${details.screenTitle}`);
-    lines.push('');
+function partitionCaptured(lines: string[]): { actions: string[]; validations: string[] } {
+  const actions: string[] = [];
+  const validations: string[] = [];
+  for (const line of lines) {
+    (line.startsWith('Validated ') ? validations : actions).push(line);
   }
-
-  lines.push('## Intent');
-  lines.push(details?.intent ?? '_No report detail supplied — infer from nested Playwright steps._');
-  lines.push('');
-
-  if (details?.actionsOrInputs?.length) {
-    lines.push('## Actions / data entered (as exercised by PFT)');
-    details.actionsOrInputs.forEach((a, i) => lines.push(`${i + 1}. ${a}`));
-    lines.push('');
-  }
-
-  if (details?.expectedAssertions?.length) {
-    lines.push('## Validations (error summary)');
-    details.expectedAssertions.forEach((ex, i) => {
-      lines.push(`### ${i + 1}. ${ex.label}`);
-      if (ex.summaryTitle) {
-        lines.push(`- **Summary title:** ${ex.summaryTitle}`);
-      }
-      if (ex.messageContains) {
-        lines.push(`- **Expected message:** ${ex.messageContains}`);
-      }
-    });
-    lines.push('');
-  }
-
-  if (error) {
-    lines.push('## Failure');
-    lines.push('```');
-    lines.push(error);
-    lines.push('```');
-  }
-
-  lines.push('---');
-  lines.push(
-    '_Nested `test.step` entries under this test show each `performAction` / `performValidation` from the PFT._'
-  );
-  return lines.join('\n');
+  return { actions, validations };
 }
 
-async function attachStepMarkdown(testInfo: TestInfo, step: string, body: string): Promise<void> {
-  const name = `${attachmentSlug(step)}-report.md`;
-  try {
-    await testInfo.attach(name, { body, contentType: 'text/markdown' });
-  } catch {
-    /* ignore */
-  }
-  try {
-    await allure.attachment(name, body, { contentType: 'text/markdown' });
-  } catch {
-    /* ignore */
-  }
+function buildAutoReport(
+  pageKey: string,
+  captured: string[],
+  errorRows: ErrorMessageValidationSnapshot[]
+): EmvStepReportDetail {
+  const { actions, validations } = partitionCaptured(captured);
+  const expectedAssertions: EmvExpectedAssertion[] | undefined =
+    errorRows.length > 0
+      ? errorRows.map((r, i) => {
+          const c = r.expected.indexOf(': ');
+          return {
+            label: `${r.pageName || `Error ${i + 1}`} (${r.passed ? 'pass' : 'fail'})`,
+            summaryTitle: c > 0 ? r.expected.slice(0, c) : undefined,
+            messageContains: c > 0 ? r.expected.slice(c + 2) : r.expected,
+          };
+        })
+      : undefined;
+
+  return {
+    intent: `EMV **${titleCaseStep(pageKey)}** (\`${pageKey}\`)`,
+    actionsOrInputs: actions.length ? actions : undefined,
+    validationSteps: validations.length ? validations : undefined,
+    expectedAssertions,
+  };
 }
 
-async function applyReportToAllure(
+async function applyAllureReport(
   ctx: { parameter: (n: string, v: string) => void | PromiseLike<void> },
-  details: EmvStepReportDetail | undefined
+  d: EmvStepReportDetail
 ): Promise<void> {
-  if (!details) {
+  await ctx.parameter('Overview', d.intent.slice(0, 500));
+  if (d.screenTitle) {
+    await ctx.parameter('Screen title', d.screenTitle.slice(0, 500));
+  }
+  if (d.actionsOrInputs?.length) {
     await ctx.parameter(
-      'Report detail',
-      'None — add optional 3rd argument to runSoftPftCheck(step, pft, { intent, actionsOrInputs, expectedAssertions, … }) for a richer Allure / Markdown report.'
+      'Actions (performAction)',
+      d.actionsOrInputs
+        .map((a, i) => `${i + 1}. ${a}`)
+        .join('\n')
+        .slice(0, 4000)
     );
-    return;
   }
-
-  await ctx.parameter('Intent', details.intent.slice(0, 500));
-  if (details.screenTitle) {
-    await ctx.parameter('Screen title', details.screenTitle.slice(0, 500));
+  if (d.validationSteps?.length) {
+    await ctx.parameter(
+      'Validations (performValidation)',
+      d.validationSteps
+        .map((v, i) => `${i + 1}. ${v}`)
+        .join('\n')
+        .slice(0, 4000)
+    );
   }
-  if (details.actionsOrInputs?.length) {
-    await ctx.parameter('Actions / inputs', details.actionsOrInputs.join(' → ').slice(0, 900));
-  }
-  if (details.expectedAssertions?.length) {
-    const summary = details.expectedAssertions
-      .map((e, i) => `${i + 1}. ${e.label}${e.messageContains ? `: “${e.messageContains}”` : ''}`)
-      .join(' | ');
-    await ctx.parameter('Expected checks', summary.slice(0, 900));
+  if (d.expectedAssertions?.length) {
+    await ctx.parameter(
+      'Error message checks',
+      d.expectedAssertions
+        .map((e, i) => `${i + 1}. ${e.label}${e.messageContains ? ` — ${e.messageContains}` : ''}`)
+        .join('\n')
+        .slice(0, 4000)
+    );
   }
 }
 
 /**
- * Optional PFT error-message checks that do not stop the journey; failures are collected
- * and thrown once from `assertFailedStepsAtEnd`.
- *
- * Pass optional **report** metadata as the 3rd argument to `runSoftPftCheck` for detailed Allure
- * parameters and per-step Markdown attachments, plus a richer journey summary.
+ * Soft EMV: failures collected; `assertFailedStepsAtEnd` throws once if any failed.
+ * Each PFT → one `allure.step`; parameters are auto-filled from `performAction` / `performValidation` capture
+ * and `ErrorMessageValidation` rows during the PFT (no extra report objects — write PFTs like on master).
  */
 export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvRunnerOptions) {
   const { page } = options ?? {};
@@ -160,123 +122,104 @@ export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvR
   }
 
   async function attachJourneySummary(): Promise<void> {
-    const tableHeader =
-      '| Page key | URL (before) | URL (after) | Outcome | Intent (short) | Failure / skip |\n| --- | --- | --- | --- | --- | --- |\n';
-    const tableBody = journeyRows
+    const header =
+      '| Page key | URL before | URL after | Outcome | Overview | Notes |\n| --- | --- | --- | --- | --- | --- |\n';
+    const body = journeyRows
       .map(r => {
-        const shortIntent = escapeMarkdownCell((r.report?.intent ?? '—').replace(/\n/g, ' ')).slice(0, 120);
-        const failOrSkip =
+        const note =
           r.outcome === 'FAILED'
-            ? escapeMarkdownCell((r.error ?? '').replace(/\n/g, '<br>')).slice(0, 400)
+            ? mdCell((r.error ?? '').slice(0, 300))
             : r.outcome === 'SKIPPED'
-              ? escapeMarkdownCell(r.skipReason ?? '')
+              ? mdCell(r.skipReason ?? '')
               : '—';
-        const u1 = escapeMarkdownCell(r.pageUrl ?? '—');
-        const u2 = escapeMarkdownCell(r.pageUrlAfter ?? '—');
-        return `| ${r.pageKey} | ${u1} | ${u2} | ${r.outcome} | ${shortIntent} | ${failOrSkip} |`;
+        return `| ${r.pageKey} | ${mdCell(r.pageUrl ?? '—')} | ${mdCell(r.pageUrlAfter ?? '—')} | ${r.outcome} | ${mdCell((r.report?.intent ?? '—').slice(0, 80))} | ${note} |`;
       })
       .join('\n');
-
-    const md = `# EMV journey summary\n\n${tableHeader}${tableBody}\n\nFull structured rows (including \`report\`) are in \`emv-journey-summary.json\`.\n`;
-    const json = JSON.stringify(journeyRows, null, 2);
-
+    const md = `# EMV journey summary\n\n${header}${body}\n`;
     try {
       await testInfo.attach('emv-journey-summary.md', { body: md, contentType: 'text/markdown' });
     } catch {
       /* ignore */
     }
-    try {
-      await testInfo.attach('emv-journey-summary.json', { body: json, contentType: 'application/json' });
-    } catch {
-      /* ignore */
-    }
-
-    try {
-      await allure.attachment('emv-journey-summary.md', md, { contentType: 'text/markdown' });
-      await allure.attachment('emv-journey-summary.json', json, ContentType.JSON);
-    } catch {
-      /* ignore */
-    }
   }
 
-  async function runSoftPftCheck(step: string, pft: () => Promise<void>, report?: EmvStepReportDetail): Promise<void> {
+  async function runSoftPftCheck(step: string, pft: () => Promise<void>): Promise<void> {
     const pageUrl = currentUrl();
-    const stepTitle = `EMV — ${titleCaseStep(step)}`;
+    const title = `EMV — ${titleCaseStep(step)}`;
 
-    await allure.step(stepTitle, async ctx => {
+    await allure.step(title, async ctx => {
       await ctx.parameter('PFT / page key', step);
       if (pageUrl) {
-        await ctx.parameter('Browser URL (before)', pageUrl);
+        await ctx.parameter('URL before', pageUrl);
       }
-      await applyReportToAllure(ctx, report);
 
       if (enable_error_message_validation_new !== 'true') {
-        const skipReason = 'ENABLE_ERROR_MESSAGES_VALIDATION_NEW is not "true" — EMV not executed.';
+        const effective = buildAutoReport(step, [], []);
+        await applyAllureReport(ctx, effective);
+        const skipReason = 'ENABLE_ERROR_MESSAGES_VALIDATION_NEW is not "true".';
         await ctx.parameter('Outcome', 'SKIPPED');
         await ctx.parameter('Note', skipReason);
-        journeyRows.push({ pageKey: step, pageUrl, outcome: 'SKIPPED', skipReason, report });
-        await attachStepMarkdown(
-          testInfo,
-          step,
-          renderStepMarkdown(step, pageUrl, undefined, 'SKIPPED', report, skipReason)
-        );
-        await allure.logStep('EMV skipped (flag off)', Status.SKIPPED);
+        journeyRows.push({ pageKey: step, pageUrl, outcome: 'SKIPPED', skipReason, report: effective });
+        await allure.logStep('EMV skipped', Status.SKIPPED);
         return;
       }
 
+      const resultsStart = ErrorMessageValidation.peekResultsLength();
+      startEmvStepCapture();
+      let captured: string[] = [];
+      let thrown: unknown;
       try {
         await pft();
-        const pageUrlAfter = currentUrl();
+      } catch (e) {
+        thrown = e;
+      } finally {
+        captured = stopEmvStepCapture();
+      }
+
+      const errorSlice = ErrorMessageValidation.getResultsSliceSince(resultsStart);
+      const effective = buildAutoReport(step, captured, errorSlice);
+      await applyAllureReport(ctx, effective);
+
+      if (!thrown) {
+        const after = currentUrl();
         await ctx.parameter('Outcome', 'PASSED');
-        await ctx.parameter('Browser URL (after)', pageUrlAfter ?? '—');
-        journeyRows.push({ pageKey: step, pageUrl, pageUrlAfter, outcome: 'PASSED', report });
-        await attachStepMarkdown(testInfo, step, renderStepMarkdown(step, pageUrl, pageUrlAfter, 'PASSED', report));
-      } catch (err) {
-        const error = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err);
-        const pageUrlAfter = currentUrl();
-        failures.push({ step, error });
-        journeyRows.push({ pageKey: step, pageUrl, pageUrlAfter, outcome: 'FAILED', error, report });
+        await ctx.parameter('URL after', after ?? '—');
+        journeyRows.push({ pageKey: step, pageUrl, pageUrlAfter: after, outcome: 'PASSED', report: effective });
+      } else {
+        const err = thrown;
+        const msg = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err);
+        const after = currentUrl();
+        failures.push({ step, error: msg });
+        journeyRows.push({
+          pageKey: step,
+          pageUrl,
+          pageUrlAfter: after,
+          outcome: 'FAILED',
+          error: msg,
+          report: effective,
+        });
         await ctx.parameter('Outcome', 'FAILED');
-        await ctx.parameter('Browser URL (after failure)', pageUrlAfter ?? '—');
-        await attachStepMarkdown(
-          testInfo,
-          step,
-          renderStepMarkdown(step, pageUrl, pageUrlAfter, 'FAILED', report, error)
-        );
-        await allure.logStep(
-          'PFT failed (journey continues)',
-          Status.FAILED,
-          err instanceof Error ? err : new Error(error)
-        );
-        console.warn(`[EMV] step "${step}" failed (journey continues):\n${error}`);
-        try {
-          await testInfo.attach(attachmentSlug(step), { body: error, contentType: 'text/plain' });
-        } catch {
-          /* ignore attach failures */
-        }
+        await ctx.parameter('URL after', after ?? '—');
+        await ctx.parameter('Failure (truncated)', msg.slice(0, 4000));
+        await allure.logStep('PFT failed (continues)', Status.FAILED, err instanceof Error ? err : new Error(msg));
+        console.warn(`[EMV] "${step}":\n${msg}`);
       }
     });
   }
 
   async function assertFailedStepsAtEnd(): Promise<void> {
     await attachJourneySummary();
-
     if (failures.length === 0) {
       return;
     }
     const summary = failures.map(f => `## ${f.step}\n${f.error}`).join('\n\n');
     try {
-      await testInfo.attach('emv-failures-summary', { body: summary, contentType: 'text/plain' });
-    } catch {
-      /* ignore */
-    }
-    try {
-      await allure.attachment('emv-failures-summary.txt', summary, ContentType.TEXT);
+      await testInfo.attach('emv-failures-summary.txt', { body: summary, contentType: 'text/plain' });
     } catch {
       /* ignore */
     }
     throw new Error(
-      `Error-message validation failed in ${failures.length} step(s) (see test attachments "emv-*", "emv-journey-summary.*", and Allure steps).`
+      `${failures.length} EMV step(s) failed — see Allure EMV steps, emv-journey-summary.md, emv-failures-summary.txt.`
     );
   }
 

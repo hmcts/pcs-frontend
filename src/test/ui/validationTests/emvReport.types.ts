@@ -6,10 +6,7 @@ export type EmvExpectedAssertion = {
   messageContains?: string;
 };
 
-/**
- * Human-readable plan for an EMV step — Allure parameters + Markdown attachments
- * (`softEmvRunner`); can be built next to the PFT that implements the checks.
- */
+/** Internal shape for auto-built EMV Allure data (`softEmvRunner` only — not used by PFT authors). */
 export type EmvStepReportDetail = {
   intent: string;
   screenTitle?: string;

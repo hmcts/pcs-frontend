@@ -141,9 +141,7 @@ export async function performValidation(
   const validationInstance = ValidationRegistry.getValidation(validation);
   const validationStepText = `Validated ${validation}${
     fieldName ? ` - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'` : ''
-  }${
-    data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''
-  }`;
+  }${data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''}`;
   appendEmvStepCaptureLine(validationStepText);
   await test.step(validationStepText, async () => {
     await validationInstance.validate(executor.page, validation, fieldName, data);

@@ -1,15 +1,6 @@
 import { contactPreferenceEmailOrPost, feedback } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
-/** Save without choosing how to receive updates (for journeys that then pick “by post”). */
-export async function contactPreferenceEmailOrPostMandatoryChoiceErrorValidation(): Promise<void> {
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
-  await performValidation('errorMessage', {
-    header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
-    message: contactPreferenceEmailOrPost.selectHowYouWantToReceiveUpdatesErrorMessage,
-  });
-}
-
 export async function contactPreferenceEmailOrPostErrorValidation(): Promise<void> {
   await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
