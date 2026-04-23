@@ -8,7 +8,6 @@ import {
   enable_navigation_tests,
 } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
-import { appendEmvStepCaptureLine } from '../validationTests/softEmvRunner';
 
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
@@ -117,7 +116,6 @@ export async function performAction(
       : ''
   }`;
 
-  appendEmvStepCaptureLine(stepText);
   await test.step(stepText, async () => {
     await actionInstance.execute(executor.page, action, fieldName, value);
   });
@@ -142,7 +140,6 @@ export async function performValidation(
   const validationStepText = `Validated ${validation}${
     fieldName ? ` - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'` : ''
   }${data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''}`;
-  appendEmvStepCaptureLine(validationStepText);
   await test.step(validationStepText, async () => {
     await validationInstance.validate(executor.page, validation, fieldName, data);
   });
