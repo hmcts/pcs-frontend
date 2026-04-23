@@ -182,8 +182,6 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
     );
 
     await softEmv.runSoftPftCheck('languageUsed', languageUsedErrorValidation);
-    //added incorrect error message validation
-    await softEmv.runSoftPftCheck('languageUsed', yourExceptionalHardShipErrorValidation);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
