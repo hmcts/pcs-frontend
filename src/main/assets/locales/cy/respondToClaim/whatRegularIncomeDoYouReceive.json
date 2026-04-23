@@ -2,6 +2,7 @@
   "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyRegular income",
   "heading": "cyWhat regular income do you receive? (Optional)",
+  "groupName": "cyRegular income options",
   "hintText": "cySelect all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.",
   "options": {
     "incomeFromJobs": "cyIncome from all jobs you do",

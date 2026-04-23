@@ -20,6 +20,7 @@ import {
   installmentPayments,
   landlordLicensed,
   landlordRegistered,
+  languageUsed,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
@@ -84,6 +85,7 @@ export class RespondToClaimAction implements IAction {
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
+      ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -548,6 +550,14 @@ export class RespondToClaimAction implements IAction {
       console.log('frequency' + frequency);
     }
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+  }
+  
+  private async languageUsed(languageScreenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: languageScreenData.question,
+      option: languageScreenData.radioOption,
+    });
+    await performAction('clickButton', languageUsed.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

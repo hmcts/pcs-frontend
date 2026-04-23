@@ -238,7 +238,7 @@ export const step: StepDefinition = createFormStep({
       required: false, // Page is optional - can select zero checkboxes
       legendClasses: 'govuk-visually-hidden',
       translationKey: {
-        label: 'pageTitle',
+        label: 'groupName',
         hint: 'hintText',
       },
       options: [
