@@ -87,7 +87,7 @@
     "serve-favicon": "2.5.1",
     "totp-generator": "1.0.0",
     "tsconfig-paths": "4.2.0",
-    "uuid": "13.0.0",
+    "uuid": "14.0.0",
     "validator": "13.15.35",
     "winston": "3.19.0",
     "zod": "3.25.76",
@@ -176,7 +176,8 @@
     "path-to-regexp": "^8.4.0",
     "protobufjs": "^7.5.5",
     "qs": "^6.14.2",
-    "semver": "^7.5.2"
+    "semver": "^7.5.2",
+    "uuid": "^14.0.0"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
