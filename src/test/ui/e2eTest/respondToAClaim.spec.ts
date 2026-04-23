@@ -278,7 +278,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performAction('clickButton', 'Continue');
     await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
