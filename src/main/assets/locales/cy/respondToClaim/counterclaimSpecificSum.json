@@ -2,9 +2,7 @@
   "pageTitle": "CySum of counterclaim",
   "heading": "CyAre you claiming for a specific sum of money?",
   "claimAmountLabel": "CyHow much are you claiming?",
-  "claimAmountHint": "CyFor example, £148.00 or £148.50",
   "maxClaimAmountLabel": "CyWhat's the maximum value of your claim?",
-  "maxClaimAmountHint": "CyFor example, £148.00 or £148.50",
   "specificFeeText": "<p class=\"govuk-body\">CyYour counterclaim fee (the fee you will pay to make this counterclaim) depends on the amount you're claiming for.</p><p class=\"govuk-body\">CyIf you want to check how much your fee will be, you can <a href=\"https://www.gov.uk/court-fees-what-they-are\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">estimate how much it will cost you to make your counterclaim (opens in new tab)</a></p>",
   "noSpecificFeeText": "<p class=\"govuk-body\">CyIf you do not know the specific sum you're claiming for, the court needs to know what you believe the maximum value of your claim will be.</p><p class=\"govuk-body\">CyIf you do not know the exact amount, give an estimate.</p>",
   "options": {

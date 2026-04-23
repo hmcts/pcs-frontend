@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { additionalRentContributionToPoundsString, poundsStringToPence } from '../../utils';
+import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -85,7 +85,6 @@ export const step: StepDefinition = createFormStep({
               errorMessage: 'errors.claimAmount.required',
               translationKey: {
                 label: 'claimAmountLabel',
-                hint: 'claimAmountHint',
               },
               prefix: { text: '£' },
               classes: 'govuk-input--width-10',
@@ -106,7 +105,6 @@ export const step: StepDefinition = createFormStep({
               errorMessage: 'errors.estimatedMaxClaimAmount.required',
               translationKey: {
                 label: 'maxClaimAmountLabel',
-                hint: 'maxClaimAmountHint',
               },
               prefix: { text: '£' },
               classes: 'govuk-input--width-10',
@@ -131,14 +129,12 @@ export const step: StepDefinition = createFormStep({
     if (counterClaim.isClaimAmountKnown === 'YES') {
       formData.isClaimAmountKnown = 'yes';
       if (counterClaim.claimAmount) {
-        formData['isClaimAmountKnown.claimAmount'] = additionalRentContributionToPoundsString(counterClaim.claimAmount);
+        formData['isClaimAmountKnown.claimAmount'] = penceToPounds(counterClaim.claimAmount);
       }
     } else if (counterClaim.isClaimAmountKnown === 'NO') {
       formData.isClaimAmountKnown = 'no';
       if (counterClaim.estimatedMaxClaimAmount) {
-        formData['isClaimAmountKnown.estimatedMaxClaimAmount'] = additionalRentContributionToPoundsString(
-          counterClaim.estimatedMaxClaimAmount
-        );
+        formData['isClaimAmountKnown.estimatedMaxClaimAmount'] = penceToPounds(counterClaim.estimatedMaxClaimAmount);
       }
     }
 
@@ -156,14 +152,13 @@ export const step: StepDefinition = createFormStep({
     if (isClaimAmountKnown === 'yes') {
       const amountRaw = req.body?.['isClaimAmountKnown.claimAmount'] as string | undefined;
       if (amountRaw) {
-        counterClaim.claimAmount = String(poundsStringToPence(amountRaw));
+        counterClaim.claimAmount = poundsToPence(amountRaw);
       }
     } else if (isClaimAmountKnown === 'no') {
       const amountRaw = req.body?.['isClaimAmountKnown.estimatedMaxClaimAmount'] as string | undefined;
       if (amountRaw) {
-        counterClaim.estimatedMaxClaimAmount = String(poundsStringToPence(amountRaw));
+        counterClaim.estimatedMaxClaimAmount = poundsToPence(amountRaw);
       }
-     
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {

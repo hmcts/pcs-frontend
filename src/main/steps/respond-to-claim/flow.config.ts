@@ -1,12 +1,12 @@
 import { type Request } from 'express';
 
 import {
-  isMoneyCounterClaim,
   getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
   isDefendantNameKnown,
+  isMoneyCounterClaim,
   isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
@@ -16,7 +16,6 @@ import {
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
-
 
 function getContactByTelephoneAnswer(
   req: Request,
