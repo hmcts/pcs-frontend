@@ -143,6 +143,30 @@ export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvR
     }
   }
 
+  /**
+   * Informational / read-only screen: no field-level EMV. Shows as a skipped Allure step and a row in
+   * `emv-journey-summary.md` so the report does not look like a missing PFT.
+   */
+  async function markReadOnlyNoEmv(pageKey: string, note?: string): Promise<void> {
+    const pageUrl = currentUrl();
+    const title = `No EMV — ${titleCaseStep(pageKey)} (read-only)`;
+    const skipReason = note ?? 'Read-only / informational screen — no field error validation.';
+    const report: EmvStepReportDetail = {
+      intent: `**Read-only** — \`${pageKey}\` (no EMV)`,
+    };
+
+    await allure.step(title, async ctx => {
+      await ctx.parameter('PFT / page key', pageKey);
+      await ctx.parameter('EMV', 'Not applicable');
+      await ctx.parameter('Note', skipReason);
+      if (pageUrl) {
+        await ctx.parameter('URL', pageUrl);
+      }
+      journeyRows.push({ pageKey, pageUrl, outcome: 'SKIPPED', skipReason, report });
+      await allure.logStep('EMV not applicable', Status.SKIPPED);
+    });
+  }
+
   async function runSoftPftCheck(step: string, pft: () => Promise<void>): Promise<void> {
     const pageUrl = currentUrl();
     const title = `EMV — ${titleCaseStep(step)}`;
@@ -166,7 +190,7 @@ export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvR
 
       const resultsStart = ErrorMessageValidation.peekResultsLength();
       startEmvStepCapture();
-      let captured: string[] = [];
+      let captured: string[];
       let thrown: unknown;
       try {
         await pft();
@@ -223,5 +247,5 @@ export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvR
     );
   }
 
-  return { runSoftPftCheck, assertFailedStepsAtEnd };
+  return { runSoftPftCheck, markReadOnlyNoEmv, assertFailedStepsAtEnd };
 }

@@ -37,11 +37,19 @@ import { contactPreferencesTelephoneErrorValidation } from '../functional/contac
 import { correspondenceAddressKnownErrorValidation } from '../functional/correspondenceAddress.pft';
 import { defendantDateOfBirthErrorValidation } from '../functional/defendantDateOfBirth.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
+import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
+import { doYouHaveAnyDependantChildrenErrorValidation } from '../functional/doYouHaveAnyDependantChildren.pft';
+import { doYouHaveAnyOtherDependantsErrorValidation } from '../functional/doYouHaveAnyOtherDependants.pft';
 import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
 import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pft';
 import { languageUsedErrorValidation } from '../functional/languageUsed.pft';
 import { rentArrearsErrorValidation } from '../functional/rentArrears.pft';
+import { repaymentsAgreedErrorValidation } from '../functional/repaymentsAgreed.pft';
+import { repaymentsMadeErrorValidation } from '../functional/repaymentsMade.pft';
+import { tenancyDateDetailsErrorValidation } from '../functional/tenancyDateDetails.pft';
 import { tenancyTypeDetailsErrorValidation } from '../functional/tenancyTypeDetails.pft';
+import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation } from '../functional/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.pft';
+import { yourCircumstancesErrorValidation } from '../functional/yourCircumstances.pft';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
@@ -78,7 +86,6 @@ test.beforeEach(async ({ page }) => {
   await performAction('navigateToUrl', home_url);
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('clickButton', startNow.startNowButton);
 });
 
 test.describe('Rent arrears introductory — notice date unknown (validation tests) @nightly @error', () => {
@@ -91,6 +98,9 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
   }) => {
     const softEmv = createSoftEmvRunner(test.info(), { page });
 
+    await softEmv.markReadOnlyNoEmv('startNow');
+    await performAction('clickButton', startNow.startNowButton);
+
     await softEmv.runSoftPftCheck('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
 
@@ -102,6 +112,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       lName: defendantNameConfirmation.lastNameInputText,
     });
 
+    // EMV-Need to be created(EMV created in this PR)
     await softEmv.runSoftPftCheck('defendantDateOfBirth', defendantDateOfBirthErrorValidation);
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
@@ -109,6 +120,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       dobYear: defendantDateOfBirth.yearInputText,
     });
 
+    //EMV-Need to be created(EMV created in this PR)
     await softEmv.runSoftPftCheck('correspondenceAddressKnown', correspondenceAddressKnownErrorValidation);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
@@ -125,6 +137,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
 
+    await softEmv.markReadOnlyNoEmv('disputeClaimInterstitial');
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
 
     await softEmv.runSoftPftCheck('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
@@ -133,42 +146,71 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
+
+    await softEmv.runSoftPftCheck('tenancyDateDetails', tenancyDateDetailsErrorValidation);
     await performAction('selectTenancyStartDateKnown', { option: tenancyDateDetails.yesRadioOption });
-    await performAction('selectNoticeDetails', { option: confirmationOfNoticeGiven.yesRadioOption });
+
+    //Until https://tools.hmcts.net/jira/browse/HDPI-6087 fixed
+    //await softEmv.runSoftPftCheck('confirmationOfNoticeGiven', confirmationOfNoticeGivenErrorValidation);
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+
+    // EMV-Need to be created
     await performAction('enterNoticeDateUnknown');
 
     await softEmv.runSoftPftCheck('rentArrears', rentArrearsErrorValidation);
     await performAction('rentArrears', { option: rentArrears.yesRadioOption });
 
+    // placeholder page
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
+
+    await softEmv.markReadOnlyNoEmv('PaymentInterstitial');
     await performAction('readPaymentInterstitial');
 
+    await softEmv.runSoftPftCheck('repaymentsMade', repaymentsMadeErrorValidation);
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
+
+    await softEmv.runSoftPftCheck('repaymentsAgreed', repaymentsAgreedErrorValidation);
     await performAction('repaymentsAgreed', {
       question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
 
+    await softEmv.markReadOnlyNoEmv('YourHouseholdAndCircumstances');
     await performAction('readYourHouseholdAndCircumstances');
+
+    await softEmv.runSoftPftCheck('doYouHaveAnyDependantChildren', doYouHaveAnyDependantChildrenErrorValidation);
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
+
+    await softEmv.runSoftPftCheck('doYouHaveAnyOtherDependants', doYouHaveAnyOtherDependantsErrorValidation);
     await performAction('doYouHaveAnyOtherDependants', {
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
+
+    await softEmv.runSoftPftCheck('doAnyOtherAdultsLiveInYourHome', doAnyOtherAdultsLiveInYourHomeErrorValidation);
     await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
       radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
     });
+
+    await softEmv.runSoftPftCheck(
+      'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
+      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation
+    );
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
     });
+
+    await softEmv.runSoftPftCheck('yourCircumstances', yourCircumstancesErrorValidation);
     await performAction('yourCircumstances', {
       question: yourCircumstances.mainHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
