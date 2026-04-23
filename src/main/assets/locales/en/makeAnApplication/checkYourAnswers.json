@@ -11,8 +11,8 @@
       "label": "What do you want to apply for?",
       "changeHint": "Change what you want to apply for",
       "options": {
-        "ADJOURN": "Ask to adjourn (delay) the hearing",
-        "SET_ASIDE": "Ask the court to change (set aside) their decision to evict you",
+        "ADJOURN": "Ask to adjourn the hearing (move it to a later time or date)",
+        "SET_ASIDE": "Ask the court to set aside (cancel) a decision the court has made",
         "SOMETHING_ELSE": "Something else"
       }
     },

@@ -11,8 +11,8 @@
       "label": "cyWhat do you want to apply for?",
       "changeHint": "cyChange what you want to apply for",
       "options": {
-        "ADJOURN": "cyAsk to adjourn (delay) the hearing",
-        "SET_ASIDE": "cyAsk the court to change (set aside) their decision to evict you",
+        "ADJOURN": "cyAsk to adjourn the hearing (move it to a later time or date)",
+        "SET_ASIDE": "cyAsk the court to set aside (cancel) a decision the court has made",
         "SOMETHING_ELSE": "cySomething else"
       }
     },
@@ -77,7 +77,7 @@
     "yourFullName": "cyYour full name"
   },
   "errors": {
-    "agreeToTheStatementOfTruth": "Agree to the statement of truth",
+    "agreeToTheStatementOfTruth": "cyAgree to the statement of truth",
     "youMustSignYourName": "cyYou must sign your name"
   }
 }
