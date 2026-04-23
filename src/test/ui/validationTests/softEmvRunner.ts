@@ -12,6 +12,10 @@ function attachmentSlug(step: string): string {
   return `emv-${step.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 }
 
+function escapeMarkdownCell(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+}
+
 function titleCaseStep(step: string): string {
   const spaced = step.replace(/([A-Z])/g, ' $1').replace(/[-_]/g, ' ');
   return spaced.replace(/\b\w/g, c => c.toUpperCase()).trim();
@@ -160,15 +164,15 @@ export function createSoftEmvRunner(testInfo: TestInfo, options?: CreateSoftEmvR
       '| Page key | URL (before) | URL (after) | Outcome | Intent (short) | Failure / skip |\n| --- | --- | --- | --- | --- | --- |\n';
     const tableBody = journeyRows
       .map(r => {
-        const shortIntent = (r.report?.intent ?? '—').replace(/\|/g, '\\|').replace(/\n/g, ' ').slice(0, 120);
+        const shortIntent = escapeMarkdownCell((r.report?.intent ?? '—').replace(/\n/g, ' ')).slice(0, 120);
         const failOrSkip =
           r.outcome === 'FAILED'
-            ? (r.error ?? '').replace(/\|/g, '\\|').replace(/\n/g, '<br>').slice(0, 400)
+            ? escapeMarkdownCell((r.error ?? '').replace(/\n/g, '<br>')).slice(0, 400)
             : r.outcome === 'SKIPPED'
-              ? (r.skipReason ?? '').replace(/\|/g, '\\|')
+              ? escapeMarkdownCell(r.skipReason ?? '')
               : '—';
-        const u1 = (r.pageUrl ?? '—').replace(/\|/g, '\\|');
-        const u2 = (r.pageUrlAfter ?? '—').replace(/\|/g, '\\|');
+        const u1 = escapeMarkdownCell(r.pageUrl ?? '—');
+        const u2 = escapeMarkdownCell(r.pageUrlAfter ?? '—');
         return `| ${r.pageKey} | ${u1} | ${u2} | ${r.outcome} | ${shortIntent} | ${failOrSkip} |`;
       })
       .join('\n');
