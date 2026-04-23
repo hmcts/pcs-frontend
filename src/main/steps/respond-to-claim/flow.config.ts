@@ -5,12 +5,13 @@ import {
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
+  hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
   isMoneyCounterClaim,
   isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
-  isWelshProperty,
+  isWalesProperty,
 } from '../utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
@@ -104,6 +105,10 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
+    'equality-and-diversity-start',
+    'equality-and-diversity-end',
+    'language-used',
+    'check-your-answers',
     'end-now',
     'installment-payments',
   ],
@@ -174,11 +179,11 @@ export const flowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial': {
       routes: [
         {
-          condition: async (req: Request) => isWelshProperty(req),
+          condition: async (req: Request) => isWalesProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !(await isWelshProperty(req)),
+          condition: async (req: Request) => !isWalesProperty(req),
           nextStep: 'tenancy-type-details',
         },
       ],
@@ -207,8 +212,8 @@ export const flowConfig: JourneyFlowConfig = {
         },
       ],
       previousStep: async (req: Request) => {
-        const welshProperty = await isWelshProperty(req);
-        if (welshProperty) {
+        const walesProperty = isWalesProperty(req);
+        if (walesProperty) {
           return 'written-terms';
         }
         return 'dispute-claim-interstitial';
@@ -522,6 +527,35 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
+      defaultNext: 'equality-and-diversity-start',
+    },
+    'equality-and-diversity-start': {
+      previousStep: 'what-other-regular-expenses-do-you-have',
+      routes: [
+        {
+          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
+            currentStepData.equalityStartChoice === 'skip',
+          nextStep: 'language-used',
+        },
+        {
+          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
+            currentStepData.equalityStartChoice === 'continue',
+          nextStep: 'equality-and-diversity-end',
+        },
+      ],
+      defaultNext: 'equality-and-diversity-end',
+    },
+    'equality-and-diversity-end': {
+      previousStep: 'equality-and-diversity-start',
+      defaultNext: 'language-used',
+    },
+    'language-used': {
+      previousStep: (req: Request) =>
+        hasSkippedEqualityAndDiversityQuestions(req) ? 'equality-and-diversity-start' : 'equality-and-diversity-end',
+      defaultNext: 'check-your-answers',
+    },
+    'check-your-answers': {
+      previousStep: 'language-used',
       defaultNext: 'end-now',
     },
   },

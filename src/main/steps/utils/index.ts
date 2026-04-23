@@ -1,6 +1,6 @@
 export { isMoneyCounterClaim } from './isMoneyCounterClaim';
 export { isDefendantNameKnown } from './isDefendantNameKnown';
-export { isWelshProperty } from './isWelshProperty';
+export { isWalesProperty } from './isWalesProperty';
 export { isNoticeDateProvided } from './isNoticeDateProvided';
 export { isRentArrearsClaim } from './isRentArrearsClaim';
 export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
@@ -15,3 +15,4 @@ export { poundsStringToPence, additionalRentContributionToPoundsString } from '.
 export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
 export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
+export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
