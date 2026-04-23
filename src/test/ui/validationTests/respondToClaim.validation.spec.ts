@@ -86,7 +86,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
     ErrorMessageValidation.clearResults();
   });
 
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async ({
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression @error', async ({
     page,
   }) => {
     const softEmv = createSoftEmvRunner(test.info(), { page });
