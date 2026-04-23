@@ -31,6 +31,10 @@ interface CustomSessionData extends SessionData {
   formData?: Record<string, any>;
   ccdCase?: CcdCase;
   caseReference?: string;
+  genApp?: {
+    applicationId?: string;
+    showDuplicateSubmissionPage?: boolean;
+  };
   postcodeLookupResult?: any[];
   lookupPostcode?: string;
   lookupError?: { field: string; text: string };
@@ -41,7 +45,6 @@ interface CustomSessionData extends SessionData {
   noticeServed?: boolean;
   rentarrears?: boolean;
   destroy(callback: (err?: Error) => void): void;
-  returnTo?: string;
 }
 
 declare module 'express-session' {

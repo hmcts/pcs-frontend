@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express from 'express';
 import type { Express, NextFunction, Request, Response } from 'express';
+import { ApplicationError, ApplicationErrorCode } from '../../../../main/ApplicationError';
 import { HTTPError } from '../../../../main/HttpError';
 
 const mockLogger = {
@@ -33,6 +34,8 @@ describe('error-handler', () => {
       'errorPages.404.paragraph': "This could be because you've followed a broken or outdated link.",
       'errorPages.500.title': "Sorry, we're having technical problems",
       'errorPages.500.paragraph': 'Please try again in a few minutes.',
+      'applicationErrors.noApplicationIdInSession.title': 'translated noApplicationIdInSession title',
+      'applicationErrors.noApplicationIdInSession.paragraph': 'translated noApplicationIdInSession paragraph',
       serviceName: 'Possession claims',
       phase: 'ALPHA',
       languageToggle: 'Language toggle',
@@ -482,6 +485,28 @@ describe('error-handler', () => {
 
       expect(res.render).toHaveBeenCalledWith('error');
       expect(res.locals.errorTitle).toBe('errorPages.500.title');
+    });
+
+    it('should handle application error with custom error codes', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new ApplicationError('Bad request', ApplicationErrorCode.noApplicationIdInSession);
+      const req = {
+        i18n: { getFixedT: () => createMockTranslation() },
+        language: 'en',
+      } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t: createMockTranslation() },
+        // headersSent: false,
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      errorHandler(err, req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.locals.errorTitle).toBe('translated noApplicationIdInSession title');
+      expect(res.locals.errorParagraph).toBe('translated noApplicationIdInSession paragraph');
     });
 
     it('should log error', () => {
