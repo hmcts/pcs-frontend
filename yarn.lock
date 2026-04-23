@@ -4085,12 +4085,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.19.3":
-  version: 22.19.3
-  resolution: "@types/node@npm:22.19.3"
+"@types/node@npm:22.19.17":
+  version: 22.19.17
+  resolution: "@types/node@npm:22.19.17"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/ffee06ce6d741fde98a40bc65a57394ed2283c521f57f9143d2356513181162bd4108809be6902a861d098b35e35569f61f14c64d3032e48a0289b74f917669a
+  checksum: 10/8adcf9c2e9e7c524196efdd5ee60ebeda980b4ec9b5b8650e2341a2cabe46d368f3a4e4c0050b3bf26eb9cf383453ea2193ec5604079cdf9493a11a742f62018
   languageName: node
   linkType: hard
 
@@ -8898,10 +8898,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-http-middleware@npm:3.9.3":
-  version: 3.9.3
-  resolution: "i18next-http-middleware@npm:3.9.3"
-  checksum: 10/88f4cd162681fde44fcc5f73bebe5080b99ae8ce75e468f06247217d2549b05826d002d4b174d6bb926991086bf5b20fd0b14bfc8512dec76ab530d0b9ccf620
+"i18next-http-middleware@npm:3.9.4":
+  version: 3.9.4
+  resolution: "i18next-http-middleware@npm:3.9.4"
+  checksum: 10/983c39c5bfea2df3477a69ad6f8f9590d62040750fc5f8e4ddaeb0eb5f11b718ef5bbc5adaf9370882a8dbd86c8a3752292555ed9e06ca19272ff3c8c32392e9
   languageName: node
   linkType: hard
 
@@ -11962,7 +11962,7 @@ __metadata:
     "@types/jest": "npm:29.5.14"
     "@types/lodash": "npm:4.17.24"
     "@types/luxon": "npm:3.7.1"
-    "@types/node": "npm:22.19.3"
+    "@types/node": "npm:22.19.17"
     "@types/nunjucks": "npm:3.2.6"
     "@types/serve-favicon": "npm:2.5.7"
     "@types/totp-generator": "npm:0.0.8"
@@ -12002,7 +12002,7 @@ __metadata:
     husky: "npm:9.1.7"
     i18next: "npm:25.10.10"
     i18next-fs-backend: "npm:2.6.4"
-    i18next-http-middleware: "npm:3.9.3"
+    i18next-http-middleware: "npm:3.9.4"
     ioredis: "npm:5.10.1"
     jest: "npm:29.7.0"
     jest-environment-jsdom: "npm:30.3.0"
@@ -12034,7 +12034,7 @@ __metadata:
     ts-node: "npm:10.9.2"
     tsconfig-paths: "npm:4.2.0"
     typescript: "npm:5.9.3"
-    uuid: "npm:13.0.0"
+    uuid: "npm:14.0.0"
     validator: "npm:13.15.35"
     webpack: "npm:5.106.2"
     webpack-cli: "npm:6.0.1"
@@ -14877,21 +14877,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:13.0.0":
-  version: 13.0.0
-  resolution: "uuid@npm:13.0.0"
+"uuid@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "uuid@npm:14.0.0"
   bin:
     uuid: dist-node/bin/uuid
-  checksum: 10/2742b24d1e00257e60612572e4d28679423469998cafbaf1fe9f1482e3edf9c40754b31bfdb3d08d71b29239f227a304588f75210b3b48f2609f0673f1feccef
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^8.3.0":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 10/9a5f7aa1d6f56dd1e8d5f2478f855f25c645e64e26e347a98e98d95781d5ed20062d6cca2eecb58ba7c84bc3910be95c0451ef4161906abaab44f9cb68ffbdd1
+  checksum: 10/8ee9b98f9650e25555515f7a28d3c3ae9364e72f7bb19b9e08b681bc135338beba5509b2830f6ae1cfaba4d45401da0d16d4d109b977097bc3d6ba0c5583341b
   languageName: node
   linkType: hard
 
