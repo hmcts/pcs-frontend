@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import type { Environment } from 'nunjucks';
 
 jest.mock('../../../../main/modules/steps/i18n', () => ({
@@ -35,6 +36,8 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
   buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
 }));
 
+import type { SupportedLang } from '../../../../main/modules/steps';
+import { GetController } from '../../../../main/modules/steps';
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/universal-credit';
 
@@ -149,6 +152,67 @@ describe('respond-to-claim universal-credit step', () => {
           ucApplicationDate: null,
         },
       },
+    });
+  });
+
+  describe('pre-population via getController', () => {
+    const hcAt = (hc: Record<string, unknown>) => ({
+      possessionClaimResponse: { defendantResponses: { householdCircumstances: hc } },
+    });
+
+    type UcStepRenderData = Record<string, unknown> & { fieldValues: Record<string, unknown> };
+
+    const render = async (hc: Record<string, unknown> | undefined): Promise<UcStepRenderData> => {
+      const req = createReq({
+        res: {
+          locals: {
+            validatedCase: { id: '1234567890123456', data: hc ? hcAt(hc) : {} },
+          },
+        },
+        session: {
+          formData: {},
+          ccdCase: { id: '1234567890123456' },
+        },
+      }) as Request;
+      const locals = req.res?.locals ?? {};
+      const res = {
+        render: jest.fn(),
+        locals,
+      } as unknown as Response;
+      req.res = res;
+
+      const gc = step.getController;
+      const controller: GetController =
+        typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
+      await controller.get(req, res);
+      return (res.render as jest.Mock).mock.calls[0][1] as UcStepRenderData;
+    };
+
+    it('pre-populates yes + date when saved with a date (came from this screen)', async () => {
+      const data = await render({ universalCredit: 'YES', ucApplicationDate: '2024-02-10' });
+      expect(data.fieldValues.haveAppliedForUniversalCredit).toBe('yes');
+      expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toEqual({
+        day: '10',
+        month: '02',
+        year: '2024',
+      });
+    });
+
+    it('pre-populates no when NO is saved (came from this screen)', async () => {
+      const data = await render({ universalCredit: 'NO' });
+      expect(data.fieldValues.haveAppliedForUniversalCredit).toBe('no');
+      expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toBeFalsy();
+    });
+
+    it('does not pre-populate when YES is saved without a date (implicit from regular-income)', async () => {
+      const data = await render({ universalCredit: 'YES' });
+      expect(data.fieldValues.haveAppliedForUniversalCredit).toBeFalsy();
+      expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toBeFalsy();
+    });
+
+    it('does not pre-populate when nothing is saved', async () => {
+      const data = await render(undefined);
+      expect(data.fieldValues.haveAppliedForUniversalCredit).toBeFalsy();
     });
   });
 

@@ -38,36 +38,53 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/regular-income';
 
+type SessionShape = {
+  formData: Record<string, unknown>;
+  ccdCase: { id: string };
+};
+
 describe('respond-to-claim regular-income step', () => {
+  const caseReference = '1234567890123456';
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (overrides: Record<string, unknown> = {}): any => ({
     body: {},
-    originalUrl: '/case/1234567890123456/respond-to-claim/what-regular-income-do-you-receive',
+    originalUrl: `/case/${caseReference}/respond-to-claim/what-regular-income-do-you-receive`,
     query: { lang: 'en' },
-    params: { caseReference: '1234567890123456' },
+    params: { caseReference },
     session: {
       formData: {},
-      ccdCase: { id: '1234567890123456' },
-    },
+      ccdCase: { id: caseReference },
+    } as SessionShape,
     app: { locals: { nunjucksEnv } },
     i18n: { getResourceBundle: jest.fn(() => ({})) },
-    res: { locals: { validatedCase: { id: '1234567890123456', data: {} } } },
+    res: { locals: { validatedCase: { id: caseReference, data: {} } } },
     ...overrides,
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
+    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: caseReference, data: {} });
   });
 
-  it('POST maps universal credit selection to CCD Yes', async () => {
+  const lastPayload = (): Record<string, unknown> => {
+    const call = mockBuildCcdCaseForPossessionClaimResponse.mock.calls[0];
+    return call[1] as Record<string, unknown>;
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getHouseholdCircumstances = (): any =>
+    (lastPayload().defendantResponses as Record<string, unknown>).householdCircumstances;
+
+  it('POST writes UC=YES, amount and frequency when UC is ticked (implicit applied=YES)', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
         action: 'continue',
         regularIncome: 'universalCredit',
+        'regularIncome.universalCreditAmount': '200.00',
+        'regularIncome.universalCreditFrequency': 'MONTHLY',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,17 +97,15 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        householdCircumstances: {
-          universalCredit: 'YES',
-          ucApplicationDate: undefined,
-        },
-      },
-    });
+    const hc = getHouseholdCircumstances();
+    expect(hc.universalCredit).toBe('YES');
+    expect(hc.universalCreditAmount).toBe('20000');
+    expect(hc.universalCreditFrequency).toBe('MONTHLY');
+    // Must NOT touch ucApplicationDate — that's owned by the applied-for-UC screen
+    expect(hc).not.toHaveProperty('ucApplicationDate');
   });
 
-  it('POST does not overwrite universal credit when selection is absent', async () => {
+  it('POST clears UC income fields when UC is unticked', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -107,25 +122,25 @@ describe('respond-to-claim regular-income step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    const hc = getHouseholdCircumstances();
+    expect(hc).not.toHaveProperty('universalCredit');
+    expect(hc.universalCreditAmount).toBeNull();
+    expect(hc.universalCreditFrequency).toBeNull();
   });
 
-  it('POST clears stale UC answer when selection is absent and existing UC data is present', async () => {
-    (validateForm as jest.Mock).mockReturnValue({});
+  it('GET does not preselect UC income when applied-for-UC answer is NO', () => {
     const req = createReq({
-      body: {
-        action: 'continue',
-      },
       res: {
         locals: {
           validatedCase: {
-            id: '1234567890123456',
+            id: caseReference,
             data: {
               possessionClaimResponse: {
                 defendantResponses: {
                   householdCircumstances: {
-                    universalCredit: 'YES',
-                    ucApplicationDate: '2024-02-10',
+                    universalCredit: 'NO',
+                    universalCreditAmount: '20000',
+                    universalCreditFrequency: 'MONTHLY',
                   },
                 },
               },
@@ -134,23 +149,12 @@ describe('respond-to-claim regular-income step', () => {
         },
       },
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    const next = jest.fn();
 
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-
-    await step.postController.post(req, res, next);
-
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        householdCircumstances: {
-          universalCredit: 'NO',
-          ucApplicationDate: null,
-        },
-      },
-    });
+    const initialData =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (step as any).getInitialFormData ? (step as any).getInitialFormData(req) : {};
+    expect(initialData.regularIncome).toBeUndefined();
+    expect(initialData['regularIncome.universalCreditAmount']).toBeUndefined();
+    expect(initialData['regularIncome.universalCreditFrequency']).toBeUndefined();
   });
 });

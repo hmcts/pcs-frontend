@@ -77,13 +77,13 @@ export const step: StepDefinition = createFormStep({
       | undefined;
 
     const data: Record<string, unknown> = {};
-    const prepopUniversalCredit = fromYesNoEnum(householdCircumstances?.universalCredit);
-    if (prepopUniversalCredit) {
-      data.haveAppliedForUniversalCredit = prepopUniversalCredit;
-    }
+    const savedAnswer = fromYesNoEnum(householdCircumstances?.universalCredit);
+    const savedDate = householdCircumstances?.ucApplicationDate;
 
-    if (householdCircumstances?.ucApplicationDate) {
-      const parsed = DateTime.fromISO(householdCircumstances.ucApplicationDate);
+    // Only pre-populate if the answer genuinely came from this screen
+    if (savedAnswer === 'yes' && savedDate) {
+      data.haveAppliedForUniversalCredit = 'yes';
+      const parsed = DateTime.fromISO(savedDate);
       if (parsed.isValid) {
         data['haveAppliedForUniversalCredit.ucApplicationDate'] = {
           day: parsed.toFormat('dd'),
@@ -91,7 +91,10 @@ export const step: StepDefinition = createFormStep({
           year: parsed.toFormat('yyyy'),
         };
       }
+    } else if (savedAnswer === 'no') {
+      data.haveAppliedForUniversalCredit = 'no';
     }
+
     return data;
   },
   translationKeys: {

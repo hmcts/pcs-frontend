@@ -1,0 +1,15 @@
+export const languageUsed = {
+  mainHeader: `Which language did you use to complete your response?`,
+  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
+  ifSomeoneElseHintText: `If someone else helped you to answer a question in this service, ask them if they answered any questions in Welsh. We’ll use this to make sure your response is processed correctly`,
+  englishRadioOption: `English`,
+  welshRadioOption: `Welsh`,
+  englishAndWelshRadioOption: `English and Welsh`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  errorHiddenMessage: `Select which language you used to complete this service`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `start-now`,
+  backLink: `Back`,
+};

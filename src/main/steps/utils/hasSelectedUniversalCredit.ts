@@ -1,10 +1,8 @@
 import type { Request } from 'express';
 
-import { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
-import { fromYesNoEnum } from './yesNoEnum';
-
 export const hasSelectedUniversalCredit = async (req: Request): Promise<boolean> => {
-  const universalCredit = getValidatedCaseHouseholdCircumstances(req)?.universalCredit;
+  const caseData = req.res?.locals?.validatedCase?.data;
+  const hc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
 
-  return fromYesNoEnum(universalCredit) === 'yes';
+  return Boolean(hc?.universalCreditAmount || hc?.universalCreditFrequency);
 };

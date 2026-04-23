@@ -74,4 +74,73 @@ describe('translateFields', () => {
     expect(month.value).toBe('');
     expect(year.value).toBe('');
   });
+
+  it('passes prefix and suffix into input component config', () => {
+    const amountFields: FormFieldConfig[] = [
+      {
+        name: 'amount',
+        type: 'text',
+        translationKey: { label: 'amountLabel' },
+        prefix: { text: '£' },
+        suffix: { text: 'per month' },
+      },
+    ];
+
+    const result = translateFields(
+      amountFields,
+      mockT as unknown as TFunction,
+      { amount: '10.00' },
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+    const field = result[0] as FormFieldConfig;
+    const component = field.component as { prefix?: { text: string }; suffix?: { text: string } } | undefined;
+
+    expect(component?.prefix).toEqual({ text: '£' });
+    expect(component?.suffix).toEqual({ text: 'per month' });
+  });
+
+  it('translates option labels and hints for radio items', () => {
+    mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        question: 'Have you had free legal advice?',
+        'options.yes': 'Yes',
+        'options.yesHint': 'This includes advice from a solicitor.',
+      };
+      return translations[key] || key;
+    });
+
+    const result = translateFields(
+      [
+        {
+          name: 'hadLegalAdvice',
+          type: 'radio',
+          translationKey: {
+            label: 'question',
+          },
+          options: [{ value: 'yes', translationKey: 'options.yes', hint: 'options.yesHint' }],
+        },
+      ],
+      mockT as unknown as TFunction,
+      {},
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+
+    const items = result[0].component?.items as Record<string, unknown>[];
+    expect(items).toEqual([
+      {
+        value: 'yes',
+        text: 'Yes',
+        hint: { text: 'This includes advice from a solicitor.' },
+        checked: false,
+      },
+    ]);
+  });
 });

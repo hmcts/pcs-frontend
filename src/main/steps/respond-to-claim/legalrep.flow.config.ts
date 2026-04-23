@@ -9,7 +9,7 @@ import {
   isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
-  isWelshProperty,
+  isWalesProperty,
 } from '../utils';
 
 import { flowConfig as citizenFlowConfig } from './flow.config';
@@ -51,7 +51,7 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
     'your-circumstances',
     'exceptional-hardship',
-    'income-and-expenditure',
+    'income-and-expenses',
     'what-regular-income-do-you-receive',
     'have-you-applied-for-universal-credit',
     'priority-debts',
@@ -118,11 +118,11 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'dispute-claim-interstitial': {
       routes: [
         {
-          condition: async (req: Request) => isWelshProperty(req),
+          condition: async (req: Request) => isWalesProperty(req),
           nextStep: 'landlord-registered',
         },
         {
-          condition: async (req: Request) => !(await isWelshProperty(req)),
+          condition: async (req: Request) => !(await isWalesProperty(req)),
           nextStep: 'tenancy-type-details',
         },
       ],
@@ -151,7 +151,7 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
         },
       ],
       previousStep: async (req: Request) => {
-        const welshProperty = await isWelshProperty(req);
+        const welshProperty = await isWalesProperty(req);
         if (welshProperty) {
           return 'written-terms';
         }
@@ -383,14 +383,14 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     },
     'exceptional-hardship': {
       previousStep: 'your-circumstances',
-      defaultNext: 'income-and-expenditure',
+      defaultNext: 'income-and-expenses',
     },
-    'income-and-expenditure': {
+    'income-and-expenses': {
       previousStep: 'exceptional-hardship',
       defaultNext: 'what-regular-income-do-you-receive',
     },
     'what-regular-income-do-you-receive': {
-      previousStep: 'income-and-expenditure',
+      previousStep: 'income-and-expenses',
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {

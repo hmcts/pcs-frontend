@@ -1,11 +1,15 @@
 export { isDefendantNameKnown } from './isDefendantNameKnown';
-export { isWelshProperty } from './isWelshProperty';
+export { isWalesProperty } from './isWalesProperty';
 export { isNoticeDateProvided } from './isNoticeDateProvided';
 export { isRentArrearsClaim } from './isRentArrearsClaim';
 export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
 export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
+export { isFromIncomeAndExpenditure } from './isFromIncomeAndExpenditure';
+export { isFinanceDetailsProvided } from './isFinanceDetailsProvided';
+export { isUniversalCreditSelected } from './isUniversalCreditSelected';
+export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { getPreviousPageForArrears } from './journeyHelpers';
 export { getStepBeforeDisputePages } from './journeyHelpers';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
@@ -13,7 +17,6 @@ export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousSt
 export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
 export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';
 export { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
-export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export {
   shouldRouteToPriorityDebts,
   shouldRouteToUniversalCreditQuestion,
@@ -26,5 +29,7 @@ export {
   additionalRentContributionToPoundsString,
 } from './moneyAmountTransforms';
 export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
-export { toYesNoEnum, fromYesNoEnum } from './yesNoEnum';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
+export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
+export { penceToPounds, poundsToPence } from './currencyConversion';
+export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';

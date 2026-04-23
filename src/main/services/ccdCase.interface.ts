@@ -14,6 +14,11 @@ export enum YesNoEnum {
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
 export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
+export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
+
+export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
+
+export type PenceAmount = string;
 
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
@@ -28,7 +33,21 @@ export interface HouseholdCircumstances {
   alternativeAccommodationTransferDate?: string;
   otherTenants?: YesNoValue;
   otherTenantsDetails?: string;
+  shareIncomeExpenseDetails?: YesNoValue;
+  incomeFromJobs?: YesNoValue;
+  incomeFromJobsAmount?: PenceAmount;
+  incomeFromJobsFrequency?: FrequencyValue;
+  pension?: YesNoValue;
+  pensionAmount?: PenceAmount;
+  pensionFrequency?: FrequencyValue;
   universalCredit?: YesNoValue;
+  universalCreditAmount?: PenceAmount | null;
+  universalCreditFrequency?: FrequencyValue | null;
+  otherBenefits?: YesNoValue;
+  otherBenefitsAmount?: PenceAmount;
+  otherBenefitsFrequency?: FrequencyValue;
+  moneyFromElsewhere?: YesNoValue;
+  moneyFromElsewhereDetails?: string;
   ucApplicationDate?: string | null;
   priorityDebts?: YesNoValue;
   debtTotal?: string;
@@ -137,6 +156,8 @@ export interface CcdDefendantResponses {
   householdCircumstances?: HouseholdCircumstances;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
+  languageUsed?: LanguageUsed;
+  equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
 }
 
 export interface PossessionClaimResponse {
@@ -173,6 +194,7 @@ export interface CcdCaseData {
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
+  otherLicenceTypeDetails?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
@@ -230,4 +252,7 @@ export enum GenAppType {
 export interface CitizenGenAppRequest {
   applicationType: GenAppType;
   within14Days?: YesNoValue;
+  needHwf?: YesNoValue;
+  appliedForHwf?: YesNoValue;
+  hwfReference?: string;
 }
