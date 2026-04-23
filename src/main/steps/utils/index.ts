@@ -1,3 +1,4 @@
+export { isMoneyCounterClaim } from './isMoneyCounterClaim';
 export { isDefendantNameKnown } from './isDefendantNameKnown';
 export { isWelshProperty } from './isWelshProperty';
 export { isNoticeDateProvided } from './isNoticeDateProvided';

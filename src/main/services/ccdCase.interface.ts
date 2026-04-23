@@ -136,9 +136,9 @@ export interface CcdDefendantResponses {
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
   claimType?: string;
-  specificSum?: string;
+  isClaimAmountKnown?: string;
   claimAmount?: string;
-  maxClaimAmount?: string;
+  estimatedMaxClaimAmount?: string;
 }
 
 export interface PossessionClaimResponse {

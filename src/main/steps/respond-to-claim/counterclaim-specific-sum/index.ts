@@ -46,10 +46,10 @@ const validateClaimAmount = createAmountValidator(
   'errors.claimAmount.negative',
   'errors.claimAmount.invalidFormat'
 );
-const validateMaxClaimAmount = createAmountValidator(
-  'errors.maxClaimAmount.largeAmount',
-  'errors.maxClaimAmount.negative',
-  'errors.maxClaimAmount.invalidFormat'
+const validateEstimatedMaxClaimAmount = createAmountValidator(
+  'errors.estimatedMaxClaimAmount.largeAmount',
+  'errors.estimatedMaxClaimAmount.negative',
+  'errors.estimatedMaxClaimAmount.invalidFormat'
 );
 
 export const step: StepDefinition = createFormStep({
@@ -63,7 +63,7 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'specificSum',
+      name: 'isClaimAmountKnown',
       type: 'radio',
       required: true,
       isPageHeading: true,
@@ -71,7 +71,7 @@ export const step: StepDefinition = createFormStep({
       translationKey: {
         label: 'heading',
       },
-      errorMessage: 'errors.specificSum.required',
+      errorMessage: 'errors.isClaimAmountKnown.required',
       options: [
         {
           value: 'yes',
@@ -99,11 +99,11 @@ export const step: StepDefinition = createFormStep({
           translationKey: 'options.no',
           conditionalText: 'noSpecificFeeText',
           subFields: {
-            maxClaimAmount: {
-              name: 'maxClaimAmount',
+            estimatedMaxClaimAmount: {
+              name: 'estimatedMaxClaimAmount',
               type: 'text',
               required: true,
-              errorMessage: 'errors.maxClaimAmount.required',
+              errorMessage: 'errors.estimatedMaxClaimAmount.required',
               translationKey: {
                 label: 'maxClaimAmountLabel',
                 hint: 'maxClaimAmountHint',
@@ -111,7 +111,7 @@ export const step: StepDefinition = createFormStep({
               prefix: { text: '£' },
               classes: 'govuk-input--width-10',
               attributes: { inputmode: 'decimal', spellcheck: false },
-              validator: validateMaxClaimAmount,
+              validator: validateEstimatedMaxClaimAmount,
             },
           },
         },
@@ -122,45 +122,48 @@ export const step: StepDefinition = createFormStep({
     const counterClaim =
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
 
-    if (!counterClaim?.specificSum) {
+    if (!counterClaim?.isClaimAmountKnown) {
       return {};
     }
 
     const formData: Record<string, unknown> = {};
 
-    if (counterClaim.specificSum === 'YES') {
-      formData.specificSum = 'yes';
+    if (counterClaim.isClaimAmountKnown === 'YES') {
+      formData.isClaimAmountKnown = 'yes';
       if (counterClaim.claimAmount) {
-        formData['specificSum.claimAmount'] = additionalRentContributionToPoundsString(counterClaim.claimAmount);
+        formData['isClaimAmountKnown.claimAmount'] = additionalRentContributionToPoundsString(counterClaim.claimAmount);
       }
-    } else if (counterClaim.specificSum === 'NO') {
-      formData.specificSum = 'no';
-      if (counterClaim.maxClaimAmount) {
-        formData['specificSum.maxClaimAmount'] = additionalRentContributionToPoundsString(counterClaim.maxClaimAmount);
+    } else if (counterClaim.isClaimAmountKnown === 'NO') {
+      formData.isClaimAmountKnown = 'no';
+      if (counterClaim.estimatedMaxClaimAmount) {
+        formData['isClaimAmountKnown.estimatedMaxClaimAmount'] = additionalRentContributionToPoundsString(
+          counterClaim.estimatedMaxClaimAmount
+        );
       }
     }
 
     return formData;
   },
   beforeRedirect: async (req: Request) => {
-    const specificSum = req.body?.specificSum as string | undefined;
+    const isClaimAmountKnown = req.body?.isClaimAmountKnown as string | undefined;
 
-    if (!specificSum) {
+    if (!isClaimAmountKnown) {
       return;
     }
 
-    const counterClaim: CcdCounterClaim = { specificSum: specificSum.toUpperCase() };
+    const counterClaim: CcdCounterClaim = { isClaimAmountKnown: isClaimAmountKnown.toUpperCase() };
 
-    if (specificSum === 'yes') {
-      const amountRaw = req.body?.['specificSum.claimAmount'] as string | undefined;
+    if (isClaimAmountKnown === 'yes') {
+      const amountRaw = req.body?.['isClaimAmountKnown.claimAmount'] as string | undefined;
       if (amountRaw) {
         counterClaim.claimAmount = String(poundsStringToPence(amountRaw));
       }
-    } else if (specificSum === 'no') {
-      const amountRaw = req.body?.['specificSum.maxClaimAmount'] as string | undefined;
+    } else if (isClaimAmountKnown === 'no') {
+      const amountRaw = req.body?.['isClaimAmountKnown.estimatedMaxClaimAmount'] as string | undefined;
       if (amountRaw) {
-        counterClaim.maxClaimAmount = String(poundsStringToPence(amountRaw));
+        counterClaim.estimatedMaxClaimAmount = String(poundsStringToPence(amountRaw));
       }
+     
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {

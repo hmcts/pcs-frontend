@@ -1,6 +1,7 @@
 import { type Request } from 'express';
 
 import {
+  isMoneyCounterClaim,
   getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
@@ -16,13 +17,6 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
-function getCounterclaimFeePreviousStep(req: Request): string {
-  const claimType =
-    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim?.claimType;
-  return claimType === 'PAYMENT_OR_COMPENSATION' || claimType === 'BOTH'
-    ? 'counterclaim-specific-sum'
-    : 'counterclaim-what-are-you-claiming-for';
-}
 
 function getContactByTelephoneAnswer(
   req: Request,
@@ -409,8 +403,7 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'counter-claim',
       routes: [
         {
-          condition: (_req: Request, _formData: Record<string, unknown>, currentStepData: Record<string, unknown>) =>
-            Promise.resolve(currentStepData.claimType === 'money' || currentStepData.claimType === 'both'),
+          condition: async (req: Request) => isMoneyCounterClaim(req),
           nextStep: 'counterclaim-specific-sum',
         },
       ],
@@ -421,7 +414,10 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'counterclaim-fee',
     },
     'counterclaim-fee': {
-      previousStep: (req: Request) => getCounterclaimFeePreviousStep(req),
+      previousStep: async (req: Request) => {
+        const moneyCounterClaim = await isMoneyCounterClaim(req);
+        return moneyCounterClaim ? 'counterclaim-specific-sum' : 'counterclaim-what-are-you-claiming-for';
+      },
       defaultNext: 'payment-interstitial',
     },
     'payment-interstitial': {
