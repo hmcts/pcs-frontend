@@ -3,7 +3,7 @@
   "pageTitle": "cyYour postal address",
   "legend": "cyIs your correspondence address ",
   "legendNa": "cyWhat’s your correspondence address?",
-  "legend.hint": "cyThis is the address provided by Treetops Housing",
+  "legend.hint": "cyThis is the address provided by {{claimantName}}",
   "legend.hintNa": "cyYour correspondence address is your postal address.",
   "labels": {
     "yes": "cyYes",

@@ -2,7 +2,7 @@
   "caption": "Respond to a property possession claim",
   "pageTitle": "Payments or agreements",
   "heading": "Payments or agreements since the claim was made",
-  "paragraph1": "You will now be asked questions about any payments or agreements you’ve made since Treetop Housing made their claim.",
+  "paragraph1": "You will now be asked questions about any payments or agreements you’ve made since {{claimantName}} made their claim.",
   "paragraph2": "This will help a judge understand:",
   "paragraph3": "The claimant will be able to see your answers.",
   "paragraph4": "If you’ve paid some or all of the money you owe, you should bring proof of this to the hearing.",
