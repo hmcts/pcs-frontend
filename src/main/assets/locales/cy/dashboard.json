@@ -15,7 +15,7 @@
     "HEARING": "cyHearing",
     "JUDGEMENT": "cyJudgement from the court",
     "NOTICE": "cyOrders and notices from the court",
-    "DOCUMENTS":"cyDocuments",
+    "DOCUMENTS": "cyDocuments",
     "RESPONSE": "cyThe response",
     "APPLICATIONS": "cyApplications"
   },
