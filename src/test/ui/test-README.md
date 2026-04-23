@@ -145,7 +145,7 @@ yarn test:functional
 
 ### PFT test-env debug logging
 
-In root [`playwright.config.ts`](../../../playwright.config.ts), `enable_pft_debug_log` is **`false` by default**. Set it to **`true`** if you want environment variables to be printed in the console while you debug. Sauce runs use [`playwright.sauce.config.ts`](../../../playwright.sauce.config.ts) for discovery only; feature flags still come from `playwright.config` imports in test code.
+In root [`playwright.config.ts`](../../../playwright.config.ts), `enable_pft_debug_log` is **`false` by default**. Set it to **`true`** if you want environment variables to be printed in the console while you debug. Jenkins and local runs use that config (including `globalSetup` for tokens). Sauce uses [`playwright.sauce.config.ts`](../../../playwright.sauce.config.ts) (separate `testDir`, no `globalSetup`); shared helpers still import timing/feature flags from `playwright.config.ts`.
 
 ## 8. Troubleshooting
 

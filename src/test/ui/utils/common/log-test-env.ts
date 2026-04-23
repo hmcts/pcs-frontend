@@ -1,6 +1,6 @@
 import { enable_pft_debug_log } from '../../../../../playwright.config';
 
-/** Env keys set in `respondToAClaimCrossBrowser.spec.ts` `beforeEach` (plus `CASE_NUMBER` from submit). */
+/** Env keys set in `respondToAClaim.spec.ts` `beforeEach` (plus `CASE_NUMBER` from submit). */
 export const RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS = [
   'CASE_NUMBER',
   'CLAIMANT_NAME',
