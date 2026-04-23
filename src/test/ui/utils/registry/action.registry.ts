@@ -85,6 +85,7 @@ export class ActionRegistry {
     ['inputErrorValidationGenApp', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
     ['languageUsed', new RespondToClaimAction()],
+    ['otherConsiderations', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

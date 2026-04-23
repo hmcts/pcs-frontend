@@ -44,3 +44,5 @@ export * from './priorityDebtDetails.page.data';
 export * from './priorityDebts.page.data';
 export * from './whatOtherRegularExpensesDoYouHave.page.data';
 export * from './whatRegularIncomeDoYouReceive.page.data';
+export * from './otherConsiderations.page.data';
+export * from './uploadFiles.page.data';
