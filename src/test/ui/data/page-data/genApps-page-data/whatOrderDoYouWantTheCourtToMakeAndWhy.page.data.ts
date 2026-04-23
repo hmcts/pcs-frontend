@@ -1,15 +1,11 @@
 export const whatOrderDoYouWantTheCourtToMakeAndWhy = {
-  mainHeader: `What order do you want the court to make and why?`,
+  mainHeader: `What order do you want the court to make, and why?`,
   makeAnApplicationParagraph: `Make an application`,
   forExampleParagraph: `For example, tell the court:`,
-  youAreUnableToAttendList: `you are unable to attend the hearing due a pre-existing medical appointment`,
-  youAreAttendingList: `you are attending a funeral`,
   includeDetailsOfAnyFactsParagraph: `Include details of any facts or evidence that you think the court should consider when it makes a decision. You can upload your evidence on the next page.`,
   explainWhatYouWantTextLabel: `Explain what you want the court to do, and why`,
-  whyYouWantToAddSomeoneList: ` why you want to add someone to your claim`,
-  whyYouShouldNotBeSanctionedList: `why you should not be sanctioned (punished)`,
-  whyYouWantToTransferList: `why you want to transfer to the High Court for enforcement`,
   youHave600CharactersHiddenHintText: `You have 6,800 characters remaining`,
+  whatYouWantTheCourtToDoTextInput: `50000`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
   backLink: `Back`,
@@ -18,6 +14,9 @@ export const whatOrderDoYouWantTheCourtToMakeAndWhy = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
   errorValidationField: {
-    errorTextField: { type: `none`, input: ``, errMessage: `Confirm the order you want the court to make, and why` },
+    errorTextField: [
+      { type: 'empty', input: 'EMPTY', errMessage: 'Confirm the order you want the court to make, and why' },
+      { type: 'moreThanMax', input: 6900, errMessage: 'Must be 6800 characters or fewer' },
+    ],
   },
 };
