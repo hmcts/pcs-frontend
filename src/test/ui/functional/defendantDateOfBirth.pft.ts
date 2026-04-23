@@ -1,5 +1,25 @@
 import { dashboard, defendantDateOfBirth, feedback } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
+import type { EmvStepReportDetail } from '../validationTests/emvReport.types';
+
+export function defendantDateOfBirthErrorValidationEmvReport(): EmvStepReportDetail {
+  return {
+    intent:
+      'Optional DOB: if any part is filled, all parts are required — partial month+year must show missing-day error.',
+    screenTitle: defendantDateOfBirth.mainHeader,
+    actionsOrInputs: [
+      'Enter month = 6 and year = 1990; leave day empty (matches PFT inputs).',
+      'Click “Save and continue”.',
+    ],
+    expectedAssertions: [
+      {
+        label: 'Missing day',
+        summaryTitle: defendantDateOfBirth.thereIsAProblemErrorMessageHeader,
+        messageContains: defendantDateOfBirth.yourDateOfBirthMustIncludeDayErrorMessage,
+      },
+    ],
+  };
+}
 
 /** Partial date (month + year only) to assert missing-part error; journey then supplies full DOB. */
 export async function defendantDateOfBirthErrorValidation(): Promise<void> {

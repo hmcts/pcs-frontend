@@ -1,5 +1,30 @@
 import { contactPreferenceEmailOrPost, feedback } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
+import type { EmvStepReportDetail } from '../validationTests/emvReport.types';
+
+export function contactPreferenceEmailOrPostMandatoryChoiceErrorValidationEmvReport(): EmvStepReportDetail {
+  return {
+    intent: 'How to receive updates must be selected; journey then chooses “By post” (not the full email-format PFT).',
+    screenTitle: contactPreferenceEmailOrPost.mainHeader,
+    actionsOrInputs: ['Click “Save and continue” without selecting By post or By email.'],
+    expectedAssertions: [
+      {
+        label: 'Channel required',
+        summaryTitle: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
+        messageContains: contactPreferenceEmailOrPost.selectHowYouWantToReceiveUpdatesErrorMessage,
+      },
+    ],
+  };
+}
+
+/** Save without choosing how to receive updates (for journeys that then pick “by post”). */
+export async function contactPreferenceEmailOrPostMandatoryChoiceErrorValidation(): Promise<void> {
+  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
+    message: contactPreferenceEmailOrPost.selectHowYouWantToReceiveUpdatesErrorMessage,
+  });
+}
 
 export async function contactPreferenceEmailOrPostErrorValidation(): Promise<void> {
   await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);

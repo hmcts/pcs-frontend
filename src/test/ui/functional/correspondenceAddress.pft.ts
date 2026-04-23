@@ -1,5 +1,30 @@
 import { correspondenceAddress, dashboard, defendantDateOfBirth } from '../data/page-data';
 import { performAction, performValidation, performValidations } from '../utils/controller';
+import type { EmvStepReportDetail } from '../validationTests/emvReport.types';
+
+export function correspondenceAddressKnownErrorValidationEmvReport(): EmvStepReportDetail {
+  return {
+    intent: 'Known correspondence address screen: must confirm Yes/No before continue (CORRESPONDENCE_ADDRESS=KNOWN).',
+    screenTitle: correspondenceAddress.correspondenceAddressKnownMainHeader,
+    actionsOrInputs: ['Click “Save and continue” without selecting Yes or No.'],
+    expectedAssertions: [
+      {
+        label: 'Confirm address',
+        summaryTitle: correspondenceAddress.thereIsAProblemErrorMessageHeader,
+        messageContains: correspondenceAddress.pleaseConfirmYourAddressErrorMessage,
+      },
+    ],
+  };
+}
+
+/** “Is this your correspondence address?” — save without Yes/No (matches CORRESPONDENCE_ADDRESS=KNOWN journeys). */
+export async function correspondenceAddressKnownErrorValidation(): Promise<void> {
+  await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: correspondenceAddress.thereIsAProblemErrorMessageHeader,
+    message: correspondenceAddress.pleaseConfirmYourAddressErrorMessage,
+  });
+}
 
 export async function correspondenceAddressErrorValidation(): Promise<void> {
   await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
