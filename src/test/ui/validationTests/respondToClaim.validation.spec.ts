@@ -43,7 +43,8 @@ import {
   finaliseAllValidations,
   initializeExecutor,
   performAction,
-  performActions, performValidation,
+  performActions,
+  performValidation,
 } from '../utils/controller';
 
 import { createSoftEmvRunner } from './softEmvRunner';
@@ -175,7 +176,7 @@ test.describe('Rent arrears introductory — notice date unknown (validation tes
       ['clickButton', priorityDebtDetails.continueButton],
       ['clickButton', whatOtherRegularExpensesDoYouHave.continueButton],
       ['clickButton', equalityAndDiversityStart.continueButton],
-      ['clickButton', equalityAndDiversityEnd.continueButton],
+      ['clickButton', equalityAndDiversityEnd.continueButton]
     );
 
     await softEmv.runSoftPftCheck('languageUsed', languageUsedErrorValidation);
