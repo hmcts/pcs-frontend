@@ -14,7 +14,7 @@ function titleCaseStep(step: string): string {
 }
 
 function mdCell(s: string): string {
-  return s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+  return s.replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\n/g, ' ');
 }
 
 export type EmvJourneyRow = {
