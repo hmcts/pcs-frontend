@@ -17,8 +17,15 @@ export const getS2SToken = async (): Promise<void> => {
   const { ServiceAuthUtils } = await import('@hmcts/playwright-common');
   process.env.S2S_URL = process.env.S2S_URL || s2STokenApiData.s2sUrl;
 
+  const onSauce = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
+  if (onSauce) {
+    await new Promise(r => setTimeout(r, 5000));
+  }
+  const maxAttempts = onSauce ? 6 : 4;
+  const delayMs = onSauce ? 3500 : 2000;
+
   let lastError: unknown;
-  for (let attempt = 1; attempt <= 4; attempt++) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
         microservice: s2STokenApiData.microservice,
@@ -26,10 +33,10 @@ export const getS2SToken = async (): Promise<void> => {
       return;
     } catch (error) {
       lastError = error;
-      if (attempt === 4) {
+      if (attempt === maxAttempts) {
         break;
       }
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, delayMs));
     }
   }
   throw lastError;

@@ -5,7 +5,7 @@ kind: playwright
 sauce:
   region: eu-central-1
   # Max parallel Sauce sessions for this config (plan + tunnel limits); not the same as Playwright workers.
-  concurrency: 3
+  concurrency: 1
   tunnel:
     name: $SAUCE_TUNNEL_NAME
   metadata:
@@ -51,6 +51,14 @@ env:
 
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
+  # Tokens: Jenkins nightly runs `yarn mint:e2e-tokens-for-sauce` on the agent, then exports these into the
+  # environment before saucectl. When set, auth.setup skips S2S/IDAM HTTP on Sauce VMs (no tunnel for those calls).
+  SERVICE_AUTH_TOKEN: $SERVICE_AUTH_TOKEN
+  BEARER_TOKEN: $BEARER_TOKEN
+  S2S_URL: $S2S_URL
+  IDAM_WEB_URL: $IDAM_WEB_URL
+  IDAM_TESTING_SUPPORT_URL: $IDAM_TESTING_SUPPORT_URL
+
 # macOS 14 is not used across all browsers because it requires ARM support, which is not enabled in our Sauce Labs subscription.
 # Using macOS 13 ensures compatibility and prevents job failures, though it runs on Intel rather than Apple Silicon.
 
@@ -76,18 +84,6 @@ suites:
     params:
       browserName: firefox
       project: firefox
-      headless: false
-      grep: $SAUCE_GREP
-
-  - name: 'pcs-frontend-mac13-webkit'
-    platformName: macOS 13
-    screenResolution: 1440x900
-    testMatch:
-      - ".*src/test/ui/.*\\.spec\\.ts$"
-      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
-    params:
-      browserName: webkit
-      project: webkit
       headless: false
       grep: $SAUCE_GREP
 

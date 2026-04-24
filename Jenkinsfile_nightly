@@ -150,6 +150,28 @@ withNightlyPipeline(type, product, component) {
   enableFortifyScan()
   def sauceSuites = selectedSauceSuites()
   if (!sauceSuites.isEmpty()) {
+    // Mint S2S + IDAM on the agent (internal URLs); pass into saucectl so Playwright on Sauce skips token HTTP.
+    yarnBuilder.yarn('mint:e2e-tokens-for-sauce')
+    def mintPath = '.sauce/minted-tokens.json'
+    if (fileExists(mintPath)) {
+      def t = readJSON file: mintPath
+      if (t.SERVICE_AUTH_TOKEN) {
+        env.SERVICE_AUTH_TOKEN = t.SERVICE_AUTH_TOKEN.toString()
+      }
+      if (t.BEARER_TOKEN) {
+        env.BEARER_TOKEN = t.BEARER_TOKEN.toString()
+      }
+      if (t.S2S_URL) {
+        env.S2S_URL = t.S2S_URL.toString()
+      }
+      if (t.IDAM_WEB_URL) {
+        env.IDAM_WEB_URL = t.IDAM_WEB_URL.toString()
+      }
+      if (t.IDAM_TESTING_SUPPORT_URL) {
+        env.IDAM_TESTING_SUPPORT_URL = t.IDAM_TESTING_SUPPORT_URL.toString()
+      }
+      sh 'rm -f .sauce/minted-tokens.json'
+    }
     env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
     enableCrossBrowserTest()
   }

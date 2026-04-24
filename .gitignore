@@ -51,6 +51,7 @@ version
 /blob-report/
 /playwright/.cache/
 /src/test/ui/.auth/setup-env.json
+/.sauce/minted-tokens.json
 /.yarn/cache/
 /.yarn/unplugged/
 /pact/
