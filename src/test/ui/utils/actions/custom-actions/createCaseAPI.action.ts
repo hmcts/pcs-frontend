@@ -46,7 +46,8 @@ export class CreateCaseAPIAction implements IAction {
         .token;
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
-        const detail = error.response?.data !== null ? JSON.stringify(error.response.data).slice(0, 2000) : '';
+        const responseData = error.response?.data;
+        const detail = responseData !== null ? JSON.stringify(responseData).slice(0, 2000) : '';
         throw new Error(
           `createCaseAPI: event-token GET failed (${error.response?.status ?? 'no status'}). ${error.message}${detail ? ` — body: ${detail}` : ''}`
         );
