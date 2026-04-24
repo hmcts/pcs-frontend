@@ -165,8 +165,15 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
-  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('clickButton', startNow.startNowButton);
+
+  //Dashboard page - custom action
+  //await performValidation('mainHeader', dashboard.mainHeader);
+  await performAction('clickLink', 'Respond to claim');
+
+  //Erase this -
+  //await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+
+  //await performValidation('mainHeader', taskList.mainHeader);
 });
 
 test.afterEach(async () => {
@@ -177,16 +184,22 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim @noDefendants @regression @accessibility', async () => {
+    // Task list custom action -
+    //    await performAction('clickOnTaskList', taskList.section1);
+    await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
+    //   await performAction('clickButton', 'Save and continue'); //CYA
+    //    await performAction('clickOnTaskList', taskList.section2);
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
+    //cA for task list
     await performAction('selectCorrespondenceAddressUnKnown', {
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
@@ -197,6 +210,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
+    //   await performAction('clickButton', 'Save and continue');
+    //    await performAction('clickOnTaskList', taskList.section3);
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
@@ -206,6 +221,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
+
+    //   await performAction('clickButton', 'Save and continue');
+    //    await performAction('clickOnTaskList', taskList.saveAndContinue);
+    //   await performAction('clickButton', 'Save and continue'); //FinalCYA
+    //   await performAction('clickButton', 'Submit');
+
+    ///////////////////////
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadNoDefendants.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
@@ -225,6 +247,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
+
     // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
