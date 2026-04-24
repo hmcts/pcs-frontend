@@ -179,7 +179,7 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim @noDefendants @regression @accessibility @PR', async () => {
+  test('Respond to a claim @noDefendants @regression @accessibility @PR @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
