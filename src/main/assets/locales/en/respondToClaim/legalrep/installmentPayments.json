@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Instalment payments",
+  "heading": "Instalment payments",
+  "question": "Would the defendant like to offer to pay off their arrears in instalments?",
+  "errors": {
+    "confirmInstallmentOffer": "Select whether the defendant would like to offer to pay off their arrears in instalments"
+  },
+  "caseNumber": "Case number: {{caseNumber}}"
+}

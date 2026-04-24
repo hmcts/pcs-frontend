@@ -1,5 +1,6 @@
 {# Tenancy Details template (matches GOV.UK layout shown) #}
 {% extends "stepsTemplate.njk" %}
+{% from "macros/caseNumberDisplay.njk"import caseNumberDisplay%}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
@@ -16,6 +17,9 @@
   {% if heading %}
     <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% endif %}
+
+  {{ caseNumberDisplay(isLegalRepresentative, caseNumber) }}
+  
   <form method="post" action="{{ url }}" novalidate>
     {% if insetText %}
       {{ govukInsetText({ text: insetText }) }}

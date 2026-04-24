@@ -1,0 +1,15 @@
+{
+  "heading": "cyRepayment agreement",
+  "caseNumber": "cyCase number: {{caseNumber}}",
+  "question": "cyHas the defendant come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+  "options": {
+    "or": " ",
+    "imNotSure": "cyDefendant is not sure"
+  },
+  "textAreaLabel": "cyGive details about how much they’ve agreed to pay and when",
+  "textAreaHint": "cyEnter up to 500 characters",
+  "errors": {
+    "repaymentsAgreed": "cySelect if the defendant has come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}",
+    "repaymentsAgreed.repaymentsAgreedDetails": "cyGive details about how much the defendant has agreed to pay, how often the defendant will pay and when the agreement was made"
+  }
+}

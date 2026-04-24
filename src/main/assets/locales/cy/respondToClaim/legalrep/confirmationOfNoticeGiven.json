@@ -1,0 +1,10 @@
+{
+  "caseNumber": "cyCase number: {{caseNumber}}",
+  "hintText": "",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": " ",
+    "imNotSure": "cyDefendant is not sure"
+  }
+}

@@ -1,5 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
+{% from "macros/caseNumberDisplay.njk" import caseNumberDisplay %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
@@ -17,6 +18,8 @@
   {% endif %}
 
   <h1 class="govuk-heading-l">{{ heading or pageTitle }}</h1>
+
+   {{ caseNumberDisplay(isLegalRepresentative, caseNumber) }}
 
   {% if paragraph %}
     <p class="govuk-body">{{ paragraph }}</p>

@@ -8,6 +8,8 @@ import { flowConfig } from '../flow.config';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';
+import { isLegalRepresentativeUser } from 'steps/utils/userRole';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -91,6 +93,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    caseNumber: 'caseNumber',
     heading: 'heading',
     insetText: 'insetText',
     saveAndContinue: 'saveAndContinue',
@@ -164,7 +167,7 @@ export const step: StepDefinition = createFormStep({
       (req.body?.correctType as string) ||
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
       '';
-
+    const claimantName = req.res?.locals.validatedCase?.data?.claimantName as string;
     const caseData = req.res?.locals.validatedCase?.data;
     const walesProperty = isWalesProperty(caseData);
     const orgName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string;
@@ -176,10 +179,7 @@ export const step: StepDefinition = createFormStep({
       : (caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string | undefined);
     // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
-    const detailsHeading =
-      typeof formContent.detailsHeading === 'string'
-        ? `${formContent.detailsHeading}${orgName}${':'}`
-        : formContent.detailsHeading;
+    const receivedDetailsBy = isLegalRepresentativeUser(req) ? claimantName : orgName;
 
     const t = getTranslationFunction(req, STEP_NAME, ['common']);
     let tenancyType: unknown;
@@ -197,9 +197,12 @@ export const step: StepDefinition = createFormStep({
       tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
     return {
       ...formContent,
-      detailsHeading,
+      caseNumber: t('caseNumber', { caseNumber }),
+      receivedDetailsBy,
       tenancyType,
       organisationName: orgName,
       orgname: orgName,

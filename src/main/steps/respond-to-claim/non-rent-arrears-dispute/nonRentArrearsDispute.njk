@@ -1,5 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
+{% from "macros/caseNumberDisplay.njk" import caseNumberDisplay %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
@@ -18,15 +19,19 @@
 
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  <p class="govuk-body">{{ introParagraph | safe }}</p>
+  {{ caseNumberDisplay(isLegalRepresentative, caseNumber) }}
 
-  <p class="govuk-body">{{ includesHeading }}</p>
+  {% if not isLegalRepresentative %}
+    <p class="govuk-body">{{ introParagraph | safe }}</p>
 
-  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
-    <li>{{ includesBullet1 | safe }}</li>
-    <li>{{ includesBullet2 }}</li>
-    <li>{{ includesBullet3 }}</li>
-  </ul>
+    <p class="govuk-body">{{ includesHeading }}</p>
+
+    <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+      <li>{{ includesBullet1 | safe }}</li>
+      <li>{{ includesBullet2 }}</li>
+      <li>{{ includesBullet3 }}</li>
+    </ul>
+  {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}

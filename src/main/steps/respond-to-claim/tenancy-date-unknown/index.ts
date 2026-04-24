@@ -8,6 +8,8 @@ import { flowConfig } from '../flow.config';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
+import { isLegalRepresentativeUser } from 'steps/utils/userRole';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 const STEP_NAME = 'tenancy-date-unknown';
 
@@ -75,11 +77,17 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: async req => {
     const claimantName = getClaimantName(req);
+    const orgName = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
+      ?.value as string;
 
+    const receivedDetailsBy = isLegalRepresentativeUser(req) ? claimantName : orgName;
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
     const t = getTranslationFunction(req, STEP_NAME, ['common']);
-    const paragraph = t('paragraph', { claimantName });
+    const paragraph = t('paragraph', { receivedDetailsBy });
 
     return {
+      caseNumber: t('caseNumber', { caseNumber }),
+      receivedDetailsBy,
       claimantName,
       paragraph,
     };

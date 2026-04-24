@@ -1,0 +1,10 @@
+{
+  "caseNumber": "Case number: {{caseNumber}}",
+  "hintText": "",
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "or": " ",
+    "imNotSure": "Defendant is not sure"
+  }
+}
