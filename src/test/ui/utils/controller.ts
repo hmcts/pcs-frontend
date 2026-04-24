@@ -33,8 +33,10 @@ function ensurePlaywrightSetupAuthEnv(): void {
   loadPlaywrightSetupEnvIntoProcess();
 }
 
-/** Set by `.sauce/config-sauce-nightly.yml` only — per-step PNGs in Playwright report, not for Jenkins VM E2E. */
-const sauceStepScreenshots = process.env.PLAYWRIGHT_SAUCE_STEP_SCREENSHOTS === 'true';
+/** Same flag as `playwright.config.ts` Sauce capture — full-page PNGs for reports; Jenkins VM leaves this unset. */
+const sauceFullPageScreenshots = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
+
+const sauceLoadScreenshotPages = new WeakSet<Page>();
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
@@ -42,8 +44,8 @@ let startFunctionalTests = false;
 let startAxeAudit = false;
 let sauceJourneyScreenshotStep = 0;
 
-async function attachSauceJourneyStepScreenshot(page: Page): Promise<void> {
-  if (!sauceStepScreenshots) {
+async function attachSauceFullPageScreenshot(page: Page): Promise<void> {
+  if (!sauceFullPageScreenshots) {
     return;
   }
   try {
@@ -56,10 +58,24 @@ async function attachSauceJourneyStepScreenshot(page: Page): Promise<void> {
   }
 }
 
+function registerSaucePageLoadScreenshots(page: Page): void {
+  if (!sauceFullPageScreenshots) {
+    return;
+  }
+  if (!sauceLoadScreenshotPages.has(page)) {
+    sauceLoadScreenshotPages.add(page);
+    page.on('load', () => {
+      void attachSauceFullPageScreenshot(page);
+    });
+  }
+  void attachSauceFullPageScreenshot(page);
+}
+
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
   previousUrl = page.url();
   sauceJourneyScreenshotStep = 0;
+  registerSaucePageLoadScreenshots(page);
 }
 
 function getExecutor(): { page: Page } {
@@ -155,7 +171,7 @@ export async function performAction(
     await actionInstance.execute(executor.page, action, fieldName, value);
   });
   await validatePageIfNavigated(action);
-  await attachSauceJourneyStepScreenshot(executor.page);
+  await attachSauceFullPageScreenshot(executor.page);
 }
 
 export async function performValidation(
