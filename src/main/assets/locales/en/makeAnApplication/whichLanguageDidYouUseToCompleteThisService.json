@@ -1,5 +1,15 @@
 {
   "pageTitle": "Which language did you use to complete this service?",
   "caption": "Make an application",
-  "heading": "Which language did you use to complete this service?"
+  "heading": "Which language did you use to complete this service?",
+  "question": "Which language did you use to complete this service?",
+  "ifSomeoneElseHelpedYou": "If someone else helped you to answer a question in this service, ask them if they answered any questions in Welsh. We’ll use this to make sure your claim is processed correctly.",
+  "options": {
+    "ENGLISH": "English",
+    "WELSH": "Welsh",
+    "ENGLISH_AND_WELSH": "English and Welsh"
+  },
+  "errors": {
+    "confirmLanguage": "Confirm which language you used to complete this service"
+  }
 }

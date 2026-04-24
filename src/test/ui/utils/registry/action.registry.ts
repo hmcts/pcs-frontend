@@ -88,6 +88,7 @@ export class ActionRegistry {
     ['confirmOtherPartiesAgreed', new GenAppsAction()],
     ['reasonsApplicationShouldNotBeShared', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
+    ['selectLanguageUsedToComplete', new GenAppsAction()],
     ['retrieveCYATableData', new GenAppsAction()],
     ['validateCYA', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],

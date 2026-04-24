@@ -7,6 +7,7 @@ import {
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
 import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString } from '../../common/string.utils';
@@ -30,6 +31,7 @@ export class GenAppsAction implements IAction {
         () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord),
       ],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
+      ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
       ['validateCYA', () => this.validateCYA()],
     ]);
@@ -48,6 +50,15 @@ export class GenAppsAction implements IAction {
     });
     FieldsStore.rename(chooseApp.question as string, 'Type of application');
     await performAction('clickButton', chooseAnApplication.continueButton);
+  }
+
+  private async selectLanguageUsedToComplete(selectLanguageData: actionRecord) {
+    await performAction('recordUserEntry', selectLanguageData);
+    await performAction('clickRadioButton', {
+      question: selectLanguageData.question,
+      option: selectLanguageData.option,
+    });
+    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
   }
 
   private async confirmIfCourtHearingInNext14Days(courtHearing: actionRecord) {
