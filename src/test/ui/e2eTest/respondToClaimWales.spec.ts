@@ -24,6 +24,7 @@ import {
   landlordRegistered,
   languageUsed,
   nonRentArrearsDispute,
+  otherConsiderations,
   priorityDebtDetails,
   priorityDebts,
   rentArrears,
@@ -32,8 +33,8 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  uploadDocuments,
   whatOtherRegularExpensesDoYouHave,
-  whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
   yourCircumstances,
@@ -170,13 +171,25 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction('clickButton', incomeAndExpenses.continueButton);
-    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+    await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
+    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
+    await performAction('clickButton', otherConsiderations.continueButton);
+    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performAction('clickButton', uploadDocuments.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
