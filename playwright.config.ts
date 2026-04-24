@@ -46,6 +46,12 @@ const captureSettings = sauceFullJourneyArtifacts
       trace: 'on-first-retry' as const,
     };
 
+/**
+ * Sauce sets `PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS`; headless Chromium there often yields blank Playwright video.
+ * Jenkins VM E2E does not set it, so stays headless in CI.
+ */
+const browserHeadless = sauceFullJourneyArtifacts ? false : !!process.env.CI;
+
 /** Build test file globs from E2E_SPEC (comma or semicolon keywords). Empty = run all specs. */
 function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
   const keys = raw
@@ -105,7 +111,7 @@ export default defineConfig({
         ...captureSettings,
         javaScriptEnabled: true,
         viewport: DEFAULT_VIEWPORT,
-        headless: !!process.env.CI,
+        headless: browserHeadless,
       },
     },
     ...(process.env.CI
@@ -119,7 +125,7 @@ export default defineConfig({
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
@@ -131,7 +137,7 @@ export default defineConfig({
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
@@ -143,7 +149,7 @@ export default defineConfig({
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
@@ -155,7 +161,7 @@ export default defineConfig({
               ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
@@ -165,7 +171,7 @@ export default defineConfig({
               ...devices['Pixel 5'],
               ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
@@ -175,7 +181,7 @@ export default defineConfig({
               ...devices['iPhone 12'],
               ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
@@ -185,7 +191,7 @@ export default defineConfig({
               ...devices['iPad Pro 11'],
               ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
         ]

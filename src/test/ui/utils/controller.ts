@@ -9,7 +9,6 @@ import {
 import { axe_exclusions } from '../config/axe-exclusions.config';
 import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
 
-loadPlaywrightSetupEnvIntoProcess();
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
@@ -20,14 +19,39 @@ import {
   VisibilityValidation,
 } from './validations/custom-validations';
 
+loadPlaywrightSetupEnvIntoProcess();
+
+/** Set by `.sauce/config-sauce-nightly.yml` only — per-step PNGs in Playwright report, not for Jenkins VM E2E. */
+const sauceStepScreenshots = process.env.PLAYWRIGHT_SAUCE_STEP_SCREENSHOTS === 'true';
+
 let testExecutor: { page: Page };
 let previousUrl: string = '';
 let startFunctionalTests = false;
 let startAxeAudit = false;
+let sauceJourneyScreenshotStep = 0;
+
+function sanitizeSauceAttachmentName(label: string): string {
+  return label.replace(/[/\\?%*:|"<>]/g, '_').replace(/\s+/g, ' ').trim().slice(0, 100);
+}
+
+async function attachSauceJourneyStepScreenshot(page: Page, stepLabel: string): Promise<void> {
+  if (!sauceStepScreenshots) {
+    return;
+  }
+  try {
+    sauceJourneyScreenshotStep += 1;
+    const name = `${String(sauceJourneyScreenshotStep).padStart(4, '0')}-${sanitizeSauceAttachmentName(stepLabel)}.png`;
+    const body = await page.screenshot({ fullPage: true });
+    await test.info().attach(name, { body, contentType: 'image/png' });
+  } catch {
+    // e.g. page closed or navigating
+  }
+}
 
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
   previousUrl = page.url();
+  sauceJourneyScreenshotStep = 0;
 }
 
 function getExecutor(): { page: Page } {
@@ -122,6 +146,7 @@ export async function performAction(
     await actionInstance.execute(executor.page, action, fieldName, value);
   });
   await validatePageIfNavigated(action);
+  await attachSauceJourneyStepScreenshot(executor.page, stepText);
 }
 
 export async function performValidation(

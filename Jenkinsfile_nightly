@@ -88,6 +88,8 @@ properties([
       name: 'SAUCE_WIN11_FIREFOX',
       defaultValue: true,
       description: 'Sauce: Windows 11 — Firefox.'
+    ),
+    string(
       name: 'PLAYWRIGHT_SPEC',
       defaultValue: '',
       description: 'Spec file filter: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate keywords with comma or semicolon. Ex.: respondToAClaim | respondToAClaim,makeAnApplication. Blank = all specs. Default: empty.'
