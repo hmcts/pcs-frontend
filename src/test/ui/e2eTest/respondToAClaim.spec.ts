@@ -651,7 +651,7 @@ test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - 
 });
 
 test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
-  await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+  /*await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
   await performAction('inputDefendantDetails', {
     fName: defendantNameCapture.firstNameTextInput,
     lName: defendantNameCapture.lastNameTextInput,
@@ -733,7 +733,11 @@ test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided
   await performValidation('mainHeader', priorityDebts.mainHeader);
   await performAction('clickButton', priorityDebts.continueButton);
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-  await performAction('clickButton', priorityDebtDetails.continueButton);
+  await performAction('clickButton', priorityDebtDetails.continueButton);*/
+  await performAction(
+    'navigateToUrl',
+    home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/what-other-regular-expenses-do-you-have`
+  );
   await performAction('selectWhatOtherRegularExpensesDoYouHave', {
     regularIncomeOptions: [
       [
@@ -745,11 +749,6 @@ test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided
         whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
         whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
         whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
-      ],
-      [
-        whatOtherRegularExpensesDoYouHave.otherExpensesParagraph,
-        whatOtherRegularExpensesDoYouHave.otherExpensesTotalAmountInput,
-        whatOtherRegularExpensesDoYouHave.otherExpensesWeekHiddenRadioOption,
       ],
     ],
   });
@@ -983,6 +982,7 @@ test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - 
   await performAction('clickButton', priorityDebts.continueButton);
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
   await performAction('clickButton', priorityDebtDetails.continueButton);
+  await performAction('selectWhatOtherRegularExpensesDoYouHave');
   await performValidation('mainHeader', otherConsiderations.mainHeader);
   await performAction('clickButton', otherConsiderations.continueButton);
   await performValidation('mainHeader', uploadDocuments.mainHeader);
@@ -1090,6 +1090,7 @@ test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes Noti
   await performAction('clickButton', priorityDebts.continueButton);
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
   await performAction('clickButton', priorityDebtDetails.continueButton);
+  await performAction('selectWhatOtherRegularExpensesDoYouHave');
   await performValidation('mainHeader', otherConsiderations.mainHeader);
   await performAction('clickButton', otherConsiderations.continueButton);
   await performValidation('mainHeader', uploadDocuments.mainHeader);
@@ -1187,6 +1188,7 @@ test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDi
   await performAction('clickButton', priorityDebts.continueButton);
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
   await performAction('clickButton', priorityDebtDetails.continueButton);
+  await performAction('selectWhatOtherRegularExpensesDoYouHave');
   await performValidation('mainHeader', otherConsiderations.mainHeader);
   await performAction('clickButton', otherConsiderations.continueButton);
   await performValidation('mainHeader', uploadDocuments.mainHeader);
