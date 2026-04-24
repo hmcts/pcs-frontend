@@ -129,9 +129,7 @@ export const whatOtherRegularExpensesDoYouHave = {
   testInputZero: `0.00`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  cancelLink: `Cancel`,
   cymraegLink: `Cymraeg`,
-  backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `what-regular-income-do-you-receive`,
 };
