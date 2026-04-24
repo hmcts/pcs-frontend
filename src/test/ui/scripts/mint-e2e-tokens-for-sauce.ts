@@ -11,6 +11,11 @@ async function main(): Promise<void> {
   console.log(
     '[E2E tokens] Minting S2S + IDAM on this machine (Jenkins agent or local shell running mint-e2e-tokens-for-sauce).'
   );
+  if (!process.env.PCS_FRONTEND_IDAM_SECRET?.trim()) {
+    console.error(
+      '[E2E tokens] PCS_FRONTEND_IDAM_SECRET is missing or empty. For Jenkins, ensure vault secrets are passed into the mint step (see Jenkinsfile_nightly withEnv). For local runs, set env or .env.'
+    );
+  }
   await getS2SToken();
   await getAccessToken();
 

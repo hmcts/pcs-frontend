@@ -154,8 +154,16 @@ withNightlyPipeline(type, product, component) {
     node {
       checkout scm
       yarnBuilder.yarn('ci:install')
-      // Mint S2S + IDAM on the agent (internal URLs); pass into saucectl so Playwright on Sauce skips token HTTP.
-      yarnBuilder.yarn('mint:e2e-tokens-for-sauce')
+      // Vault is loaded before `node`; re-inject so yarn/Node sees PCS_FRONTEND_IDAM_SECRET etc. (avoids IDAM invalid_client).
+      withEnv([
+        "PCS_FRONTEND_IDAM_SECRET=${env.PCS_FRONTEND_IDAM_SECRET ?: ''}",
+        "IDAM_PCS_USER_PASSWORD=${env.IDAM_PCS_USER_PASSWORD ?: ''}",
+        "IDAM_PCS_USER_PASSWORD_B64=${env.IDAM_PCS_USER_PASSWORD_B64 ?: ''}",
+        "PCS_SOLICITOR_AUTOMATION_UID=${env.PCS_SOLICITOR_AUTOMATION_UID ?: ''}",
+      ]) {
+        // Mint S2S + IDAM on the agent (internal URLs); pass into saucectl so Playwright on Sauce skips token HTTP.
+        yarnBuilder.yarn('mint:e2e-tokens-for-sauce')
+      }
       def mintPath = '.sauce/minted-tokens.json'
       if (fileExists(mintPath)) {
         def t = readJSON file: mintPath
