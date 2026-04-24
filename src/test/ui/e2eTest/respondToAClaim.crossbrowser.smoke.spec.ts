@@ -24,6 +24,7 @@ test.describe('Respond to a claim - crossbrowser @smoke @nightly', () => {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'NO';
     process.env.RENT_NON_RENT = 'YES';
+    await performAction('navigateToUrl', home_url);
 
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
