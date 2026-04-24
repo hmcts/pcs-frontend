@@ -51,8 +51,8 @@ env:
 
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
-  # Tokens: Jenkins nightly runs `yarn mint:e2e-tokens-for-sauce` on the agent, then exports these into the
-  # environment before saucectl. When set, auth.setup skips S2S/IDAM HTTP on Sauce VMs (no tunnel for those calls).
+  # Optional: when set (e.g. local sauce-run.sh after yarn mint:e2e-tokens-for-sauce), auth.setup skips S2S/IDAM HTTP on Sauce.
+  # Jenkins nightly does not pre-mint; tokens are fetched in Playwright on Sauce (vault secrets below still apply).
   SERVICE_AUTH_TOKEN: $SERVICE_AUTH_TOKEN
   BEARER_TOKEN: $BEARER_TOKEN
   S2S_URL: $S2S_URL

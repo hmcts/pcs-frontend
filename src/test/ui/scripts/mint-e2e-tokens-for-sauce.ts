@@ -1,6 +1,7 @@
 /**
- * Run on the Jenkins agent before saucectl (same vault/network as VM E2E).
- * Writes `.sauce/minted-tokens.json`; Jenkinsfile_nightly loads it into `env.*` so saucectl passes tokens into Sauce and auth.setup skips HTTP mint there.
+ * Optional: run locally (e.g. via sauce-run.sh) before saucectl to pre-mint S2S + IDAM and pass tokens into Sauce.
+ * Writes `.sauce/minted-tokens.json` for shell scripts to export into the environment before `yarn test:sauce:nightly`.
+ * Jenkins nightly does not use this; it mints in Playwright on Sauce (auth.setup).
  */
 import * as fs from 'fs';
 import * as path from 'path';

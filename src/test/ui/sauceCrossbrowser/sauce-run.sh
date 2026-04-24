@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Local / CI: mint S2S + IDAM on this machine when tokens are not already exported, then run saucectl.
-# Jenkins nightly still mints in Jenkinsfile and passes env into saucectl; this path is for yarn test:crossbrowser.
+# Jenkins nightly mints on Sauce (auth.setup). This script is for local yarn test:crossbrowser (optional pre-mint here).
 # SAUCE_GREP / SAUCE_SUITE_NAME(S) behave as before.
 set -euo pipefail
 
