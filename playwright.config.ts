@@ -58,16 +58,19 @@ function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
 }
 
 const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
+// Same as master for Jenkins VM / local. Sauce sets PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS — omit root
+// grep and E2E_SPEC testMatch so filtering stays in .sauce/*.yml (suite grep only); no per-project grep needed
+// without a separate setup project.
+const e2eTag = process.env.E2E_TEST_SCOPE ?? '';
 const resolvedTestMatch =
-  e2eSpecTestMatch?.length && !sauceFullJourneyArtifacts ? { testMatch: e2eSpecTestMatch } : {};
-// Tags come from Jenkins choices or PR labels. Unset -> no grep (Jenkins sets E2E_TEST_SCOPE for nightly).
-// Sauce: suite grep only — no root grep when PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS is set.
-const e2eTag = sauceFullJourneyArtifacts ? '' : (process.env.E2E_TEST_SCOPE ?? '');
+  !sauceFullJourneyArtifacts && e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {};
+const resolvedGrep =
+  !sauceFullJourneyArtifacts && e2eTag ? { grep: new RegExp(e2eTag) } : {};
 
 export default defineConfig({
   testDir: './src/test/ui',
   ...resolvedTestMatch,
-  ...(e2eTag ? { grep: new RegExp(e2eTag) } : {}),
+  ...resolvedGrep,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
