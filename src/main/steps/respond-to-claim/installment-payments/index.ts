@@ -5,6 +5,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): YesNoValue | undefined {
   if (value === 'yes') {
@@ -61,6 +62,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    caseNumber: 'caseNumber',
     paragraph1: 'paragraph1',
     paragraph2: 'paragraph2',
     paragraph3: 'paragraph3',
@@ -83,12 +85,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: req => {
     const caseData = req.res?.locals?.validatedCase?.data as { claimantName?: string } | undefined;
     const claimantName = caseData?.claimantName || 'Treetops Housing';
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     const t = getTranslationFunction(req, 'installment-payments', ['common']);
 
     return {
       claimantName,
       paragraph1: t('paragraph1', { claimantName }),
+      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
 });

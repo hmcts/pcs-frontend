@@ -1,0 +1,13 @@
+{
+  "heading": "{{claimantName}} claim",
+  "disputeOtherPartsQuestion": "Does the defendant dispute any other parts of the claim?",
+  "caseNumber": "Case number: {{caseNumber}}",
+  "disputeDetails": {
+    "label": "Explain which parts of the claim the defendant does not agree with"
+  },
+  "errors": {
+    "disputeDetails": {
+      "required": "Enter the parts of the claim the defendant does not agree with"
+    }
+  }
+}

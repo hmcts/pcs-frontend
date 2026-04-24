@@ -1,0 +1,13 @@
+{
+  "heading": "cy{{claimantName}} claim",
+  "disputeOtherPartsQuestion": "cyDoes the defendant dispute any other parts of the claim?",
+  "caseNumber": "cyCase number: {{caseNumber}}",
+  "disputeDetails": {
+    "label": "cyExplain which parts of the claim the defendant does not agree with"
+  },
+  "errors": {
+    "disputeDetails": {
+      "required": "cyEnter the parts of the claim the defendant does not agree with"
+    }
+  }
+}

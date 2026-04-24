@@ -1,10 +1,12 @@
 import type { Request } from 'express';
 
+import { getTranslationFunction } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 function mapRepaymentsAgreedToCcdValue(repaymentsAgreed: string | undefined): 'YES' | 'NO' | 'NOT_SURE' {
   if (repaymentsAgreed === 'yes') {
@@ -66,6 +68,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
+    caseNumber: 'caseNumber',
+    heading: 'heading',
     caption: 'caption',
     question: 'question',
   },
@@ -110,8 +114,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseData = req.res?.locals?.validatedCase?.data;
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
     const claimIssueDate = '20th May 2025';
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    const t = getTranslationFunction(req, 'repayments-agreed', ['common']);
 
     return {
+      caseNumber: t('caseNumber', { caseNumber }),
       claimantName,
       claimIssueDate,
     };
@@ -122,7 +130,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       type: 'radio',
       required: true,
       translationKey: { label: 'question' },
-      legendClasses: 'govuk-visually-hidden',
+      legendClasses: 'govuk-fieldset__legend--m',
       options: [
         {
           value: 'yes',

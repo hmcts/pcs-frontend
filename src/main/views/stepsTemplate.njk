@@ -90,7 +90,7 @@
       {% endblock %}
     </div>
 
-    {% if contactUsForHelp %}
+    {% if contactUsForHelp and not isLegalRepresentative %}
       <div class="govuk-grid-column-one-third">
         <aside class="app-related-items" role="complementary">
           <nav role="navigation" aria-label="Support and contact information">

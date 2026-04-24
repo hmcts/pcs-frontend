@@ -10,6 +10,8 @@ import { Logger } from '@modules/logger';
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse } from '@services/ccdCase.interface';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+
 const logger = Logger.getLogger('confirmation-of-notice-date-when-not-provided');
 
 export const step: StepDefinition = createRespondToClaimFormStep({
@@ -18,6 +20,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/confirmationOfNoticeDateWhenNotProvided.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    caseNumber: 'caseNumber',
     subTitle: 'subTitle',
     caption: 'caption',
     question: 'question',
@@ -90,10 +93,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const claimantName = getClaimantName(req);
 
     const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-not-provided', ['common']);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     const paragraph = t('paragraph', { returnObjects: true, claimantName });
 
     return {
+      caseNumber: t('caseNumber', { caseNumber }),
       claimantName,
       paragraph,
     };

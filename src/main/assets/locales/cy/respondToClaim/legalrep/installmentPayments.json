@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyInstalment payments",
+  "heading": "cyInstalment payments",
+  "question": "cyWould the defendant like to offer to pay off their arrears in instalments?",
+  "errors": {
+    "confirmInstallmentOffer": "cySelect whether the defendant would like to offer to pay off their arrears in instalments"
+  },
+  "caseNumber": "cyCase number: {{caseNumber}}"
+}

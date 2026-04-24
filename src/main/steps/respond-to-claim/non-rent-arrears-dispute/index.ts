@@ -7,6 +7,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'non-rent-arrears-dispute',
@@ -14,6 +15,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/nonRentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    caseNumber: 'caseNumber',
     heading: 'heading',
     caption: 'caption',
   },
@@ -79,13 +81,15 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseData = req.res?.locals?.validatedCase?.data;
     const caseReference = req.params.caseReference;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
 
     // Pre-translate content with interpolation (following rent-arrears pattern)
     return {
-      heading: t('heading'),
+      heading: t('heading', { claimantName }),
       introParagraph: t('introParagraph', { caseReference }),
+      caseNumber: t('caseNumber', { caseNumber }),
       includesHeading: t('includesHeading'),
       includesBullet1: t('includesBullet1', { claimantName }),
       includesBullet2: t('includesBullet2'),

@@ -7,6 +7,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 // Validation constants
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
@@ -32,6 +33,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    caseNumber: 'caseNumber',
     caption: 'captionHeading',
   },
   beforeRedirect: async req => {
@@ -105,6 +107,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
     const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
     const rentArrearsAmount = currency(amountInPounds);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string)
 
     const t = getTranslationFunction(req, 'rent-arrears-dispute', ['common']);
 
@@ -114,6 +117,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
     return {
+      caseNumber: t('caseNumber', { caseNumber }),
       insetIntroText,
       insetDetailsText,
       insetConditionalYesText,
