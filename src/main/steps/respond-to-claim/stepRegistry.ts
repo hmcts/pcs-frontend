@@ -9,8 +9,8 @@ import { step as contactPreferencesTelephone } from './contact-preferences-telep
 import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
-import { step as counterclaimHaveYouAlreadyAppliedForHelpWithYourFees } from './counterclaim-have-you-already-applied-for-help-with-your-fees/index';
-import { step as counterclaimYouNeedToApplyForHelpWithYourCounterclaimFees } from './counterclaim-you-need-to-apply-for-help-with-your-counterclaim-fees/index';
+import { step as counterclaimHaveYouAlreadyAppliedForHelpWithYourFees } from './counterclaim-have-you-already-applied-for-help-with-your-fees';
+import { step as counterclaimYouNeedToApplyForHelpWithYourCounterclaimFees } from './counterclaim-you-need-to-apply-for-help-with-your-counterclaim-fees';
 import { step as yourCircumstances } from './current-circumstances';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
