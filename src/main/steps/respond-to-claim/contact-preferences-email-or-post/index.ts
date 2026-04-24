@@ -23,7 +23,7 @@ export const step: StepDefinition = createFormStep({
   fields: [
     {
       name: 'contactByEmailOrPost',
-      type: 'radio',
+      type: 'checkbox',
       required: true,
       legendClasses: 'govuk-!-font-weight-bold govuk-!-font-size-24',
       translationKey: {
@@ -67,33 +67,34 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: req => {
     const validatedCase = req.res?.locals?.validatedCase;
     const existingEmail = validatedCase?.defendantContactDetailsPartyEmailAddress;
-    const preferenceType = validatedCase?.defendantResponsesPreferenceType;
 
-    if (
-      preferenceType === 'EMAIL' ||
-      validatedCase?.defendantResponsesContactByEmail === 'YES' ||
-      (typeof existingEmail === 'string' && existingEmail.trim().length > 0)
-    ) {
-      return {
-        contactByEmailOrPost: 'email',
-        ...(existingEmail ? { 'contactByEmailOrPost.email': existingEmail } : {}),
-      };
+    const formData: Record<string, unknown> = {};
+    const selected: string[] = [];
+
+    if (validatedCase?.defendantResponsesContactByEmail === 'YES') {
+      selected.push('email');
+    }
+    if (validatedCase?.defendantResponsesContactByPost === 'YES') {
+      selected.push('post');
     }
 
-    if (preferenceType === 'POST' || validatedCase?.defendantResponsesContactByPost === 'YES') {
-      return {
-        contactByEmailOrPost: 'post',
-      };
+    if (selected.length > 0) {
+      formData.contactByEmailOrPost = selected;
+    }
+    if (existingEmail && selected.includes('email')) {
+      formData['contactByEmailOrPost.email'] = existingEmail;
     }
 
-    return {};
+    return formData;
   },
 
   beforeRedirect: async req => {
     const emailForm = req.body as Record<string, unknown>;
 
-    const emailSelected = emailForm.contactByEmailOrPost === 'email';
-    const postSelected = emailForm.contactByEmailOrPost === 'post';
+    const selectedRaw = emailForm.contactByEmailOrPost as string | string[] | undefined;
+    const selected = Array.isArray(selectedRaw) ? selectedRaw : selectedRaw ? [selectedRaw] : [];
+    const emailSelected = selected.includes('email');
+    const postSelected = selected.includes('post');
 
     if (!emailSelected && !postSelected) {
       return;
@@ -114,7 +115,6 @@ export const step: StepDefinition = createFormStep({
       defendantResponses: {
         contactByEmail: emailSelected ? 'YES' : 'NO',
         contactByPost: postSelected ? 'YES' : 'NO',
-        preferenceType: emailSelected ? 'EMAIL' : postSelected ? 'POST' : undefined,
       },
     };
 

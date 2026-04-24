@@ -168,20 +168,38 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord) {
-    await performAction('clickRadioButton', {
-      question: contactPreferenceData.question,
-      option: contactPreferenceData.radioOption,
-    });
-    if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailRadioOption) {
-      await performAction(
-        'inputText',
-        contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-        contactPreferenceData.emailAddress
-      );
+    if (Array.isArray(contactPreferenceData.options)) {
+      for (const option of contactPreferenceData.options) {
+        await performAction('check', {
+          question: contactPreferenceData.question,
+          option,
+        });
+        if (option === contactPreferenceEmailOrPost.byEmailCheckbox && contactPreferenceData.emailAddress) {
+          await performAction(
+            'inputText',
+            contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+            contactPreferenceData.emailAddress
+          );
+        }
+      }
+    }
+    // Handle single selection
+    else if (contactPreferenceData.radioOption) {
+      await performAction('check', {
+        question: contactPreferenceData.question,
+        option: contactPreferenceData.radioOption,
+      });
+
+      if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailCheckbox) {
+        await performAction(
+          'inputText',
+          contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+          contactPreferenceData.emailAddress
+        );
+      }
     }
     await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   }
-
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: contactPreferencesTelephone.areYouHappyToContactQuestion,

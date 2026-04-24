@@ -8,7 +8,7 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
     message: contactPreferenceEmailOrPost.selectHowYouWantToReceiveUpdatesErrorMessage,
   });
 
-  await performAction('clickRadioButton', contactPreferenceEmailOrPost.byEmailRadioOption);
+  await performAction('check', contactPreferenceEmailOrPost.byEmailCheckbox);
   await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
@@ -84,6 +84,7 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
+  await performAction('inputText', contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, 'test@test.com');
 }
 
 export async function contactPreferenceEmailOrPostNavigationTests(): Promise<void> {
