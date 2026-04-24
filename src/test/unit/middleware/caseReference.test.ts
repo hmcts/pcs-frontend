@@ -14,9 +14,14 @@ jest.mock('@modules/logger', () => ({
 jest.mock('@utils/caseReference', () => ({
   sanitiseCaseReference: jest.fn((input: string | number) => {
     const str = String(input);
-    // Only return valid if it's exactly 16 digits
     return /^\d{16}$/.test(str) ? str : null;
   }),
+}));
+
+const mockGetEventIdFromPath = jest.fn();
+
+jest.mock('@utils/getEventIdFromPath', () => ({
+  getEventIdFromPath: (...args: unknown[]) => mockGetEventIdFromPath(...args),
 }));
 
 const mockGetCaseById = jest.fn();
@@ -46,10 +51,12 @@ describe('caseReferenceParamMiddleware', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    mockGetEventIdFromPath.mockReturnValue('citizenCreateGenApp');
+
     mockReq = {
       params: {},
       session: {} as unknown as Request['session'],
-      originalUrl: '/case/1234567890123456/some-page',
+      originalUrl: '/case/1234567890123456/make-an-application',
     };
 
     mockRes = {
@@ -72,7 +79,7 @@ describe('caseReferenceParamMiddleware', () => {
 
       await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
-      expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef);
+      expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef, 'citizenCreateGenApp');
       expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
       expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
       expect(next).toHaveBeenCalledWith();
@@ -128,6 +135,92 @@ describe('caseReferenceParamMiddleware', () => {
           error: 'Case not found',
         })
       );
+    });
+
+    it('should preserve HTTPError status when getCaseById throws an HTTPError', async () => {
+      const validCaseRef = '1234567890123456';
+      const mockAccessToken = 'mock-access-token';
+
+      mockReq.session = { user: { accessToken: mockAccessToken } } as MockSession as Request['session'];
+      mockGetCaseById.mockRejectedValue(new HTTPError('Forbidden', 403));
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(403);
+      expect(error.message).toBe('Forbidden');
+    });
+  });
+
+  describe('event ID resolution', () => {
+    const validCaseRef = '1234567890123456';
+    const mockAccessToken = 'mock-access-token';
+
+    beforeEach(() => {
+      mockReq.session = { user: { accessToken: mockAccessToken } } as MockSession as Request['session'];
+    });
+
+    it('should call next with 404 HTTPError when getEventIdFromPath returns undefined', async () => {
+      mockGetEventIdFromPath.mockReturnValue(undefined);
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(next).toHaveBeenCalledWith(expect.any(HTTPError));
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(404);
+      expect(error.message).toBe('Invalid event ID');
+      expect(mockGetCaseById).not.toHaveBeenCalled();
+    });
+
+    it('should not call getCaseById when event ID is invalid', async () => {
+      mockGetEventIdFromPath.mockReturnValue(undefined);
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(mockGetCaseById).not.toHaveBeenCalled();
+      expect(mockRes.locals?.validatedCase).toBeUndefined();
+    });
+
+    it('should log error with caseReference and originalUrl when event ID is invalid', async () => {
+      mockGetEventIdFromPath.mockReturnValue(undefined);
+      mockReq.originalUrl = '/case/1234567890123456/unknown-path';
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(mockLogger.error).toHaveBeenCalledWith('Invalid event ID', {
+        caseReference: validCaseRef,
+        originalUrl: '/case/1234567890123456/unknown-path',
+      });
+    });
+
+    it('should pass the resolved eventId to getCaseById', async () => {
+      const mockCase = { id: validCaseRef, state: 'Open' };
+      mockGetEventIdFromPath.mockReturnValue('respondPossessionClaim');
+      mockGetCaseById.mockResolvedValue(mockCase);
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef, 'respondPossessionClaim');
+    });
+
+    it('should call getEventIdFromPath with the request object', async () => {
+      mockGetEventIdFromPath.mockReturnValue(undefined);
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(mockGetEventIdFromPath).toHaveBeenCalledWith(mockReq);
+    });
+
+    it('should check event ID after authentication check', async () => {
+      mockReq.session = {} as MockSession as Request['session'];
+      mockGetEventIdFromPath.mockReturnValue(undefined);
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
+      expect(error.status).toBe(401);
+      expect(mockGetEventIdFromPath).not.toHaveBeenCalled();
     });
   });
 
