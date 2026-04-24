@@ -75,6 +75,8 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    // Register Sauce cross-browser stages with the pipeline (must run here, not inside afterAlways — too late).
+    enableCrossBrowserTest()
     before('functionalTest:preview') {
       sh 'rm -rf allure-results allure-report'
     }
@@ -83,7 +85,6 @@ withPipeline(type, product, component) {
     }
     afterAlways('smoketest:preview') {
       archiveSmokeTestReports()
-      enableCrossBrowserTest()
     }
     afterAlways('functionalTest:preview') {
       archiveFunctionalTestReports()
