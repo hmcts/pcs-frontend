@@ -58,15 +58,15 @@ test.beforeEach(async ({ page }) => {
   process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
   process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
 
-  //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  //await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
 
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   logTestEnvAfterBeforeEach(
     'Respond to a claim @noDefendants @regression @crossbrowser (Sauce)',
     RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS
   );
-  //await performAction('fetchPINsAPI');
+  await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
