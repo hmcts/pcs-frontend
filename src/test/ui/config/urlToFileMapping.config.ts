@@ -55,4 +55,5 @@ export default {
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
   'language-used': 'languageUsed',
+
 };
