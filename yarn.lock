@@ -3827,10 +3827,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/config@npm:3.3.5":
-  version: 3.3.5
-  resolution: "@types/config@npm:3.3.5"
-  checksum: 10/6e8595d00e4df85e3e982f812a3fdfd9a952df11776800b0ddf7893963fc179c684a2d82c84f2160d09e90345bce7cb68a49c95dc864f0c9052019ea2c0e31bb
+"@types/config@npm:4.4.0":
+  version: 4.4.0
+  resolution: "@types/config@npm:4.4.0"
+  dependencies:
+    config: "npm:*"
+  checksum: 10/2b5aaf0684516f63d0c96b6fe709a1164cd39994d015c9139c25d1241e4607adcabe00288ca4ec1951d91554d35b27015cd4ca7792bd55caf99c1bc5269a4102
   languageName: node
   linkType: hard
 
@@ -6379,12 +6381,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"config@npm:3.3.12":
-  version: 3.3.12
-  resolution: "config@npm:3.3.12"
+"config@npm:*, config@npm:4.4.1":
+  version: 4.4.1
+  resolution: "config@npm:4.4.1"
   dependencies:
     json5: "npm:^2.2.3"
-  checksum: 10/f7973d1192c98d9b8d49e273bef816b4c74a6bab6e7c500792d3fe239e87fa3a80fac89ee552b7da7e2c3d9f6f8f3568e856f08ebd9861917cf47a655cee3e6a
+  checksum: 10/b237298b107111f88f8b4226c6412298a93052642c8e67a352e36f64be02fb4644351890f57e518338d1491e83064c6fb8fe31f676c7355491ef969e174ec9f1
   languageName: node
   linkType: hard
 
@@ -8939,10 +8941,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-http-middleware@npm:3.9.4":
-  version: 3.9.4
-  resolution: "i18next-http-middleware@npm:3.9.4"
-  checksum: 10/983c39c5bfea2df3477a69ad6f8f9590d62040750fc5f8e4ddaeb0eb5f11b718ef5bbc5adaf9370882a8dbd86c8a3752292555ed9e06ca19272ff3c8c32392e9
+"i18next-http-middleware@npm:3.9.5":
+  version: 3.9.5
+  resolution: "i18next-http-middleware@npm:3.9.5"
+  checksum: 10/e405366674662602beedd40eb566bfc099c8909133ea14b095fc65c62aa56140e13e2a0c80095d11d6981cf0d025590bd0536558327b639388c8da2e60448535
   languageName: node
   linkType: hard
 
@@ -11972,7 +11974,7 @@ __metadata:
     "@pact-foundation/pact-cli": "npm:18.0.0"
     "@playwright/test": "npm:1.59.1"
     "@types/body-parser": "npm:1.19.6"
-    "@types/config": "npm:3.3.5"
+    "@types/config": "npm:4.4.0"
     "@types/connect-redis": "npm:0.0.23"
     "@types/cookie-parser": "npm:1.4.10"
     "@types/express": "npm:5.0.6"
@@ -11997,7 +11999,7 @@ __metadata:
     axios: "npm:1.15.2"
     body-parser: "npm:2.2.2"
     chokidar: "npm:3.6.0"
-    config: "npm:3.3.12"
+    config: "npm:4.4.1"
     connect-redis: "npm:7.1.1"
     cookie-parser: "npm:1.4.7"
     copy-webpack-plugin: "npm:13.0.1"
@@ -12022,7 +12024,7 @@ __metadata:
     husky: "npm:9.1.7"
     i18next: "npm:25.10.10"
     i18next-fs-backend: "npm:2.6.5"
-    i18next-http-middleware: "npm:3.9.4"
+    i18next-http-middleware: "npm:3.9.5"
     ioredis: "npm:5.10.1"
     jest: "npm:29.7.0"
     jest-environment-jsdom: "npm:30.3.0"
