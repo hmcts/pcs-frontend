@@ -9,7 +9,7 @@ export default {
   'contact-preferences-telephone': 'contactPreferencesTelephone',
   'contact-preferences-text-message': 'contactPreferencesTextMessage',
   'dispute-claim-interstitial': 'disputeClaimInterstitial',
-  'confirmation-of-notice-date-when-not-provided': 'noticeDateWhenNotProvided',
+  'confirmation-of-notice-date-when-not-provided': 'confirmationOfNoticeDateWhenNotProvided',
   'confirmation-of-notice-given': 'confirmationOfNoticeGiven',
   'non-rent-arrears-dispute': 'nonRentArrearsDispute',
   'confirmation-of-notice-date-when-provided': 'noticeDateWhenProvided',
