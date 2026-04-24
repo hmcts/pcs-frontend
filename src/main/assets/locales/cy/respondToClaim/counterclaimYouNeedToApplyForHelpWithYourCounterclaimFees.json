@@ -1,0 +1,10 @@
+{
+  "pageTitle": "cyYou need to apply for help with your counterclaim fee",
+  "caption": "cyStop or delay an eviction",
+  "heading": "cyYou need to apply for help with your counterclaim fee",
+  "youNeedToApplyBeforeContinuing": "cyYou need to <a href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">apply for help with fees (opens in new tab)</a> before you can continue with this counterclaim.",
+  "enterCourtFormNumber": "cyEnter the court form number 'XXX' when asked. This will be one of the first questions when you apply for help with your fees.",
+  "afterYouHaveApplied": "cyAfter you have applied you will receive a help with fees reference number. You should enter the reference number when you return to this counterclaim.",
+  "ifYouReceiveAnyBenefit": "cyIf you receive any benefit that qualifies you for help with fees, you must include evidence of it when you apply online for help with fees.",
+  "ifYouHaveYourHWFReference": "cyIf you have your help with fees reference number you can <a href=\"./counterclaim-have-you-already-applied-for-help-with-your-fees\" rel=\"noopener noreferrer\" class=\"govuk-link\">enter it here</a>."
+}
