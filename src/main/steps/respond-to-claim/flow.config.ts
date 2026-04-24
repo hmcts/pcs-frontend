@@ -8,7 +8,6 @@ import {
   hasSelectedUniversalCredit,
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
-  isMoneyCounterClaim,
   isFinanceDetailsProvided,
   isFromIncomeAndExpenditure,
   isNoticeDateProvided,
@@ -17,6 +16,8 @@ import {
   isUniversalCreditSelected,
   isWalesProperty,
 } from '../utils';
+
+import { isMoneyCounterClaim } from './utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
