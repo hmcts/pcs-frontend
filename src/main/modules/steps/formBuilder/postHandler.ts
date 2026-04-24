@@ -6,6 +6,7 @@ import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
+import { type FormBuilderFlowConfig, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import {
   getCustomErrorTranslations,
@@ -36,7 +37,7 @@ export function createPostHandler(
   stepName: string,
   viewPath: string,
   journeyFolder: string,
-  flowConfig: JourneyFlowConfig,
+  flowConfig: FormBuilderFlowConfig,
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
   showCancelButton?: boolean,
@@ -53,7 +54,7 @@ export function createPostHandler(
       translationKeys,
     });
   }
-  const stepNavigation = createStepNavigation(flowConfig);
+  const stepNavigation = createStepNavigation(req => resolveFormBuilderFlowConfig(req, flowConfig));
 
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
@@ -67,7 +68,9 @@ export function createPostHandler(
         throw new Error('Nunjucks environment not initialized');
       }
 
-      const allFormData = shouldUseSessionFormData(flowConfig)
+      const resolvedFlowConfig = await resolveFormBuilderFlowConfig(req, flowConfig);
+
+      const allFormData = shouldUseSessionFormData(resolvedFlowConfig)
         ? req.session.formData
           ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
           : {}
@@ -135,7 +138,7 @@ export function createPostHandler(
       // Process field data (normalize checkboxes + consolidate date fields) before saving
       processFieldData(req, fields);
       const { action: _, ...bodyWithoutAction } = req.body;
-      if (shouldUseSessionFormData(flowConfig)) {
+      if (shouldUseSessionFormData(resolvedFlowConfig)) {
         setFormData(req, stepName, bodyWithoutAction);
       }
 

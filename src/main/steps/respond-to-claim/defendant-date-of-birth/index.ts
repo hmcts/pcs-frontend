@@ -1,18 +1,14 @@
 import { DateTime } from 'luxon';
 
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-date-of-birth',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  basePath: '/respond-to-claim',
-  flowConfig,
   showCancelButton: false,
   beforeRedirect: async req => {
     const dateOfBirth = req.body?.dateOfBirth;

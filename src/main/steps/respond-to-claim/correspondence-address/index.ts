@@ -2,9 +2,9 @@ import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { getTranslationFunction } from '@modules/steps';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
@@ -97,11 +97,9 @@ const fieldsConfig: FormFieldConfig[] = [
   },
 ];
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'correspondence-address',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: 'respond-to-claim/correspondence-address/correspondenceAddress.njk',
   translationKeys: {
     pageTitle: 'pageTitle',

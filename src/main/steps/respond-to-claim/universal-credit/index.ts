@@ -1,13 +1,10 @@
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'have-you-applied-for-universal-credit',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   fields: [],
   customTemplate: `${__dirname}/universalCredit.njk`,
 });

@@ -24,9 +24,10 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'counter-claim',
-    'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
+    'installment-payments',
+    'how-much-afford-to-pay',
     'correspondence-address',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
@@ -43,7 +44,6 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-not-provided',
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
-    'your-household-and-circumstances',
     'do-you-have-any-dependant-children',
     'do-you-have-any-other-dependants',
     'do-any-other-adults-live-in-your-home',
@@ -57,7 +57,6 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'end-now',
-    'installment-payments',
   ],
   steps: {
     'start-now': {
@@ -319,18 +318,14 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
       },
     },
     'counter-claim': {
-      defaultNext: 'payment-interstitial',
+      defaultNext: 'repayments-made',
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
-    'payment-interstitial': {
-      previousStep: 'counter-claim',
-      defaultNext: 'repayments-made',
-    },
     'repayments-made': {
-      previousStep: 'payment-interstitial',
+      previousStep: 'counter-claim',
       defaultNext: 'repayments-agreed',
     },
     'repayments-agreed': {
@@ -351,17 +346,31 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> =>
             currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
-          nextStep: 'your-household-and-circumstances',
+          nextStep: 'do-you-have-any-dependant-children',
         },
       ],
       previousStep: 'repayments-made',
     },
-    'your-household-and-circumstances': {
+    'installment-payments': {
       previousStep: 'repayments-agreed',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData?.confirmInstallmentOffer === 'yes',
+          nextStep: 'how-much-afford-to-pay',
+        },
+      ],
       defaultNext: 'do-you-have-any-dependant-children',
     },
+    'how-much-afford-to-pay': {
+      previousStep: 'installment-payments',
+      defaultNext: 'your-household-and-circumstances',
+    },
     'do-you-have-any-dependant-children': {
-      previousStep: 'your-household-and-circumstances',
+      previousStep: 'repayments-agreed',
       defaultNext: 'do-you-have-any-other-dependants',
     },
     'do-you-have-any-other-dependants': {
@@ -407,10 +416,6 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
       defaultNext: 'end-now',
-    },
-    'installment-payments': {
-      previousStep: 'repayments-agreed',
-      defaultNext: 'your-household-and-circumstances',
     },
   },
 };

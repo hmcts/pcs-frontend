@@ -1,9 +1,9 @@
 import type { Request } from 'express';
 
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { getTranslationFunction } from '../../../modules/steps';
 import { isWalesProperty } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -83,11 +83,9 @@ const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   OTHER: 'other',
 };
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',

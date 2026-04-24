@@ -7,21 +7,23 @@ import { createGetController } from '../controller';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
+import { getStaticBasePath, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
 import { validateConfigInDevelopment } from './schema';
 
 import type { BuiltFormContent, FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 
 export type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
-function getPersistedFormData(
+function getPersistedFormDataFromResolvedConfig(
   req: Request,
   stepName: string,
-  flowConfig?: FormBuilderConfig['flowConfig']
+  flowConfig: JourneyFlowConfig
 ): Record<string, unknown> {
   if (flowConfig?.useSessionFormData === false) {
     return {};
@@ -54,6 +56,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     flowConfig,
     showCancelButton,
     customTemplate,
+    basePath: configuredBasePath,
   } = config;
 
   if (!flowConfig) {
@@ -62,8 +65,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
 
   const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath = customTemplate || 'formBuilder.njk';
-  const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
-  const stepNavigation = createStepNavigation(flowConfig);
+  const basePath = getStaticBasePath(flowConfig, configuredBasePath || `/steps/${journeyPath}`);
+  const stepNavigation = createStepNavigation(req => resolveFormBuilderFlowConfig(req, flowConfig));
 
   return {
     url: path.join(basePath, stepName),
@@ -89,10 +92,11 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         const emptyFormContent = { fields: [] } as BuiltFormContent;
         const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
         const initialFormData = getInitialFormData ? await getInitialFormData(req) : undefined;
+        const resolvedFlowConfig = await resolveFormBuilderFlowConfig(req, flowConfig);
         const formContent = buildFormContent(
           fields,
           t,
-          initialFormData ?? getPersistedFormData(req, stepName, flowConfig),
+          initialFormData ?? getPersistedFormDataFromResolvedConfig(req, stepName, resolvedFlowConfig),
           {},
           translationKeys,
           nunjucksEnv,

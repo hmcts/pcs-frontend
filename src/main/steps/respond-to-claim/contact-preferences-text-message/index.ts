@@ -1,16 +1,13 @@
-import { createFormStep } from '../../../modules/steps';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'contact-preferences-text-message',
-  journeyFolder: 'respondToClaim',
   showCancelButton: false,
   stepDir: __dirname,
-  flowConfig,
 
   translationKeys: {
     caption: 'caption',
