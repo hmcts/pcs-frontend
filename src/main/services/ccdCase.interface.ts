@@ -43,12 +43,12 @@ export interface HouseholdCircumstances {
   universalCredit?: YesNoValue;
   universalCreditAmount?: PenceAmount | null;
   universalCreditFrequency?: FrequencyValue | null;
+  ucApplicationDate?: string | null;
   otherBenefits?: YesNoValue;
   otherBenefitsAmount?: PenceAmount;
   otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
-  ucApplicationDate?: string | null;
   priorityDebts?: YesNoValue;
   debtTotal?: string;
   debtContribution?: string;
