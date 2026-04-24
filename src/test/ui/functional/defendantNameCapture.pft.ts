@@ -41,6 +41,7 @@ export async function defendantNameCaptureErrorValidation(): Promise<void> {
     message: defendantNameCapture.emojiFirstNameErrorMessage,
   });
   await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantNameCapture.emojiTextInput);
+  await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
     message: defendantNameCapture.emojiLastNameErrorMessage,
