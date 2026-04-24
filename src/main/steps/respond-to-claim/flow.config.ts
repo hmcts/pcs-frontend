@@ -68,9 +68,9 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'counter-claim',
-    'counterclaim-what-are-you-claiming-for',
-    'counterclaim-specific-sum',
-    'counterclaim-fee',
+    'counter-claim-what-are-you-claiming-for',
+    'counter-claim-specific-sum',
+    'counter-claim-fee',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -397,35 +397,35 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'counter-claim': {
-      defaultNext: 'counterclaim-what-are-you-claiming-for',
+      defaultNext: 'counter-claim-what-are-you-claiming-for',
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
-    'counterclaim-what-are-you-claiming-for': {
+    'counter-claim-what-are-you-claiming-for': {
       previousStep: 'counter-claim',
       routes: [
         {
           condition: async (req: Request) => isMoneyCounterClaim(req),
-          nextStep: 'counterclaim-specific-sum',
+          nextStep: 'counter-claim-specific-sum',
         },
       ],
-      defaultNext: 'counterclaim-fee',
+      defaultNext: 'counter-claim-fee',
     },
-    'counterclaim-specific-sum': {
-      previousStep: 'counterclaim-what-are-you-claiming-for',
-      defaultNext: 'counterclaim-fee',
+    'counter-claim-specific-sum': {
+      previousStep: 'counter-claim-what-are-you-claiming-for',
+      defaultNext: 'counter-claim-fee',
     },
-    'counterclaim-fee': {
+    'counter-claim-fee': {
       previousStep: async (req: Request) => {
         const moneyCounterClaim = await isMoneyCounterClaim(req);
-        return moneyCounterClaim ? 'counterclaim-specific-sum' : 'counterclaim-what-are-you-claiming-for';
+        return moneyCounterClaim ? 'counter-claim-specific-sum' : 'counter-claim-what-are-you-claiming-for';
       },
       defaultNext: 'payment-interstitial',
     },
     'payment-interstitial': {
-      previousStep: 'counterclaim-fee',
+      previousStep: 'counter-claim-fee',
       defaultNext: 'repayments-made',
     },
     'repayments-made': {

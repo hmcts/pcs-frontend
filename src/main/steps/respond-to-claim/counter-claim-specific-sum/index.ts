@@ -53,11 +53,11 @@ const validateEstimatedMaxClaimAmount = createAmountValidator(
 );
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'counterclaim-specific-sum',
+  stepName: 'counter-claim-specific-sum',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: `${__dirname}/counterclaimSpecificSum.njk`,
+  customTemplate: `${__dirname}/counterClaimSpecificSum.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
   },
