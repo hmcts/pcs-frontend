@@ -44,7 +44,6 @@ import { finaliseAllValidations, initializeExecutor, performAction, performValid
 const home_url = process.env.TEST_URL;
 let claimantName: string;
 
-/** Env for the single @noDefendants non–rent-arrears journey (matches `respondToAClaim.spec.ts` outcome for this title). */
 test.beforeEach(async ({ page }) => {
   await getS2SToken();
   await getAccessToken();
