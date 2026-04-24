@@ -15,6 +15,7 @@
     "HEARING": "cyHearing",
     "JUDGEMENT": "cyJudgement from the court",
     "NOTICE": "cyOrders and notices from the court",
+    "DOCUMENTS": "cyDocuments",
     "RESPONSE": "cyThe response",
     "APPLICATIONS": "cyApplications"
   },
@@ -43,6 +44,7 @@
       "ViewClaim": { "title": "cyView the claim" },
       "RespondToClaim": { "title": "cyRespond to the claim" },
       "ViewDocuments": { "title": "cyView documents" },
+      "UploadDocuments": { "title": "cyUpload documents" },
       "ReviewResponse": { "title": "cyReview the response" },
       "SubmitResponse": { "title": "cySubmit the response" }
     }
