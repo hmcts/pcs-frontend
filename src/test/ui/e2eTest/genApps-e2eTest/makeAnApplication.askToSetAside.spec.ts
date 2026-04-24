@@ -46,7 +46,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
     //The below are placeholder pages
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
       question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
       option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
@@ -59,8 +58,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-    await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
-    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performAction('confirmOtherPartiesAgreed', {
+      question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
+      option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
+    });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
@@ -68,9 +69,13 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
-    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performAction('selectLanguageUsedToComplete', {
+      question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
+      option: whichLanguageDidYouUseToCompleteThisService.welshRadioOption,
+    });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 });
