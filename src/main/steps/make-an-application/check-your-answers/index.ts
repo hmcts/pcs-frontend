@@ -62,6 +62,7 @@ export const step: StepDefinition = {
         withoutNotice: toYesNoEnum(visibleFormData.getAnyReasonsNotToShareField()?.fieldValue),
         withoutNoticeReason: visibleFormData.getReasonForNotSharingField()?.fieldValue,
         languageUsed: visibleFormData.getWhichLanguageField()?.fieldValue,
+        whatOrderWanted: visibleFormData.getWhatOrderWantedField()?.fieldValue,
       };
 
       await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
