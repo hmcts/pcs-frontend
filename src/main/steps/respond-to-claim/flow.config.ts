@@ -5,12 +5,16 @@ import {
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
+  hasSelectedUniversalCredit,
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
   isMoneyCounterClaim,
+  isFinanceDetailsProvided,
+  isFromIncomeAndExpenditure,
   isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
+  isUniversalCreditSelected,
   isWalesProperty,
 } from '../utils';
 
@@ -99,18 +103,19 @@ export const flowConfig: JourneyFlowConfig = {
     'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
     'your-circumstances',
     'exceptional-hardship',
-    'income-and-expenditure',
+    'income-and-expenses',
     'what-regular-income-do-you-receive',
     'have-you-applied-for-universal-credit',
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
+    'other-considerations',
+    'upload-docs',
     'equality-and-diversity-start',
     'equality-and-diversity-end',
     'language-used',
     'check-your-answers',
     'end-now',
-    'installment-payments',
   ],
   steps: {
     'start-now': {
@@ -503,14 +508,44 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'exceptional-hardship': {
       previousStep: 'your-circumstances',
-      defaultNext: 'income-and-expenditure',
+      defaultNext: 'income-and-expenses',
     },
-    'income-and-expenditure': {
+    'income-and-expenses': {
       previousStep: 'exceptional-hardship',
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            return !(await isFinanceDetailsProvided(req));
+          },
+          nextStep: 'other-considerations',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const provided = await isFinanceDetailsProvided(req);
+            return provided;
+          },
+          nextStep: 'what-regular-income-do-you-receive',
+        },
+      ],
       defaultNext: 'what-regular-income-do-you-receive',
     },
     'what-regular-income-do-you-receive': {
-      previousStep: 'income-and-expenditure',
+      previousStep: 'income-and-expenses',
+      routes: [
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            const selected = await isUniversalCreditSelected(req);
+            return selected;
+          },
+          nextStep: 'priority-debts',
+        },
+        {
+          condition: async (req: Request): Promise<boolean> => {
+            return !(await isUniversalCreditSelected(req));
+          },
+          nextStep: 'have-you-applied-for-universal-credit',
+        },
+      ],
       defaultNext: 'have-you-applied-for-universal-credit',
     },
     'have-you-applied-for-universal-credit': {
@@ -518,7 +553,10 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
-      previousStep: 'have-you-applied-for-universal-credit',
+      previousStep: async (req: Request): Promise<string> => {
+        const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
+        return selectedUniversalCredit ? 'what-regular-income-do-you-receive' : 'have-you-applied-for-universal-credit';
+      },
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {
@@ -527,19 +565,36 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
+      defaultNext: 'other-considerations',
+    },
+    'other-considerations': {
+      previousStep: async (req: Request): Promise<string> => {
+        const fromIncomeExpenditure = await isFromIncomeAndExpenditure(req);
+        return fromIncomeExpenditure ? 'income-and-expenses' : 'what-other-regular-expenses-do-you-have';
+      },
+      defaultNext: 'upload-docs',
+    },
+    'upload-docs': {
+      previousStep: 'other-considerations',
       defaultNext: 'equality-and-diversity-start',
     },
     'equality-and-diversity-start': {
-      previousStep: 'what-other-regular-expenses-do-you-have',
+      previousStep: 'upload-docs',
       routes: [
         {
-          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
-            currentStepData.equalityStartChoice === 'skip',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ) => currentStepData.equalityStartChoice === 'skip',
           nextStep: 'language-used',
         },
         {
-          condition: async (_req, _formData, currentStepData: Record<string, unknown>) =>
-            currentStepData.equalityStartChoice === 'continue',
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ) => currentStepData.equalityStartChoice === 'continue',
           nextStep: 'equality-and-diversity-end',
         },
       ],

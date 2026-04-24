@@ -93,6 +93,35 @@ describe('translateFields', () => {
     expect(mockT).toHaveBeenCalledWith('feeText');
   });
 
+  it('passes prefix and suffix into input component config', () => {
+    const amountFields: FormFieldConfig[] = [
+      {
+        name: 'amount',
+        type: 'text',
+        translationKey: { label: 'amountLabel' },
+        prefix: { text: '£' },
+        suffix: { text: 'per month' },
+      },
+    ];
+
+    const result = translateFields(
+      amountFields,
+      mockT as unknown as TFunction,
+      { amount: '10.00' },
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+
+    const field = result[0] as FormFieldConfig;
+    const component = field.component as { prefix?: { text: string }; suffix?: { text: string } } | undefined;
+
+    expect(component?.prefix).toEqual({ text: '£' });
+    expect(component?.suffix).toEqual({ text: 'per month' });
+  });
+
   it('translates option labels and hints for radio items', () => {
     mockT = jest.fn((key: string) => {
       const translations: Record<string, string> = {

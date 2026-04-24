@@ -35,8 +35,10 @@
   {% endif %}
 
   <form method="post" action="{{ url }}">
-    {# Wrap fields in fieldset with visually-hidden legend for accessibility #}
-    {% if heading %}
+    {# Wrap fields in fieldset with visually-hidden legend for accessibility.
+       Skip for radio/checkbox pages - they create their own fieldset via GOV.UK macros,
+       so wrapping them in an outer fieldset causes screen readers to announce the legend twice. #}
+    {% if heading and not allFieldsHaveOwnFieldset %}
       {% call govukFieldset({
         legend: {
           text: heading,
