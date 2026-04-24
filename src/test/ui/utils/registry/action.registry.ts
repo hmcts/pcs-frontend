@@ -85,10 +85,12 @@ export class ActionRegistry {
     ['confirmOtherPartiesAgreed', new GenAppsAction()],
     ['reasonsApplicationShouldNotBeShared', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
+    ['selectLanguageUsedToComplete', new GenAppsAction()],
     ['retrieveCYATableData', new GenAppsAction()],
     ['validateCYA', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
     ['languageUsed', new RespondToClaimAction()],
+    ['confirmOrderDoYouWant', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {

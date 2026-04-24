@@ -7,6 +7,8 @@ import {
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  whatOrderDoYouWantTheCourtToMakeAndWhy,
+  whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
 import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString } from '../../common/string.utils';
@@ -26,10 +28,12 @@ export class GenAppsAction implements IAction {
       ['doYouNeedHelpPayingFee', () => this.doYouNeedHelpPayingFee(fieldName as actionRecord)],
       ['confirmYouHaveAppliedForFeeHelp', () => this.confirmYouHaveAppliedForFeeHelp(fieldName as actionRecord)],
       ['confirmOtherPartiesAgreed', () => this.confirmOtherPartiesAgreed(fieldName as actionRecord)],
+      ['confirmOrderDoYouWant', () => this.confirmOrderDoYouWant(fieldName as actionRecord)],
       [
         'reasonsApplicationShouldNotBeShared',
         () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord),
       ],
+      ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
       ['validateCYA', () => this.validateCYA()],
@@ -47,7 +51,7 @@ export class GenAppsAction implements IAction {
       question: chooseApp.question,
       option: chooseApp.option,
     });
-    FieldsStore.rename(chooseApp.question as string, 'Type of application');
+    //FieldsStore.rename(chooseApp.question as string, 'Type of application');
     await performAction('clickButton', chooseAnApplication.continueButton);
   }
 
@@ -82,6 +86,7 @@ export class GenAppsAction implements IAction {
           : (confirmFeeHelp.input as string);
       await performAction('inputText', confirmFeeHelp.label, userInput);
       FieldsStore.update(confirmFeeHelp.label as string, userInput);
+      FieldsStore.rename(confirmFeeHelp.label as string, 'What is your Help with Fees reference number?');
     } else {
       FieldsStore.delete(confirmFeeHelp.label as string);
     }
@@ -108,10 +113,33 @@ export class GenAppsAction implements IAction {
         typeof reason.input === 'number' ? generateRandomString(reason.input) : (reason.input as string);
       await performAction('inputText', reason.label, userInput);
       FieldsStore.update(reason.label as string, userInput);
+      
     } else {
       FieldsStore.delete(reason.label as string);
     }
     await performAction('clickButton', areThereAnyReasonsThatThisApplicationShouldNotBeShared.continueButton);
+  }
+
+  private async confirmOrderDoYouWant(confirmOrder: actionRecord) {
+    await performAction('recordUserEntry', confirmOrder);
+    const userInput =
+      typeof confirmOrder.input === 'number'
+        ? generateRandomString(confirmOrder.input)
+        : (confirmOrder.input as string);
+    await performAction('inputText', confirmOrder.label, userInput);
+    FieldsStore.update(confirmOrder.label as string, userInput);
+    //FieldsStore.rename(confirmOrder.label as string, whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
+    FieldsStore.rename(confirmOrder.label as string, 'What order do you want the court to make and why?');
+    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+  }
+
+  private async selectLanguageUsedToComplete(selectLanguageData: actionRecord) {
+    await performAction('recordUserEntry', selectLanguageData);
+    await performAction('clickRadioButton', {
+      question: selectLanguageData.question,
+      option: selectLanguageData.option,
+    });
+    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
@@ -202,8 +230,8 @@ export class GenAppsAction implements IAction {
           console.log(`• key: "${String(key)}" → Expected: ${expectedValue} | Actual: ${actualValue}`);
         }
         console.log(`\n**********  END OF CYA FAILURE LIST. ***************`);
-        /* throw new Error(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`); */
-        console.log(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`);
+        throw new Error(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`);
+       // console.log(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`);
       } else {
         console.log('\n✅ CHECK YOUR ANSWERS VALIDATION PASSED!\n');
       }

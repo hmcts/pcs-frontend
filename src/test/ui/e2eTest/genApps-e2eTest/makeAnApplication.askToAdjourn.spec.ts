@@ -11,7 +11,6 @@ import {
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
-  uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
@@ -72,14 +71,20 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
     });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
-    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performAction('confirmOrderDoYouWant', {
+      label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
+      input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
+    });
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
     await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
-    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+    // await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
+    // await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
     await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
-    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performAction('selectLanguageUsedToComplete', {
+      question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
+      option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
+    });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
@@ -111,12 +116,18 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       input: areThereAnyReasonsThatThisApplicationShouldNotBeShared.provideReasonTextInput,
     });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
-    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performAction('confirmOrderDoYouWant', {
+      label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
+      input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
+    });
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
     await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.noRadioOption);
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
     await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
-    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performAction('selectLanguageUsedToComplete', {
+      question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
+      option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
+    });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
