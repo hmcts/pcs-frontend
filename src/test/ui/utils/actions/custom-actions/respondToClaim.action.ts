@@ -4,6 +4,7 @@ import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
   confirmationOfNoticeDateWhenNotProvided,
+  confirmationOfNoticeDateWhenProvided,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -24,7 +25,6 @@ import {
   landlordRegistered,
   languageUsed,
   nonRentArrearsDispute,
-  noticeDateWhenProvided,
   paymentInterstitial,
   rentArrears,
   repaymentsAgreed,
@@ -315,12 +315,12 @@ export class RespondToClaimAction implements IAction {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', noticeDateWhenProvided.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
+        ['inputText', confirmationOfNoticeDateWhenProvided.dayTextLabel, noticeData.day],
+        ['inputText', confirmationOfNoticeDateWhenProvided.monthTextLabel, noticeData.month],
+        ['inputText', confirmationOfNoticeDateWhenProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', noticeDateWhenProvided.saveAndContinueButton);
+    await performAction('clickButton', confirmationOfNoticeDateWhenProvided.saveAndContinueButton);
   }
 
   private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {

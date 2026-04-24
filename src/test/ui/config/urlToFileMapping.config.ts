@@ -12,7 +12,7 @@ export default {
   'confirmation-of-notice-date-when-not-provided': 'confirmationOfNoticeDateWhenNotProvided',
   'confirmation-of-notice-given': 'confirmationOfNoticeGiven',
   'non-rent-arrears-dispute': 'nonRentArrearsDispute',
-  'confirmation-of-notice-date-when-provided': 'noticeDateWhenProvided',
+  'confirmation-of-notice-date-when-provided': 'confirmationOfNoticeDateWhenProvided',
   'rent-arrears-dispute': 'rentArrears',
   'payment-interstitial': 'paymentInterstitial',
   'repayments-made': 'repaymentsMade',
