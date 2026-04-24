@@ -49,8 +49,8 @@
       "changeHint": "Change the reason this application should not be shared with the other party"
     },
     "whatOrderWanted": {
-      "label": "What order do you want the judge to make and why?",
-      "changeHint": "Change what order do you want the judge to make and why"
+      "label": "What order do you want the court to make and why?",
+      "changeHint": "Change what order do you want the court to make and why"
     },
     "hasSupportingDocuments": {
       "label": "Do you want to upload documents to support your application?",
