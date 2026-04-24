@@ -310,4 +310,63 @@ describe('multi-file-upload', () => {
       expect(XMLHttpRequest.prototype.open).not.toBe(originalOpen);
     });
   });
+
+  describe('duplicate label accessibility fix', () => {
+    function setupDropzoneDOM() {
+      document.body.innerHTML = `
+        <form>
+          <div id="uploaded-documents-container"></div>
+          <div id="upload-container"
+               data-module="moj-multi-file-upload"
+               data-upload-url="/upload"
+               data-delete-url="/delete">
+            <div class="moj-multi-file-upload__dropzone">
+              <input id="documents" class="moj-multi-file-upload__input" type="file" />
+              <label class="govuk-button govuk-button--secondary" for="documents">Choose file</label>
+            </div>
+          </div>
+        </form>
+      `;
+    }
+
+    function getLabel(): HTMLLabelElement {
+      return document.querySelector(
+        '.moj-multi-file-upload__dropzone label.govuk-button--secondary'
+      ) as HTMLLabelElement;
+    }
+
+    it('clicking the label triggers a click on the file input and is hidden from AT', () => {
+      setupDropzoneDOM();
+      const input = document.getElementById('documents') as HTMLInputElement;
+      const clickSpy = jest.spyOn(input, 'click').mockImplementation(() => {});
+
+      initMultiFileUpload();
+
+      const label = getLabel();
+      expect(label.getAttribute('aria-hidden')).toBe('true');
+
+      label.click();
+      expect(clickSpy).toHaveBeenCalledTimes(1);
+    });
+
+    // MOJ clones the <input> after every successful upload (multi-file-upload.mjs:102-107).
+    // The click handler must late-bind to the live input via the class selector, otherwise
+    // the "Choose file" control goes dead after the first upload.
+    it('clicking the label targets the live input after MOJ clones it', () => {
+      setupDropzoneDOM();
+      const original = document.getElementById('documents') as HTMLInputElement;
+      const originalSpy = jest.spyOn(original, 'click').mockImplementation(() => {});
+
+      initMultiFileUpload();
+
+      const cloned = original.cloneNode(true) as HTMLInputElement;
+      const clonedSpy = jest.spyOn(cloned, 'click').mockImplementation(() => {});
+      original.replaceWith(cloned);
+
+      getLabel().click();
+
+      expect(clonedSpy).toHaveBeenCalledTimes(1);
+      expect(originalSpy).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -218,19 +218,20 @@ function initContainer(container: HTMLElement): void {
   });
   uploadInstances.set(container, instance);
 
-  // Fix accessibility: MOJ creates a second <label for="..."> styled as a button inside the
-  // dropzone, resulting in duplicate labels for the file input. Replace it with an aria-hidden
-  // <span> so only the original govuk-label remains as the accessible label.
+  // MOJ injects a second <label for="..."> styled as a button inside the dropzone, which
+  // together with the outer govuk-label trips axe's form-field-multiple-labels rule. Strip
+  // the `for` (so only one label points to the input), hide it from the a11y tree, and
+  // attach a click handler that late-binds to the live input -- MOJ replaces the <input>
+  // with a clone after every upload, so a cached reference would go stale.
   const dropzone = container.querySelector('.moj-multi-file-upload__dropzone');
-  if (dropzone) {
-    const duplicateLabel = dropzone.querySelector<HTMLLabelElement>('label.govuk-button--secondary');
-    if (duplicateLabel) {
-      const span = document.createElement('span');
-      span.className = duplicateLabel.className;
-      span.setAttribute('aria-hidden', 'true');
-      span.textContent = duplicateLabel.textContent;
-      duplicateLabel.replaceWith(span);
-    }
+  const duplicateLabel = dropzone?.querySelector<HTMLLabelElement>('label.govuk-button--secondary');
+  if (duplicateLabel) {
+    duplicateLabel.removeAttribute('for');
+    duplicateLabel.setAttribute('aria-hidden', 'true');
+    duplicateLabel.addEventListener('click', event => {
+      event.preventDefault();
+      container.querySelector<HTMLInputElement>('.moj-multi-file-upload__input')?.click();
+    });
   }
 
   form.addEventListener('submit', event => {
