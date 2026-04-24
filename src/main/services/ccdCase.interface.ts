@@ -161,8 +161,8 @@ export interface CcdDefendantResponses {
 export interface CcdCounterClaim {
   claimType?: string;
   isClaimAmountKnown?: string;
-  claimAmount?: string;
-  estimatedMaxClaimAmount?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
 }
 
 export interface PossessionClaimResponse {
