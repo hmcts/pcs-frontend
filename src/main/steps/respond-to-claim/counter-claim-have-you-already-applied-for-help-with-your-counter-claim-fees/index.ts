@@ -6,7 +6,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, CcdCounterClaim, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'counterclaim-have-you-already-applied-for-help-with-your-fees',
+  stepName: 'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,

@@ -67,8 +67,8 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'counter-claim',
-    'counterclaim-have-you-already-applied-for-help-with-your-fees',
-    'counterclaim-you-need-to-apply-for-help-with-your-counterclaim-fees',
+    'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees',
+    'counter-claim-you-need-to-apply-for-help-with-your-counter-claim-fees',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -395,13 +395,13 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'counter-claim': {
-      defaultNext: 'counterclaim-have-you-already-applied-for-help-with-your-fees',
+      defaultNext: 'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees',
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
-    'counterclaim-have-you-already-applied-for-help-with-your-fees': {
+    'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees': {
       previousStep: 'counter-claim',
       routes: [
         {
@@ -413,14 +413,14 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'payment-interstitial',
         },
       ],
-      defaultNext: 'counterclaim-you-need-to-apply-for-help-with-your-counterclaim-fees',
+      defaultNext: 'counter-claim-you-need-to-apply-for-help-with-your-counter-claim-fees',
     },
-    'counterclaim-you-need-to-apply-for-help-with-your-counterclaim-fees': {
-      previousStep: 'counterclaim-have-you-already-applied-for-help-with-your-fees',
+    'counter-claim-you-need-to-apply-for-help-with-your-counter-claim-fees': {
+      previousStep: 'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees',
       defaultNext: 'end-now',
     },
     'payment-interstitial': {
-      previousStep: 'counterclaim-have-you-already-applied-for-help-with-your-fees',
+      previousStep: 'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees',
       defaultNext: 'repayments-made',
     },
     'repayments-made': {
