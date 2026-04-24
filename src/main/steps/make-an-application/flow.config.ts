@@ -86,5 +86,5 @@ function otherPartiesAgreed(req: Request): boolean {
 }
 
 function documentUploadWanted(req: Request): boolean {
-  return getFormData(req, 'do-you-want-to-upload-documents-to-support-your-application').uploadDocuments === 'YES';
+  return getFormData(req, 'do-you-want-to-upload-documents-to-support-your-application').uploadDocuments === 'yes';
 }

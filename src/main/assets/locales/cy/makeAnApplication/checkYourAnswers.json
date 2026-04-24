@@ -3,15 +3,16 @@
   "caption": "cyMake an application",
   "heading": "cyCheck your answers",
   "buttons": {
-    "submitApplication": "cySubmit application"
+    "submit": "cySubmit",
+    "continueToPayment": "cyContinue to payment"
   },
   "answers": {
     "typeOfApplication": {
-      "label": "cyType of application",
-      "changeHint": "cyChange type of application",
+      "label": "cyWhat do you want to apply for?",
+      "changeHint": "cyChange what you want to apply for",
       "options": {
-        "ADJOURN": "cyAsk to adjourn (delay) the hearing",
-        "SET_ASIDE": "cyAsk the court to change (set aside) their decision to evict you",
+        "ADJOURN": "cyAsk to adjourn the hearing (move it to a later time or date)",
+        "SET_ASIDE": "cyAsk the court to set aside (cancel) a decision the court has made",
         "SOMETHING_ELSE": "cySomething else"
       }
     },
@@ -32,7 +33,7 @@
       "changeHint": "cyChange whether you have already applied for help with your application fee"
     },
     "hwfReference": {
-      "label": "cyEnter your Help with Fees reference number",
+      "label": "cyWhat is your Help with Fees reference number?",
       "changeHint": "cyChange your Help with Fees reference number"
     },
     "otherPartiesAgreed": {
@@ -47,6 +48,14 @@
       "label": "cyProvide a reason this application should not be shared with the other party",
       "changeHint": "cyChange the reason this application should not be shared with the other party"
     },
+    "whatOrderWanted": {
+      "label": "cyWhat order do you want the court to make and why?",
+      "changeHint": "cyChange what order do you want the court to make and why"
+    },
+    "hasSupportingDocuments": {
+      "label": "cyDo you want to upload documents to support your application?",
+      "changeHint": "cyChange whether you want to upload documents to support your application"
+    },
     "whichLanguage": {
       "label": "cyWhich language did you use to complete this service?",
       "changeHint": "cyChange which language you used to complete this service",
@@ -56,5 +65,19 @@
         "ENGLISH_AND_WELSH": "cyEnglish and Welsh"
       }
     }
+  },
+  "statementOfTruth": {
+    "subheading": "cyStatement of truth",
+    "theInformationFormsYourApplication": "cyThe information on this page forms your application.",
+    "whenYouAreSatisfied": "cyWhen you’re satisfied that your answers are correct, you should tick the box below and write your name to “sign” this statement of truth.",
+    "checkbox": {
+      "fieldLabel": "cyStatement of truth",
+      "value": "cyI believe that the facts stated in this form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth."
+    },
+    "yourFullName": "cyYour full name"
+  },
+  "errors": {
+    "agreeToTheStatementOfTruth": "cyAgree to the statement of truth",
+    "youMustSignYourName": "cyYou must sign your name"
   }
 }

@@ -64,12 +64,19 @@ export default class VisibleFormDataView {
     }
   }
 
-  getWhichLanguageField(): FieldDetails<LanguageUsed> | undefined {
-    return this.getField<LanguageUsed>('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
-  }
-
   getWhatOrderWantedField(): FieldDetails<string> | undefined {
     return this.getField<string>('what-order-do-you-want-the-court-to-make-and-why', 'whatOrderWanted');
+  }
+
+  getHasSupportingDocuments(): FieldDetails<'yes' | 'no'> | undefined {
+    return this.getField<'yes' | 'no'>(
+      'do-you-want-to-upload-documents-to-support-your-application',
+      'uploadDocuments'
+    );
+  }
+
+  getWhichLanguageField(): FieldDetails<LanguageUsed> | undefined {
+    return this.getField<LanguageUsed>('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
   }
 
   private getField<T>(stepName: string, fieldName: string): FieldDetails<T> | undefined {

@@ -42,10 +42,6 @@
     "month": "cyMonth",
     "year": "cyYear"
   },
-  "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
-  },
   "warningHiddenText": "cyWarning",
   "errors": {
     "title": "cyThere is a problem",
