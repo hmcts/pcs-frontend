@@ -1,4 +1,4 @@
-import { additionalRentContributionToPoundsString, poundsStringToPence } from '../../utils';
+import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -18,10 +18,10 @@ export const step: StepDefinition = createFormStep({
     const paymentAgreement: Record<string, unknown> = {};
 
     if (typeof installmentAmount === 'string' && installmentAmount.trim()) {
-      const amountInPence = poundsStringToPence(installmentAmount);
+      const amountInPence = poundsToPence(installmentAmount);
       if (amountInPence !== undefined) {
         // pcs-api MoneyGBP JSON is a pence string (see MoneyGBPDeserializer), not { amount: ... }.
-        paymentAgreement.additionalRentContribution = String(amountInPence);
+        paymentAgreement.additionalRentContribution = amountInPence;
       }
     }
 
@@ -66,7 +66,7 @@ export const step: StepDefinition = createFormStep({
 
     const pcr = caseData?.possessionClaimResponse;
     const paymentAgreement = pcr?.defendantResponses?.paymentAgreement ?? pcr?.paymentAgreement;
-    const amountInPounds = additionalRentContributionToPoundsString(paymentAgreement?.additionalRentContribution);
+    const amountInPounds = penceToPounds(paymentAgreement?.additionalRentContribution as string | undefined);
     const installmentFrequency = paymentAgreement?.additionalContributionFrequency;
 
     if (amountInPounds || installmentFrequency) {

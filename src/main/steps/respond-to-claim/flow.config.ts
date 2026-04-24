@@ -17,6 +17,8 @@ import {
   isWalesProperty,
 } from '../utils';
 
+import { isMoneyCounterClaim } from './utils';
+
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
@@ -71,6 +73,9 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'counter-claim',
+    'counter-claim-what-are-you-claiming-for',
+    'counter-claim-specific-sum',
+    'counter-claim-fee',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -398,14 +403,35 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'counter-claim': {
-      defaultNext: 'payment-interstitial',
+      defaultNext: 'counter-claim-what-are-you-claiming-for',
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
-    'payment-interstitial': {
+    'counter-claim-what-are-you-claiming-for': {
       previousStep: 'counter-claim',
+      routes: [
+        {
+          condition: async (req: Request) => isMoneyCounterClaim(req),
+          nextStep: 'counter-claim-specific-sum',
+        },
+      ],
+      defaultNext: 'counter-claim-fee',
+    },
+    'counter-claim-specific-sum': {
+      previousStep: 'counter-claim-what-are-you-claiming-for',
+      defaultNext: 'counter-claim-fee',
+    },
+    'counter-claim-fee': {
+      previousStep: async (req: Request) => {
+        const moneyCounterClaim = await isMoneyCounterClaim(req);
+        return moneyCounterClaim ? 'counter-claim-specific-sum' : 'counter-claim-what-are-you-claiming-for';
+      },
+      defaultNext: 'payment-interstitial',
+    },
+    'payment-interstitial': {
+      previousStep: 'counter-claim-fee',
       defaultNext: 'repayments-made',
     },
     'repayments-made': {

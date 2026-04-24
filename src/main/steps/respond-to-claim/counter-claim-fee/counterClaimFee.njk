@@ -1,0 +1,18 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "macros/stepButtons.njk" import stepButtons %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  <p class="govuk-body">Counter claim fee (Placeholder)</p>
+
+  <form method="post" action="{{ url }}">
+    {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ csrfProtection(csrfToken) }}
+  </form>
+{% endblock %}

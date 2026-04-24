@@ -75,6 +75,24 @@ describe('translateFields', () => {
     expect(year.value).toBe('');
   });
 
+  it('resolves string conditionalText by calling t(key) directly', () => {
+    mockT = jest.fn((key: string) => (key === 'feeText' ? '<p>Fee info</p>' : key));
+
+    const result = translateFields(
+      [{ name: 'isClaimAmountKnown', type: 'radio', options: [{ value: 'yes', conditionalText: 'feeText' }] }],
+      mockT as unknown as TFunction,
+      {},
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+
+    expect(result[0].options?.[0].conditionalText).toBe('<p>Fee info</p>');
+    expect(mockT).toHaveBeenCalledWith('feeText');
+  });
+
   it('passes prefix and suffix into input component config', () => {
     const amountFields: FormFieldConfig[] = [
       {
@@ -96,6 +114,7 @@ describe('translateFields', () => {
       {},
       mockNunjucksEnv
     );
+
     const field = result[0] as FormFieldConfig;
     const component = field.component as { prefix?: { text: string }; suffix?: { text: string } } | undefined;
 
