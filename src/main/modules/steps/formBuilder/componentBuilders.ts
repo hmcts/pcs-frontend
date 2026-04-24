@@ -99,7 +99,7 @@ export function buildComponentConfig({
     id: field.name,
     name: field.name,
     label: { text: label, classes: field.labelClasses },
-    hint: hint ? { text: hint } : null,
+    hint: hint ? (hint.includes('<') ? { html: hint } : { text: hint }) : null,
     errorMessage: hasError && errorText ? { text: errorText } : null,
     classes: field.classes || (field.type === 'text' ? 'govuk-!-width-three-quarters' : undefined),
     attributes: field.attributes || {},

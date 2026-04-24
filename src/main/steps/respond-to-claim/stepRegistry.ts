@@ -9,6 +9,8 @@ import { step as contactPreferencesTelephone } from './contact-preferences-telep
 import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
+import { step as counterClaimHaveYouAlreadyAppliedForHelpWithYourCounterClaimFees } from './counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees';
+import { step as counterClaimYouNeedToApplyForHelpWithYourCounterClaimFees } from './counter-claim-you-need-to-apply-for-help-with-your-counter-claim-fees';
 import { step as yourCircumstances } from './current-circumstances';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
@@ -72,6 +74,10 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'counter-claim': counterClaim,
+  'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees':
+    counterClaimHaveYouAlreadyAppliedForHelpWithYourCounterClaimFees,
+  'counter-claim-you-need-to-apply-for-help-with-your-counter-claim-fees':
+    counterClaimYouNeedToApplyForHelpWithYourCounterClaimFees,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
