@@ -42,13 +42,6 @@ export const step: StepDefinition = createFormStep({
                 label: 'textAreaLabel',
                 hint: 'textAreaHintText',
               },
-              validator: (value): boolean | string => {
-                if (typeof value !== 'string' || !value.trim()) {
-                  return true;
-                }
-                const invalidCharacters = /\p{Extended_Pictographic}|\u200D|\uFE0F/u;
-                return !invalidCharacters.test(value) || 'errors.otherAdultsDetailsInvalidCharacters';
-              },
             },
           },
         },
