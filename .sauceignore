@@ -31,3 +31,4 @@ playwright/.cache/
 
 # Local setup project output (secrets)
 src/test/ui/.auth/setup-env.json
+.sauce/sauce-auth-tokens.json

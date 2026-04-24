@@ -28,7 +28,7 @@ function writeSetupEnvSnapshot(): void {
 }
 
 /** Clears PFT lock dir on local runs only (skipped when CI is set). */
-export function clearEmvLocksIfLocal(): void {
+function clearEmvLocksIfLocal(): void {
   if (process.env.CI) {
     return;
   }
@@ -75,11 +75,21 @@ export const getAccessToken = async (): Promise<void> => {
   });
 };
 
+/** Sauce VMs use tokens from env (.sauce.yml / agent-issued file); globalSetup does not call IDAM/S2S there. */
+const isSauceFlow = (): boolean => process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
+
 async function globalSetupConfig(): Promise<void> {
   clearEmvLocksIfLocal();
 
   const hasTokens = process.env.SERVICE_AUTH_TOKEN?.trim() && process.env.BEARER_TOKEN?.trim();
-  if (!hasTokens) {
+
+  if (isSauceFlow()) {
+    if (!hasTokens) {
+      throw new Error(
+        'Sauce run: SERVICE_AUTH_TOKEN and BEARER_TOKEN must be set in the environment (e.g. .sauce/config-sauce-nightly.yml or yarn e2e:issue-sauce-auth-tokens on the agent). GlobalSetup does not call S2S/IDAM on Sauce.'
+      );
+    }
+  } else if (!hasTokens) {
     await getS2SToken();
     await getAccessToken();
   }

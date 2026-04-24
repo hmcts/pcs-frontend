@@ -19,7 +19,7 @@ defaults:
   timeout: 30m
 
 playwright:
-  version: 1.59.1
+  version: 1.58.2
   configFile: playwright.config.ts
 
 nodeVersion: v22
@@ -51,8 +51,8 @@ env:
 
   SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
 
-  # Optional: when set (e.g. after yarn mint:e2e-tokens-for-sauce), globalSetup skips S2S/IDAM HTTP on Sauce.
-  # Otherwise tokens are minted in Playwright globalSetup on the Sauce VM (vault secrets below still apply).
+  # Required for tests: SERVICE_AUTH_TOKEN + BEARER_TOKEN (vault + optional agent issue). Playwright globalSetup
+  # does not call S2S/IDAM on Sauce; it only snapshots these into setup-env.json for workers.
   SERVICE_AUTH_TOKEN: $SERVICE_AUTH_TOKEN
   BEARER_TOKEN: $BEARER_TOKEN
   S2S_URL: $S2S_URL

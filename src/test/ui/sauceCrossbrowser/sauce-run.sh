@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Local / CI: mint S2S + IDAM on this machine when tokens are not already exported, then run saucectl.
-# Jenkins can use the same flow, or rely on globalSetup minting on Sauce when tokens are not pre-exported.
+# Mint S2S + IDAM on this machine when tokens are not already exported, then run saucectl.
+# Sauce test VMs do not call IDAM/S2S in globalSetup — tokens must be in env (issue here, Jenkins pre-step, or vault → .sauce.yml).
 # SAUCE_GREP / SAUCE_SUITE_NAME(S) behave as before.
 set -euo pipefail
 
@@ -12,23 +12,23 @@ else
 fi
 
 if [[ -z "${SERVICE_AUTH_TOKEN:-}" || -z "${BEARER_TOKEN:-}" ]]; then
-  echo "[E2E tokens] Minting on this shell before saucectl (yarn mint:e2e-tokens-for-sauce). Export SERVICE_AUTH_TOKEN + BEARER_TOKEN to skip."
+  echo "[E2E auth] Issuing tokens on this shell before saucectl (yarn e2e:issue-sauce-auth-tokens). Export SERVICE_AUTH_TOKEN + BEARER_TOKEN to skip."
   if [[ ! -d node_modules ]]; then
-    yarn ci:install
+    yarn install
   fi
-  yarn mint:e2e-tokens-for-sauce
-  if [[ -f .sauce/minted-tokens.json ]]; then
+  yarn e2e:issue-sauce-auth-tokens
+  if [[ -f .sauce/sauce-auth-tokens.json ]]; then
     eval "$(node -e "
       const fs = require('fs');
-      const j = JSON.parse(fs.readFileSync('.sauce/minted-tokens.json', 'utf8'));
+      const j = JSON.parse(fs.readFileSync('.sauce/sauce-auth-tokens.json', 'utf8'));
       for (const [k, v] of Object.entries(j)) {
         if (typeof v === 'string' && v) process.stdout.write('export ' + k + '=' + JSON.stringify(v) + '\\n');
       }
     ")"
-    rm -f .sauce/minted-tokens.json
+    rm -f .sauce/sauce-auth-tokens.json
   fi
 else
-  echo "[E2E tokens] SERVICE_AUTH_TOKEN + BEARER_TOKEN already set; skipping mint in sauce-run.sh."
+  echo "[E2E auth] SERVICE_AUTH_TOKEN + BEARER_TOKEN already set; skipping token issue in sauce-run.sh."
 fi
 
 export SAUCE_GREP="${SAUCE_GREP:-@crossbrowser}"
