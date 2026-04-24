@@ -37,6 +37,15 @@ export interface StepConfig {
   preventBack?: boolean;
 }
 
+export type SectionApplicabilityCondition = (req: Request) => Promise<boolean>;
+
+export interface SectionConfig {
+  titleKey: string;
+  steps: string[];
+  order: number;
+  isApplicable?: SectionApplicabilityCondition;
+}
+
 export interface JourneyFlowConfig {
   basePath?: string;
   journeyName?: string;
@@ -44,4 +53,5 @@ export interface JourneyFlowConfig {
   useSessionFormData?: boolean;
   stepOrder: string[];
   steps: Record<string, StepConfig>;
+  sections?: Record<string, SectionConfig>;
 }
