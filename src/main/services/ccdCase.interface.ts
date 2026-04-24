@@ -106,6 +106,12 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
+/** Counter-claim data captured across the counterclaim journey screens. */
+export interface CcdCounterClaim {
+  appliedForHwf?: YesNoValue;
+  hwfReferenceNumber?: string;
+}
+
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
   tenancyTypeCorrect?: YesNoNotSureValue;
@@ -129,6 +135,7 @@ export interface CcdDefendantResponses {
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
   disputeClaimDetails?: string;
+  counterClaim?: CcdCounterClaim;
   paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
   possessionNoticeReceived?: YesNoNotSureValue;

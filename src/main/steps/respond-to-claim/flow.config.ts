@@ -403,14 +403,24 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counterclaim-have-you-already-applied-for-help-with-your-fees': {
       previousStep: 'counter-claim',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.alreadyAppliedForHelp === 'yes',
+          nextStep: 'payment-interstitial',
+        },
+      ],
       defaultNext: 'counterclaim-you-need-to-apply-for-help-with-your-counterclaim-fees',
     },
     'counterclaim-you-need-to-apply-for-help-with-your-counterclaim-fees': {
       previousStep: 'counterclaim-have-you-already-applied-for-help-with-your-fees',
-      defaultNext: 'payment-interstitial',
+      defaultNext: 'end-now',
     },
     'payment-interstitial': {
-      previousStep: 'counterclaim-you-need-to-apply-for-help-with-your-counterclaim-fees',
+      previousStep: 'counterclaim-have-you-already-applied-for-help-with-your-fees',
       defaultNext: 'repayments-made',
     },
     'repayments-made': {
