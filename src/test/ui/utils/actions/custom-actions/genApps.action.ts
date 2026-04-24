@@ -1,4 +1,4 @@
-import { Page, test } from '@playwright/test';
+import { Page, expect, test } from '@playwright/test';
 
 import {
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
@@ -12,6 +12,7 @@ import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString } from '../../common/string.utils';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
+import { defaultJourney, journeys } from '../../mapping';
 
 import { FieldsStore } from './recordAnsweredFields.action';
 
@@ -208,5 +209,62 @@ export class GenAppsAction implements IAction {
       }
     });
     cyaMap.clear();
+  }
+
+  private async reviewCYA(page: Page) {
+    const rows = page.locator('.govuk-summary-list__row');
+    const rowCount = await rows.count();
+
+    for (let i = 0; i < rowCount; i++) {
+      const row = page.locator('.govuk-summary-list__row').nth(i);
+      const questionText = await row.locator('dt').innerText();
+
+      const changeLink = row.getByRole('link', { name: 'Change' });
+      if ((await changeLink.count()) === 0) {
+        continue;
+      }
+
+      const href = await changeLink.getAttribute('href');
+      expect(href, `Missing href for question: ${questionText}`).toBeTruthy();
+
+      // Click Change
+      await Promise.all([page.waitForURL(new RegExp(href!)), changeLink.click()]);
+
+      const pagesForThisQuestion = journeys[questionText] ?? defaultJourney;
+
+      // Follow the allowed journey
+      await this.followJourneyBackToCya(page, pagesForThisQuestion);
+
+      // Final safety check
+      await expect(page).toHaveURL(/check-your-answers/);
+    }
+  }
+
+  private async followJourneyBackToCya(page: Page, allowedPages: string[]) {
+    const cyaUrlPart = '/check-your-answers';
+
+    for (let step = 0; step < 10; step++) {
+      const currentUrl = page.url();
+
+      // ✅ Success condition
+      if (currentUrl.includes(cyaUrlPart)) {
+        return;
+      }
+
+      // ✅ Ensure we're on a known page
+      const onAllowedPage = allowedPages.some(p => currentUrl.includes(p));
+
+      expect(onAllowedPage, `Unexpected page in Change journey: ${currentUrl}`).toBeTruthy();
+
+      // ✅ Continue through journey
+      const continueButton = page.getByRole('button', {
+        name: /continue|save and continue/i,
+      });
+
+      await expect(continueButton).toBeVisible();
+      await continueButton.click();
+    }
+
+    throw new Error('Exceeded maximum steps before reaching CYA');
   }
 }
