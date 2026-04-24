@@ -225,7 +225,9 @@ function initContainer(container: HTMLElement): void {
   // with a clone after every upload, so a cached reference would go stale.
   const dropzone = container.querySelector('.moj-multi-file-upload__dropzone');
   const duplicateLabel = dropzone?.querySelector<HTMLLabelElement>('label.govuk-button--secondary');
-  if (duplicateLabel) {
+  // Use `aria-hidden` as an "already processed" sentinel so HMR / re-inits don't stack
+  // duplicate click listeners on the same label.
+  if (duplicateLabel && duplicateLabel.getAttribute('aria-hidden') !== 'true') {
     duplicateLabel.removeAttribute('for');
     duplicateLabel.setAttribute('aria-hidden', 'true');
     duplicateLabel.addEventListener('click', event => {

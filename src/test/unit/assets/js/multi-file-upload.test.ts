@@ -368,5 +368,18 @@ describe('multi-file-upload', () => {
       expect(clonedSpy).toHaveBeenCalledTimes(1);
       expect(originalSpy).not.toHaveBeenCalled();
     });
+
+    // Guards against HMR / double-init stacking multiple click listeners on the same label.
+    it('re-running init on the same DOM does not stack duplicate click handlers', () => {
+      setupDropzoneDOM();
+      const input = document.getElementById('documents') as HTMLInputElement;
+      const clickSpy = jest.spyOn(input, 'click').mockImplementation(() => {});
+
+      initMultiFileUpload();
+      initMultiFileUpload();
+
+      getLabel().click();
+      expect(clickSpy).toHaveBeenCalledTimes(1);
+    });
   });
 });
