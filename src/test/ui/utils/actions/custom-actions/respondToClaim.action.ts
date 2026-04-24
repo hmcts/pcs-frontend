@@ -33,6 +33,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
@@ -78,6 +79,10 @@ export class RespondToClaimAction implements IAction {
       ],
       ['yourCircumstances', () => this.yourCircumstances(fieldName as actionRecord)],
       ['exceptionalHardship', () => this.exceptionalHardship(fieldName as actionRecord)],
+      [
+        'selectWhatOtherRegularExpensesDoYouHave',
+        () => this.selectWhatOtherRegularExpensesDoYouHave(fieldName as actionRecord),
+      ],
       [
         'selectIfAnyOtherAdultsLiveInYourHouse',
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
@@ -594,6 +599,31 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  }
+
+  private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
+    if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+      return;
+    }
+
+    for (const income of regularIncome.regularIncomeOptions) {
+      const [option, value, frequency] = income;
+
+      await performAction('check', {
+        question: whatOtherRegularExpensesDoYouHave.mainHeader,
+        option,
+      });
+      console.log('option' + option);
+      if (!value || !frequency) {
+        throw new Error(`Amount and frequency are required for option: ${option}`);
+      }
+      await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
+      console.log('input' + value);
+      await performAction('clickRadioButton', frequency);
+      console.log('frequency' + frequency);
+    }
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   }
 
   private async languageUsed(languageScreenData: actionRecord): Promise<void> {
