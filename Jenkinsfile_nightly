@@ -1,7 +1,6 @@
 #!groovy
 
 properties([
-  // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
     text(
@@ -74,6 +73,36 @@ properties([
       choices: ['true', 'false'],
       description: 'Run axe audits during E2E. Default: true.'
     ),
+    string(
+      name: 'SAUCE_GREP',
+      defaultValue: '@crossbrowser',
+      description: 'Sauce only — Playwright title grep passed to saucectl (see .sauce/config-sauce-nightly.yml).'
+    ),
+    booleanParam(
+      name: 'SAUCE_MAC13_CHROME',
+      defaultValue: false,
+      description: 'Sauce suite: macOS 13 — Chrome (pcs-frontend-mac13-chrome).'
+    ),
+    booleanParam(
+      name: 'SAUCE_MAC13_FIREFOX',
+      defaultValue: false,
+      description: 'Sauce suite: macOS 13 — Firefox (pcs-frontend-mac13-firefox).'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_CHROME',
+      defaultValue: false,
+      description: 'Sauce suite: Windows 11 — Chrome (pcs-frontend-win11-chrome).'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_EDGE',
+      defaultValue: false,
+      description: 'Sauce suite: Windows 11 — Edge (pcs-frontend-win11-edge).'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_FIREFOX',
+      defaultValue: false,
+      description: 'Sauce suite: Windows 11 — Firefox (pcs-frontend-win11-firefox).'
+    ),
   ])
 ])
 
@@ -97,6 +126,7 @@ def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
     secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
+    secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64'),
     secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID')
   ]
 ]
@@ -109,10 +139,26 @@ withNightlyPipeline(type, product, component) {
   setFunctionalTestEnvVars()
   enableFortifyScan()
 
+  def sauceSuites = selectedSauceSuites()
+  if (!sauceSuites.isEmpty()) {
+    env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
+    enableCrossBrowserTest()
+  }
+
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
   }
+}
+
+def selectedSauceSuites() {
+  [
+    params.SAUCE_MAC13_CHROME ? 'pcs-frontend-mac13-chrome' : null,
+    params.SAUCE_MAC13_FIREFOX ? 'pcs-frontend-mac13-firefox' : null,
+    params.SAUCE_WIN11_CHROME ? 'pcs-frontend-win11-chrome' : null,
+    params.SAUCE_WIN11_EDGE ? 'pcs-frontend-win11-edge' : null,
+    params.SAUCE_WIN11_FIREFOX ? 'pcs-frontend-win11-firefox' : null,
+  ].findAll { it != null }
 }
 
 def validateInputs() {
@@ -133,6 +179,7 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  env.SAUCE_GREP = (params.SAUCE_GREP?.trim()) ?: '@crossbrowser'
   def tag = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@nightly'
   env.E2E_TEST_SCOPE = tag
   env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
@@ -190,7 +237,7 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
   def msg = sh(script: "yarn exec ts-node src/test/ui/utils/common/allure-slack-notifier.ts --print-only --pipeline-type nightly 2>/dev/null || true", returnStdout: true).trim()
   if (!msg) { msg = "E2E Test Results — Build #${env.BUILD_NUMBER} — See ${env.BUILD_URL} for details" }
   try {
-    slackSend(channel: '#hdp-qa-e2e-test-results', message: msg)
+    slackSend(channel: '#pcs-tech', message: msg)
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }

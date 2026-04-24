@@ -31,6 +31,23 @@ const junit_result_output =
   process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
   (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
 
+const skipAllureReporter = process.env.PLAYWRIGHT_SKIP_ALLURE === 'true';
+const sauceFullJourneyArtifacts = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
+
+const captureSettings = sauceFullJourneyArtifacts
+  ? {
+      screenshot: 'on' as const,
+      video: 'on' as const,
+      trace: 'on' as const,
+    }
+  : {
+      screenshot: 'only-on-failure' as const,
+      video: 'retain-on-failure' as const,
+      trace: 'on-first-retry' as const,
+    };
+
+const browserHeadless = sauceFullJourneyArtifacts ? false : !!process.env.CI;
+
 /** Build test file globs from E2E_SPEC (comma or semicolon keywords). Empty = run all specs. */
 function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
   const keys = raw
@@ -41,12 +58,15 @@ function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
 }
 
 const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
-// Tags come from Jenkins choices or PR labels. Unset -> @nightly; empty -> no grep.
-const e2eTag = process.env.E2E_TEST_SCOPE ?? '';
+const resolvedTestMatch =
+  e2eSpecTestMatch?.length && !sauceFullJourneyArtifacts ? { testMatch: e2eSpecTestMatch } : {};
+// Tags come from Jenkins choices or PR labels. Unset -> no grep (Jenkins sets E2E_TEST_SCOPE for nightly).
+// Sauce: suite grep only — no root grep when PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS is set.
+const e2eTag = sauceFullJourneyArtifacts ? '' : (process.env.E2E_TEST_SCOPE ?? '');
 
 export default defineConfig({
   testDir: './src/test/ui',
-  ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
+  ...resolvedTestMatch,
   ...(e2eTag ? { grep: new RegExp(e2eTag) } : {}),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -61,16 +81,20 @@ export default defineConfig({
   reporter: [
     ['list'],
     ...(process.env.CI ? [['junit', { outputFile: junit_result_output }] as const] : []),
-    [
-      'allure-playwright',
-      {
-        resultsDir: 'allure-results',
-        suiteTitle: false,
-        environmentInfo: {
-          os_version: process.version,
-        },
-      },
-    ],
+    ...(skipAllureReporter
+      ? []
+      : ([
+          [
+            'allure-playwright',
+            {
+              resultsDir: 'allure-results',
+              suiteTitle: false,
+              environmentInfo: {
+                os_version: process.version,
+              },
+            },
+          ],
+        ] as const)),
   ],
   projects: [
     {
@@ -78,12 +102,10 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
-        screenshot: 'only-on-failure',
-        video: 'retain-on-failure',
-        trace: 'on-first-retry',
+        ...captureSettings,
         javaScriptEnabled: true,
         viewport: DEFAULT_VIEWPORT,
-        headless: !!process.env.CI,
+        headless: browserHeadless,
       },
     },
     ...(process.env.CI
@@ -93,12 +115,10 @@ export default defineConfig({
             use: {
               ...devices['Desktop Firefox'],
               channel: 'firefox',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
@@ -106,12 +126,10 @@ export default defineConfig({
             use: {
               ...devices['Desktop Safari'],
               channel: 'webkit',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
@@ -119,45 +137,48 @@ export default defineConfig({
             use: {
               ...devices['Desktop Edge'],
               channel: 'msedge',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
+            },
+          },
+          {
+            name: 'MicrosoftEdge',
+            use: {
+              ...devices['Desktop Edge'],
+              ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
+              ...captureSettings,
+              javaScriptEnabled: true,
+              viewport: DEFAULT_VIEWPORT,
+              headless: browserHeadless,
             },
           },
           {
             name: 'mobile-android',
             use: {
               ...devices['Pixel 5'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
             name: 'mobile-ios',
             use: {
               ...devices['iPhone 12'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
             name: 'mobile-ipad',
             use: {
               ...devices['iPad Pro 11'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
         ]

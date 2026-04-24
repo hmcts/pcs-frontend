@@ -8,6 +8,7 @@ import {
   enable_navigation_tests,
 } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
+import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
 
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
@@ -18,6 +19,19 @@ import {
   PageNavigationValidation,
   VisibilityValidation,
 } from './validations/custom-validations';
+
+loadPlaywrightSetupEnvIntoProcess();
+
+/**
+ * globalSetup writes tokens to `src/test/ui/.auth/setup-env.json`. Workers can import this module
+ * before that file exists; re-load when tokens are missing (e.g. before API-backed actions).
+ */
+function ensurePlaywrightSetupAuthEnv(): void {
+  if (process.env.SERVICE_AUTH_TOKEN && process.env.BEARER_TOKEN) {
+    return;
+  }
+  loadPlaywrightSetupEnvIntoProcess();
+}
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
@@ -91,6 +105,7 @@ export async function performAction(
   fieldName?: actionData | actionRecord,
   value?: actionData | actionRecord
 ): Promise<void> {
+  ensurePlaywrightSetupAuthEnv();
   const executor = getExecutor();
   await validatePageIfNavigated(action);
   const actionInstance = ActionRegistry.getAction(action);
@@ -127,6 +142,7 @@ export async function performValidation(
   inputFieldName?: validationData | validationRecord,
   inputData?: validationData | validationRecord
 ): Promise<void> {
+  ensurePlaywrightSetupAuthEnv();
   const executor = getExecutor();
 
   const [fieldName, data] =
