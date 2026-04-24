@@ -1,0 +1,101 @@
+{
+  "pageTitle": "Regular expenses",
+  "heading": "What other regular expenses do you have? (Optional)",
+  "hintText": "Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.",
+  "options": {
+    "householdBills": "Household bills (for example, council tax, gas, electricity, water, internet)",
+    "loanPayments": "Loan payments",
+    "childSpousalMaintenance": "Child or spousal maintenance",
+    "mobilePhone": "Mobile phone",
+    "groceryShopping": "Grocery shopping",
+    "fuelParkingTransport": "Fuel, parking and transport",
+    "schoolCosts": "School costs (for example, uniform and school dinners)",
+    "clothing": "Clothing",
+    "otherExpenses": "Other"
+  },
+  "subFields": {
+    "amount": "Amount paid",
+    "frequency": "Paid every:"
+  },
+  "frequency": {
+    "week": "Week",
+    "month": "Month"
+  },
+  "errors": {
+    "householdBillsAmount": {
+      "required": "Enter the amount you pay for household bills",
+      "negative": "The amount you pay for household bills each week or month must be £0.00 or above",
+      "largeAmount": "The amount you pay for household bills each week or month must be less than £1 billion"
+    },
+    "householdBillsFrequency": {
+      "required": "Select how frequently you pay household bills"
+    },
+    "loanPaymentsAmount": {
+      "required": "Enter the amount you pay for loan payments",
+      "negative": "The amount you pay for loan payments each week or month must be £0.00 or above",
+      "largeAmount": "The amount you pay for loan payments each week or month must be less than £1 billion"
+    },
+    "loanPaymentsFrequency": {
+      "required": "Select how frequently you make loan payments"
+    },
+    "childSpousalMaintenanceAmount": {
+      "required": "Enter the amount you pay for child or spousal maintenance",
+      "negative": "The amount you pay for child or spousal maintenance each week or month must be £0.00 or above",
+      "largeAmount": "The amount you pay for child or spousal maintenance each week or month must be less than £1 billion"
+    },
+    "childSpousalMaintenanceFrequency": {
+      "required": "Select how frequently you pay child or spousal maintenance"
+    },
+    "mobilePhoneAmount": {
+      "required": "Enter the amount you pay for a mobile phone",
+      "negative": "The amount you pay for a mobile phone each week or month must be £0.00 or above",
+      "largeAmount": "The amount you pay for a mobile phone each week or month must be less than £1 billion"
+    },
+    "mobilePhoneFrequency": {
+      "required": "Select how frequently you pay for a mobile phone"
+    },
+    "groceryShoppingAmount": {
+      "required": "Enter the amount you pay for grocery shopping",
+      "negative": "The amount you pay for grocery shopping each week or month must be £0.00 or above",
+      "largeAmount": "The amount you pay for grocery shopping each week or month must be less than £1 billion"
+    },
+    "groceryShoppingFrequency": {
+      "required": "Select how frequently you pay for grocery shopping"
+    },
+    "fuelParkingTransportAmount": {
+      "required": "Enter the amount you pay for fuel, parking and transport",
+      "negative": "The amount you pay for fuel, parking and transport each week or month must be £0.00 or above",
+      "largeAmount": "The amount you pay for fuel, parking and transport each week or month must be less than £1 billion"
+    },
+    "fuelParkingTransportFrequency": {
+      "required": "Select how frequently you pay for fuel, parking and transport"
+    },
+    "schoolCostsAmount": {
+      "required": "Enter the amount you pay for school costs",
+      "negative": "The amount you pay for school costs each week or month must be £0.00 or above",
+      "largeAmount": "The amount you pay for school costs each week or month must be less than £1 billion"
+    },
+    "schoolCostsFrequency": {
+      "required": "Select how frequently you pay school costs"
+    },
+    "clothingAmount": {
+      "required": "Enter the amount you pay for clothing",
+      "negative": "The amount you pay for clothing each week or month must be £0.00 or above",
+      "largeAmount": "The amount you pay for clothing each week or month must be less than £1 billion"
+    },
+    "clothingFrequency": {
+      "required": "Select how frequently you pay for clothing"
+    },
+    "otherExpensesAmount": {
+      "required": "Enter the amount you pay for other regular expenses",
+      "negative": "The amount you pay for other expenses each week or month must be £0.00 or above",
+      "largeAmount": "The amount you pay for other expenses each week or month must be less than £1 billion"
+    },
+    "otherExpensesFrequency": {
+      "required": "Select how frequently you pay for other expenses"
+    },
+    "amount": {
+      "invalidFormat": "Enter an amount in the correct format, for example 148.00 or 148.50"
+    }
+  }
+}
