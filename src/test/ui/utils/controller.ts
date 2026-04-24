@@ -21,6 +21,18 @@ import {
 
 loadPlaywrightSetupEnvIntoProcess();
 
+/**
+ * Setup project writes tokens to `src/test/ui/.auth/setup-env.json` after `globalSetup`.
+ * This module can load before that file exists (worker import timing), leaving env empty → 401 on CCD.
+ * Re-read the snapshot whenever tokens are missing, including before each API action.
+ */
+function ensurePlaywrightSetupAuthEnv(): void {
+  if (process.env.SERVICE_AUTH_TOKEN && process.env.BEARER_TOKEN) {
+    return;
+  }
+  loadPlaywrightSetupEnvIntoProcess();
+}
+
 /** Set by `.sauce/config-sauce-nightly.yml` only — per-step PNGs in Playwright report, not for Jenkins VM E2E. */
 const sauceStepScreenshots = process.env.PLAYWRIGHT_SAUCE_STEP_SCREENSHOTS === 'true';
 
@@ -113,6 +125,7 @@ export async function performAction(
   fieldName?: actionData | actionRecord,
   value?: actionData | actionRecord
 ): Promise<void> {
+  ensurePlaywrightSetupAuthEnv();
   const executor = getExecutor();
   await validatePageIfNavigated(action);
   const actionInstance = ActionRegistry.getAction(action);
@@ -150,6 +163,7 @@ export async function performValidation(
   inputFieldName?: validationData | validationRecord,
   inputData?: validationData | validationRecord
 ): Promise<void> {
+  ensurePlaywrightSetupAuthEnv();
   const executor = getExecutor();
 
   const [fieldName, data] =

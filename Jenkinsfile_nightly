@@ -101,7 +101,7 @@ properties([
     ),
     choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
-      choices: ['false', 'true'],
+      choices: ['true', 'false'],
       description: 'Run page functional tests (content, errors, navigation). Default: true.'
     ),
     choice(
