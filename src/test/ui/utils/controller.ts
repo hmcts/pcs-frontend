@@ -30,17 +30,13 @@ let startFunctionalTests = false;
 let startAxeAudit = false;
 let sauceJourneyScreenshotStep = 0;
 
-function sanitizeSauceAttachmentName(label: string): string {
-  return label.replace(/[/\\?%*:|"<>]/g, '_').replace(/\s+/g, ' ').trim().slice(0, 100);
-}
-
-async function attachSauceJourneyStepScreenshot(page: Page, stepLabel: string): Promise<void> {
+async function attachSauceJourneyStepScreenshot(page: Page): Promise<void> {
   if (!sauceStepScreenshots) {
     return;
   }
   try {
     sauceJourneyScreenshotStep += 1;
-    const name = `${String(sauceJourneyScreenshotStep).padStart(4, '0')}-${sanitizeSauceAttachmentName(stepLabel)}.png`;
+    const name = `page${String(sauceJourneyScreenshotStep).padStart(3, '0')}.png`;
     const body = await page.screenshot({ fullPage: true });
     await test.info().attach(name, { body, contentType: 'image/png' });
   } catch {
@@ -146,7 +142,7 @@ export async function performAction(
     await actionInstance.execute(executor.page, action, fieldName, value);
   });
   await validatePageIfNavigated(action);
-  await attachSauceJourneyStepScreenshot(executor.page, stepText);
+  await attachSauceJourneyStepScreenshot(executor.page);
 }
 
 export async function performValidation(
