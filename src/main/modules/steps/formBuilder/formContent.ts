@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import { type FormError, buildErrorSummary, getErrorMessage } from './errorUtils';
+import { type FormError, buildErrorSummary } from './errorUtils';
 import { buildFieldValues, translateFields } from './fieldTranslation';
 import { getTranslation } from './helpers';
 
@@ -24,10 +24,6 @@ export function buildFormContent(
   const fieldValues = buildFieldValues(fields, bodyData);
   const pageTitle =
     getTranslation(t, 'title', undefined, interpolation) || getTranslation(t, 'question', undefined, interpolation);
-  // Convert FormError to string for translateFields (which expects strings for error messages)
-  const stringErrors: Record<string, string> = Object.fromEntries(
-    Object.entries(errors).map(([key, error]) => [key, getErrorMessage(error)])
-  );
   // Pass bodyData as originalData so translateFields can extract nested field values
   const fieldsWithLabels = translateFields(
     fields,
@@ -36,7 +32,7 @@ export function buildFormContent(
 
     fieldValues,
 
-    stringErrors,
+    errors,
 
     !!pageTitle,
 
