@@ -1,12 +1,11 @@
 {
-  "pageTitle": "Dependant children",
-  "caption": "Respond to a property possession claim",
-  "heading": "Do you have any dependant children?",
-  "dependantChildrenParagraph": "Dependant children are children you look after financially.",
-  "dependantChildrenDetailsLabel": "Give details about your dependant children",
-  "dependantChildrenDetailsHint": "You should include details about how many dependant children you have and how old they are",
+  "pageTitle": "Dependent children",
+  "heading": "Do you have any dependent children?",
+  "dependentChildrenParagraph": "Dependent children are children you look after financially.",
+  "dependentChildrenDetailsLabel": "Give details about your dependent children",
+  "dependentChildrenDetailsHint": "You should include details about how many dependent children you have and how old they are",
   "errors": {
-    "dependantChildren": "Select if you have any dependant children",
-    "dependantChildrenDetails": "Give details about your dependant children"
+    "dependentChildren": "Select if you have any dependent children",
+    "dependentChildrenDetails": "Give details about your dependent children"
   }
 }

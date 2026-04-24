@@ -48,7 +48,6 @@ export const step: StepDefinition = createFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
   },
   getInitialFormData: req => {
     const { defendantResponsesDateOfBirth: dateOfBirth } = req.res?.locals.validatedCase ?? {

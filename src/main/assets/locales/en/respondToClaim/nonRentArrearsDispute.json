@@ -1,5 +1,4 @@
 {
-  "caption": "Respond to a possession claim",
   "pageTitle": "Disputing the claim",
   "heading": "Disputing other parts of the claim",
   "introParagraph": "You should <a href=\"/case/{{caseReference}}/view-claim\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">view the claim (opens in new tab)</a> to see if there's any other parts of the claim that are incorrect or you disagree with.",

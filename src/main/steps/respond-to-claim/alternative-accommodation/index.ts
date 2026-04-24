@@ -13,7 +13,6 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/alternativeAccommodation.njk`,
   translationKeys: {
-    caption: 'caption',
     question: 'question',
     pageTitle: 'pageTitle',
   },

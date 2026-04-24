@@ -12,7 +12,6 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
   },
   fields: [
     {

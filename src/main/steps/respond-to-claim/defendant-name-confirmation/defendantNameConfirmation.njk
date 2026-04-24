@@ -10,9 +10,6 @@
     {% if errorSummary %}
       {{ govukErrorSummary(errorSummary) }}
     {% endif %}
-    {% if caption %}
-      <span class="govuk-caption-xl">{{ caption }}</span>
-    {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}

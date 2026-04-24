@@ -38,7 +38,6 @@ jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () =
 const t = ((key: string) => {
   const translations: Record<string, string> = {
     pageTitle: 'Instalments',
-    caption: 'Respond to a property possession claim',
     heading: 'Instalments',
     paragraph1:
       'A decision about the instalments you can afford to pay will be made at the hearing. You’ll be able to tell the judge if your circumstances have changed between now and the hearing.',
@@ -119,7 +118,6 @@ describe('respond-to-claim installments step', () => {
       expect.objectContaining({
         pageTitle: 'Instalments',
         heading: 'Instalments',
-        caption: 'Respond to a property possession claim',
       })
     );
 

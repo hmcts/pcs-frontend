@@ -15,7 +15,6 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/confirmationOfNoticeGiven.njk`,
   translationKeys: {
-    caption: 'caption',
     pageTitle: 'pageTitle',
     question: 'question',
     hintText: 'hintText',

@@ -1,5 +1,4 @@
 {
-  "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyNotice date",
   "bulletPointLabel": "cyNotice details given by {{claimantName}}:",
   "hintText": "cyWhen making the claim, {{claimantName}} had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.",

@@ -1,5 +1,4 @@
 {
-  "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyNotice date",
   "question": "cyWhen did you receive notice from {{claimantName}} (optional)?",
   "noticeDateHint": "cyFor example, 27 9 2022. If you’re not sure of the exact date, you can find it on the notice",

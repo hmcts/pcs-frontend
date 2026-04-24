@@ -1,9 +1,8 @@
 {
   "title": "Rent arrears",
-  "captionHeading": "Respond to a property possession claim",
   "pageTitle": "Rent arrears",
   "insetIntroText": "Rent arrears are money you owe in rent payments.",
-  "insetDetailsText": "When making their claim, {{claimantName}} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.",
+  "insetDetailsText": "When they made their claim, {{claimantName}} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.",
   "insetConditionalYesText": "The rent statement will have been included in the pack you received in the post letting you know a claim had been made against you, and is also available to view from ‘View the claim’ on your case overview.",
   "amountOwedHeading": "Amount you owe in rent arrears given by {{claimantName}}:",
   "rentArrearsQuestion": "Do you owe this amount in rent arrears?",
