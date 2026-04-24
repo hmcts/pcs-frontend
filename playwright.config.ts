@@ -68,8 +68,7 @@ const rawE2eScope = process.env.E2E_TEST_SCOPE;
 const e2eTag = typeof rawE2eScope === 'string' && rawE2eScope.trim() !== '' ? rawE2eScope.trim() : '';
 const browserGrep = e2eTag ? { grep: new RegExp(e2eTag) } : {};
 // Sauce (`PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS`): only suite `grep` in .sauce/*.yml (e.g. SAUCE_GREP). No E2E_SPEC / E2E_TEST_SCOPE narrowing here.
-const resolvedTestMatch =
-  e2eSpecTestMatch?.length && !sauceFullJourneyArtifacts ? { testMatch: e2eSpecTestMatch } : {};
+const resolvedTestMatch = e2eSpecTestMatch?.length && !sauceFullJourneyArtifacts ? { testMatch: e2eSpecTestMatch } : {};
 const browserGrepForRun = sauceFullJourneyArtifacts ? {} : browserGrep;
 
 export default defineConfig({
