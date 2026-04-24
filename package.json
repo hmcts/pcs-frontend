@@ -94,7 +94,7 @@
     "zod-i18n-map": "2.27.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.11.2",
+    "@axe-core/playwright": "4.11.1",
     "@eslint/compat": "2.0.5",
     "@eslint/eslintrc": "3.3.5",
     "@eslint/js": "9.39.4",
@@ -136,7 +136,7 @@
     "eslint-plugin-jest": "28.14.0",
     "git-rev-sync": "3.0.2",
     "globals": "16.5.0",
-    "html-webpack-plugin": "5.6.7",
+    "html-webpack-plugin": "5.6.6",
     "husky": "9.1.7",
     "jest": "29.7.0",
     "jest-environment-jsdom": "30.3.0",
