@@ -35,7 +35,6 @@
     "imNotSure": "cyI'm not sure"
   },
   "change": "cyChange",
-  "chooseOption": "cyChoose an option",
   "back": "cyBack",
   "date": {
     "day": "cyDay",
@@ -49,6 +48,7 @@
     "defaultRequired": "cyThis field is required",
     "defaultInvalid": "cyInvalid format",
     "defaultMaxLength": "cyMust be {max} characters or fewer",
+    "chooseOption": "cyChoose an option",
     "email": {
       "required": "cyEnter an email address",
       "invalid": "cyEnter a valid email address"
@@ -61,10 +61,7 @@
       "month": "cyMonth",
       "year": "cyYear",
       "required": "cyEnter a date",
-      "notRealDate": "cyEnter a valid date",
-      "invalidDay": "cyEnter a valid day",
-      "invalidMonth": "cyEnter a valid month",
-      "invalidYear": "cyEnter a valid year",
+      "notRealDate": "cyDate must be a real date",
       "futureDate": "cyDate must be in the past",
       "pastDate": "cyDate must be in the future",
       "invalidValue": "cyEnter a valid value",
@@ -134,6 +131,12 @@
     "500": {
       "title": "cySorry, we’re having technical problems",
       "paragraph": "cyPlease try again in a few minutes."
+    }
+  },
+  "applicationErrors": {
+    "noApplicationIdInSession": {
+      "title": "cyApplication not available",
+      "paragraph": "cyThis application is not available. It may have already been submitted in a different window."
     }
   }
 }

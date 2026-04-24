@@ -132,5 +132,11 @@
       "title": "Sorry, we’re having technical problems",
       "paragraph": "Please try again in a few minutes."
     }
+  },
+  "applicationErrors": {
+    "noApplicationIdInSession": {
+      "title": "Application not available",
+      "paragraph": "This application is not available. It may have already been submitted in a different window."
+    }
   }
 }

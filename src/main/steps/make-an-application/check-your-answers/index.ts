@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
+import { ApplicationError, ApplicationErrorCode } from '../../../ApplicationError';
 import { createFormStep, getFormData, getTranslationFunction } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { toYesNoEnum } from '../../utils';
@@ -72,15 +73,18 @@ export const step: StepDefinition = createFormStep({
     };
   },
   beforeRedirect: async (req: Request) => {
-    const formData = req.session.formData;
-
     const ccdCase = req.res?.locals.validatedCase;
     if (!ccdCase) {
       throw Error('No existing case details in session');
     }
 
+    const formData = req.session.formData;
     if (!formData) {
       throw Error('No existing formData in session');
+    }
+
+    if (!req.session.genApp?.applicationId) {
+      throw new ApplicationError('No application ID in session', ApplicationErrorCode.noApplicationIdInSession);
     }
 
     const cyaFormData = getFormData(req, STEP_NAME);
@@ -101,6 +105,7 @@ export const step: StepDefinition = createFormStep({
       whatOrderWanted: visibleFormData.getWhatOrderWantedField()?.fieldValue,
       sotAccepted: toYesNoEnum(statementOfTruthAccepted),
       sotFullName: cyaFormData.fullName as string,
+      clientReference: req.session.genApp.applicationId,
     };
 
     await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
@@ -111,5 +116,6 @@ export const step: StepDefinition = createFormStep({
     });
 
     delete req.session.formData;
+    delete req.session.genApp;
   },
 });
