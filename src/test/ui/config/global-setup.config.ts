@@ -78,8 +78,7 @@ export const getAccessToken = async (): Promise<void> => {
 async function globalSetupConfig(): Promise<void> {
   clearEmvLocksIfLocal();
 
-  const hasTokens =
-    process.env.SERVICE_AUTH_TOKEN?.trim() && process.env.BEARER_TOKEN?.trim();
+  const hasTokens = process.env.SERVICE_AUTH_TOKEN?.trim() && process.env.BEARER_TOKEN?.trim();
   if (!hasTokens) {
     await getS2SToken();
     await getAccessToken();

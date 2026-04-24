@@ -62,10 +62,8 @@ const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
 // grep and E2E_SPEC testMatch so filtering stays in .sauce/*.yml (suite grep only); no per-project grep needed
 // without a separate setup project.
 const e2eTag = process.env.E2E_TEST_SCOPE ?? '';
-const resolvedTestMatch =
-  !sauceFullJourneyArtifacts && e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {};
-const resolvedGrep =
-  !sauceFullJourneyArtifacts && e2eTag ? { grep: new RegExp(e2eTag) } : {};
+const resolvedTestMatch = !sauceFullJourneyArtifacts && e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {};
+const resolvedGrep = !sauceFullJourneyArtifacts && e2eTag ? { grep: new RegExp(e2eTag) } : {};
 
 export default defineConfig({
   testDir: './src/test/ui',
