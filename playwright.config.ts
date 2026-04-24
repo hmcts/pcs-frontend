@@ -30,6 +30,27 @@ const is_smoke_run = process.env.npm_lifecycle_event === 'test:smoke';
 const junit_result_output =
   process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
   (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
+// Sauce YAML sets these; local/Jenkins VM runs leave them unset.
+const skipAllureReporter = process.env.PLAYWRIGHT_SKIP_ALLURE === 'true';
+const sauceFullJourneyArtifacts = process.env.PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS === 'true';
+
+const captureSettings = sauceFullJourneyArtifacts
+  ? {
+      screenshot: 'on' as const,
+      video: 'on' as const,
+      trace: 'on' as const,
+    }
+  : {
+      screenshot: 'only-on-failure' as const,
+      video: 'retain-on-failure' as const,
+      trace: 'on-first-retry' as const,
+    };
+
+/**
+ * Sauce sets `PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS`; headless Chromium there often yields blank Playwright video.
+ * Jenkins VM E2E does not set it, so stays headless in CI.
+ */
+const browserHeadless = sauceFullJourneyArtifacts ? false : !!process.env.CI;
 
 /** Build test file globs from E2E_SPEC (comma or semicolon keywords). Empty = run all specs. */
 function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
@@ -61,103 +82,116 @@ export default defineConfig({
   reporter: [
     ['list'],
     ...(process.env.CI ? [['junit', { outputFile: junit_result_output }] as const] : []),
-    [
-      'allure-playwright',
-      {
-        resultsDir: 'allure-results',
-        suiteTitle: false,
-        environmentInfo: {
-          os_version: process.version,
-        },
-      },
-    ],
+    ...(skipAllureReporter
+      ? []
+      : ([
+          [
+            'allure-playwright',
+            {
+              resultsDir: 'allure-results',
+              suiteTitle: false,
+              environmentInfo: {
+                os_version: process.version,
+              },
+            },
+          ],
+        ] as const)),
   ],
   projects: [
     {
+      name: 'setup',
+      testMatch: '**/setup/**/*.setup.ts',
+    },
+    {
       name: 'chrome',
+      dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
-        screenshot: 'only-on-failure',
-        video: 'retain-on-failure',
-        trace: 'on-first-retry',
+        ...captureSettings,
         javaScriptEnabled: true,
         viewport: DEFAULT_VIEWPORT,
-        headless: !!process.env.CI,
+        headless: browserHeadless,
       },
     },
     ...(process.env.CI
       ? [
           {
             name: 'firefox',
+            dependencies: ['setup'],
             use: {
               ...devices['Desktop Firefox'],
               channel: 'firefox',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
             name: 'webkit',
+            dependencies: ['setup'],
             use: {
               ...devices['Desktop Safari'],
               channel: 'webkit',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
             name: 'edge',
+            dependencies: ['setup'],
             use: {
               ...devices['Desktop Edge'],
               channel: 'msedge',
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
               viewport: DEFAULT_VIEWPORT,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
+            },
+          },
+          {
+            name: 'MicrosoftEdge',
+            dependencies: ['setup'],
+            use: {
+              ...devices['Desktop Edge'],
+              ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
+              ...captureSettings,
+              javaScriptEnabled: true,
+              viewport: DEFAULT_VIEWPORT,
+              headless: browserHeadless,
             },
           },
           {
             name: 'mobile-android',
+            dependencies: ['setup'],
             use: {
               ...devices['Pixel 5'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
             name: 'mobile-ios',
+            dependencies: ['setup'],
             use: {
               ...devices['iPhone 12'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
           {
             name: 'mobile-ipad',
+            dependencies: ['setup'],
             use: {
               ...devices['iPad Pro 11'],
-              screenshot: 'only-on-failure' as const,
-              video: 'retain-on-failure' as const,
-              trace: 'on-first-retry' as const,
+              ...captureSettings,
               javaScriptEnabled: true,
-              headless: !!process.env.CI,
+              headless: browserHeadless,
             },
           },
         ]

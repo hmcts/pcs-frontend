@@ -1,4 +1,3 @@
-import { AxeUtils } from '@hmcts/playwright-common';
 import { Page, test } from '@playwright/test';
 
 import {
@@ -8,6 +7,7 @@ import {
   enable_navigation_tests,
 } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
+import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
 
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
@@ -19,14 +19,35 @@ import {
   VisibilityValidation,
 } from './validations/custom-validations';
 
+loadPlaywrightSetupEnvIntoProcess();
+
+/** Set by `.sauce/config-sauce-nightly.yml` only — per-step PNGs in Playwright report, not for Jenkins VM E2E. */
+const sauceStepScreenshots = process.env.PLAYWRIGHT_SAUCE_STEP_SCREENSHOTS === 'true';
+
 let testExecutor: { page: Page };
 let previousUrl: string = '';
 let startFunctionalTests = false;
 let startAxeAudit = false;
+let sauceJourneyScreenshotStep = 0;
+
+async function attachSauceJourneyStepScreenshot(page: Page): Promise<void> {
+  if (!sauceStepScreenshots) {
+    return;
+  }
+  try {
+    sauceJourneyScreenshotStep += 1;
+    const name = `page${String(sauceJourneyScreenshotStep).padStart(3, '0')}.png`;
+    const body = await page.screenshot({ fullPage: true });
+    await test.info().attach(name, { body, contentType: 'image/png' });
+  } catch {
+    // e.g. page closed or navigating
+  }
+}
 
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
   previousUrl = page.url();
+  sauceJourneyScreenshotStep = 0;
 }
 
 function getExecutor(): { page: Page } {
@@ -60,6 +81,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
     if (pageNavigated) {
       if (startAxeAudit && enable_axe_audit === 'true') {
         try {
+          const { AxeUtils } = await import('@hmcts/playwright-common');
           await test.step('Running Accessibility Scan', async () => {
             await new AxeUtils(executor.page).audit({
               exclude: axe_exclusions,
@@ -120,6 +142,7 @@ export async function performAction(
     await actionInstance.execute(executor.page, action, fieldName, value);
   });
   await validatePageIfNavigated(action);
+  await attachSauceJourneyStepScreenshot(executor.page);
 }
 
 export async function performValidation(

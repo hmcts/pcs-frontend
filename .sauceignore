@@ -1,0 +1,33 @@
+# Dependencies (saucectl installs on the runner)
+node_modules/
+
+# Local env files (use CI / saucectl env for secrets)
+.env
+.env.local
+
+# VCS and IDE
+.git/
+.gitignore
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Build and generated assets
+dist/
+public/
+coverage/
+*.log
+npm-debug.log*
+.eslintcache
+
+# Playwright / test output (not needed to run tests from archive)
+test-results/
+playwright-report/
+allure-report/
+allure-results/
+blob-report/
+playwright/.cache/
+
+# Local setup project output (secrets)
+src/test/ui/.auth/setup-env.json
