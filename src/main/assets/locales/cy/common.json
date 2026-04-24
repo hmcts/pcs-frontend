@@ -37,6 +37,10 @@
   "change": "cyChange",
   "chooseOption": "cyChoose an option",
   "back": "cyBack",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
   "date": {
     "day": "cyDay",
     "month": "cyMonth",
@@ -46,6 +50,7 @@
     "yes": "cyYes",
     "no": "cyNo"
   },
+  "warningHiddenText": "cyWarning",
   "errors": {
     "title": "cyThere is a problem",
     "required": "cyEnter a value",
@@ -102,8 +107,7 @@
     "minute": "cyminute",
     "minutes": "cyminutes",
     "second": "cysecond",
-    "seconds": "cyseconds",
-    "remaining": "cyremaining"
+    "seconds": "cyseconds"
   },
   "errorPages": {
     "403": {
