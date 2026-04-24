@@ -8,6 +8,9 @@ export const dashboard = {
       : `${createCaseApiData.createCasePayload.propertyAddress.AddressLine1}, ${createCaseApiData.createCasePayload.propertyAddress.PostTown}, ${createCaseApiData.createCasePayload.propertyAddress.PostCode}`;
   },
   caseNumberParagraph: (): string => `Case number: ${process.env.CASE_FID}`,
+  iWantToHeader: 'I want to...',
+  askTheCourtToMakeAnOrderLink: 'Ask the court to make an order (make a general application)',
+  uploadAdditionalDocumentsLink: 'Upload additional documents',
   helpAndSupportHeader: `Help and support`,
   helpWithFeesLink: `Help with fees`,
   getHelpPayingCourtFeesHeader: `Get help paying court and tribunal fees`,
