@@ -67,7 +67,6 @@ export interface HouseholdCircumstances {
   schoolCosts?: IncomeExpenseDetails;
   clothing?: IncomeExpenseDetails;
   otherExpenses?: IncomeExpenseDetails;
-
 }
 
 export type PaymentAgreement = {
