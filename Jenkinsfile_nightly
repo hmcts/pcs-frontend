@@ -77,41 +77,41 @@ properties([
       defaultValue: false,
       description: 'Jenkins VM: run E2E on iPad Pro 11 WebKit profile.'
     ),
-    // 4) Sauce Labs — tag filter then platform matrix (see .sauce/config-sauce-nightly.yml suite names)
+    // 4) Sauce Labs — tag filter then platform matrix (see .sauce/config-sauce-nightly.yml suite names). Suite toggles default off.
     string(
       name: 'SAUCE_GREP',
       defaultValue: '@crossbrowser',
-      description: 'Sauce only — Playwright title grep passed to saucectl (e.g. @crossbrowser).'
+      description: 'Sauce only — Playwright title grep for saucectl when at least one suite below is enabled (e.g. @crossbrowser).'
     ),
     booleanParam(
       name: 'SAUCE_MAC13_CHROME',
-      defaultValue: true,
-      description: 'Sauce suite: macOS 13 — Chrome (pcs-frontend-mac13-chrome).'
+      defaultValue: false,
+      description: 'Sauce suite: macOS 13 — Chrome (pcs-frontend-mac13-chrome). Default off.'
     ),
     booleanParam(
       name: 'SAUCE_MAC13_FIREFOX',
-      defaultValue: true,
-      description: 'Sauce suite: macOS 13 — Firefox (pcs-frontend-mac13-firefox).'
+      defaultValue: false,
+      description: 'Sauce suite: macOS 13 — Firefox (pcs-frontend-mac13-firefox). Default off.'
     ),
     booleanParam(
       name: 'SAUCE_MAC_SAFARI',
-      defaultValue: true,
-      description: 'Sauce suite: macOS 13 — WebKit / Safari engine (pcs-frontend-mac13-webkit).'
+      defaultValue: false,
+      description: 'Sauce suite: macOS 13 — WebKit / Safari engine (pcs-frontend-mac13-webkit). Default off.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_CHROME',
-      defaultValue: true,
-      description: 'Sauce suite: Windows 11 — Chrome (pcs-frontend-win11-chrome).'
+      defaultValue: false,
+      description: 'Sauce suite: Windows 11 — Chrome (pcs-frontend-win11-chrome). Default off.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_EDGE',
-      defaultValue: true,
-      description: 'Sauce suite: Windows 11 — Edge (pcs-frontend-win11-edge).'
+      defaultValue: false,
+      description: 'Sauce suite: Windows 11 — Edge (pcs-frontend-win11-edge). Default off.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_FIREFOX',
-      defaultValue: true,
-      description: 'Sauce suite: Windows 11 — Firefox (pcs-frontend-win11-firefox).'
+      defaultValue: false,
+      description: 'Sauce suite: Windows 11 — Firefox (pcs-frontend-win11-firefox). Default off.'
     ),
   ])
 ])
