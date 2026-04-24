@@ -1,0 +1,24 @@
+{
+  "pageTitle": "Priority debt details",
+  "caption": "Respond to a property possession claim",
+  "totalQuestion": "What is the total amount you owe for all your priority debts?",
+  "contributionQuestion": "How much do you pay towards your priority debts each week or month?",
+  "frequencyQuestion": "Paid every:",
+  "amountHint": "Enter total amount in pounds and pence, for example £148.00 or £148.50",
+  "frequency": {
+    "week": "Week",
+    "month": "Month"
+  },
+  "errors": {
+    "priorityDebtTotal": "Enter the total amount you owe for all your priority debts",
+    "priorityDebtTotalMin": "The total amount you owe for all your priority debts must be £0.00 or above",
+    "priorityDebtTotalMax": "The total amount you owe for all your priority debts must be less than £1 billion",
+    "priorityDebtContribution": "Enter the amount you pay towards your priority debts each week or month",
+    "priorityDebtContributionMin": "The amount you pay towards your priority debts each week or month must be £0.00 or above",
+    "priorityDebtContributionMax": "The amount you pay towards your priority debts each week or month must be less than £1 billion",
+    "priorityDebtContributionFrequency": "Select how frequently you pay the amount you entered above",
+    "amount": {
+      "invalidFormat": "Enter an amount in the correct format, for example £148.00 or £148.50"
+    }
+  }
+}

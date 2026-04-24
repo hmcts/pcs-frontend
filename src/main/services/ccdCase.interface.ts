@@ -13,11 +13,11 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
+export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
 
 export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
-export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
 export interface HouseholdCircumstances {
@@ -41,14 +41,18 @@ export interface HouseholdCircumstances {
   pensionAmount?: PenceAmount;
   pensionFrequency?: FrequencyValue;
   universalCredit?: YesNoValue;
-  universalCreditAmount?: PenceAmount;
-  universalCreditFrequency?: FrequencyValue;
-  ucApplicationDate?: string;
+  universalCreditAmount?: PenceAmount | null;
+  universalCreditFrequency?: FrequencyValue | null;
+  ucApplicationDate?: string | null;
   otherBenefits?: YesNoValue;
   otherBenefitsAmount?: PenceAmount;
   otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
+  priorityDebts?: YesNoValue;
+  debtTotal?: string;
+  debtContribution?: string;
+  debtContributionFrequency?: FrequencyValue;
 }
 
 export type PaymentAgreement = {

@@ -1,6 +1,7 @@
 import { type Request } from 'express';
 
 import {
+  getPreviousStepForPriorityDebts,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
@@ -397,7 +398,7 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
-      previousStep: 'have-you-applied-for-universal-credit',
+      previousStep: getPreviousStepForPriorityDebts,
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {

@@ -99,7 +99,12 @@ export function buildComponentConfig({
     id: field.name,
     name: field.name,
     label: { text: label, classes: field.labelClasses },
-    hint: hint ? { text: hint } : null,
+    hint: hint
+      ? {
+          text: hint,
+          ...(field.hintClasses ? { classes: field.hintClasses } : {}),
+        }
+      : null,
     errorMessage: hasError && errorText ? { text: errorText } : null,
     classes: field.classes || (field.type === 'text' ? 'govuk-!-width-three-quarters' : undefined),
     attributes: field.attributes || {},
@@ -112,6 +117,12 @@ export function buildComponentConfig({
       component.value = (fieldValue as string) || '';
       if (field.prefix) {
         component.prefix = field.prefix;
+      }
+      if (field.formGroupClasses) {
+        component.formGroup = {
+          classes: field.formGroupClasses,
+          attributes: {},
+        };
       }
       if (field.suffix) {
         component.suffix = field.suffix;

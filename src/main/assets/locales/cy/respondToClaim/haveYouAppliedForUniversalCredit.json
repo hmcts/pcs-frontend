@@ -1,0 +1,22 @@
+{
+  "pageTitle": "cyUniversal Credit",
+  "caption": "cyRespond to a property possession claim",
+  "heading": "cyHave you applied for Universal Credit?",
+  "question": "cyHave you applied for Universal Credit?",
+  "dateLabel": "cyWhen did you apply?",
+  "dateHint": "cyFor example, 27 9 2022",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
+  "errors": {
+    "haveAppliedForUniversalCredit": "cySelect if you’ve applied for Universal Credit",
+    "date": {
+      "required": "cyEnter the date you applied for Universal Credit",
+      "missingOne": "cyThe date you applied for Universal Credit must include a {{missingField}}",
+      "missingTwo": "cyThe date you applied for Universal Credit must include a {{first}} and {{second}}",
+      "notRealDate": "cyThe date you applied for Universal Credit must be a real date",
+      "futureDate": "cyThe date you applied for Universal Credit must must either be today’s date or in the past"
+    }
+  }
+}
