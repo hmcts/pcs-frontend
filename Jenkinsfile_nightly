@@ -4,6 +4,7 @@ properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
+    // 1) Where
     text(
       name: 'MANUAL_BUILD_REASON',
       defaultValue: 'Daily nightly schedule run',
@@ -12,102 +13,105 @@ properties([
     choice(
       name: 'ENVIRONMENT',
       choices: ['aat', 'preview'],
-      description: 'Environment to run the test.'
+      description: 'Target environment for TEST_URL (AAT or PR preview).'
     ),
     string(
       name: 'PR_NUMBER',
       defaultValue: '',
-      description: 'PR number (REQUIRED if environment is preview, leave blank otherwise).'
+      description: 'PR number — required when ENVIRONMENT is preview; leave blank for AAT.'
     ),
-    booleanParam(
-      name: 'CHROME_TESTS',
-      defaultValue: true,
-      description: 'Run E2E tests in Chrome (on by default).'
-    ),
-    booleanParam(
-      name: 'FIREFOX_TESTS',
-      defaultValue: false,
-      description: 'Run E2E tests in Firefox (off by default; enable when needed).'
-    ),
-    booleanParam(
-      name: 'WEBKIT_TESTS',
-      defaultValue: false,
-      description: 'Run E2E tests in WebKit / desktop Safari (off by default; enable when needed).'
-    ),
-    booleanParam(
-      name: 'EDGE_TESTS',
-      defaultValue: false,
-      description: 'Run E2E tests in Microsoft Edge (off by default; enable when needed).'
-    ),
-    booleanParam(
-      name: 'MOBILE_ANDROID_TESTS',
-      defaultValue: false,
-      description: 'Run E2E tests on the Android (Pixel 5) profile (off by default; enable when needed).'
-    ),
-    booleanParam(
-      name: 'MOBILE_IOS_TESTS',
-      defaultValue: false,
-      description: 'Run E2E tests on the iOS (iPhone 12) WebKit profile (off by default; enable when needed).'
-    ),
-    booleanParam(
-      name: 'MOBILE_IPAD_TESTS',
-      defaultValue: false,
-      description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
-    ),
-    string(
-      name: 'SAUCE_GREP',
-      defaultValue: '@crossbrowser',
-      description: 'Playwright grep pattern for Sauce cross-browser runs (tags, e.g. @crossbrowser). Passed to saucectl as SAUCE_GREP.'
-    ),
-    booleanParam(
-      name: 'SAUCE_MAC13_CHROME',
-      defaultValue: true,
-      description: 'Sauce: macOS 13 — Chrome.'
-    ),
-    booleanParam(
-      name: 'SAUCE_MAC13_FIREFOX',
-      defaultValue: true,
-      description: 'Sauce: macOS 13 — Firefox.'
-    ),
-    booleanParam(
-      name: 'SAUCE_MAC_SAFARI',
-      defaultValue: true,
-      description: 'Sauce: macOS 13 — WebKit (Safari engine).'
-    ),
-    booleanParam(
-      name: 'SAUCE_WIN11_CHROME',
-      defaultValue: true,
-      description: 'Sauce: Windows 11 — Chrome.'
-    ),
-    booleanParam(
-      name: 'SAUCE_WIN11_EDGE',
-      defaultValue: true,
-      description: 'Sauce: Windows 11 — Edge.'
-    ),
-    booleanParam(
-      name: 'SAUCE_WIN11_FIREFOX',
-      defaultValue: true,
-      description: 'Sauce: Windows 11 — Firefox.'
+    // 2) What to run — scope for Jenkins VM E2E (also sets E2E_* env used where applicable)
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
+      description: 'Tag filter for Jenkins VM Playwright runs (sets E2E_TEST_SCOPE). First choice is the scheduled default.'
     ),
     string(
       name: 'PLAYWRIGHT_SPEC',
       defaultValue: '',
-      description: 'Spec file filter: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate keywords with comma or semicolon. Ex.: respondToAClaim | respondToAClaim,makeAnApplication. Blank = all specs. Default: empty.'
-    ),
-    choice(
-      name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
-      description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
+      description: 'Jenkins VM only — limit spec files: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate with comma or semicolon (e.g. respondToAClaim). Blank = all specs. Sauce uses suite grep only.'
     ),
     choice(
       name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
       choices: ['true', 'false'],
-      description: 'Run page functional tests (content, errors, navigation). Default: true.'
+      description: 'Run page functional tests (content, errors, navigation). Applies to VM and Sauce.'
     ),
     choice(
       name: 'ENABLE_AXE_AUDIT',
       choices: ['true', 'false'],
-      description: 'Run axe audits during E2E. Default: true.'
+      description: 'Run axe accessibility audits during E2E. Applies to VM and Sauce.'
+    ),
+    // 3) Jenkins VM — which Playwright projects to run on the agent (not Sauce)
+    booleanParam(
+      name: 'CHROME_TESTS',
+      defaultValue: true,
+      description: 'Jenkins VM: run E2E in Chrome (default on).'
+    ),
+    booleanParam(
+      name: 'FIREFOX_TESTS',
+      defaultValue: false,
+      description: 'Jenkins VM: run E2E in Firefox.'
+    ),
+    booleanParam(
+      name: 'WEBKIT_TESTS',
+      defaultValue: false,
+      description: 'Jenkins VM: run E2E in WebKit (desktop Safari).'
+    ),
+    booleanParam(
+      name: 'EDGE_TESTS',
+      defaultValue: false,
+      description: 'Jenkins VM: run E2E in Microsoft Edge.'
+    ),
+    booleanParam(
+      name: 'MOBILE_ANDROID_TESTS',
+      defaultValue: false,
+      description: 'Jenkins VM: run E2E on Android (Pixel 5) profile.'
+    ),
+    booleanParam(
+      name: 'MOBILE_IOS_TESTS',
+      defaultValue: false,
+      description: 'Jenkins VM: run E2E on iOS (iPhone 12) WebKit profile.'
+    ),
+    booleanParam(
+      name: 'MOBILE_IPAD_TESTS',
+      defaultValue: false,
+      description: 'Jenkins VM: run E2E on iPad Pro 11 WebKit profile.'
+    ),
+    // 4) Sauce Labs — tag filter then platform matrix (see .sauce/config-sauce-nightly.yml suite names)
+    string(
+      name: 'SAUCE_GREP',
+      defaultValue: '@crossbrowser',
+      description: 'Sauce only — Playwright title grep passed to saucectl (e.g. @crossbrowser).'
+    ),
+    booleanParam(
+      name: 'SAUCE_MAC13_CHROME',
+      defaultValue: true,
+      description: 'Sauce suite: macOS 13 — Chrome (pcs-frontend-mac13-chrome).'
+    ),
+    booleanParam(
+      name: 'SAUCE_MAC13_FIREFOX',
+      defaultValue: true,
+      description: 'Sauce suite: macOS 13 — Firefox (pcs-frontend-mac13-firefox).'
+    ),
+    booleanParam(
+      name: 'SAUCE_MAC_SAFARI',
+      defaultValue: true,
+      description: 'Sauce suite: macOS 13 — WebKit / Safari engine (pcs-frontend-mac13-webkit).'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_CHROME',
+      defaultValue: true,
+      description: 'Sauce suite: Windows 11 — Chrome (pcs-frontend-win11-chrome).'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_EDGE',
+      defaultValue: true,
+      description: 'Sauce suite: Windows 11 — Edge (pcs-frontend-win11-edge).'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_FIREFOX',
+      defaultValue: true,
+      description: 'Sauce suite: Windows 11 — Firefox (pcs-frontend-win11-firefox).'
     ),
   ])
 ])
