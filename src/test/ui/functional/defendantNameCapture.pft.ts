@@ -27,9 +27,23 @@ export async function defendantNameCaptureErrorValidation(): Promise<void> {
     header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
     message: defendantNameCapture.enterFirstNameMaxLengthErrorMessage,
   });
+  await performAction('inputText', defendantNameCapture.lastNameTextLabel, overMaxLengthString);
   await performValidation('errorMessage', {
     header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
-    message: defendantNameCapture.enterFirstNameMaxLengthErrorMessage,
+    message: defendantNameCapture.enterLastNameMaxLengthErrorMessage,
+  });
+
+  //Test: Both first name and last name for emoji
+  await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantNameCapture.emojiTextInput);
+  await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
+    message: defendantNameCapture.emojiFirstNameErrorMessage,
+  });
+  await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantNameCapture.emojiTextInput);
+  await performValidation('errorMessage', {
+    header: defendantNameCapture.thereIsAProblemErrorMessageHeader,
+    message: defendantNameCapture.emojiLastNameErrorMessage,
   });
 }
 export async function defendantNameCaptureNavigationTests(): Promise<void> {
