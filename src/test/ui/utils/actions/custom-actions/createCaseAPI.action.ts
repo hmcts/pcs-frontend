@@ -12,6 +12,17 @@ import {
 import { user } from '../../../data/user-data';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
+function assertCcdApiAuthEnv(): void {
+  if (!process.env.BEARER_TOKEN?.trim() || !process.env.SERVICE_AUTH_TOKEN?.trim()) {
+    throw new Error(
+      'CCD API: BEARER_TOKEN and/or SERVICE_AUTH_TOKEN is missing. On Sauce, set them in .sauce env (or issue on the agent) so globalSetup can write setup-env.json; workers load it when controller imports.'
+    );
+  }
+  if (!process.env.DATA_STORE_URL_BASE?.trim()) {
+    throw new Error('CCD API: DATA_STORE_URL_BASE is missing.');
+  }
+}
+
 export class CreateCaseAPIAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -27,9 +38,21 @@ export class CreateCaseAPIAction implements IAction {
   }
 
   private async createCaseAPI(caseData: actionData): Promise<void> {
+    assertCcdApiAuthEnv();
     const createCaseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
-    const CREATE_EVENT_TOKEN = (await createCaseApi.get(createCaseEventTokenApiData.createCaseEventTokenApiEndPoint))
-      .data.token;
+    let CREATE_EVENT_TOKEN: string;
+    try {
+      CREATE_EVENT_TOKEN = (await createCaseApi.get(createCaseEventTokenApiData.createCaseEventTokenApiEndPoint)).data
+        .token;
+    } catch (error: unknown) {
+      if (Axios.isAxiosError(error)) {
+        const detail = error.response?.data !== null ? JSON.stringify(error.response.data).slice(0, 2000) : '';
+        throw new Error(
+          `createCaseAPI: event-token GET failed (${error.response?.status ?? 'no status'}). ${error.message}${detail ? ` — body: ${detail}` : ''}`
+        );
+      }
+      throw error;
+    }
     const createCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
     const createResponse = await createCaseApi.post(createCaseApiData.createCaseApiEndPoint, {
       data: createCasePayloadData,
@@ -41,6 +64,7 @@ export class CreateCaseAPIAction implements IAction {
   }
 
   private async submitCaseAPI(caseData: actionData): Promise<void> {
+    assertCcdApiAuthEnv();
     const submitCaseApi = Axios.create(submitCaseEventTokenApiData.createCaseApiInstance());
     const SUBMIT_EVENT_TOKEN = (await submitCaseApi.get(submitCaseEventTokenApiData.submitCaseEventTokenApiEndPoint()))
       .data.token;
