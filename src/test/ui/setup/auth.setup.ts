@@ -17,7 +17,8 @@ const KEYS_TO_SNAPSHOT = [
 
 setup.describe.configure({ mode: 'serial' });
 
-setup('S2S and IDAM tokens for API helpers', async () => {
+// Tags so this project is not filtered out when Playwright/Sauce use @nightly (Jenkins VM) or @crossbrowser (saucectl).
+setup('@nightly @crossbrowser setup: S2S and IDAM tokens for API helpers', async () => {
   clearEmvLocksIfLocal();
   await getS2SToken();
   await getAccessToken();

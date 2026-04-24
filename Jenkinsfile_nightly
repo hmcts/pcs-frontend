@@ -186,7 +186,7 @@ def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
   env.SAUCE_GREP = (params.SAUCE_GREP?.trim()) ?: '@crossbrowser'
-  def tag = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@crossbrowser'
+  def tag = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@nightly'
   env.E2E_TEST_SCOPE = tag
   env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
