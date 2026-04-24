@@ -8,6 +8,9 @@ import * as path from 'path';
 import { getAccessToken, getS2SToken } from '../config/global-setup.config';
 
 async function main(): Promise<void> {
+  console.log(
+    '[E2E tokens] Minting S2S + IDAM on this machine (Jenkins agent or local shell running mint-e2e-tokens-for-sauce).'
+  );
   await getS2SToken();
   await getAccessToken();
 
@@ -25,7 +28,9 @@ async function main(): Promise<void> {
 
   const dir = path.join(process.cwd(), '.sauce');
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'minted-tokens.json'), JSON.stringify(payload), 'utf8');
+  const outFile = path.join(dir, 'minted-tokens.json');
+  fs.writeFileSync(outFile, JSON.stringify(payload), 'utf8');
+  console.log(`[E2E tokens] Wrote ${outFile} for Jenkins/sauce-run to pass into Sauce.`);
 }
 
 main().catch((err: unknown) => {

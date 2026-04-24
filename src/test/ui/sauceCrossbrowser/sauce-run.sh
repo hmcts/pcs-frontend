@@ -1,7 +1,35 @@
 #!/usr/bin/env bash
-# Jenkins: SAUCE_SUITE_NAMES → one yarn test:sauce:nightly per suite; else single suite via SAUCE_SUITE_NAME.
-# SAUCE_GREP: Jenkins string param SAUCE_GREP → env (setFunctionalTestEnvVars); default here matches Jenkins default.
+# Local / CI: mint S2S + IDAM on this machine when tokens are not already exported, then run saucectl.
+# Jenkins nightly still mints in Jenkinsfile and passes env into saucectl; this path is for yarn test:crossbrowser.
+# SAUCE_GREP / SAUCE_SUITE_NAME(S) behave as before.
 set -euo pipefail
+
+if git rev-parse --show-toplevel >/dev/null 2>&1; then
+  cd "$(git rev-parse --show-toplevel)"
+else
+  _script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  cd "${_script_dir}/../../../.." || exit 1
+fi
+
+if [[ -z "${SERVICE_AUTH_TOKEN:-}" || -z "${BEARER_TOKEN:-}" ]]; then
+  echo "[E2E tokens] Minting on this shell before saucectl (yarn mint:e2e-tokens-for-sauce). Export SERVICE_AUTH_TOKEN + BEARER_TOKEN to skip."
+  if [[ ! -d node_modules ]]; then
+    yarn ci:install
+  fi
+  yarn mint:e2e-tokens-for-sauce
+  if [[ -f .sauce/minted-tokens.json ]]; then
+    eval "$(node -e "
+      const fs = require('fs');
+      const j = JSON.parse(fs.readFileSync('.sauce/minted-tokens.json', 'utf8'));
+      for (const [k, v] of Object.entries(j)) {
+        if (typeof v === 'string' && v) process.stdout.write('export ' + k + '=' + JSON.stringify(v) + '\\n');
+      }
+    ")"
+    rm -f .sauce/minted-tokens.json
+  fi
+else
+  echo "[E2E tokens] SERVICE_AUTH_TOKEN + BEARER_TOKEN already set; skipping mint in sauce-run.sh."
+fi
 
 export SAUCE_GREP="${SAUCE_GREP:-@crossbrowser}"
 
