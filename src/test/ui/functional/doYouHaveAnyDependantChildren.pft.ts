@@ -24,6 +24,19 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
     message: doYouHaveAnyDependantChildren.mustBeUnderCharacterLimitErrorMessage,
   });
+
+  //Test: emoji
+  await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
+  await performAction(
+    'inputText',
+    doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
+    doYouHaveAnyDependantChildren.emojiTextInput
+  );
+  await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
+    message: doYouHaveAnyDependantChildren.emojiExplainPartsOfClaimErrorMessage,
+  });
 }
 
 export async function doYouHaveAnyDependantChildrenNavigationTests(): Promise<void> {
