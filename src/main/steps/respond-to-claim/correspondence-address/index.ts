@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
+import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -185,11 +186,14 @@ export const step: StepDefinition = createFormStep({
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
     const isAddressKnown = formattedAddressStr !== '?';
 
+    const claimantName = getClaimantName(req);
+
     const radio = formContent.fields.find(f => f.componentType === 'radios') as
       | {
           component: {
             label: { text: string };
             fieldset: { legend: { text: string; isPageHeading?: boolean } };
+            hint: { text: string };
           };
         }
       | undefined;
@@ -203,6 +207,9 @@ export const step: StepDefinition = createFormStep({
       radio.component.label.text = prepopulateHeading;
       radio.component.fieldset.legend.text = prepopulateHeading;
       radio.component.fieldset.legend.isPageHeading = true;
+      if (radio.component.hint) {
+        radio.component.hint.text = t('legend.hint', { claimantName });
+      }
     }
 
     // TODO: Refactor to avoid mutating module-scoped `fieldsConfig` per request.

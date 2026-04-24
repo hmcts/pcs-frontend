@@ -1,6 +1,7 @@
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({
@@ -13,7 +14,6 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     heading: 'heading',
     caption: 'caption',
-    paragraph1: 'paragraph1',
     paragraph2: 'paragraph2',
     paragraph3: 'paragraph3',
     paragraph4: 'paragraph4',
@@ -21,4 +21,12 @@ export const step: StepDefinition = createFormStep({
     bullet2: 'bullet2',
   },
   fields: [],
+  extendGetContent: req => {
+    const claimantName = getClaimantName(req);
+    const t = getTranslationFunction(req, 'payment-interstitial', ['common']);
+
+    return {
+      paragraph1: t('paragraph1', { claimantName }),
+    };
+  },
 });
