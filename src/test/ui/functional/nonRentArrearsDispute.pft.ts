@@ -1,9 +1,9 @@
 import {
+  confirmationOfNoticeDateWhenNotProvided,
+  confirmationOfNoticeDateWhenProvided,
   confirmationOfNoticeGiven,
   dashboard,
   nonRentArrearsDispute,
-  noticeDateWhenNotProvided,
-  noticeDateWhenProvided,
   rentArrears,
   tenancyDateDetails,
   tenancyDateUnknown,
@@ -42,13 +42,21 @@ export async function noRentArrearsNavigationTests(): Promise<void> {
     if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
       await performValidation('pageNavigation', nonRentArrearsDispute.backLink, confirmationOfNoticeGiven.mainHeader);
     } else {
-      await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenProvided.mainHeader);
+      await performValidation(
+        'pageNavigation',
+        nonRentArrearsDispute.backLink,
+        confirmationOfNoticeDateWhenProvided.mainHeader
+      );
     }
   } else if (process.env.NOTICE_SERVED === 'YES' && process.env.NOTICE_DATE_PROVIDED === 'NO') {
     if (process.env.NOTICE_DETAILS_NO_NOTSURE === 'YES') {
       await performValidation('pageNavigation', nonRentArrearsDispute.backLink, confirmationOfNoticeGiven.mainHeader);
     } else {
-      await performValidation('pageNavigation', nonRentArrearsDispute.backLink, noticeDateWhenNotProvided.mainHeader);
+      await performValidation(
+        'pageNavigation',
+        nonRentArrearsDispute.backLink,
+        confirmationOfNoticeDateWhenNotProvided.mainHeader
+      );
     }
   }
 
