@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
+  confirmationOfNoticeDateWhenNotProvided,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -23,7 +24,6 @@ import {
   landlordRegistered,
   languageUsed,
   nonRentArrearsDispute,
-  noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   paymentInterstitial,
   rentArrears,
@@ -327,12 +327,12 @@ export class RespondToClaimAction implements IAction {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', noticeDateWhenProvided.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
+        ['inputText', confirmationOfNoticeDateWhenNotProvided.dayTextLabel, noticeData.day],
+        ['inputText', confirmationOfNoticeDateWhenNotProvided.monthTextLabel, noticeData.month],
+        ['inputText', confirmationOfNoticeDateWhenNotProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
+    await performAction('clickButton', confirmationOfNoticeDateWhenNotProvided.saveAndContinueButton);
   }
 
   private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {

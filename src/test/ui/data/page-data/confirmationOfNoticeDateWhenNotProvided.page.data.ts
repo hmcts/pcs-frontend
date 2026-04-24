@@ -1,6 +1,6 @@
 // import { submitCaseApiData } from '../api-data';
 
-export const noticeDateWhenNotProvided = {
+export const confirmationOfNoticeDateWhenNotProvided = {
   mainHeader: `Notice date`,
   respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
@@ -10,6 +10,7 @@ export const noticeDateWhenNotProvided = {
   dayTextLabel: `Day`,
   monthTextLabel: `Month`,
   yearTextLabel: `Year`,
+
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   signOutLink: `Sign out`,

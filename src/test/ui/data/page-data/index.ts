@@ -12,7 +12,7 @@ export * from './contactPreferencesTelephone.page.data';
 export * from './contactPreferencesTextMessage.page.data';
 export * from './confirmationOfNoticeGiven.page.data';
 export * from './noticeDateWhenProvided.page.data';
-export * from './noticeDateWhenNotProvided.page.data';
+export * from './confirmationOfNoticeDateWhenNotProvided.page.data';
 export * from './contactPreferenceEmailOrPost.page.data';
 export * from './rentArrears.page.data';
 export * from './nonRentArrearsDispute.page.data';
