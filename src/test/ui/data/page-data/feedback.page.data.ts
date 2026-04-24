@@ -1,6 +1,6 @@
 export const feedback = {
   finishSurveyButton: `Finish Survey`,
-  tellUsWhatYouThinkParagraph: `Tell us what you xxxx think!`,
+  tellUsWhatYouThinkParagraph: `Tell us what you think!`,
   weReallyAppreciateYourFeedbackParagraph: `We'd really appreciate your feedback, but please note, you will not receive a reply to comments left here`,
   ifYouHaveAProblemParagraph: `If you have a problem that needs a response, please contact us on;`,
   telephoneNumberParagraph: `Phone: [telephone number tbc] (Opening times Monday to Friday, XXam to XXpm)`,
