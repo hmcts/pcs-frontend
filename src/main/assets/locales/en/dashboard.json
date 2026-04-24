@@ -11,7 +11,7 @@
 
   "taskGroups": {
     "CLAIM": "The claim",
-    "HEARING": "Hearing",
+    "HEARING": "Court Hearings",
     "JUDGEMENT": "Judgement from the court",
     "NOTICE": "Orders and notices from the court",
     "RESPONSE": "The response",
@@ -42,6 +42,8 @@
       "ViewClaim": { "title": "View the claim" },
       "RespondToClaim": { "title": "Respond to the claim" },
       "ViewDocuments": { "title": "View documents" },
+      "ViewHearingDocuments": { "title": "View hearing documents" },
+      "ViewOrdersAndNotices": { "title": "View orders and notices" },
       "ReviewResponse": { "title": "Review the response" },
       "SubmitResponse": { "title": "Submit the response" }
     }
