@@ -651,7 +651,7 @@ test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - 
 });
 
 test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
-  /*await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+  await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
   await performAction('inputDefendantDetails', {
     fName: defendantNameCapture.firstNameTextInput,
     lName: defendantNameCapture.lastNameTextInput,
@@ -733,11 +733,7 @@ test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided
   await performValidation('mainHeader', priorityDebts.mainHeader);
   await performAction('clickButton', priorityDebts.continueButton);
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-  await performAction('clickButton', priorityDebtDetails.continueButton);*/
-  await performAction(
-    'navigateToUrl',
-    home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/what-other-regular-expenses-do-you-have`
-  );
+  await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave', {
     regularIncomeOptions: [
       [
