@@ -2,7 +2,15 @@ import type { Request } from 'express';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
-export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup';
+export type FormFieldType =
+  | 'radio'
+  | 'checkbox'
+  | 'text'
+  | 'date'
+  | 'textarea'
+  | 'character-count'
+  | 'postcodeLookup'
+  | 'file';
 export type ComponentType =
   | 'input'
   | 'textarea'
@@ -10,7 +18,8 @@ export type ComponentType =
   | 'radios'
   | 'checkboxes'
   | 'dateInput'
-  | 'postcodeLookup';
+  | 'postcodeLookup'
+  | 'fileUpload';
 
 export interface FormFieldOption {
   value?: string;
@@ -67,6 +76,11 @@ export interface FormFieldConfig {
     formData?: Record<string, unknown>,
     allData?: Record<string, unknown>
   ) => boolean | string;
+  // File upload configuration
+  accept?: string;
+  maxFileSize?: number;
+  uploadUrl?: string;
+  deleteUrl?: string;
   // For date fields: prevent future dates from being entered
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
