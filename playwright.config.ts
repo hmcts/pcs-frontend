@@ -62,13 +62,19 @@ function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
 }
 
 const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
-// Tags come from Jenkins choices or PR labels. Unset -> @nightly; empty -> no grep.
-const e2eTag = process.env.E2E_TEST_SCOPE ?? '@smoke';
+// Do not set grep at config root — it applies to the `setup` project too and breaks Sauce (suite grep @crossbrowser).
+// Browser projects: only when E2E_TEST_SCOPE is set (e.g. Jenkins VM). Unset/empty = no config grep; use CLI --grep or suite grep instead.
+const rawE2eScope = process.env.E2E_TEST_SCOPE;
+const e2eTag = typeof rawE2eScope === 'string' && rawE2eScope.trim() !== '' ? rawE2eScope.trim() : '';
+const browserGrep = e2eTag ? { grep: new RegExp(e2eTag) } : {};
+// Sauce (`PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS`): only suite `grep` in .sauce/*.yml (e.g. SAUCE_GREP). No E2E_SPEC / E2E_TEST_SCOPE narrowing here.
+const resolvedTestMatch =
+  e2eSpecTestMatch?.length && !sauceFullJourneyArtifacts ? { testMatch: e2eSpecTestMatch } : {};
+const browserGrepForRun = sauceFullJourneyArtifacts ? {} : browserGrep;
 
 export default defineConfig({
   testDir: './src/test/ui',
-  ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
-  ...(e2eTag ? { grep: new RegExp(e2eTag) } : {}),
+  ...resolvedTestMatch,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -105,6 +111,7 @@ export default defineConfig({
     {
       name: 'chrome',
       dependencies: ['setup'],
+      ...browserGrepForRun,
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
@@ -119,6 +126,7 @@ export default defineConfig({
           {
             name: 'firefox',
             dependencies: ['setup'],
+            ...browserGrepForRun,
             use: {
               ...devices['Desktop Firefox'],
               channel: 'firefox',
@@ -131,6 +139,7 @@ export default defineConfig({
           {
             name: 'webkit',
             dependencies: ['setup'],
+            ...browserGrepForRun,
             use: {
               ...devices['Desktop Safari'],
               channel: 'webkit',
@@ -143,6 +152,7 @@ export default defineConfig({
           {
             name: 'edge',
             dependencies: ['setup'],
+            ...browserGrepForRun,
             use: {
               ...devices['Desktop Edge'],
               channel: 'msedge',
@@ -155,6 +165,7 @@ export default defineConfig({
           {
             name: 'MicrosoftEdge',
             dependencies: ['setup'],
+            ...browserGrepForRun,
             use: {
               ...devices['Desktop Edge'],
               ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
@@ -167,6 +178,7 @@ export default defineConfig({
           {
             name: 'mobile-android',
             dependencies: ['setup'],
+            ...browserGrepForRun,
             use: {
               ...devices['Pixel 5'],
               ...captureSettings,
@@ -177,6 +189,7 @@ export default defineConfig({
           {
             name: 'mobile-ios',
             dependencies: ['setup'],
+            ...browserGrepForRun,
             use: {
               ...devices['iPhone 12'],
               ...captureSettings,
@@ -187,6 +200,7 @@ export default defineConfig({
           {
             name: 'mobile-ipad',
             dependencies: ['setup'],
+            ...browserGrepForRun,
             use: {
               ...devices['iPad Pro 11'],
               ...captureSettings,
