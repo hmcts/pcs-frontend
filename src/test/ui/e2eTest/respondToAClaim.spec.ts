@@ -278,7 +278,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
+  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @smoke @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -735,7 +735,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @smoke @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -828,7 +828,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
