@@ -5,7 +5,7 @@ export default {
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'defendant-name-confirmation': 'defendantNameConfirmation',
-  'defendant-date-of-birth': 'defendantDateOfBirth',
+  'date-of-birth': 'dateOfBirth',
   'contact-preferences-telephone': 'contactPreferencesTelephone',
   'contact-preferences-text-message': 'contactPreferencesTextMessage',
   'dispute-claim-interstitial': 'disputeClaimInterstitial',
@@ -53,5 +53,8 @@ export default {
   'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
+  'have-you-applied-for-universal-credit': 'haveYouAppliedForUniversalCredit',
+  'priority-debt-details': 'priorityDebtDetails',
+  'priority-debts': 'priorityDebts',
   'language-used': 'languageUsed',
 };
