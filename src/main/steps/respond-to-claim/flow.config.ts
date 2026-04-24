@@ -101,6 +101,8 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debts',
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
+    'other-considerations',
+    'upload-docs',
     'equality-and-diversity-start',
     'equality-and-diversity-end',
     'language-used',
@@ -502,6 +504,14 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'what-other-regular-expenses-do-you-have': {
       previousStep: 'priority-debt-details',
+      defaultNext: 'other-considerations',
+    },
+    'other-considerations': {
+      previousStep: 'what-other-regular-expenses-do-you-have',
+      defaultNext: 'upload-docs',
+    },
+    'upload-docs': {
+      previousStep: 'other-considerations',
       defaultNext: 'equality-and-diversity-start',
     },
     'equality-and-diversity-start': {

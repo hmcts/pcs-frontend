@@ -24,6 +24,7 @@ import {
   installmentPayments,
   languageUsed,
   nonRentArrearsDispute,
+  otherConsiderations,
   priorityDebtDetails,
   priorityDebts,
   rentArrears,
@@ -32,6 +33,7 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -270,6 +272,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
@@ -364,6 +372,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
@@ -456,6 +469,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
@@ -550,6 +568,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
@@ -638,6 +661,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
@@ -727,6 +755,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
@@ -820,6 +853,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
@@ -917,6 +955,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
@@ -1007,6 +1050,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
