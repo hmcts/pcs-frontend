@@ -1,5 +1,5 @@
 import { type Session, type SessionData } from 'express-session';
-import { type TokenEndpointResponse, type UserInfoResponse } from 'openid-client';
+import { type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
 import { type Environment } from 'nunjucks';
 import { type CcdCase } from '@services/ccdCase.interface';
@@ -14,15 +14,6 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   refreshToken: string;
 }
 
-export interface AddressLookupSessionData {
-  [stepId: string]: {
-    [fieldNamePrefix: string]: {
-      postcode?: string;
-      addresses?: any[];
-    };
-  };
-}
-
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
@@ -30,20 +21,10 @@ interface CustomSessionData extends SessionData {
   returnTo?: string;
   formData?: Record<string, any>;
   ccdCase?: CcdCase;
-  caseReference?: string;
   genApp?: {
     applicationId?: string;
     showDuplicateSubmissionPage?: boolean;
   };
-  postcodeLookupResult?: any[];
-  lookupPostcode?: string;
-  lookupError?: { field: string; text: string };
-  _addressLookup?: AddressLookupSessionData;
-  //TODO: currently served from LaunchDarkly flag - remove this once CCD case is implemented
-  defendantName?: string;
-  noticeDate?: string;
-  noticeServed?: boolean;
-  rentarrears?: boolean;
   destroy(callback: (err?: Error) => void): void;
 }
 
