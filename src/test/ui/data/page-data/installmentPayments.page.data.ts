@@ -1,7 +1,8 @@
 export const installmentPayments = {
   mainHeader: `Making an offer to pay your arrears`,
   respondToClaimParagraph: `Respond to a property possession claim`,
-  fromYourPreviousAnswerParagraph:() => `From your previous answers, you have not come to any arrangement with ${process.env.CLAIMANT_NAME} to pay off your rent arrears.`,
+  fromYourPreviousAnswerParagraph: () =>
+    `From your previous answers, you have not come to any arrangement with ${process.env.CLAIMANT_NAME} to pay off your rent arrears.`,
   youCanOfferToPayParagraph: `You can offer to pay off your arrears in instalments and say how much you’d be able to afford to pay and how frequently.`,
   atTheHearingParagraph: `At the hearing, the judge will look at your offer and the details of your income and expenses you choose to share. They will decide if your offer is affordable.`,
   youBeAbleToTellTheJudgeParagraph: `You’ll be able to tell the judge if the amount you can afford to pay has changed.`,
