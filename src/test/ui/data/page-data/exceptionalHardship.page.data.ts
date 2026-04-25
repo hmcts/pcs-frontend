@@ -15,7 +15,7 @@ export const exceptionalHardship = {
   detailsTextInput: `mention Exceptional hardship here`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  giveDetailsHiddenTextLabel: `Give details about the exceptional hardship you'd experience`,
+  giveDetailsHiddenTextLabel: `Give details about the exceptional hardship you’d experience`,
   youCanEnterUpToHiddenHintText: `You can enter up to 500 characters`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   backLink: `Back`,
