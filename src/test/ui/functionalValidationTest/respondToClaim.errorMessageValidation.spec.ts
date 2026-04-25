@@ -68,27 +68,13 @@ import {
 } from '../utils/common/error-message-validation-helper';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
+import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
 
 const home_url = config.get('e2e.testUrl') as string;
 let claimantName: string;
 
 const NO_EMV_READ_ONLY = 'Read-only / informational screen — no field error validation.';
-
-async function continueThroughIncomeDebtsEquality(): Promise<void> {
-  await performActions(
-    'Continue through place holder pages for income, debts, expenses, equality',
-    ['clickButton', incomeAndExpenses.continueButton],
-    ['clickButton', whatRegularIncomeDoYouReceive.continueButton],
-    ['clickButton', haveYouAppliedForUniversalCredit.continueButton],
-    ['clickButton', priorityDebts.continueButton],
-    ['clickButton', priorityDebtDetails.continueButton],
-    ['clickButton', whatOtherRegularExpensesDoYouHave.continueButton],
-    ['clickButton', equalityAndDiversityStart.continueButton],
-    ['clickButton', equalityAndDiversityEnd.continueButton]
-  );
-}
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -337,7 +323,15 @@ test.describe('Respond to claim — error message validation @nightly @error', (
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
 
-    await continueThroughIncomeDebtsEquality();
+    await softErrorMessageValidation('incomeAndExpenses', 'Place holder page - No EMV yet');
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
@@ -474,7 +468,14 @@ test.describe('Respond to claim — error message validation @nightly @error', (
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
 
-    await continueThroughIncomeDebtsEquality();
+    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await performAction('clickButton', priorityDebts.continueButton);
+    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
