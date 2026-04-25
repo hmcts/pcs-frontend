@@ -22,6 +22,7 @@ import {
   incomeAndExpenses,
   languageUsed,
   nonRentArrearsDispute,
+  otherConsiderations,
   priorityDebtDetails,
   priorityDebts,
   rentArrears,
@@ -30,6 +31,7 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
+  uploadDocuments,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -50,6 +52,7 @@ import { doYouHaveAnyDependantChildrenErrorValidation } from '../functional/doYo
 import { doYouHaveAnyOtherDependantsErrorValidation } from '../functional/doYouHaveAnyOtherDependants.pft';
 import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
 import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pft';
+import { incomeAndExpensesErrorValidation } from '../functional/incomeAndExpenses.pft';
 import { languageUsedErrorValidation } from '../functional/languageUsed.pft';
 import { nonRentArrearsDisputeErrorValidation } from '../functional/nonRentArrearsDispute.pft';
 import { noticeDateWhenProvidedErrorValidation } from '../functional/noticeDateWhenProvided.pft';
@@ -59,6 +62,7 @@ import { repaymentsMadeErrorValidation } from '../functional/repaymentsMade.pft'
 import { tenancyDateDetailsErrorValidation } from '../functional/tenancyDateDetails.pft';
 import { tenancyDateUnknownErrorValidation } from '../functional/tenancyDateUnknown.pft';
 import { tenancyTypeDetailsErrorValidation } from '../functional/tenancyTypeDetails.pft';
+import { whatRegularIncomeDoYouReceiveErrorValidation } from '../functional/whatRegularIncomeDoYouReceive.pft';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation } from '../functional/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.pft';
 import { yourCircumstancesErrorValidation } from '../functional/yourCircumstances.pft';
 import {
@@ -75,6 +79,7 @@ const home_url = config.get('e2e.testUrl') as string;
 let claimantName: string;
 
 const NO_EMV_READ_ONLY = 'Read-only / informational screen — no field error validation.';
+const NO_EMV_PENDING_PFT = 'No field-level error message validation (PFT) for this page yet.';
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -264,6 +269,7 @@ test.describe('Respond to claim — error message validation @nightly @PR', () =
     await softErrorMessageValidation('rentArrears', rentArrearsErrorValidation);
     await performAction('rentArrears', { option: rentArrears.yesRadioOption });
 
+    await softErrorMessageValidation('counterClaim', NO_EMV_READ_ONLY);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
 
@@ -323,14 +329,67 @@ test.describe('Respond to claim — error message validation @nightly @PR', () =
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
 
-    await softErrorMessageValidation('incomeAndExpenses', 'Place holder page - No EMV yet');
-    await performAction('clickButton', incomeAndExpenses.saveAndContinueButton);
-    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+
+    await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
+    await performAction('selectWhatRegularIncomeDoYouReceive', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
+          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.universalCreditParagraph,
+          whatRegularIncomeDoYouReceive.universalCreditTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
+          whatRegularIncomeDoYouReceive.pensionTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
+          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
+          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
+        ],
+      ],
+    });
+
+    await softErrorMessageValidation('priorityDebts', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
+
+    await softErrorMessageValidation('priorityDebtDetails', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
+
+    await softErrorMessageValidation('whatOtherRegularExpensesDoYouHave', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+
+    await softErrorMessageValidation('otherConsiderations', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
+    await performAction('clickButton', otherConsiderations.continueButton);
+
+    await softErrorMessageValidation('uploadDocuments', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performAction('clickButton', uploadDocuments.continueButton);
+
+    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
+
+    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
@@ -411,6 +470,7 @@ test.describe('Respond to claim — error message validation @nightly @PR', () =
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
 
+    await softErrorMessageValidation('counterClaim', NO_EMV_READ_ONLY);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
 
@@ -468,13 +528,44 @@ test.describe('Respond to claim — error message validation @nightly @PR', () =
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
 
-    await performAction('clickButton', incomeAndExpenses.continueButton);
-    await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
+    await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+
+    await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+
+    await softErrorMessageValidation('haveYouAppliedForUniversalCredit', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+
+    await softErrorMessageValidation('priorityDebts', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
+
+    await softErrorMessageValidation('priorityDebtDetails', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
+
+    await softErrorMessageValidation('whatOtherRegularExpensesDoYouHave', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+
+    await softErrorMessageValidation('otherConsiderations', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', otherConsiderations.mainHeader);
+    await performAction('clickButton', otherConsiderations.continueButton);
+
+    await softErrorMessageValidation('uploadDocuments', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', uploadDocuments.mainHeader);
+    await performAction('clickButton', uploadDocuments.continueButton);
+
+    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
+
+    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PENDING_PFT);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
@@ -482,7 +573,6 @@ test.describe('Respond to claim — error message validation @nightly @PR', () =
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-
     assertAllErrorMessageValidations();
   });
 });
