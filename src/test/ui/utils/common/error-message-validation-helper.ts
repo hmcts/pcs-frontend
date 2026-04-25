@@ -2,7 +2,7 @@ import { type StepContext, step as allureStep } from 'allure-js-commons';
 
 import { ErrorMessageValidation } from '../validations/custom-validations';
 
-/** Marks the Allure step failed; caught outside so the test keeps running. */
+/** Swallowed after the Allure step so the journey continues; step still records as failed. */
 class SoftEmvStepFailed extends Error {
   constructor(detail: string) {
     super(detail);
@@ -31,24 +31,23 @@ export async function softErrorMessageValidation(
   try {
     await allureStep(`EMV: ${pageKey}`, async () => {
       const start = ErrorMessageValidation.peekResultsLength();
-      let thrown: unknown;
-      try {
-        //PFT error validation function gets triggered here
-        await pftFun();
-      } catch (e) {
-        thrown = e;
-      }
+      let pftError: unknown;
+      await pftFun().catch(e => {
+        pftError = e;
+      });
 
-      const failed = ErrorMessageValidation.getResultsSliceSince(start).filter(r => !r.passed);
-      const fromCatch = thrown !== undefined && thrown !== null;
-      if (!fromCatch && failed.length === 0) {
+      const failedMessageChecks = ErrorMessageValidation.getResultsSliceSince(start).filter(r => !r.passed);
+      const pftCrashed = pftError !== undefined && pftError !== null;
+
+      if (!pftCrashed && failedMessageChecks.length === 0) {
         return;
       }
 
-      const error = fromCatch ? asText(thrown) : failed.map(r => `${r.pageName || pageKey}: ${r.expected}`).join('\n');
-
-      failures.push({ pageKey, error });
-      throw new SoftEmvStepFailed(error);
+      const detail = pftCrashed
+        ? asText(pftError)
+        : failedMessageChecks.map(r => `${r.pageName || pageKey}: ${r.expected}`).join('\n');
+      failures.push({ pageKey, error: detail });
+      throw new SoftEmvStepFailed(detail);
     });
   } catch (e) {
     if (e instanceof SoftEmvStepFailed) {
@@ -62,8 +61,8 @@ export function assertAllErrorMessageValidations(): void {
   if (!failures.length) {
     return;
   }
-  const blocks = failures.map(f => `${f.pageKey}:\n${f.error}`).join('\n\n---\n\n');
-  throw new Error(`Soft EMV failures (${failures.length}):\n\n${blocks}`);
+  const body = failures.map(f => `${f.pageKey}:\n${f.error}`).join('\n\n---\n\n');
+  throw new Error(`Soft EMV failures (${failures.length}):\n\n${body}`);
 }
 
 export function clearErrorMessageValidationFailures(): void {
