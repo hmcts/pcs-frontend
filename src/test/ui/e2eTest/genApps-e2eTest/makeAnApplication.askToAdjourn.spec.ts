@@ -1,5 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
+  areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   askToAdjournTheCourtHearing,
   checkYourAnswers,
   chooseAnApplication,
@@ -39,7 +40,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] @regression @smoke', async () => {
+  test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] @regression @smoke @PR', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.adjournTheHearingRadioOption,
@@ -64,8 +65,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-    await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
-    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performAction('confirmOtherPartiesAgreed', {
+      question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
+      option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
+    });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
@@ -73,13 +76,17 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
-    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performAction('selectLanguageUsedToComplete', {
+      question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
+      option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
+    });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 
-  test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression', async () => {
+  test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression @PR', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.adjournTheHearingRadioOption,
@@ -92,5 +99,28 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: isTheCourtHearingInTheNext14Days.noRadioOption,
     });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+    await performAction('confirmOtherPartiesAgreed', {
+      question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
+      option: haveTheOtherPartiesAgreedToThisApplication.noRadioOption,
+    });
+    await performValidation('mainHeader', areThereAnyReasonsThatThisApplicationShouldNotBeShared.mainHeader);
+    await performAction('reasonsApplicationShouldNotBeShared', {
+      question: areThereAnyReasonsThatThisApplicationShouldNotBeShared.areThereAnyReasonQuestion,
+      option: areThereAnyReasonsThatThisApplicationShouldNotBeShared.yesRadioOption,
+      label: areThereAnyReasonsThatThisApplicationShouldNotBeShared.provideReasonHiddenTextLabel,
+      input: areThereAnyReasonsThatThisApplicationShouldNotBeShared.provideReasonTextInput,
+    });
+    await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
+    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.noRadioOption);
+    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performAction('selectLanguageUsedToComplete', {
+      question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
+      option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
+    });
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
   });
 });
