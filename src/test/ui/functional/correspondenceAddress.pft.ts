@@ -1,6 +1,14 @@
 import { correspondenceAddress, dashboard, defendantDateOfBirth } from '../data/page-data';
 import { performAction, performValidation, performValidations } from '../utils/controller';
 
+export async function correspondenceAddressKnownErrorValidation(): Promise<void> {
+  await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: correspondenceAddress.thereIsAProblemErrorMessageHeader,
+    message: correspondenceAddress.pleaseConfirmYourAddressErrorMessage,
+  });
+}
+
 export async function correspondenceAddressErrorValidation(): Promise<void> {
   await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   await performValidation('errorMessage', {

@@ -137,11 +137,10 @@ export async function performValidation(
         : ['', inputFieldName];
 
   const validationInstance = ValidationRegistry.getValidation(validation);
-  await test.step(`Validated ${validation}${
+  const validationStepText = `Validated ${validation}${
     fieldName ? ` - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'` : ''
-  }${
-    data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''
-  }`, async () => {
+  }${data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''}`;
+  await test.step(validationStepText, async () => {
     await validationInstance.validate(executor.page, validation, fieldName, data);
   });
 }

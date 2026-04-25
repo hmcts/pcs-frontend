@@ -16,6 +16,12 @@ type ValidationResult = {
   error?: string;
 };
 
+export type ErrorMessageValidationSnapshot = {
+  pageName: string;
+  expected: string;
+  passed: boolean;
+};
+
 export class ErrorMessageValidation implements IValidation {
   private static results: ValidationResult[] = [];
   private static testCounter = 0;
@@ -341,5 +347,17 @@ export class ErrorMessageValidation implements IValidation {
     ErrorMessageValidation.pagesPassed.clear();
     ErrorMessageValidation.missingEMVFiles.clear();
     ErrorMessageValidation.emvFailed = false;
+  }
+
+  static peekResultsLength(): number {
+    return ErrorMessageValidation.results.length;
+  }
+
+  static getResultsSliceSince(start: number): ErrorMessageValidationSnapshot[] {
+    return ErrorMessageValidation.results.slice(start).map(r => ({
+      pageName: r.pageName,
+      expected: r.expected,
+      passed: r.passed,
+    }));
   }
 }
