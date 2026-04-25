@@ -23,7 +23,6 @@ if (enable_all_page_functional_tests.toLowerCase() === 'true') {
 export const enable_pft_debug_log = false;
 export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION || 'false';
 export const enable_visibility_validation = process.env.ENABLE_VISIBILITY_VALIDATION || 'false';
-export const enable_error_message_validation_new = process.env.ENABLE_ERROR_MESSAGES_VALIDATION_NEW || 'true';
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
