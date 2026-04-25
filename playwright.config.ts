@@ -48,6 +48,7 @@ function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
 }
 
 const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
+// Tags come from Jenkins choices or PR labels. Unset -> @nightly; empty -> no grep.
 const e2eTag = process.env.E2E_TEST_SCOPE ?? '';
 
 export default defineConfig({

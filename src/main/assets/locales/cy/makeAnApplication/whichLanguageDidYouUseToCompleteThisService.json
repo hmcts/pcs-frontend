@@ -1,5 +1,15 @@
 {
   "pageTitle": "cyWhich language did you use to complete this service?",
   "caption": "cyMake an application",
-  "heading": "cyWhich language did you use to complete this service?"
+  "heading": "cyWhich language did you use to complete this service?",
+  "question": "cyWhich language did you use to complete this service?",
+  "ifSomeoneElseHelpedYou": "cyIf someone else helped you to answer a question in this service, ask them if they answered any questions in Welsh. We’ll use this to make sure your claim is processed correctly.",
+  "options": {
+    "ENGLISH": "cyEnglish",
+    "WELSH": "cyWelsh",
+    "ENGLISH_AND_WELSH": "cyEnglish and Welsh"
+  },
+  "errors": {
+    "confirmLanguage": "cyConfirm which language you used to complete this service"
+  }
 }
