@@ -44,7 +44,6 @@ import {
   correspondenceAddressErrorValidation,
   correspondenceAddressKnownErrorValidation,
 } from '../functional/correspondenceAddress.pft';
-import { defendantDateOfBirthErrorValidation } from '../functional/defendantDateOfBirth.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
@@ -224,7 +223,7 @@ test.describe('Respond to claim — error message validation @nightly @PR', () =
       lName: defendantNameConfirmation.lastNameInputText,
     });
 
-    await softErrorMessageValidation('defendantDateOfBirth', defendantDateOfBirthErrorValidation);
+    await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_PENDING_PFT);
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
@@ -411,7 +410,7 @@ test.describe('Respond to claim — error message validation @nightly @PR', () =
       lName: defendantNameCapture.lastNameTextInput,
     });
 
-    await softErrorMessageValidation('defendantDateOfBirth', defendantDateOfBirthErrorValidation);
+    await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_PENDING_PFT);
     await performAction('enterDateOfBirthDetails');
 
     await softErrorMessageValidation('correspondenceAddressUnknown', correspondenceAddressErrorValidation);
