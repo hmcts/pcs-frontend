@@ -206,7 +206,7 @@ test.afterEach(() => {
   clearErrorMessageValidationFailures();
 });
 
-test.describe('Respond to claim — error message validation @nightly @error', () => {
+test.describe('Respond to claim — error message validation @nightly @PR', () => {
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression @error', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
@@ -324,7 +324,7 @@ test.describe('Respond to claim — error message validation @nightly @error', (
     });
 
     await softErrorMessageValidation('incomeAndExpenses', 'Place holder page - No EMV yet');
-    await performAction('clickButton', incomeAndExpenses.continueButton);
+    await performAction('clickButton', incomeAndExpenses.saveAndContinueButton);
     await performAction('clickButton', whatRegularIncomeDoYouReceive.continueButton);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.continueButton);
     await performAction('clickButton', priorityDebts.continueButton);
