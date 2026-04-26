@@ -67,17 +67,19 @@ export const step: StepDefinition = createFormStep({
 
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    // Reads from session for now - session removal is a separate ticket
-    const emailForm = req.session.formData?.['contact-preferences-email-or-post'];
-    if (emailForm) {
-      const emailSelected = emailForm.contactByEmailOrPost === 'email';
-      response.defendantResponses.preferenceType = emailSelected ? 'EMAIL' : 'POST';
+    const contactByEmailOrPost = req.body?.contactByEmailOrPost as 'email' | 'post' | undefined;
 
-      if (emailSelected) {
-        response.defendantContactDetails.party.emailAddress = emailForm['contactByEmailOrPost.email'];
+    if (contactByEmailOrPost === 'email') {
+      response.defendantResponses.preferenceType = 'EMAIL';
+      const email = (req.body?.['contactByEmailOrPost.email'] as string | undefined)?.trim();
+      if (email) {
+        response.defendantContactDetails.party.emailAddress = email;
       } else {
         delete response.defendantContactDetails.party.emailAddress;
       }
+    } else if (contactByEmailOrPost === 'post') {
+      response.defendantResponses.preferenceType = 'POST';
+      delete response.defendantContactDetails.party.emailAddress;
     } else {
       delete response.defendantResponses.preferenceType;
       delete response.defendantContactDetails.party.emailAddress;

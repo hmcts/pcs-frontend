@@ -42,10 +42,12 @@ export const step: StepDefinition = createFormStep({
   ],
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    // Reads from session for now - session removal is a separate ticket
-    const textForm = req.session.formData?.['contact-preferences-text-message'];
-    if (textForm) {
-      response.defendantResponses.contactByText = textForm.contactByTextMessage === 'yes' ? 'YES' : 'NO';
+    const contactByTextMessage = req.body?.contactByTextMessage as 'yes' | 'no' | undefined;
+
+    if (contactByTextMessage === 'yes') {
+      response.defendantResponses.contactByText = 'YES';
+    } else if (contactByTextMessage === 'no') {
+      response.defendantResponses.contactByText = 'NO';
     } else {
       delete response.defendantResponses.contactByText;
     }

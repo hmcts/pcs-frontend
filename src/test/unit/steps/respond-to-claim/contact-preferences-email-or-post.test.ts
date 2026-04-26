@@ -60,40 +60,11 @@ describe('contact-preferences-email-or-post', () => {
     jest.clearAllMocks();
   });
 
-  it('saves with fields deleted when session formData is empty (holistic draft save reads from session)', async () => {
+  it('builds CCD payload when req.body has email selection', async () => {
     const { req, res, next } = createBaseReqRes();
     req.body = {
       contactByEmailOrPost: 'email',
       'contactByEmailOrPost.email': 'new@example.com',
-    };
-
-    const post = step.postController?.post;
-    expect(post).toBeDefined();
-    await post!(req, res, next);
-
-    // beforeRedirect reads from req.session.formData which is empty,
-    // so the else branch runs, deleting preferenceType and emailAddress
-    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-      undefined, // accessToken
-      '123', // caseId
-      {
-        defendantResponses: {},
-        defendantContactDetails: { party: {} },
-      }
-    );
-  });
-
-  it('builds CCD payload when session formData has email selection', async () => {
-    const { req, res, next } = createBaseReqRes();
-    req.body = {
-      contactByEmailOrPost: 'email',
-      'contactByEmailOrPost.email': 'new@example.com',
-    };
-    req.session.formData = {
-      'contact-preferences-email-or-post': {
-        contactByEmailOrPost: 'email',
-        'contactByEmailOrPost.email': 'new@example.com',
-      },
     };
 
     const post = step.postController?.post;
@@ -116,15 +87,10 @@ describe('contact-preferences-email-or-post', () => {
     );
   });
 
-  it('clears email when session formData has post selection', async () => {
+  it('clears email when req.body has post selection', async () => {
     const { req, res, next } = createBaseReqRes();
     req.body = {
       contactByEmailOrPost: 'post',
-    };
-    req.session.formData = {
-      'contact-preferences-email-or-post': {
-        contactByEmailOrPost: 'post',
-      },
     };
 
     const post = step.postController?.post;

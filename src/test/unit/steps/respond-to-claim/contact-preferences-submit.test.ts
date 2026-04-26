@@ -63,43 +63,12 @@ describe('contact preferences submit-time CCD payloads', () => {
   });
 
   describe('contact-preferences-telephone', () => {
-    it('saves with fields deleted when session formData is empty (holistic draft save reads from session)', async () => {
+    it('builds CCD payload when req.body has telephone data', async () => {
       const { req, res, next } = createBaseReqRes();
 
       req.body = {
         contactByTelephone: 'yes',
         'contactByTelephone.phoneNumber': '07123456789',
-      };
-
-      const post = telephoneStep.postController?.post;
-      expect(post).toBeDefined();
-
-      await post!(req as unknown as Request, res as unknown as Response, next);
-
-      // beforeRedirect reads from req.session.formData which is empty,
-      // so the else branch runs, deleting contactByPhone and phoneNumber
-      expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-        undefined, // accessToken (no user in session)
-        '123', // caseId
-        {
-          defendantResponses: {},
-          defendantContactDetails: { party: {} },
-        }
-      );
-    });
-
-    it('builds CCD payload when session formData has telephone data', async () => {
-      const { req, res, next } = createBaseReqRes();
-
-      req.body = {
-        contactByTelephone: 'yes',
-        'contactByTelephone.phoneNumber': '07123456789',
-      };
-      req.session.formData = {
-        'contact-preferences-telephone': {
-          contactByTelephone: 'yes',
-          'contactByTelephone.phoneNumber': '07123456789',
-        },
       };
 
       const post = telephoneStep.postController?.post;
@@ -125,40 +94,11 @@ describe('contact preferences submit-time CCD payloads', () => {
   });
 
   describe('contact-preferences-text-message', () => {
-    it('saves with fields deleted when session formData is empty (holistic draft save reads from session)', async () => {
+    it('builds CCD payload when req.body has text message data', async () => {
       const { req, res, next } = createBaseReqRes();
 
       req.body = {
         contactByTextMessage: 'yes',
-      };
-
-      const post = textStep.postController?.post;
-      expect(post).toBeDefined();
-
-      await post!(req as unknown as Request, res as unknown as Response, next);
-
-      // beforeRedirect reads from req.session.formData which is empty,
-      // so the else branch runs, deleting contactByText
-      expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-        undefined, // accessToken
-        '123', // caseId
-        {
-          defendantResponses: {},
-          defendantContactDetails: { party: {} },
-        }
-      );
-    });
-
-    it('builds CCD payload when session formData has text message data', async () => {
-      const { req, res, next } = createBaseReqRes();
-
-      req.body = {
-        contactByTextMessage: 'yes',
-      };
-      req.session.formData = {
-        'contact-preferences-text-message': {
-          contactByTextMessage: 'yes',
-        },
       };
 
       const post = textStep.postController?.post;

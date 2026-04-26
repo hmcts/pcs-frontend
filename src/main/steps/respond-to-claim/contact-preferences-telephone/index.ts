@@ -77,16 +77,19 @@ export const step: StepDefinition = createFormStep({
 
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    // Reads from session for now - session removal is a separate ticket
-    const telephoneForm = req.session.formData?.['contact-preferences-telephone'];
-    if (telephoneForm) {
-      response.defendantResponses.contactByPhone = telephoneForm.contactByTelephone === 'yes' ? 'YES' : 'NO';
+    const contactByTelephone = req.body?.contactByTelephone as 'yes' | 'no' | undefined;
 
-      if (telephoneForm.contactByTelephone === 'yes') {
-        response.defendantContactDetails.party.phoneNumber = telephoneForm['contactByTelephone.phoneNumber'];
+    if (contactByTelephone === 'yes') {
+      response.defendantResponses.contactByPhone = 'YES';
+      const phoneNumber = (req.body?.['contactByTelephone.phoneNumber'] as string | undefined)?.trim();
+      if (phoneNumber) {
+        response.defendantContactDetails.party.phoneNumber = phoneNumber;
       } else {
         delete response.defendantContactDetails.party.phoneNumber;
       }
+    } else if (contactByTelephone === 'no') {
+      response.defendantResponses.contactByPhone = 'NO';
+      delete response.defendantContactDetails.party.phoneNumber;
     } else {
       delete response.defendantResponses.contactByPhone;
       delete response.defendantContactDetails.party.phoneNumber;
