@@ -60,7 +60,7 @@ export type PaymentAgreement = {
   repaymentPlanAgreed?: YesNoNotSureValue;
   repaymentAgreedDetails?: string;
   repayArrearsInstalments?: YesNoValue;
-  additionalRentContribution?: unknown;
+  additionalRentContribution?: PenceAmount;
   additionalContributionFrequency?: string;
 };
 

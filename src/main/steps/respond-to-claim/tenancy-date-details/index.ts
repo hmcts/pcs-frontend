@@ -121,7 +121,7 @@ export const step: StepDefinition = createFormStep({
           delete response.defendantResponses.tenancyStartDate;
         }
       } else {
-        response.defendantResponses.tenancyStartDate = ' ';
+        delete response.defendantResponses.tenancyStartDate;
       }
     } else {
       delete response.defendantResponses.tenancyStartDateCorrect;

@@ -38,15 +38,9 @@ export const step: StepDefinition = createFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data as
-      | {
-          possessionClaimResponse?: {
-            defendantResponses?: { paymentAgreement?: { repayArrearsInstalments?: YesNoValue } };
-          };
-        }
-      | undefined;
-
-    const stored = caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement?.repayArrearsInstalments;
+    const stored =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
+        ?.repayArrearsInstalments;
     const normalizedStored = normalizeYesNoValue(stored);
 
     if (normalizedStored === 'YES') {
