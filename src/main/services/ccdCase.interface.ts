@@ -190,7 +190,10 @@ export interface CcdCaseData {
   legislativeCountry?: string;
   notice_NoticeHandedOverDateTime?: string;
   notice_NoticePostedDate?: string;
+  notice_NoticeDeliveredDate?: string;
+  notice_NoticeEmailSentDateTime?: string;
   notice_NoticeOtherElectronicDateTime?: string;
+  notice_NoticeOtherDateTime?: string;
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;

@@ -79,6 +79,18 @@ export class CcdCaseModel {
     return this.data.notice_NoticeOtherElectronicDateTime;
   }
 
+  get notice_NoticeDeliveredDate(): string | undefined {
+    return this.data.notice_NoticeDeliveredDate;
+  }
+
+  get notice_NoticeEmailSentDateTime(): string | undefined {
+    return this.data.notice_NoticeEmailSentDateTime;
+  }
+
+  get notice_NoticeOtherDateTime(): string | undefined {
+    return this.data.notice_NoticeOtherDateTime;
+  }
+
   get tenancy_TypeOfTenancyLicence(): string | undefined {
     return this.data.tenancy_TypeOfTenancyLicence;
   }
@@ -287,19 +299,22 @@ export class CcdCaseModel {
   }
 
   /**
-   * First provided notice date from CCD case data, regardless of channel.
+   * First provided notice date from CCD case data, normalised to YYYY-MM-DD
+   * regardless of whether the source field is LocalDate or LocalDateTime.
    *
-   * Order of precedence:
-   * - notice_NoticeHandedOverDateTime (hand delivered)
-   * - notice_NoticePostedDate (posted)
-   * - notice_NoticeOtherElectronicDateTime (electronic)
+   * The backend populates exactly one of six notice_* fields based on
+   * NoticeServiceMethod. LocalDateTime fields carry a 'Thh:mm:ss' suffix
+   * which we strip so downstream Luxon parsing sees a uniform shape.
    */
   get noticeDate(): string | undefined {
-    return (
-      this.notice_NoticeHandedOverDateTime ||
-      this.notice_NoticePostedDate ||
-      this.notice_NoticeOtherElectronicDateTime ||
-      undefined
-    );
+    const raw =
+      this.notice_NoticePostedDate ??
+      this.notice_NoticeDeliveredDate ??
+      this.notice_NoticeHandedOverDateTime ??
+      this.notice_NoticeEmailSentDateTime ??
+      this.notice_NoticeOtherElectronicDateTime ??
+      this.notice_NoticeOtherDateTime;
+
+    return raw ? raw.slice(0, 10) : undefined;
   }
 }
