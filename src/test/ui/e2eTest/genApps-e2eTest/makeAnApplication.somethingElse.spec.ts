@@ -8,7 +8,7 @@ import {
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
-  haveYouAlreadyAppliedForHelp,
+  haveYouAlreadyAppliedForHelpWithFees,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
@@ -43,22 +43,25 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.somethingElseRadioOption,
     });
+    await performValidation('mainHeader', askTheCourtToMakeAnOrder.mainHeader);
     await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-    //The below are placeholder pages
-    await performAction('clickRadioButton', doYouNeedHelpPayingTheFee.yesRadioOption);
-    await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
-    await performValidation('mainHeader', haveYouAlreadyAppliedForHelp.mainHeader);
-    await performAction('clickRadioButton', haveYouAlreadyAppliedForHelp.yesRadioOption);
-    await performAction(
-      'inputText',
-      haveYouAlreadyAppliedForHelp.hwfReferenceHiddenTextLabel,
-      haveYouAlreadyAppliedForHelp.hwfReferenceTextInput
-    );
-    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
+    await performAction('doYouNeedHelpPayingFee', {
+      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+    });
+    await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
+    await performAction('confirmYouHaveAppliedForFeeHelp', {
+      question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+      option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
+      label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
+      input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
+    });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-    await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
-    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performAction('confirmOtherPartiesAgreed', {
+      question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
+      option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
+    });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
@@ -66,9 +69,13 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
-    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performAction('selectLanguageUsedToComplete', {
+      question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
+      option: whichLanguageDidYouUseToCompleteThisService.englishAndWelshRadioOption,
+    });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 });

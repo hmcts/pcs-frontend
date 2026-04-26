@@ -1,7 +1,7 @@
-import { createFormStep } from '../../../modules/steps';
 import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
+import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
