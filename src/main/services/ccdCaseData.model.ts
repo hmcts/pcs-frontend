@@ -298,23 +298,16 @@ export class CcdCaseModel {
     return this.defendantResponses?.noticeDate ?? undefined;
   }
 
-  /**
-   * First provided notice date from CCD case data, normalised to YYYY-MM-DD
-   * regardless of whether the source field is LocalDate or LocalDateTime.
-   *
-   * The backend populates exactly one of six notice_* fields based on
-   * NoticeServiceMethod. LocalDateTime fields carry a 'Thh:mm:ss' suffix
-   * which we strip so downstream Luxon parsing sees a uniform shape.
-   */
   get noticeDate(): string | undefined {
-    const raw =
-      this.notice_NoticePostedDate ??
-      this.notice_NoticeDeliveredDate ??
-      this.notice_NoticeHandedOverDateTime ??
-      this.notice_NoticeEmailSentDateTime ??
-      this.notice_NoticeOtherElectronicDateTime ??
-      this.notice_NoticeOtherDateTime;
+    const populatedNoticeField = [
+      this.notice_NoticePostedDate,
+      this.notice_NoticeDeliveredDate,
+      this.notice_NoticeHandedOverDateTime,
+      this.notice_NoticeEmailSentDateTime,
+      this.notice_NoticeOtherElectronicDateTime,
+      this.notice_NoticeOtherDateTime,
+    ].find(Boolean);
 
-    return raw ? raw.slice(0, 10) : undefined;
+    return populatedNoticeField?.slice(0, 10);
   }
 }

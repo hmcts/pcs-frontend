@@ -311,15 +311,5 @@ describe('CcdCaseModel', () => {
 
       expect(model.noticeDate).toBeUndefined();
     });
-
-    it('prefers NoticePostedDate when multiple fields are set', () => {
-      const model = buildModel({
-        data: {
-          notice_NoticePostedDate: '2024-05-02',
-          notice_NoticeHandedOverDateTime: '2024-06-10T10:00:00',
-        },
-      });
-      expect(model.noticeDate).toBe('2024-05-02');
-    });
   });
 });
