@@ -46,7 +46,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
     //The below are placeholder pages
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
       question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
       option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
@@ -70,8 +69,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
-    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performAction('selectLanguageUsedToComplete', {
+      question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
+      option: whichLanguageDidYouUseToCompleteThisService.welshRadioOption,
+    });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
