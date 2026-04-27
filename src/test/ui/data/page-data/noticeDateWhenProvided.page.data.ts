@@ -1,6 +1,6 @@
 import { submitCaseApiData } from '../api-data';
 
-export const confirmationOfNoticeDateWhenProvided = {
+export const noticeDateWhenProvided = {
   mainHeader: `Notice date`,
   respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
