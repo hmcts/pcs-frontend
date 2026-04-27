@@ -5,7 +5,7 @@ kind: playwright
 sauce:
   region: eu-central-1
   # Max parallel Sauce sessions for this config (plan + tunnel limits); not the same as Playwright workers.
-  concurrency: 3
+  concurrency: 1
   tunnel:
     name: $SAUCE_TUNNEL_NAME
   metadata:
