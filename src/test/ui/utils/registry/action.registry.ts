@@ -93,6 +93,7 @@ export class ActionRegistry {
     ['validateCYA', new GenAppsAction()],
     ['confirmDocumentToUpload', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
+    ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
   ]);
 
