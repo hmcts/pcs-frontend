@@ -96,5 +96,11 @@
   },
   "xui": {
     "uri": "https://manage-case.aat.platform.hmcts.net"
+  },
+  "dashboard": {
+    "taskRoutes": {
+      "Defendant.ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
+      "Defendant.ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices"
+    }
   }
 }
