@@ -3,7 +3,7 @@ import config from 'config';
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
   askTheCourtToSetAsideTheOrder,
-  checkYourAnswers,
+  checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentToSupportYourApplication,
@@ -13,6 +13,7 @@ import {
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
+import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
@@ -20,6 +21,7 @@ const home_url = config.get('e2e.testUrl') as string;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
+  FieldsStore.clear();
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
   await performAction('fetchPINsAPI');
@@ -78,7 +80,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
     });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
     // await performAction('clickButton', checkYourAnswers.submitApplicationButton);

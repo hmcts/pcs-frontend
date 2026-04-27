@@ -4,13 +4,14 @@ import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   askToAdjournTheCourtHearing,
-  checkYourAnswers,
+  checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
@@ -78,17 +79,24 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
     await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
-    // await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
-    // await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
+    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
     await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
     });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performAction('reviewCYA', 'journey1');
+    await performAction('selectStatementOfTruth',{
+      question: checkYourAnswersGenApps.statementOfTruthQuestion,
+      option: checkYourAnswersGenApps.iBelieveTheFactsHiddenCheckbox,
+      label: checkYourAnswersGenApps.yourFullNameTextLabel,
+      input: checkYourAnswersGenApps.yourFullNameTextInput,
+    });
+    //await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 
   test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression @PR', async () => {
@@ -128,7 +136,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
     });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
   });

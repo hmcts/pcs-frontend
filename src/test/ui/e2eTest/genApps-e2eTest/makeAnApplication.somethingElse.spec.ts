@@ -3,7 +3,7 @@ import config from 'config';
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
   askTheCourtToMakeAnOrder,
-  checkYourAnswers,
+  checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentToSupportYourApplication,
@@ -77,7 +77,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
     });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
     // await performAction('clickButton', checkYourAnswers.submitApplicationButton);

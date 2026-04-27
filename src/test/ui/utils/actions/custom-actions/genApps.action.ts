@@ -2,6 +2,7 @@ import { Page, expect, test } from '@playwright/test';
 
 import {
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
+  checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
   haveTheOtherPartiesAgreedToThisApplication,
@@ -14,7 +15,7 @@ import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString } from '../../common/string.utils';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
-import { defaultJourney, journeys } from '../../mapping';
+import { defaultJourney, journeys } from '../../journeyMapping';
 
 import { FieldsStore } from './recordAnsweredFields.action';
 
@@ -34,9 +35,11 @@ export class GenAppsAction implements IAction {
         () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord),
       ],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
+      ['selectStatementOfTruth', () => this.selectStatementOfTruth(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
       ['validateCYA', () => this.validateCYA()],
+      ['reviewCYA', () => this.reviewCYA(page, fieldName as actionData)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -113,7 +116,6 @@ export class GenAppsAction implements IAction {
         typeof reason.input === 'number' ? generateRandomString(reason.input) : (reason.input as string);
       await performAction('inputText', reason.label, userInput);
       FieldsStore.update(reason.label as string, userInput);
-      
     } else {
       FieldsStore.delete(reason.label as string);
     }
@@ -142,6 +144,15 @@ export class GenAppsAction implements IAction {
     await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
   }
 
+  private async selectStatementOfTruth(sot: actionRecord) {
+    await performAction('check', {
+      question: sot.question,
+      option: sot.option
+    });
+    await performAction('inputText',sot.label, sot.input);
+    await performAction('clickButton', checkYourAnswersGenApps.continueToPaymentButton);
+  }
+
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
     const inputs = Array.isArray(validationArr.inputArray) ? validationArr.inputArray : [validationArr.inputArray];
 
@@ -161,6 +172,12 @@ export class GenAppsAction implements IAction {
           await performAction('inputText', validationArr.label, generateRandomString(item.input));
           await performAction('clickButton', validationArr.button);
           await performValidation('errorMessage', validationArr.label, item.errMessage);
+          break;
+
+        case 'checkBox':
+          await performAction('clickButton', validationArr.button);
+          await performValidation('errorMessage', !validationArr?.header ? validationArr.header = 'There is a problem' : validationArr.header, item.errMessage);
+          await performAction('check', { question: validationArr.question, option: validationArr.option });
           break;
       }
     }
@@ -231,7 +248,7 @@ export class GenAppsAction implements IAction {
         }
         console.log(`\n**********  END OF CYA FAILURE LIST. ***************`);
         throw new Error(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`);
-       // console.log(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`);
+        // console.log(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`);
       } else {
         console.log('\n✅ CHECK YOUR ANSWERS VALIDATION PASSED!\n');
       }
@@ -239,39 +256,40 @@ export class GenAppsAction implements IAction {
     cyaMap.clear();
   }
 
-  private async reviewCYA(page: Page) {
-    const rows = page.locator('.govuk-summary-list__row');
-    const rowCount = await rows.count();
+  private async reviewCYA(page: Page, startPage: actionData) {
+    //const rows = page.locator('.govuk-summary-list__row');
+    // const rowCount = await rows.count();
 
-    for (let i = 0; i < rowCount; i++) {
-      const row = page.locator('.govuk-summary-list__row').nth(i);
-      const questionText = await row.locator('dt').innerText();
+    //for (let i = 0; i < rowCount; i++) {
+    const row = page.locator('.govuk-summary-list__row').nth(0);
+    const questionText = await row.locator('dt').innerText();
 
-      const changeLink = row.getByRole('link', { name: 'Change' });
-      if ((await changeLink.count()) === 0) {
-        continue;
-      }
+    const changeLink = row.getByRole('link', { name: 'Change' });
+    // if ((await changeLink.count()) === 0) {
+    //   continue;
+    // }
 
-      const href = await changeLink.getAttribute('href');
-      expect(href, `Missing href for question: ${questionText}`).toBeTruthy();
+    const href = await changeLink.getAttribute('href');
+    expect(href, `Missing href for question: ${questionText}`).toBeTruthy();
 
-      // Click Change
-      await Promise.all([page.waitForURL(new RegExp(href!)), changeLink.click()]);
+    // Click Change
+    await Promise.all([page.waitForURL(new RegExp(href!)), changeLink.click()]);
 
-      const pagesForThisQuestion = journeys[questionText] ?? defaultJourney;
+    const pagesForThisQuestion = journeys[String(startPage)] ?? defaultJourney;
 
-      // Follow the allowed journey
-      await this.followJourneyBackToCya(page, pagesForThisQuestion);
+    // Follow the allowed journey
+    await this.followJourneyBackToCya(page, pagesForThisQuestion);
 
-      // Final safety check
-      await expect(page).toHaveURL(/check-your-answers/);
-    }
+    // Final safety check
+    await expect(page).toHaveURL(/check-your-answers/);
+    //}
   }
 
   private async followJourneyBackToCya(page: Page, allowedPages: string[]) {
     const cyaUrlPart = '/check-your-answers';
+    console.log('length' + allowedPages.length);
 
-    for (let step = 0; step < 10; step++) {
+    for (let i = 0; i <= allowedPages.length; i++) {
       const currentUrl = page.url();
 
       // ✅ Success condition
@@ -284,13 +302,12 @@ export class GenAppsAction implements IAction {
 
       expect(onAllowedPage, `Unexpected page in Change journey: ${currentUrl}`).toBeTruthy();
 
+      const navButton = !currentUrl.includes('ask') ? 'Continue' : 'Start now';
+      await performAction('clickButton', navButton);
       // ✅ Continue through journey
-      const continueButton = page.getByRole('button', {
-        name: /continue|save and continue/i,
-      });
-
-      await expect(continueButton).toBeVisible();
-      await continueButton.click();
+      // const navButton = page.getByRole('button', {
+      //   name: /continue|Start now/i,
+      // });
     }
 
     throw new Error('Exceeded maximum steps before reaching CYA');

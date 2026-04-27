@@ -1,5 +1,5 @@
 export * from './chooseAnApplication.page.data';
-export * from './checkYourAnswers.page.data';
+export * from './checkYourAnswersGenApps.page.data';
 export * from './applicationSubmitted.page.data';
 export * from './askToAdjournTheCourtHearing.page.data';
 export * from './doYouNeedHelpPayingTheFee.page.data';
