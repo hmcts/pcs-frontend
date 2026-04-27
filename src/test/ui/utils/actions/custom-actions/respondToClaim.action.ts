@@ -3,8 +3,6 @@ import { Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
-  confirmationOfNoticeDateWhenNotProvided,
-  confirmationOfNoticeDateWhenProvided,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -26,6 +24,8 @@ import {
   landlordRegistered,
   languageUsed,
   nonRentArrearsDispute,
+  noticeDateWhenNotProvided,
+  noticeDateWhenProvided,
   paymentInterstitial,
   rentArrears,
   repaymentsAgreed,
@@ -370,24 +370,24 @@ export class RespondToClaimAction implements IAction {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', confirmationOfNoticeDateWhenProvided.dayTextLabel, noticeData.day],
-        ['inputText', confirmationOfNoticeDateWhenProvided.monthTextLabel, noticeData.month],
-        ['inputText', confirmationOfNoticeDateWhenProvided.yearTextLabel, noticeData.year]
+        ['inputText', noticeDateWhenProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', confirmationOfNoticeDateWhenProvided.saveAndContinueButton);
+    await performAction('clickButton', noticeDateWhenProvided.saveAndContinueButton);
   }
 
   private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', confirmationOfNoticeDateWhenNotProvided.dayTextLabel, noticeData.day],
-        ['inputText', confirmationOfNoticeDateWhenNotProvided.monthTextLabel, noticeData.month],
-        ['inputText', confirmationOfNoticeDateWhenNotProvided.yearTextLabel, noticeData.year]
+        ['inputText', noticeDateWhenNotProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenNotProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenNotProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', confirmationOfNoticeDateWhenNotProvided.saveAndContinueButton);
+    await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
   }
 
   private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {

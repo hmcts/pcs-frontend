@@ -10,7 +10,6 @@ export const noticeDateWhenNotProvided = {
   dayTextLabel: `Day`,
   monthTextLabel: `Month`,
   yearTextLabel: `Year`,
-
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   signOutLink: `Sign out`,
