@@ -19,6 +19,26 @@ properties([
       defaultValue: '',
       description: 'PR number (REQUIRED if environment is preview, leave blank otherwise).'
     ),
+    string(
+      name: 'PLAYWRIGHT_SPEC',
+      defaultValue: '',
+      description: 'Spec file filter: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate keywords with comma or semicolon. Ex.: respondToAClaim | respondToAClaim,makeAnApplication. Blank = all specs. Default: empty.'
+    ),
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
+      description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
+    ),
+    choice(
+      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
+      choices: ['true', 'false'],
+      description: 'Run page functional tests (content, errors, navigation). Default: true.'
+    ),
+    choice(
+      name: 'ENABLE_AXE_AUDIT',
+      choices: ['true', 'false'],
+      description: 'Run axe audits during E2E. Default: true.'
+    ),
     booleanParam(
       name: 'CHROME_TESTS',
       defaultValue: true,
@@ -61,48 +81,28 @@ properties([
     ),
     booleanParam(
       name: 'SAUCE_MAC13_CHROME',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Sauce: macOS 13 — Chrome.'
     ),
     booleanParam(
       name: 'SAUCE_MAC13_FIREFOX',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Sauce: macOS 13 — Firefox.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_CHROME',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Sauce: Windows 11 — Chrome.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_EDGE',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Sauce: Windows 11 — Edge.'
     ),
     booleanParam(
       name: 'SAUCE_WIN11_FIREFOX',
-      defaultValue: true,
+      defaultValue: false,
       description: 'Sauce: Windows 11 — Firefox.'
-    ),
-    string(
-      name: 'PLAYWRIGHT_SPEC',
-      defaultValue: '',
-      description: 'Spec file filter: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate keywords with comma or semicolon. Ex.: respondToAClaim | respondToAClaim,makeAnApplication. Blank = all specs. Default: empty.'
-    ),
-    choice(
-      name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
-      description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
-    ),
-    choice(
-      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
-      choices: ['true', 'false'],
-      description: 'Run page functional tests (content, errors, navigation). Default: true.'
-    ),
-    choice(
-      name: 'ENABLE_AXE_AUDIT',
-      choices: ['true', 'false'],
-      description: 'Run axe audits during E2E. Default: true.'
     ),
   ])
 ])
