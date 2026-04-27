@@ -74,7 +74,7 @@ export const step: StepDefinition = createFormStep({
     if (preferenceType === 'EMAIL') {
       result.contactByEmailOrPost = 'email';
       if (emailAddress) {
-        result['contactByEmailOrPost.email'] = emailAddress;
+        result.email = emailAddress;
       }
     } else if (preferenceType === 'POST') {
       result.contactByEmailOrPost = 'post';

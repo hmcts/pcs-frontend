@@ -84,7 +84,7 @@ export const step: StepDefinition = createFormStep({
     if (contactByPhone === 'YES') {
       result.contactByTelephone = 'yes';
       if (phoneNumber) {
-        result['contactByTelephone.phoneNumber'] = phoneNumber;
+        result.phoneNumber = phoneNumber;
       }
     } else if (contactByPhone === 'NO') {
       result.contactByTelephone = 'no';

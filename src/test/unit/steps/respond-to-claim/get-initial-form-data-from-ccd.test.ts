@@ -48,7 +48,7 @@ const createReqRes = (validatedCase: CcdCaseModel, sessionFormData: Record<strin
 };
 
 describe('respond-to-claim getInitialFormData uses CCD', () => {
-  it('returns empty field values when step has no getInitialFormData (telephone)', async () => {
+  it('returns populated field values from CCD data (telephone)', async () => {
     const validatedCase = new CcdCaseModel({
       id: '1771325608502536',
       data: {
@@ -73,11 +73,15 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    // Step has no getInitialFormData and useSessionFormData is false, so fields are empty
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ contactByTelephone: '' }));
+    // Step has getInitialFormData and loads saved telephone preference
+    expect(renderData.fieldValues).toEqual(
+      expect.objectContaining({
+        contactByTelephone: 'yes',
+      })
+    );
   });
 
-  it('returns empty field values when step has no getInitialFormData (email-or-post)', async () => {
+  it('returns populated field values from CCD data (email-or-post)', async () => {
     const validatedCase = new CcdCaseModel({
       id: '1771325608502536',
       data: {
@@ -102,8 +106,12 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    // Step has no getInitialFormData and useSessionFormData is false, so fields are empty
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ contactByEmailOrPost: '' }));
+    // Step has getInitialFormData and loads saved email preference
+    expect(renderData.fieldValues).toEqual(
+      expect.objectContaining({
+        contactByEmailOrPost: 'email',
+      })
+    );
   });
 
   it('returns empty field values for tenancy-date-details (no getInitialFormData, useSessionFormData false)', async () => {
