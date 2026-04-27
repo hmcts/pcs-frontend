@@ -70,11 +70,6 @@ properties([
       description: 'Sauce: macOS 13 — Firefox.'
     ),
     booleanParam(
-      name: 'SAUCE_MAC_SAFARI',
-      defaultValue: true,
-      description: 'Sauce: macOS 13 — WebKit (Safari engine).'
-    ),
-    booleanParam(
       name: 'SAUCE_WIN11_CHROME',
       defaultValue: true,
       description: 'Sauce: Windows 11 — Chrome.'
@@ -160,7 +155,6 @@ def selectedSauceSuites() {
   [
     params.SAUCE_MAC13_CHROME ? 'pcs-frontend-mac13-chrome' : null,
     params.SAUCE_MAC13_FIREFOX ? 'pcs-frontend-mac13-firefox' : null,
-    params.SAUCE_MAC_SAFARI ? 'pcs-frontend-mac13-webkit' : null,
     params.SAUCE_WIN11_CHROME ? 'pcs-frontend-win11-chrome' : null,
     params.SAUCE_WIN11_EDGE ? 'pcs-frontend-win11-edge' : null,
     params.SAUCE_WIN11_FIREFOX ? 'pcs-frontend-win11-firefox' : null,

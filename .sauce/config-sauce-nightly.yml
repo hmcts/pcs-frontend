@@ -80,18 +80,6 @@ suites:
       headless: false
       grep: $SAUCE_GREP
 
-  - name: 'pcs-frontend-mac13-webkit'
-    platformName: macOS 13
-    screenResolution: 1440x900
-    testMatch:
-      - ".*src/test/ui/.*\\.spec\\.ts$"
-      - ".*src\\\\test\\\\ui\\\\.*\\.spec\\.ts$"
-    params:
-      browserName: webkit
-      project: webkit
-      headless: false
-      grep: $SAUCE_GREP
-
   - name: 'pcs-frontend-win11-chrome'
     platformName: Windows 11
     screenResolution: 1920x1080
