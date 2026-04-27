@@ -40,7 +40,8 @@
     <div class="govuk-button-group">
       {{ govukButton({
         text: buttonLabel,
-        attributes: { type: 'submit', name: 'action', value: 'submit' }
+        attributes: { type: 'submit', name: 'action', value: 'submit' },
+        preventDoubleClick: true
       }) }}
     </div>
 
