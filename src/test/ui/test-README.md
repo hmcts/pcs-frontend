@@ -216,7 +216,5 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 - **Runs:** `yarn test:E2e` for each selected browser/device stage.
 - **Tag/scope logic:** `PLAYWRIGHT_GREP_TAG` maps to `E2E_TEST_SCOPE` (`@nightly`, `@smoke`, `@e2e`, or `@regression`).
 - **Spec logic:** `PLAYWRIGHT_SPEC` maps to `E2E_SPEC` (path filter, case-sensitive).
-- **Defaults (Playwright stages):** `CHROME_TESTS=true`; other desktop/mobile flags are optional (`false` by default).
-- **Defaults (Sauce cross-browser):** all `SAUCE_*` browser suite toggles are `false` by default and must be explicitly enabled per run.
-- **Sauce matrix:** macOS Safari/WebKit suite is removed; available suites are macOS Chrome/Firefox and Windows Chrome/Edge/Firefox.
+- **Defaults:** Chrome is enabled by default; other platforms are optional.
 - **Reporting:** Each stage publishes its own Allure report and Slack message. Failed stages do not stop later stages.
