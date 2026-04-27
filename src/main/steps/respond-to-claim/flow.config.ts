@@ -15,6 +15,7 @@ import {
 } from '../utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
+import { hasMultipleParties } from 'steps/utils/hasMultipleParties';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -71,6 +72,9 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-what-are-you-claiming-for',
     'counter-claim-specific-sum',
     'counter-claim-fee',
+    'counter-claim-have-you-applied-for-help',
+    'counter-claim-against-who',
+    'counter-claim-about',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -422,7 +426,32 @@ export const flowConfig: JourneyFlowConfig = {
         const moneyCounterClaim = await isMoneyCounterClaim(req);
         return moneyCounterClaim ? 'counter-claim-specific-sum' : 'counter-claim-what-are-you-claiming-for';
       },
-      defaultNext: 'payment-interstitial',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ) => currentStepData.counterClaimNeedHelpWithFees === 'YES',
+          nextStep: 'counter-claim-have-you-applied-for-help',
+        },
+        {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ) => currentStepData.counterClaimNeedHelpWithFees === 'NO' && (await hasMultipleParties()),
+          nextStep: 'counter-claim-against-who',
+        },
+        {
+          condition: async (
+            req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ) => currentStepData.counterClaimNeedHelpWithFees === 'NO' && !(await hasMultipleParties()),
+          nextStep: 'counter-claim-about',
+        },
+      ],
     },
     'payment-interstitial': {
       previousStep: 'counter-claim-fee',

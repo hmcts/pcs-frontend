@@ -1,4 +1,14 @@
 {
   "pageTitle": "Counterclaim fee",
-  "heading": "Counterclaim fee"
+  "counterClaimFeeCostParagraph":"Based on the information provided, it will cost £X to make your counterclaim.",
+  "counterClaimFeeHeading": "Help with court fees",
+  "counterClaimFeeHelpParagraph":"You may be able to get help paying the fee if you (one or more of the following):",
+  "counterClaimFeeBulletBenefits":"are on certain benefits",
+  "counterClaimFeeBulletLowSavings":"have little or no savings",
+  "counterClaimFeeBulletLowIncome":"have low income",
+  "counterClaimFeeHeading2": "Do you need help paying the counterclaim fee?",
+  "counterClaimFeeOptions": {
+    "iNeedHelpWithPayingFee": "I need help paying the fee",
+    "iDoNotNeedHelpWithPayingFee": "I do not need help paying the fee"
+  }
 }

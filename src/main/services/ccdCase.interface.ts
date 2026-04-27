@@ -140,6 +140,7 @@ export interface CcdDefendantResponses {
 
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
+  needHelpWithFees?: VerticalYesNoValue;
   claimType?: string;
   isClaimAmountKnown?: string;
   claimAmount?: string;
