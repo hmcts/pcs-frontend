@@ -5,7 +5,6 @@ export enum CaseState {
 
 export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'YES' | 'NO' | null;
-export type TenancyTypeCorrectValue = YesNoNotSureValue;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
 export enum YesNoEnum {
@@ -13,7 +12,11 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
-export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
+export enum LanguageUsed {
+  ENGLISH = 'ENGLISH',
+  WELSH = 'WELSH',
+  ENGLISH_AND_WELSH = 'ENGLISH_AND_WELSH',
+}
 
 export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
@@ -21,7 +24,7 @@ export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
 export interface IncomeExpenseDetails {
-  applies: YesNoValue;
+  applies?: YesNoValue;
   amount?: PenceAmount;
   frequency?: FrequencyValue;
 }
@@ -261,9 +264,13 @@ export enum GenAppType {
 }
 
 export interface CitizenGenAppRequest {
-  applicationType: GenAppType;
+  applicationType?: GenAppType;
   within14Days?: YesNoValue;
   needHwf?: YesNoValue;
   appliedForHwf?: YesNoValue;
   hwfReference?: string;
+  otherPartiesAgreed?: YesNoValue;
+  withoutNotice?: YesNoValue;
+  withoutNoticeReason?: string;
+  languageUsed?: LanguageUsed;
 }
