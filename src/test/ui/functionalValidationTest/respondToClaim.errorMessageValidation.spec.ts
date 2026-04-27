@@ -210,7 +210,7 @@ test.afterEach(() => {
   clearErrorMessageValidationFailures();
 });
 
-test.describe('Respond to claim — error message validation @nightly @PR', () => {
+test.describe('Respond to claim — error message validation @nightly @PR with wrapper', () => {
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression @error', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
