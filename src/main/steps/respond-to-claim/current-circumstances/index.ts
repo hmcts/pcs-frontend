@@ -1,10 +1,9 @@
-import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'your-circumstances',
@@ -89,9 +88,9 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.householdCircumstances.additionalCircumstancesDetails;
     }
 
-    await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken || '',
-      req.res?.locals.validatedCase?.id || '',
+    await saveDraftDefendantResponse(
+      req,
+
       response
     );
   },

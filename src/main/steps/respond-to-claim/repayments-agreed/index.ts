@@ -1,12 +1,11 @@
 import type { Request } from 'express';
 
 import { createFormStep } from '../../../modules/steps';
-import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoNotSureValue } from '@services/ccdCase.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',
@@ -35,9 +34,9 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.paymentAgreement.repaymentAgreedDetails;
     }
 
-    await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id || '',
+    await saveDraftDefendantResponse(
+      req,
+
       response
     );
   },

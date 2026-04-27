@@ -2,12 +2,11 @@ import type { Request } from 'express';
 
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
-import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
 
 const createAmountValidator =
   (negativeErrorKey: string, largeAmountErrorKey: string) =>
@@ -232,9 +231,9 @@ export const step: StepDefinition = createFormStep({
       delete hc.moneyFromElsewhereDetails;
     }
 
-    await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken || '',
-      req.res?.locals.validatedCase?.id || '',
+    await saveDraftDefendantResponse(
+      req,
+
       response
     );
   },

@@ -2,13 +2,12 @@ import type { Request } from 'express';
 
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { isWalesProperty } from '../../utils';
-import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoNotSureValue } from '@services/ccdCase.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -149,11 +148,7 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.tenancyType;
     }
 
-    await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id || '',
-      response
-    );
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async (req, formContent) => {
     const existingTenancyTypeCorrect = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses

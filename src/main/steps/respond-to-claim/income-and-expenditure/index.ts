@@ -1,10 +1,9 @@
-import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils/yesNoEnum';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'income-and-expenses',
@@ -33,9 +32,9 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.householdCircumstances.shareIncomeExpenseDetails;
     }
 
-    await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken || '',
-      req.res?.locals.validatedCase?.id || '',
+    await saveDraftDefendantResponse(
+      req,
+
       response
     );
   },

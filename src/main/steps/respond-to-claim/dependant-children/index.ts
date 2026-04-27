@@ -1,10 +1,9 @@
-import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccdCase.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'do-you-have-any-dependant-children',
@@ -40,9 +39,9 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.householdCircumstances.dependantChildrenDetails;
     }
 
-    await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken || '',
-      req.res?.locals.validatedCase?.id || '',
+    await saveDraftDefendantResponse(
+      req,
+
       response
     );
   },

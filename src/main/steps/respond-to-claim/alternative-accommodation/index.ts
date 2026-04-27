@@ -1,11 +1,10 @@
 import { createFormStep } from '../../../modules/steps';
 import { formatDatePartsToISODate, parseISOToDateParts } from '../../utils';
-import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoNotSureValue } from '@services/ccdCase.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
@@ -96,9 +95,9 @@ export const step: StepDefinition = createFormStep({
       delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
     }
 
-    await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id || '',
+    await saveDraftDefendantResponse(
+      req,
+
       response
     );
   },
