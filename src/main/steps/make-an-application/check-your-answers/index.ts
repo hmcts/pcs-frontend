@@ -54,6 +54,7 @@ export const step: StepDefinition = createFormStep({
     statementOfTruthSubheading: 'statementOfTruth.subheading',
     theInformationFormsYourApplication: 'statementOfTruth.theInformationFormsYourApplication',
     whenYouAreSatisfied: 'statementOfTruth.whenYouAreSatisfied',
+    understandProceedings: 'statementOfTruth.understandProceedings',
   },
   extendGetContent: async (req: Request) => {
     const t: TFunction = getTranslationFunction(req, STEP_NAME, ['common']);
