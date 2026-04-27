@@ -20,7 +20,6 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
     question: 'question',
     hint: 'hint',
     paragraph: 'paragraph',

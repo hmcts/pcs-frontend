@@ -39,6 +39,7 @@ export const step: StepDefinition = {
           cancel: t('buttons.cancel', { ns: 'common' }),
           heading: t('heading', { claimantName }),
           paragraph1: t('paragraph1', { claimantName }),
+          paragraph4: t('paragraph4', { claimantName }),
         };
       },
       'respondToClaim'

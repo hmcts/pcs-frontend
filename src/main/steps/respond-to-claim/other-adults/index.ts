@@ -13,7 +13,6 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/otherAdults.njk`,
   translationKeys: {
     question: 'question',
-    caption: 'caption',
     pageTitle: 'pageTitle',
   },
   fields: [
