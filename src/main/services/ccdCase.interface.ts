@@ -24,7 +24,7 @@ export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
 export interface IncomeExpenseDetails {
-  applies: YesNoValue;
+  applies?: YesNoValue;
   amount?: PenceAmount;
   frequency?: FrequencyValue;
 }
