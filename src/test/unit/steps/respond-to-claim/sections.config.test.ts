@@ -29,8 +29,8 @@ describe('respond-to-claim sections config', () => {
     expect(sectionStepsNotInFlow).toEqual([]);
   });
 
-  it('keeps upload placeholder section available for future steps', () => {
-    expect(respondToClaimSections.uploadFiles.steps).toEqual([]);
+  it('maps upload section steps', () => {
+    expect(respondToClaimSections.uploadFiles.steps).toEqual(['upload-docs']);
   });
 
   it('maps end-of-journey steps into final section', () => {

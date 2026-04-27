@@ -68,18 +68,19 @@ export const respondToClaimSections = {
     titleKey: 'taskList.incomeAndExpenditure',
     order: 6,
     steps: [
-      'income-and-expenditure',
+      'income-and-expenses',
       'what-regular-income-do-you-receive',
       'have-you-applied-for-universal-credit',
       'priority-debts',
       'priority-debt-details',
       'what-other-regular-expenses-do-you-have',
+      'other-considerations',
     ],
   },
   uploadFiles: {
     titleKey: 'taskList.uploadFiles',
     order: 7,
-    steps: [],
+    steps: ['upload-docs'],
   },
   checkYourAnswersAndSubmit: {
     titleKey: 'taskList.checkYourAnswersAndSubmit',
