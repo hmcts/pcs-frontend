@@ -35,7 +35,7 @@ export async function softErrorMessageValidation(
   }
 
   try {
-    await allureStep(`Triggering ErrorMessageValidation(EMV): ${pageKey}`, async () => {
+    await allureStep(`ErrorMessageValidation(EMV) for - ${pageKey}`, async () => {
       const start = ErrorMessageValidation.peekResultsLength();
       let pftError: unknown;
       await pftFun().catch(e => {

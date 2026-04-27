@@ -588,7 +588,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', priorityDebtDetails.continueButton);
 
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatOtherRegularExpensesDoYouHaveErrorValidation);
-    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
 
     await softErrorMessageValidation('otherConsiderations', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', otherConsiderations.mainHeader);
