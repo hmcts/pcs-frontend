@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
@@ -34,6 +36,28 @@ export const step: StepDefinition = createFormStep({
       },
     },
   ],
+  getInitialFormData: req => {
+    const tenancyStartDateRaw = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses
+      ?.tenancyStartDate as string | undefined;
+
+    if (!tenancyStartDateRaw) {
+      return {};
+    }
+
+    const dt = DateTime.fromISO(tenancyStartDateRaw);
+    if (!dt.isValid) {
+      return {};
+    }
+
+    return {
+      tenancyStartDate: {
+        day: dt.toFormat('dd'),
+        month: dt.toFormat('MM'),
+        year: dt.toFormat('yyyy'),
+      },
+    };
+  },
+
   beforeRedirect: async req => {
     const dateObject = req.body?.tenancyStartDate;
     const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';

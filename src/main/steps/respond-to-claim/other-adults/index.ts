@@ -56,20 +56,21 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   getInitialFormData: req => {
-    const caseData =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const existingRadioValue = caseData?.otherTenants as string | undefined;
-    const existingDetails = caseData?.otherTenantsDetails as string | undefined;
+    const hc = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const otherTenants = hc?.otherTenants as string | undefined;
 
-    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
-    const formValue = existingRadioValue ? mapping[existingRadioValue] : undefined;
-
-    const result: Record<string, unknown> = { confirmOtherAdults: formValue };
-    if (existingDetails) {
-      result['confirmOtherAdults.otherAdultsDetails'] = existingDetails;
+    if (!otherTenants) {
+      return {};
     }
 
-    return result;
+    if (otherTenants === 'YES') {
+      return {
+        confirmOtherAdults: 'yes',
+        'confirmOtherAdults.otherAdultsDetails': hc?.otherTenantsDetails ?? '',
+      };
+    }
+
+    return { confirmOtherAdults: 'no' };
   },
   beforeRedirect: async req => {
     const confirmValue = req.body?.confirmOtherAdults as string | undefined;
