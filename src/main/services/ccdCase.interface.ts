@@ -172,6 +172,7 @@ export interface CcdDefendantResponses {
   noticeReceivedDate?: string;
   languageUsed?: LanguageUsed;
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
+  makeCounterClaim?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
