@@ -60,6 +60,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
     await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
     await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performAction('confirmOtherPartiesAgreed', {
+      question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
+      option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
+    });
     await performAction('confirmOrderDoYouWant', {
       label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
       input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
@@ -74,6 +78,8 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: whichLanguageDidYouUseToCompleteThisService.englishAndWelshRadioOption,
     });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 });

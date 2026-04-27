@@ -2,6 +2,7 @@ import config from 'config';
 
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
+  areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   askToAdjournTheCourtHearing,
   checkYourAnswers,
   chooseAnApplication,
@@ -66,8 +67,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-    await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
-    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performAction('confirmOtherPartiesAgreed', {
+      question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
+      option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
+    });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('confirmOrderDoYouWant', {
       label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
@@ -83,6 +86,8 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
     });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
     await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 
@@ -99,5 +104,28 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: isTheCourtHearingInTheNext14Days.noRadioOption,
     });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+    await performAction('confirmOtherPartiesAgreed', {
+      question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
+      option: haveTheOtherPartiesAgreedToThisApplication.noRadioOption,
+    });
+    await performValidation('mainHeader', areThereAnyReasonsThatThisApplicationShouldNotBeShared.mainHeader);
+    await performAction('reasonsApplicationShouldNotBeShared', {
+      question: areThereAnyReasonsThatThisApplicationShouldNotBeShared.areThereAnyReasonQuestion,
+      option: areThereAnyReasonsThatThisApplicationShouldNotBeShared.yesRadioOption,
+      label: areThereAnyReasonsThatThisApplicationShouldNotBeShared.provideReasonHiddenTextLabel,
+      input: areThereAnyReasonsThatThisApplicationShouldNotBeShared.provideReasonTextInput,
+    });
+    await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
+    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.noRadioOption);
+    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performAction('selectLanguageUsedToComplete', {
+      question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
+      option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
+    });
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
   });
 });

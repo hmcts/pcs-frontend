@@ -24,6 +24,7 @@ import { IAction } from '../interfaces';
 export class ActionRegistry {
   private static actions: Map<string, IAction> = new Map<string, IAction>([
     ['check', new CheckAction()],
+    ['uncheck', new CheckAction()],
     ['clickButton', new ClickButtonAction()],
     ['clickSummary', new ClickSummaryAction()],
     ['clickLink', new ClickLinkAction()],
@@ -75,19 +76,27 @@ export class ActionRegistry {
     ['installmentPayments', new RespondToClaimAction()],
     ['selectHowMuchAffordToPay', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
+    ['selectIncomeAndExpenses', new RespondToClaimAction()],
+    ['selectWhatRegularIncomeDoYouReceive', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
+     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
     ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
     ['doYouNeedHelpPayingFee', new GenAppsAction()],
     ['confirmYouHaveAppliedForFeeHelp', new GenAppsAction()],
+    ['confirmOtherPartiesAgreed', new GenAppsAction()],
+    ['reasonsApplicationShouldNotBeShared', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
     ['selectLanguageUsedToComplete', new GenAppsAction()],
+    ['retrieveCYATableData', new GenAppsAction()],
+    ['validateCYA', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
+    ['languageUsed', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
