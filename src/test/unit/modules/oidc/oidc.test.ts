@@ -111,7 +111,6 @@ describe('OIDCModule', () => {
     };
     mockResponse = {
       redirect: jest.fn(),
-      set: jest.fn(),
     };
     mockNext = jest.fn();
   });
@@ -353,7 +352,7 @@ describe('OIDCModule', () => {
         });
         expect(mockRequest.session).not.toHaveProperty('codeVerifier');
         expect(mockRequest.session).not.toHaveProperty('nonce');
-        expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/');
+        expect(mockResponse.redirect).toHaveBeenCalledWith('/');
       });
 
       it('should redirect to returnTo URL when present', async () => {
@@ -383,7 +382,7 @@ describe('OIDCModule', () => {
         const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
-        expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/dashboard');
+        expect(mockResponse.redirect).toHaveBeenCalledWith('/dashboard');
         expect(mockRequest.session).not.toHaveProperty('returnTo');
       });
 
@@ -451,59 +450,33 @@ describe('OIDCModule', () => {
         const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
-        expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/');
+        expect(mockResponse.redirect).toHaveBeenCalledWith('/');
       });
 
-      it('should redirect to login when codeVerifier is missing and user is not logged in', async () => {
+      it('should handle missing session data', async () => {
+        const mockTokens = {
+          access_token: 'test-token',
+          id_token: 'test-id-token',
+          refresh_token: 'test-refresh-token',
+          claims: jest.fn().mockReturnValue({ sub: 'test-sub' }),
+        };
+
+        (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
+
         mockRequest.session = createMockSession({});
 
         oidcModule.enableFor(mockApp);
         const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
-        expect(authorizationCodeGrant).not.toHaveBeenCalled();
-        expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/login');
-      });
-
-      it('should redirect to returnTo on callback replay when user is already logged in', async () => {
-        mockRequest.session = createMockSession({
-          user: { idToken: 'test-id-token' },
-          returnTo: '/dashboard/case-123',
-        });
-
-        oidcModule.enableFor(mockApp);
-        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
-        await callbackHandler(mockRequest, mockResponse, mockNext);
-
-        expect(authorizationCodeGrant).not.toHaveBeenCalled();
-        expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/dashboard/case-123');
-        expect(mockRequest.session).not.toHaveProperty('returnTo');
-      });
-
-      it('should redirect to / on callback replay when user is logged in and returnTo is absent', async () => {
-        mockRequest.session = createMockSession({
-          user: { idToken: 'test-id-token' },
-        });
-
-        oidcModule.enableFor(mockApp);
-        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
-        await callbackHandler(mockRequest, mockResponse, mockNext);
-
-        expect(authorizationCodeGrant).not.toHaveBeenCalled();
-        expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/');
-      });
-
-      it('should set no-store cache headers on callback', async () => {
-        mockRequest.session = createMockSession({
-          user: { idToken: 'test-id-token' },
-        });
-
-        oidcModule.enableFor(mockApp);
-        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
-        await callbackHandler(mockRequest, mockResponse, mockNext);
-
-        expect(mockResponse.set).toHaveBeenCalledWith('Cache-Control', 'no-store');
-        expect(mockResponse.set).toHaveBeenCalledWith('Pragma', 'no-cache');
+        expect(authorizationCodeGrant).toHaveBeenCalledWith(
+          expect.any(Object),
+          expect.any(URL),
+          expect.objectContaining({
+            pkceCodeVerifier: undefined,
+            idTokenExpected: true,
+          })
+        );
       });
     });
 

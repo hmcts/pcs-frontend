@@ -179,19 +179,7 @@ export class OIDCModule {
     // Callback route
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
       try {
-        res.set('Cache-Control', 'no-store');
-        res.set('Pragma', 'no-cache');
-
         const { codeVerifier, nonce } = req.session;
-
-        if (!codeVerifier) {
-          if (req.session.user) {
-            const returnTo = req.session.returnTo || '/';
-            delete req.session.returnTo;
-            return res.redirect(303, returnTo);
-          }
-          return res.redirect(303, '/login');
-        }
 
         const callbackUrl = OIDCModule.getCurrentUrl(req);
 
@@ -231,7 +219,7 @@ export class OIDCModule {
 
           const returnTo = req.session.returnTo || '/';
           delete req.session.returnTo;
-          res.redirect(303, returnTo);
+          res.redirect(returnTo);
         });
       } catch (error) {
         if (error.error_description) {
