@@ -19,7 +19,8 @@ defaults:
   timeout: 30m
 
 playwright:
-  version: 1.58.1
+  # saucectl schema: use a listed pin or package.json (keeps Sauce in sync with package.json).
+  version: package.json
   configFile: playwright.config.ts
 
 nodeVersion: v22
