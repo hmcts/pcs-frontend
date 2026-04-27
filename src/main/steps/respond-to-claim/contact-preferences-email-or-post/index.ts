@@ -64,6 +64,25 @@ export const step: StepDefinition = createFormStep({
     },
   ],
 
+  getInitialFormData: req => {
+    const caseData = req.res?.locals?.validatedCase?.data?.possessionClaimResponse;
+    const preferenceType = caseData?.defendantResponses?.preferenceType as string | undefined;
+    const emailAddress = caseData?.defendantContactDetails?.party?.emailAddress as string | undefined;
+
+    const result: Record<string, unknown> = {};
+
+    if (preferenceType === 'EMAIL') {
+      result.contactByEmailOrPost = 'email';
+      if (emailAddress) {
+        result['contactByEmailOrPost.email'] = emailAddress;
+      }
+    } else if (preferenceType === 'POST') {
+      result.contactByEmailOrPost = 'post';
+    }
+
+    return result;
+  },
+
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
     const contactByEmailOrPost = req.body?.contactByEmailOrPost as 'email' | 'post' | undefined;

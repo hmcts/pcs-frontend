@@ -39,6 +39,22 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+
+  getInitialFormData: req => {
+    const caseData = req.res?.locals?.validatedCase?.data?.possessionClaimResponse;
+    const contactByText = caseData?.defendantResponses?.contactByText as string | undefined;
+
+    const result: Record<string, unknown> = {};
+
+    if (contactByText === 'YES') {
+      result.contactByTextMessage = 'yes';
+    } else if (contactByText === 'NO') {
+      result.contactByTextMessage = 'no';
+    }
+
+    return result;
+  },
+
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
     const contactByTextMessage = req.body?.contactByTextMessage as 'yes' | 'no' | undefined;
