@@ -7,7 +7,7 @@
   },
   "errors": {
     "disputeDetails": {
-      "required": "cyEnter the parts of the claim the defendant does not agree with"
+      "required": "cyEnter the parts of the claim the defendant disputes"
     }
   }
 }

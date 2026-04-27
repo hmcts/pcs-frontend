@@ -32,7 +32,23 @@ export const step: StepDefinition = createFormStep({
       translationKey: { label: 'question', hint: 'hintText' },
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
-        { value: 'YES', translationKey: 'options.yes' },
+        { 
+          value: 'YES', 
+          translationKey: 'options.yes',
+          subFields: {
+            noticeDateGiven: {
+              name: 'noticeDateGiven',
+              type: 'date',
+              required: false,
+              noFutureDate: true,
+              noCurrentDate: true,
+              legendClasses: 'govuk-label--s govuk-!-font-weight-bold',
+              translationKey: {
+                label: 'noticeDateLabel'
+              }
+            }
+          }
+        },
         { value: 'NO', translationKey: 'options.no' },
         { divider: 'options.or' },
         { value: 'NOT_SURE', translationKey: 'options.imNotSure' },

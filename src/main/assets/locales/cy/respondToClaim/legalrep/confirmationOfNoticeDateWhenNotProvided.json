@@ -1,6 +1,6 @@
 {
   "caseNumber": "cyCase number: {{caseNumber}}",
-  "question": "cyWhen did the defendant receive notice from {{claimantName}} (optional)?",
+  "question": "cyWhen did the defendant receive notice from {{claimantName}}? (Optional)",
   "noticeDateHint": "",
   "paragraph": "cy{{claimantName}} did not provide the date they served the defendant notice."
 }

@@ -1,10 +1,24 @@
 {
   "caseNumber": "Case number: {{caseNumber}}",
   "hintText": "",
+  "question": "Did {{claimantName}} give the defendant notice of their intention to begin possession proceedings?",
   "options": {
     "yes": "Yes",
     "no": "No",
     "or": " ",
     "imNotSure": "Defendant is not sure"
+  },
+  "noticeDateLabel": "When did the defendant receive notice from {{claimantName}} ? (Optional)",
+    "errors": {
+    "date": {
+      "day": "Day",
+      "month": "Month",
+      "year": "Year",
+      "required": "The date must include a day, month and year",
+      "notRealDate": "The date must be a real date",
+      "futureDate": "The date must be in the past",
+      "missingOne": "The date must include a {{missingField}}",
+      "missingTwo": "The date must include a {{first}} and {{second}}"
+    }
   }
 }

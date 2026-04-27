@@ -6,5 +6,18 @@
     "no": "cyNo",
     "or": " ",
     "imNotSure": "cyDefendant is not sure"
+  },
+  "noticeDateLabel": "cyWhen did the defendant receive notice from {{claimantName}} ? (Optional)",
+    "errors": {
+    "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
+      "required": "cyThe date must include a day, month and year",
+      "notRealDate": "cyThe date must be a real date",
+      "futureDate": "cyThe date must be in the past",
+      "missingOne": "cyThe date must include a {{missingField}}",
+      "missingTwo": "cyThe date must include a {{first}} and {{second}}"
+    }
   }
 }

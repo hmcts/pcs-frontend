@@ -169,6 +169,8 @@ export const step: StepDefinition = createFormStep({
 
     const receivedDetailsBy = isLegalRepresentativeUser(req) ? claimantName : orgName;
 
+    console.log("Testing Claimant name:" + receivedDetailsBy)
+
     const tenancyType =
       tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
 
