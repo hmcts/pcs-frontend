@@ -24,6 +24,17 @@ let previousUrl: string = '';
 let startFunctionalTests = false;
 let startAxeAudit = false;
 
+/**
+ * Used to mark an individual errorMessage validation step as failed in reporting,
+ * while allowing PFT journeys to continue and aggregate failures at the end.
+ */
+class SoftErrorMessageStepFailed extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SoftErrorMessageStepFailed';
+  }
+}
+
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
   previousUrl = page.url();
@@ -140,9 +151,34 @@ export async function performValidation(
   const validationStepText = `Validated ${validation}${
     fieldName ? ` - '${typeof fieldName === 'object' ? readValuesFromInputObjects(fieldName) : fieldName}'` : ''
   }${data !== undefined ? ` with value '${typeof data === 'object' ? readValuesFromInputObjects(data) : data}'` : ''}`;
-  await test.step(validationStepText, async () => {
-    await validationInstance.validate(executor.page, validation, fieldName, data);
-  });
+  if (validation !== 'errorMessage') {
+    await test.step(validationStepText, async () => {
+      await validationInstance.validate(executor.page, validation, fieldName, data);
+    });
+    return;
+  }
+
+  try {
+    await test.step(validationStepText, async () => {
+      const start = ErrorMessageValidation.peekResultsLength();
+      await validationInstance.validate(executor.page, validation, fieldName, data);
+      const failedChecks = ErrorMessageValidation.getResultsSliceSince(start).filter(result => !result.passed);
+
+      if (failedChecks.length === 0) {
+        return;
+      }
+
+      const failureDetail = failedChecks
+        .map(result => `${result.pageName || fieldName || 'errorMessage'}: ${result.expected}`)
+        .join('\n');
+      throw new SoftErrorMessageStepFailed(failureDetail);
+    });
+  } catch (error) {
+    if (error instanceof SoftErrorMessageStepFailed) {
+      return;
+    }
+    throw error;
+  }
 }
 
 export async function performActions(groupName: string, ...actions: actionTuple[]): Promise<void> {
