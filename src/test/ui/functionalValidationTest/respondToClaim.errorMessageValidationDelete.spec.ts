@@ -200,8 +200,8 @@ test.afterEach(() => {
   ErrorMessageValidation.clearResults();
 });
 
-test.describe('Respond to claim — error message validation @nightly @PR without wrapper', () => {
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression @error', async () => {
+test.describe('Respond to claim — error message validation @nightly without wrapper', () => {
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression @PR', async () => {
     await freeLegalAdviceErrorValidation();
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
 
