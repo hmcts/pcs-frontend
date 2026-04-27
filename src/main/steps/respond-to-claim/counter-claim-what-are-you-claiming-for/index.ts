@@ -43,11 +43,7 @@ export const step: StepDefinition = createFormStep({
     return { claimType };
   },
   beforeRedirect: async req => {
-    const claimType = req.body?.claimType as string | undefined;
-
-    if (!claimType) {
-      return;
-    }
+    const claimType = req.body?.claimType as string;
 
     const counterClaim: CcdCounterClaim = { claimType };
     const possessionClaimResponse: PossessionClaimResponse = {
