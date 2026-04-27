@@ -41,7 +41,7 @@ export const step: StepDefinition = createFormStep({
   ],
 
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data?.possessionClaimResponse;
+    const caseData = req.res?.locals?.validatedCase?.possessionClaimResponse;
     const contactByText = caseData?.defendantResponses?.contactByText as string | undefined;
 
     const result: Record<string, unknown> = {};
