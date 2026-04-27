@@ -1,4 +1,4 @@
-import { type StepContext, step as allureStep } from 'allure-js-commons';
+import { step as allureStep } from 'allure-js-commons';
 
 import { ErrorMessageValidation } from '../validations/custom-validations';
 
@@ -22,12 +22,15 @@ export async function softErrorMessageValidation(
   pftFun: (() => Promise<void>) | string
 ): Promise<void> {
   if (typeof pftFun === 'string') {
-    await allureStep(
-      `No ErrorMessageValidation(EMV): ${pageKey} (read-only, placeholder, or pending design)`,
-      async (ctx: StepContext) => {
-        await ctx.parameter('Note', pftFun.slice(0, 4000));
-      }
-    );
+    // Do not use StepContext.parameter() here: with allure-playwright it can race step teardown
+    // and log "could not update test step: no step with uuid ... is found". Keep the reason in the title.
+    const note = pftFun.trim().slice(0, 400);
+    const title = note
+      ? `No ErrorMessageValidation(EMV): ${pageKey} — ${note}`
+      : `No ErrorMessageValidation(EMV): ${pageKey}`;
+    await allureStep(title, async () => {
+      /* note is in step title */
+    });
     return;
   }
 
