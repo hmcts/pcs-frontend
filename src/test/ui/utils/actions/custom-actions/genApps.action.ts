@@ -4,6 +4,7 @@ import {
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
+  doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
@@ -32,6 +33,7 @@ export class GenAppsAction implements IAction {
       ],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
+      ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
       ['validateCYA', () => this.validateCYA()],
     ]);
@@ -122,6 +124,15 @@ export class GenAppsAction implements IAction {
       FieldsStore.delete(reason.label as string);
     }
     await performAction('clickButton', areThereAnyReasonsThatThisApplicationShouldNotBeShared.continueButton);
+  }
+
+  private async confirmDocumentToUpload(confirmUpload: actionRecord) {
+    await performAction('recordUserEntry', confirmUpload);
+    await performAction('clickRadioButton', {
+      question: confirmUpload.question,
+      option: confirmUpload.option,
+    });
+    await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {

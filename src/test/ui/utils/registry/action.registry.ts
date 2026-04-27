@@ -91,6 +91,7 @@ export class ActionRegistry {
     ['selectLanguageUsedToComplete', new GenAppsAction()],
     ['retrieveCYATableData', new GenAppsAction()],
     ['validateCYA', new GenAppsAction()],
+    ['confirmDocumentToUpload', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
     ['languageUsed', new RespondToClaimAction()],
   ]);
