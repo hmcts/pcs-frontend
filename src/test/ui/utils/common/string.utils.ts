@@ -48,7 +48,10 @@ export function formatTextToLowercaseSeparatedBySpace(value: string): string {
   return value.toLowerCase().replace(/_/g, ' ').trim();
 }
 
-export function generateRandomString(length: number): string {
+export function generateRandomString(length: string | number): string {
+  if (typeof length !== 'number' || !Number.isInteger(length) || length <= 0) {
+    return '';
+  }
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
