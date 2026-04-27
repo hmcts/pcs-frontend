@@ -5,6 +5,17 @@ import type { PossessionClaimResponse } from '@services/ccdCase.interface';
  * Normalisers mutate a working copy in place; the orchestrator owns the cloning so the
  * public boundary stays pure.
  *
+ * When to add a normaliser:
+ *   1. A step is conditionally skipped based on a defendant's answer (mutable trigger).
+ *   2. The skipped step's data lives in `defendantResponses.*`.
+ *   3. If the user goes back and changes their answer, the skipped step's data becomes stale.
+ *   Rule: delete the stale downstream field when its trigger condition is no longer met.
+ *
+ * When NOT to add a normaliser:
+ *   - The routing gate is claimant data (e.g. hasTenancyStartDate) — it never changes, so
+ *     no stale data can accumulate.
+ *   - The stale field is in `defendantContactDetails.party.*` — see constraint below.
+ *
  * IMPORTANT: only operate on `defendantResponses.*`. Fields under
  * `defendantContactDetails.party.*` are rebuilt from PartyEntity by the BE on every START
  * callback — dropping them in a normaliser appears to work locally but the next page reload
