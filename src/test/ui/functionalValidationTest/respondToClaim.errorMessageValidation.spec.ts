@@ -37,6 +37,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
@@ -76,10 +77,12 @@ let claimantName: string;
 
 // softErrorMessageValidation(pageName, validationOrReason):
 // - 1st param: journey page key/name (for example 'tenancyTypeDetails').
-// - 2nd param: PFT error-validation function for that page, or a custom string to explain why EMV is missing/deferred/not applicable.
+// - 2nd param: PFT error-validation function for that page, or a custom string
+//   to explain why ErrorMessageValidation(EMV) is missing/deferred/not applicable.
 
 const NO_EMV_READ_ONLY = 'Read-only / informational screen — no field error validation.';
-const NO_EMV_PENDING_PFT = 'Error message validation (PFT) for this page is not designed yet.';
+const NO_EMV_PLACEHOLDER_PAGE = 'Placeholder page — ErrorMessageValidation(EMV) is not designed yet.';
+const NO_EMV_MISSING_DESIGN = 'ErrorMessageValidation(EMV) is missing for this page and needs to be designed.';
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -212,7 +215,7 @@ test.afterEach(() => {
 });
 
 test.describe('Respond to claim — error message validation @nightly @EMV', () => {
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression @PR', async () => {
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
 
@@ -224,14 +227,14 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
       lName: defendantNameConfirmation.lastNameInputText,
     });
 
-    await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
 
-    await softErrorMessageValidation('correspondenceAddressKnown', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('correspondenceAddressKnown', NO_EMV_MISSING_DESIGN);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
@@ -260,8 +263,7 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
     await softErrorMessageValidation('tenancyDateDetails', tenancyDateDetailsErrorValidation);
     await performAction('selectTenancyStartDateKnown', { option: tenancyDateDetails.yesRadioOption });
 
-    await softErrorMessageValidation('confirmationOfNoticeGiven', 'confirmationOfNoticeGiven EMV deferred — HDPI-6087');
-    // confirmationOfNoticeGiven EMV deferred — HDPI-6087
+    await softErrorMessageValidation('confirmationOfNoticeGiven', confirmationOfNoticeGivenErrorValidation);
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
@@ -370,31 +372,31 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
       ],
     });
 
-    await softErrorMessageValidation('priorityDebts', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('priorityDebts', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
 
-    await softErrorMessageValidation('priorityDebtDetails', 'No EMV yet as this place holder page');
+    await softErrorMessageValidation('priorityDebtDetails', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
 
-    await softErrorMessageValidation('whatOtherRegularExpensesDoYouHave', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('whatOtherRegularExpensesDoYouHave', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
 
-    await softErrorMessageValidation('otherConsiderations', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('otherConsiderations', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', otherConsiderations.mainHeader);
     await performAction('clickButton', otherConsiderations.continueButton);
 
-    await softErrorMessageValidation('uploadDocuments', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('uploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', uploadDocuments.mainHeader);
     await performAction('clickButton', uploadDocuments.continueButton);
 
-    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
 
-    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
 
@@ -407,7 +409,7 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
     assertAllErrorMessageValidations();
   });
 
-  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression @error', async () => {
+  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
 
@@ -417,7 +419,7 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
       lName: defendantNameCapture.lastNameTextInput,
     });
 
-    await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
     await performAction('enterDateOfBirthDetails');
 
     await softErrorMessageValidation('correspondenceAddressUnknown', correspondenceAddressErrorValidation);
@@ -463,7 +465,7 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
       tsYear: '2024',
     });
 
-    // confirmationOfNoticeGiven EMV deferred — HDPI-6087
+    await softErrorMessageValidation('confirmationOfNoticeGiven', NO_EMV_MISSING_DESIGN);
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
@@ -542,35 +544,35 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
     await performAction('selectWhatRegularIncomeDoYouReceive');
 
-    await softErrorMessageValidation('haveYouAppliedForUniversalCredit', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('haveYouAppliedForUniversalCredit', NO_EMV_MISSING_DESIGN);
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
 
-    await softErrorMessageValidation('priorityDebts', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('priorityDebts', NO_EMV_MISSING_DESIGN);
     await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
 
-    await softErrorMessageValidation('priorityDebtDetails', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('priorityDebtDetails', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
 
-    await softErrorMessageValidation('whatOtherRegularExpensesDoYouHave', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('whatOtherRegularExpensesDoYouHave', NO_EMV_MISSING_DESIGN);
     await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
 
-    await softErrorMessageValidation('otherConsiderations', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('otherConsiderations', NO_EMV_MISSING_DESIGN);
     await performValidation('mainHeader', otherConsiderations.mainHeader);
     await performAction('clickButton', otherConsiderations.continueButton);
 
-    await softErrorMessageValidation('uploadDocuments', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('uploadDocuments', NO_EMV_MISSING_DESIGN);
     await performValidation('mainHeader', uploadDocuments.mainHeader);
     await performAction('clickButton', uploadDocuments.continueButton);
 
-    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_MISSING_DESIGN);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
 
-    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_MISSING_DESIGN);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
 
