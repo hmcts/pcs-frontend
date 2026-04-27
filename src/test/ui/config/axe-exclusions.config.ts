@@ -19,5 +19,6 @@ export const axe_exclusions = [
   '#exceptionalHardship', //page: exceptionalHardship, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#alreadyAppliedForHelp', //page : alreadyAppliedForHelp,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#otherConsiderations', //page: otherConsiderations, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#alreadyAppliedForHwf', //page : alreadyAppliedForHwf,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#alreadyAppliedForHwf', //page : alreadyAppliedForHelp,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#reasonsAppShouldNotBeShared', //page : reasonsAppShouldNotBeShared,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
 ];
