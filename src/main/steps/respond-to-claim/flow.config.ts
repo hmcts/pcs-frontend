@@ -5,6 +5,7 @@ import {
   getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
+  hasMultipleParties,
   hasOnlyRentArrearsGrounds,
   hasSelectedUniversalCredit,
   hasSkippedEqualityAndDiversityQuestions,
@@ -21,7 +22,6 @@ import {
 import { isMoneyCounterClaim } from './utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
-import { hasMultipleParties } from 'steps/utils/hasMultipleParties';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
