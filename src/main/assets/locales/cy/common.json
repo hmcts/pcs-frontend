@@ -50,6 +50,7 @@
     "yes": "cyYes",
     "no": "cyNo"
   },
+  "warningHiddenText": "cyWarning",
   "errors": {
     "title": "cyThere is a problem",
     "required": "cyEnter a value",
@@ -106,8 +107,7 @@
     "minute": "cyminute",
     "minutes": "cyminutes",
     "second": "cysecond",
-    "seconds": "cyseconds",
-    "remaining": "cyremaining"
+    "seconds": "cyseconds"
   },
   "errorPages": {
     "403": {
