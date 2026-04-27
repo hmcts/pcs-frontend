@@ -38,13 +38,7 @@ import { HTTPError } from '../HttpError';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { CaseState } from '@services/ccdCase.interface';
-import type {
-  CcdCase,
-  CcdCaseData,
-  CcdUserCases,
-  PossessionClaimResponse,
-  StartCallbackData,
-} from '@services/ccdCase.interface';
+import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
 
 const logger = Logger.getLogger('ccdCaseService');
 
@@ -319,14 +313,6 @@ export const ccdCaseService = {
       }
       throw httpError;
     }
-  },
-
-  async saveDraftDefendantResponse(
-    accessToken: string | undefined,
-    caseId: string,
-    response: PossessionClaimResponse
-  ): Promise<CcdCase> {
-    return this.updateDraftRespondToClaim(accessToken, caseId, { possessionClaimResponse: response });
   },
 
   async updateDraftRespondToClaim(

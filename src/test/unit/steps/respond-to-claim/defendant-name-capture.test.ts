@@ -57,17 +57,12 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
     defendantResponses: {},
     defendantContactDetails: { party: {} },
   })),
-}));
-
-jest.mock('../../../../main/services/ccdCaseService', () => ({
-  ccdCaseService: {
-    saveDraftDefendantResponse: jest.fn(),
-  },
+  saveDraftDefendantResponse: jest.fn(),
 }));
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 describe('respond-to-claim defendant-name-capture step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -159,7 +154,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
   it('POST saves data and redirects when validation passes', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
-    (ccdCaseService.saveDraftDefendantResponse as jest.Mock).mockResolvedValue(undefined);
+    (saveDraftDefendantResponse as jest.Mock).mockResolvedValue(undefined);
 
     const req = createReq({
       body: { action: 'continue', firstName: 'Jane', lastName: 'Doe' },
@@ -171,9 +166,8 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
     await step.postController!.post(req, res, next);
 
-    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-      undefined, // accessToken
-      '123', // caseId
+    expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+      req,
       expect.objectContaining({
         defendantContactDetails: expect.objectContaining({
           party: expect.objectContaining({

@@ -10,16 +10,11 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
     defendantResponses: {},
     defendantContactDetails: { party: {} },
   })),
+  saveDraftDefendantResponse: jest.fn(),
 }));
 
-jest.mock('../../../../main/services/ccdCaseService', () => ({
-  ccdCaseService: {
-    saveDraftDefendantResponse: jest.fn(),
-  },
-}));
-
-import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 describe('contact-preferences-email-or-post', () => {
   const createBaseReqRes = () => {
@@ -71,9 +66,8 @@ describe('contact-preferences-email-or-post', () => {
     expect(post).toBeDefined();
     await post!(req, res, next);
 
-    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-      undefined, // accessToken
-      '123', // caseId
+    expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+      req,
       expect.objectContaining({
         defendantContactDetails: expect.objectContaining({
           party: expect.objectContaining({
@@ -97,9 +91,8 @@ describe('contact-preferences-email-or-post', () => {
     expect(post).toBeDefined();
     await post!(req, res, next);
 
-    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-      undefined, // accessToken
-      '123', // caseId
+    expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+      req,
       expect.objectContaining({
         defendantResponses: expect.objectContaining({
           preferenceType: 'POST',

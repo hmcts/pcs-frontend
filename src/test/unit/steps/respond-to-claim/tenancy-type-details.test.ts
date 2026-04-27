@@ -28,16 +28,11 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
     defendantResponses: {},
     defendantContactDetails: { party: {} },
   })),
+  saveDraftDefendantResponse: jest.fn(),
 }));
 
-jest.mock('../../../../main/services/ccdCaseService', () => ({
-  ccdCaseService: {
-    saveDraftDefendantResponse: jest.fn(),
-  },
-}));
-
-import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
 
 type TenancyTypeDetailsStep = {
@@ -142,9 +137,8 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
       await testedStep.beforeRedirect(req);
 
-      expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-        undefined, // accessToken
-        '', // caseId (empty string fallback)
+      expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+        expect.anything(), // req
         expect.objectContaining({
           defendantResponses: expect.objectContaining({
             tenancyTypeCorrect,
@@ -160,9 +154,8 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
         await testedStep.beforeRedirect(req);
 
-        expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-          undefined, // accessToken
-          '', // caseId (empty string fallback)
+        expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+          expect.anything(), // req
           {
             defendantResponses: {},
             defendantContactDetails: { party: {} },

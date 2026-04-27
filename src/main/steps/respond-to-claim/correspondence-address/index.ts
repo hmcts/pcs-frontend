@@ -3,12 +3,11 @@ import isPostalCode from 'validator/lib/isPostalCode';
 
 import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { arrayToString } from '../../../utils/arrayToString';
-import { buildDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
 
 const STEP_NAME = 'postcode-finder';
 
@@ -133,11 +132,7 @@ export const step: StepDefinition = createFormStep({
       };
     }
 
-    await ccdCaseService.saveDraftDefendantResponse(
-      req.session?.user?.accessToken,
-      req.res?.locals.validatedCase?.id || '',
-      response
-    );
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'correspondence-address', ['common']);

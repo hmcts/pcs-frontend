@@ -35,12 +35,7 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
     defendantResponses: {},
     defendantContactDetails: { party: {} },
   })),
-}));
-
-jest.mock('../../../../main/services/ccdCaseService', () => ({
-  ccdCaseService: {
-    saveDraftDefendantResponse: jest.fn(),
-  },
+  saveDraftDefendantResponse: jest.fn(),
 }));
 
 const t = ((key: string) => {
@@ -76,8 +71,8 @@ const t = ((key: string) => {
 }) as unknown as (key: string, options?: unknown) => string;
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/repayments-agreed';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 describe('respond-to-claim repayments-agreed step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -137,9 +132,8 @@ describe('respond-to-claim repayments-agreed step', () => {
     }
     await step.postController.post(req, res, next);
 
-    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-      'token', // accessToken
-      '1234567890123456', // caseId
+    expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+      expect.anything(), // req
       expect.objectContaining({
         defendantResponses: expect.objectContaining({
           paymentAgreement: expect.objectContaining({
@@ -169,9 +163,8 @@ describe('respond-to-claim repayments-agreed step', () => {
     }
     await step.postController.post(req, res, next);
 
-    expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-      'token', // accessToken
-      '1234567890123456', // caseId
+    expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+      expect.anything(), // req
       expect.objectContaining({
         defendantResponses: expect.objectContaining({
           paymentAgreement: expect.objectContaining({

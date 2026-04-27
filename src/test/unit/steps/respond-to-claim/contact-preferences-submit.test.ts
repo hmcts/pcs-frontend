@@ -10,17 +10,12 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
     defendantResponses: {},
     defendantContactDetails: { party: {} },
   })),
+  saveDraftDefendantResponse: jest.fn(),
 }));
 
-jest.mock('../../../../main/services/ccdCaseService', () => ({
-  ccdCaseService: {
-    saveDraftDefendantResponse: jest.fn(),
-  },
-}));
-
-import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step as telephoneStep } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
 import { step as textStep } from '../../../../main/steps/respond-to-claim/contact-preferences-text-message';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 describe('contact preferences submit-time CCD payloads', () => {
   // Reusable minimal req/res scaffolding for formBuilder steps
@@ -76,9 +71,8 @@ describe('contact preferences submit-time CCD payloads', () => {
 
       await post!(req as unknown as Request, res as unknown as Response, next);
 
-      expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-        undefined, // accessToken
-        '123', // caseId
+      expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
         expect.objectContaining({
           defendantContactDetails: expect.objectContaining({
             party: expect.objectContaining({
@@ -106,9 +100,8 @@ describe('contact preferences submit-time CCD payloads', () => {
 
       await post!(req as unknown as Request, res as unknown as Response, next);
 
-      expect(ccdCaseService.saveDraftDefendantResponse).toHaveBeenCalledWith(
-        undefined, // accessToken
-        '123', // caseId
+      expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
         expect.objectContaining({
           defendantResponses: expect.objectContaining({
             contactByText: 'YES',
