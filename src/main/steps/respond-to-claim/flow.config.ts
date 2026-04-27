@@ -444,15 +444,15 @@ export const flowConfig: JourneyFlowConfig = {
         },
         {
           condition: async (
-            req: Request,
+            _req: Request,
             _formData: Record<string, unknown>,
             currentStepData: Record<string, unknown>
-          ) => currentStepData.counterClaimNeedHelpWithFees === 'NO' && (await hasMultipleParties()),
+          ) => currentStepData.counterClaimNeedHelpWithFees === 'NO' && hasMultipleParties(),
           nextStep: 'counter-claim-against-who',
         },
         {
           condition: async (
-            req: Request,
+            _req: Request,
             _formData: Record<string, unknown>,
             currentStepData: Record<string, unknown>
           ) => currentStepData.counterClaimNeedHelpWithFees === 'NO' && !(await hasMultipleParties()),
