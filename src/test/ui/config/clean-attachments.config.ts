@@ -3,6 +3,11 @@ import * as path from 'path';
 
 const testCasesPath = path.join(__dirname, '../../../../allure-report/data/test-cases');
 
+if (!fs.existsSync(testCasesPath)) {
+  console.log(`Skipping attachment cleanup: path does not exist (${testCasesPath})`);
+  process.exit(0);
+}
+
 const files = fs.readdirSync(testCasesPath).filter(f => f.endsWith('.json'));
 
 for (const file of files) {
@@ -43,6 +48,6 @@ for (const file of files) {
       fs.writeFileSync(filePath, JSON.stringify(cleanedData, null, 2));
     }
   } catch (error) {
-    console.log(error.message()); // Ignore errors
+    console.log(error instanceof Error ? error.message : String(error)); // Ignore per-file errors
   }
 }

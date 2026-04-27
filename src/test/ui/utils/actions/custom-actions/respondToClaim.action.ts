@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
+import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
@@ -17,9 +18,11 @@ import {
   exceptionalHardship,
   freeLegalAdvice,
   howMuchAffordToPay,
+  incomeAndExpenses,
   installmentPayments,
   landlordLicensed,
   landlordRegistered,
+  languageUsed,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
@@ -30,6 +33,8 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  whatOtherRegularExpensesDoYouHave,
+  whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
   yourCircumstances,
@@ -67,8 +72,17 @@ export class RespondToClaimAction implements IAction {
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
+      ['selectIncomeAndExpenses', () => this.selectIncomeAndExpenses(fieldName as actionRecord)],
+      [
+        'selectWhatRegularIncomeDoYouReceive',
+        () => this.selectWhatRegularIncomeDoYouReceive(fieldName as actionRecord),
+      ],
       ['yourCircumstances', () => this.yourCircumstances(fieldName as actionRecord)],
       ['exceptionalHardship', () => this.exceptionalHardship(fieldName as actionRecord)],
+      [
+        'selectWhatOtherRegularExpensesDoYouHave',
+        () => this.selectWhatOtherRegularExpensesDoYouHave(fieldName as actionRecord),
+      ],
       [
         'selectIfAnyOtherAdultsLiveInYourHouse',
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
@@ -79,6 +93,7 @@ export class RespondToClaimAction implements IAction {
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
+      ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -282,6 +297,54 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
   }
 
+  private async selectIncomeAndExpenses(incomeAndExpenseData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: incomeAndExpenses.doYouWantToProvideDetailsHeader,
+      option: incomeAndExpenseData.incomeAndExpensesOption,
+    });
+    await performAction('clickButton', incomeAndExpenses.saveAndContinueButton);
+  }
+
+  private async selectWhatRegularIncomeDoYouReceive(regularIncome?: actionRecord): Promise<void> {
+    if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+      return;
+    }
+
+    for (const income of regularIncome.regularIncomeOptions) {
+      const [option, value, frequency] = income;
+
+      // Select checkbox
+      await performAction('check', {
+        question: whatRegularIncomeDoYouReceive.mainHeader,
+        option,
+      });
+
+      // Special case: "moneyFromSomewhereElse"
+      if (option === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph) {
+        await performAction(
+          'inputText',
+          whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
+          value
+        );
+        continue;
+      }
+
+      // Normal validation
+      if (!value || !frequency) {
+        throw new Error(`Amount and frequency are required for option: ${option}`);
+      }
+
+      // Enter amount
+      await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
+
+      // Select frequency
+      await performAction('clickRadioButton', frequency);
+    }
+
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  }
+
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
     const getDetailsGivenByParagraph = tenancyDateDetails.getDetailsGivenByParagraph(claimantsName);
     await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
@@ -422,23 +485,41 @@ export class RespondToClaimAction implements IAction {
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
     const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
     const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
-
-    if (
-      tenancyType === 'assured tenancy' ||
-      tenancyType === 'introductory tenancy' ||
-      tenancyType === 'secure tenancy' ||
-      tenancyType === 'flexible tenancy' ||
-      tenancyType === 'demoted tenancy'
-    ) {
-      await performValidation('text', {
-        elementType: 'listItem',
-        text: `The property is let under ${article} ${tenancyType} agreement`,
-      });
-    } else if (tenancyType === 'other') {
-      await performValidation('text', {
-        elementType: 'listItem',
-        text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
-      });
+    if (process.env.WALES_POSTCODE === 'YES') {
+      if (tenancyType === 'secure contract') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under a secure occupation contract`,
+        });
+      } else if (tenancyType === 'standard contract') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under a standard occupation contract`,
+        });
+      } else if (tenancyType === 'other') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiDataWales.submitCaseRentOtherTenancy.otherLicenceTypeDetails}`,
+        });
+      }
+    } else {
+      if (
+        tenancyType === 'assured tenancy' ||
+        tenancyType === 'introductory tenancy' ||
+        tenancyType === 'secure tenancy' ||
+        tenancyType === 'flexible tenancy' ||
+        tenancyType === 'demoted tenancy'
+      ) {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under ${article} ${tenancyType} agreement`,
+        });
+      } else if (tenancyType === 'other') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+        });
+      }
     }
     await performAction('clickRadioButton', {
       question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
@@ -518,6 +599,39 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  }
+
+  private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
+    if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+      return;
+    }
+
+    for (const income of regularIncome.regularIncomeOptions) {
+      const [option, value, frequency] = income;
+
+      await performAction('check', {
+        question: whatOtherRegularExpensesDoYouHave.mainHeader,
+        option,
+      });
+      console.log('option' + option);
+      if (!value || !frequency) {
+        throw new Error(`Amount and frequency are required for option: ${option}`);
+      }
+      await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
+      console.log('input' + value);
+      await performAction('clickRadioButton', frequency);
+      console.log('frequency' + frequency);
+    }
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+  }
+
+  private async languageUsed(languageScreenData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: languageScreenData.question,
+      option: languageScreenData.radioOption,
+    });
+    await performAction('clickButton', languageUsed.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

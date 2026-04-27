@@ -1,11 +1,39 @@
 {
   "caseReferenceLabel": "Case number:",
+  "iWantToHeading": "I want to...",
+  "askCourtToMakeOrder": "Ask the court to make an order (make a general application)",
+  "uploadAdditionalDocuments": "Upload additional documents",
   "helpAndSupportHeading": "Help and support",
+  "helpAndSupportAriaLabel": "Help and support",
   "contactInformationAriaLabel": "Support and contact information",
   "helpWithFees": "Help with fees",
-  "findOutAboutMediation": "Find out about mediation",
   "whatToExpectAtTheHearing": "What to expect at a hearing",
   "representMyselfAtTheHearing": "Represent myself at a hearing",
   "findLegalAdvice": "Find legal advice",
-  "findInformation": "Find information about my court"
+  "getDebtRespite": "Get debt respite (Breathing Space)",
+  "findInformation": "Find information about my court",
+  "tasks": {
+    "Task": {
+      "AAA6": {
+        "Claim": {
+          "ViewClaim": { "title": "View the claim" },
+          "Adjustments": { "title": "Support or adjustments during your hearing" },
+          "Equality": { "title": "Equality" },
+          "Information": { "title": "Claim information" }
+        },
+        "Response": {
+          "ViewResponse": { "title": "View the response" },
+          "Information": { "title": "Response information" }
+        },
+        "Hearing": {
+          "ViewHearing": { "title": "View the hearing" },
+          "UploadDocuments": { "title": "Upload documents" },
+          "ViewDocuments": { "title": "View documents" },
+          "TrialArrangments": { "title": "Trial arrangements" },
+          "PayFee": { "title": "Pay the hearing fee" },
+          "ViewBundle": { "title": "View the hearing bundle" }
+        }
+      }
+    }
+  }
 }

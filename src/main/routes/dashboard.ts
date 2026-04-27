@@ -1,9 +1,11 @@
+import config from 'config';
 import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
 
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 
+import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import type { CcdCase, CcdCaseAddress } from '@services/ccdCase.interface';
 import {
@@ -56,15 +58,55 @@ export const DASHBOARD_ROUTE = '/dashboard';
 
 const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'helpWithFees', href: 'https://www.gov.uk/get-help-with-court-fees' },
-  { key: 'findOutAboutMediation', href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation' },
   {
     key: 'whatToExpectAtTheHearing',
     href: 'https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal',
   },
   { key: 'representMyselfAtTheHearing', href: 'https://www.gov.uk/represent-yourself-in-court' },
   { key: 'findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
+  { key: 'getDebtRespite', href: 'https://www.gov.uk/options-for-dealing-with-your-debts/breathing-space' },
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
+
+function getIWantToLinks(caseId: string): { key: string; href: string }[] {
+  return [
+    {
+      key: 'askCourtToMakeOrder',
+      href: `/case/${caseId}/make-an-application/choose-an-application`,
+    },
+    {
+      key: 'uploadAdditionalDocuments',
+      href: `/case/${caseId}/upload-additional-documents`,
+    },
+  ];
+}
+
+function getDashboardTaskRoutes(): Record<string, string> {
+  if (!config.has('dashboard.taskRoutes')) {
+    return {};
+  }
+  const taskRoutes = config.get('dashboard.taskRoutes');
+  if (taskRoutes && typeof taskRoutes === 'object') {
+    return taskRoutes as Record<string, string>;
+  }
+  return {};
+}
+
+function getTaskUrl(
+  templateId: string,
+  taskStatus: string,
+  caseReference: string,
+  taskGroupId: string
+): string | undefined {
+  if (taskStatus === 'NOT_AVAILABLE') {
+    return undefined;
+  }
+  const pattern = getDashboardTaskRoutes()[templateId];
+  if (pattern) {
+    return pattern.replace(/:caseReference/g, caseReference);
+  }
+  return `/dashboard/${caseReference}/${taskGroupId}/${templateId}`;
+}
 
 export const getDashboardUrl = (caseReference?: string | number): string | null => {
   if (!caseReference) {
@@ -79,8 +121,10 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
   return `${DASHBOARD_ROUTE}/${sanitised}`;
 };
 
-function mapTaskGroups(app: Application, caseReference: string) {
+function mapTaskGroups(app: Application, req: Request, caseReference: string) {
   return (taskGroups: DashboardTaskGroup[]): MappedTaskGroup[] => {
+    const t = getTranslationFunction(req, ['dashboard']);
+
     return taskGroups.map(taskGroup => {
       const mappedTitle = TASK_GROUP_MAP[taskGroup.groupId];
 
@@ -106,17 +150,10 @@ function mapTaskGroups(app: Application, caseReference: string) {
 
           return {
             title: {
-              html: app.locals.nunjucksEnv.render(
-                `components/taskGroup/${taskGroupId}/${task.templateId}.njk`,
-                task.templateValues
-              ),
+              html: t(`dashboard:tasks.${task.templateId}.title`),
             },
             hint,
-            // Absolute internal link is more robust than a relative one
-            href:
-              task.status === 'NOT_AVAILABLE'
-                ? undefined
-                : `/dashboard/${caseReference}/${taskGroupId}/${task.templateId}`,
+            href: getTaskUrl(task.templateId, task.status, caseReference, taskGroupId),
             status: STATUS_MAP[task.status],
           };
         }),
@@ -164,7 +201,7 @@ export default function dashboardRoutes(app: Application): void {
     try {
       const [notifications, taskGroups] = await Promise.all([
         getDashboardNotifications(caseReferenceNumber),
-        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, validatedCase.id)),
+        getDashboardTaskGroups(caseReferenceNumber).then(mapTaskGroups(app, req, validatedCase.id)),
       ]);
 
       return res.render('dashboard', {
@@ -172,6 +209,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
         propertyAddress,
         dashboardCaseReference,
+        iWantToLinks: getIWantToLinks(validatedCase.id),
         helpSupportLinks: HELP_SUPPORT_LINKS,
       });
     } catch (e) {

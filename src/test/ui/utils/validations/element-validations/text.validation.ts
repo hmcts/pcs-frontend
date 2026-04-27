@@ -12,6 +12,9 @@ export class TextValidation implements IValidation {
       case 'subHeader':
         data.elementType = 'h2';
         break;
+      case 'subSectionHeader':
+        data.elementType = 'h3';
+        break;
       case 'paragraphLink':
         data.elementType = 'p > a';
         break;
@@ -29,6 +32,9 @@ export class TextValidation implements IValidation {
         break;
       case 'summaryText':
         data.elementType = '.govuk-details__text';
+        break;
+      case 'hintText':
+        data.elementType = 'div';
         break;
     }
     const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
