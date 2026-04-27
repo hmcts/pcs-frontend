@@ -32,7 +32,6 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
   uploadDocuments,
-  whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
@@ -41,7 +40,6 @@ import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirma
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
-import { correspondenceAddressErrorValidation } from '../functional/correspondenceAddress.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
@@ -52,6 +50,7 @@ import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pf
 import { incomeAndExpensesErrorValidation } from '../functional/incomeAndExpenses.pft';
 import { languageUsedErrorValidation } from '../functional/languageUsed.pft';
 import { nonRentArrearsDisputeErrorValidation } from '../functional/nonRentArrearsDispute.pft';
+import { noticeDateWhenNotProvidedErrorValidation } from '../functional/noticeDateWhenNotProvided.pft';
 import { noticeDateWhenProvidedErrorValidation } from '../functional/noticeDateWhenProvided.pft';
 import { rentArrearsErrorValidation } from '../functional/rentArrears.pft';
 import { repaymentsAgreedErrorValidation } from '../functional/repaymentsAgreed.pft';
@@ -59,6 +58,7 @@ import { repaymentsMadeErrorValidation } from '../functional/repaymentsMade.pft'
 import { tenancyDateDetailsErrorValidation } from '../functional/tenancyDateDetails.pft';
 import { tenancyDateUnknownErrorValidation } from '../functional/tenancyDateUnknown.pft';
 import { tenancyTypeDetailsErrorValidation } from '../functional/tenancyTypeDetails.pft';
+import { whatOtherRegularExpensesDoYouHaveErrorValidation } from '../functional/whatOtherRegularExpensesDoYouHave.pft';
 import { whatRegularIncomeDoYouReceiveErrorValidation } from '../functional/whatRegularIncomeDoYouReceive.pft';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation } from '../functional/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.pft';
 import { yourCircumstancesErrorValidation } from '../functional/yourCircumstances.pft';
@@ -68,6 +68,7 @@ import {
   softErrorMessageValidation,
 } from '../utils/common/error-message-validation-helper';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
+import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
@@ -234,7 +235,7 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
       dobYear: defendantDateOfBirth.yearInputText,
     });
 
-    await softErrorMessageValidation('correspondenceAddressKnown', NO_EMV_MISSING_DESIGN);
+    await softErrorMessageValidation('correspondenceAddress', NO_EMV_MISSING_DESIGN);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
@@ -380,9 +381,35 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
 
-    await softErrorMessageValidation('whatOtherRegularExpensesDoYouHave', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatOtherRegularExpensesDoYouHaveErrorValidation);
+    await performAction('selectWhatRegularIncomeDoYouReceive', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
+          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.universalCreditParagraph,
+          whatRegularIncomeDoYouReceive.universalCreditTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
+          whatRegularIncomeDoYouReceive.pensionTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
+          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
+          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
+        ],
+      ],
+    });
 
     await softErrorMessageValidation('otherConsiderations', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', otherConsiderations.mainHeader);
@@ -422,7 +449,7 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
     await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
     await performAction('enterDateOfBirthDetails');
 
-    await softErrorMessageValidation('correspondenceAddressUnknown', correspondenceAddressErrorValidation);
+    await softErrorMessageValidation('correspondenceAddress', NO_EMV_MISSING_DESIGN);
     await performAction('selectCorrespondenceAddressUnKnown', {
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
@@ -465,12 +492,15 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
       tsYear: '2024',
     });
 
-    await softErrorMessageValidation('confirmationOfNoticeGiven', NO_EMV_MISSING_DESIGN);
+    await softErrorMessageValidation('confirmationOfNoticeGiven', confirmationOfNoticeGivenErrorValidation);
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
 
-    await softErrorMessageValidation('noticeDateWhenProvided', noticeDateWhenProvidedErrorValidation);
+    await softErrorMessageValidation(
+      'confirmation-of-notice-date-when-not-provided',
+      noticeDateWhenNotProvidedErrorValidation
+    );
     await performAction('enterNoticeDateKnown');
 
     await softErrorMessageValidation('nonRentArrearsDispute', nonRentArrearsDisputeErrorValidation);
@@ -478,7 +508,7 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
 
-    await softErrorMessageValidation('counterClaim', NO_EMV_READ_ONLY);
+    await softErrorMessageValidation('counterClaim', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
 
@@ -522,6 +552,7 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
     );
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(1),
     });
 
     await softErrorMessageValidation('yourCircumstances', yourCircumstancesErrorValidation);
@@ -544,11 +575,11 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
     await performAction('selectWhatRegularIncomeDoYouReceive');
 
-    await softErrorMessageValidation('haveYouAppliedForUniversalCredit', NO_EMV_MISSING_DESIGN);
+    await softErrorMessageValidation('haveYouAppliedForUniversalCredit', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
     await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
 
-    await softErrorMessageValidation('priorityDebts', NO_EMV_MISSING_DESIGN);
+    await softErrorMessageValidation('priorityDebts', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
 
@@ -556,23 +587,22 @@ test.describe('Respond to claim — error message validation @nightly @EMV', () 
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
 
-    await softErrorMessageValidation('whatOtherRegularExpensesDoYouHave', NO_EMV_MISSING_DESIGN);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
+    await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatOtherRegularExpensesDoYouHaveErrorValidation);
+    await performAction('selectWhatRegularIncomeDoYouReceive');
 
-    await softErrorMessageValidation('otherConsiderations', NO_EMV_MISSING_DESIGN);
+    await softErrorMessageValidation('otherConsiderations', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', otherConsiderations.mainHeader);
     await performAction('clickButton', otherConsiderations.continueButton);
 
-    await softErrorMessageValidation('uploadDocuments', NO_EMV_MISSING_DESIGN);
+    await softErrorMessageValidation('uploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', uploadDocuments.mainHeader);
     await performAction('clickButton', uploadDocuments.continueButton);
 
-    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_MISSING_DESIGN);
+    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
 
-    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_MISSING_DESIGN);
+    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
 
