@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cyLanguage used",
+  "heading": "cyWhich language did you use to complete your response?",
+  "languageUsedHint": "cyIf someone else helped you to answer a question in this service, ask them if they answered any questions in Welsh. We’ll use this to make sure your response is processed correctly",
+  "language": {
+    "english": "cyEnglish",
+    "welsh": "cyWelsh",
+    "englishAndWelsh": "cyEnglish and Welsh"
+  },
+  "errors": {
+    "languageUsed": "cySelect which language you used to complete this service"
+  }
+}

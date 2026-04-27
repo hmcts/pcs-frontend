@@ -5,7 +5,6 @@ export const haveYouAlreadyAppliedForHelp = {
   hwfReferenceHiddenTextLabel: `hwfReference (placeholder label)`,
   hwfReferenceTextInput: `ReferenceTest123`,
   noRadioOption: `No`,
-  placeholderParagraph: `Placeholder page`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
 };

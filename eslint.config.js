@@ -174,6 +174,7 @@ module.exports = defineConfig([
   },
   globalIgnores([
     'src/main/views/govuk/**/*',
+    'src/main/views/moj/**/*',
     '**/jest.*.config.*',
     '**/__mocks__/**/*',
     'dist/*',

@@ -4,6 +4,18 @@
   "heading": "Do you need help paying the fee for this application?",
   "question": "Do you need help paying the fee for this application?",
   "errors": {
-    "typeOfApplication": "You must select whether you need help paying the fee"
-  }
+    "needHelpPayingFee": "Confirm whether you need help paying the fee"
+  },
+  "options": {
+    "yes": "I need help paying the fee",
+    "no": "I do not need help paying the fee"
+  },
+  "itUsuallyCostsToApply": "It usually costs {{standardFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to apply. The fee will increase to {{maxFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} if:",
+  "youHaveAlreadyToldTheOtherParty": "you have already told the other party that you are making this application, and",
+  "theyDidNotAgreeToIt": "they did not agree to it (this means that they have objected to it)",
+  "youWillSeeTheFinalApplicationFee": "You’ll see the final application fee before you pay.",
+  "youMayBeAbleToGetHelp": "You may be able to get help paying the fee if you (one or more of the following):",
+  "areOnCertainBenefits": "are on certain benefits",
+  "haveLittleOrNoSavings": "have little or no savings",
+  "haveLowIncome": "have low income"
 }

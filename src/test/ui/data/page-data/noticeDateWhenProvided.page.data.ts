@@ -6,7 +6,9 @@ export const noticeDateWhenProvided = {
   backLink: `Back`,
   whenMakingClaimHintText: `When making the claim, Possession Claims Solicitor Org had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.`,
   noticeDetailsGivenLabel: `Notice details given by Possession Claims Solicitor Org:`,
-  noticeGivenDateLabel: `They served you with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCasePayload.notice_NoticePostedDate)}`,
+  noticeGivenDateLabel: `They served you with a notice seeking possession on ${convertDateFormat(
+    submitCaseApiData.submitCasePayload.notice_NoticePostedDate
+  )}`,
   getWhenDidYouReceiveNoticeQuestion: (claimantName: string) =>
     `When did you receive notice from ${claimantName} (optional)?`,
   exampleHintText: `For example, 27 9 2022`,

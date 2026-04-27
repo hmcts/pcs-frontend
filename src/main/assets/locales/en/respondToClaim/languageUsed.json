@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Language used",
+  "heading": "Which language did you use to complete your response?",
+  "languageUsedHint": "If someone else helped you to answer a question in this service, ask them if they answered any questions in Welsh. We’ll use this to make sure your response is processed correctly",
+  "language": {
+    "english": "English",
+    "welsh": "Welsh",
+    "englishAndWelsh": "English and Welsh"
+  },
+  "errors": {
+    "languageUsed": "Select which language you used to complete this service"
+  }
+}
