@@ -14,6 +14,7 @@ export { getPreviousPageForArrears } from './journeyHelpers';
 export { getStepBeforeDisputePages } from './journeyHelpers';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
+export { getPreviousStepForCounterClaimAbout } from './getPreviousStepForCounterClaimAbout';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';

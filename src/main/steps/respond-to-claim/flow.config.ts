@@ -1,6 +1,7 @@
 import { type Request } from 'express';
 
 import {
+  getPreviousStepForCounterClaimAbout,
   getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
@@ -458,6 +459,18 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'counter-claim-about',
         },
       ],
+    },
+    'counter-claim-have-you-applied-for-help': {
+      defaultNext: 'payment-interstitial',
+      previousStep: 'counter-claim-fee',
+    },
+    'counter-claim-against-who': {
+      defaultNext: 'counter-claim-about',
+      previousStep: 'counter-claim-fee',
+    },
+    'counter-claim-about': {
+      defaultNext: 'payment-interstitial',
+      previousStep: async (req: Request) => getPreviousStepForCounterClaimAbout(req),
     },
     'payment-interstitial': {
       previousStep: 'counter-claim-fee',
