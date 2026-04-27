@@ -8,11 +8,12 @@ import {
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  uploadDocumentsToSupportYourApplication,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
 import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString } from '../../common/string.utils';
-import { performAction, performValidation } from '../../controller';
+import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { FieldsStore } from './recordAnsweredFields.action';
@@ -34,6 +35,7 @@ export class GenAppsAction implements IAction {
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
       ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
+      ['uploadDocuments', () => this.uploadDocuments(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
       ['validateCYA', () => this.validateCYA()],
     ]);
@@ -133,6 +135,20 @@ export class GenAppsAction implements IAction {
       option: confirmUpload.option,
     });
     await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
+  }
+
+  private async uploadDocuments(documentsData: actionRecord) {
+    if (Array.isArray(documentsData.documents)) {
+      for (let fileIndex = 0; fileIndex < documentsData.documents.length; fileIndex++) {
+        const document = documentsData.documents[fileIndex];
+        await performActions(
+          'Add Document',
+          ['uploadFile', document.fileName],
+          ['select', { dropdown: uploadDocumentsToSupportYourApplication.typeOfDocumentHiddenTextLabel, index: fileIndex }, document.type],
+        );
+      }
+    }
+    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
