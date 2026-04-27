@@ -6,7 +6,7 @@ import { ErrorMessageValidation } from '../validations/custom-validations';
 class SoftEmvStepFailed extends Error {
   constructor(detail: string) {
     super(detail);
-    this.name = 'SoftEmvStepFailed';
+    this.name = 'SoftErrorMessageValidation(EMV)StepFailed';
   }
 }
 
@@ -16,20 +16,23 @@ function asText(err: unknown): string {
   return err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err);
 }
 
-/** Soft EMV (`errorMessage` PFT) or Allure-only skip note; end the test with `assertAllErrorMessageValidations`. */
+/** Soft ErrorMessageValidation(EMV) (`errorMessage` PFT) or Allure-only skip note; end the test with `assertAllErrorMessageValidations`. */
 export async function softErrorMessageValidation(
   pageKey: string,
   pftFun: (() => Promise<void>) | string
 ): Promise<void> {
   if (typeof pftFun === 'string') {
-    await allureStep(`No EMV: ${pageKey}`, async (ctx: StepContext) => {
-      await ctx.parameter('Note', pftFun.slice(0, 4000));
-    });
+    await allureStep(
+      `No ErrorMessageValidation(EMV): ${pageKey} (read-only, placeholder, or pending design)`,
+      async (ctx: StepContext) => {
+        await ctx.parameter('Note', pftFun.slice(0, 4000));
+      }
+    );
     return;
   }
 
   try {
-    await allureStep(`EMV: ${pageKey}`, async () => {
+    await allureStep(`Triggering ErrorMessageValidation(EMV): ${pageKey}`, async () => {
       const start = ErrorMessageValidation.peekResultsLength();
       let pftError: unknown;
       await pftFun().catch(e => {
@@ -62,7 +65,7 @@ export function assertAllErrorMessageValidations(): void {
     return;
   }
   const body = failures.map(f => `${f.pageKey}:\n${f.error}`).join('\n\n---\n\n');
-  throw new Error(`Soft EMV failures (${failures.length}):\n\n${body}`);
+  throw new Error(`Soft ErrorMessageValidation(EMV) failures (${failures.length}):\n\n${body}`);
 }
 
 export function clearErrorMessageValidationFailures(): void {

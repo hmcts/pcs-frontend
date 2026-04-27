@@ -40,10 +40,7 @@ import {
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
-import {
-  correspondenceAddressErrorValidation,
-  correspondenceAddressKnownErrorValidation,
-} from '../functional/correspondenceAddress.pft';
+import { correspondenceAddressErrorValidation } from '../functional/correspondenceAddress.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
@@ -77,8 +74,12 @@ import { ErrorMessageValidation } from '../utils/validations/custom-validations'
 const home_url = config.get('e2e.testUrl') as string;
 let claimantName: string;
 
+// softErrorMessageValidation(pageName, validationOrReason):
+// - 1st param: journey page key/name (for example 'tenancyTypeDetails').
+// - 2nd param: PFT error-validation function for that page, or a custom string to explain why EMV is missing/deferred/not applicable.
+
 const NO_EMV_READ_ONLY = 'Read-only / informational screen — no field error validation.';
-const NO_EMV_PENDING_PFT = 'No field-level error message validation (PFT) for this page yet.';
+const NO_EMV_PENDING_PFT = 'Error message validation (PFT) for this page is not designed yet.';
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -210,7 +211,7 @@ test.afterEach(() => {
   clearErrorMessageValidationFailures();
 });
 
-test.describe('Respond to claim — error message validation @nightly with wrapper', () => {
+test.describe('Respond to claim — error message validation @nightly @EMV', () => {
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression @PR', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
@@ -230,7 +231,7 @@ test.describe('Respond to claim — error message validation @nightly with wrapp
       dobYear: defendantDateOfBirth.yearInputText,
     });
 
-    await softErrorMessageValidation('correspondenceAddressKnown', correspondenceAddressKnownErrorValidation);
+    await softErrorMessageValidation('correspondenceAddressKnown', NO_EMV_PENDING_PFT);
     await performAction('selectCorrespondenceAddressKnown', {
       radioOption: correspondenceAddress.yesRadioOption,
     });

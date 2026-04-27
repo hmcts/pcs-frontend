@@ -731,7 +731,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression @PR', async () => {
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
     //universal credit with all other options - priority debts
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
