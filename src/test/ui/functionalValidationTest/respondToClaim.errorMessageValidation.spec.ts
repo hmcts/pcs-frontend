@@ -259,10 +259,16 @@ test.describe('Respond to claim — error message validation @nightly with wrapp
     await softErrorMessageValidation('tenancyDateDetails', tenancyDateDetailsErrorValidation);
     await performAction('selectTenancyStartDateKnown', { option: tenancyDateDetails.yesRadioOption });
 
+    await softErrorMessageValidation('confirmationOfNoticeGiven', 'confirmationOfNoticeGiven EMV deferred — HDPI-6087');
     // confirmationOfNoticeGiven EMV deferred — HDPI-6087
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
+
+    await softErrorMessageValidation(
+      'confirmation-of-notice-date-when-provided',
+      noticeDateWhenProvidedErrorValidation
+    );
     await performAction('enterNoticeDateUnknown');
 
     await softErrorMessageValidation('rentArrears', rentArrearsErrorValidation);
@@ -367,7 +373,7 @@ test.describe('Respond to claim — error message validation @nightly with wrapp
     await performValidation('mainHeader', priorityDebts.mainHeader);
     await performAction('clickButton', priorityDebts.continueButton);
 
-    await softErrorMessageValidation('priorityDebtDetails', NO_EMV_PENDING_PFT);
+    await softErrorMessageValidation('priorityDebtDetails', 'No EMV yet as this place holder page');
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
 
