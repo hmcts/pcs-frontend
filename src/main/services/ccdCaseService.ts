@@ -315,7 +315,7 @@ export const ccdCaseService = {
     }
   },
 
-  async updateDraftRespondToClaim(
+  async saveDraftRespondToClaim(
     accessToken: string | undefined,
     caseId: string,
     data: CcdCaseData | Record<string, unknown>

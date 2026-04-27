@@ -31,7 +31,7 @@ jest.mock('@modules/http', () => ({
 
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
-    updateDraftRespondToClaim: jest.fn(),
+    saveDraftRespondToClaim: jest.fn(),
   },
 }));
 jest.mock('@services/pcq/createToken');
@@ -101,7 +101,7 @@ describe('pcqRedirectMiddleware', () => {
 
     (axios.get as jest.Mock).mockResolvedValue({ data: { status: 'UP' } });
 
-    (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockResolvedValue({
+    (ccdCaseService.saveDraftRespondToClaim as jest.Mock).mockResolvedValue({
       id: '123456789',
       data: { userPcqId: 'mock-pcq-id' },
     });
@@ -117,7 +117,7 @@ describe('pcqRedirectMiddleware', () => {
 
     expect(axios.get).toHaveBeenCalledWith('https://pcq.test/health');
     expect(createTokenModule.createToken).toHaveBeenCalled();
-    expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalled();
+    expect(ccdCaseService.saveDraftRespondToClaim).toHaveBeenCalled();
     expect(mockRedirect).toHaveBeenCalledWith(expect.stringContaining('https://pcq.test/service-endpoint?'));
     expect(mockNext).not.toHaveBeenCalled();
   });
@@ -153,7 +153,7 @@ describe('pcqRedirectMiddleware', () => {
   });
 
   it('should call next() if CCD update fails', async () => {
-    (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockRejectedValue(new Error('CCD error'));
+    (ccdCaseService.saveDraftRespondToClaim as jest.Mock).mockRejectedValue(new Error('CCD error'));
     mockSave.mockImplementation(cb => cb());
 
     const middleware = pcqRedirectMiddleware();

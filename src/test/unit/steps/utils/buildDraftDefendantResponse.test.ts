@@ -2,7 +2,7 @@ import type { Request } from 'express';
 
 jest.mock('../../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
-    updateDraftRespondToClaim: jest.fn().mockResolvedValue({ id: '123', data: {} }),
+    saveDraftRespondToClaim: jest.fn().mockResolvedValue({ id: '123', data: {} }),
   },
 }));
 
@@ -35,7 +35,7 @@ describe('saveDraftDefendantResponse', () => {
 
     await saveDraftDefendantResponse(req, response);
 
-    expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith('tok', '123', {
+    expect(ccdCaseService.saveDraftRespondToClaim).toHaveBeenCalledWith('tok', '123', {
       possessionClaimResponse: {
         defendantResponses: {
           paymentAgreement: { repaymentPlanAgreed: 'YES' },
@@ -72,7 +72,7 @@ describe('saveDraftDefendantResponse', () => {
 
     await saveDraftDefendantResponse(req, response);
 
-    expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith('tok', '123', {
+    expect(ccdCaseService.saveDraftRespondToClaim).toHaveBeenCalledWith('tok', '123', {
       possessionClaimResponse: {
         defendantResponses: {
           possessionNoticeReceived: 'YES',

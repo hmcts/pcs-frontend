@@ -42,7 +42,7 @@ export const saveDraftDefendantResponse = async (req: Request, response: Possess
   const accessToken = req.session?.user?.accessToken || '';
   const caseId = req.res?.locals.validatedCase?.id || '';
 
-  const updatedCase = await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, {
+  const updatedCase = await ccdCaseService.saveDraftRespondToClaim(accessToken, caseId, {
     possessionClaimResponse: normalised,
   });
 

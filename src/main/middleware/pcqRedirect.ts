@@ -74,7 +74,7 @@ export function pcqRedirectMiddleware() {
     };
 
     try {
-      const updatedCase = await ccdCaseService.updateDraftRespondToClaim(user.accessToken, ccdCase.id, {
+      const updatedCase = await ccdCaseService.saveDraftRespondToClaim(user.accessToken, ccdCase.id, {
         ...ccdCase.data,
         userPcqId: pcqId,
       });
