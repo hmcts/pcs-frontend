@@ -27,6 +27,10 @@
       "ResponseToClaim": {
         "title": "Response to claim",
         "body": "<a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/response/Defendant.RespondToClaim\">{{ctaLabel}}</a>"
+      },
+      "NoHearingArranged": {
+        "title": "A property possession claim has been made against you",
+        "body": "The court will arrange the hearing and contact you with details."
       }
     }
   },
