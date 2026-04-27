@@ -17,5 +17,6 @@ export async function landlordLicensedNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', landlordLicensed.backLink, landlordRegistered.mainHeader);
   await performAction('clickRadioButton', landlordLicensed.yesRadioOption);
   await performValidation('pageNavigation', landlordLicensed.saveForLaterButton, dashboard.mainHeader);
+  //https://tools.hmcts.net/jira/browse/HDPI-5786
   // In Wales, tenancy-type-details back link goes to written-terms (not dispute-claim-interstitial)
 }

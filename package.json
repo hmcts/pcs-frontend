@@ -126,7 +126,7 @@
     "allure-commandline": "2.38.1",
     "allure-js-commons": "3.7.1",
     "allure-playwright": "3.7.1",
-    "chokidar": "3.6.0",
+    "chokidar": "5.0.0",
     "copy-webpack-plugin": "13.0.1",
     "css-loader": "7.1.4",
     "eslint": "9.39.4",
