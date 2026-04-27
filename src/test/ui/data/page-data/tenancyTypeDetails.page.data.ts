@@ -16,4 +16,5 @@ export const tenancyTypeDetails = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfTenancyDetailsErrorMessage: `Select if these tenancy, licence or occupation contract details are correct`,
   enterCorrectTenancyDetailsErrorMessage: `Enter the correct tenancy, licence or occupation contract details`,
+  characterLimitErrorMessage: `Tenancy, occupation contract or licence type must be 60 characters or less`,
 };
