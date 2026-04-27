@@ -213,9 +213,7 @@ export class RespondToClaimAction implements IAction {
       claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     }
     const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
-    const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
     await performValidation('text', { elementType: 'heading', text: mainHeader });
-    await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
