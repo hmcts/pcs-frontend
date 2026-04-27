@@ -20,7 +20,7 @@ export const contactPreferenceEmailOrPost = {
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectHowYouWantToReceiveUpdatesErrorMessage: `Select how you want to receive updates`,
-  enterEmailAddressErrorMessage: `Enter your email address`,
+  enterEmailAddressErrorMessage: `Enter XXXXX your email address`,
   invalidEmailAddressErrorMessage: `Enter an email address in the correct format, like name@example.com`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `contact-preferences-email-or-post`,
