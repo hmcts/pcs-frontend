@@ -13,6 +13,7 @@ import { step as counterClaimAbout } from './counter-claim-about';
 import { step as counterClaimAgainstWho } from './counter-claim-against-who';
 import { step as counterClaimFee } from './counter-claim-fee';
 import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
+import { step as counterClaimOrderOtherThanSum } from './counter-claim-order-other-than-sum';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
 import { step as yourCircumstances } from './current-circumstances';
@@ -79,6 +80,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'counter-claim-fee': counterClaimFee,
   'counter-claim-about': counterClaimAbout,
   'counter-claim-against-who': counterClaimAgainstWho,
+  'counter-claim-order-other-than-sum': counterClaimOrderOtherThanSum,
   'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
