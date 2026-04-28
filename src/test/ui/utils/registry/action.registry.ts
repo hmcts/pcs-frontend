@@ -92,7 +92,9 @@ export class ActionRegistry {
     ['retrieveCYATableData', new GenAppsAction()],
     ['validateCYA', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
+    ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
+    ['otherConsiderations', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
