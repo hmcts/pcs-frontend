@@ -3,7 +3,7 @@ export const haveYouAlreadyAppliedForHelpWithFees = {
   haveYouAlreadyAppliedForHelpQuestion: `Have you already applied for help with your application fee?`,
   yesRadioOption: `Yes`,
   hwfReferenceHiddenTextLabel: `Enter your Help with Fees reference number`,
-  hwfReferenceTextInput: `ReferenceTest123`,
+  hwfReferenceTextInput: 10,
   noRadioOption: `No`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
@@ -15,7 +15,6 @@ export const haveYouAlreadyAppliedForHelpWithFees = {
       input: ``,
       errMessage: `Confirm whether you have already applied for help with your application fee`,
     },
-
     errorTextField: [
       { type: 'empty', input: 'EMPTY', errMessage: 'You must enter a reference number for Help with Fees' },
       { type: 'moreThanMax', input: 65, errMessage: 'Must be 60 characters or fewer' },
