@@ -142,7 +142,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
     await performAction('clickRadioButton', {
-      question: correspondenceAddress.correspondenceAddressConfirmHintText,
+      question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
     });
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
@@ -405,9 +405,9 @@ export class RespondToClaimAction implements IAction {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', noticeDateWhenProvided.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
+        ['inputText', noticeDateWhenNotProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenNotProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenNotProvided.yearTextLabel, noticeData.year]
       );
     }
     await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
