@@ -97,6 +97,7 @@ export class ActionRegistry {
     ['recordUserEntry', new RecordAnswers()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
     ['languageUsed', new RespondToClaimAction()],
+    ['otherConsiderations', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

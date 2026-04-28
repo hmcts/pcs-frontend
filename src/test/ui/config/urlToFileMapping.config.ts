@@ -39,6 +39,7 @@ export default {
   'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
   'choose-an-application': 'chooseAnApplication',
   'language-used': 'languageUsed',
+  'other-considerations': 'otherConsiderations',
   /* 'check-your-answers': 'checkYourAnswers', */
   'ask-to-adjourn-the-court-hearing': 'askToAdjournTheCourtHearing',
   'ask-the-court-to-set-aside-the-order': 'askTheCourtToSetAsideTheOrder',
