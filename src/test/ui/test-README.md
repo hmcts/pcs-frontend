@@ -190,6 +190,13 @@ Missing elements: Submit button, Continue link
 - Error Message Validation
 - Page Navigation tests
 
+### ErrorMessageValidation(EMV) conventions
+
+- Use `softErrorMessageValidation(pageKey, validationOrReason)` in journey specs.
+- Parameter 1 (`pageKey`): first-page key/name in the journey (for example `tenancyTypeDetails`).
+- Parameter 2 (`validationOrReason`): either the PFT error validation function for that page, or a custom string explaining why ErrorMessageValidation(EMV) is not executed yet.
+- Use a custom string when a page is read-only, a placeholder, or ErrorMessageValidation(EMV) design/PFT implementation is still pending.
+
 Please follow this confluence page for detailed instructions and guidelines- https://tools.hmcts.net/confluence/x/14FLd
 
 ## 10. CI Pipeline Stages
