@@ -283,7 +283,7 @@ export const step: StepDefinition = createFormStep({
 function getAddressData(
   req: Request,
   stepData: Record<string, unknown>,
-  partyAddress?: CcdCaseAddress,
+  partyAddress?: CcdCaseAddress | Record<string, never>,
   correspondenceAddressConfirmed?: string
 ) {
   const addressConfirmedRadioSelection =
@@ -312,10 +312,12 @@ function getAddressData(
 
     const key = fieldMap[field];
 
+    const caseAddressValue = isCcdCaseAddress(partyAddress) ? partyAddress[key] : '';
+
     return (
       req.body?.[`correspondenceAddressConfirm.${field}`] ||
       stepData?.[`correspondenceAddressConfirm.${field}`] ||
-      partyAddress?.[key] ||
+      caseAddressValue ||
       ''
     );
   };
@@ -328,6 +330,10 @@ function getAddressData(
     county: getField('county'),
     postcode: getField('postcode'),
   };
+}
+
+function isCcdCaseAddress(address?: CcdCaseAddress | Record<string, never>): address is CcdCaseAddress {
+  return Boolean(address && typeof address === 'object' && 'AddressLine1' in address);
 }
 
 function getExistingAddress(req: Request): { formattedAddress: string } {

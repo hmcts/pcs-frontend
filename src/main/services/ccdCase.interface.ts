@@ -128,6 +128,7 @@ export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
   firstName?: string;
   lastName?: string;
+  address?: CcdCaseAddress;
 }
 
 /** Defendant party contact details (name/address known flags and values). */
@@ -145,6 +146,9 @@ export interface CcdDefendantParty {
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
+  correspondenceAddressConfirmation?: string;
+  otherConsiderations?: YesNoValue;
+  otherConsiderationsDetails?: string;
   tenancyTypeCorrect?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
