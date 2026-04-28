@@ -192,7 +192,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
         propertyAddress,
         dashboardCaseReference,
-        iWantToLinks: getIWantToLinks(validatedCase.id),
+        iWantToLinks: getIWantToLinks(caseReference),
         helpSupportLinks: HELP_SUPPORT_LINKS,
       });
     } catch (e) {
