@@ -27,6 +27,17 @@ export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
     message: tenancyTypeDetails.characterLimitErrorMessage,
   });
+  //emoji error validation
+  await performAction(
+    'inputText',
+    tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+    tenancyTypeDetails.emojiTextInput
+  );
+  await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
+    message: tenancyTypeDetails.emojiGiveTheCorrectTenancyTypeErrorMessage,
+  });
 }
 
 export async function tenancyTypeDetailsNavigationTests(): Promise<void> {

@@ -49,12 +49,14 @@
     "yes": "Yes",
     "no": "No"
   },
+  "warningHiddenText": "Warning",
   "errors": {
     "title": "There is a problem",
     "required": "Enter a value",
     "defaultRequired": "This field is required",
     "defaultInvalid": "Invalid format",
     "defaultMaxLength": "Must be {max} characters or fewer",
+    "defaultSpecialCharacter": "{fieldName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
     "chooseOption": "Choose an option",
     "email": {
       "required": "Enter an email address",

@@ -85,8 +85,14 @@ export class ActionRegistry {
     ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
     ['doYouNeedHelpPayingFee', new GenAppsAction()],
     ['confirmYouHaveAppliedForFeeHelp', new GenAppsAction()],
+    ['confirmOtherPartiesAgreed', new GenAppsAction()],
+    ['reasonsApplicationShouldNotBeShared', new GenAppsAction()],
     ['inputErrorValidationGenApp', new GenAppsAction()],
+    ['selectLanguageUsedToComplete', new GenAppsAction()],
+    ['retrieveCYATableData', new GenAppsAction()],
+    ['validateCYA', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
+    ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
   ]);
 
