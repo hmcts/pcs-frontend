@@ -8,8 +8,8 @@ import { flowConfig } from '../flow.config';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
-import { isLegalRepresentativeUser } from 'steps/utils/userRole';
 import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+import { isLegalRepresentativeUser } from 'steps/utils/userRole';
 
 const STEP_NAME = 'tenancy-date-unknown';
 

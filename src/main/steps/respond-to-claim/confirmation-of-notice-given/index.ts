@@ -32,8 +32,8 @@ export const step: StepDefinition = createFormStep({
       translationKey: { label: 'question', hint: 'hintText' },
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
-        { 
-          value: 'YES', 
+        {
+          value: 'YES',
           translationKey: 'options.yes',
           subFields: {
             noticeDateGiven: {
@@ -44,10 +44,10 @@ export const step: StepDefinition = createFormStep({
               noCurrentDate: true,
               legendClasses: 'govuk-label--s govuk-!-font-weight-bold',
               translationKey: {
-                label: 'noticeDateLabel'
-              }
-            }
-          }
+                label: 'noticeDateLabel',
+              },
+            },
+          },
         },
         { value: 'NO', translationKey: 'options.no' },
         { divider: 'options.or' },
@@ -84,7 +84,7 @@ export const step: StepDefinition = createFormStep({
 
     return {
       claimantName,
-      caseNumber: t('caseNumber', { caseNumber })
+      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
 });

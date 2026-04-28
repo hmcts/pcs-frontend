@@ -109,7 +109,7 @@ export const step: StepDefinition = createFormStep({
     const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
     const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
     const rentArrearsAmount = currency(amountInPounds);
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string)
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     const t = getTranslationFunction(req, 'rent-arrears-dispute', ['common']);
 

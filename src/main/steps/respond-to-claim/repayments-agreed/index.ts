@@ -118,7 +118,7 @@ export const step: StepDefinition = createFormStep({
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
     const claimIssueDate = '20th May 2025';
     const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-    
+
     const t = getTranslationFunction(req, 'repayments-agreed', ['common']);
 
     return {

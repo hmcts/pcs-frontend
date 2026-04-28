@@ -8,8 +8,8 @@ import { flowConfig } from '../flow.config';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';
-import { isLegalRepresentativeUser } from 'steps/utils/userRole';
 import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+import { isLegalRepresentativeUser } from 'steps/utils/userRole';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
