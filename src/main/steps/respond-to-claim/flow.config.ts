@@ -11,7 +11,9 @@ import {
 } from '../utils';
 
 import {
+  hasChosenToShareIncomeExpenses,
   hasConfirmedInstallmentOffer,
+  hasDeclaredUniversalCreditOnRegularIncome,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
   shouldShowInstallmentPaymentsStep,
@@ -76,6 +78,22 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'how-much-afford-to-pay': {
       showCondition: (req: Request) => hasConfirmedInstallmentOffer(req),
+    },
+    'what-regular-income-do-you-receive': {
+      showCondition: (req: Request) => hasChosenToShareIncomeExpenses(req),
+    },
+    'have-you-applied-for-universal-credit': {
+      showCondition: (req: Request) =>
+        hasChosenToShareIncomeExpenses(req) && !hasDeclaredUniversalCreditOnRegularIncome(req),
+    },
+    'priority-debts': {
+      showCondition: (req: Request) => hasChosenToShareIncomeExpenses(req),
+    },
+    'priority-debt-details': {
+      showCondition: (req: Request) => hasChosenToShareIncomeExpenses(req),
+    },
+    'what-other-regular-expenses-do-you-have': {
+      showCondition: (req: Request) => hasChosenToShareIncomeExpenses(req),
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),

@@ -34,6 +34,7 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
   uploadDocuments,
+  whatAreYouClaimingFor,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -179,7 +180,7 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim @noDefendants @regression @accessibility @PR', async () => {
+  test('Respond to a claim @noDefendants @regression @accessibility', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -222,25 +223,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
-    //This is a placeholder page
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    });
-    await performAction('installmentPayments', {
-      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-      radioOption: installmentPayments.noRadioOption,
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -342,20 +329,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
     });
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
-    });
-    //include missing steps
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -441,18 +417,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -543,20 +509,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       disputeOption: nonRentArrearsDispute.yesRadioOption,
       disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
     });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.yesRadioOption,
-      repaymentInfo: repaymentsMade.detailsTextInput,
-    });
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
-      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -668,17 +622,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -731,6 +676,50 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
+  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - CounterClaim - Yes @secureFlexible @regression', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.noRadioOption,
+    });
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
+    );
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+    await performAction('enterTenancyStartDetailsUnKnown');
+    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('selectCounterClaim', {
+      option: counterClaim.yesRadioOption,
+    });
+    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
+    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
+  });
+
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
     //universal credit with all other options - priority debts
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
@@ -771,9 +760,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('rentArrears', {
       option: rentArrears.yesRadioOption,
     });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -784,7 +773,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    //include missing steps
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -900,9 +888,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: rentArrears.noRadioOption,
       rentAmount: rentArrears.rentAmountTextInput,
     });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1002,9 +990,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('rentArrears', {
       option: rentArrears.imNotSureRadioOption,
     });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1114,9 +1102,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),

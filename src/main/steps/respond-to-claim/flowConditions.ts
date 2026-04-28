@@ -35,3 +35,17 @@ export function hasConfirmedInstallmentOffer(req: Request): boolean {
 export function shouldShowInstallmentPaymentsStep(req: Request): boolean {
   return hasRejectedRepaymentAgreement(req) && hasAnyRentArrearsGround(req);
 }
+
+export function hasChosenToShareIncomeExpenses(req: Request): boolean {
+  const ccdAnswer =
+    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances
+      ?.shareIncomeExpenseDetails;
+  return normalizeYesNoValue(ccdAnswer) === 'YES';
+}
+
+export function hasDeclaredUniversalCreditOnRegularIncome(req: Request): boolean {
+  const ccdAnswer =
+    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances
+      ?.universalCredit;
+  return normalizeYesNoValue(ccdAnswer) === 'YES';
+}
