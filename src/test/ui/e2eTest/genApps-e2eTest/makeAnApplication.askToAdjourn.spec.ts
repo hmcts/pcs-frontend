@@ -90,7 +90,13 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
     await performAction('reviewCYA', 'journey1');
-    await performAction('selectStatementOfTruth',{
+    await performAction('reviewAndUpdateCYA', {
+      changeOption: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
+      journey: 'journey2'
+    });
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    await performAction('selectStatementOfTruth', {
       question: checkYourAnswersGenApps.statementOfTruthQuestion,
       option: checkYourAnswersGenApps.iBelieveTheFactsHiddenCheckbox,
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
@@ -139,5 +145,17 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
+    await performAction('reviewAndUpdateCYA', {
+      changeOption: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
+      journey: 'journey3'
+    });
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    await performAction('selectStatementOfTruth', {
+      question: checkYourAnswersGenApps.statementOfTruthQuestion,
+      option: checkYourAnswersGenApps.iBelieveTheFactsHiddenCheckbox,
+      label: checkYourAnswersGenApps.yourFullNameTextLabel,
+      input: checkYourAnswersGenApps.yourFullNameTextInput,
+    });
   });
 });

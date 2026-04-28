@@ -93,6 +93,7 @@ export class ActionRegistry {
     ['confirmOrderDoYouWant', new GenAppsAction()],
     ['reviewCYA', new GenAppsAction()],
     ['selectStatementOfTruth', new GenAppsAction()],
+    ['reviewAndUpdateCYA', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {

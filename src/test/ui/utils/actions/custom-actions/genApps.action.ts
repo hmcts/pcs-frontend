@@ -12,7 +12,7 @@ import {
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
 import { compareMaps } from '../../common/compareMaps.util';
-import { generateRandomString } from '../../common/string.utils';
+import { generateRandomString, stringToCamelCase } from '../../common/string.utils';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 import { defaultJourney, journeys } from '../../journeyMapping';
@@ -40,6 +40,7 @@ export class GenAppsAction implements IAction {
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
       ['validateCYA', () => this.validateCYA()],
       ['reviewCYA', () => this.reviewCYA(page, fieldName as actionData)],
+      ['reviewAndUpdateCYA', () => this.reviewAndUpdateCYA(page, fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -149,8 +150,9 @@ export class GenAppsAction implements IAction {
       question: sot.question,
       option: sot.option
     });
-    await performAction('inputText',sot.label, sot.input);
-    await performAction('clickButton', checkYourAnswersGenApps.continueToPaymentButton);
+    await performAction('inputText', sot.label, sot.input);
+    const button = FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'Yes' ? checkYourAnswersGenApps.continueToPaymentHiddenButton : checkYourAnswersGenApps.submitHiddenButton;
+    await performAction('clickButton', button);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
@@ -283,6 +285,71 @@ export class GenAppsAction implements IAction {
     // Final safety check
     await expect(page).toHaveURL(/check-your-answers/);
     //}
+  }
+
+  private async reviewAndUpdateCYA(page: Page, review: actionRecord) {
+    const rows = page.locator('.govuk-summary-list__row');
+    const rowCount = await rows.count();
+
+    for (let i = 0; i < rowCount; i++) {
+      const row = page.locator('.govuk-summary-list__row').nth(i);
+      const questionText = await row.locator('dt').innerText();
+
+
+      // if ((await changeLink.count()) === 0) {
+      //   continue;
+      // }
+      if (questionText === review.changeOption as string) {
+        const changeLink = row.getByRole('link', { name: 'Change' });
+
+        const href = await changeLink.getAttribute('href');
+        expect(href, `Missing href for question: ${questionText}`).toBeTruthy();
+
+        // Click Change
+        await Promise.all([page.waitForURL(new RegExp(href!)), changeLink.click()]);
+        break;
+      }
+    }
+    await this.updatePreviouslyAnsweredPage(page);
+    const pagesForThisQuestion = journeys[String(review.journey)] ?? defaultJourney;
+
+    // Follow the allowed journey
+    await this.followJourneyBackToCya(page, pagesForThisQuestion);
+
+    // Final safety check
+    await expect(page).toHaveURL(/check-your-answers/);
+
+  }
+
+  private async updatePreviouslyAnsweredPage(page: Page) {
+    const currentPage = stringToCamelCase(await page
+      .locator(
+        'legend h1.govuk-fieldset__heading, h1.govuk-heading-xl, h1.govuk-heading-l, h1.govuk-heading-m, legend.govuk-fieldset__legend--l'
+      )
+      .first().innerText());
+
+    switch (currentPage) {
+      case 'isTheCourtHearingInTheNext14Days':
+        {
+          const option1 = FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'Yes' ? isTheCourtHearingInTheNext14Days.noRadioOption : isTheCourtHearingInTheNext14Days.yesRadioOption;
+          await performAction('confirmIfCourtHearingInNext14Days', {
+            question: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
+            option: option1,
+          });
+          if (option1 === 'Yes') {
+            await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+            await performAction('doYouNeedHelpPayingFee', {
+              question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+              option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
+            });
+          }
+
+          break;
+        }
+
+      default:
+        break;
+    }
   }
 
   private async followJourneyBackToCya(page: Page, allowedPages: string[]) {

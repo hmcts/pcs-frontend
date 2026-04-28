@@ -46,8 +46,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: chooseAnApplication.setAsideRadioOption,
     });
     await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
-    //The below are placeholder pages
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
       question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
