@@ -182,13 +182,22 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
     await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performAction('otherConsiderations', {
+    await performAction('selectWhatOtherRegularExpensesDoYouHave', {
+      regularIncomeOptions: [
+        [
+          whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
+        ],
+      ],
+    });
+      await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('clickButton', uploadFiles.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
