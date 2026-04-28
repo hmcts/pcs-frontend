@@ -197,6 +197,8 @@ export interface CcdDefendantResponses {
   counterClaimDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   languageUsed?: LanguageUsed;
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
+  otherConsiderations?: YesNoValue;
+  otherConsiderationsDetails?: string;
 }
 
 export interface PossessionClaimResponse {
