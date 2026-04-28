@@ -18,18 +18,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@axe-core/playwright@npm:4.11.2":
-  version: 4.11.2
-  resolution: "@axe-core/playwright@npm:4.11.2"
-  dependencies:
-    axe-core: "npm:~4.11.3"
-  peerDependencies:
-    playwright-core: ">= 1.0.0"
-  checksum: 10/3e4b3d75c56442dadc42717ab28167edcef8df1442bd3b51ddf25947d3be63ff08a2e3e1a382a04a681a1438f81d4685d099d093afa9abb0ec485b535df2a830
-  languageName: node
-  linkType: hard
-
-"@axe-core/playwright@npm:^4.11.0":
+"@axe-core/playwright@npm:4.11.1, @axe-core/playwright@npm:^4.11.0":
   version: 4.11.1
   resolution: "@axe-core/playwright@npm:4.11.1"
   dependencies:
@@ -5446,7 +5435,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axe-core@npm:^4.11.1, axe-core@npm:^4.11.2, axe-core@npm:~4.11.3":
+"axe-core@npm:^4.11.1, axe-core@npm:^4.11.2":
   version: 4.11.3
   resolution: "axe-core@npm:4.11.3"
   checksum: 10/4ef64672117df20f040b245d78b5b38552497bd6a1a84222f8c6a07304e0a374a290504ccd76efc3d1ee3a17c8731a65b625a49bf6701c7bd16093a54fcd5b8d
@@ -10219,7 +10208,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:6.2.2, jose@npm:^6.2.2":
+"jose@npm:6.2.3":
+  version: 6.2.3
+  resolution: "jose@npm:6.2.3"
+  checksum: 10/876974613c5ee988d43b65a34c96ce440dbf7706a2f07f465b8874af16ee532102e224459a7068d2c6ef044affe49690667d23ca12770c279804baec95a09608
+  languageName: node
+  linkType: hard
+
+"jose@npm:^6.2.2":
   version: 6.2.2
   resolution: "jose@npm:6.2.2"
   checksum: 10/fd66f24916d2507dbde0ca77ede86377e7d7eae42c7f94db0dfd014b0c6ce5041365dc8e757a44e54cd7606ea5e9c757aa544b51e55cb8a736e83320db1b8258
@@ -11622,13 +11618,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:6.8.3":
-  version: 6.8.3
-  resolution: "openid-client@npm:6.8.3"
+"openid-client@npm:6.8.4":
+  version: 6.8.4
+  resolution: "openid-client@npm:6.8.4"
   dependencies:
     jose: "npm:^6.2.2"
     oauth4webapi: "npm:^3.8.5"
-  checksum: 10/4936fd338c65387921ab4f1d8bc9da18bf9b78f56f4d4a17e8cd9731cc992ab99daa47e051e800c5a68d236a08737303d520984138ae797385c0131e71705248
+  checksum: 10/39402afd4534081d0c9af41aadc916b2b6d41cab1d9eaa9b33f1a3bc3a73ba437f04ccb4b906a4523b41886ee3de716d24c028fd734282b4924cac641d5c5869
   languageName: node
   linkType: hard
 
@@ -11878,7 +11874,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "pcs-frontend@workspace:."
   dependencies:
-    "@axe-core/playwright": "npm:4.11.2"
+    "@axe-core/playwright": "npm:4.11.1"
     "@azure/monitor-opentelemetry": "npm:1.16.0"
     "@eslint/compat": "npm:2.0.5"
     "@eslint/eslintrc": "npm:3.3.5"
@@ -11952,7 +11948,7 @@ __metadata:
     jest-environment-jsdom: "npm:30.3.0"
     jest-html-reporter: "npm:4.4.0"
     jest-pact: "npm:0.13.0"
-    jose: "npm:6.2.2"
+    jose: "npm:6.2.3"
     lint-staged: "npm:15.5.2"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
@@ -11960,7 +11956,7 @@ __metadata:
     module-alias: "npm:2.3.4"
     nodemon: "npm:3.1.14"
     nunjucks: "npm:3.2.4"
-    openid-client: "npm:6.8.3"
+    openid-client: "npm:6.8.4"
     playwright: "npm:1.59.1"
     playwright-core: "npm:1.59.1"
     postcss: "npm:8.5.12"
