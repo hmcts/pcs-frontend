@@ -22,7 +22,7 @@ export const exceptionalHardship = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   emojiTextInput: `👉 😄`,
   emojiGiveDetailsAboutExceptionalHardshipErrorMessage: `Give details about the exceptional hardship you’d experience must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
-  selectExceptionHardshipErrorMessage: `Select if you'd experience exceptional hardship if you were asked to leave your home`,
+  selectExceptionHardshipErrorMessage: `Select if you’d experience exceptional hardship if you were asked to leave your home`,
   mustBe500CharactersOrFewerErrorMessage: `Must be 500 characters or fewer`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `exceptional-hardship`,
