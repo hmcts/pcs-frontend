@@ -46,6 +46,15 @@
     "reasonForNotSharing": {
       "label": "cyProvide a reason this application should not be shared with the other party",
       "changeHint": "cyChange the reason this application should not be shared with the other party"
+    },
+    "whichLanguage": {
+      "label": "cyWhich language did you use to complete this service?",
+      "changeHint": "cyChange which language you used to complete this service",
+      "options": {
+        "ENGLISH": "cyEnglish",
+        "WELSH": "cyWelsh",
+        "ENGLISH_AND_WELSH": "cyEnglish and Welsh"
+      }
     }
   }
 }
