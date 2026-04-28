@@ -2,7 +2,7 @@ import { format, parseISO } from 'date-fns';
 import type { Request } from 'express';
 
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { formatDatePartsToISODate } from '../../utils';
+import { formatDatePartsToISODate, fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
@@ -59,26 +59,10 @@ export const step: StepDefinition = createFormStep({
   ],
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const existingDateIsCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateCorrect as
-      | string
-      | undefined;
-    const existingTenancyStartDate = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDate as
-      | string
-      | undefined;
+    const existingDateIsCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateCorrect;
+    const existingTenancyStartDate = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDate;
 
-    if (!existingDateIsCorrect) {
-      return {};
-    }
-
-    const formValue =
-      existingDateIsCorrect === 'YES'
-        ? 'yes'
-        : existingDateIsCorrect === 'NO'
-          ? 'no'
-          : existingDateIsCorrect === 'NOT_SURE'
-            ? 'notSure'
-            : undefined;
-
+    const formValue = fromYesNoNotSureEnum(existingDateIsCorrect);
     if (!formValue) {
       return {};
     }
@@ -100,10 +84,10 @@ export const step: StepDefinition = createFormStep({
     const confirmValue = req.body?.confirmTenancyDate as string | undefined;
 
     const response = buildDraftDefendantResponse(req);
-    const enumMapping: Record<string, string> = { yes: 'YES', no: 'NO', notSure: 'NOT_SURE' };
+    const enumValue = toYesNoNotSureEnum(confirmValue);
 
-    if (confirmValue && enumMapping[confirmValue]) {
-      response.defendantResponses.tenancyStartDateCorrect = enumMapping[confirmValue];
+    if (enumValue) {
+      response.defendantResponses.tenancyStartDateCorrect = enumValue;
 
       if (confirmValue === 'yes') {
         const caseData = req.res?.locals?.validatedCase?.data;
@@ -139,10 +123,8 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const claimantNameFromValidatedCase = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as
-      | string
-      | undefined;
-    const claimantNameFromSession = caseData?.claimantName as string | undefined;
+    const claimantNameFromValidatedCase = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
+    const claimantNameFromSession = caseData?.claimantName;
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession;
     const existingStartDate = getTenancyStartDate(caseData);
 

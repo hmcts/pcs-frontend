@@ -1,10 +1,9 @@
 import { createFormStep } from '../../../modules/steps';
-import { formatDatePartsToISODate, parseISOToDateParts } from '../../utils';
+import { formatDatePartsToISODate, fromYesNoNotSureEnum, parseISOToDateParts, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { YesNoNotSureValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
@@ -52,11 +51,10 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: req => {
     const caseData =
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const existing = caseData?.alternativeAccommodation as string | undefined;
-    const existingDate = caseData?.alternativeAccommodationTransferDate as string | undefined;
+    const existing = caseData?.alternativeAccommodation;
+    const existingDate = caseData?.alternativeAccommodationTransferDate;
 
-    const mapping: Record<string, string> = { YES: 'yes', NO: 'no', NOT_SURE: 'notSure' };
-    const formValue = existing ? mapping[existing] : undefined;
+    const formValue = fromYesNoNotSureEnum(existing);
 
     const result: Record<string, unknown> = { confirmAlternativeAccommodation: formValue };
 
@@ -70,10 +68,10 @@ export const step: StepDefinition = createFormStep({
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const confirmValue = req.body?.confirmAlternativeAccommodation as string | undefined;
-    const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', notSure: 'NOT_SURE' };
+    const enumValue = toYesNoNotSureEnum(confirmValue);
 
-    if (confirmValue && enumMapping[confirmValue]) {
-      response.defendantResponses.householdCircumstances.alternativeAccommodation = enumMapping[confirmValue];
+    if (enumValue) {
+      response.defendantResponses.householdCircumstances.alternativeAccommodation = enumValue;
 
       if (confirmValue === 'yes') {
         const day =

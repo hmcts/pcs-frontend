@@ -141,10 +141,10 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: CcdCaseData | Record<string, unknown>
+  data: CcdCaseData
 ): Promise<CcdCase> {
   const payload = {
-    data: data as Record<string, unknown>,
+    data,
     event: {
       id: eventId,
       summary: `Citizen ${eventId} summary`,
@@ -242,7 +242,7 @@ export const ccdCaseService = {
    * @param data - Initial case data
    * @returns Created case with merged data from CCD
    */
-  async createCase(accessToken: string | undefined, data: Record<string, unknown>): Promise<CcdCase> {
+  async createCase(accessToken: string | undefined, data: CcdCaseData): Promise<CcdCase> {
     // Phase 1: START - Get event token
     const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
@@ -315,11 +315,7 @@ export const ccdCaseService = {
     }
   },
 
-  async saveDraftRespondToClaim(
-    accessToken: string | undefined,
-    caseId: string,
-    data: CcdCaseData | Record<string, unknown>
-  ): Promise<CcdCase> {
+  async saveDraftRespondToClaim(accessToken: string | undefined, caseId: string, data: CcdCaseData): Promise<CcdCase> {
     if (!caseId) {
       throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
     }

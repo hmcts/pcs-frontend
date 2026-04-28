@@ -3,7 +3,6 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export type ContactPreference = 'EMAIL' | 'POST' | null;
@@ -141,7 +140,7 @@ export interface CcdDefendantParty {
   address?: CcdCaseAddress | Record<string, never>;
   addressKnown?: string;
   addressSameAsProperty?: string;
-  phoneNumberProvided?: VerticalYesNoValue;
+  phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
 }
 
@@ -157,10 +156,10 @@ export interface CcdDefendantResponses {
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;
-  contactByPhone?: VerticalYesNoValue;
-  contactByEmail?: VerticalYesNoValue;
-  contactByPost?: VerticalYesNoValue;
-  contactByText?: VerticalYesNoValue;
+  contactByPhone?: YesNoValue;
+  contactByEmail?: YesNoValue;
+  contactByPost?: YesNoValue;
+  contactByText?: YesNoValue;
   preferenceType?: ContactPreference;
   rentArrearsAmountConfirmation?: string;
   rentArrearsAmount?: string;

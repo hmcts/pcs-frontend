@@ -1,11 +1,11 @@
 import type { Request } from 'express';
 
 import { createFormStep } from '../../../modules/steps';
+import { fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { YesNoNotSureValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',
@@ -17,10 +17,10 @@ export const step: StepDefinition = createFormStep({
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
     const repaymentsAgreed = req.body?.repaymentsAgreed as string | undefined;
-    const enumMapping: Record<string, YesNoNotSureValue> = { yes: 'YES', no: 'NO', imNotSure: 'NOT_SURE' };
+    const enumValue = toYesNoNotSureEnum(repaymentsAgreed);
 
-    if (repaymentsAgreed && enumMapping[repaymentsAgreed]) {
-      response.defendantResponses.paymentAgreement.repaymentPlanAgreed = enumMapping[repaymentsAgreed];
+    if (enumValue) {
+      response.defendantResponses.paymentAgreement.repaymentPlanAgreed = enumValue;
 
       if (repaymentsAgreed === 'yes') {
         response.defendantResponses.paymentAgreement.repaymentAgreedDetails = req.body?.[
@@ -50,14 +50,7 @@ export const step: StepDefinition = createFormStep({
     const repaymentPlanAgreed = paymentAgreement?.repaymentPlanAgreed;
     const repaymentAgreedDetails = paymentAgreement?.repaymentAgreedDetails;
 
-    const formValue =
-      repaymentPlanAgreed === 'YES'
-        ? 'yes'
-        : repaymentPlanAgreed === 'NO'
-          ? 'no'
-          : repaymentPlanAgreed === 'NOT_SURE'
-            ? 'imNotSure'
-            : undefined;
+    const formValue = fromYesNoNotSureEnum(repaymentPlanAgreed);
 
     if (formValue === undefined) {
       return {};
@@ -109,7 +102,7 @@ export const step: StepDefinition = createFormStep({
         },
         { value: 'no', translationKey: 'options.no' },
         { divider: 'options.or' },
-        { value: 'imNotSure', translationKey: 'options.imNotSure' },
+        { value: 'notSure', translationKey: 'options.imNotSure' },
       ],
     },
   ],

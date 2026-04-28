@@ -24,6 +24,17 @@ export interface FormFieldOption {
   subFields?: Record<string, FormFieldConfig>;
 }
 
+// Shape of the built `component` config that the radio macro consumes. Steps reach into this
+// via `formContent.fields.find(f => f.componentType === 'radios')` to mutate heading/legend/hint
+// at render time. Narrowed from FormFieldConfig['component'] which is Record<string, unknown>.
+export interface RadioFormField {
+  component: {
+    label: { text: string };
+    fieldset: { legend: { text: string; isPageHeading?: boolean } };
+    hint?: { text: string };
+  };
+}
+
 export interface FormFieldConfig {
   name: string;
   type: FormFieldType;

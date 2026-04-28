@@ -3,7 +3,9 @@
  * Used for CCD API integration where boolean choices are represented as enum strings.
  */
 
-import type { VerticalYesNoValue, YesNoValue } from '@services/ccdCase.interface';
+import type { YesNoNotSureValue, YesNoValue } from '@services/ccdCase.interface';
+
+export type YesNoNotSureFormValue = 'yes' | 'no' | 'notSure';
 
 /**
  * Converts frontend 'yes'/'no' string to backend CCD enum 'Yes'/'No'
@@ -37,29 +39,40 @@ export function fromYesNoEnum(value: YesNoValue | string | null | undefined): 'y
 }
 
 /**
- * Converts frontend 'yes'/'no' to backend 'YES'/'NO' enum (VerticalYesNo).
- * Used for vertical radio button fields like contactByPhone, contactByText.
- * @example toVerticalYesNoEnum('yes') // returns 'YES'
+ * Converts a frontend 'yes' / 'no' / 'notSure' value to backend CCD enum
+ * 'YES' / 'NO' / 'NOT_SURE'.
  */
-export function toVerticalYesNoEnum(value: 'yes' | 'no'): VerticalYesNoValue {
-  return value.toLowerCase() === 'yes' ? 'YES' : 'NO';
+export function toYesNoNotSureEnum(value: string | undefined): YesNoNotSureValue | undefined {
+  if (value === 'yes') {
+    return 'YES';
+  }
+  if (value === 'no') {
+    return 'NO';
+  }
+  if (value === 'notSure') {
+    return 'NOT_SURE';
+  }
+  return undefined;
 }
 
 /**
- * Converts backend 'YES'/'NO' enum to frontend 'yes'/'no'.
- * Case-insensitive for backward compatibility.
- * @example fromVerticalYesNoEnum('YES') // returns 'yes'
+ * Converts a backend CCD 'YES' / 'NO' / 'NOT_SURE' enum to its frontend form value.
  */
-export function fromVerticalYesNoEnum(value: VerticalYesNoValue | string | null | undefined): 'yes' | 'no' | undefined {
+export function fromYesNoNotSureEnum(
+  value: YesNoNotSureValue | string | null | undefined
+): YesNoNotSureFormValue | undefined {
   if (!value) {
     return undefined;
   }
-  const lowerValue = value.toLowerCase();
-  if (lowerValue === 'yes') {
+  const upper = value.toUpperCase();
+  if (upper === 'YES') {
     return 'yes';
   }
-  if (lowerValue === 'no') {
+  if (upper === 'NO') {
     return 'no';
+  }
+  if (upper === 'NOT_SURE') {
+    return 'notSure';
   }
   return undefined;
 }

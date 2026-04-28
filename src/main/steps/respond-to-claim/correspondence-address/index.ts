@@ -2,12 +2,12 @@ import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
-import { arrayToString } from '../../../utils/arrayToString';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildCcdAddressFromFormParts, formatCcdAddress } from '../../utils/ccdAddress';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
-import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { FormFieldConfig, RadioFormField } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 // Define fields array separately so we can reference it
@@ -106,22 +106,14 @@ export const step: StepDefinition = createFormStep({
   customTemplate: 'respond-to-claim/correspondence-address/correspondenceAddress.njk',
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    if (req.body?.['correspondenceAddressConfirm'] === 'yes') {
-      // Address already in the clone from START callback - no change needed
-    } else {
-      const addressLine1 = req.body?.['correspondenceAddressConfirm.addressLine1'] ?? '';
-      const addressLine2 = req.body?.['correspondenceAddressConfirm.addressLine2'];
-      const townOrCity = req.body?.['correspondenceAddressConfirm.townOrCity'] ?? '';
-      const county = req.body?.['correspondenceAddressConfirm.county'];
-      const postcode = req.body?.['correspondenceAddressConfirm.postcode'] ?? '';
-
-      response.defendantContactDetails.party.address = {
-        AddressLine1: addressLine1,
-        ...(addressLine2 !== undefined && addressLine2 !== '' && { AddressLine2: addressLine2 }),
-        PostTown: townOrCity,
-        ...(county !== undefined && county !== '' && { County: county }),
-        PostCode: postcode,
-      };
+    if (req.body?.['correspondenceAddressConfirm'] !== 'yes') {
+      response.defendantContactDetails.party.address = buildCcdAddressFromFormParts({
+        addressLine1: req.body?.['correspondenceAddressConfirm.addressLine1'] ?? '',
+        addressLine2: req.body?.['correspondenceAddressConfirm.addressLine2'],
+        townOrCity: req.body?.['correspondenceAddressConfirm.townOrCity'] ?? '',
+        county: req.body?.['correspondenceAddressConfirm.county'],
+        postcode: req.body?.['correspondenceAddressConfirm.postcode'] ?? '',
+      });
     }
 
     await saveDraftDefendantResponse(req, response);
@@ -154,15 +146,7 @@ export const step: StepDefinition = createFormStep({
 
     const isAddressKnown = formattedAddressStr !== '?';
 
-    const radio = formContent.fields.find(f => f.componentType === 'radios') as
-      | {
-          component: {
-            label: { text: string };
-            fieldset: { legend: { text: string; isPageHeading?: boolean } };
-            hint?: { text: string };
-          };
-        }
-      | undefined;
+    const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioFormField | undefined;
     if (!radio || !radio.component) {
       return {};
     }
@@ -258,18 +242,8 @@ function getExistingAddress(req: Request): { formattedAddress: string } {
   const caseData = req.res?.locals?.validatedCase?.data;
   const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address;
 
-  if (originalAddress?.AddressLine1) {
-    const formattedAddress =
-      arrayToString([
-        originalAddress.AddressLine1,
-        originalAddress.AddressLine2,
-        originalAddress.AddressLine3,
-        originalAddress.PostTown,
-        originalAddress.County,
-        originalAddress.PostCode,
-        originalAddress.Country,
-      ]) + '?';
-    return { formattedAddress };
+  if (originalAddress && 'AddressLine1' in originalAddress && originalAddress.AddressLine1) {
+    return { formattedAddress: formatCcdAddress(originalAddress) + '?' };
   }
   return { formattedAddress: '?' };
 }

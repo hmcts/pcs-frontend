@@ -435,7 +435,7 @@ export const flowConfig: JourneyFlowConfig = {
             _formData: Record<string, unknown>,
             currentStepData: Record<string, unknown>
           ): Promise<boolean> =>
-            currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
+            currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'notSure',
           nextStep: 'your-household-and-circumstances',
         },
       ],

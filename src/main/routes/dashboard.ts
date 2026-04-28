@@ -4,6 +4,7 @@ import type { Application, Request, Response } from 'express';
 
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
+import { formatCcdAddress } from '../steps/utils/ccdAddress';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -15,7 +16,6 @@ import {
   getDashboardNotifications,
   getDashboardTaskGroups,
 } from '@services/pcsApi';
-import { arrayToString } from '@utils/arrayToString';
 import { sanitiseCaseReference, toCaseReference16 } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -31,21 +31,7 @@ interface MappedTask {
 
 function getPropertyAddressFromValidatedCase(validatedCase: CcdCase): string | null {
   const address = (validatedCase.data as { propertyAddress?: CcdCaseAddress | undefined })?.propertyAddress;
-
-  if (!address) {
-    return null;
-  }
-
-  const formatted = arrayToString([
-    address.AddressLine1,
-    address.AddressLine2,
-    address.AddressLine3,
-    address.PostTown,
-    address.County,
-    address.PostCode,
-  ]);
-
-  return formatted || null;
+  return formatCcdAddress(address) || null;
 }
 
 interface MappedTaskGroup {

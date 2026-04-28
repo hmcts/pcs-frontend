@@ -17,6 +17,6 @@ export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousSt
 export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
 export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
-export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
+export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
