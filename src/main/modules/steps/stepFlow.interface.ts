@@ -42,7 +42,6 @@ export type SectionApplicabilityCondition = (req: Request) => Promise<boolean>;
 export interface SectionConfig {
   titleKey: string;
   steps: string[];
-  order: number;
   isApplicable?: SectionApplicabilityCondition;
 }
 

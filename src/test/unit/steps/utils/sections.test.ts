@@ -13,12 +13,10 @@ import {
 const testSections: Record<string, SectionConfig> = {
   sectionA: {
     titleKey: 'sectionA',
-    order: 1,
     steps: ['step-a1', 'step-a2'],
   },
   sectionB: {
     titleKey: 'sectionB',
-    order: 2,
     steps: ['step-b1'],
     isApplicable: async req => Boolean(req.res?.locals?.validatedCase),
   },
@@ -115,7 +113,6 @@ describe('sections utils', () => {
         ...testSections,
         sectionC: {
           titleKey: 'sectionC',
-          order: 3,
           steps: ['step-a2'],
         },
       };

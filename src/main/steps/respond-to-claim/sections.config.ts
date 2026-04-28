@@ -4,12 +4,10 @@ import { hasAnyRentArrearsGround } from '../utils';
 export const respondToClaimSections = {
   startNowAndDetails: {
     titleKey: 'taskList.startNowAndDetails',
-    order: 1,
     steps: ['start-now', 'free-legal-advice'],
   },
   personalDetails: {
     titleKey: 'taskList.personalDetails',
-    order: 2,
     steps: [
       'defendant-name-confirmation',
       'defendant-name-capture',
@@ -22,7 +20,6 @@ export const respondToClaimSections = {
   },
   disputeAndTenancy: {
     titleKey: 'taskList.disputeAndTenancy',
-    order: 3,
     steps: [
       'dispute-claim-interstitial',
       'landlord-registered',
@@ -41,7 +38,6 @@ export const respondToClaimSections = {
   },
   payments: {
     titleKey: 'taskList.payments',
-    order: 4,
     steps: [
       'payment-interstitial',
       'repayments-made',
@@ -53,7 +49,6 @@ export const respondToClaimSections = {
   },
   situationAndCircumstances: {
     titleKey: 'taskList.situationAndCircumstances',
-    order: 5,
     steps: [
       'your-household-and-circumstances',
       'do-you-have-any-dependant-children',
@@ -66,7 +61,6 @@ export const respondToClaimSections = {
   },
   incomeAndExpenditure: {
     titleKey: 'taskList.incomeAndExpenditure',
-    order: 6,
     steps: [
       'income-and-expenses',
       'what-regular-income-do-you-receive',
@@ -79,12 +73,10 @@ export const respondToClaimSections = {
   },
   uploadFiles: {
     titleKey: 'taskList.uploadFiles',
-    order: 7,
     steps: ['upload-docs'],
   },
   checkYourAnswersAndSubmit: {
     titleKey: 'taskList.checkYourAnswersAndSubmit',
-    order: 8,
     steps: ['language-used', 'equality-and-diversity-start', 'equality-and-diversity-end', 'check-your-answers'],
   },
 } satisfies Record<string, SectionConfig>;
