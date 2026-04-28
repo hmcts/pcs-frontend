@@ -141,11 +141,7 @@ export const step: StepDefinition = createFormStep({
     return formData;
   },
   beforeRedirect: async (req: Request) => {
-    const isClaimAmountKnown = req.body?.isClaimAmountKnown as string | undefined;
-
-    if (!isClaimAmountKnown) {
-      return;
-    }
+    const isClaimAmountKnown = req.body?.isClaimAmountKnown as string;
 
     const counterClaim: CcdCounterClaim = { isClaimAmountKnown: isClaimAmountKnown.toUpperCase() };
 
