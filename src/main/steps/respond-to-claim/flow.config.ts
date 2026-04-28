@@ -10,6 +10,7 @@ import {
   isMoneyCounterClaim,
   isNoticeDateProvided,
   isNoticeServed,
+  isSomethingElseCounterClaim,
   isTenancyStartDateKnown,
   isWalesProperty,
 } from '../utils';
@@ -440,7 +441,7 @@ export const flowConfig: JourneyFlowConfig = {
             req: Request,
             _formData: Record<string, unknown>,
             currentStepData: Record<string, unknown>
-          ) => currentStepData.counterClaimNeedHelpWithFees === 'NO' && (await hasMultipleParties()),
+          ) => currentStepData.counterClaimNeedHelpWithFees === 'NO' && hasMultipleParties(),
           nextStep: 'counter-claim-against-who',
         },
         {
@@ -452,9 +453,30 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'counter-claim-about',
         },
       ],
+      defaultNext: 'counter-claim-against-who',
+    },
+    'counter-claim-against-who': {
+      previousStep: 'counter-claim-fee',
+      defaultNext: 'counter-claim-about',
+    },
+    'counter-claim-about': {
+      previousStep: async (_req: Request) =>
+        (await hasMultipleParties()) ? 'counter-claim-against-who' : 'counter-claim-fee',
+      routes: [
+        {
+          condition: async (req: Request) => isSomethingElseCounterClaim(req),
+          nextStep: 'counter-claim-order-other-than-sum',
+        },
+      ],
+      defaultNext: 'payment-interstitial',
+    },
+    'counter-claim-order-other-than-sum': {
+      previousStep: 'counter-claim-about',
+      defaultNext: 'payment-interstitial',
     },
     'payment-interstitial': {
-      previousStep: 'counter-claim-fee',
+      previousStep: async (req: Request) =>
+        (await isSomethingElseCounterClaim(req)) ? 'counter-claim-order-other-than-sum' : 'counter-claim-about',
       defaultNext: 'repayments-made',
     },
     'repayments-made': {
