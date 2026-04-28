@@ -2,7 +2,9 @@ import type { Request } from 'express';
 
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import {
+  hasChosenToShareIncomeExpenses,
   hasConfirmedInstallmentOffer,
+  hasDeclaredUniversalCreditOnRegularIncome,
   shouldShowInstallmentPaymentsStep,
 } from '../../../../main/steps/respond-to-claim/flowConditions';
 
@@ -199,5 +201,90 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     expect(hasConfirmedInstallmentOffer(howMuchReq)).toBe(true);
     expect(hasConfirmedInstallmentOffer(createReq({}))).toBe(false);
+  });
+
+  it('routes finance journey based on share income/expenses answer', async () => {
+    const shareNoReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'NO',
+            },
+          },
+        },
+      },
+    });
+
+    await expect(getNextStep(shareNoReq, 'income-and-expenses', flowConfig, {})).resolves.toBe('other-considerations');
+  });
+
+  it('routes UC vs Priority Debts based on regular income UC selection', async () => {
+    const shareYesUcNotDeclaredReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+              universalCredit: 'NO',
+            },
+          },
+        },
+      },
+    });
+
+    const shareYesUcDeclaredReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+              universalCredit: 'YES',
+            },
+          },
+        },
+      },
+    });
+
+    await expect(
+      getNextStep(shareYesUcNotDeclaredReq, 'what-regular-income-do-you-receive', flowConfig, {})
+    ).resolves.toBe('have-you-applied-for-universal-credit');
+
+    await expect(
+      getNextStep(shareYesUcDeclaredReq, 'what-regular-income-do-you-receive', flowConfig, {})
+    ).resolves.toBe('priority-debts');
+  });
+
+  it('derives finance show helpers from CCD case data only', () => {
+    const shareYesReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+              universalCredit: 'YES',
+            },
+          },
+        },
+      },
+    });
+
+    const shareNoReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'NO',
+              universalCredit: 'NO',
+            },
+          },
+        },
+      },
+    });
+
+    expect(hasChosenToShareIncomeExpenses(shareYesReq)).toBe(true);
+    expect(hasDeclaredUniversalCreditOnRegularIncome(shareYesReq)).toBe(true);
+    expect(hasChosenToShareIncomeExpenses(shareNoReq)).toBe(false);
+    expect(hasDeclaredUniversalCreditOnRegularIncome(shareNoReq)).toBe(false);
   });
 });
