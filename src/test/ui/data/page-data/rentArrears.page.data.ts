@@ -8,7 +8,6 @@ export const rentArrears = {
   doYouOweThisQuestion: `Do you owe this amount in rent arrears?`,
   howMuchDoYouBelieveHiddenTextLabel: `How much do you believe you owe in rent arrears?`,
   rentArrearsAreMoneyParagraph: `Rent arrears are money you owe in rent payments.`,
-  theRentStatementParagraph: `The rent statement will have been included in the pack you received in the post letting you know a claim had been made against you, and is also available to view from ‘View the claim’ on your case overview.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   imNotSureRadioOption: `I’m not sure`,
