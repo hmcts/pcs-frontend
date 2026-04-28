@@ -81,7 +81,7 @@ export class ActionRegistry {
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
-     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
+    ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],

@@ -110,7 +110,7 @@ export class GenAppsAction implements IAction {
     FieldsStore.update(confirmOrder.label as string, userInput);
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
   }
-  
+
   private async confirmOtherPartiesAgreed(confirmOtherParty: actionRecord) {
     await performAction('recordUserEntry', confirmOtherParty);
     await performAction('clickRadioButton', {
