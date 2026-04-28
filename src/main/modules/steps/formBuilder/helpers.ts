@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
+import _ from 'lodash';
 
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
@@ -173,7 +174,7 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
   const stepSpecificErrors: Record<string, string> = {};
 
   const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate'];
-  const commonErrorKeys = ['defaultRequired', 'defaultInvalid', 'defaultMaxLength'];
+  const commonErrorKeys = ['defaultRequired', 'defaultInvalid', 'defaultMaxLength', 'defaultSpecialCharacter'];
 
   for (const key of commonErrorKeys) {
     const errorKey = `errors.${key}`;
@@ -461,6 +462,36 @@ export function validateForm(
             const defaultMaxLengthMsg = translations?.defaultMaxLength?.replace('{max}', field.maxLength.toString());
             errors[fieldName] =
               fieldSpecificMaxLengthMsg || defaultMaxLengthMsg || `Must be ${field.maxLength} characters or less`;
+          }
+        }
+
+        const toSentenceCase = (name: string): string => {
+          const lastSegment = _.startCase(name.split('.').pop() ?? name);
+          return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1).toLowerCase();
+        };
+
+        //emoji validation
+        if (field.type === 'character-count' || field.type === 'text' || (field.type === 'textarea' && value)) {
+          const text = (value as string)?.trim();
+          const allowedCharsRegex = /^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u;
+
+          if (!allowedCharsRegex.test(text)) {
+            if (!errors[fieldName]) {
+              const translationLabelKey =
+                typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
+
+              const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
+
+              const displayName = resolvedLabel ?? toSentenceCase(fieldName);
+
+              const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
+                '{fieldName}',
+                displayName
+              );
+              errors[fieldName] =
+                defaultSpecialCharacterMsg ||
+                `${displayName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`;
+            }
           }
         }
 
