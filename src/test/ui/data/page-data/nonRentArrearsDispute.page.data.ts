@@ -20,6 +20,8 @@ export const nonRentArrearsDispute = {
   saveForLaterButton: `Save for later`,
   saveAndContinueButton: `Save and continue`,
   backLink: `Back`,
+  emojiTextInput: `👉 😄`,
+  emojiExplainPartsOfClaimErrorMessage: `Explain which parts of the claim you do not agree with must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   detailsCharLimitInputText: generateRandomString(6501),
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   youHave6500CharactersHiddenHintText: `You have 6,500 characters remaining`,
