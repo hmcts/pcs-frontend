@@ -64,11 +64,11 @@ function testMatchFromE2eSpec(raw: string | undefined): string[] | undefined {
 const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
 // Tags come from Jenkins choices or PR labels. Unset -> @nightly; empty -> no grep.
 const e2eTag = process.env.E2E_TEST_SCOPE ?? '';
+const projectTagFilter = e2eTag ? { grep: new RegExp(e2eTag) } : {};
 
 export default defineConfig({
   testDir: './src/test/ui',
   ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
-  ...(e2eTag ? { grep: new RegExp(e2eTag) } : {}),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -105,6 +105,7 @@ export default defineConfig({
     {
       name: 'chrome',
       dependencies: ['setup'],
+      ...projectTagFilter,
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
@@ -119,6 +120,7 @@ export default defineConfig({
           {
             name: 'firefox',
             dependencies: ['setup'],
+            ...projectTagFilter,
             use: {
               ...devices['Desktop Firefox'],
               channel: 'firefox',
@@ -131,6 +133,7 @@ export default defineConfig({
           {
             name: 'webkit',
             dependencies: ['setup'],
+            ...projectTagFilter,
             use: {
               ...devices['Desktop Safari'],
               channel: 'webkit',
@@ -143,6 +146,7 @@ export default defineConfig({
           {
             name: 'edge',
             dependencies: ['setup'],
+            ...projectTagFilter,
             use: {
               ...devices['Desktop Edge'],
               channel: 'msedge',
@@ -155,6 +159,7 @@ export default defineConfig({
           {
             name: 'MicrosoftEdge',
             dependencies: ['setup'],
+            ...projectTagFilter,
             use: {
               ...devices['Desktop Edge'],
               ...(sauceFullJourneyArtifacts ? {} : { channel: 'msedge' as const }),
@@ -167,6 +172,7 @@ export default defineConfig({
           {
             name: 'mobile-android',
             dependencies: ['setup'],
+            ...projectTagFilter,
             use: {
               ...devices['Pixel 5'],
               ...captureSettings,
@@ -177,6 +183,7 @@ export default defineConfig({
           {
             name: 'mobile-ios',
             dependencies: ['setup'],
+            ...projectTagFilter,
             use: {
               ...devices['iPhone 12'],
               ...captureSettings,
@@ -187,6 +194,7 @@ export default defineConfig({
           {
             name: 'mobile-ipad',
             dependencies: ['setup'],
+            ...projectTagFilter,
             use: {
               ...devices['iPad Pro 11'],
               ...captureSettings,
