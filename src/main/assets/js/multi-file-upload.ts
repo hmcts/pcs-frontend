@@ -218,22 +218,23 @@ function initContainer(container: HTMLElement): void {
   });
   uploadInstances.set(container, instance);
 
-  // MOJ injects a second <label for="..."> styled as a button inside the dropzone, which
-  // together with the outer govuk-label trips axe's form-field-multiple-labels rule. Strip
-  // the `for` (so only one label points to the input), hide it from the a11y tree, and
-  // attach a click handler that late-binds to the live input -- MOJ replaces the <input>
-  // with a clone after every upload, so a cached reference would go stale.
+  // MOJ injects a <label for="documents"> styled as a button inside the dropzone. A label
+  // with no matching control (or with a duplicate for= reference) triggers WAVE "Orphaned
+  // form label". Replace the element with a real <button> so semantics are correct and no
+  // label rule fires. MOJ replaces the <input> with a clone after every upload, so the
+  // click handler uses a live querySelector rather than a cached reference.
   const dropzone = container.querySelector('.moj-multi-file-upload__dropzone');
   const duplicateLabel = dropzone?.querySelector<HTMLLabelElement>('label.govuk-button--secondary');
-  // Use `aria-hidden` as an "already processed" sentinel so HMR / re-inits don't stack
-  // duplicate click listeners on the same label.
-  if (duplicateLabel && duplicateLabel.getAttribute('aria-hidden') !== 'true') {
-    duplicateLabel.removeAttribute('for');
-    duplicateLabel.setAttribute('aria-hidden', 'true');
-    duplicateLabel.addEventListener('click', event => {
+  if (duplicateLabel) {
+    const chooseFilesButton = document.createElement('button');
+    chooseFilesButton.type = 'button';
+    chooseFilesButton.className = duplicateLabel.className;
+    chooseFilesButton.textContent = duplicateLabel.textContent?.trim() || 'Choose files';
+    chooseFilesButton.addEventListener('click', event => {
       event.preventDefault();
       container.querySelector<HTMLInputElement>('.moj-multi-file-upload__input')?.click();
     });
+    duplicateLabel.replaceWith(chooseFilesButton);
   }
 
   form.addEventListener('submit', event => {
