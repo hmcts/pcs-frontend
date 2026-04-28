@@ -1,0 +1,16 @@
+{
+  "pageTitle": "About your counterclaim",
+  "heading": "About your counterclaim",
+  "infoParagraph1": "You will be able to upload any evidence you have on the next page.",
+  "infoParagraph2": "The claimant will be able to see your answers.",
+  "aboutCounterclaimForLabel": "What is your counterclaim for?",
+  "aboutCounterclaimReasonsLabel": "What are your reasons for making the counterclaim?",
+  "errors": {
+    "aboutCounterclaimFor": {
+      "required": "Enter what your counterclaim is for"
+    },
+    "aboutCounterclaimReasons": {
+      "required": "Enter what your reasons are for making the counterclaim"
+    }
+  }
+}

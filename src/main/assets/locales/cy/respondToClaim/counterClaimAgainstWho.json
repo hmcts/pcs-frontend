@@ -1,0 +1,10 @@
+{
+  "pageTitle": "CyWho counterclaim is against",
+  "heading": "CyWho are you making the counterclaim against?",
+  "checkboxHint": "CySelect all that apply",
+  "errors": {
+    "counterClaimAgainst": {
+      "required": "CySelect who you are making the counterclaim against"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "pageTitle": "Claim for something else",
+  "heading": "Counterclaim for an order other than a sum of money",
+  "infoParagraph1": "You will be able to upload any evidence you have on the next page.",
+  "infoParagraph2": "The claimant will be able to see your answers.",
+  "characterCountHint": "For example, 'for the landlord to conduct remedial works'",
+  "orderOtherThanSumRequestedLabel": "What orders are you asking the court to make?",
+  "orderOtherThanSumFactsLabel": "What facts would you like the court to consider when deciding the claim?",
+  "errors": {
+    "orderOtherThanSumRequested": {
+      "required": "Enter what orders you are asking the court to make"
+    },
+    "orderOtherThanSumFacts": {
+      "required": "Enter what facts you would like the court to consider when deciding the claim"
+    }
+  }
+}
