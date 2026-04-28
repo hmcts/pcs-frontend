@@ -44,7 +44,6 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
-import { step as uploadDocs } from './upload-docs';
 import { step as uploadDocument } from './upload-document';
 import { step as writtenTerms } from './written-terms';
 
@@ -96,7 +95,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'priority-debt-details': priorityDebtDetails,
   'what-other-regular-expenses-do-you-have': regularExpenses,
   'other-considerations': otherConsiderations,
-  'upload-docs': uploadDocs,
   'equality-and-diversity-start': equalityAndDiversityStart,
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,

@@ -108,7 +108,6 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'other-considerations',
-    'upload-docs',
     'equality-and-diversity-start',
     'equality-and-diversity-end',
     'language-used',
@@ -557,14 +556,10 @@ export const flowConfig: JourneyFlowConfig = {
         const fromIncomeExpenditure = await isFromIncomeAndExpenditure(req);
         return fromIncomeExpenditure ? 'income-and-expenses' : 'what-other-regular-expenses-do-you-have';
       },
-      defaultNext: 'upload-docs',
-    },
-    'upload-docs': {
-      previousStep: 'other-considerations',
       defaultNext: 'equality-and-diversity-start',
     },
     'equality-and-diversity-start': {
-      previousStep: 'upload-docs',
+      previousStep: 'other-considerations',
       routes: [
         {
           condition: async (

@@ -8,12 +8,15 @@
   filesAddedHeading='Files added',
   uploadedFiles=[]
 ) %}
+  <label class="govuk-label{{ ' ' + component.label.classes if component.label.classes }}" for="{{ component.id }}">
+    {{ component.label.text }}
+  </label>
+
   {% set uploadHtml %}
     {{ govukFileUpload({
       id: component.id,
       name: component.name,
       classes: "moj-multi-file-upload__input",
-      label: component.label,
       attributes: { accept: component.accept }
     }) }}
     {{ govukButton({
