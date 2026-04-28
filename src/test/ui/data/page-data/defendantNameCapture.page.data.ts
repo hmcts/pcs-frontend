@@ -14,6 +14,9 @@ export const defendantNameCapture = {
   enterYourLastNameErrorMessage: `Enter your last name`,
   enterFirstNameMaxLengthErrorMessage: `First name must be 60 characters or less`,
   enterLastNameMaxLengthErrorMessage: `Last name must be 60 characters or less`,
+  emojiTextInput: `👉 😄`,
+  emojiFirstNameErrorMessage: `First name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
+  emojiLastNameErrorMessage: `Last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `defendant-name-capture`,
 };
