@@ -12,7 +12,7 @@
 
   "taskGroups": {
     "CLAIM": "The claim",
-    "HEARING": "Court Hearings",
+    "HEARING": "Court hearings",
     "JUDGEMENT": "Judgement from the court",
     "NOTICE": "Orders and notices from the court",
     "RESPONSE": "The response",
