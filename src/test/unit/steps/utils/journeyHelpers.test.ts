@@ -20,27 +20,33 @@ describe('getStepBeforeDisputePages', () => {
     (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
   });
 
-  describe('User rejected notice (CCD-backed confirmNoticeGiven)', () => {
-    it('returns confirmation-of-notice-given when user said no and notice served', async () => {
+  describe('User rejected notice (CCD-backed possessionNoticeReceived)', () => {
+    it('returns confirmation-of-notice-given when user said NO and notice served', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
-      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'no' };
+      mockReq.res.locals.validatedCase = {
+        data: { possessionClaimResponse: { defendantResponses: { possessionNoticeReceived: 'NO' } } },
+      };
 
       expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-given');
     });
 
-    it('returns confirmation-of-notice-given when user said imNotSure and notice served', async () => {
+    it('returns confirmation-of-notice-given when user said NOT_SURE and notice served', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
-      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'imNotSure' };
+      mockReq.res.locals.validatedCase = {
+        data: { possessionClaimResponse: { defendantResponses: { possessionNoticeReceived: 'NOT_SURE' } } },
+      };
 
       expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-given');
     });
 
-    it('returns confirmation-of-notice-given when user said no, notice served, even if date was provided', async () => {
+    it('returns confirmation-of-notice-given when user said NO, notice served, even if date was provided', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
-      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'no' };
+      mockReq.res.locals.validatedCase = {
+        data: { possessionClaimResponse: { defendantResponses: { possessionNoticeReceived: 'NO' } } },
+      };
 
       expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-given');
     });
@@ -89,20 +95,24 @@ describe('getStepBeforeDisputePages', () => {
       expect(await getStepBeforeDisputePages(mockReq)).toBe('tenancy-date-details');
     });
 
-    it('returns tenancy-date-details when notice not served, even if user said no, and start date is known', async () => {
+    it('returns tenancy-date-details when notice not served, even if user said NO, and start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
-      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'no' };
+      mockReq.res.locals.validatedCase = {
+        data: { possessionClaimResponse: { defendantResponses: { possessionNoticeReceived: 'NO' } } },
+      };
 
       expect(await getStepBeforeDisputePages(mockReq)).toBe('tenancy-date-details');
     });
 
-    it('returns tenancy-date-details when notice not served, even if user said yes, and start date is known', async () => {
+    it('returns tenancy-date-details when notice not served, even if user said YES, and start date is known', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(false);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
       (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
-      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'yes' };
+      mockReq.res.locals.validatedCase = {
+        data: { possessionClaimResponse: { defendantResponses: { possessionNoticeReceived: 'YES' } } },
+      };
 
       expect(await getStepBeforeDisputePages(mockReq)).toBe('tenancy-date-details');
     });
@@ -154,7 +164,9 @@ describe('getStepBeforeDisputePages', () => {
     it('handles user rejection scenario (CCD-backed)', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
-      mockReq.res.locals.validatedCase = { defendantResponsesConfirmNoticeGiven: 'no' };
+      mockReq.res.locals.validatedCase = {
+        data: { possessionClaimResponse: { defendantResponses: { possessionNoticeReceived: 'NO' } } },
+      };
 
       expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-given');
     });

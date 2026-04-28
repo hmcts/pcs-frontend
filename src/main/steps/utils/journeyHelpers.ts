@@ -14,10 +14,11 @@ export async function getStepBeforeDisputePages(req: Request): Promise<string> {
   const noticeServed = await isNoticeServed(req);
   const noticeDateProvided = await isNoticeDateProvided(req);
   const tenancyStartDateKnown = await isTenancyStartDateKnown(req);
-  const confirmNoticeGiven = req.res?.locals?.validatedCase?.defendantResponsesConfirmNoticeGiven;
+  const confirmNoticeGiven =
+    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived;
 
   // User rejected or unsure about notice: back to the question page (CCD-backed, survives logout)
-  if ((confirmNoticeGiven === 'no' || confirmNoticeGiven === 'imNotSure') && noticeServed) {
+  if ((confirmNoticeGiven === 'NO' || confirmNoticeGiven === 'NOT_SURE') && noticeServed) {
     return 'confirmation-of-notice-given';
   }
 

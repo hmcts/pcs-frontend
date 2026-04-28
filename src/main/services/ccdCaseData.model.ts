@@ -242,10 +242,6 @@ export class CcdCaseModel {
     return this.defendantResponses?.contactByPost ?? undefined;
   }
 
-  get defendantResponsesPreferenceType(): string | undefined {
-    return this.defendantResponses?.preferenceType ?? undefined;
-  }
-
   get defendantResponsesLandlordLicensed(): string | undefined {
     return this.defendantResponses?.landlordLicensed ?? undefined;
   }

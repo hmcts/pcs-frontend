@@ -179,7 +179,7 @@ export const step: StepDefinition = createFormStep({
           delete hc[frequencyKey];
         }
       } else {
-        hc[flagKey] = toYesNoEnum('no');
+        delete hc[flagKey];
         delete hc[amountKey];
         delete hc[frequencyKey];
       }
@@ -227,7 +227,7 @@ export const step: StepDefinition = createFormStep({
         delete hc.moneyFromElsewhereDetails;
       }
     } else {
-      hc.moneyFromElsewhere = toYesNoEnum('no');
+      delete hc.moneyFromElsewhere;
       delete hc.moneyFromElsewhereDetails;
     }
 

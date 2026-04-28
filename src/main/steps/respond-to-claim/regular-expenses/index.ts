@@ -485,30 +485,29 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async (req: Request) => {
     const selectedRaw = req.body?.regularExpenses as string | string[] | undefined;
     const selected = Array.isArray(selectedRaw) ? selectedRaw : selectedRaw ? [selectedRaw] : [];
-    const householdCircumstances: Record<string, unknown> = {};
     const body = req.body as Record<string, unknown> | undefined;
 
-    for (const key of regularExpenseKeys) {
-      const isYes = selected.includes(key);
-      const amountRaw = body?.[`regularExpenses.${key}Amount`] as string | undefined;
-      const frequency = body?.[`regularExpenses.${key}Frequency`] as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    const hc = response.defendantResponses.householdCircumstances;
 
-      const details: IncomeExpenseDetails = {
-        applies: toYesNoEnum(isYes ? 'yes' : 'no'),
-      };
-      if (isYes) {
+    for (const key of regularExpenseKeys) {
+      if (selected.includes(key)) {
+        const details: IncomeExpenseDetails = { applies: toYesNoEnum('yes') };
+        const amountRaw = body?.[`regularExpenses.${key}Amount`] as string | undefined;
+        const frequency = body?.[`regularExpenses.${key}Frequency`] as string | undefined;
         if (amountRaw) {
           details.amount = poundsToPence(amountRaw);
         }
         if (frequency) {
           details.frequency = frequency as FrequencyValue;
         }
+        hc[key] = details;
+      } else {
+        delete hc[key];
       }
-      householdCircumstances[key] = details;
     }
 
-    const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = householdCircumstances;
     await saveDraftDefendantResponse(req, response);
   },
 });

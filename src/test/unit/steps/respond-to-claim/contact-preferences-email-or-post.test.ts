@@ -75,7 +75,8 @@ describe('contact-preferences-email-or-post', () => {
           }),
         }),
         defendantResponses: expect.objectContaining({
-          preferenceType: 'EMAIL',
+          contactByEmail: 'YES',
+          contactByPost: 'NO',
         }),
       })
     );
@@ -95,7 +96,8 @@ describe('contact-preferences-email-or-post', () => {
       req,
       expect.objectContaining({
         defendantResponses: expect.objectContaining({
-          preferenceType: 'POST',
+          contactByEmail: 'NO',
+          contactByPost: 'YES',
         }),
       })
     );

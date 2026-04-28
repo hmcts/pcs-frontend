@@ -66,17 +66,17 @@ export const step: StepDefinition = createFormStep({
 
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.possessionClaimResponse;
-    const preferenceType = caseData?.defendantResponses?.preferenceType;
+    const defendantResponses = caseData?.defendantResponses;
     const emailAddress = caseData?.defendantContactDetails?.party?.emailAddress;
 
     const result: Record<string, unknown> = {};
 
-    if (preferenceType === 'EMAIL') {
+    if (defendantResponses?.contactByEmail === 'YES') {
       result.contactByEmailOrPost = 'email';
       if (emailAddress) {
         result['contactByEmailOrPost.email'] = emailAddress;
       }
-    } else if (preferenceType === 'POST') {
+    } else if (defendantResponses?.contactByPost === 'YES') {
       result.contactByEmailOrPost = 'post';
     }
 
@@ -88,7 +88,8 @@ export const step: StepDefinition = createFormStep({
     const contactByEmailOrPost = req.body?.contactByEmailOrPost as 'email' | 'post' | undefined;
 
     if (contactByEmailOrPost === 'email') {
-      response.defendantResponses.preferenceType = 'EMAIL';
+      response.defendantResponses.contactByEmail = 'YES';
+      response.defendantResponses.contactByPost = 'NO';
       const email = (req.body?.['contactByEmailOrPost.email'] as string | undefined)?.trim();
       if (email) {
         response.defendantContactDetails.party.emailAddress = email;
@@ -96,10 +97,12 @@ export const step: StepDefinition = createFormStep({
         delete response.defendantContactDetails.party.emailAddress;
       }
     } else if (contactByEmailOrPost === 'post') {
-      response.defendantResponses.preferenceType = 'POST';
+      response.defendantResponses.contactByEmail = 'NO';
+      response.defendantResponses.contactByPost = 'YES';
       delete response.defendantContactDetails.party.emailAddress;
     } else {
-      delete response.defendantResponses.preferenceType;
+      delete response.defendantResponses.contactByEmail;
+      delete response.defendantResponses.contactByPost;
       delete response.defendantContactDetails.party.emailAddress;
     }
 
