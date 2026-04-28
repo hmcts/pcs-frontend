@@ -85,9 +85,9 @@ const fieldsConfig: FormFieldConfig[] = [
             attributes: {
               autocomplete: 'postal-code',
             },
-            validator: (value): boolean => {
-              if (typeof value === 'string' && value.trim()) {
-                return isPostalCode(value.trim(), 'GB');
+            validator: (value): boolean | string => {
+              if (typeof value === 'string' && value.trim() && !isPostalCode(value.trim(), 'GB')) {
+                return 'errors.correspondenceAddressConfirm.postcode';
               }
               return true;
             },
@@ -171,22 +171,6 @@ export const step: StepDefinition = createFormStep({
           : confirmed === 'NO'
             ? 'no'
             : undefined;
-
-    // TODO: Refactor to avoid mutating module-scoped `fieldsConfig` per request.
-    // Use the same pattern as `rent-arrears-dispute` (static validator returning a translation key).
-    // Dynamically inject validator with translation function
-    const postcodeField = fieldsConfig[0].options?.[1]?.subFields?.postcode;
-    if (postcodeField) {
-      postcodeField.validator = (value: unknown): boolean | string => {
-        if (typeof value === 'string' && value.trim()) {
-          const isValid = isPostalCode(value.trim(), 'GB');
-          if (!isValid) {
-            return t('errors.correspondenceAddressConfirm.postcode');
-          }
-        }
-        return true;
-      };
-    }
 
     return {
       ...formContent,
