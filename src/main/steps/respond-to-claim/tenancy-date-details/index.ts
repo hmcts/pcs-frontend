@@ -1,6 +1,8 @@
 import { format, parseISO } from 'date-fns';
+import type { Request } from 'express';
 
-import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
+
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
@@ -56,7 +58,7 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  beforeGet: async req => {
+  getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const existingDateIsCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateCorrect as
       | string
@@ -65,32 +67,31 @@ export const step: StepDefinition = createFormStep({
       | string
       | undefined;
 
-    const existingDraftData = getFormData(req, 'tenancy-date-details');
-    if (existingDateIsCorrect && !existingDraftData?.confirmTenancyDate && !req.body?.confirmTenancyDate) {
-      const formValue =
-        existingDateIsCorrect === 'YES'
-          ? 'yes'
-          : existingDateIsCorrect === 'NO'
-            ? 'no'
-            : existingDateIsCorrect === 'NOT_SURE'
-              ? 'notSure'
-              : undefined;
+    if (!existingDateIsCorrect) {return {};}
 
-      if (formValue) {
-        const draftData: Record<string, unknown> = { confirmTenancyDate: formValue };
+    const formValue =
+      existingDateIsCorrect === 'YES'
+        ? 'yes'
+        : existingDateIsCorrect === 'NO'
+          ? 'no'
+          : existingDateIsCorrect === 'NOT_SURE'
+            ? 'notSure'
+            : undefined;
 
-        if (existingDateIsCorrect === 'NO' && existingTenancyStartDate) {
-          const parsed = parseISO(existingTenancyStartDate);
-          draftData.tenancyStartDate = {
-            day: format(parsed, 'd'),
-            month: format(parsed, 'M'),
-            year: format(parsed, 'yyyy'),
-          };
-        }
+    if (!formValue) {return {};}
 
-        setFormData(req, 'tenancy-date-details', draftData);
-      }
+    const result: Record<string, unknown> = { confirmTenancyDate: formValue };
+
+    if (existingDateIsCorrect === 'NO' && existingTenancyStartDate) {
+      const parsed = parseISO(existingTenancyStartDate);
+      result.tenancyStartDate = {
+        day: format(parsed, 'd'),
+        month: format(parsed, 'M'),
+        year: format(parsed, 'yyyy'),
+      };
     }
+
+    return result;
   },
   beforeRedirect: async req => {
     const confirmValue = req.body?.confirmTenancyDate as string | undefined;

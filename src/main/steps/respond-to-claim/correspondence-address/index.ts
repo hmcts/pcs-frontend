@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
-import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { arrayToString } from '../../../utils/arrayToString';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
@@ -9,22 +9,12 @@ import { flowConfig } from '../flow.config';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-const STEP_NAME = 'postcode-finder';
-
-// Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
-// Session is set in extendGetContent; validation reads it via allData on POST.
-const correspondenceAddressRequired = (_formData: Record<string, unknown>, allData: Record<string, unknown>): boolean =>
-  allData.__isAddressKnown === true;
-
-// Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
-// Session is set in extendGetContent; validation reads it via allData on POST.
-
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
   {
     name: 'correspondenceAddressConfirm',
     type: 'radio',
-    required: correspondenceAddressRequired,
+    required: true,
     isPageHeading: true,
     translationKey: {
       label: 'legend',
@@ -162,7 +152,6 @@ export const step: StepDefinition = createFormStep({
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
 
     const isAddressKnown = formattedAddressStr !== '?';
-    setFormData(req, STEP_NAME, { ...getFormData(req, STEP_NAME), __isAddressKnown: isAddressKnown });
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as
       | { component: { label: { text: string }; fieldset: { legend: { text: string } } } }
