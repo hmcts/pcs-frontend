@@ -2,7 +2,6 @@
 
 export const noticeDateWhenNotProvided = {
   mainHeader: `Notice date`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   //Need to fix this as part of HDPI-5786
   //didNotProvideNoticeLabel: `${submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName} did not provide the date they served you notice.`,

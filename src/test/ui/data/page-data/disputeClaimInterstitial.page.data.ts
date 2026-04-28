@@ -5,7 +5,6 @@ export const disputeClaimInterstitial = {
     return nameClaimant + ' claim';
   },
   whenTheyMadeTheirClaimParagraph: `When they made their claim, they had to give information about:`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   theTenancyList: `the tenancy, occupation contract or licence agreement`,
   theNoticeOfTheirIntentionList: `the notice of their intention to begin possession proceedings, if they served you with one`,
   theirGroundsForPossessionList: `their grounds for possession (their reasons for making the claim)`,

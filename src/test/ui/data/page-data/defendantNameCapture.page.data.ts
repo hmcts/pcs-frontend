@@ -1,6 +1,5 @@
 export const defendantNameCapture = {
   mainHeader: `What’s your name?`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   firstNameTextLabel: `First name`,
   lastNameTextLabel: `Last name`,

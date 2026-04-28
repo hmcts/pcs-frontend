@@ -1,6 +1,5 @@
 export const doYouHaveAnyDependantChildren = {
   mainHeader: `Do you have any dependent children?`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   dependantChildrenParagraph: `Dependent children are children you look after financially.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

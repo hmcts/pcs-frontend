@@ -1,5 +1,4 @@
 export const exceptionalHardship = {
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   mainHeader: `Exceptional hardship`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
