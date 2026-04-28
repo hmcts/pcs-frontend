@@ -50,7 +50,8 @@ export interface JourneyFlowConfig {
   journeyName?: string;
   useShowConditions?: boolean;
   useSessionFormData?: boolean;
-  stepOrder: string[];
+  stepOrder?: string[];
+  nonSectionStepOrder?: string[];
   steps: Record<string, StepConfig>;
   sections?: Record<string, SectionConfig>;
 }

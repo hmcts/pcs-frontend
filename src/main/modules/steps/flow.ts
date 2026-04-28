@@ -31,10 +31,11 @@ export async function getNextStep(
 }
 
 async function getNextStepByShowCondition(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
-  const currentIndex = getStepIndex(flowConfig, currentStepName);
+  const stepOrder = getStepOrder(flowConfig);
+  const currentIndex = getStepIndex(stepOrder, currentStepName);
 
-  for (let stepIndex = currentIndex + 1; stepIndex < flowConfig.stepOrder.length; stepIndex++) {
-    const candidateNextStepName = flowConfig.stepOrder[stepIndex];
+  for (let stepIndex = currentIndex + 1; stepIndex < stepOrder.length; stepIndex++) {
+    const candidateNextStepName = stepOrder[stepIndex];
     const candidateNextStep = flowConfig.steps[candidateNextStepName];
 
     if (!candidateNextStep || !candidateNextStep.showCondition) {
@@ -59,6 +60,7 @@ async function getNextStepByRouteConditions(
   currentStepData: Record<string, unknown>
 ) {
   const stepConfig = flowConfig.steps[currentStepName];
+  const stepOrder = getStepOrder(flowConfig);
 
   if (stepConfig?.routes) {
     for (const route of stepConfig.routes) {
@@ -76,9 +78,9 @@ async function getNextStepByRouteConditions(
     return stepConfig.defaultNext;
   }
 
-  const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
-  if (currentIndex >= 0 && currentIndex < flowConfig.stepOrder.length - 1) {
-    return flowConfig.stepOrder[currentIndex + 1];
+  const currentIndex = stepOrder.indexOf(currentStepName);
+  if (currentIndex >= 0 && currentIndex < stepOrder.length - 1) {
+    return stepOrder[currentIndex + 1];
   }
 
   return null;
@@ -106,10 +108,11 @@ async function getPreviousStepByShowConditions(req: Request, currentStepName: st
     return null;
   }
 
-  const currentIndex = getStepIndex(flowConfig, currentStepName);
+  const stepOrder = getStepOrder(flowConfig);
+  const currentIndex = getStepIndex(stepOrder, currentStepName);
 
   for (let stepIndex = currentIndex - 1; stepIndex >= 0; stepIndex--) {
-    const candidatePreviousStepName = flowConfig.stepOrder[stepIndex];
+    const candidatePreviousStepName = stepOrder[stepIndex];
     const candidatePreviousStep = flowConfig.steps[candidatePreviousStepName];
 
     if (!candidatePreviousStep || !candidatePreviousStep.showCondition) {
@@ -133,6 +136,7 @@ async function getPreviousStepByRouteConditions(
   formData: Record<string, unknown>
 ) {
   const stepConfig = flowConfig.steps[currentStepName];
+  const stepOrder = getStepOrder(flowConfig);
 
   // If step has explicit previousStep configuration, use it
   if (stepConfig?.previousStep) {
@@ -166,9 +170,9 @@ async function getPreviousStepByRouteConditions(
   }
 
   // Fallback to stepOrder array index
-  const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
+  const currentIndex = stepOrder.indexOf(currentStepName);
   if (currentIndex > 0) {
-    return flowConfig.stepOrder[currentIndex - 1];
+    return stepOrder[currentIndex - 1];
   }
   return null;
 }
@@ -270,10 +274,24 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
   };
 }
 
-function getStepIndex(flowConfig: JourneyFlowConfig, stepName: string) {
-  const stepIndex = flowConfig.stepOrder.indexOf(stepName);
+function getStepIndex(stepOrder: string[], stepName: string) {
+  const stepIndex = stepOrder.indexOf(stepName);
   if (stepIndex === -1) {
     throw new Error(`Step ${stepName} not found in stepOrder`);
   }
   return stepIndex;
+}
+
+export function getStepOrder(flowConfig: JourneyFlowConfig): string[] {
+  if (flowConfig.stepOrder?.length) {
+    return flowConfig.stepOrder;
+  }
+
+  if (!flowConfig.sections) {
+    throw new Error('JourneyFlowConfig requires stepOrder when sections are not configured');
+  }
+
+  const sectionSteps = Object.values(flowConfig.sections).flatMap(section => section.steps);
+  const nonSectionSteps = flowConfig.nonSectionStepOrder ?? [];
+  return [...sectionSteps, ...nonSectionSteps];
 }

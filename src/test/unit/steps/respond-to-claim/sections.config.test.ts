@@ -1,13 +1,13 @@
 import type { Request } from 'express';
 
-import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import { respondToClaimSections } from '../../../../main/steps/respond-to-claim/sections.config';
+import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegistry';
 import { getSectionCoverage } from '../../../../main/steps/utils/sections';
 
 describe('respond-to-claim sections config', () => {
   it('maps every sectioned flow step to exactly one section', () => {
     const nonSectionStepSlugs = new Set(['end-now']);
-    const flowStepSlugs = flowConfig.stepOrder.filter(stepSlug => !nonSectionStepSlugs.has(stepSlug));
+    const flowStepSlugs = Object.keys(stepRegistry).filter(stepSlug => !nonSectionStepSlugs.has(stepSlug));
     const coverage = getSectionCoverage(flowStepSlugs, respondToClaimSections);
 
     expect(coverage.unmappedSteps).toEqual([]);
@@ -15,7 +15,7 @@ describe('respond-to-claim sections config', () => {
   });
 
   it('lists only steps that exist in the configured journey order', () => {
-    const flowStepKeys = new Set(flowConfig.stepOrder);
+    const flowStepKeys = new Set(Object.keys(stepRegistry));
     const sectionStepsNotInFlow: string[] = [];
 
     for (const section of Object.values(respondToClaimSections)) {

@@ -19,7 +19,6 @@ import {
   shouldShowInstallmentPaymentsStep,
 } from './flowConditions';
 import { respondToClaimSections } from './sections.config';
-import { respondToClaimStepOrder } from './stepOrder';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
@@ -31,7 +30,7 @@ export const flowConfig: JourneyFlowConfig = {
   useShowConditions: true,
   useSessionFormData: false,
   sections: respondToClaimSections,
-  stepOrder: [...respondToClaimStepOrder],
+  nonSectionStepOrder: ['end-now'],
   steps: {
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),

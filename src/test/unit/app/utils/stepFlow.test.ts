@@ -107,10 +107,43 @@ describe('stepFlow', () => {
         'Step step99 not found in stepOrder'
       );
     });
+
+    it('should derive order from sections when stepOrder is not provided', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: {
+          sectionA: {
+            titleKey: 'sectionA',
+            steps: ['step1', 'step2'],
+          },
+        },
+        nonSectionStepOrder: ['end-now'],
+        steps: {
+          step2: {
+            showCondition: _req => true,
+          },
+        },
+      };
+
+      await expect(getNextStep(mockReq, 'step2', flowConfig, {})).resolves.toBe('end-now');
+    });
   });
 
   describe('getNextStep without show conditions', () => {
     const mockReq = {} as Request;
+
+    it('should throw when neither stepOrder nor sections are configured', async () => {
+      const config: JourneyFlowConfig = {
+        basePath: '/test',
+        steps: {
+          step1: {},
+        },
+      };
+
+      await expect(getNextStep(mockReq, 'step1', config, {})).rejects.toThrow(
+        'JourneyFlowConfig requires stepOrder when sections are not configured'
+      );
+    });
 
     it('should return defaultNext when step has defaultNext configured', async () => {
       const result = await getNextStep(mockReq, 'step1', mockFlowConfig, {});
