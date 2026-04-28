@@ -4,6 +4,7 @@ import isPostalCode from 'validator/lib/isPostalCode';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { arrayToString } from '../../../utils/arrayToString';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { flowConfig } from '../flow.config';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
@@ -154,16 +155,27 @@ export const step: StepDefinition = createFormStep({
     const isAddressKnown = formattedAddressStr !== '?';
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as
-      | { component: { label: { text: string }; fieldset: { legend: { text: string } } } }
+      | {
+          component: {
+            label: { text: string };
+            fieldset: { legend: { text: string; isPageHeading?: boolean } };
+            hint?: { text: string };
+          };
+        }
       | undefined;
     if (!radio || !radio.component) {
       return {};
     }
 
     if (isAddressKnown) {
-      const prepopulateHeading = `${t('legend')}${formattedAddressStr}`;
+      const claimantName = getClaimantName(req);
+      const prepopulateHeading = t('legend', { formattedAddressStr });
       radio.component.label.text = prepopulateHeading;
       radio.component.fieldset.legend.text = prepopulateHeading;
+      radio.component.fieldset.legend.isPageHeading = true;
+      if (radio.component.hint) {
+        radio.component.hint.text = t('legend.hint', { claimantName });
+      }
     }
 
     const confirmed = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
