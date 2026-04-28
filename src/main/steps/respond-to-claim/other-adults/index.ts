@@ -1,9 +1,10 @@
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'do-any-other-adults-live-in-your-home',
@@ -15,6 +16,10 @@ export const step: StepDefinition = createFormStep({
     question: 'question',
     caption: 'caption',
     pageTitle: 'pageTitle',
+    dependantHeading: 'dependantHeading',
+    dependantQuestion: 'dependantQuestion',
+    heading: 'heading',
+    caseNumber: 'caseNumber'
   },
   fields: [
     {
@@ -91,5 +96,15 @@ export const step: StepDefinition = createFormStep({
     };
 
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+    extendGetContent: async req => {
+      
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+      
+    const t = getTranslationFunction(req, 'do-any-other-adults-live-in-your-home', ['common']);
+  
+    return {
+      caseNumber: t('caseNumber', { caseNumber })
+    };
   },
 });

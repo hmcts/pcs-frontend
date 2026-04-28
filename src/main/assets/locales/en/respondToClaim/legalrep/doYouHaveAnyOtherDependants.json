@@ -1,0 +1,12 @@
+{
+  "caseNumber": "Case number: {{caseNumber}}",
+  "heading": "Dependants and other adults",
+  "dependantHeading": "Other dependants",
+  "dependantQuestion": "Does the defendant have any other dependants?",
+  "otherDependantDetailsLabel": "Give details about their other dependants",
+  "otherDependantDetailsHint": "",
+  "errors": {
+    "otherDependants": "Select if they have any other dependants",
+    "otherDependantDetails": "Give details about their other dependants"
+  }
+}
