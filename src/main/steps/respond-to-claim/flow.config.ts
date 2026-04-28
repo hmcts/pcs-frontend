@@ -400,13 +400,13 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'counter-claim': {
-      defaultNext: 'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees',
+      defaultNext: 'counter-claim-have-you-already-applied-for-help-with-your-fees',
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
-    'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees': {
+    'counter-claim-have-you-already-applied-for-help-with-your-fees': {
       previousStep: 'counter-claim',
       routes: [
         {
@@ -418,14 +418,14 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'payment-interstitial',
         },
       ],
-      defaultNext: 'counter-claim-you-need-to-apply-for-help-with-your-counter-claim-fees',
+      defaultNext: 'counter-claim-you-need-to-apply-for-help-with-your-fees',
     },
-    'counter-claim-you-need-to-apply-for-help-with-your-counter-claim-fees': {
-      previousStep: 'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees',
+    'counter-claim-you-need-to-apply-for-help-with-your-fees': {
+      previousStep: 'counter-claim-have-you-already-applied-for-help-with-your-fees',
       defaultNext: 'end-now',
     },
     'payment-interstitial': {
-      previousStep: 'counter-claim-have-you-already-applied-for-help-with-your-counter-claim-fees',
+      previousStep: 'counter-claim-have-you-already-applied-for-help-with-your-fees',
       defaultNext: 'repayments-made',
     },
     'repayments-made': {

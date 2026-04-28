@@ -4,11 +4,11 @@ import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'counter-claim-you-need-to-apply-for-help-with-your-counter-claim-fees',
+  stepName: 'counter-claim-you-need-to-apply-for-help-with-your-fees',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: `${__dirname}/counterclaimYouNeedToApplyForHelpWithYourCounterclaimFees.njk`,
+  customTemplate: `${__dirname}/counterClaimYouNeedToApplyForHelpWithYourFees.njk`,
   fields: [],
   translationKeys: {
     pageTitle: 'pageTitle',
