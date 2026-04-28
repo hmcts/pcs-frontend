@@ -31,7 +31,7 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
-  uploadDocuments,
+  uploadFiles,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
@@ -52,6 +52,7 @@ import { languageUsedErrorValidation } from '../functional/languageUsed.pft';
 import { nonRentArrearsDisputeErrorValidation } from '../functional/nonRentArrearsDispute.pft';
 import { noticeDateWhenNotProvidedErrorValidation } from '../functional/noticeDateWhenNotProvided.pft';
 import { noticeDateWhenProvidedErrorValidation } from '../functional/noticeDateWhenProvided.pft';
+import { otherConsiderationsErrorValidation } from '../functional/otherConsiderations.pft';
 import { rentArrearsErrorValidation } from '../functional/rentArrears.pft';
 import { repaymentsAgreedErrorValidation } from '../functional/repaymentsAgreed.pft';
 import { repaymentsMadeErrorValidation } from '../functional/repaymentsMade.pft';
@@ -387,13 +388,16 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     );
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
 
-    await softErrorMessageValidation('otherConsiderations', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
+    await softErrorMessageValidation('otherConsiderations', otherConsiderationsErrorValidation);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
 
     await softErrorMessageValidation('uploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performValidation('mainHeader', uploadFiles.mainHeader);
+    await performAction('clickButton', uploadFiles.continueButton);
 
     await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -566,13 +570,16 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatOtherRegularExpensesDoYouHaveErrorValidation);
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
 
-    await softErrorMessageValidation('otherConsiderations', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
+    await softErrorMessageValidation('otherConsiderations', otherConsiderationsErrorValidation);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
 
     await softErrorMessageValidation('uploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performValidation('mainHeader', uploadFiles.mainHeader);
+    await performAction('clickButton', uploadFiles.continueButton);
 
     await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
