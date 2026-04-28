@@ -31,7 +31,7 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
-  uploadDocuments,
+  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -294,10 +294,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
     });
 
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -392,11 +394,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
     });
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
@@ -497,10 +499,11 @@ test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
   await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave');
-  await performValidation('mainHeader', otherConsiderations.mainHeader);
-  await performAction('clickButton', otherConsiderations.continueButton);
-  await performValidation('mainHeader', uploadDocuments.mainHeader);
-  await performAction('clickButton', uploadDocuments.continueButton);
+  await performAction('otherConsiderations', {
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -633,10 +636,11 @@ test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - 
       ],
     ],
   });
-  await performValidation('mainHeader', otherConsiderations.mainHeader);
-  await performAction('clickButton', otherConsiderations.continueButton);
-  await performValidation('mainHeader', uploadDocuments.mainHeader);
-  await performAction('clickButton', uploadDocuments.continueButton);
+  await performAction('otherConsiderations', {
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -745,10 +749,11 @@ test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided
       ],
     ],
   });
-  await performValidation('mainHeader', otherConsiderations.mainHeader);
-  await performAction('clickButton', otherConsiderations.continueButton);
-  await performValidation('mainHeader', uploadDocuments.mainHeader);
-  await performAction('clickButton', uploadDocuments.continueButton);
+  await performAction('otherConsiderations', {
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -872,10 +877,11 @@ test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - N
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
   await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave');
-  await performValidation('mainHeader', otherConsiderations.mainHeader);
-  await performAction('clickButton', otherConsiderations.continueButton);
-  await performValidation('mainHeader', uploadDocuments.mainHeader);
-  await performAction('clickButton', uploadDocuments.continueButton);
+  await performAction('otherConsiderations', {
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -976,10 +982,11 @@ test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - 
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
   await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave');
-  await performValidation('mainHeader', otherConsiderations.mainHeader);
-  await performAction('clickButton', otherConsiderations.continueButton);
-  await performValidation('mainHeader', uploadDocuments.mainHeader);
-  await performAction('clickButton', uploadDocuments.continueButton);
+  await performAction('otherConsiderations', {
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1084,10 +1091,11 @@ test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes Noti
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
   await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave');
-  await performValidation('mainHeader', otherConsiderations.mainHeader);
-  await performAction('clickButton', otherConsiderations.continueButton);
-  await performValidation('mainHeader', uploadDocuments.mainHeader);
-  await performAction('clickButton', uploadDocuments.continueButton);
+  await performAction('otherConsiderations', {
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1182,10 +1190,11 @@ test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDi
   await performValidation('mainHeader', priorityDebtDetails.mainHeader);
   await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave');
-  await performValidation('mainHeader', otherConsiderations.mainHeader);
-  await performAction('clickButton', otherConsiderations.continueButton);
-  await performValidation('mainHeader', uploadDocuments.mainHeader);
-  await performAction('clickButton', uploadDocuments.continueButton);
+  await performAction('otherConsiderations', {
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);

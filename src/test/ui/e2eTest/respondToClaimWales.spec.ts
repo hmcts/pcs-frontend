@@ -31,7 +31,7 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
-  uploadDocuments,
+  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
@@ -189,10 +189,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
