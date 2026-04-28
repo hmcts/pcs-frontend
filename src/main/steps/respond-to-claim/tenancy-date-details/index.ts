@@ -1,7 +1,6 @@
 import { format, parseISO } from 'date-fns';
 import type { Request } from 'express';
 
-
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
@@ -67,7 +66,9 @@ export const step: StepDefinition = createFormStep({
       | string
       | undefined;
 
-    if (!existingDateIsCorrect) {return {};}
+    if (!existingDateIsCorrect) {
+      return {};
+    }
 
     const formValue =
       existingDateIsCorrect === 'YES'
@@ -78,7 +79,9 @@ export const step: StepDefinition = createFormStep({
             ? 'notSure'
             : undefined;
 
-    if (!formValue) {return {};}
+    if (!formValue) {
+      return {};
+    }
 
     const result: Record<string, unknown> = { confirmTenancyDate: formValue };
 
