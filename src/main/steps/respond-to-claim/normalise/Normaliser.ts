@@ -17,10 +17,10 @@ import type { PossessionClaimResponse } from '@services/ccdCase.interface';
  *   - The stale field is in `defendantContactDetails.party.*` — see constraint below.
  *
  * IMPORTANT: only operate on `defendantResponses.*`. Fields under
- * `defendantContactDetails.party.*` are rebuilt from PartyEntity by the BE on every START
- * callback — dropping them in a normaliser appears to work locally but the next page reload
- * will re-populate them from the entity. If you need to clear a `party.*` field, do it in
- * the owning step's `beforeRedirect` (same-page DELETE), not here.
+ * `defendantContactDetails.party.*` are defendant-entered contact details written to
+ * PartyEntity on final submission — deleting them in a normaliser silently prevents them
+ * reaching the entity. If you need to clear a `party.*` field, do it in the owning step's
+ * `beforeRedirect`, not here.
  *
  * The `normaliserContract.test.ts` regression test enforces this: any normaliser that
  * touches `defendantContactDetails` will fail the build.
