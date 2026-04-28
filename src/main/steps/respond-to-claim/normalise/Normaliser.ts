@@ -2,8 +2,8 @@ import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 /**
  * A normaliser removes fields that are no longer reachable in the current journey state.
- * Normalisers mutate a working copy in place; the orchestrator owns the cloning so the
- * public boundary stays pure.
+ * Normalisers mutate a working copy in place; `normaliseRespondToClaimDraft` owns the
+ * cloning so the input is never modified.
  *
  * When to add a normaliser:
  *   1. A step is conditionally skipped based on a defendant's answer (mutable trigger).
