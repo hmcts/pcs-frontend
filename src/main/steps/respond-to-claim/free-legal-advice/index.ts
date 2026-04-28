@@ -45,8 +45,7 @@ export const step: StepDefinition = createFormStep({
     paragraph4: 'paragraph4',
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const existingAnswer = caseData?.possessionClaimResponse?.defendantResponses?.freeLegalAdvice;
+    const existingAnswer = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.freeLegalAdvice;
 
     // Map CCD enum to frontend value
     const formValue =
