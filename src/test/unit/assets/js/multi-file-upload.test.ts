@@ -329,30 +329,35 @@ describe('multi-file-upload', () => {
       `;
     }
 
-    function getLabel(): HTMLLabelElement {
+    function getChooseFilesButton(): HTMLButtonElement {
       return document.querySelector(
-        '.moj-multi-file-upload__dropzone label.govuk-button--secondary'
-      ) as HTMLLabelElement;
+        '.moj-multi-file-upload__dropzone button.govuk-button--secondary'
+      ) as HTMLButtonElement;
     }
 
-    it('clicking the label triggers a click on the file input and is hidden from AT', () => {
+    it('replaces the MoJ duplicate label with a button to fix WAVE orphaned label', () => {
       setupDropzoneDOM();
       const input = document.getElementById('documents') as HTMLInputElement;
       const clickSpy = jest.spyOn(input, 'click').mockImplementation(() => {});
 
       initMultiFileUpload();
 
-      const label = getLabel();
-      expect(label.getAttribute('aria-hidden')).toBe('true');
+      // Original <label> is gone; a real <button> takes its place
+      expect(document.querySelector('.moj-multi-file-upload__dropzone label.govuk-button--secondary')).toBeNull();
 
-      label.click();
+      const button = getChooseFilesButton();
+      expect(button).toBeInstanceOf(HTMLButtonElement);
+      expect(button.type).toBe('button');
+      expect(button.textContent).toBe('Choose file');
+
+      button.click();
       expect(clickSpy).toHaveBeenCalledTimes(1);
     });
 
     // MOJ clones the <input> after every successful upload (multi-file-upload.mjs:102-107).
     // The click handler must late-bind to the live input via the class selector, otherwise
     // the "Choose file" control goes dead after the first upload.
-    it('clicking the label targets the live input after MOJ clones it', () => {
+    it('clicking the button targets the live input after MOJ clones it', () => {
       setupDropzoneDOM();
       const original = document.getElementById('documents') as HTMLInputElement;
       const originalSpy = jest.spyOn(original, 'click').mockImplementation(() => {});
@@ -363,23 +368,10 @@ describe('multi-file-upload', () => {
       const clonedSpy = jest.spyOn(cloned, 'click').mockImplementation(() => {});
       original.replaceWith(cloned);
 
-      getLabel().click();
+      getChooseFilesButton().click();
 
       expect(clonedSpy).toHaveBeenCalledTimes(1);
       expect(originalSpy).not.toHaveBeenCalled();
-    });
-
-    // Guards against HMR / double-init stacking multiple click listeners on the same label.
-    it('re-running init on the same DOM does not stack duplicate click handlers', () => {
-      setupDropzoneDOM();
-      const input = document.getElementById('documents') as HTMLInputElement;
-      const clickSpy = jest.spyOn(input, 'click').mockImplementation(() => {});
-
-      initMultiFileUpload();
-      initMultiFileUpload();
-
-      getLabel().click();
-      expect(clickSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
