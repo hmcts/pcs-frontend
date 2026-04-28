@@ -502,10 +502,10 @@ test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes
   await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave');
   await performAction('otherConsiderations', {
-      question: otherConsiderations.mainHeader,
-      option: otherConsiderations.noRadioOption,
-    });
-    await performAction('clickButton', uploadFiles.continueButton);
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -639,9 +639,9 @@ test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - 
     ],
   });
   await performAction('otherConsiderations', {
-      question: otherConsiderations.mainHeader,
-      option: otherConsiderations.noRadioOption,
-    });
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
   await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -752,9 +752,9 @@ test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided
     ],
   });
   await performAction('otherConsiderations', {
-      question: otherConsiderations.mainHeader,
-      option: otherConsiderations.noRadioOption,
-    });
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
   await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -880,10 +880,10 @@ test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - N
   await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave');
   await performAction('otherConsiderations', {
-      question: otherConsiderations.mainHeader,
-      option: otherConsiderations.noRadioOption,
-    });
-    await performAction('clickButton', uploadFiles.continueButton);
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -985,10 +985,10 @@ test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - 
   await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave');
   await performAction('otherConsiderations', {
-      question: otherConsiderations.mainHeader,
-      option: otherConsiderations.noRadioOption,
-    });
-    await performAction('clickButton', uploadFiles.continueButton);
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
   await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1094,9 +1094,9 @@ test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes Noti
   await performAction('clickButton', priorityDebtDetails.continueButton);
   await performAction('selectWhatOtherRegularExpensesDoYouHave');
   await performAction('otherConsiderations', {
-      question: otherConsiderations.mainHeader,
-      option: otherConsiderations.noRadioOption,
-    });
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
   await performAction('clickButton', uploadFiles.continueButton);
   await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
   await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -1108,104 +1108,101 @@ test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes Noti
   });
 });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.mainHeader,
-      option: defendantNameConfirmation.yesRadioOption,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirth.dayInputText,
-      dobMonth: defendantDateOfBirth.monthInputText,
-      dobYear: defendantDateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
-    });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.noRadioOption,
-    });
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadRentNonRent.isClaimantNameCorrect
-    );
-    await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadRentNonRent.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
-    });
-    await performAction('selectTenancyStartDateKnown', {
-      option: tenancyDateDetails.noRadioOption,
-      day: '01',
-      month: '12',
-      year: '2025',
-    });
-    await performAction('rentArrears', {
-      option: rentArrears.yesRadioOption,
-    });
-    await performAction('disputingOtherPartsOfTheClaim', {
-      disputeOption: nonRentArrearsDispute.noRadioOption,
-    });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
-    });
-    await performAction('readYourHouseholdAndCircumstances');
-    await performAction('doYouHaveAnyDependantChildren', {
-      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
-    });
-    await performAction('doYouHaveAnyOtherDependants', {
-      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
-      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
-    });
-    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
-    });
-    await performAction('selectAlternativeAccommodation', {
-      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
-    });
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-    });
-    await performAction('selectIncomeAndExpenses', {
-      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
-    });
-    await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
-    await performAction('selectWhatOtherRegularExpensesDoYouHave');
-    await performAction('otherConsiderations', {
-      question: otherConsiderations.mainHeader,
-      option: otherConsiderations.noRadioOption,
-    });
-    await performAction('clickButton', uploadFiles.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
-    });
+test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
+  await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+  await performAction('confirmDefendantDetails', {
+    question: defendantNameConfirmation.mainHeader,
+    option: defendantNameConfirmation.yesRadioOption,
   });
+  await performAction('enterDateOfBirthDetails', {
+    dobDay: defendantDateOfBirth.dayInputText,
+    dobMonth: defendantDateOfBirth.monthInputText,
+    dobYear: defendantDateOfBirth.yearInputText,
+  });
+  await performAction('selectCorrespondenceAddressKnown', {
+    radioOption: correspondenceAddress.yesRadioOption,
+  });
+  await performAction('selectContactPreferenceEmailOrPost', {
+    question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+  });
+  await performAction('selectContactByTelephone', {
+    radioOption: contactPreferencesTelephone.noRadioOption,
+  });
+  await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayloadRentNonRent.isClaimantNameCorrect);
+  await performAction('tenancyOrContractTypeDetails', {
+    tenancyType: submitCaseApiData.submitCasePayloadRentNonRent.tenancy_TypeOfTenancyLicence,
+    tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
+  });
+  await performAction('selectTenancyStartDateKnown', {
+    option: tenancyDateDetails.noRadioOption,
+    day: '01',
+    month: '12',
+    year: '2025',
+  });
+  await performAction('rentArrears', {
+    option: rentArrears.yesRadioOption,
+  });
+  await performAction('disputingOtherPartsOfTheClaim', {
+    disputeOption: nonRentArrearsDispute.noRadioOption,
+  });
+  // placeholder page, so need to be replaced with custom action when actual page is implemented
+  await performValidation('mainHeader', counterClaim.mainHeader);
+  await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('readPaymentInterstitial');
+  await performAction('repaymentsMade', {
+    question: repaymentsMade.getmainHeader(claimantName),
+    repaymentOption: repaymentsMade.noRadioOption,
+  });
+  await performAction('repaymentsAgreed', {
+    question: repaymentsAgreed.getMainHeader(claimantName),
+    repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+  });
+  await performAction('readYourHouseholdAndCircumstances');
+  await performAction('doYouHaveAnyDependantChildren', {
+    dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+  });
+  await performAction('doYouHaveAnyOtherDependants', {
+    otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+    otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+  });
+  await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+    radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+    details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+  });
+  await performAction('selectAlternativeAccommodation', {
+    radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+  });
+  await performAction('yourCircumstances', {
+    question: yourCircumstances.mainHeader,
+    yourCircumstancesOption: yourCircumstances.noRadioOption,
+  });
+  await performAction('exceptionalHardship', {
+    question: exceptionalHardship.mainHeader,
+    exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+  });
+  await performAction('selectIncomeAndExpenses', {
+    incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+  });
+  await performAction('selectWhatRegularIncomeDoYouReceive');
+  await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
+  await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  await performValidation('mainHeader', priorityDebts.mainHeader);
+  await performAction('clickButton', priorityDebts.continueButton);
+  await performValidation('mainHeader', priorityDebtDetails.mainHeader);
+  await performAction('clickButton', priorityDebtDetails.continueButton);
+  await performAction('selectWhatOtherRegularExpensesDoYouHave');
+  await performAction('otherConsiderations', {
+    question: otherConsiderations.mainHeader,
+    option: otherConsiderations.noRadioOption,
+  });
+  await performAction('clickButton', uploadFiles.continueButton);
+  await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+  await performAction('clickButton', equalityAndDiversityStart.continueButton);
+  await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+  await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+  await performAction('languageUsed', {
+    question: languageUsed.mainHeader,
+    radioOption: languageUsed.englishRadioOption,
+  });
+});
