@@ -145,6 +145,11 @@ export interface CcdCounterClaim {
   isClaimAmountKnown?: string;
   claimAmount?: string;
   estimatedMaxClaimAmount?: string;
+  counterClaimAgainst?: string[];
+  aboutCounterclaimFor?: string;
+  aboutCounterclaimReasons?: string;
+  orderOtherThanSumRequested?: string;
+  orderOtherThanSumFacts?: string;
 }
 
 export interface PossessionClaimResponse {
