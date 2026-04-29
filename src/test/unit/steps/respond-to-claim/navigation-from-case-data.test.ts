@@ -2,10 +2,10 @@ import type { Request } from 'express';
 
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import {
-  hasChosenToShareIncomeExpenses,
   hasConfirmedInstallmentOffer,
-  hasDeclaredUniversalCreditOnRegularIncome,
+  hasProvidedFinanceDetails,
   shouldShowInstallmentPaymentsStep,
+  shouldShowUniversalCreditStep,
 } from '../../../../main/steps/respond-to-claim/flowConditions';
 
 import { getNextStep, getPreviousStep } from '@modules/steps/flow';
@@ -201,10 +201,18 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     expect(hasConfirmedInstallmentOffer(howMuchReq)).toBe(true);
     expect(hasConfirmedInstallmentOffer(createReq({}))).toBe(false);
-  });
-
-  it('routes finance journey based on share income/expenses answer', async () => {
-    const shareNoReq = createReq({
+    const financeProvidedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+            },
+          },
+        },
+      },
+    });
+    const financeNotProvidedReq = createReq({
       data: {
         possessionClaimResponse: {
           defendantResponses: {
@@ -216,11 +224,22 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(shareNoReq, 'income-and-expenses', flowConfig, {})).resolves.toBe('other-considerations');
-  });
+    expect(hasProvidedFinanceDetails(financeProvidedReq)).toBe(true);
+    expect(hasProvidedFinanceDetails(financeNotProvidedReq)).toBe(false);
 
-  it('routes UC vs Priority Debts based on regular income UC selection', async () => {
-    const shareYesUcNotDeclaredReq = createReq({
+    const universalCreditSelectedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+              universalCredit: 'YES',
+            },
+          },
+        },
+      },
+    });
+    const universalCreditNotSelectedReq = createReq({
       data: {
         possessionClaimResponse: {
           defendantResponses: {
@@ -233,58 +252,61 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    const shareYesUcDeclaredReq = createReq({
-      data: {
-        possessionClaimResponse: {
-          defendantResponses: {
-            householdCircumstances: {
-              shareIncomeExpenseDetails: 'YES',
-              universalCredit: 'YES',
-            },
-          },
-        },
-      },
-    });
-
-    await expect(
-      getNextStep(shareYesUcNotDeclaredReq, 'what-regular-income-do-you-receive', flowConfig, {})
-    ).resolves.toBe('have-you-applied-for-universal-credit');
-
-    await expect(
-      getNextStep(shareYesUcDeclaredReq, 'what-regular-income-do-you-receive', flowConfig, {})
-    ).resolves.toBe('priority-debts');
+    expect(shouldShowUniversalCreditStep(universalCreditSelectedReq)).toBe(false);
+    expect(shouldShowUniversalCreditStep(universalCreditNotSelectedReq)).toBe(true);
   });
 
-  it('derives finance show helpers from CCD case data only', () => {
-    const shareYesReq = createReq({
+  it('routes income-and-expenses no answer directly to other-considerations', async () => {
+    const req = createReq({});
+    req.body = { provideFinanceDetails: 'no' };
+
+    await expect(getNextStep(req, 'income-and-expenses', flowConfig, {})).resolves.toBe('other-considerations');
+  });
+
+  it('routes income-and-expenses yes answer into finance journey', async () => {
+    const req = createReq({});
+    req.body = { provideFinanceDetails: 'yes' };
+
+    await expect(getNextStep(req, 'income-and-expenses', flowConfig, {})).resolves.toBe(
+      'what-regular-income-do-you-receive'
+    );
+  });
+
+  it('routes regular-income to priority-debts when universal credit is selected', async () => {
+    const req = createReq({
       data: {
         possessionClaimResponse: {
           defendantResponses: {
             householdCircumstances: {
               shareIncomeExpenseDetails: 'YES',
-              universalCredit: 'YES',
             },
           },
         },
       },
     });
+    req.body = { regularIncome: ['universalCredit'] };
 
-    const shareNoReq = createReq({
+    await expect(getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
+      'priority-debts'
+    );
+  });
+
+  it('routes regular-income to universal-credit when universal credit is not selected', async () => {
+    const req = createReq({
       data: {
         possessionClaimResponse: {
           defendantResponses: {
             householdCircumstances: {
-              shareIncomeExpenseDetails: 'NO',
-              universalCredit: 'NO',
+              shareIncomeExpenseDetails: 'YES',
             },
           },
         },
       },
     });
+    req.body = { regularIncome: ['incomeFromJobs'] };
 
-    expect(hasChosenToShareIncomeExpenses(shareYesReq)).toBe(true);
-    expect(hasDeclaredUniversalCreditOnRegularIncome(shareYesReq)).toBe(true);
-    expect(hasChosenToShareIncomeExpenses(shareNoReq)).toBe(false);
-    expect(hasDeclaredUniversalCreditOnRegularIncome(shareNoReq)).toBe(false);
+    await expect(getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
+      'have-you-applied-for-universal-credit'
+    );
   });
 });

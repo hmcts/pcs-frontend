@@ -2,7 +2,7 @@ import type { Request } from 'express';
 
 import { fromYesNoEnum } from './yesNoEnum';
 
-export const hasSelectedUniversalCredit = async (req: Request): Promise<boolean> => {
+export const hasSelectedUniversalCredit = (req: Request): boolean => {
   const caseData = req.res?.locals?.validatedCase?.data;
   const universalCredit =
     caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances?.universalCredit;

@@ -9,7 +9,7 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-    messages: defendantNameConfirmation.nameErrorMessage,
+    message: defendantNameConfirmation.nameErrorMessage,
   });
   // Test: Both first name and last name text fields are empty
   await performAction('clickRadioButton', defendantNameConfirmation.noRadioOption);

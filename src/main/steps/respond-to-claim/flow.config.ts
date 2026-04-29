@@ -11,12 +11,12 @@ import {
 } from '../utils';
 
 import {
-  hasChosenToShareIncomeExpenses,
   hasConfirmedInstallmentOffer,
-  hasDeclaredUniversalCreditOnRegularIncome,
+  hasProvidedFinanceDetails,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
   shouldShowInstallmentPaymentsStep,
+  shouldShowUniversalCreditStep,
 } from './flowConditions';
 import { respondToClaimSections } from './sections.config';
 
@@ -79,20 +79,19 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => hasConfirmedInstallmentOffer(req),
     },
     'what-regular-income-do-you-receive': {
-      showCondition: (req: Request) => hasChosenToShareIncomeExpenses(req),
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'have-you-applied-for-universal-credit': {
-      showCondition: (req: Request) =>
-        hasChosenToShareIncomeExpenses(req) && !hasDeclaredUniversalCreditOnRegularIncome(req),
+      showCondition: (req: Request) => shouldShowUniversalCreditStep(req),
     },
     'priority-debts': {
-      showCondition: (req: Request) => hasChosenToShareIncomeExpenses(req),
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'priority-debt-details': {
-      showCondition: (req: Request) => hasChosenToShareIncomeExpenses(req),
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'what-other-regular-expenses-do-you-have': {
-      showCondition: (req: Request) => hasChosenToShareIncomeExpenses(req),
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
