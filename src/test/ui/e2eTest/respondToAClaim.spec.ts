@@ -195,7 +195,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
@@ -220,6 +220,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
+    //This is a placeholder page
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -324,7 +325,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      options: [contactPreferenceEmailOrPost.byEmailCheckbox, contactPreferenceEmailOrPost.byPostCheckbox],
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
@@ -420,7 +421,7 @@ test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
     emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
   });
   await performAction('selectContactByTelephone', {
@@ -529,7 +530,7 @@ test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - 
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -665,7 +666,7 @@ test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -779,7 +780,7 @@ test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - N
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -904,7 +905,7 @@ test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - 
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -1009,7 +1010,7 @@ test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes Noti
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -1118,7 +1119,7 @@ test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDi
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
