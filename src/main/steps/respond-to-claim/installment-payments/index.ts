@@ -1,11 +1,11 @@
 import { normalizeYesNoValue } from '../../utils';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): YesNoValue | undefined {
   if (value === 'yes') {

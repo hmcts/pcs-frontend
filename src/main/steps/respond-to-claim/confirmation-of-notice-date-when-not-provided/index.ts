@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 import { DateTime } from 'luxon';
 
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
@@ -10,7 +11,6 @@ import { Logger } from '@modules/logger';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 const logger = Logger.getLogger('confirmation-of-notice-date-when-not-provided');
 

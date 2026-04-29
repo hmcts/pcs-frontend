@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
@@ -7,7 +8,6 @@ import { flowConfig } from '../flow.config';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 const STEP_NAME = 'confirmation-of-notice-given';
 

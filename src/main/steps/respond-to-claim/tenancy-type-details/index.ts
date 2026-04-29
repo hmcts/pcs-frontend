@@ -2,14 +2,14 @@ import type { Request } from 'express';
 
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { isWalesProperty } from '../../utils';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { flowConfig } from '../flow.config';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
-import { isLegalRepresentativeUser } from '../../utils/userRole';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {

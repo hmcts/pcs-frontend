@@ -1,12 +1,12 @@
 import type { Request } from 'express';
 
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 function mapRepaymentsAgreedToCcdValue(repaymentsAgreed: string | undefined): 'YES' | 'NO' | 'NOT_SURE' {
   if (repaymentsAgreed === 'yes') {
