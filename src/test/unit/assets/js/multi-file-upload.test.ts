@@ -13,6 +13,17 @@ jest.mock('@ministryofjustice/frontend', () => ({
 
 jest.mock('@utils/fileExtensionValidation', () => ({
   isBlockedExtension: jest.fn((filename: string) => filename.endsWith('.mp4') || filename.endsWith('.mp3')),
+  isAllowedExtension: jest.fn(
+    (filename: string) =>
+      filename.endsWith('.pdf') ||
+      filename.endsWith('.doc') ||
+      filename.endsWith('.docx') ||
+      filename.endsWith('.png') ||
+      filename.endsWith('.jpg') ||
+      filename.endsWith('.jpeg') ||
+      filename.endsWith('.txt') ||
+      filename.endsWith('.csv')
+  ),
 }));
 
 import { initMultiFileUpload } from '../../../../main/assets/js/multi-file-upload';
@@ -223,12 +234,14 @@ describe('multi-file-upload', () => {
       expect(summary!.textContent).toContain('Server says no');
     });
 
-    it('falls back to wrong type message on parse failure', () => {
+    it('does not show a banner when server response has no structured error message', () => {
+      // Per AC: non-AC failures (abort, network, CDAM, 5xx) get the row-level
+      // "Upload failed" indicator only — no misleading wrong-type banner.
       const xhr = { status: 500, response: null, responseText: 'not json' } as unknown as XMLHttpRequest;
       capturedHooks.errorHook(null, {}, xhr);
 
       const summary = getForm().querySelector('.govuk-error-summary');
-      expect(summary!.textContent).toContain('Wrong file type');
+      expect(summary).toBeNull();
     });
   });
 

@@ -1,8 +1,14 @@
 import config from 'config';
 
-import { BLOCKED_EXTENSIONS, getFileExtensionLower } from './fileExtensionValidation';
+import { ALLOWED_EXTENSIONS, BLOCKED_EXTENSIONS, getFileExtensionLower } from './fileExtensionValidation';
 
-export { BLOCKED_EXTENSIONS, getFileExtensionLower, isBlockedExtension } from './fileExtensionValidation';
+export {
+  ALLOWED_EXTENSIONS,
+  BLOCKED_EXTENSIONS,
+  getFileExtensionLower,
+  isAllowedExtension,
+  isBlockedExtension,
+} from './fileExtensionValidation';
 
 export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizeMB');
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;
@@ -31,36 +37,6 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/bmp',
   'image/tiff',
   'image/x-tiff',
-]);
-
-const ALLOWED_EXTENSIONS = new Set([
-  '.doc',
-  '.dot',
-  '.docx',
-  '.dotx',
-  '.xls',
-  '.xlt',
-  '.xla',
-  '.xlsx',
-  '.xltx',
-  '.xlsb',
-  '.ppt',
-  '.pot',
-  '.pps',
-  '.ppa',
-  '.pptx',
-  '.potx',
-  '.ppsx',
-  '.pdf',
-  '.txt',
-  '.rtf',
-  '.csv',
-  '.jpg',
-  '.jpeg',
-  '.png',
-  '.bmp',
-  '.tif',
-  '.tiff',
 ]);
 
 export const ACCEPT_ATTRIBUTE_EXTENSIONS = Array.from(ALLOWED_EXTENSIONS)

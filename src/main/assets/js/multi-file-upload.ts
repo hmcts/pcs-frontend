@@ -1,6 +1,6 @@
 import { MultiFileUpload } from '@ministryofjustice/frontend';
 
-import { isBlockedExtension } from '@utils/fileExtensionValidation';
+import { isAllowedExtension, isBlockedExtension } from '@utils/fileExtensionValidation';
 
 const uploadInstances = new WeakMap<HTMLElement, MultiFileUpload>();
 
@@ -126,15 +126,37 @@ function initContainer(container: HTMLElement): void {
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
 
+  // Serialization queue — MOJ's uploadFiles fires uploads in parallel which causes
+  // a lost-update race on the server (read-modify-write of defendantDocuments).
+  // We resolve a per-file promise when exitHook/errorHook fires so we can await
+  // each upload before starting the next.
+  const fileCompletionResolvers = new Map<File, () => void>();
+  const resolveFileCompletion = (file: File): void => {
+    const resolver = fileCompletionResolvers.get(file);
+    if (resolver) {
+      fileCompletionResolvers.delete(file);
+      resolver();
+    }
+  };
+
   const instance = new MultiFileUpload(container, {
     uploadUrl,
     deleteUrl,
     hooks: {
       entryHook: (_upload: InstanceType<typeof MultiFileUpload>, file: File) => {
         clearErrorSummary(form);
+        // Mirror server's validateFileType precedence:
+        //   1. blocked media (AC04)         → wrong-type message
+        //   2. extension not in allowlist   → wrong-type message
+        //   3. file too large               → too-large message
+        // Pre-flight here saves the round-trip; server still validates as defence in depth.
         if (isBlockedExtension(file.name)) {
           showErrorSummary(form, wrongTypeMessage, errorSummaryTitle);
           throw new Error('blocked');
+        }
+        if (!isAllowedExtension(file.name)) {
+          showErrorSummary(form, wrongTypeMessage, errorSummaryTitle);
+          throw new Error('invalid_type');
         }
         if (file.size > maxBytes) {
           showErrorSummary(form, tooLargeMessage, errorSummaryTitle);
@@ -142,8 +164,9 @@ function initContainer(container: HTMLElement): void {
         }
       },
 
-      exitHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {
+      exitHook: (_upload: InstanceType<typeof MultiFileUpload>, file: File, xhr: XMLHttpRequest) => {
         clearErrorSummary(form);
+        resolveFileCompletion(file);
         try {
           const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
           const doc: DisplayDocument | undefined = response?.document;
@@ -184,17 +207,20 @@ function initContainer(container: HTMLElement): void {
         });
       },
 
-      errorHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {
-        let message = wrongTypeMessage;
+      errorHook: (_upload: InstanceType<typeof MultiFileUpload>, file: File, xhr: XMLHttpRequest) => {
+        resolveFileCompletion(file);
+        // Per AC04/AC05: show the error-summary banner only for AC-defined messages
+        // returned by the server (wrongType / tooLarge as structured JSON).
+        // Non-AC failures (abort, network drop, CDAM unreachable, 5xx) leave the MOJ
+        // row-level "Upload failed" indicator as the sole signal — no misleading banner.
         try {
           const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
           if (response?.error?.message) {
-            message = response.error.message;
+            showErrorSummary(form, response.error.message, errorSummaryTitle);
           }
         } catch {
-          // Use default message
+          // No structured server message — leave the row-level "Upload failed" alone
         }
-        showErrorSummary(form, message, errorSummaryTitle);
       },
 
       deleteHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File | undefined, xhr: XMLHttpRequest) => {
@@ -217,6 +243,38 @@ function initContainer(container: HTMLElement): void {
     },
   });
   uploadInstances.set(container, instance);
+
+  // Serialize uploads — MOJ's default uploadFiles is parallel, which causes a
+  // lost-update race on defendantDocuments. A single global promise chain ensures
+  // every file (whether part of the same selection or added mid-upload) waits for
+  // the previous file's completion before starting. exitHook/errorHook resolve the
+  // per-file promise via fileCompletionResolvers; entryHook may throw before XHR
+  // fires — catch and resolve so the queue moves on.
+  // MOJ's TypeScript declarations don't expose uploadFile/uploadFiles publicly,
+  // but they exist on the runtime class — cast via the runtime instance.
+  const mojInstance = instance as unknown as {
+    uploadFile?: (file: File) => void;
+    uploadFiles?: (files: FileList | File[]) => void | Promise<void>;
+  };
+  if (typeof mojInstance.uploadFile === 'function') {
+    const originalUploadFile = mojInstance.uploadFile.bind(mojInstance);
+    let uploadQueue: Promise<unknown> = Promise.resolve();
+    mojInstance.uploadFiles = function (files: FileList | File[]): Promise<void> {
+      uploadQueue = uploadQueue.then(async () => {
+        for (const file of Array.from(files)) {
+          await new Promise<void>(resolve => {
+            fileCompletionResolvers.set(file, resolve);
+            try {
+              originalUploadFile(file);
+            } catch {
+              resolveFileCompletion(file);
+            }
+          });
+        }
+      });
+      return uploadQueue as Promise<void>;
+    };
+  }
 
   // MOJ injects a <label for="documents"> styled as a button inside the dropzone. A label
   // with no matching control (or with a duplicate for= reference) triggers WAVE "Orphaned
