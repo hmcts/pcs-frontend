@@ -26,8 +26,7 @@ export class ClickLinkAction implements IAction {
   private async clickLinkAndVerifySameTabTitle(page: Page, fieldName: string, expectedHeader: string): Promise<void> {
     const link = page.locator(`a:text-is("${fieldName}")`);
     await link.waitFor({ state: 'visible', timeout: VERY_SHORT_TIMEOUT });
-    await link.click();
-    await page.waitForFunction(() => document.title && document.title.length > 0);
+    await Promise.all([page.waitForLoadState('domcontentloaded'), link.click()]);
     const pageTitle = await page.title();
     if (!pageTitle.includes(expectedHeader)) {
       throw new Error(

@@ -85,7 +85,6 @@ module.exports = defineConfig([
       '@typescript-eslint/no-var-requires': 'off',
       curly: 'error',
       eqeqeq: 'error',
-      'import/no-unresolved': ['error', { ignore: ['^@hmcts-cft/'] }],
       'import/no-duplicates': 'error',
       'import/no-named-as-default': 'error',
       'import/no-named-as-default-member': 'off',

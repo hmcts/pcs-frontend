@@ -2,7 +2,6 @@ export default {
   'start-now': 'startNow',
   'free-legal-advice': 'freeLegalAdvice',
   home: 'home',
-  'what-other-regular-expenses-do-you-have': 'whatOtherRegularExpensesDoYouHave',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'defendant-name-confirmation': 'defendantNameConfirmation',
@@ -55,5 +54,4 @@ export default {
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
   'language-used': 'languageUsed',
-  'other-considerations': 'otherConsiderations',
 };

@@ -1,5 +1,4 @@
 import { normalizeYesNoValue } from '../../utils';
-import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -64,6 +63,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    paragraph1: 'paragraph1',
     paragraph2: 'paragraph2',
     paragraph3: 'paragraph3',
     paragraph4: 'paragraph4',
@@ -83,10 +83,13 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: req => {
-    const claimantName = getClaimantName(req);
+    const caseData = req.res?.locals?.validatedCase?.data as { claimantName?: string } | undefined;
+    const claimantName = caseData?.claimantName || 'Treetops Housing';
+
     const t = getTranslationFunction(req, 'installment-payments', ['common']);
 
     return {
+      claimantName,
       paragraph1: t('paragraph1', { claimantName }),
     };
   },

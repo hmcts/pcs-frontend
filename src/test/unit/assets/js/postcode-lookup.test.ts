@@ -1467,7 +1467,7 @@ describe('initPostcodeSelection', () => {
       <input id="town" name="address[town]" />
       <input id="county" name="address[county]" />
       <input id="postcode" name="address[postcode]" />
-      <details class="govuk-details"></details>
+      <div class="govuk-details"></div>
     `;
 
     initPostcodeSelection();
@@ -1594,7 +1594,7 @@ describe('initPostcodeSelection', () => {
         <option value="">Select address</option>
       </select>
       <input id="addressLine1" />
-      <details class="govuk-details" open></details>
+      <div class="govuk-details" open></div>
     `;
 
     initPostcodeSelection();

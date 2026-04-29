@@ -1,9 +1,9 @@
 {
   "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyYour postal address",
-  "legend": "cyIs your correspondence address {{ formattedAddressStr }}",
+  "legend": "cyIs your correspondence address ",
   "legendNa": "cyWhat’s your correspondence address?",
-  "legend.hint": "cyThis is the address provided by {{claimantName}}",
+  "legend.hint": "cyThis is the address provided by Treetops Housing",
   "legend.hintNa": "cyYour correspondence address is your postal address.",
   "labels": {
     "yes": "cyYes",

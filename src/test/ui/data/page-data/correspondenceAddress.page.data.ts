@@ -6,7 +6,7 @@ export const correspondenceAddress = {
   correspondenceAddressUnKnownMainHeader: `What’s your correspondence address?`,
   correspondenceAddressUnKnownParagraph: `Your correspondence address is your postal address.`,
   respondToClaimParagraph: `Respond to a property possession claim`,
-  correspondenceAddressConfirmHintText: () => `This is the address provided by ${process.env.CLAIMANT_NAME}`,
+  correspondenceAddressConfirmHintText: `This is the address provided by Treetops Housing`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   backLink: `Back`,

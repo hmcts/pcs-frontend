@@ -18,6 +18,7 @@
     "tenancyTypeConfirm": "Select if these tenancy, licence or occupation contract details are correct",
     "tenancyDetails.correctType": "Enter the correct tenancy, occupation contract or licence type",
     "requiredText": "Enter the correct tenancy, licence or occupation contract details",
-    "defaultMaxLength": "Tenancy, occupation contract or licence type must be 60 characters or less"
+    "defaultMaxLength": "Tenancy, occupation contract or licence type must be 60 characters or less",
+    "correctTypeInvalidCharacters": "The correct tenancy, occupation contract or licence type must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }

@@ -34,18 +34,6 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
     nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
     nonRentArrearsDispute.explainClaimTextInput
   );
-  // emoji
-  await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
-  await performAction(
-    'inputText',
-    nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
-    nonRentArrearsDispute.emojiTextInput
-  );
-  await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
-  await performValidation('errorMessage', {
-    header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
-    message: nonRentArrearsDispute.emojiExplainPartsOfClaimErrorMessage,
-  });
 }
 
 //This test has to be modified HDPI-5786

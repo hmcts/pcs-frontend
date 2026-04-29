@@ -79,8 +79,4 @@ export class CheckAction implements IAction {
 
     await checkbox.uncheck();
   }
-
-  private async unCheck(page: Page, label: string) {
-    await page.getByLabel(label, { exact: true }).uncheck();
-  }
 }

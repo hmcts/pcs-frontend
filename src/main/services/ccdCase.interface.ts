@@ -23,12 +23,6 @@ export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
-export interface IncomeExpenseDetails {
-  applies?: YesNoValue;
-  amount?: PenceAmount;
-  frequency?: FrequencyValue;
-}
-
 export interface HouseholdCircumstances {
   shareAdditionalCircumstances?: YesNoValue;
   additionalCircumstancesDetails?: string;
@@ -58,15 +52,6 @@ export interface HouseholdCircumstances {
   otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
-  householdBills?: IncomeExpenseDetails;
-  loanPayments?: IncomeExpenseDetails;
-  childSpousalMaintenance?: IncomeExpenseDetails;
-  mobilePhone?: IncomeExpenseDetails;
-  groceryShopping?: IncomeExpenseDetails;
-  fuelParkingTransport?: IncomeExpenseDetails;
-  schoolCosts?: IncomeExpenseDetails;
-  clothing?: IncomeExpenseDetails;
-  otherExpenses?: IncomeExpenseDetails;
 }
 
 export type PaymentAgreement = {
@@ -94,12 +79,12 @@ export interface CcdUserCases {
 
 /** Address shape used in CCD case data (property, defendant, etc.). */
 export interface CcdCaseAddress {
-  AddressLine1?: string;
+  AddressLine1: string;
   AddressLine2?: string;
   AddressLine3?: string;
-  PostTown?: string;
+  PostTown: string;
   County?: string;
-  PostCode?: string;
+  PostCode: string;
   Country?: string;
 }
 
@@ -128,8 +113,6 @@ export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
   firstName?: string;
   lastName?: string;
-  address?: CcdCaseAddress | Record<string, never>;
-  addressKnown?: YesNoValue;
 }
 
 /** Defendant party contact details (name/address known flags and values). */
@@ -147,7 +130,6 @@ export interface CcdDefendantParty {
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
-  correspondenceAddressConfirmation?: YesNoValue;
   tenancyTypeCorrect?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
@@ -175,8 +157,6 @@ export interface CcdDefendantResponses {
   noticeReceivedDate?: string;
   languageUsed?: LanguageUsed;
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
-  otherConsiderations?: YesNoValue;
-  otherConsiderationsDetails?: string;
 }
 
 export interface PossessionClaimResponse {

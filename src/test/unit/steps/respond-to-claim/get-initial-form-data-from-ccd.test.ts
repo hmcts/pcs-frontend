@@ -158,7 +158,7 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     expect(renderData.confirmLandlordLicensed).toBe('imNotSure');
   });
 
-  it('populates page heading from CCD without pre-selecting yes or filling address form', async () => {
+  it('hydrates manual correspondence address fields from CCD without pre-selecting yes', async () => {
     const validatedCase = {
       id: '1771325608502536',
       hasDefendantContactDetailsPartyAddress: true,
@@ -167,17 +167,6 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
         AddressLine1: '10 Second Avenue',
         PostTown: 'London',
         PostCode: 'W3 7RX',
-      },
-      data: {
-        possessionClaimResponse: {
-          claimantEnteredDefendantDetails: {
-            address: {
-              AddressLine1: '10 Second Avenue',
-              PostTown: 'London',
-              PostCode: 'W3 7RX',
-            },
-          },
-        },
       },
     };
     const { req, res } = createReqRes(validatedCase as unknown as CcdCaseModel);
@@ -188,43 +177,34 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
     expect(renderData.fieldValues.correspondenceAddressConfirm).toBe('');
-    expect(renderData.correspondenceAddressLine1).toBe('');
-    expect(renderData.formattedAddressStr).toContain('10 Second Avenue');
+    expect(renderData.correspondenceAddressLine1).toBe('10 Second Avenue');
+    expect(renderData.correspondenceTownOrCity).toBe('London');
+    expect(renderData.correspondencePostcode).toBe('W3 7RX');
   });
 
-  it('defaults radio selection from CCD when no session value exists', async () => {
-    const validatedCase = new CcdCaseModel({
+  it('prefills manually entered correspondence address from CCD instead of session', async () => {
+    const validatedCase = {
       id: '1771325608502536',
-      data: {
-        possessionClaimResponse: {
-          defendantResponses: {
-            correspondenceAddressConfirmation: 'NO',
-          },
-          defendantContactDetails: {
-            party: {
-              address: {
-                AddressLine1: '22 Example Street',
-                AddressLine2: 'Flat 3',
-                PostTown: 'Cardiff',
-                County: 'South Glamorgan',
-                PostCode: 'CF10 1AA',
-              },
-            },
-          },
-        },
+      hasDefendantContactDetailsPartyAddress: false,
+      defendantContactDetailsPartyAddressKnown: 'NO',
+      defendantContactDetailsPartyAddress: {
+        AddressLine1: '22 Example Street',
+        AddressLine2: 'Flat 3',
+        PostTown: 'Cardiff',
+        County: 'South Glamorgan',
+        PostCode: 'CF10 1AA',
       },
-    } as CcdCase);
-
-    const { req, res } = createReqRes(validatedCase);
+    };
+    const { req, res } = createReqRes(validatedCase as unknown as CcdCaseModel, {
+      'correspondence-address': { correspondenceAddressConfirm: 'yes' },
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const controller = (correspondenceAddressStep.getController as any)();
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-
-    expect(renderData.fieldValues.correspondenceAddressConfirm).toBe('no');
-
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ correspondenceAddressConfirm: 'no' }));
     expect(renderData.correspondenceAddressLine1).toBe('22 Example Street');
     expect(renderData.correspondenceAddressLine2).toBe('Flat 3');
     expect(renderData.correspondenceTownOrCity).toBe('Cardiff');

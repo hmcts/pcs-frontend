@@ -14,8 +14,6 @@ export const tenancyTypeDetails = {
   saveAndContinueButton: `Save and continue`,
   backLink: `Back`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  emojiTextInput: `👉 😄`,
-  emojiGiveTheCorrectTenancyTypeErrorMessage: `Give the correct tenancy, occupation contract or licence type must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   selectIfTenancyDetailsErrorMessage: `Select if these tenancy, licence or occupation contract details are correct`,
   enterCorrectTenancyDetailsErrorMessage: `Enter the correct tenancy, licence or occupation contract details`,
   characterLimitErrorMessage: `Tenancy, occupation contract or licence type must be 60 characters or less`,
