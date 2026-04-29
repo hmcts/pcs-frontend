@@ -673,13 +673,13 @@ export class RespondToClaimAction implements IAction {
       await performAction(
         'inputText',
         counterClaimSpecificSumOfMoney.howMuchAreYouClaimingHiddenQuestion,
-        counterClaimSpecificSumOfMoney.claimInput
+        sumOfMoney.amount
       );
     } else {
       await performAction(
         'inputText',
         counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,
-        counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput
+        sumOfMoney.amount
       );
     }
     await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);

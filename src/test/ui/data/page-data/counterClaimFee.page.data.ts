@@ -1,5 +1,5 @@
 export const counterClaimFee = {
   mainHeader: `Counterclaim fee`,
-  saveAndContinueButton: `Save and continue`,
+  continueButton: `Continue`,
   saveForLaterButton: `Save for later`,
 };

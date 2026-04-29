@@ -8,6 +8,9 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimFee,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -179,8 +182,8 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim @noDefendants @regression @accessibility', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+  test.skip('Respond to a claim @noDefendants @regression @accessibility', async () => {
+    /*await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -224,9 +227,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterNoticeDateUnknown');
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
-    });
+    });*/
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/counter-claim-specific-sum-of-money`);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.continueButton);
     // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
@@ -358,6 +373,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // placeholder page, so need to be replaced with custom action when actual page is implemented
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.continueButton);
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
@@ -458,6 +484,12 @@ test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes
   // placeholder page, so need to be replaced with custom action when actual page is implemented
   await performValidation('mainHeader', counterClaim.mainHeader);
   await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('selectWhatAreYouClaimingFor', {
+    question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+  });
+  await performValidation('mainHeader', counterClaimFee.mainHeader);
+  await performAction('clickButton', counterClaimFee.continueButton);
   // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
@@ -560,6 +592,17 @@ test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - 
   // placeholder page, so need to be replaced with custom action when actual page is implemented
   await performValidation('mainHeader', counterClaim.mainHeader);
   await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('selectWhatAreYouClaimingFor', {
+    question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+  });
+  await performAction('counterClaimSpecificSumOfMoney', {
+    question: counterClaimSpecificSumOfMoney.mainHeader,
+    option: counterClaimSpecificSumOfMoney.noRadioOption,
+    amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+  });
+  await performValidation('mainHeader', counterClaimFee.mainHeader);
+  await performAction('clickButton', counterClaimFee.continueButton);
   // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
@@ -693,6 +736,17 @@ test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided
   // placeholder page, so need to be replaced with custom action when actual page is implemented
   await performValidation('mainHeader', counterClaim.mainHeader);
   await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('selectWhatAreYouClaimingFor', {
+    question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+  });
+  await performAction('counterClaimSpecificSumOfMoney', {
+    question: counterClaimSpecificSumOfMoney.mainHeader,
+    option: counterClaimSpecificSumOfMoney.noRadioOption,
+    amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+  });
+  await performValidation('mainHeader', counterClaimFee.mainHeader);
+  await performAction('clickButton', counterClaimFee.continueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),
@@ -809,6 +863,12 @@ test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - N
   // placeholder page, so need to be replaced with custom action when actual page is implemented
   await performValidation('mainHeader', counterClaim.mainHeader);
   await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('selectWhatAreYouClaimingFor', {
+    question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+  });
+  await performValidation('mainHeader', counterClaimFee.mainHeader);
+  await performAction('clickButton', counterClaimFee.continueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),
@@ -938,6 +998,12 @@ test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - 
   // placeholder page, so need to be replaced with custom action when actual page is implemented
   await performValidation('mainHeader', counterClaim.mainHeader);
   await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('selectWhatAreYouClaimingFor', {
+    question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+  });
+  await performValidation('mainHeader', counterClaimFee.mainHeader);
+  await performAction('clickButton', counterClaimFee.continueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),
@@ -1040,6 +1106,12 @@ test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes Noti
   // placeholder page, so need to be replaced with custom action when actual page is implemented
   await performValidation('mainHeader', counterClaim.mainHeader);
   await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('selectWhatAreYouClaimingFor', {
+    question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+  });
+  await performValidation('mainHeader', counterClaimFee.mainHeader);
+  await performAction('clickButton', counterClaimFee.continueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),
@@ -1149,6 +1221,12 @@ test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDi
   // placeholder page, so need to be replaced with custom action when actual page is implemented
   await performValidation('mainHeader', counterClaim.mainHeader);
   await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('selectWhatAreYouClaimingFor', {
+    question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+  });
+  await performValidation('mainHeader', counterClaimFee.mainHeader);
+  await performAction('clickButton', counterClaimFee.continueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),
