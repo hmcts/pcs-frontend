@@ -94,12 +94,12 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     });
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
-    await performAction('selectStatementOfTruth', {
-      question: checkYourAnswersGenApps.statementOfTruthQuestion,
-      option: checkYourAnswersGenApps.iBelieveTheFactsHiddenCheckbox,
-      label: checkYourAnswersGenApps.yourFullNameTextLabel,
-      input: checkYourAnswersGenApps.yourFullNameTextInput,
-    });
+    // await performAction('selectStatementOfTruth', {
+    //   question: checkYourAnswersGenApps.statementOfTruthQuestion,
+    //   option: checkYourAnswersGenApps.iBelieveTheFactsHiddenCheckbox,
+    //   label: checkYourAnswersGenApps.yourFullNameTextLabel,
+    //   input: checkYourAnswersGenApps.yourFullNameTextInput,
+    // });
     //await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 

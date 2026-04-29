@@ -15,7 +15,7 @@ import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString, stringToCamelCase } from '../../common/string.utils';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
-import { defaultJourney, journeys } from '../../journeyMapping';
+import { defaultJourney, journeys } from '../../journeyMappingGenApps';
 
 import { FieldsStore } from './recordAnsweredFields.action';
 
@@ -92,7 +92,7 @@ export class GenAppsAction implements IAction {
       FieldsStore.update(confirmFeeHelp.label as string, userInput);
       FieldsStore.rename(confirmFeeHelp.label as string, 'What is your Help with Fees reference number?');
     } else {
-      FieldsStore.delete(confirmFeeHelp.label as string);
+      FieldsStore.delete('What is your Help with Fees reference number?');
     }
     await performAction('clickButton', haveYouAlreadyAppliedForHelpWithFees.continueButton);
   }
@@ -294,18 +294,11 @@ export class GenAppsAction implements IAction {
     for (let i = 0; i < rowCount; i++) {
       const row = page.locator('.govuk-summary-list__row').nth(i);
       const questionText = await row.locator('dt').innerText();
-
-
-      // if ((await changeLink.count()) === 0) {
-      //   continue;
-      // }
       if (questionText === review.changeOption as string) {
         const changeLink = row.getByRole('link', { name: 'Change' });
 
         const href = await changeLink.getAttribute('href');
         expect(href, `Missing href for question: ${questionText}`).toBeTruthy();
-
-        // Click Change
         await Promise.all([page.waitForURL(new RegExp(href!)), changeLink.click()]);
         break;
       }
@@ -342,6 +335,10 @@ export class GenAppsAction implements IAction {
               question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
               option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
             });
+          } else {
+            await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+            FieldsStore.delete(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion);
+            FieldsStore.delete(haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion);
           }
 
           break;
@@ -354,27 +351,27 @@ export class GenAppsAction implements IAction {
 
   private async followJourneyBackToCya(page: Page, allowedPages: string[]) {
     const cyaUrlPart = '/check-your-answers';
-    console.log('length' + allowedPages.length);
 
-    for (let i = 0; i <= allowedPages.length; i++) {
+    for (let i = 0; i < allowedPages.length; i++) {
       const currentUrl = page.url();
 
-      // ✅ Success condition
       if (currentUrl.includes(cyaUrlPart)) {
         return;
       }
 
-      // ✅ Ensure we're on a known page
-      const onAllowedPage = allowedPages.some(p => currentUrl.includes(p));
 
-      expect(onAllowedPage, `Unexpected page in Change journey: ${currentUrl}`).toBeTruthy();
+      const expectedPage = allowedPages[i];
+      const onAllowedPage = currentUrl.includes(expectedPage);
+
+      expect(
+        onAllowedPage,
+        `Unexpected page. Expected: ${expectedPage}, Actual: ${currentUrl}`
+      ).toBeTruthy();
+
 
       const navButton = !currentUrl.includes('ask') ? 'Continue' : 'Start now';
       await performAction('clickButton', navButton);
-      // ✅ Continue through journey
-      // const navButton = page.getByRole('button', {
-      //   name: /continue|Start now/i,
-      // });
+
     }
 
     throw new Error('Exceeded maximum steps before reaching CYA');
