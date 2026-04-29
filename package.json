@@ -153,7 +153,7 @@
     "prettier": "3.8.3",
     "sass": "1.99.0",
     "sass-loader": "16.0.7",
-    "saucectl": "^0.202.0",
+    "saucectl": "^0.205.0",
     "style-loader": "4.0.0",
     "stylelint": "16.26.1",
     "stylelint-config-standard": "38.0.0",
