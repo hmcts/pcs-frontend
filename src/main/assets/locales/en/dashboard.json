@@ -25,8 +25,8 @@
         "body": "Your case has been issued. <a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/claim/Defendant.ViewClaim\">View the claim</a>. Respond by {{responseEndDate}}."
       },
       "ResponseToClaim": {
-        "title": "Response to claim",
-        "body": "<a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/response/Defendant.RespondToClaim\">{{ctaLabel}}</a>"
+        "title": "Your response",
+        "body": "You should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}//respond-to-claim/start-now\">{{ctaLabel}}</a>"
       },
       "NoHearingArranged": {
         "title": "A property possession claim has been made against you",
