@@ -1,5 +1,3 @@
-import config from 'config';
-
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
@@ -74,7 +72,7 @@ import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 let claimantName: string;
 
 // softErrorMessageValidation(pageName, validationOrReason):
