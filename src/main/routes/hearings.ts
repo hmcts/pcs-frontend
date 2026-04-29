@@ -4,7 +4,7 @@ import { oidcMiddleware } from '../middleware';
 
 export default function hearingsRoutes(app: Application): void {
   app.get(
-    '/dashboard/:caseReference/hearing/Defendant.ViewHearingDocuments',
+    '/case/:caseReference/view-hearing-documents',
     oidcMiddleware,
     (req: Request, res: Response) => {
       res.render('view-hearing-documents');
