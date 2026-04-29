@@ -4,7 +4,6 @@ import { oidcMiddleware } from '../middleware';
 
 export default function noticesRoutes(app: Application): void {
   app.get('/case/:caseReference/view-orders-and-notices', oidcMiddleware, (req: Request, res: Response) => {
-      res.render('view-orders-and-notices');
-    }
-  );
+    res.render('view-orders-and-notices');
+  });
 }
