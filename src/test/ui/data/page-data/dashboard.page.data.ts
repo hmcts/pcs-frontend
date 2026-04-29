@@ -24,4 +24,6 @@ export const dashboard = {
   breathingSpaceHeader: `Breathing Space (Debt Respite Scheme)`,
   findInfoAboutMyCourtLink: `Find information about my court`,
   findACourtOrTribunalHeader: `Find a court or tribunal`,
+  theClaimSubHeader: `The claim`,
+  viewTheClaimLink: `View the claim`,
 };

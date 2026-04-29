@@ -4,10 +4,13 @@ import { VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
 import { IAction } from '../../interfaces';
 
 export class ClickLinkAction implements IAction {
-  async execute(page: Page, action: string, fieldName: string, header?: string): Promise<void> {
+  async execute(page: Page, action: string, fieldName: string, header?: string, sectionHeader?: string): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['clickLink', () => this.clickLink(page, fieldName)],
-      ['clickLinkAndVerifySameTabTitle', () => this.clickLinkAndVerifySameTabTitle(page, fieldName!, header!)],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        () => this.clickLinkAndVerifySameTabTitle(page, fieldName!, header!, sectionHeader),
+      ],
       ['clickLinkAndVerifyNewTabTitle', () => this.clickLinkAndVerifyNewTabTitle(page, fieldName!, header!)],
     ]);
 
@@ -23,8 +26,19 @@ export class ClickLinkAction implements IAction {
     await locator.click();
   }
 
-  private async clickLinkAndVerifySameTabTitle(page: Page, fieldName: string, expectedHeader: string): Promise<void> {
-    const link = page.locator(`a:text-is("${fieldName}")`);
+  private async clickLinkAndVerifySameTabTitle(
+    page: Page,
+    fieldName: string,
+    expectedHeader: string,
+    sectionHeader?: string
+  ): Promise<void> {
+    let link;
+    if (sectionHeader) {
+      const section = page.locator(`h2:text-is("${sectionHeader}") + ul`);
+      link = section.locator(`a:text-is("${fieldName}")`);
+    } else {
+      link = page.locator(`a:text-is("${fieldName}")`);
+    }
     await link.waitFor({ state: 'visible', timeout: VERY_SHORT_TIMEOUT });
     await link.click();
     await page.waitForFunction(() => document.title && document.title.length > 0);
