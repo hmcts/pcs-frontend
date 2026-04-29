@@ -242,7 +242,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
 
     await softErrorMessageValidation('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation);
@@ -437,7 +437,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
 
