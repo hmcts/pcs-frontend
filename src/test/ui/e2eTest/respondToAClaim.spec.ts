@@ -1017,7 +1017,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
-       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
+      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
     });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
