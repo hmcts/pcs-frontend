@@ -89,7 +89,7 @@ describe('respond-to-claim universal-credit step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: 'YES',
+          hasAppliedForUniversalCredit: 'YES',
           ucApplicationDate: '2024-02-10',
         },
       },
@@ -117,7 +117,7 @@ describe('respond-to-claim universal-credit step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: 'NO',
+          hasAppliedForUniversalCredit: 'NO',
           ucApplicationDate: null,
         },
       },
@@ -148,7 +148,7 @@ describe('respond-to-claim universal-credit step', () => {
     expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit: 'NO',
+          hasAppliedForUniversalCredit: 'NO',
           ucApplicationDate: null,
         },
       },
@@ -189,7 +189,7 @@ describe('respond-to-claim universal-credit step', () => {
     };
 
     it('pre-populates yes + date when saved with a date (came from this screen)', async () => {
-      const data = await render({ universalCredit: 'YES', ucApplicationDate: '2024-02-10' });
+      const data = await render({ hasAppliedForUniversalCredit: 'YES', ucApplicationDate: '2024-02-10' });
       expect(data.fieldValues.haveAppliedForUniversalCredit).toBe('yes');
       expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toEqual({
         day: '10',
@@ -199,13 +199,13 @@ describe('respond-to-claim universal-credit step', () => {
     });
 
     it('pre-populates no when NO is saved (came from this screen)', async () => {
-      const data = await render({ universalCredit: 'NO' });
+      const data = await render({ hasAppliedForUniversalCredit: 'NO' });
       expect(data.fieldValues.haveAppliedForUniversalCredit).toBe('no');
       expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toBeFalsy();
     });
 
-    it('does not pre-populate when YES is saved without a date (implicit from regular-income)', async () => {
-      const data = await render({ universalCredit: 'YES' });
+    it('does not pre-populate when nothing is saved (new field not set)', async () => {
+      const data = await render({});
       expect(data.fieldValues.haveAppliedForUniversalCredit).toBeFalsy();
       expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toBeFalsy();
     });

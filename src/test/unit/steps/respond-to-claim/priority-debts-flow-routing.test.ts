@@ -38,7 +38,7 @@ describe('respond-to-claim priority-debts flow routing', () => {
     expect(result).toBe('what-regular-income-do-you-receive');
   });
 
-  it('uses have-you-applied-for-universal-credit as previous step when universal credit not selected as income', async () => {
+  it('uses have-you-applied-for-universal-credit as previous step when user answered NO to UC application', async () => {
     if (!previousStep || typeof previousStep === 'string') {
       throw new Error('expected previousStep function');
     }
@@ -51,7 +51,7 @@ describe('respond-to-claim priority-debts flow routing', () => {
               possessionClaimResponse: {
                 defendantResponses: {
                   householdCircumstances: {
-                    universalCredit: 'NO',
+                    hasAppliedForUniversalCredit: 'NO',
                     universalCreditAmount: null,
                     universalCreditFrequency: null,
                   },
@@ -98,7 +98,7 @@ describe('respond-to-claim priority-debts flow routing', () => {
     expect(result).toBe('what-regular-income-do-you-receive');
   });
 
-  it('uses have-you-applied-for-universal-credit as previous step when applied-for-UC answer is NO and UC income is not selected', async () => {
+  it('prefers regular-income over have-you-applied-for-universal-credit when user receives UC as income (skipped UC application page)', async () => {
     if (!previousStep || typeof previousStep === 'string') {
       throw new Error('expected previousStep function');
     }
@@ -111,9 +111,41 @@ describe('respond-to-claim priority-debts flow routing', () => {
               possessionClaimResponse: {
                 defendantResponses: {
                   householdCircumstances: {
-                    universalCredit: 'NO',
-                    universalCreditAmount: null,
-                    universalCreditFrequency: null,
+                    universalCredit: 'YES',
+                    universalCreditAmount: '20000',
+                    universalCreditFrequency: 'MONTHLY',
+                    // Stale data from a previous path through the UC application page
+                    hasAppliedForUniversalCredit: 'YES',
+                    ucApplicationDate: '2024-01-15',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const result = await previousStep(req, {});
+    expect(result).toBe('what-regular-income-do-you-receive');
+  });
+
+  it('uses have-you-applied-for-universal-credit as previous step when user answered YES to UC application', async () => {
+    if (!previousStep || typeof previousStep === 'string') {
+      throw new Error('expected previousStep function');
+    }
+
+    const req = {
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  householdCircumstances: {
+                    hasAppliedForUniversalCredit: 'YES',
+                    ucApplicationDate: '2024-01-15',
                   },
                 },
               },

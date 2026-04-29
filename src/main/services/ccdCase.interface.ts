@@ -50,6 +50,7 @@ export interface HouseholdCircumstances {
   pensionAmount?: PenceAmount;
   pensionFrequency?: FrequencyValue;
   universalCredit?: YesNoValue;
+  hasAppliedForUniversalCredit?: YesNoValue;
   universalCreditAmount?: PenceAmount | null;
   universalCreditFrequency?: FrequencyValue | null;
   ucApplicationDate?: string | null;

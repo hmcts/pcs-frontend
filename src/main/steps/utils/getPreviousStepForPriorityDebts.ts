@@ -8,20 +8,23 @@ export const getPreviousStepForPriorityDebts = async (
   req: Request,
   _formData?: Record<string, unknown>
 ): Promise<string> => {
+  const householdCircumstances = getValidatedCaseHouseholdCircumstances(req);
+  const receivesUcAsIncome = fromYesNoEnum(householdCircumstances?.universalCredit);
+
+  if (receivesUcAsIncome === 'yes') {
+    return 'what-regular-income-do-you-receive';
+  }
+
+  const appliedForUc = fromYesNoEnum(householdCircumstances?.hasAppliedForUniversalCredit);
+  if (appliedForUc === 'yes' || appliedForUc === 'no') {
+    return 'have-you-applied-for-universal-credit';
+  }
+
   const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
   if (selectedUniversalCredit) {
     return 'what-regular-income-do-you-receive';
   }
 
-  const householdCircumstances = getValidatedCaseHouseholdCircumstances(req);
-  const ucApplicationDate = householdCircumstances?.ucApplicationDate;
-  const appliedForUc = fromYesNoEnum(householdCircumstances?.universalCredit);
-  if (ucApplicationDate) {
-    return 'have-you-applied-for-universal-credit';
-  }
-  if (appliedForUc === 'no') {
-    return 'have-you-applied-for-universal-credit';
-  }
-
+  // Default fallback (shouldn't normally reach here)
   return 'have-you-applied-for-universal-credit';
 };
