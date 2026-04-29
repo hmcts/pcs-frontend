@@ -12,7 +12,7 @@ function getNeedHelpWithFees(req: Request): VerticalYesNoValue | undefined {
 export async function getPreviousStepForCounterClaimAbout(req: Request): Promise<string> {
   const needHelpWithFees = getNeedHelpWithFees(req);
 
-  if (needHelpWithFees === 'NO' && (await hasMultipleParties())) {
+  if (needHelpWithFees === 'NO' && (await hasMultipleParties(req))) {
     return 'counter-claim-against-who';
   }
 

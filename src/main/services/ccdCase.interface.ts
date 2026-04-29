@@ -108,6 +108,17 @@ export interface CcdClaimantOrganisation {
   id: string;
 }
 
+/** Parties involved in the claim  */
+export interface CcdClaimParty {
+  id: string;
+  value: {
+    firstName?: string;
+    lastName?: string;
+    orgName?: string;
+    role: string;
+  };
+}
+
 /** Claimant-entered defendant details captured when the claim was created. */
 export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
@@ -176,6 +187,8 @@ export interface PossessionClaimResponse {
   };
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
+  claimParties?: CcdClaimParty[];
+  currentDefendantPartyId?: string;
 }
 
 export type CaseData = CcdCaseData;
