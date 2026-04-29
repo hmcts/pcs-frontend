@@ -7,9 +7,10 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../u
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CcdCaseData } from '@services/ccdCase.interface';
 
-function getTenancyStartDate(caseData: Record<string, unknown> | undefined): string | undefined {
-  return (caseData?.tenancy_TenancyLicenceDate ?? caseData?.licenceStartDate) as string | undefined;
+function getTenancyStartDate(caseData: CcdCaseData | undefined): string | undefined {
+  return caseData?.tenancy_TenancyLicenceDate ?? caseData?.licenceStartDate;
 }
 
 export const step: StepDefinition = createFormStep({

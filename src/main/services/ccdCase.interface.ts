@@ -189,7 +189,6 @@ export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
-  [key: string]: unknown;
   claimIssueDate?: string;
   claimantName?: string;
   isClaimantNameCorrect?: YesNoValue;
@@ -202,6 +201,7 @@ export interface CcdCaseData {
   noticeServed?: string;
   propertyAddress?: CcdCaseAddress;
   claimGroundSummaries?: CcdClaimGroundSummaryItem[];
+  userPcqId?: string;
   userPcqIdSet?: string;
   tenancy_TenancyLicenceDate?: string;
   legislativeCountry?: string;
@@ -219,6 +219,9 @@ export interface CcdCaseData {
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
   citizenGenAppRequest?: CitizenGenAppRequest;
+  // Gen-apps applicant fields written at create-case time
+  applicantForename?: string;
+  applicantSurname?: string;
 }
 
 /** Case representation used by services: id + case_data. */

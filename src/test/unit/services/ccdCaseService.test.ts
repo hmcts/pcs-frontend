@@ -206,9 +206,9 @@ describe('ccdCaseService', () => {
 
   describe('updateCase', () => {
     it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, '', {})).rejects.toThrow(HTTPError);
 
-      await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(
+      await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, '', {})).rejects.toThrow(
         'Cannot UPDATE draft, Case Id not specified'
       );
     });
@@ -306,8 +306,8 @@ describe('updateCase', () => {
   });
 
   it('should throw HTTPError if case id is missing', async () => {
-    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
-    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(
+    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, '', {})).rejects.toThrow(HTTPError);
+    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, '', {})).rejects.toThrow(
       'Cannot UPDATE draft, Case Id not specified'
     );
   });
@@ -353,11 +353,9 @@ describe('updateCase', () => {
       message: 'Server exploded',
     });
 
-    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
-      HTTPError
-    );
+    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, caseId, {})).rejects.toThrow(HTTPError);
 
-    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
+    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, caseId, {})).rejects.toThrow(
       'CCD case service error'
     );
   });
@@ -373,7 +371,7 @@ describe('updateCase', () => {
       message: 'Unprocessable Entity',
     });
 
-    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
+    await expect(ccdCaseService.saveDraftRespondToClaim(accessToken, caseId, {})).rejects.toThrow(
       'CCD callback rejected request: Invalid submission: immutable field nameKnown'
     );
   });
