@@ -52,5 +52,5 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
     return false;
   }
 
-  return isUniversalCreditSelected(req) || hasSelectedUniversalCredit(req);
+  return !isUniversalCreditSelected(req) && !hasSelectedUniversalCredit(req);
 }
