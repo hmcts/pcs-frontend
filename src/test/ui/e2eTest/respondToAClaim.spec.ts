@@ -183,7 +183,7 @@ test.afterEach(async () => {
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
   test('Respond to a claim @noDefendants @regression @accessibility', async () => {
-    /*await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -227,8 +227,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterNoticeDateUnknown');
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
-    });*/
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/counter-claim-specific-sum-of-money`);
+    });
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('selectWhatAreYouClaimingFor', {
