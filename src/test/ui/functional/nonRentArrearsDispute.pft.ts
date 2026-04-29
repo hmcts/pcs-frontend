@@ -4,6 +4,7 @@ import {
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
+  rentArrears,
   tenancyDateDetails,
   tenancyDateUnknown,
 } from '../data/page-data';
@@ -33,6 +34,18 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
     nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
     nonRentArrearsDispute.explainClaimTextInput
   );
+  // emoji
+  await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
+  await performAction(
+    'inputText',
+    nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
+    nonRentArrearsDispute.emojiTextInput
+  );
+  await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
+    message: nonRentArrearsDispute.emojiExplainPartsOfClaimErrorMessage,
+  });
 }
 
 //This test has to be modified HDPI-5786
@@ -63,16 +76,13 @@ export async function noRentArrearsNavigationTests(): Promise<void> {
     process.env.RENT_NON_RENT === 'NO'
   ) {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateDetails.mainHeader);
+  } else if (
+    process.env.NOTICE_SERVED === 'NO' &&
+    process.env.TENANCY_START_DATE_KNOWN === 'YES' &&
+    process.env.RENT_NON_RENT === 'YES'
+  ) {
+    await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrears.mainHeader);
   }
-  //enable after 3495 is merged
-
-  // else if (
-  //   process.env.NOTICE_SERVED === 'NO' &&
-  //   process.env.TENANCY_START_DATE_KNOWN === 'YES' &&
-  //   process.env.RENT_NON_RENT === 'YES'
-  // ) {
-  //   await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrearsDispute.mainHeader);
-  // }
   await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
   await performValidation('pageNavigation', nonRentArrearsDispute.saveForLaterButton, dashboard.mainHeader);
 }
