@@ -32,7 +32,13 @@
     {% for field in fields %}
       {% if field.componentType == 'checkboxes' %}
         {{ govukCheckboxes(field.component) }}
-      {% elif field.componentType == 'input' %}
+      {% endif %}
+    {% endfor %}
+
+    <p class="govuk-body">{{ understandProceedings }}</p>
+
+    {% for field in fields %}
+      {% if field.componentType == 'input' %}
         {{ govukInput(field.component) }}
       {% endif %}
     {% endfor %}
@@ -43,6 +49,9 @@
         attributes: { type: 'submit', name: 'action', value: 'submit' },
         preventDoubleClick: true
       }) }}
+      <p class="govuk-body">
+        <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+      </p>
     </div>
 
     {{ csrfProtection(csrfToken) }}
