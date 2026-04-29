@@ -1,6 +1,13 @@
 import { Request } from 'express';
 
-import { hasAnyRentArrearsGround, isNoticeDateProvided, normalizeYesNoValue } from '../utils';
+import {
+  hasAnyRentArrearsGround,
+  hasSelectedUniversalCredit,
+  isFinanceDetailsProvided,
+  isNoticeDateProvided,
+  isUniversalCreditSelected,
+  normalizeYesNoValue,
+} from '../utils';
 
 export function isNoticeDateConfirmedAndProvided(req: Request): boolean {
   if (req.res?.locals?.validatedCase?.defendantResponsesPossessionNoticeReceived !== 'yes') {
@@ -34,4 +41,16 @@ export function hasConfirmedInstallmentOffer(req: Request): boolean {
 
 export function shouldShowInstallmentPaymentsStep(req: Request): boolean {
   return hasRejectedRepaymentAgreement(req) && hasAnyRentArrearsGround(req);
+}
+
+export function hasProvidedFinanceDetails(req: Request): boolean {
+  return isFinanceDetailsProvided(req);
+}
+
+export function shouldShowUniversalCreditStep(req: Request): boolean {
+  if (!hasProvidedFinanceDetails(req)) {
+    return false;
+  }
+
+  return isUniversalCreditSelected(req) || hasSelectedUniversalCredit(req);
 }

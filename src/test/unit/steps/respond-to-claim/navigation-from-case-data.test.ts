@@ -3,7 +3,9 @@ import type { Request } from 'express';
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import {
   hasConfirmedInstallmentOffer,
+  hasProvidedFinanceDetails,
   shouldShowInstallmentPaymentsStep,
+  shouldShowUniversalCreditStep,
 } from '../../../../main/steps/respond-to-claim/flowConditions';
 
 import { getNextStep, getPreviousStep } from '@modules/steps/flow';
@@ -199,5 +201,75 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     expect(hasConfirmedInstallmentOffer(howMuchReq)).toBe(true);
     expect(hasConfirmedInstallmentOffer(createReq({}))).toBe(false);
+
+    const financeProvidedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+            },
+          },
+        },
+      },
+    });
+    const financeNotProvidedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'NO',
+            },
+          },
+        },
+      },
+    });
+
+    expect(hasProvidedFinanceDetails(financeProvidedReq)).toBe(true);
+    expect(hasProvidedFinanceDetails(financeNotProvidedReq)).toBe(false);
+
+    const universalCreditSelectedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+              universalCredit: 'YES',
+            },
+          },
+        },
+      },
+    });
+    const universalCreditNotSelectedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+              universalCredit: 'NO',
+            },
+          },
+        },
+      },
+    });
+
+    expect(shouldShowUniversalCreditStep(universalCreditSelectedReq)).toBe(true);
+    expect(shouldShowUniversalCreditStep(universalCreditNotSelectedReq)).toBe(false);
+  });
+
+  it('routes income-and-expenses no answer directly to other-considerations', async () => {
+    const req = createReq({});
+    req.body = { provideFinanceDetails: 'no' };
+
+    await expect(getNextStep(req, 'income-and-expenses', flowConfig, {})).resolves.toBe('other-considerations');
+  });
+
+  it('routes income-and-expenses yes answer into finance journey', async () => {
+    const req = createReq({});
+    req.body = { provideFinanceDetails: 'yes' };
+
+    await expect(getNextStep(req, 'income-and-expenses', flowConfig, {})).resolves.toBe(
+      'what-regular-income-do-you-receive'
+    );
   });
 });

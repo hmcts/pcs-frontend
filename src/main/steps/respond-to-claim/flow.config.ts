@@ -12,9 +12,11 @@ import {
 
 import {
   hasConfirmedInstallmentOffer,
+  hasProvidedFinanceDetails,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
   shouldShowInstallmentPaymentsStep,
+  shouldShowUniversalCreditStep,
 } from './flowConditions';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
@@ -121,6 +123,21 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'how-much-afford-to-pay': {
       showCondition: (req: Request) => hasConfirmedInstallmentOffer(req),
+    },
+    'what-regular-income-do-you-receive': {
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
+    },
+    'have-you-applied-for-universal-credit': {
+      showCondition: (req: Request) => shouldShowUniversalCreditStep(req),
+    },
+    'priority-debts': {
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
+    },
+    'priority-debt-details': {
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
+    },
+    'what-other-regular-expenses-do-you-have': {
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
