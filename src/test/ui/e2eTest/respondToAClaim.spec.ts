@@ -56,9 +56,12 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
 
-  if (testInfo.title.includes('RentArrears') && !testInfo.title.includes('NonRentArrears') || !testInfo.title.includes('Respond to a claim') ) {
+  if (
+    (testInfo.title.includes('RentArrears') && !testInfo.title.includes('NonRentArrears')) ||
+    !testInfo.title.includes('Respond to a claim')
+  ) {
     process.env.RENT_ARREARS = 'YES';
-  } else if(testInfo.title.includes('NonRentArrears') || testInfo.title.includes('Respond to a claim')){
+  } else if (testInfo.title.includes('NonRentArrears') || testInfo.title.includes('Respond to a claim')) {
     process.env.RENT_ARREARS = 'NO';
   }
 
