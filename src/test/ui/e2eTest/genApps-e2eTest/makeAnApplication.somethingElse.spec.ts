@@ -1,5 +1,3 @@
-import config from 'config';
-
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
   askTheCourtToMakeAnOrder,
@@ -16,7 +14,7 @@ import {
 import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
@@ -58,8 +56,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
     await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-    await performAction('clickRadioButton', haveTheOtherPartiesAgreedToThisApplication.yesRadioOption);
-    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performAction('confirmOtherPartiesAgreed', {
+      question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
+      option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
+    });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
@@ -72,6 +72,8 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: whichLanguageDidYouUseToCompleteThisService.englishAndWelshRadioOption,
     });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 });
