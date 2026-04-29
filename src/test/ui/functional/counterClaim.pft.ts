@@ -17,9 +17,7 @@ export async function counterClaimNavigationTests(): Promise<void> {
 
   if (process.env.RENT_ARREARS === 'YES' && process.env.RENT_NON_RENT === 'NO') {
     await performValidation('pageNavigation', counterClaim.backLink, rentArrears.mainHeader);
-  } else if (process.env.RENT_ARREARS === 'NO' && process.env.RENT_NON_RENT === 'NO') {
-    await performValidation('pageNavigation', counterClaim.backLink, nonRentArrearsDispute.mainHeader);
-  } else if (process.env.RENT_NON_RENT === 'YES') {
+  } else {
     await performValidation('pageNavigation', counterClaim.backLink, nonRentArrearsDispute.mainHeader);
   }
   await performAction('clickRadioButton', counterClaim.noRadioOption);
