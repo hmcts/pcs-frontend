@@ -7,7 +7,7 @@ import { flowConfig } from '../flow.config';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 const STEP_NAME = 'confirmation-of-notice-given';
 

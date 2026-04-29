@@ -6,7 +6,7 @@ import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 function mapRepaymentsAgreedToCcdValue(repaymentsAgreed: string | undefined): 'YES' | 'NO' | 'NOT_SURE' {
   if (repaymentsAgreed === 'yes') {

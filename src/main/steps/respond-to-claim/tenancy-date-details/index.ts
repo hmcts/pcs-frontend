@@ -7,7 +7,7 @@ import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCaseModel, PossessionClaimResponse } from '@services/ccdCaseData.model';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 function getTenancyStartDate(validatedCase?: CcdCaseModel): string | undefined {
   return validatedCase?.tenancyStartDate as string | undefined;

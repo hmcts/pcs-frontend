@@ -10,7 +10,7 @@ import { Logger } from '@modules/logger';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 const logger = Logger.getLogger('confirmation-of-notice-date-when-not-provided');
 
