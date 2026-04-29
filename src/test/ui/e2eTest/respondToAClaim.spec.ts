@@ -1,5 +1,3 @@
-import config from 'config';
-
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
@@ -44,7 +42,7 @@ import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
@@ -179,7 +177,7 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim @noDefendants @regression @accessibility', async () => {
+  test('Respond to a claim @noDefendants @regression @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -197,7 +195,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
@@ -222,6 +220,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
+    //This is a placeholder page
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -330,7 +329,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      options: [contactPreferenceEmailOrPost.byEmailCheckbox, contactPreferenceEmailOrPost.byPostCheckbox],
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
@@ -426,7 +425,7 @@ test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
     emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
   });
   await performAction('selectContactByTelephone', {
@@ -535,7 +534,7 @@ test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - 
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -671,7 +670,7 @@ test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -785,7 +784,7 @@ test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - N
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -910,7 +909,7 @@ test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - 
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -1015,7 +1014,7 @@ test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes Noti
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
@@ -1124,7 +1123,7 @@ test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDi
   });
   await performAction('selectContactPreferenceEmailOrPost', {
     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-    radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+    radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
   });
   await performAction('selectContactByTelephone', {
     radioOption: contactPreferencesTelephone.noRadioOption,
