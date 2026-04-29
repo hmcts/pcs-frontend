@@ -18,6 +18,7 @@
   "errors": {
     "exceptionalHardship": "Select if you’d experience exceptional hardship if you were asked to leave your home",
     "exceptionalHardshipDetails": "Give details about the exceptional hardship you’d experience",
+    "exceptionalHardshipDetailsMaxLength": "Exceptional hardship details must be 500 characters or less",
     "exceptionalHardshipDetailsInvalidCharacters": "The details of the exceptional hardship you’d experience must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }

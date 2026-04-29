@@ -86,6 +86,13 @@ export const step: StepDefinition = createFormStep({
         autocomplete: 'given-name',
         spellcheck: false,
       },
+      validator: (value: unknown): boolean | string => {
+        if (typeof value !== 'string' || !value.trim()) {
+          return true;
+        }
+        const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
+        return !invalidCharacters.test(value) || 'errors.firstNameInvalidCharacters';
+      },
     },
     {
       name: 'lastName',
@@ -99,6 +106,13 @@ export const step: StepDefinition = createFormStep({
       attributes: {
         autocomplete: 'family-name',
         spellcheck: false,
+      },
+      validator: (value: unknown): boolean | string => {
+        if (typeof value !== 'string' || !value.trim()) {
+          return true;
+        }
+        const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
+        return !invalidCharacters.test(value) || 'errors.lastNameInvalidCharacters';
       },
     },
   ],

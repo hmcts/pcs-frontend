@@ -51,7 +51,7 @@
     "required": "cyEnter a value",
     "defaultRequired": "cyThis field is required",
     "defaultInvalid": "cyInvalid format",
-    "defaultMaxLength": "cyMust be {max} characters or fewer",
+    "defaultMaxLength": "cyMust be {max} characters or less",
     "email": {
       "required": "cyEnter an email address",
       "invalid": "cyEnter a valid email address"

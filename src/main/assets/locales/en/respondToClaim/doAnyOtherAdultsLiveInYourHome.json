@@ -11,6 +11,7 @@
   "errors": {
     "confirmOtherAdults": "Select if any other adults live in your home",
     "otherAdultsDetails": "Give details about the other adults living in your home",
+    "otherAdultsDetailsMaxLength": "Details about other adults must be 500 characters or less",
     "otherAdultsDetailsInvalidCharacters": "Give details about the other adults living in your home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }

@@ -50,7 +50,7 @@
     "required": "Enter a value",
     "defaultRequired": "This field is required",
     "defaultInvalid": "Invalid format",
-    "defaultMaxLength": "Must be {max} characters or fewer",
+    "defaultMaxLength": "Must be {max} characters or less",
     "chooseOption": "Choose an option",
     "email": {
       "required": "Enter an email address",

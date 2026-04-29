@@ -8,7 +8,9 @@
   "errors": {
     "firstName": "cyEnter your first name",
     "firstNameMaxLength": "cyFirst name must be 60 characters or less",
+    "firstNameInvalidCharacters": "cyFirst name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
     "lastName": "cyEnter your last name",
-    "lastNameMaxLength": "cyLast name must be 60 characters or less"
+    "lastNameMaxLength": "cyLast name must be 60 characters or less",
+    "lastNameInvalidCharacters": "cyLast name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }
