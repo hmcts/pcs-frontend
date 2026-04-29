@@ -19,7 +19,7 @@ function getStepRunner(): StepRunner {
   }
   try {
     // Keep this optional for runners where allure-js-commons is not installed.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+
     const allureModule = require('allure-js-commons') as { step?: StepRunner };
     if (typeof allureModule.step === 'function') {
       cachedStepRunner = allureModule.step;

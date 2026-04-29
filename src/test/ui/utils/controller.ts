@@ -61,6 +61,16 @@ export function initializeExecutor(page: Page): void {
   sauceJourneyScreenshotStep = 0;
 }
 
+/** EMV specs under this folder drive their own checks; skip navigation-triggered PFT even when nightly enables all page functional tests. */
+function isFunctionalValidationTestFile(): boolean {
+  try {
+    const file = test.info().file;
+    return file.replace(/\\/g, '/').includes('/functionalValidationTest/');
+  } catch {
+    return false;
+  }
+}
+
 function getExecutor(): { page: Page } {
   if (!testExecutor) {
     throw new Error('Test executor not initialized. Call initializeExecutor(page) first.');
@@ -109,6 +119,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
       }
       if (
         startFunctionalTests &&
+        !isFunctionalValidationTestFile() &&
         (enable_content_validation === 'true' ||
           enable_error_message_validation === 'true' ||
           enable_navigation_tests === 'true')
