@@ -1,0 +1,17 @@
+export const otherConsiderations = {
+  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
+  mainHeader: `Is there anything else you want to tell the court as part of your response?`,
+  yesRadioOption: `Yes`,
+  noRadioOption: `No`,
+  detailsTextInput: `Court details`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  giveDetailsHiddenTextLabel: `Give details about what else you want to tell the court`,
+  youCanEnterUpToHiddenHintText: `You can enter up to 500 characters`,
+  tooManyCharacterHiddenHintText: `You have 1 character too many`,
+  backLink: `Back`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfThereIsAnythingElseYouWantToTellTheCourtErrorMessage: `Select if there is anything else you want to tell the court`,
+  giveDetailsAboutWhatYouWantToTellTheCourtErrorMessage: `Enter details about what you want to tell the court`,
+  mustBeUnderCharacterLimitErrorMessage: `Must be 500 characters or fewer`,
+};

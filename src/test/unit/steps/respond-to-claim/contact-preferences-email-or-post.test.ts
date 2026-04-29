@@ -75,7 +75,6 @@ describe('contact-preferences-email-or-post', () => {
         defendantResponses: {
           contactByEmail: 'YES',
           contactByPost: 'NO',
-          preferenceType: 'EMAIL',
         },
       })
     );
@@ -102,7 +101,6 @@ describe('contact-preferences-email-or-post', () => {
         defendantResponses: {
           contactByEmail: 'NO',
           contactByPost: 'YES',
-          preferenceType: 'POST',
         },
       })
     );

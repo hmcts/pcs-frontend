@@ -22,6 +22,13 @@ export async function yourCircumstancesErrorValidation(): Promise<void> {
     header: yourCircumstances.thereIsAProblemErrorMessageHeader,
     message: yourCircumstances.mustBe500CharactersOrFewerErrorMessage,
   });
+  //emoji validation
+  await performAction('inputText', yourCircumstances.giveDetailsHiddenTextLabel, yourCircumstances.emojiTextInput);
+  await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: yourCircumstances.thereIsAProblemErrorMessageHeader,
+    message: yourCircumstances.emojiGiveGiveDetailsAboutYourCircumstancesErrorMessage,
+  });
 }
 
 export async function yourCircumstancesNavigationTests(): Promise<void> {
