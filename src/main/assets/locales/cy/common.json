@@ -36,6 +36,10 @@
   },
   "change": "cyChange",
   "back": "cyBack",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
   "date": {
     "day": "cyDay",
     "month": "cyMonth",
