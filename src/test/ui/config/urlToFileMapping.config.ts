@@ -56,4 +56,5 @@ export default {
   'application-submitted': 'applicationSubmitted',
   'language-used': 'languageUsed',
   'other-considerations': 'otherConsiderations',
+  'counter-claim': 'counterClaim',
 };
