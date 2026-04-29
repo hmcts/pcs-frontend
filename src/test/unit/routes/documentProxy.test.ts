@@ -418,6 +418,29 @@ describe('documentProxyRoutes', () => {
       expect(body.document.index).toBe(1);
     });
 
+    it('assigns a generated UUID id to the new collection item (so CCD treats it as stable across round-trips)', async () => {
+      mockUploadDocument.mockResolvedValue({
+        document_url: 'http://dm/doc/new-uuid',
+        document_binary_url: 'http://dm/doc/new-uuid/binary',
+        document_filename: 'new.pdf',
+        content_type: 'application/pdf',
+        size: 2048,
+      });
+
+      const req = makeReqWithDocs({
+        file: { originalname: 'new.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 2048 },
+      });
+      const res = { json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
+      const savedDocs = (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mock.calls[0][2].possessionClaimResponse
+        .defendantResponses.defendantDocuments;
+      expect(savedDocs).toHaveLength(1);
+      expect(savedDocs[0].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    });
+
     it('returns 502 when cdamService throws', async () => {
       mockUploadDocument.mockRejectedValue(new Error('CDAM down'));
 

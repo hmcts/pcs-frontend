@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 import { Application, Request, Response } from 'express';
 import multer from 'multer';
 
@@ -121,7 +123,13 @@ async function saveDraftDocuments(req: Request, documents: CcdCollectionItem<Ccd
 }
 
 function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocument> {
+  // Generate the collection-item id on the frontend. CCD treats collection items
+  // with stable ids as "existing" (preserved across draft round-trips); items
+  // without ids are treated as new each round-trip and can be lost/duplicated by
+  // the backend's merge logic. This matches the original fileUpload.ts behaviour
+  // that was dropped during the BFF proxy refactor.
   return {
+    id: randomUUID(),
     value: {
       document: {
         document_url: cdamDoc.document_url,
