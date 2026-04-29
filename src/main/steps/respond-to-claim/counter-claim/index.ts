@@ -42,7 +42,7 @@ export const step: StepDefinition = createFormStep({
       name: 'makeCounterClaim',
       type: 'radio',
       required: true,
-      legendClasses: 'govuk-fieldset__legend--m',
+      legendClasses: 'govuk-fieldset__legend--s',
       translationKey: {
         label: 'question',
       },
