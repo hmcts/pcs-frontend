@@ -84,7 +84,7 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            preferenceType: 'EMAIL',
+            contactByEmail: 'YES',
           },
           defendantContactDetails: {
             party: {
@@ -103,8 +103,7 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ contactByEmailOrPost: 'email' }));
-    expect(renderData.contactByEmailOrPost).toBe('email');
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ contactByEmailOrPost: ['email'] }));
     expect(renderData['contactByEmailOrPost.email']).toBe('tenant@example.com');
   });
 
