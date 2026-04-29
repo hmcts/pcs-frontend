@@ -416,7 +416,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     assertAllErrorMessageValidations();
   });
 
-  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression @PR', async () => {
+  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
 
@@ -492,21 +492,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectCounterClaim', {
       option: counterClaim.noRadioOption,
     });
-
-    // await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
-    // await performAction('readPaymentInterstitial');
-    //
-    // await softErrorMessageValidation('repaymentsMade', repaymentsMadeErrorValidation);
-    // await performAction('repaymentsMade', {
-    //   question: repaymentsMade.getmainHeader(claimantName),
-    //   repaymentOption: repaymentsMade.noRadioOption,
-    // });
-    //
-    // await softErrorMessageValidation('repaymentsAgreed', repaymentsAgreedErrorValidation);
-    // await performAction('repaymentsAgreed', {
-    //   question: repaymentsAgreed.getMainHeader(claimantName),
-    //   repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
-    // });
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
