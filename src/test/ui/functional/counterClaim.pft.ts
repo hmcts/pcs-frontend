@@ -14,9 +14,12 @@ export async function counterClaimNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: counterClaim.pageSlug,
   });
-  if (process.env.RENT_ARREARS === 'YES') {
+
+  if (process.env.RENT_ARREARS === 'YES' && process.env.RENT_NON_RENT === 'NO') {
     await performValidation('pageNavigation', counterClaim.backLink, rentArrears.mainHeader);
-  } else {
+  } else if (process.env.RENT_ARREARS === 'NO' && process.env.RENT_NON_RENT === 'NO') {
+    await performValidation('pageNavigation', counterClaim.backLink, nonRentArrearsDispute.mainHeader);
+  } else if (process.env.RENT_NON_RENT === 'YES') {
     await performValidation('pageNavigation', counterClaim.backLink, nonRentArrearsDispute.mainHeader);
   }
   await performAction('clickRadioButton', counterClaim.noRadioOption);
