@@ -1,3 +1,5 @@
+import type { Request } from 'express';
+
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -72,8 +74,10 @@ export const step: StepDefinition = createFormStep({
 
     return makeCounterClaim !== undefined ? { makeCounterClaim } : {};
   },
-  extendGetContent: async () => {
+  extendGetContent: async (req: Request) => {
     const counterClaimFlatFeeFEE0450 = await getFee(FeeType.counterClaimFlatFeeFEE0450);
-    return { counterClaimFlatFeeFEE0450 };
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    return { counterClaimFlatFeeFEE0450, claimantName };
   },
 });
