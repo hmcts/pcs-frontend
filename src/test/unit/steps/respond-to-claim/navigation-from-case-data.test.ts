@@ -176,6 +176,15 @@ describe('respond-to-claim navigation from CCD case data', () => {
     await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
   });
 
+  it('routes installment-payments forward from the submitted answer before CCD state is refreshed', async () => {
+    const req = createReq({});
+    req.body = { confirmInstallmentOffer: 'yes' };
+
+    await expect(getNextStep(req, 'installment-payments', flowConfig, {}, req.body)).resolves.toBe(
+      'how-much-afford-to-pay'
+    );
+  });
+
   it('show helpers are derived from CCD (GET / deep link)', async () => {
     const installmentVisibleReq = createReq({
       data: {
@@ -220,6 +229,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     expect(hasConfirmedInstallmentOffer(howMuchReq)).toBe(true);
     expect(hasConfirmedInstallmentOffer(howMuchTopLevelReq)).toBe(true);
+    const howMuchSubmittedAnswerReq = createReq({});
+    howMuchSubmittedAnswerReq.body = { confirmInstallmentOffer: 'yes' };
+    expect(hasConfirmedInstallmentOffer(howMuchSubmittedAnswerReq)).toBe(true);
     expect(hasConfirmedInstallmentOffer(createReq({}))).toBe(false);
     const financeProvidedReq = createReq({
       data: {

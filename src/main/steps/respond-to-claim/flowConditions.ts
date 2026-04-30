@@ -33,6 +33,10 @@ export function hasRejectedRepaymentAgreement(req: Request): boolean {
 }
 
 export function hasConfirmedInstallmentOffer(req: Request): boolean {
+  if (req.body?.confirmInstallmentOffer === 'yes') {
+    return true;
+  }
+
   const possessionClaimResponse = req.res?.locals?.validatedCase?.data?.possessionClaimResponse as
     | {
         defendantResponses?: { paymentAgreement?: { repayArrearsInstalments?: string } };
