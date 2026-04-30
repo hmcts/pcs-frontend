@@ -3,6 +3,7 @@ import type { Environment } from 'nunjucks';
 
 import { buildComponentConfig } from './componentBuilders';
 import { buildConditionalContent, getNestedFieldName } from './conditionalFields';
+import { type FormError, getErrorMessage } from './errorUtils';
 import { getTranslation, normalizeCheckboxValue } from './helpers';
 
 import type { FormFieldConfig, FormFieldOption } from '@modules/steps/formBuilder/formFieldConfig.interface';
@@ -223,7 +224,7 @@ export function translateFields(
   fields: FormFieldConfig[],
   t: TFunction,
   fieldValues: Record<string, unknown>,
-  errors: Record<string, string> = {},
+  errors: Record<string, FormError> = {},
   hasTitle = false,
   fieldPrefix = '',
   originalData?: Record<string, unknown>,
@@ -314,8 +315,11 @@ export function translateFields(
     const fieldNameForValueLookup =
       fieldPrefix && field.name.includes('.') ? field.name.split('.').pop() || field.name : field.name;
 
-    const hasError = errors[processedField.name] !== undefined;
-    const errorText = errors[processedField.name];
+    const fieldError = errors[processedField.name];
+    const hasError = fieldError !== undefined;
+    const errorText = fieldError !== undefined ? getErrorMessage(fieldError) : undefined;
+    const erroneousParts =
+      fieldError !== undefined && typeof fieldError !== 'string' ? fieldError.erroneousParts : undefined;
     // processedField.label is already resolved to a string by processField
     const resolvedLabel = typeof processedField.label === 'string' ? processedField.label : processedField.name;
     if (!nunjucksEnv) {
@@ -330,6 +334,7 @@ export function translateFields(
       translatedOptions,
       hasError: hasError || false,
       errorText,
+      erroneousParts,
       index,
       hasTitle,
       t,
