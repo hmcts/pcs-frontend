@@ -1,10 +1,11 @@
-import config from 'config';
 import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware/oidc';
+
+import { DASHBOARD_TASK_PATH_PATTERNS } from './dashboardTaskPaths';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -14,6 +15,7 @@ import { sanitiseCaseReference } from '@utils/caseReference';
 import { getTagClasses, isLinkableStatus } from '@utils/dashboardTaskStatus';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
+
 
 interface MappedTask {
   title: { html: string };
@@ -56,17 +58,6 @@ function getIWantToLinks(caseId: string): { key: string; href: string }[] {
   ];
 }
 
-function getDashboardTaskRoutes(): Record<string, string> {
-  if (!config.has('dashboard.taskRoutes')) {
-    return {};
-  }
-  const taskRoutes = config.get('dashboard.taskRoutes');
-  if (taskRoutes && typeof taskRoutes === 'object') {
-    return taskRoutes as Record<string, string>;
-  }
-  return {};
-}
-
 function getTaskUrl(
   templateId: string,
   taskStatus: string,
@@ -76,7 +67,7 @@ function getTaskUrl(
   if (taskStatus === 'NOT_AVAILABLE') {
     return undefined;
   }
-  const pattern = getDashboardTaskRoutes()[templateId];
+  const pattern = DASHBOARD_TASK_PATH_PATTERNS[templateId];
   if (pattern) {
     return pattern.replace(/:caseReference/g, caseReference);
   }
