@@ -21,6 +21,7 @@ interface CustomSessionData extends SessionData {
   returnTo?: string;
   formData?: Record<string, any>;
   ccdCase?: CcdCase;
+  validatedCaseId?: string;
   destroy(callback: (err?: Error) => void): void;
   returnTo?: string;
 }
