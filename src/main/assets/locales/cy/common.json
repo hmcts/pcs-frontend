@@ -35,7 +35,6 @@
     "imNotSure": "cyI'm not sure"
   },
   "change": "cyChange",
-  "chooseOption": "cyChoose an option",
   "back": "cyBack",
   "options": {
     "yes": "cyYes",
@@ -46,10 +45,6 @@
     "month": "cyMonth",
     "year": "cyYear"
   },
-  "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
-  },
   "warningHiddenText": "cyWarning",
   "errors": {
     "title": "cyThere is a problem",
@@ -57,6 +52,7 @@
     "defaultRequired": "cyThis field is required",
     "defaultInvalid": "cyInvalid format",
     "defaultMaxLength": "cyMust be {max} characters or fewer",
+    "chooseOption": "cyChoose an option",
     "email": {
       "required": "cyEnter an email address",
       "invalid": "cyEnter a valid email address"
@@ -69,10 +65,7 @@
       "month": "cyMonth",
       "year": "cyYear",
       "required": "cyEnter a date",
-      "notRealDate": "cyEnter a valid date",
-      "invalidDay": "cyEnter a valid day",
-      "invalidMonth": "cyEnter a valid month",
-      "invalidYear": "cyEnter a valid year",
+      "notRealDate": "cyDate must be a real date",
       "futureDate": "cyDate must be in the past",
       "pastDate": "cyDate must be in the future",
       "invalidValue": "cyEnter a valid value",
@@ -109,6 +102,27 @@
     "second": "cysecond",
     "seconds": "cyseconds"
   },
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "cyYou have %{count} character remaining",
+      "other": "cyYou have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "cyYou have 0 characters remaining",
+    "charactersOverLimitText": {
+      "one": "cyYou have %{count} character too many",
+      "other": "cyYou have %{count} characters too many"
+    },
+    "wordsUnderLimitText": {
+      "one": "cyYou have %{count} word remaining",
+      "other": "cyYou have %{count} words remaining"
+    },
+    "wordsAtLimitText": "cyYou have 0 words remaining",
+    "wordsOverLimitText": {
+      "one": "cyYou have %{count} word too many",
+      "other": "cyYou have %{count} words too many"
+    },
+    "textareaDescriptionText": "cyYou can enter up to %{count} characters"
+  },
   "errorPages": {
     "403": {
       "title": "cyNot Authorised",
@@ -121,6 +135,12 @@
     "500": {
       "title": "cySorry, we’re having technical problems",
       "paragraph": "cyPlease try again in a few minutes."
+    }
+  },
+  "applicationErrors": {
+    "noApplicationIdInSession": {
+      "title": "cyApplication not available",
+      "paragraph": "cyThis application is not available. It may have already been submitted in a different window."
     }
   }
 }

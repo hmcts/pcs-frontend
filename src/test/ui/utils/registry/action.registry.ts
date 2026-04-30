@@ -80,6 +80,9 @@ export class ActionRegistry {
     ['selectWhatRegularIncomeDoYouReceive', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
+    ['languageUsed', new RespondToClaimAction()],
+    ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
+
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
     ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
@@ -92,7 +95,7 @@ export class ActionRegistry {
     ['retrieveCYATableData', new GenAppsAction()],
     ['validateCYA', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
-    ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
+    ['confirmOrderDoYouWant', new GenAppsAction()],
     ['languageUsed', new RespondToClaimAction()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
     ['reviewCYA', new GenAppsAction()],
