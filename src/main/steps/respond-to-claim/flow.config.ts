@@ -71,6 +71,8 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-capture',
     'defendant-date-of-birth',
     'counter-claim',
+    'do-you-want-to-upload-counterclaim-files',
+    'upload-counterclaim-files',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -399,14 +401,35 @@ export const flowConfig: JourneyFlowConfig = {
       },
     },
     'counter-claim': {
-      defaultNext: 'payment-interstitial',
+      defaultNext: 'do-you-want-to-upload-counterclaim-files',
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
-    'payment-interstitial': {
+    'do-you-want-to-upload-counterclaim-files': {
       previousStep: 'counter-claim',
+      defaultNext: 'payment-interstitial',
+      routes: [
+        {
+          condition: async (
+            _req: Request,
+            _formData: Record<string, unknown>,
+            currentStepData: Record<string, unknown>
+          ): Promise<boolean> => currentStepData.wantsToUploadCounterClaimDocs === 'YES',
+          nextStep: 'upload-counterclaim-files',
+        },
+      ],
+    },
+    'upload-counterclaim-files': {
+      previousStep: 'do-you-want-to-upload-counterclaim-files',
+      defaultNext: 'payment-interstitial',
+    },
+    'payment-interstitial': {
+      previousStep: async (req: Request) => {
+        const docs = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.counterClaimDocuments;
+        return docs && docs.length > 0 ? 'upload-counterclaim-files' : 'do-you-want-to-upload-counterclaim-files';
+      },
       defaultNext: 'repayments-made',
     },
     'repayments-made': {
