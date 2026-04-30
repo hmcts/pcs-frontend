@@ -26,7 +26,8 @@ export interface StepDefinition {
   // Path of CCD field keys identifying where this step's uploaded documents
   // live in the case data — e.g. ['possessionClaimResponse','defendantResponses','defendantDocuments']
   // resolves to caseData.possessionClaimResponse.defendantResponses.defendantDocuments.
-  // Required on upload steps; absent on every other step. The upload handler
-  // refuses requests targeting a step that does not declare this path.
-  uploadDocsPath?: readonly string[];
+  // Required on upload steps; absent on every other step. The non-empty tuple
+  // type prevents silently declaring an empty path. The upload handler refuses
+  // requests targeting a step that does not declare this path.
+  uploadDocsPath?: readonly [string, ...string[]];
 }

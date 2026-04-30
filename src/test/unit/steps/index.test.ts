@@ -70,31 +70,31 @@ describe('journeyForSlug', () => {
 
 describe('findStep', () => {
   it('returns the step for a known slug + step + default variant', () => {
-    const step = findStep('respond-to-claim', 'upload-document');
+    const step = findStep('respond-to-claim', 'counter-claim', 'default');
 
     expect(step).toBeDefined();
-    expect(step?.name).toBe('upload-document');
+    expect(step?.name).toBe('counter-claim');
   });
 
   it('returns the step for the legalrep variant when present', () => {
-    const step = findStep('respond-to-claim', 'upload-document', 'legalrep');
+    const step = findStep('respond-to-claim', 'counter-claim', 'legalrep');
 
     expect(step).toBeDefined();
-    expect(step?.name).toBe('upload-document');
+    expect(step?.name).toBe('counter-claim');
   });
 
   it('returns undefined when slug is known but stepName is unknown', () => {
-    expect(findStep('respond-to-claim', 'this-step-does-not-exist')).toBeUndefined();
+    expect(findStep('respond-to-claim', 'this-step-does-not-exist', 'default')).toBeUndefined();
   });
 
   it('returns undefined when slug is unknown', () => {
-    expect(findStep('not-a-real-journey', 'upload-document')).toBeUndefined();
+    expect(findStep('not-a-real-journey', 'counter-claim', 'default')).toBeUndefined();
   });
 
-  it('plumbs uploadDocsPath through createFormStep onto the StepDefinition', () => {
-    const step = findStep('respond-to-claim', 'upload-document');
+  it('preserves uploadDocsPath from createFormStep config onto the StepDefinition', () => {
+    const step = findStep('respond-to-claim', 'counter-claim', 'default');
 
-    expect(step?.uploadDocsPath).toEqual(['possessionClaimResponse', 'defendantResponses', 'defendantDocuments']);
+    expect(step?.uploadDocsPath).toEqual(['possessionClaimResponse', 'defendantResponses', 'counterClaimDocuments']);
   });
 });
 

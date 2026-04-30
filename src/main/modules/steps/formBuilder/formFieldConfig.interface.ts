@@ -131,7 +131,7 @@ export interface FormBuilderConfig {
   basePath?: string;
   flowConfig?: JourneyFlowConfig;
   showCancelButton?: boolean;
-  uploadDocsPath?: readonly string[];
+  uploadDocsPath?: readonly [string, ...string[]];
 }
 
 export interface ComponentConfig {

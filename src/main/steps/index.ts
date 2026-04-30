@@ -94,15 +94,12 @@ export function journeyForSlug(slug: string): JourneyConfig | undefined {
   return Object.values(journeyRegistry).find(journey => journey.slug === slug);
 }
 
-// Variant-scoped step lookup. Forward-looking: today the citizen and legalrep
-// stepRegistries are the same imported object, so both variants resolve to the
-// same step. Once they diverge, callers MUST pass the correct variant — there
-// is no fallback across variants.
-export function findStep(
-  slug: string,
-  stepName: string,
-  variant: JourneyVariant = 'default'
-): StepDefinition | undefined {
+// Variant-scoped step lookup. Variant is required (no default) to force every
+// caller to think about citizen vs legalrep — a silent default would let a
+// caller miss a legalrep-only step the day the registries diverge. Today the
+// citizen and legalrep stepRegistries are the same imported object, so both
+// variants resolve to the same step.
+export function findStep(slug: string, stepName: string, variant: JourneyVariant): StepDefinition | undefined {
   const journey = journeyForSlug(slug);
   if (!journey) {
     return undefined;

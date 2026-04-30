@@ -106,12 +106,12 @@ function uploadCtx(req: Request): {
   const variant: JourneyVariant = getUserType(req) === 'legalrep' ? 'legalrep' : 'default';
   const journey = slug ? journeyForSlug(slug) : undefined;
   const step = slug && stepName ? findStep(slug, stepName, variant) : undefined;
-  if (!journey?.draftEvent || !step?.uploadDocsPath || step.uploadDocsPath.length === 0) {
+  if (!journey?.draftEvent || !step?.uploadDocsPath) {
     logger.warn('Upload requested without uploadConfig', { slug, stepName, variant });
     throw new HTTPError('Not found', 404);
   }
   return {
-    path: step.uploadDocsPath as readonly [string, ...string[]],
+    path: step.uploadDocsPath,
     draftEvent: journey.draftEvent,
   };
 }
