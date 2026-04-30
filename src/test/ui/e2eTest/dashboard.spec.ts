@@ -1,12 +1,12 @@
-import config from 'config';
-
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
+import { uploadAdditionalDocuments } from '../data/page-data/documents-page-data';
+import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -28,6 +28,12 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
   test('Validate address, case number and links on the dashboard @regression', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
+    await performValidation('text', { elementType: 'subHeader', text: dashboard.iWantToHeader });
+    await performActions(
+      'Validate I want to... links',
+      ['clickLinkAndVerifySameTabTitle', dashboard.askTheCourtToMakeAnOrderLink, chooseAnApplication.mainHeader],
+      ['clickLinkAndVerifySameTabTitle', dashboard.uploadAdditionalDocumentsLink, uploadAdditionalDocuments.mainHeader]
+    );
     await performValidation('text', { elementType: 'subHeader', text: dashboard.helpAndSupportHeader });
     await performActions(
       'Validate Help and Support links',
