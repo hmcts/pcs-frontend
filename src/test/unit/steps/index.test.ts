@@ -9,7 +9,6 @@ import {
 } from '../../../main/steps/index';
 
 import { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 describe('shouldShowStep', () => {
   const req: Request = {} as Request;
@@ -91,25 +90,17 @@ describe('findStep', () => {
     expect(findStep('not-a-real-journey', 'counter-claim', 'default')).toBeUndefined();
   });
 
-  it('preserves uploadDocsPath from createFormStep config onto the StepDefinition', () => {
+  it('carries documentStorage adapter from createFormStep config onto the StepDefinition', () => {
     const step = findStep('respond-to-claim', 'counter-claim', 'default');
 
-    expect(step?.uploadDocsPath).toEqual(['possessionClaimResponse', 'defendantResponses', 'counterClaimDocuments']);
+    expect(step?.documentStorage).toBeDefined();
+    expect(typeof step?.documentStorage?.read).toBe('function');
+    expect(typeof step?.documentStorage?.readFresh).toBe('function');
+    expect(typeof step?.documentStorage?.save).toBe('function');
   });
 });
 
 describe('validateJourneyRegistry', () => {
-  function makeStep(overrides: Partial<StepDefinition> = {}): StepDefinition {
-    return {
-      url: '/x',
-      name: 'x',
-      view: 'x.njk',
-      stepDir: '/tmp',
-      getController: jest.fn(),
-      ...overrides,
-    } as StepDefinition;
-  }
-
   function makeJourney(overrides: Partial<JourneyConfig> = {}): JourneyConfig {
     return {
       name: 'journeyA',
@@ -138,58 +129,5 @@ describe('validateJourneyRegistry', () => {
         b: makeJourney({ name: 'journeyB', slug: 'dup' }),
       })
     ).toThrow(/Duplicate journey slug "dup"/);
-  });
-
-  it('throws when an upload step exists in a journey without draftEvent', () => {
-    expect(() =>
-      validateJourneyRegistry({
-        a: makeJourney({
-          slug: 'a',
-          default: {
-            flowConfig: {} as JourneyFlowConfig,
-            stepRegistry: {
-              upload: makeStep({ name: 'upload', uploadDocsPath: ['x', 'y'] }),
-            },
-          },
-        }),
-      })
-    ).toThrow(/Upload step "upload" defined for journey "a" but journey has no draftEvent/);
-  });
-
-  it('passes when upload step is paired with draftEvent', () => {
-    expect(() =>
-      validateJourneyRegistry({
-        a: makeJourney({
-          slug: 'a',
-          draftEvent: { id: 'someEvent', pageId: 'somePage' },
-          default: {
-            flowConfig: {} as JourneyFlowConfig,
-            stepRegistry: {
-              upload: makeStep({ name: 'upload', uploadDocsPath: ['x', 'y'] }),
-            },
-          },
-        }),
-      })
-    ).not.toThrow();
-  });
-
-  it('also enforces the upload-step invariant on the legalrep variant', () => {
-    expect(() =>
-      validateJourneyRegistry({
-        a: makeJourney({
-          slug: 'a',
-          default: {
-            flowConfig: {} as JourneyFlowConfig,
-            stepRegistry: {},
-          },
-          legalrep: {
-            flowConfig: {} as JourneyFlowConfig,
-            stepRegistry: {
-              upload: makeStep({ name: 'upload', uploadDocsPath: ['x'] }),
-            },
-          },
-        }),
-      })
-    ).toThrow(/Upload step "upload" defined for journey "a" but journey has no draftEvent/);
   });
 });

@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express';
 
+import type { DocumentStorage } from '@modules/documents/storage';
 import { GetController, type SupportedLang } from '@modules/steps';
 
 export interface ErrorField {
@@ -23,11 +24,9 @@ export interface StepDefinition {
   postController?: { post: RequestHandler };
   middleware?: RequestHandler[];
   showCancelButton?: boolean;
-  // Path of CCD field keys identifying where this step's uploaded documents
-  // live in the case data — e.g. ['possessionClaimResponse','defendantResponses','defendantDocuments']
-  // resolves to caseData.possessionClaimResponse.defendantResponses.defendantDocuments.
-  // Required on upload steps; absent on every other step. The non-empty tuple
-  // type prevents silently declaring an empty path. The upload handler refuses
-  // requests targeting a step that does not declare this path.
-  uploadDocsPath?: readonly [string, ...string[]];
+  // Storage adapter for upload steps — encapsulates where documents are persisted
+  // (CCD draft for respond-to-claim, session for make-an-application).
+  // Absent on every non-upload step. The upload handler refuses requests targeting
+  // a step that does not declare this.
+  documentStorage?: DocumentStorage;
 }

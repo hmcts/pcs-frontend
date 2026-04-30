@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 
+import type { DocumentStorage } from '@modules/documents/storage';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export type FormFieldType =
@@ -131,7 +132,9 @@ export interface FormBuilderConfig {
   basePath?: string;
   flowConfig?: JourneyFlowConfig;
   showCancelButton?: boolean;
-  uploadDocsPath?: readonly [string, ...string[]];
+  // Storage adapter for upload steps. When set, formBuilder auto-wires uploadUrl/deleteUrl
+  // onto the fileUpload field component from req.originalUrl.
+  documentStorage?: DocumentStorage;
 }
 
 export interface ComponentConfig {

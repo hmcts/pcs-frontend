@@ -3,15 +3,21 @@ jest.mock('../../../../main/modules/steps', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
+jest.mock('../../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    getCaseById: jest.fn(),
+    updateDraft: jest.fn(),
+  },
+}));
+
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim';
 
 type CounterClaimStep = {
-  getInitialFormData: (req: Record<string, unknown>) => Record<string, unknown>;
-  extendGetContent: (req: Record<string, unknown>, formContent: Record<string, unknown>) => Record<string, unknown>;
+  getInitialFormData: (req: Record<string, unknown>) => Promise<Record<string, unknown>>;
   beforeRedirect?: (req: Record<string, unknown>) => Promise<void>;
   fields: { name: string; type: string; required: boolean }[];
   stepName: string;
-  uploadDocsPath: readonly string[];
+  documentStorage: { read: jest.Mock; readFresh: jest.Mock; save: jest.Mock };
   translationKeys: Record<string, string>;
 };
 
@@ -23,12 +29,10 @@ describe('counter-claim step (counterclaim docs upload)', () => {
       expect(testedStep.stepName).toBe('counter-claim');
     });
 
-    it('declares uploadDocsPath at counterClaimDocuments', () => {
-      expect(testedStep.uploadDocsPath).toEqual([
-        'possessionClaimResponse',
-        'defendantResponses',
-        'counterClaimDocuments',
-      ]);
+    it('carries a documentStorage adapter with read, readFresh, save', () => {
+      expect(typeof testedStep.documentStorage?.read).toBe('function');
+      expect(typeof testedStep.documentStorage?.readFresh).toBe('function');
+      expect(typeof testedStep.documentStorage?.save).toBe('function');
     });
 
     it('declares an optional file field (per Figma "optional")', () => {
@@ -44,6 +48,8 @@ describe('counter-claim step (counterclaim docs upload)', () => {
 
   describe('getInitialFormData', () => {
     const makeReq = (counterClaimDocuments?: unknown[]) => ({
+      session: { user: { accessToken: 'token' } },
+      params: { caseReference: '123' },
       res: {
         locals: {
           validatedCase: {
@@ -55,15 +61,15 @@ describe('counter-claim step (counterclaim docs upload)', () => {
       },
     });
 
-    it('returns empty when no documents exist', () => {
-      expect(testedStep.getInitialFormData(makeReq(undefined))).toEqual({});
+    it('returns empty documents when no documents exist', async () => {
+      expect(await testedStep.getInitialFormData(makeReq(undefined))).toEqual({ documents: [] });
     });
 
-    it('returns empty when documents array is empty', () => {
-      expect(testedStep.getInitialFormData(makeReq([]))).toEqual({});
+    it('returns empty documents when documents array is empty', async () => {
+      expect(await testedStep.getInitialFormData(makeReq([]))).toEqual({ documents: [] });
     });
 
-    it('maps existing documents to display format', () => {
+    it('maps existing documents to display format', async () => {
       const docs = [
         {
           id: 'doc-1',
@@ -74,7 +80,7 @@ describe('counter-claim step (counterclaim docs upload)', () => {
           },
         },
       ];
-      expect(testedStep.getInitialFormData(makeReq(docs))).toEqual({
+      expect(await testedStep.getInitialFormData(makeReq(docs))).toEqual({
         documents: [
           {
             index: 0,
@@ -84,22 +90,6 @@ describe('counter-claim step (counterclaim docs upload)', () => {
             size: 1234,
           },
         ],
-      });
-    });
-  });
-
-  describe('extendGetContent', () => {
-    it('wires upload and delete URLs onto the file field component', () => {
-      const formContent = {
-        fields: [{ componentType: 'fileUpload', component: {} as Record<string, unknown> }],
-      };
-      const req = { originalUrl: '/case/123/respond-to-claim/counter-claim?lang=cy' };
-
-      testedStep.extendGetContent(req, formContent);
-
-      expect(formContent.fields[0].component).toEqual({
-        uploadUrl: '/case/123/respond-to-claim/counter-claim/upload',
-        deleteUrl: '/case/123/respond-to-claim/counter-claim/delete',
       });
     });
   });

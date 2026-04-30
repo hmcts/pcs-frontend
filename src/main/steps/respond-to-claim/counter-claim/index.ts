@@ -1,34 +1,19 @@
-import type { Request } from 'express';
-
 import { flowConfig } from '../flow.config';
 
+import { ccdDraftDocs, toDisplayDocuments } from '@modules/documents/storage';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
-interface DisplayDocument {
-  index: number;
-  id?: string;
-  document_filename: string;
-  content_type?: string;
-  size?: number;
-}
-
-function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[]): DisplayDocument[] {
-  return docs.map((item, index) => ({
-    index,
-    id: item.id,
-    document_filename: item.value.document.document_filename,
-    content_type: item.value.contentType,
-    size: item.value.size,
-  }));
-}
+const storage = ccdDraftDocs({
+  event: { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
+  path: ['possessionClaimResponse', 'defendantResponses', 'counterClaimDocuments'],
+});
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim',
   journeyFolder: 'respondToClaim',
-  uploadDocsPath: ['possessionClaimResponse', 'defendantResponses', 'counterClaimDocuments'],
+  documentStorage: storage,
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/counterClaim.njk`,
@@ -55,22 +40,7 @@ export const step: StepDefinition = createFormStep({
     uploadButton: 'uploadButton',
     deleteButton: 'deleteButton',
   },
-  getInitialFormData: (req: Request) => {
-    const existingDocs: CcdCollectionItem<CcdUploadedDocument>[] | undefined =
-      req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.counterClaimDocuments;
-    if (!existingDocs?.length) {
-      return {};
-    }
-    return { documents: toDisplayDocuments(existingDocs) };
-  },
-  extendGetContent: (req, formContent) => {
-    const basePath = req.originalUrl.split('?')[0];
-    const fileField = formContent.fields?.find((f: { componentType?: string }) => f.componentType === 'fileUpload');
-    if (fileField?.component) {
-      fileField.component.uploadUrl = `${basePath}/upload`;
-      fileField.component.deleteUrl = `${basePath}/delete`;
-    }
-    return {};
-  },
+  getInitialFormData: async req => ({ documents: toDisplayDocuments(await storage.read(req)) }),
+  // No extendGetContent — formBuilder auto-wires uploadUrl/deleteUrl when documentStorage is set.
   // No beforeRedirect — documents are saved to CCD on upload/delete via documentProxy.
 });

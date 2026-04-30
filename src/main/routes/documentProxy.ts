@@ -5,12 +5,12 @@ import multer from 'multer';
 
 import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware';
-import { type JourneyVariant, findStep, journeyForSlug } from '../steps';
+import { type JourneyVariant, findStep } from '../steps';
 import { getUserType } from '../steps/utils';
 
+import type { DocumentStorage } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
 import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 import type { CdamDocument } from '@services/documentUpload.interface';
 import { UPLOAD_MAX_FILE_SIZE_BYTES, validateFileType } from '@utils/documentUploadValidation';
@@ -77,51 +77,16 @@ export function handleMulterError(
   next(err);
 }
 
-function getAtPath<T>(obj: unknown, path: readonly [string, ...string[]]): T | undefined {
-  let cursor: unknown = obj;
-  for (const key of path) {
-    if (cursor === null || cursor === undefined || typeof cursor !== 'object') {
-      return undefined;
-    }
-    cursor = (cursor as Record<string, unknown>)[key];
-  }
-  return cursor as T | undefined;
-}
-
-// Returns an object even when `value` is itself an array (e.g. a list of
-// documents) — `reduceRight` always wraps the leaf in at least one key from
-// `path`, so the result is always `{ <firstKey>: ... }`. The non-empty path
-// type makes that wrapping reachable; uploadCtx 404s before this is called.
-function setAtPath(path: readonly [string, ...string[]], value: unknown): Record<string, unknown> {
-  return path.reduceRight<unknown>((acc, key) => ({ [key]: acc }), value) as Record<string, unknown>;
-}
-
-function uploadCtx(req: Request): {
-  path: readonly [string, ...string[]];
-  draftEvent: { id: string; pageId: string };
-} {
+function uploadCtx(req: Request): { storage: DocumentStorage } {
   const slug = req.params.journey as string | undefined;
   const stepName = req.params.step as string | undefined;
-  // getUserType returns 'citizen' | 'legalrep'; we map citizen → default.
   const variant: JourneyVariant = getUserType(req) === 'legalrep' ? 'legalrep' : 'default';
-  const journey = slug ? journeyForSlug(slug) : undefined;
   const step = slug && stepName ? findStep(slug, stepName, variant) : undefined;
-  if (!journey?.draftEvent || !step?.uploadDocsPath) {
-    logger.warn('Upload requested without uploadConfig', { slug, stepName, variant });
+  if (!step?.documentStorage) {
+    logger.warn('Upload requested without documentStorage', { slug, stepName, variant });
     throw new HTTPError('Not found', 404);
   }
-  return {
-    path: step.uploadDocsPath,
-    draftEvent: journey.draftEvent,
-  };
-}
-
-// res.locals.validatedCase is a CcdCaseModel, not a plain object. It exposes
-// top-level CCD fields via getters, so bracket access (used by getAtPath)
-// resolves them. If a future refactor breaks that, walk validatedCase.data
-// instead.
-function getExistingDocuments(req: Request): CcdCollectionItem<CcdUploadedDocument>[] {
-  return getAtPath<CcdCollectionItem<CcdUploadedDocument>[]>(req.res?.locals?.validatedCase, uploadCtx(req).path) ?? [];
+  return { storage: step.documentStorage };
 }
 
 // Per-case in-process mutex. Two concurrent uploads/deletes for the same case
@@ -146,22 +111,33 @@ async function withCaseLock<T>(caseId: string, fn: () => Promise<T>): Promise<T>
   }
 }
 
-async function fetchFreshDocuments(
-  req: Request,
-  caseId: string,
-  accessToken: string
-): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-  const { path, draftEvent } = uploadCtx(req);
-  const fresh = await ccdCaseService.getCaseById(accessToken, caseId, draftEvent.id);
-  return getAtPath<CcdCollectionItem<CcdUploadedDocument>[]>(fresh.data, path) ?? [];
+async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<CcdUploadedDocument>): Promise<number> {
+  const caseId = req.params.caseReference as string;
+  const { storage } = uploadCtx(req);
+
+  return withCaseLock(caseId, async () => {
+    const existing = await storage.readFresh(req);
+    const updated = [...existing, entry];
+    await storage.save(req, updated);
+    return updated.length - 1;
+  });
 }
 
-async function saveDraftDocuments(req: Request, documents: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
+async function removeDraftDocument(req: Request, docId: string): Promise<'removed' | 'stale'> {
   const caseId = req.params.caseReference as string;
-  const accessToken = getUserToken(req);
-  const { path, draftEvent } = uploadCtx(req);
+  const { storage } = uploadCtx(req);
 
-  await ccdCaseService.updateDraft(draftEvent, accessToken, caseId, setAtPath(path, documents));
+  return withCaseLock(caseId, async () => {
+    const existing = await storage.readFresh(req);
+    const docToDelete = existing.find(d => d.id === docId);
+    if (!docToDelete) {
+      return 'stale';
+    }
+    const updated = existing.filter(d => d.id !== docId);
+    await storage.save(req, updated);
+    await deleteDocument(docToDelete.value.document.document_url, getUserToken(req));
+    return 'removed';
+  });
 }
 
 function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocument> {
@@ -182,37 +158,6 @@ function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocu
       size: cdamDoc.size,
     },
   };
-}
-
-async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<CcdUploadedDocument>): Promise<number> {
-  const caseId = req.params.caseReference as string;
-  const accessToken = getUserToken(req);
-
-  return withCaseLock(caseId, async () => {
-    const existing = await fetchFreshDocuments(req, caseId, accessToken);
-    const updated = [...existing, entry];
-    await saveDraftDocuments(req, updated);
-    return updated.length - 1;
-  });
-}
-
-async function removeDraftDocument(req: Request, docId: string): Promise<'removed' | 'stale'> {
-  const caseId = req.params.caseReference as string;
-  const accessToken = getUserToken(req);
-
-  return withCaseLock(caseId, async () => {
-    const existing = await fetchFreshDocuments(req, caseId, accessToken);
-
-    const docToDelete = existing.find(d => d.id === docId);
-    if (!docToDelete) {
-      return 'stale';
-    }
-
-    const updated = existing.filter(d => d.id !== docId);
-    await saveDraftDocuments(req, updated);
-    await deleteDocument(docToDelete.value.document.document_url, accessToken);
-    return 'removed';
-  });
 }
 
 function buildUploadResponse(
@@ -269,7 +214,7 @@ export default function documentProxyRoutes(app: Application): void {
     async (req: Request, res: Response) => {
       const errors = getErrorTranslations(req);
       try {
-        const existingDocs = getExistingDocuments(req);
+        const existingDocs = await uploadCtx(req).storage.read(req);
         const docIndex = validateDocumentIndex(req.params.index as string, existingDocs);
         if (docIndex === null) {
           return res.status(404).json({ error: { message: errors.documentNotFound } });

@@ -71,20 +71,6 @@ export function validateJourneyRegistry(registry: Record<string, JourneyConfig>)
       throw new Error(`Duplicate journey slug "${journey.slug}" in journeyRegistry`);
     }
     seenSlugs.add(journey.slug);
-
-    for (const variant of ['default', 'legalrep'] as const) {
-      const stepRegistry = journey[variant]?.stepRegistry;
-      if (!stepRegistry) {
-        continue;
-      }
-      for (const [stepName, step] of Object.entries(stepRegistry)) {
-        if (step.uploadDocsPath && !journey.draftEvent) {
-          throw new Error(
-            `Upload step "${stepName}" defined for journey "${journey.slug}" but journey has no draftEvent`
-          );
-        }
-      }
-    }
   }
 }
 

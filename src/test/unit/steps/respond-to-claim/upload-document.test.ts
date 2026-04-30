@@ -3,15 +3,22 @@ jest.mock('../../../../main/modules/steps', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
+jest.mock('../../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    getCaseById: jest.fn(),
+    updateDraft: jest.fn(),
+  },
+}));
+
 import { step } from '../../../../main/steps/respond-to-claim/upload-document';
 
 type UploadDocumentStep = {
-  getInitialFormData: (req: Record<string, unknown>) => Record<string, unknown>;
-  extendGetContent: (req: Record<string, unknown>, formContent: Record<string, unknown>) => Record<string, unknown>;
+  getInitialFormData: (req: Record<string, unknown>) => Promise<Record<string, unknown>>;
   beforeRedirect?: (req: Record<string, unknown>) => Promise<void>;
   fields: { name: string; type: string; required: boolean }[];
   stepName: string;
   translationKeys: Record<string, string>;
+  documentStorage: { read: jest.Mock; readFresh: jest.Mock; save: jest.Mock };
 };
 
 describe('upload-document step', () => {
@@ -53,10 +60,18 @@ describe('upload-document step', () => {
     it('does not have beforeRedirect - documents saved on upload/delete', () => {
       expect(testedStep.beforeRedirect).toBeUndefined();
     });
+
+    it('carries a documentStorage adapter with read, readFresh, save', () => {
+      expect(typeof testedStep.documentStorage?.read).toBe('function');
+      expect(typeof testedStep.documentStorage?.readFresh).toBe('function');
+      expect(typeof testedStep.documentStorage?.save).toBe('function');
+    });
   });
 
   describe('getInitialFormData', () => {
     const makeReq = (defendantDocuments?: unknown[]) => ({
+      session: { user: { accessToken: 'token' } },
+      params: { caseReference: '123' },
       res: {
         locals: {
           validatedCase: {
@@ -68,19 +83,20 @@ describe('upload-document step', () => {
       },
     });
 
-    it('returns empty object when no documents exist', () => {
-      const result = testedStep.getInitialFormData(makeReq(undefined));
-      expect(result).toEqual({});
+    it('returns empty documents when no documents exist', async () => {
+      const result = await testedStep.getInitialFormData(makeReq(undefined));
+      expect(result).toEqual({ documents: [] });
     });
 
-    it('returns empty object when documents array is empty', () => {
-      const result = testedStep.getInitialFormData(makeReq([]));
-      expect(result).toEqual({});
+    it('returns empty documents when documents array is empty', async () => {
+      const result = await testedStep.getInitialFormData(makeReq([]));
+      expect(result).toEqual({ documents: [] });
     });
 
-    it('returns display-only data with index and filename, no CDAM URLs', () => {
+    it('returns display-only data with index and filename, no CDAM URLs', async () => {
       const docs = [
         {
+          id: 'doc-1',
           value: {
             document: {
               document_url: 'http://dm-store/documents/abc-123',
@@ -93,107 +109,37 @@ describe('upload-document step', () => {
         },
       ];
 
-      const result = testedStep.getInitialFormData(makeReq(docs));
+      const result = await testedStep.getInitialFormData(makeReq(docs));
       const documents = result.documents as Record<string, unknown>[];
 
       expect(documents).toHaveLength(1);
       expect(documents[0]).toEqual({
         index: 0,
+        id: 'doc-1',
         document_filename: 'evidence.pdf',
         content_type: 'application/pdf',
         size: 1024,
       });
-      // No CDAM URLs exposed
       expect(documents[0]).not.toHaveProperty('document_url');
       expect(documents[0]).not.toHaveProperty('document_binary_url');
     });
 
-    it('assigns sequential indexes to multiple documents', () => {
+    it('assigns sequential indexes to multiple documents', async () => {
       const docs = [
-        {
-          value: {
-            document: {
-              document_url: 'http://dm-store/documents/aaa',
-              document_binary_url: 'http://dm-store/documents/aaa/binary',
-              document_filename: 'first.pdf',
-            },
-          },
-        },
-        {
-          value: {
-            document: {
-              document_url: 'http://dm-store/documents/bbb',
-              document_binary_url: 'http://dm-store/documents/bbb/binary',
-              document_filename: 'second.pdf',
-            },
-          },
-        },
+        { value: { document: { document_url: 'x', document_binary_url: 'x/b', document_filename: 'first.pdf' } } },
+        { value: { document: { document_url: 'y', document_binary_url: 'y/b', document_filename: 'second.pdf' } } },
       ];
 
-      const result = testedStep.getInitialFormData(makeReq(docs));
+      const result = await testedStep.getInitialFormData(makeReq(docs));
       const documents = result.documents as Record<string, unknown>[];
 
       expect(documents[0].index).toBe(0);
       expect(documents[1].index).toBe(1);
     });
 
-    it('handles missing contentType and size gracefully', () => {
-      const docs = [
-        {
-          value: {
-            document: {
-              document_url: 'http://dm-store/documents/abc-123',
-              document_binary_url: 'http://dm-store/documents/abc-123/binary',
-              document_filename: 'doc.pdf',
-            },
-          },
-        },
-      ];
-
-      const result = testedStep.getInitialFormData(makeReq(docs));
-      const documents = result.documents as Record<string, unknown>[];
-
-      expect(documents[0].document_filename).toBe('doc.pdf');
-      expect(documents[0].content_type).toBeUndefined();
-      expect(documents[0].size).toBeUndefined();
-    });
-
-    it('handles missing validatedCase gracefully', () => {
-      const result = testedStep.getInitialFormData({ res: { locals: {} } });
-      expect(result).toEqual({});
-    });
-  });
-
-  describe('extendGetContent', () => {
-    it('injects upload and delete URLs from request URL', () => {
-      const fileField = { componentType: 'fileUpload', component: {} as Record<string, unknown> };
-      const formContent = { fields: [fileField] };
-      const req = { originalUrl: '/case/123/respond-to-claim/upload-document?lang=en' };
-
-      testedStep.extendGetContent(req, formContent);
-
-      expect(fileField.component.uploadUrl).toBe('/case/123/respond-to-claim/upload-document/upload');
-      expect(fileField.component.deleteUrl).toBe('/case/123/respond-to-claim/upload-document/delete');
-    });
-
-    it('strips query string from URL before appending', () => {
-      const fileField = { componentType: 'fileUpload', component: {} as Record<string, unknown> };
-      const formContent = { fields: [fileField] };
-      const req = { originalUrl: '/case/123/respond-to-claim/upload-document?lang=cy&foo=bar' };
-
-      testedStep.extendGetContent(req, formContent);
-
-      expect(fileField.component.uploadUrl).not.toContain('?');
-      expect(fileField.component.deleteUrl).not.toContain('?');
-    });
-
-    it('does nothing when no fileUpload field exists', () => {
-      const formContent = { fields: [{ componentType: 'input', component: {} }] };
-      const req = { originalUrl: '/some/path' };
-
-      const result = testedStep.extendGetContent(req, formContent);
-
-      expect(result).toEqual({});
+    it('handles missing validatedCase gracefully', async () => {
+      const result = await testedStep.getInitialFormData({ res: { locals: {} }, session: {}, params: {} });
+      expect(result).toEqual({ documents: [] });
     });
   });
 });
