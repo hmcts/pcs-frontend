@@ -99,7 +99,9 @@
   },
   "dashboard": {
     "taskRoutes": {
-      "Defendant.ViewClaim": "/case/:caseReference/view-the-claim"
+      "ViewClaim": "/case/:caseReference/view-the-claim",
+      "MakeGeneralApplication": "/case/:caseReference/make-an-application/choose-an-application",
+      "ViewAllApplications": "/case/:caseReference/view-all-applications"
     }
   }
 }

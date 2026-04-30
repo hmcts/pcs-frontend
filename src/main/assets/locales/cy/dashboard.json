@@ -1,4 +1,5 @@
 {
+  "serviceName": "cyPossession Claims",
   "caseReferenceLabel": "cyCase number:",
   "iWantToHeading": "cyI want to...",
   "askCourtToMakeOrder": "cyAsk the court to make an order (make a general application)",
@@ -41,10 +42,12 @@
       "COMPLETED": "cyCompleted",
       "NOT_STARTED": "cyNot started"
     },
+    "ViewClaim": { "title": "cyView the claim" },
+    "ViewDocuments": { "title": "cyView documents" },
+    "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
+    "ViewAllApplications": { "title": "cyView all applications" },
     "Defendant": {
-      "ViewClaim": { "title": "cyView the claim" },
       "RespondToClaim": { "title": "cyRespond to the claim" },
-      "ViewDocuments": { "title": "cyView documents" },
       "ReviewResponse": { "title": "cyReview the response" },
       "SubmitResponse": { "title": "cySubmit the response" }
     }
