@@ -10,5 +10,10 @@
   "counterClaimFeeOptions": {
     "iNeedHelpWithPayingFee": "I need help paying the fee",
     "iDoNotNeedHelpWithPayingFee": "I do not need help paying the fee"
+  },
+  "errors": {
+    "counterClaimFee": {
+      "required": "Select if you need help paying the counterclaim fee"
+    }
   }
 }
