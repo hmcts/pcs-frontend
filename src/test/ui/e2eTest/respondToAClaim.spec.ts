@@ -1036,9 +1036,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('rentArrears', {
       option: rentArrears.imNotSureRadioOption,
     });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
