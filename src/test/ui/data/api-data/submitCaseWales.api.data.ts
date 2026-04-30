@@ -100,7 +100,7 @@ export const submitCaseApiDataWales = {
       },
     ],
 
-    secureGroundsWales_MandatoryGrounds: ['LANDLORD_NOTICE_S199'],
+    secureGroundsWales_MandatoryGrounds: ['FAILURE_TO_GIVE_UP_POSSESSION_S170'],
     walesSecureLandlordNoticeSection199Reason: 'test',
     secureGroundsWales_DiscretionaryGrounds: ['RENT_ARREARS_S157'],
 
