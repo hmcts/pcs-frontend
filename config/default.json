@@ -99,7 +99,7 @@
   },
   "dashboard": {
     "taskRoutes": {
-      "Task.AAA6.Claim.ViewClaim": "/case/:caseReference/view-the-claim"
+      "Defendant.ViewClaim": "/case/:caseReference/view-the-claim"
     }
   }
 }
