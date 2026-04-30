@@ -95,6 +95,7 @@ export class ActionRegistry {
     ['recordUserEntry', new RecordAnswers()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
+    ['otherConsiderations', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
