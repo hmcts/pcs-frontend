@@ -106,7 +106,13 @@ export const step: StepDefinition = createFormStep({
   customTemplate: 'respond-to-claim/correspondence-address/correspondenceAddress.njk',
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    if (req.body?.['correspondenceAddressConfirm'] !== 'yes') {
+    const addressConfirm = req.body?.['correspondenceAddressConfirm'] as string | undefined;
+
+    if (addressConfirm === 'yes') {
+      response.defendantResponses.correspondenceAddressConfirmation = 'YES';
+      delete response.defendantContactDetails.party.address;
+    } else if (addressConfirm === 'no') {
+      response.defendantResponses.correspondenceAddressConfirmation = 'NO';
       response.defendantContactDetails.party.address = buildCcdAddressFromFormParts({
         addressLine1: req.body?.['correspondenceAddressConfirm.addressLine1'] ?? '',
         addressLine2: req.body?.['correspondenceAddressConfirm.addressLine2'],
@@ -114,6 +120,9 @@ export const step: StepDefinition = createFormStep({
         county: req.body?.['correspondenceAddressConfirm.county'],
         postcode: req.body?.['correspondenceAddressConfirm.postcode'] ?? '',
       });
+    } else {
+      delete response.defendantResponses.correspondenceAddressConfirmation;
+      delete response.defendantContactDetails.party.address;
     }
 
     await saveDraftDefendantResponse(req, response);
