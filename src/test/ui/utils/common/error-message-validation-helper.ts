@@ -1,5 +1,3 @@
-import { step as allureStep } from 'allure-js-commons';
-
 import { ErrorMessageValidation } from '../validations/custom-validations';
 
 /** Swallowed after the Allure step so the journey continues; step still records as failed. */
@@ -11,6 +9,28 @@ class SoftEmvStepFailed extends Error {
 }
 
 const failures: { pageKey: string; error: string }[] = [];
+type StepRunner = <T>(name: string, body: () => Promise<T> | T) => Promise<T>;
+
+let cachedStepRunner: StepRunner | null = null;
+
+function getStepRunner(): StepRunner {
+  if (cachedStepRunner) {
+    return cachedStepRunner;
+  }
+  try {
+    // Keep this optional for runners where allure-js-commons is not installed.
+
+    const allureModule = require('allure-js-commons') as { step?: StepRunner };
+    if (typeof allureModule.step === 'function') {
+      cachedStepRunner = allureModule.step;
+      return cachedStepRunner;
+    }
+  } catch {
+    // no-op: fallback to plain execution
+  }
+  cachedStepRunner = async <T>(_name: string, body: () => Promise<T> | T) => Promise.resolve(body());
+  return cachedStepRunner;
+}
 
 function asText(err: unknown): string {
   return err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err);
@@ -21,6 +41,7 @@ export async function softErrorMessageValidation(
   pageKey: string,
   pftFun: (() => Promise<void>) | string
 ): Promise<void> {
+  const stepRunner = getStepRunner();
   if (typeof pftFun === 'string') {
     // Do not use StepContext.parameter() here: with allure-playwright it can race step teardown
     // and log "could not update test step: no step with uuid ... is found". Keep the reason in the title.
@@ -28,14 +49,14 @@ export async function softErrorMessageValidation(
     const title = note
       ? `No ErrorMessageValidation(EMV): ${pageKey} — ${note}`
       : `No ErrorMessageValidation(EMV): ${pageKey}`;
-    await allureStep(title, async () => {
+    await stepRunner(title, async () => {
       /* note is in step title */
     });
     return;
   }
 
   try {
-    await allureStep(`ErrorMessageValidation(EMV) for - ${pageKey}`, async () => {
+    await stepRunner(`ErrorMessageValidation(EMV) for - ${pageKey}`, async () => {
       const start = ErrorMessageValidation.peekResultsLength();
       let pftError: unknown;
       await pftFun().catch(e => {

@@ -19,6 +19,26 @@ properties([
       defaultValue: '',
       description: 'PR number (REQUIRED if environment is preview, leave blank otherwise).'
     ),
+    string(
+      name: 'PLAYWRIGHT_SPEC',
+      defaultValue: '',
+      description: 'Spec file filter: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate keywords with comma or semicolon. Ex.: respondToAClaim | respondToAClaim,makeAnApplication. Blank = all specs. Default: empty.'
+    ),
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
+      description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
+    ),
+    choice(
+      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
+      choices: ['true', 'false'],
+      description: 'Run page functional tests (content, errors, navigation). Default: true.'
+    ),
+    choice(
+      name: 'ENABLE_AXE_AUDIT',
+      choices: ['true', 'false'],
+      description: 'Run axe audits during E2E. Default: true.'
+    ),
     booleanParam(
       name: 'CHROME_TESTS',
       defaultValue: true,
@@ -55,24 +75,34 @@ properties([
       description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
     string(
-      name: 'PLAYWRIGHT_SPEC',
-      defaultValue: '',
-      description: 'Spec file filter: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate keywords with comma or semicolon. Ex.: respondToAClaim | respondToAClaim,makeAnApplication. Blank = all specs. Default: empty.'
+      name: 'SAUCE_GREP',
+      defaultValue: '@crossbrowser',
+      description: 'Playwright grep pattern for Sauce cross-browser runs (tags, e.g. @crossbrowser). Passed to saucectl as SAUCE_GREP.'
     ),
-    choice(
-      name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
-      description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
+    booleanParam(
+      name: 'SAUCE_MAC13_CHROME',
+      defaultValue: false,
+      description: 'Sauce: macOS 13 — Chrome.'
     ),
-    choice(
-      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
-      choices: ['true', 'false'],
-      description: 'Run page functional tests (content, errors, navigation). Default: true.'
+    booleanParam(
+      name: 'SAUCE_MAC13_FIREFOX',
+      defaultValue: false,
+      description: 'Sauce: macOS 13 — Firefox.'
     ),
-    choice(
-      name: 'ENABLE_AXE_AUDIT',
-      choices: ['true', 'false'],
-      description: 'Run axe audits during E2E. Default: true.'
+    booleanParam(
+      name: 'SAUCE_WIN11_CHROME',
+      defaultValue: false,
+      description: 'Sauce: Windows 11 — Chrome.'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_EDGE',
+      defaultValue: false,
+      description: 'Sauce: Windows 11 — Edge.'
+    ),
+    booleanParam(
+      name: 'SAUCE_WIN11_FIREFOX',
+      defaultValue: false,
+      description: 'Sauce: Windows 11 — Firefox.'
     ),
   ])
 ])
@@ -97,6 +127,7 @@ def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
     secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
+    secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64'),
     secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID')
   ]
 ]
@@ -108,11 +139,26 @@ withNightlyPipeline(type, product, component) {
   handleEnvironmentSetting()
   setFunctionalTestEnvVars()
   enableFortifyScan()
+  def sauceSuites = selectedSauceSuites()
+  if (!sauceSuites.isEmpty()) {
+    env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
+    enableCrossBrowserTest()
+  }
 
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
   }
+}
+
+def selectedSauceSuites() {
+  [
+    params.SAUCE_MAC13_CHROME ? 'pcs-frontend-mac13-chrome' : null,
+    params.SAUCE_MAC13_FIREFOX ? 'pcs-frontend-mac13-firefox' : null,
+    params.SAUCE_WIN11_CHROME ? 'pcs-frontend-win11-chrome' : null,
+    params.SAUCE_WIN11_EDGE ? 'pcs-frontend-win11-edge' : null,
+    params.SAUCE_WIN11_FIREFOX ? 'pcs-frontend-win11-firefox' : null,
+  ].findAll { it != null }
 }
 
 def validateInputs() {
@@ -133,6 +179,7 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
   env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  env.SAUCE_GREP = (params.SAUCE_GREP?.trim()) ?: '@crossbrowser'
   def tag = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@nightly'
   env.E2E_TEST_SCOPE = tag
   env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
