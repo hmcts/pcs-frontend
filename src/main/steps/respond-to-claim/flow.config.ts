@@ -401,6 +401,21 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counter-claim': {
       defaultNext: 'payment-interstitial',
+        routes: [
+              {
+                condition: async (req: Request): Promise<boolean> => {
+                  return !(await hasOnlyRentArrearsGrounds(req));
+                },
+                nextStep: 'your-household-and-circumstances',
+              },
+              {
+                condition: async (req: Request): Promise<boolean> => {
+                  const provided = await hasOnlyRentArrearsGrounds(req);
+                  return provided;
+                },
+                nextStep: 'payment-interstitial',
+              },
+            ],
       previousStep: async (req: Request) => {
         const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
