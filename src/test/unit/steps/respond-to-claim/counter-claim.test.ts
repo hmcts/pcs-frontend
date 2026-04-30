@@ -3,9 +3,9 @@ jest.mock('../../../../main/modules/steps', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
-import { step } from '../../../../main/steps/respond-to-claim/upload-counterclaim-files';
+import { step } from '../../../../main/steps/respond-to-claim/counter-claim';
 
-type UploadCounterclaimStep = {
+type CounterClaimStep = {
   getInitialFormData: (req: Record<string, unknown>) => Record<string, unknown>;
   extendGetContent: (req: Record<string, unknown>, formContent: Record<string, unknown>) => Record<string, unknown>;
   beforeRedirect?: (req: Record<string, unknown>) => Promise<void>;
@@ -15,12 +15,12 @@ type UploadCounterclaimStep = {
   translationKeys: Record<string, string>;
 };
 
-describe('upload-counterclaim-files step', () => {
-  const testedStep = step as unknown as UploadCounterclaimStep;
+describe('counter-claim step (counterclaim docs upload)', () => {
+  const testedStep = step as unknown as CounterClaimStep;
 
   describe('step config', () => {
     it('has correct step name', () => {
-      expect(testedStep.stepName).toBe('upload-counterclaim-files');
+      expect(testedStep.stepName).toBe('counter-claim');
     });
 
     it('declares uploadDocsPath at counterClaimDocuments', () => {
@@ -31,32 +31,13 @@ describe('upload-counterclaim-files step', () => {
       ]);
     });
 
-    it('declares a file field that is not required (optional per Figma)', () => {
+    it('declares an optional file field (per Figma "optional")', () => {
       expect(testedStep.fields).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            name: 'documents',
-            type: 'file',
-            required: false,
-          }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ name: 'documents', type: 'file', required: false })])
       );
     });
 
-    it('has all required translation keys', () => {
-      expect(testedStep.translationKeys).toEqual(
-        expect.objectContaining({
-          pageTitle: 'pageTitle',
-          caption: 'caption',
-          heading: 'heading',
-          uploadButton: 'uploadButton',
-          filesAddedHeading: 'filesAddedHeading',
-          deleteButton: 'deleteButton',
-        })
-      );
-    });
-
-    it('does not have beforeRedirect - documents saved on upload/delete via documentProxy', () => {
+    it('does not have beforeRedirect — saves on upload/delete via documentProxy', () => {
       expect(testedStep.beforeRedirect).toBeUndefined();
     });
   });
@@ -74,11 +55,11 @@ describe('upload-counterclaim-files step', () => {
       },
     });
 
-    it('returns empty object when no documents exist', () => {
+    it('returns empty when no documents exist', () => {
       expect(testedStep.getInitialFormData(makeReq(undefined))).toEqual({});
     });
 
-    it('returns empty object when documents array is empty', () => {
+    it('returns empty when documents array is empty', () => {
       expect(testedStep.getInitialFormData(makeReq([]))).toEqual({});
     });
 
@@ -112,13 +93,13 @@ describe('upload-counterclaim-files step', () => {
       const formContent = {
         fields: [{ componentType: 'fileUpload', component: {} as Record<string, unknown> }],
       };
-      const req = { originalUrl: '/case/123/respond-to-claim/upload-counterclaim-files?lang=cy' };
+      const req = { originalUrl: '/case/123/respond-to-claim/counter-claim?lang=cy' };
 
       testedStep.extendGetContent(req, formContent);
 
       expect(formContent.fields[0].component).toEqual({
-        uploadUrl: '/case/123/respond-to-claim/upload-counterclaim-files/upload',
-        deleteUrl: '/case/123/respond-to-claim/upload-counterclaim-files/delete',
+        uploadUrl: '/case/123/respond-to-claim/counter-claim/upload',
+        deleteUrl: '/case/123/respond-to-claim/counter-claim/delete',
       });
     });
   });

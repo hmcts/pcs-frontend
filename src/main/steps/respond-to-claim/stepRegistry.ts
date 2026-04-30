@@ -15,7 +15,6 @@ import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
 import { step as doYouHaveAnyDependantChildren } from './dependant-children';
 import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
-import { step as doYouWantToUploadCounterclaimFiles } from './do-you-want-to-upload-counterclaim-files';
 import { step as endNow } from './end-now';
 import { step as equalityAndDiversityEnd } from './equality-and-diversity-end';
 import { step as equalityAndDiversityStart } from './equality-and-diversity-start';
@@ -45,7 +44,6 @@ import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
-import { step as uploadCounterclaimFiles } from './upload-counterclaim-files';
 import { step as uploadDocument } from './upload-document';
 import { step as writtenTerms } from './written-terms';
 
@@ -77,8 +75,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'upload-document': uploadDocument,
   'support-needs': supportNeeds,
   'counter-claim': counterClaim,
-  'do-you-want-to-upload-counterclaim-files': doYouWantToUploadCounterclaimFiles,
-  'upload-counterclaim-files': uploadCounterclaimFiles,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
