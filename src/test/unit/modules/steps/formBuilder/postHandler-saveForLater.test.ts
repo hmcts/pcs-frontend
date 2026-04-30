@@ -7,6 +7,12 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import * as dashboardModule from '@routes/dashboard';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 
+const mockBuildCcdCaseForPossessionClaimResponse = jest.fn().mockResolvedValue(undefined);
+
+jest.mock('../../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
+  buildCcdCaseForPossessionClaimResponse: (...args: unknown[]) => mockBuildCcdCaseForPossessionClaimResponse(...args),
+}));
+
 jest.mock('@routes/dashboard');
 jest.mock('@modules/i18n');
 jest.mock('@modules/steps/flow');
@@ -85,6 +91,7 @@ describe('PostHandler - Save for Later Fix', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue(undefined);
   });
 
   describe('Fix #3: Save for Later Functionality', () => {
@@ -122,6 +129,120 @@ describe('PostHandler - Save for Later Fix', () => {
       expect(mockResponse.redirect).toHaveBeenCalledWith(
         303,
         '/case/1771325608502536/respond-to-claim/contact-preferences'
+      );
+    });
+
+    it('redirects to sectional CYA when leaving a non-final section', async () => {
+      const getNextStepUrl = jest
+        .fn()
+        .mockResolvedValue('/case/1771325608502536/respond-to-claim/dispute-claim-interstitial');
+      (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
+        getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
+        getNextStepUrl,
+      });
+
+      const sectionFlowConfig: JourneyFlowConfig = {
+        journeyName: 'respondToClaim',
+        basePath: '/case/:caseReference/respond-to-claim',
+        stepOrder: ['start-now', 'free-legal-advice', 'dispute-claim-interstitial'],
+        steps: {},
+        sections: {
+          startNowAndDetails: {
+            titleKey: 'taskList.startNowAndDetails',
+            steps: ['start-now', 'free-legal-advice'],
+          },
+          disputeAndTenancy: {
+            titleKey: 'taskList.disputeAndTenancy',
+            steps: ['dispute-claim-interstitial'],
+          },
+        },
+      };
+
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', sectionFlowConfig);
+      mockRequest.body = { hadLegalAdvice: 'yes' };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1771325608502536/respond-to-claim/check-your-answers?section=startNowAndDetails'
+      );
+    });
+
+    it('returns to sectional CYA after editing when section is complete', async () => {
+      const getNextStepUrl = jest
+        .fn()
+        .mockResolvedValue('/case/1771325608502536/respond-to-claim/dispute-claim-interstitial');
+      (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
+        getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
+        getNextStepUrl,
+      });
+
+      const sectionFlowConfig: JourneyFlowConfig = {
+        journeyName: 'respondToClaim',
+        basePath: '/case/:caseReference/respond-to-claim',
+        stepOrder: ['start-now', 'free-legal-advice', 'dispute-claim-interstitial'],
+        steps: {},
+        sections: {
+          startNowAndDetails: {
+            titleKey: 'taskList.startNowAndDetails',
+            steps: ['start-now', 'free-legal-advice'],
+          },
+          disputeAndTenancy: {
+            titleKey: 'taskList.disputeAndTenancy',
+            steps: ['dispute-claim-interstitial'],
+          },
+        },
+      };
+
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', sectionFlowConfig);
+      mockRequest.body = { hadLegalAdvice: 'yes' };
+      (mockRequest as Request).query = { returnToSectionCya: 'startNowAndDetails' };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1771325608502536/respond-to-claim/check-your-answers?section=startNowAndDetails'
+      );
+    });
+
+    it('marks section In progress in CCD when CYA edit changes routing (next step stays in section)', async () => {
+      const getNextStepUrl = jest
+        .fn()
+        .mockResolvedValue('/case/1771325608502536/respond-to-claim/payment-follow-on-step');
+      (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
+        getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
+        getNextStepUrl,
+      });
+
+      const sectionFlowConfig: JourneyFlowConfig = {
+        journeyName: 'respondToClaim',
+        basePath: '/case/:caseReference/respond-to-claim',
+        stepOrder: ['instalment-screen', 'payment-follow-on-step', 'payments-final'],
+        steps: {},
+        sections: {
+          payments: {
+            titleKey: 'taskList.payments',
+            steps: ['instalment-screen', 'payment-follow-on-step', 'payments-final'],
+          },
+        },
+      };
+
+      const { post } = createPostHandler(fields, 'instalment-screen', 'test.njk', 'respondToClaim', sectionFlowConfig);
+      mockRequest.body = { hadLegalAdvice: 'yes' };
+      (mockRequest as Request).query = { returnToSectionCya: 'payments' };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(mockRequest, {
+        defendantResponses: {
+          sectionStatuses: [{ value: { sectionId: 'payments', status: 'IN_PROGRESS' } }],
+        },
+      });
+      expect(mockResponse.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1771325608502536/respond-to-claim/payment-follow-on-step'
       );
     });
 

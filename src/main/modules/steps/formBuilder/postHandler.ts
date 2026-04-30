@@ -1,6 +1,9 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { buildSectionStatusPatch } from '../../../steps/respond-to-claim/utils/sectionStatusPatch';
+import { getSectionForStep, isLastStepInSection } from '../../../steps/utils';
+import { buildCcdCaseForPossessionClaimResponse } from '../../../steps/utils/populateResponseToClaimPayloadmap';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -29,6 +32,24 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 
 function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
   return flowConfig?.useSessionFormData !== false;
+}
+
+function getStepSlugFromRedirectPath(redirectPath: string): string | null {
+  const pathWithoutQuery = redirectPath.split('?')[0];
+  if (!pathWithoutQuery) {
+    return null;
+  }
+
+  const parts = pathWithoutQuery.split('/').filter(Boolean);
+  return parts.length > 0 ? parts[parts.length - 1] : null;
+}
+
+function getSectionCyaUrl(flowConfig: JourneyFlowConfig, sectionId: string, caseId?: string): string {
+  let basePath = flowConfig.basePath || '';
+  if (caseId && basePath.includes(':caseReference')) {
+    basePath = basePath.replace(':caseReference', caseId);
+  }
+  return `${basePath}/check-your-answers?section=${encodeURIComponent(sectionId)}`;
 }
 
 export function createPostHandler(
@@ -165,6 +186,47 @@ export function createPostHandler(
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
       if (!redirectPath) {
         return res.status(500).send('Unable to determine next step');
+      }
+
+      const sections = flowConfig.sections;
+      if (journeyFolder === 'respondToClaim' && sections) {
+        const currentSectionId = getSectionForStep(stepName, sections);
+        const nextStepSlug = getStepSlugFromRedirectPath(redirectPath);
+        const query = req.query ?? {};
+        const returnToSectionCya = typeof query.returnToSectionCya === 'string' ? query.returnToSectionCya : undefined;
+        const caseId = req.res?.locals.validatedCase?.id;
+
+        // For edits from a sectional CYA, stay in the section if routing changed,
+        // otherwise jump back to the sectional CYA.
+        if (
+          returnToSectionCya &&
+          currentSectionId &&
+          returnToSectionCya === currentSectionId &&
+          isLastStepInSection(stepName, nextStepSlug, sections)
+        ) {
+          const sectionCyaUrl = getSectionCyaUrl(flowConfig, currentSectionId, caseId);
+          safeRedirect303(res, sectionCyaUrl, '/', ['/']);
+          return;
+        }
+
+        if (
+          currentSectionId &&
+          currentSectionId !== 'checkYourAnswersAndSubmit' &&
+          isLastStepInSection(stepName, nextStepSlug, sections)
+        ) {
+          const sectionCyaUrl = getSectionCyaUrl(flowConfig, currentSectionId, caseId);
+          safeRedirect303(res, sectionCyaUrl, '/', ['/']);
+          return;
+        }
+
+        if (
+          returnToSectionCya &&
+          currentSectionId &&
+          returnToSectionCya === currentSectionId &&
+          !isLastStepInSection(stepName, nextStepSlug, sections)
+        ) {
+          await buildCcdCaseForPossessionClaimResponse(req, buildSectionStatusPatch(currentSectionId, 'IN_PROGRESS'));
+        }
       }
 
       // Allow all internal paths since this is a generic form builder
