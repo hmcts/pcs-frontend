@@ -94,6 +94,7 @@ function makeReqWithDocs(overrides: Record<string, unknown>, docs: unknown[] = [
 }
 
 const existingDoc = {
+  id: 'existing-doc-id',
   value: {
     document: {
       document_url: 'http://dm/doc/existing-uuid',
@@ -473,19 +474,20 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(404);
     });
 
-    it('returns 409 when index is out of range against fresh CCD state (stale)', async () => {
-      const req = makeReqWithDocs({ body: { delete: '5' } }, [existingDoc]);
+    it('returns success (idempotent) when docId is not found in fresh CCD state', async () => {
+      const req = makeReqWithDocs({ body: { delete: 'unknown-id' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(409);
+      expect(res.json).toHaveBeenCalledWith({ success: true });
+      expect(mockDeleteDocument).not.toHaveBeenCalled();
     });
 
-    it('deletes by index using server-side CDAM URL and saves draft', async () => {
+    it('deletes by docId using server-side CDAM URL and saves draft', async () => {
       mockDeleteDocument.mockResolvedValue(undefined);
 
-      const req = makeReqWithDocs({ body: { delete: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs({ body: { delete: 'existing-doc-id' } }, [existingDoc]);
       const res = { json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -507,7 +509,7 @@ describe('documentProxyRoutes', () => {
     it('returns 502 when delete fails', async () => {
       mockDeleteDocument.mockRejectedValue(new Error('CDAM down'));
 
-      const req = makeReqWithDocs({ body: { delete: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs({ body: { delete: 'existing-doc-id' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -515,8 +517,8 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(502);
     });
 
-    it('returns 404 when delete index is negative', async () => {
-      const req = makeReqWithDocs({ body: { delete: '-1' } }, [existingDoc]);
+    it('returns 404 when delete docId is empty', async () => {
+      const req = makeReqWithDocs({ body: { delete: '' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -527,7 +529,7 @@ describe('documentProxyRoutes', () => {
     it('logs non-Error rejections with String()', async () => {
       mockDeleteDocument.mockRejectedValue('string-error');
 
-      const req = makeReqWithDocs({ body: { delete: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs({ body: { delete: 'existing-doc-id' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -619,19 +621,19 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(502);
     });
 
-    it('delete: out-of-range index against empty fresh CCD state returns 409 (stale)', async () => {
+    it('delete: unknown docId against empty fresh CCD state returns success (idempotent)', async () => {
       const req = {
         session: { user: { accessToken: 'token' } },
         params: { caseReference: '123' },
         t: mockT,
         res: { locals: {} },
-        body: { delete: '0' },
+        body: { delete: 'unknown-id' },
       } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await deleteHandler(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(409);
+      expect(res.json).toHaveBeenCalledWith({ success: true });
     });
   });
 
@@ -748,7 +750,7 @@ describe('documentProxyRoutes', () => {
         params: { caseReference: '123456' },
         t: mockT,
         res: { locals: {} },
-        body: { delete: '0' },
+        body: { delete: 'existing-doc-id' },
       } as unknown as Request;
 
       const uploadRes = { json: jest.fn() } as unknown as Response;

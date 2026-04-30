@@ -15,8 +15,25 @@ function getCsrfToken(): string {
   return document.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value || '';
 }
 
-function getOrCreateErrorSummary(form: HTMLFormElement, title: string): HTMLDivElement {
-  let summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
+// MOJ multi-file-upload error pattern (https://design-patterns.service.justice.gov.uk/components/multi-file-upload/):
+// - Page-level error summary at the top of the grid column / main, linking to the file input.
+// - Inline govuk-error-message inside the input's form-group, with form-group--error and aria-describedby on the input.
+
+function getPageAnchor(): HTMLElement {
+  return (
+    document.querySelector<HTMLElement>('.govuk-grid-column-two-thirds') ??
+    document.querySelector<HTMLElement>('main') ??
+    document.body
+  );
+}
+
+function getFileInput(container: HTMLElement): HTMLInputElement | null {
+  return container.querySelector<HTMLInputElement>('.moj-multi-file-upload__input');
+}
+
+function getOrCreateErrorSummary(title: string): HTMLDivElement {
+  const anchor = getPageAnchor();
+  let summary = anchor.querySelector<HTMLDivElement>(':scope > .govuk-error-summary');
   if (summary) {
     return summary;
   }
@@ -32,44 +49,104 @@ function getOrCreateErrorSummary(form: HTMLFormElement, title: string): HTMLDivE
     <div class="govuk-error-summary__body">
       <ul class="govuk-list govuk-error-summary__list"></ul>
     </div>`;
-  form.insertBefore(summary, form.firstChild);
+  anchor.insertBefore(summary, anchor.firstChild);
   return summary;
 }
 
-function showErrorSummary(form: HTMLFormElement, message: string, title = 'There is a problem'): void {
-  const summary = getOrCreateErrorSummary(form, title);
-  const list = summary.querySelector<HTMLUListElement>('.govuk-error-summary__list');
-  if (!list) {
+function setInlineFieldError(container: HTMLElement, message: string): void {
+  const fileInput = getFileInput(container);
+  if (!fileInput) {
     return;
   }
-  list.innerHTML = '';
-  const li = document.createElement('li');
-  const a = document.createElement('a');
-  a.href = '#documents';
-  a.textContent = message;
-  li.appendChild(a);
-  list.appendChild(li);
-  summary.hidden = false;
+  const formGroup = fileInput.closest<HTMLElement>('.govuk-form-group');
+  if (!formGroup) {
+    return;
+  }
+
+  formGroup.classList.add('govuk-form-group--error');
+  const errorId = `${fileInput.id}-error`;
+  let errorEl = formGroup.querySelector<HTMLParagraphElement>(`#${CSS.escape(errorId)}`);
+  if (!errorEl) {
+    errorEl = document.createElement('p');
+    errorEl.id = errorId;
+    errorEl.className = 'govuk-error-message';
+    // Anchor inside the form-group, immediately before the dropzone (or input,
+    // pre-MOJ-init). MOJ's setupDropzone() moves the input INTO a runtime-created
+    // .moj-multi-file-upload__dropzone, so insertBefore(input) post-init would
+    // put the error inside the dropzone box — wrong place visually. Insert
+    // before the dropzone wrapper instead so the error sits between label and
+    // dashed box, matching the MOJ design pattern.
+    const anchor = formGroup.querySelector<HTMLElement>('.moj-multi-file-upload__dropzone') ?? fileInput;
+    anchor.parentNode?.insertBefore(errorEl, anchor);
+  }
+  errorEl.innerHTML = '<span class="govuk-visually-hidden">Error:</span> ';
+  errorEl.appendChild(document.createTextNode(message));
+
+  const ids = (fileInput.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+  if (!ids.includes(errorId)) {
+    ids.push(errorId);
+    fileInput.setAttribute('aria-describedby', ids.join(' '));
+  }
 }
 
-function clearErrorSummary(form: HTMLFormElement): void {
-  const summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
-  if (!summary) {
+function clearInlineFieldError(container: HTMLElement): void {
+  const fileInput = getFileInput(container);
+  if (!fileInput) {
     return;
   }
+  const formGroup = fileInput.closest<HTMLElement>('.govuk-form-group');
+  if (!formGroup) {
+    return;
+  }
+  formGroup.classList.remove('govuk-form-group--error');
+  const errorId = `${fileInput.id}-error`;
+  formGroup.querySelector(`#${CSS.escape(errorId)}`)?.remove();
+
+  const ids = (fileInput.getAttribute('aria-describedby') || '').split(/\s+/).filter(id => id && id !== errorId);
+  if (ids.length === 0) {
+    fileInput.removeAttribute('aria-describedby');
+  } else {
+    fileInput.setAttribute('aria-describedby', ids.join(' '));
+  }
+}
+
+function showErrorSummary(container: HTMLElement, message: string, title = 'There is a problem'): void {
+  const summary = getOrCreateErrorSummary(title);
   const list = summary.querySelector<HTMLUListElement>('.govuk-error-summary__list');
   if (list) {
     list.innerHTML = '';
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    const fileInput = getFileInput(container);
+    a.href = fileInput ? `#${fileInput.id}` : '#';
+    a.textContent = message;
+    li.appendChild(a);
+    list.appendChild(li);
   }
-  summary.hidden = true;
+  summary.hidden = false;
+  setInlineFieldError(container, message);
+}
+
+function clearErrorSummary(container: HTMLElement): void {
+  const anchor = getPageAnchor();
+  const summary = anchor.querySelector<HTMLDivElement>(':scope > .govuk-error-summary');
+  if (summary) {
+    const list = summary.querySelector<HTMLUListElement>('.govuk-error-summary__list');
+    if (list) {
+      list.innerHTML = '';
+    }
+    summary.hidden = true;
+  }
+  clearInlineFieldError(container);
 }
 
 function hasVisibleError(container: HTMLElement): boolean {
-  const form = container.closest('form');
-  if (!form) {
-    return false;
+  const fileInput = getFileInput(container);
+  const formGroup = fileInput?.closest<HTMLElement>('.govuk-form-group');
+  if (formGroup?.classList.contains('govuk-form-group--error')) {
+    return true;
   }
-  const summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
+  const summary = getPageAnchor().querySelector<HTMLDivElement>(':scope > .govuk-error-summary');
   return !!summary && !summary.hidden;
 }
 
@@ -131,28 +208,28 @@ function initContainer(container: HTMLElement): void {
     deleteUrl,
     hooks: {
       entryHook: (_upload: InstanceType<typeof MultiFileUpload>, file: File) => {
-        clearErrorSummary(form);
+        clearErrorSummary(container);
         // Mirror server's validateFileType precedence:
         //   1. blocked media (AC04)         → wrong-type message
         //   2. extension not in allowlist   → wrong-type message
         //   3. file too large               → too-large message
         // Pre-flight here saves the round-trip; server still validates as defence in depth.
         if (isBlockedExtension(file.name)) {
-          showErrorSummary(form, wrongTypeMessage, errorSummaryTitle);
+          showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
           throw new Error('blocked');
         }
         if (!isAllowedExtension(file.name)) {
-          showErrorSummary(form, wrongTypeMessage, errorSummaryTitle);
+          showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
           throw new Error('invalid_type');
         }
         if (file.size > maxBytes) {
-          showErrorSummary(form, tooLargeMessage, errorSummaryTitle);
+          showErrorSummary(container, tooLargeMessage, errorSummaryTitle);
           throw new Error('too_large');
         }
       },
 
       exitHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {
-        clearErrorSummary(form);
+        clearErrorSummary(container);
         try {
           const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
           const doc: DisplayDocument | undefined = response?.document;
@@ -201,7 +278,7 @@ function initContainer(container: HTMLElement): void {
         try {
           const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
           if (response?.error?.message) {
-            showErrorSummary(form, response.error.message, errorSummaryTitle);
+            showErrorSummary(container, response.error.message, errorSummaryTitle);
           }
         } catch {
           // No structured server message — leave the row-level "Upload failed" alone
@@ -216,7 +293,7 @@ function initContainer(container: HTMLElement): void {
           return;
         }
         if (xhr.status >= 200 && xhr.status < 300) {
-          clearErrorSummary(form);
+          clearErrorSummary(container);
           try {
             const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
             if (response?.success) {
@@ -226,7 +303,7 @@ function initContainer(container: HTMLElement): void {
             // Cleanup failed
           }
         } else {
-          showErrorSummary(form, deleteFailedMessage, errorSummaryTitle);
+          showErrorSummary(container, deleteFailedMessage, errorSummaryTitle);
         }
       },
     },

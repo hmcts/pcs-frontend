@@ -125,7 +125,7 @@ describe('multi-file-upload', () => {
 
     it('throws for blocked extensions', () => {
       expect(() => capturedHooks.entryHook(null, { name: 'video.mp4', size: 100 })).toThrow('blocked');
-      const summary = getForm().querySelector('.govuk-error-summary');
+      const summary = document.querySelector('.govuk-error-summary');
       expect(summary).not.toBeNull();
       expect(summary!.textContent).toContain('Wrong file type');
     });
@@ -133,7 +133,7 @@ describe('multi-file-upload', () => {
     it('throws for files exceeding max size', () => {
       const maxBytes = 1024 * 1024 * 1024;
       expect(() => capturedHooks.entryHook(null, { name: 'big.pdf', size: maxBytes + 1 })).toThrow('too_large');
-      const summary = getForm().querySelector('.govuk-error-summary');
+      const summary = document.querySelector('.govuk-error-summary');
       expect(summary!.textContent).toContain('File too large');
     });
 
@@ -147,7 +147,7 @@ describe('multi-file-upload', () => {
       } catch {
         /* expected */
       }
-      const summary = getForm().querySelector<HTMLDivElement>('.govuk-error-summary');
+      const summary = document.querySelector<HTMLDivElement>('.govuk-error-summary');
       expect(summary!.hidden).toBe(false);
 
       expect(() => capturedHooks.entryHook(null, { name: 'doc.pdf', size: 100 })).not.toThrow();
@@ -230,7 +230,7 @@ describe('multi-file-upload', () => {
       const xhr = makeXhr(400, { error: { message: 'Server says no' } });
       capturedHooks.errorHook(null, {}, xhr);
 
-      const summary = getForm().querySelector('.govuk-error-summary');
+      const summary = document.querySelector('.govuk-error-summary');
       expect(summary!.textContent).toContain('Server says no');
     });
 
@@ -240,7 +240,7 @@ describe('multi-file-upload', () => {
       const xhr = { status: 500, response: null, responseText: 'not json' } as unknown as XMLHttpRequest;
       capturedHooks.errorHook(null, {}, xhr);
 
-      const summary = getForm().querySelector('.govuk-error-summary');
+      const summary = document.querySelector('.govuk-error-summary');
       expect(summary).toBeNull();
     });
   });
@@ -275,7 +275,7 @@ describe('multi-file-upload', () => {
       const xhr = makeXhr(500, { error: { message: 'fail' } });
       capturedHooks.deleteHook(null, undefined, xhr);
 
-      const summary = getForm().querySelector('.govuk-error-summary');
+      const summary = document.querySelector('.govuk-error-summary');
       expect(summary!.textContent).toContain('Delete failed');
     });
 
