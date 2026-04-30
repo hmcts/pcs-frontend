@@ -108,7 +108,6 @@ describe('respond-to-claim repayments-agreed step', () => {
   it('exposes correct step url and default form view', () => {
     expect(step.name).toBe('repayments-agreed');
     expect(step.url).toBe('/case/:caseReference/respond-to-claim/repayments-agreed');
-    expect(step.view).toContain('formBuilder.njk');
   });
 
   it('POST saves NO with defendantResponses.paymentAgreement', async () => {

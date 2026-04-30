@@ -1,12 +1,12 @@
 import type { Request } from 'express';
 
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 function mapRepaymentsAgreedToCcdValue(repaymentsAgreed: string | undefined): 'YES' | 'NO' | 'NOT_SURE' {
   if (repaymentsAgreed === 'yes') {
@@ -118,7 +118,7 @@ export const step: StepDefinition = createFormStep({
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
     const claimIssueDate = '20th May 2025';
     const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-    
+
     const t = getTranslationFunction(req, 'repayments-agreed', ['common']);
 
     return {
@@ -147,15 +147,6 @@ export const step: StepDefinition = createFormStep({
               labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
               translationKey: {
                 label: 'textAreaLabel',
-              },
-              validator: (value: unknown) => {
-                const text = (value as string)?.trim();
-                const allowedCharsRegex = /^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u;
-
-                if (allowedCharsRegex.test(text)) {
-                  return true;
-                }
-                return 'errors.repaymentsAgreed.repaymentsAgreedDetails.invalid';
               },
             },
           },

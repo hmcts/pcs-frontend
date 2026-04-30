@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
@@ -7,7 +8,6 @@ import { flowConfig } from '../flow.config';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 const STEP_NAME = 'confirmation-of-notice-given';
 
@@ -32,8 +32,8 @@ export const step: StepDefinition = createFormStep({
       translationKey: { label: 'question', hint: 'hintText' },
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
-        { 
-          value: 'YES', 
+        {
+          value: 'YES',
           translationKey: 'options.yes',
           subFields: {
             noticeDateGiven: {
@@ -44,10 +44,10 @@ export const step: StepDefinition = createFormStep({
               noCurrentDate: true,
               legendClasses: 'govuk-label--s govuk-!-font-weight-bold',
               translationKey: {
-                label: 'noticeDateLabel'
-              }
-            }
-          }
+                label: 'noticeDateLabel',
+              },
+            },
+          },
         },
         { value: 'NO', translationKey: 'options.no' },
         { divider: 'options.or' },
@@ -84,7 +84,7 @@ export const step: StepDefinition = createFormStep({
 
     return {
       claimantName,
-      caseNumber: t('caseNumber', { caseNumber })
+      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
 });

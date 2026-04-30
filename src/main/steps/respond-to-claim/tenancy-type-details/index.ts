@@ -2,14 +2,14 @@ import type { Request } from 'express';
 
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { isWalesProperty } from '../../utils';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { flowConfig } from '../flow.config';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';
-import { isLegalRepresentativeUser } from 'steps/utils/userRole';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -39,14 +39,6 @@ const fieldsConfig: FormFieldConfig[] = [
             maxLength: 60,
             translationKey: {
               label: 'correctTypeLabel',
-            },
-            validator: (value: unknown): boolean | string => {
-              if (typeof value !== 'string' || !value.trim()) {
-                return true;
-              }
-
-              const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
-              return !invalidCharacters.test(value) || 'errors.correctTypeInvalidCharacters';
             },
           },
         },

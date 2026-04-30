@@ -101,3 +101,12 @@ export function getStepsForJourney(journeyName: string, req?: Request): StepDefi
     })
     .filter((step: StepDefinition | undefined): step is StepDefinition => step !== undefined);
 }
+
+export function shouldShowStep(req: Request, stepName: string, flowConfig: JourneyFlowConfig): boolean {
+  const stepConfig = flowConfig.steps[stepName];
+  if (!stepConfig || !stepConfig.showCondition) {
+    return true;
+  }
+
+  return stepConfig.showCondition(req);
+}

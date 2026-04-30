@@ -143,6 +143,7 @@ export async function renderWithErrors(
 ): Promise<void> {
   const lang = getRequestLanguage(req);
   const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+  const extraHeaders = res.locals?.extraHeaders ?? {};
 
   // formContent already includes errorSummary from buildFormContent, so we don't need to rebuild it
   // res.render() sends the response directly and doesn't return a value
@@ -160,6 +161,6 @@ export async function renderWithErrors(
     dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
     languageToggle: t('languageToggle'),
     showCancelButton,
-    ...(res.locals?.extraHeaders ?? {}),
+    ...extraHeaders,
   });
 }
