@@ -17,7 +17,7 @@ export const doYouHaveAnyDependantChildren = {
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
   emojiTextInput: `👉 😄`,
-  emojiExplainPartsOfClaimErrorMessage: `Give details about your dependant children must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
+  emojiExplainPartsOfClaimErrorMessage: `Give details about your dependent children must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `do-you-have-any-dependant-children`,
 };
