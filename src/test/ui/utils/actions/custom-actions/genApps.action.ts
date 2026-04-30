@@ -144,7 +144,11 @@ export class GenAppsAction implements IAction {
         await performActions(
           'Add Document',
           ['uploadFile', document.fileName],
-          ['select', { dropdown: uploadDocumentsToSupportYourApplication.typeOfDocumentHiddenTextLabel, index: fileIndex }, document.type],
+          [
+            'select',
+            { dropdown: uploadDocumentsToSupportYourApplication.typeOfDocumentHiddenTextLabel, index: fileIndex },
+            document.type,
+          ]
         );
       }
     }
