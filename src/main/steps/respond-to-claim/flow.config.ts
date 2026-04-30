@@ -2,6 +2,7 @@ import { type Request } from 'express';
 
 import {
   getPreviousStepForPriorityDebts,
+  getPreviousStepForWhatOtherRegularExpenses,
   getPreviousStepForYourHouseholdAndCircumstances,
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
@@ -15,6 +16,8 @@ import {
   isTenancyStartDateKnown,
   isUniversalCreditSelected,
   isWalesProperty,
+  shouldRouteToOtherRegularExpenses,
+  shouldRouteToPriorityDebtDetails,
 } from '../utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
@@ -530,7 +533,17 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'priority-debts',
     },
     'priority-debts': {
-      previousStep: async (req: Request): Promise<string> => getPreviousStepForPriorityDebts(req),
+      previousStep: getPreviousStepForPriorityDebts,
+      routes: [
+        {
+          condition: shouldRouteToPriorityDebtDetails,
+          nextStep: 'priority-debt-details',
+        },
+        {
+          condition: shouldRouteToOtherRegularExpenses,
+          nextStep: 'what-other-regular-expenses-do-you-have',
+        },
+      ],
       defaultNext: 'priority-debt-details',
     },
     'priority-debt-details': {
@@ -538,7 +551,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'what-other-regular-expenses-do-you-have',
     },
     'what-other-regular-expenses-do-you-have': {
-      previousStep: 'priority-debt-details',
+      previousStep: getPreviousStepForWhatOtherRegularExpenses,
       defaultNext: 'other-considerations',
     },
     'other-considerations': {
