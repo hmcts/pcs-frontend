@@ -5,17 +5,15 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware/oidc';
 
-import { DASHBOARD_TASK_PATH_PATTERNS } from './dashboardTaskPaths';
-
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { DashboardTaskGroup } from '@services/dashboard.interface';
 import { sanitiseCaseReference } from '@utils/caseReference';
+import { DASHBOARD_TASK_PATH_PATTERNS } from '@utils/dashboardTaskPaths';
 import { getTagClasses, isLinkableStatus } from '@utils/dashboardTaskStatus';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
-
 
 interface MappedTask {
   title: { html: string };
