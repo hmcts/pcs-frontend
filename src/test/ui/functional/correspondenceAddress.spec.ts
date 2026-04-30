@@ -18,6 +18,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
+  process.env.WALES_POSTCODE = 'NO';
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.NOTICE_SERVED = 'NO';
   } else {

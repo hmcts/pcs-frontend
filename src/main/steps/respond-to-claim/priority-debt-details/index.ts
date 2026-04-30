@@ -1,3 +1,4 @@
+import { AMOUNT_FORMAT_REGEX } from '../../../constants/validation';
 import type { FrequencyValue, PossessionClaimResponse } from '../../../services/ccdCase.interface';
 import { ccdPenceToPoundsString, getValidatedCaseHouseholdCircumstances, poundsStringToPence } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
@@ -7,7 +8,6 @@ import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const MAX_AMOUNT = 1_000_000_000;
-const AMOUNT_REGEX = /^\d+(\.\d{1,2})?$/;
 type FrequencyFormValue = Lowercase<FrequencyValue>;
 const FREQUENCY_MAP: Record<FrequencyValue, FrequencyFormValue> = {
   WEEKLY: 'weekly',
@@ -21,18 +21,23 @@ const validateMoney =
       return true;
     }
     const normalized = value.trim().split(',').join('');
-    if (!AMOUNT_REGEX.test(normalized)) {
+    const numericValue = parseFloat(normalized);
+
+    if (!Number.isNaN(numericValue)) {
+      if (numericValue < 0) {
+        return negativeKey;
+      }
+      if (numericValue >= MAX_AMOUNT) {
+        return largeKey;
+      }
+    }
+
+    if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
       return 'errors.amount.invalidFormat';
     }
-    const parsed = Number(normalized);
-    if (Number.isNaN(parsed)) {
+
+    if (Number.isNaN(numericValue)) {
       return 'errors.amount.invalidFormat';
-    }
-    if (parsed < 0) {
-      return negativeKey;
-    }
-    if (parsed >= MAX_AMOUNT) {
-      return largeKey;
     }
     return true;
   };

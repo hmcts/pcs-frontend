@@ -2,6 +2,7 @@ export default {
   'start-now': 'startNow',
   'free-legal-advice': 'freeLegalAdvice',
   home: 'home',
+  'what-other-regular-expenses-do-you-have': 'whatOtherRegularExpensesDoYouHave',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'defendant-name-confirmation': 'defendantNameConfirmation',
@@ -57,4 +58,5 @@ export default {
   'priority-debt-details': 'priorityDebtDetails',
   'priority-debts': 'priorityDebts',
   'language-used': 'languageUsed',
+  'other-considerations': 'otherConsiderations',
 };

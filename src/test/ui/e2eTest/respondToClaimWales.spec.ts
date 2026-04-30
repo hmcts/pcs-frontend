@@ -33,7 +33,7 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
-  uploadDocuments,
+  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
@@ -190,11 +190,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: priorityDebtDetails.weekRadioOption,
     });
     await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave', {
+      regularIncomeOptions: [
+        [
+          whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);

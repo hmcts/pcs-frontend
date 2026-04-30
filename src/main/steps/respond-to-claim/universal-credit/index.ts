@@ -24,7 +24,7 @@ export const step: StepDefinition = createFormStep({
       const possessionClaimResponse: PossessionClaimResponse = {
         defendantResponses: {
           householdCircumstances: {
-            universalCredit: toYesNoEnum('no'),
+            hasAppliedForUniversalCredit: toYesNoEnum('no'),
             ucApplicationDate: null,
           },
         },
@@ -43,7 +43,7 @@ export const step: StepDefinition = createFormStep({
       (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-year'] as string | undefined) ?? ''
     ).trim();
 
-    const universalCredit = selection === 'yes' ? toYesNoEnum(selection) : undefined;
+    const hasAppliedForUniversalCredit = selection === 'yes' ? toYesNoEnum(selection) : undefined;
 
     let isoDate: string | undefined;
     if (selection === 'yes') {
@@ -57,14 +57,14 @@ export const step: StepDefinition = createFormStep({
       isoDate = parsedIsoDate;
     }
 
-    if (!universalCredit) {
+    if (!hasAppliedForUniversalCredit) {
       return;
     }
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances: {
-          universalCredit,
+          hasAppliedForUniversalCredit,
           ucApplicationDate: isoDate,
         },
       },
@@ -73,11 +73,11 @@ export const step: StepDefinition = createFormStep({
   },
   getInitialFormData: req => {
     const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
-      | { universalCredit?: string; ucApplicationDate?: string }
+      | { hasAppliedForUniversalCredit?: string; ucApplicationDate?: string }
       | undefined;
 
     const data: Record<string, unknown> = {};
-    const savedAnswer = fromYesNoEnum(householdCircumstances?.universalCredit);
+    const savedAnswer = fromYesNoEnum(householdCircumstances?.hasAppliedForUniversalCredit);
     const savedDate = householdCircumstances?.ucApplicationDate;
 
     // Only pre-populate if the answer genuinely came from this screen

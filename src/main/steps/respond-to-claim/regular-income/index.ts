@@ -181,8 +181,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Universal Credit
+    householdCircumstances.universalCredit = toYesNoEnum(incomeArray.includes('universalCredit') ? 'yes' : 'no');
     if (incomeArray.includes('universalCredit')) {
-      householdCircumstances.universalCredit = toYesNoEnum('yes');
       const amountRaw = req.body?.['regularIncome.universalCreditAmount'] as string | undefined;
       const frequency = req.body?.['regularIncome.universalCreditFrequency'] as string | undefined;
 

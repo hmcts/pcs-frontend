@@ -77,7 +77,7 @@ describe('respond-to-claim regular-income step', () => {
   const getHouseholdCircumstances = (): any =>
     (lastPayload().defendantResponses as Record<string, unknown>).householdCircumstances;
 
-  it('POST writes UC=YES, amount and frequency when UC is ticked (implicit applied=YES)', async () => {
+  it('POST writes only UC income amount and frequency when UC is ticked', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -101,8 +101,9 @@ describe('respond-to-claim regular-income step', () => {
     expect(hc.universalCredit).toBe('YES');
     expect(hc.universalCreditAmount).toBe('20000');
     expect(hc.universalCreditFrequency).toBe('MONTHLY');
-    // Must NOT touch ucApplicationDate — that's owned by the applied-for-UC screen
+    // Must NOT touch ucApplicationDate or hasAppliedForUniversalCredit — those are owned by the applied-for-UC screen
     expect(hc).not.toHaveProperty('ucApplicationDate');
+    expect(hc).not.toHaveProperty('hasAppliedForUniversalCredit');
   });
 
   it('POST clears UC income fields when UC is unticked', async () => {
@@ -123,9 +124,12 @@ describe('respond-to-claim regular-income step', () => {
     await step.postController.post(req, res, next);
 
     const hc = getHouseholdCircumstances();
-    expect(hc).not.toHaveProperty('universalCredit');
+    expect(hc.universalCredit).toBe('NO');
     expect(hc.universalCreditAmount).toBeNull();
     expect(hc.universalCreditFrequency).toBeNull();
+    // Must NOT touch hasAppliedForUniversalCredit or ucApplicationDate
+    expect(hc).not.toHaveProperty('hasAppliedForUniversalCredit');
+    expect(hc).not.toHaveProperty('ucApplicationDate');
   });
 
   it('GET does not preselect UC income when applied-for-UC answer is NO', () => {
