@@ -33,20 +33,8 @@ export function hasRejectedRepaymentAgreement(req: Request): boolean {
 }
 
 export function hasConfirmedInstallmentOffer(req: Request): boolean {
-  if (req.body?.confirmInstallmentOffer === 'yes') {
-    return true;
-  }
-
-  const possessionClaimResponse = req.res?.locals?.validatedCase?.data?.possessionClaimResponse as
-    | {
-        defendantResponses?: { paymentAgreement?: { repayArrearsInstalments?: string } };
-        paymentAgreement?: { repayArrearsInstalments?: string };
-      }
-    | undefined;
-  const ccdAnswer =
-    possessionClaimResponse?.defendantResponses?.paymentAgreement?.repayArrearsInstalments ??
-    possessionClaimResponse?.paymentAgreement?.repayArrearsInstalments;
-  return normalizeYesNoValue(ccdAnswer) === 'YES';
+  const defendantResponses = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses;
+  return defendantResponses?.paymentAgreement?.repayArrearsInstalments === 'YES';
 }
 
 export function shouldShowInstallmentPaymentsStep(req: Request): boolean {
