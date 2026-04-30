@@ -7,6 +7,7 @@ import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respon
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
 import { getUserType } from './utils';
 
+import type { CcdDraftEvent } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -21,9 +22,7 @@ export interface ResolvedJourneyConfig {
 export interface JourneyConfig {
   name: string;
   slug: string;
-  // One draft event per journey (one mid-event endpoint per CCD event-trigger).
-  // Required for any journey with at least one upload step; enforced at module load.
-  draftEvent?: { id: string; pageId: string };
+  draftEvent?: CcdDraftEvent;
   default: ResolvedJourneyConfig;
   legalrep?: ResolvedJourneyConfig;
 }

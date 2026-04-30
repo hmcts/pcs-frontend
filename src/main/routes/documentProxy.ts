@@ -6,7 +6,7 @@ import multer from 'multer';
 import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware';
 import { type JourneyVariant, findStep } from '../steps';
-import { getUserType } from '../steps/utils';
+import { getUserToken, getUserType } from '../steps/utils';
 
 import type { DocumentStorage } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
@@ -30,14 +30,6 @@ const upload = multer({
   limits: { fileSize: UPLOAD_MAX_FILE_SIZE_BYTES },
   fileFilter,
 });
-
-function getUserToken(req: Request): string {
-  const token = req.session?.user?.accessToken;
-  if (!token) {
-    throw new Error('User not authenticated');
-  }
-  return token;
-}
 
 type ErrorTranslations = ReturnType<typeof getErrorTranslations>;
 

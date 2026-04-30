@@ -1,7 +1,14 @@
 import type { Request } from 'express';
 
+import { getUserToken } from '../../steps/utils';
+
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+
+export interface CcdDraftEvent {
+  id: string;
+  pageId: string;
+}
 
 export interface DisplayDocument {
   index: number;
@@ -42,32 +49,21 @@ function setAtPath(path: readonly [string, ...string[]], value: unknown): Record
   return path.reduceRight<unknown>((acc, key) => ({ [key]: acc }), value) as Record<string, unknown>;
 }
 
-function extractToken(req: Request): string {
-  const token = req.session?.user?.accessToken;
-  if (!token) {
-    throw new Error('User not authenticated');
-  }
-  return token;
-}
-
-export function ccdDraftDocs(opts: {
-  event: { id: string; pageId: string };
-  path: readonly [string, ...string[]];
-}): DocumentStorage {
+export function ccdDraftDocs(opts: { event: CcdDraftEvent; path: readonly [string, ...string[]] }): DocumentStorage {
   return {
     async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
       return getAtPath<CcdCollectionItem<CcdUploadedDocument>[]>(req.res?.locals?.validatedCase, opts.path) ?? [];
     },
 
     async readFresh(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-      const token = extractToken(req);
+      const token = getUserToken(req);
       const caseId = req.params.caseReference as string;
       const fresh = await ccdCaseService.getCaseById(token, caseId, opts.event.id);
       return getAtPath<CcdCollectionItem<CcdUploadedDocument>[]>(fresh.data, opts.path) ?? [];
     },
 
     async save(req: Request, docs: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
-      const token = extractToken(req);
+      const token = getUserToken(req);
       const caseId = req.params.caseReference as string;
       await ccdCaseService.updateDraft(opts.event, token, caseId, setAtPath(opts.path, docs));
     },
