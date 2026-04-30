@@ -255,6 +255,9 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async readPaymentInterstitial(): Promise<void> {
+    await performAction('clickRadioButton', { question: 'What are you claiming for?', option: 'Something else' });
+    await performAction('clickButton', 'Save and continue');
+    await performAction('clickButton', 'Save and continue');
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {

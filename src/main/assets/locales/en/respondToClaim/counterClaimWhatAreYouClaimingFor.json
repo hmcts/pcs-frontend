@@ -1,0 +1,14 @@
+{
+  "pageTitle": "What is your counterclaim?",
+  "heading": "What are you claiming for?",
+  "options": {
+    "paymentOrCompensation": "A sum of money or compensation",
+    "somethingElse": "Something else",
+    "both": "Both"
+  },
+  "errors": {
+    "claimType": {
+      "required": "Select if you're claiming for a sum of money or compensation, both or something else"
+    }
+  }
+}

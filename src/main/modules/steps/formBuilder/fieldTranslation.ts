@@ -138,7 +138,11 @@ function processOptions(
     // Process conditionalText if provided
     let resolvedConditionalText: string | undefined;
     if (option.conditionalText) {
-      resolvedConditionalText = buildConditionalContent(option.conditionalText, translations);
+      if (typeof option.conditionalText === 'string') {
+        resolvedConditionalText = t(option.conditionalText);
+      } else {
+        resolvedConditionalText = buildConditionalContent(option.conditionalText, translations);
+      }
     }
 
     // Process subFields recursively if they exist
