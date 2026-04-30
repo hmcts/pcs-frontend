@@ -28,6 +28,7 @@ function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[]): Dis
 export const step: StepDefinition = createFormStep({
   stepName: 'upload-document',
   journeyFolder: 'respondToClaim',
+  uploadDocsPath: ['possessionClaimResponse', 'defendantResponses', 'defendantDocuments'],
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/uploadDocument.njk`,

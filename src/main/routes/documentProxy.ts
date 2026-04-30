@@ -3,7 +3,10 @@ import { randomUUID } from 'crypto';
 import { Application, Request, Response } from 'express';
 import multer from 'multer';
 
+import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware';
+import { type JourneyVariant, findStep, journeyForSlug } from '../steps';
+import { getUserType } from '../steps/utils';
 
 import { Logger } from '@modules/logger';
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
@@ -74,9 +77,50 @@ export function handleMulterError(
   next(err);
 }
 
+function getAtPath<T>(obj: unknown, path: readonly [string, ...string[]]): T | undefined {
+  let cursor: unknown = obj;
+  for (const key of path) {
+    if (cursor === null || cursor === undefined || typeof cursor !== 'object') {
+      return undefined;
+    }
+    cursor = (cursor as Record<string, unknown>)[key];
+  }
+  return cursor as T | undefined;
+}
+
+// Inner cast walks the nested object literal we're building, not the leaf
+// value (which may be an array). Empty path is unreachable because uploadCtx
+// 404s when uploadDocsPath is missing or empty.
+function setAtPath(path: readonly [string, ...string[]], value: unknown): Record<string, unknown> {
+  return path.reduceRight<unknown>((acc, key) => ({ [key]: acc }), value) as Record<string, unknown>;
+}
+
+// Today's CcdCaseModel proxies top-level CCD fields via getters, so
+// validatedCase['possessionClaimResponse'] works through bracket access. If a
+// future refactor breaks that, switch getExistingDocuments to walk
+// validatedCase.data instead of validatedCase.
+function uploadCtx(req: Request): {
+  path: readonly [string, ...string[]];
+  draftEvent: { id: string; pageId: string };
+} {
+  const slug = req.params.journey as string | undefined;
+  const stepName = req.params.step as string | undefined;
+  // getUserType returns 'citizen' | 'legalrep'; we map citizen → default.
+  const variant: JourneyVariant = getUserType(req) === 'legalrep' ? 'legalrep' : 'default';
+  const journey = slug ? journeyForSlug(slug) : undefined;
+  const step = slug && stepName ? findStep(slug, stepName, variant) : undefined;
+  if (!journey?.draftEvent || !step?.uploadDocsPath || step.uploadDocsPath.length === 0) {
+    logger.warn('Upload requested without uploadConfig', { slug, stepName, variant });
+    throw new HTTPError('Not found', 404);
+  }
+  return {
+    path: step.uploadDocsPath as readonly [string, ...string[]],
+    draftEvent: journey.draftEvent,
+  };
+}
+
 function getExistingDocuments(req: Request): CcdCollectionItem<CcdUploadedDocument>[] {
-  const caseData = req.res?.locals?.validatedCase;
-  return caseData?.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [];
+  return getAtPath<CcdCollectionItem<CcdUploadedDocument>[]>(req.res?.locals?.validatedCase, uploadCtx(req).path) ?? [];
 }
 
 // Per-case in-process mutex. Two concurrent uploads/deletes for the same case can
@@ -102,24 +146,21 @@ async function withCaseLock<T>(caseId: string, fn: () => Promise<T>): Promise<T>
 }
 
 async function fetchFreshDocuments(
+  req: Request,
   caseId: string,
   accessToken: string
 ): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-  const fresh = await ccdCaseService.getCaseById(accessToken, caseId);
-  return fresh.data?.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [];
+  const { path, draftEvent } = uploadCtx(req);
+  const fresh = await ccdCaseService.getCaseById(accessToken, caseId, draftEvent.id);
+  return getAtPath<CcdCollectionItem<CcdUploadedDocument>[]>(fresh.data, path) ?? [];
 }
 
 async function saveDraftDocuments(req: Request, documents: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
   const caseId = req.params.caseReference as string;
   const accessToken = getUserToken(req);
+  const { path, draftEvent } = uploadCtx(req);
 
-  await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, {
-    possessionClaimResponse: {
-      defendantResponses: {
-        defendantDocuments: documents,
-      },
-    },
-  });
+  await ccdCaseService.updateDraft(draftEvent, accessToken, caseId, setAtPath(path, documents));
 }
 
 function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocument> {
@@ -147,7 +188,7 @@ async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<C
   const accessToken = getUserToken(req);
 
   return withCaseLock(caseId, async () => {
-    const existing = await fetchFreshDocuments(caseId, accessToken);
+    const existing = await fetchFreshDocuments(req, caseId, accessToken);
     const updated = [...existing, entry];
     await saveDraftDocuments(req, updated);
     return updated.length - 1;
@@ -159,7 +200,7 @@ async function removeDraftDocument(req: Request, docId: string): Promise<'remove
   const accessToken = getUserToken(req);
 
   return withCaseLock(caseId, async () => {
-    const existing = await fetchFreshDocuments(caseId, accessToken);
+    const existing = await fetchFreshDocuments(req, caseId, accessToken);
 
     const docToDelete = existing.find(d => d.id === docId);
     if (!docToDelete) {
@@ -254,6 +295,9 @@ export default function documentProxyRoutes(app: Application): void {
 
         stream.pipe(res);
       } catch (error) {
+        if (error instanceof HTTPError && error.status === 404) {
+          return res.status(404).json({ error: { message: errors.documentNotFound } });
+        }
         logger.error('Failed to proxy document from CDAM', {
           error: error instanceof Error ? error.message : String(error),
         });
@@ -282,6 +326,9 @@ export default function documentProxyRoutes(app: Application): void {
         const index = await saveDraftWithNewDocument(req, entry);
         return res.json(buildUploadResponse(errors, cdamDoc, entry.id as string, index));
       } catch (error) {
+        if (error instanceof HTTPError && error.status === 404) {
+          return res.status(404).json({ error: { message: errors.documentNotFound } });
+        }
         logger.error('Failed to upload document to CDAM', {
           error: error instanceof Error ? error.message : String(error),
         });
@@ -303,6 +350,9 @@ export default function documentProxyRoutes(app: Application): void {
       await removeDraftDocument(req, docId);
       return res.json({ success: true });
     } catch (error) {
+      if (error instanceof HTTPError && error.status === 404) {
+        return res.status(404).json({ error: { message: errors.documentNotFound } });
+      }
       logger.error('Failed to delete document from CDAM', {
         error: error instanceof Error ? error.message : String(error),
       });

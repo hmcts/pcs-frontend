@@ -39,7 +39,7 @@ jest.mock('../../../main/services/cdamService', () => ({
 jest.mock('../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
     getCaseById: jest.fn(),
-    updateDraftRespondToClaim: jest.fn().mockResolvedValue({ id: '123', data: {} }),
+    updateDraft: jest.fn().mockResolvedValue({ id: '123', data: {} }),
   },
 }));
 
@@ -76,7 +76,7 @@ function makeReqWithDocs(overrides: Record<string, unknown>, docs: unknown[] = [
   });
   return {
     session: { user: { accessToken: 'token' } },
-    params: { caseReference: '123456' },
+    params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
     t: mockT,
     res: {
       locals: {
@@ -126,7 +126,7 @@ describe('documentProxyRoutes', () => {
     jest.clearAllMocks();
     const { ccdCaseService } = require('../../../main/services/ccdCaseService');
     (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue(freshCaseWith([]));
-    (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockResolvedValue({ id: '123', data: {} });
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValue({ id: '123', data: {} });
     mockApp = {
       get: jest.fn(),
       post: jest.fn(),
@@ -164,7 +164,9 @@ describe('documentProxyRoutes', () => {
     });
 
     it('returns 404 for invalid index', async () => {
-      const req = makeReqWithDocs({ params: { caseReference: '123456', index: 'abc' } });
+      const req = makeReqWithDocs({
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: 'abc' },
+      });
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -173,7 +175,10 @@ describe('documentProxyRoutes', () => {
     });
 
     it('returns 404 when index out of range', async () => {
-      const req = makeReqWithDocs({ params: { caseReference: '123456', index: '5' } }, [existingDoc]);
+      const req = makeReqWithDocs(
+        { params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: '5' } },
+        [existingDoc]
+      );
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -186,7 +191,10 @@ describe('documentProxyRoutes', () => {
       const mockStream = { pipe: jest.fn(), on: jest.fn() };
       (getDocumentBinary as jest.Mock).mockResolvedValue({ stream: mockStream, contentType: 'application/pdf' });
 
-      const req = makeReqWithDocs({ params: { caseReference: '123456', index: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs(
+        { params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: '0' } },
+        [existingDoc]
+      );
       const res = {
         setHeader: jest.fn(),
         headersSent: false,
@@ -207,7 +215,10 @@ describe('documentProxyRoutes', () => {
       const { getDocumentBinary } = require('@services/cdamService');
       (getDocumentBinary as jest.Mock).mockRejectedValue(new Error('CDAM down'));
 
-      const req = makeReqWithDocs({ params: { caseReference: '123456', index: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs(
+        { params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: '0' } },
+        [existingDoc]
+      );
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -404,16 +415,21 @@ describe('documentProxyRoutes', () => {
       await handler(req, res);
 
       const { ccdCaseService } = require('../../../main/services/ccdCaseService');
-      expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith('token', '123456', {
-        possessionClaimResponse: {
-          defendantResponses: {
-            defendantDocuments: expect.arrayContaining([
-              existingDoc,
-              expect.objectContaining({ value: expect.any(Object) }),
-            ]),
+      expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+        { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
+        'token',
+        '123456',
+        {
+          possessionClaimResponse: {
+            defendantResponses: {
+              defendantDocuments: expect.arrayContaining([
+                existingDoc,
+                expect.objectContaining({ value: expect.any(Object) }),
+              ]),
+            },
           },
-        },
-      });
+        }
+      );
 
       const body = (res.json as jest.Mock).mock.calls[0][0];
       expect(body.document.index).toBe(1);
@@ -436,7 +452,7 @@ describe('documentProxyRoutes', () => {
       await handler(req, res);
 
       const { ccdCaseService } = require('../../../main/services/ccdCaseService');
-      const savedDocs = (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mock.calls[0][2].possessionClaimResponse
+      const savedDocs = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0][3].possessionClaimResponse
         .defendantResponses.defendantDocuments;
       expect(savedDocs).toHaveLength(1);
       expect(savedDocs[0].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
@@ -497,13 +513,18 @@ describe('documentProxyRoutes', () => {
       expect(res.json).toHaveBeenCalledWith({ success: true });
 
       const { ccdCaseService } = require('../../../main/services/ccdCaseService');
-      expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith('token', '123456', {
-        possessionClaimResponse: {
-          defendantResponses: {
-            defendantDocuments: [],
+      expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+        { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
+        'token',
+        '123456',
+        {
+          possessionClaimResponse: {
+            defendantResponses: {
+              defendantDocuments: [],
+            },
           },
-        },
-      });
+        }
+      );
     });
 
     it('returns 502 when delete fails', async () => {
@@ -595,7 +616,7 @@ describe('documentProxyRoutes', () => {
 
       const req = {
         session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123' },
+        params: { caseReference: '123', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
         res: { locals: {} },
         file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 10 },
@@ -624,7 +645,7 @@ describe('documentProxyRoutes', () => {
     it('delete: unknown docId against empty fresh CCD state returns success (idempotent)', async () => {
       const req = {
         session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123' },
+        params: { caseReference: '123', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
         res: { locals: {} },
         body: { delete: 'unknown-id' },
@@ -678,7 +699,7 @@ describe('documentProxyRoutes', () => {
           },
         },
       }));
-      (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockImplementation(async (_t, _c, payload) => {
+      (ccdCaseService.updateDraft as jest.Mock).mockImplementation(async (_e, _t, _c, payload) => {
         const docs = payload.possessionClaimResponse.defendantResponses.defendantDocuments;
         persisted.length = 0;
         persisted.push(...docs);
@@ -729,7 +750,7 @@ describe('documentProxyRoutes', () => {
           },
         },
       }));
-      (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockImplementation(async (_t, _c, payload) => {
+      (ccdCaseService.updateDraft as jest.Mock).mockImplementation(async (_e, _t, _c, payload) => {
         const docs = payload.possessionClaimResponse.defendantResponses.defendantDocuments;
         persisted.length = 0;
         persisted.push(...docs);
@@ -740,14 +761,14 @@ describe('documentProxyRoutes', () => {
 
       const uploadReq = {
         session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123456' },
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
         res: { locals: {} },
         file: makeFile('new.pdf', 99),
       } as unknown as Request;
       const deleteReq = {
         session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123456' },
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
         res: { locals: {} },
         body: { delete: 'existing-doc-id' },
@@ -779,7 +800,7 @@ describe('documentProxyRoutes', () => {
 
       const req = {
         session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123456' },
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
         res: {
           locals: { validatedCase: { possessionClaimResponse: { defendantResponses: { defendantDocuments: [] } } } },
@@ -792,7 +813,8 @@ describe('documentProxyRoutes', () => {
 
       const body = (res.json as jest.Mock).mock.calls[0][0];
       expect(body.document.index).toBe(1); // 0 = existingDoc, 1 = the new one
-      expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith(
+      expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+        { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
         'token',
         '123456',
         expect.objectContaining({

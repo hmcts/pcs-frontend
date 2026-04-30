@@ -39,7 +39,11 @@ export const buildCcdCaseForPossessionClaimResponse = async (
       possessionClaimResponse,
     },
   };
-  const updatedCase = await ccdCaseService.updateDraftRespondToClaim(
+  // Inline literal (not journeyRegistry.respondToClaim.draftEvent) to avoid a
+  // circular import: this util is imported by 20+ respond-to-claim step index
+  // files, which are themselves in journeyRegistry's import graph.
+  const updatedCase = await ccdCaseService.updateDraft(
+    { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
     req.session?.user?.accessToken,
     ccdCase.id,
     ccdCase.data as Record<string, unknown>

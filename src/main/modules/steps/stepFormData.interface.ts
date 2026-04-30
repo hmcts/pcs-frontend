@@ -23,4 +23,7 @@ export interface StepDefinition {
   postController?: { post: RequestHandler };
   middleware?: RequestHandler[];
   showCancelButton?: boolean;
+  // CCD field path for upload steps (e.g. ['possessionClaimResponse','defendantResponses','defendantDocuments']).
+  // Drives documentProxy.ts read/write and is paired with JourneyConfig.draftEvent.
+  uploadDocsPath?: readonly string[];
 }

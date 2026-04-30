@@ -20,14 +20,26 @@ export interface ResolvedJourneyConfig {
 
 export interface JourneyConfig {
   name: string;
+  slug: string;
+  // One draft event per journey (one mid-event endpoint per CCD event-trigger).
+  // Required for any journey with at least one upload step; enforced at module load.
+  draftEvent?: { id: string; pageId: string };
   default: ResolvedJourneyConfig;
   legalrep?: ResolvedJourneyConfig;
 }
+
+// JourneyVariant intentionally diverges from UserType ('citizen' | 'legalrep').
+// 'citizen' maps to 'default' — the registry key chosen so journeys without a
+// legalrep variant don't have to declare a 'citizen' key. Callers map at the
+// call site (see uploadCtx in documentProxy.ts).
+export type JourneyVariant = 'default' | 'legalrep';
 
 // Journey registry - add new journeys here
 export const journeyRegistry: Record<string, JourneyConfig> = {
   respondToClaim: {
     name: 'respondToClaim',
+    slug: 'respond-to-claim',
+    draftEvent: { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
     default: {
       flowConfig: respondToClaimFlowConfig,
       stepRegistry: respondToClaimStepRegistry,
@@ -39,12 +51,64 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
   },
   makeAnApplication: {
     name: 'makeAnApplication',
+    slug: 'make-an-application',
+    // draftEvent omitted until BE confirms gen-app draft event/page id.
+    // Activating gen-app uploads also requires teaching caseReferenceParamMiddleware
+    // about journey-specific load events — see JOURNEY-AGNOSTIC-UPLOADS-PLAN-V3.md.
     default: {
       flowConfig: makeAnApplicationFlowConfig,
       stepRegistry: makeAnApplicationStepRegistry,
     },
   },
 };
+
+// Startup invariants — fail loud at module load, not at request time.
+// Exported for unit testing without re-importing the whole registry.
+export function validateJourneyRegistry(registry: Record<string, JourneyConfig>): void {
+  const seenSlugs = new Set<string>();
+  for (const journey of Object.values(registry)) {
+    if (seenSlugs.has(journey.slug)) {
+      throw new Error(`Duplicate journey slug "${journey.slug}" in journeyRegistry`);
+    }
+    seenSlugs.add(journey.slug);
+
+    for (const variant of ['default', 'legalrep'] as const) {
+      const stepRegistry = journey[variant]?.stepRegistry;
+      if (!stepRegistry) {
+        continue;
+      }
+      for (const [stepName, step] of Object.entries(stepRegistry)) {
+        if (step.uploadDocsPath && !journey.draftEvent) {
+          throw new Error(
+            `Upload step "${stepName}" defined for journey "${journey.slug}" but journey has no draftEvent`
+          );
+        }
+      }
+    }
+  }
+}
+
+validateJourneyRegistry(journeyRegistry);
+
+export function journeyForSlug(slug: string): JourneyConfig | undefined {
+  return Object.values(journeyRegistry).find(journey => journey.slug === slug);
+}
+
+// Variant-scoped step lookup. Forward-looking: today the citizen and legalrep
+// stepRegistries are the same imported object, so both variants resolve to the
+// same step. Once they diverge, callers MUST pass the correct variant — there
+// is no fallback across variants.
+export function findStep(
+  slug: string,
+  stepName: string,
+  variant: JourneyVariant = 'default'
+): StepDefinition | undefined {
+  const journey = journeyForSlug(slug);
+  if (!journey) {
+    return undefined;
+  }
+  return journey[variant]?.stepRegistry[stepName];
+}
 
 function getJourneyConfigForRequest(journeyName: string, req?: Request): ResolvedJourneyConfig | undefined {
   const journey = journeyRegistry[journeyName];
