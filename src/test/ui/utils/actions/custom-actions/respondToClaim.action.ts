@@ -26,6 +26,7 @@ import {
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
+  otherConsiderations,
   paymentInterstitial,
   rentArrears,
   repaymentsAgreed,
@@ -33,6 +34,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
@@ -79,6 +81,10 @@ export class RespondToClaimAction implements IAction {
       ['yourCircumstances', () => this.yourCircumstances(fieldName as actionRecord)],
       ['exceptionalHardship', () => this.exceptionalHardship(fieldName as actionRecord)],
       [
+        'selectWhatOtherRegularExpensesDoYouHave',
+        () => this.selectWhatOtherRegularExpensesDoYouHave(fieldName as actionRecord),
+      ],
+      [
         'selectIfAnyOtherAdultsLiveInYourHouse',
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
       ],
@@ -89,6 +95,7 @@ export class RespondToClaimAction implements IAction {
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
+      ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -137,7 +144,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
     await performAction('clickRadioButton', {
-      question: correspondenceAddress.correspondenceAddressConfirmHintText,
+      question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
     });
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
@@ -168,20 +175,38 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord) {
-    await performAction('clickRadioButton', {
-      question: contactPreferenceData.question,
-      option: contactPreferenceData.radioOption,
-    });
-    if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailRadioOption) {
-      await performAction(
-        'inputText',
-        contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-        contactPreferenceData.emailAddress
-      );
+    if (Array.isArray(contactPreferenceData.options)) {
+      for (const option of contactPreferenceData.options) {
+        await performAction('check', {
+          question: contactPreferenceData.question,
+          option,
+        });
+        if (option === contactPreferenceEmailOrPost.byEmailCheckbox && contactPreferenceData.emailAddress) {
+          await performAction(
+            'inputText',
+            contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+            contactPreferenceData.emailAddress
+          );
+        }
+      }
+    }
+    // Handle single selection
+    else if (contactPreferenceData.radioOption) {
+      await performAction('check', {
+        question: contactPreferenceData.question,
+        option: contactPreferenceData.radioOption,
+      });
+
+      if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailCheckbox) {
+        await performAction(
+          'inputText',
+          contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+          contactPreferenceData.emailAddress
+        );
+      }
     }
     await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   }
-
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: contactPreferencesTelephone.areYouHappyToContactQuestion,
@@ -382,9 +407,9 @@ export class RespondToClaimAction implements IAction {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', noticeDateWhenProvided.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
+        ['inputText', noticeDateWhenNotProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenNotProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenNotProvided.yearTextLabel, noticeData.year]
       );
     }
     await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
@@ -596,12 +621,52 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
+  private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
+    if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+      return;
+    }
+
+    for (const income of regularIncome.regularIncomeOptions) {
+      const [option, value, frequency] = income;
+
+      await performAction('check', {
+        question: whatOtherRegularExpensesDoYouHave.mainHeader,
+        option,
+      });
+      console.log('option' + option);
+      if (!value || !frequency) {
+        throw new Error(`Amount and frequency are required for option: ${option}`);
+      }
+      await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
+      console.log('input' + value);
+      await performAction('clickRadioButton', frequency);
+      console.log('frequency' + frequency);
+    }
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+  }
+
   private async languageUsed(languageScreenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: languageScreenData.question,
       option: languageScreenData.radioOption,
     });
     await performAction('clickButton', languageUsed.saveAndContinueButton);
+  }
+
+  private async otherConsiderations(otherConsiderationsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: otherConsiderationsData.question,
+      option: otherConsiderationsData.option,
+    });
+    if (otherConsiderationsData.option === otherConsiderations.yesRadioOption) {
+      await performAction(
+        'inputText',
+        otherConsiderations.giveDetailsHiddenTextLabel,
+        otherConsiderationsData.courtInfo
+      );
+    }
+    await performAction('clickButton', otherConsiderations.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
