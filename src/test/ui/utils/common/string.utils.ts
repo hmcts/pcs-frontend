@@ -59,8 +59,8 @@ export function generateRandomString(length: string | number): string {
 export function stringToCamelCase(input: string): string {
   return input
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/gi, '') // remove punctuation
-    .split(/\s+/) // split on spaces
+    .replace(/[^a-z0-9\s]/gi, '')
+    .split(/\s+/)
     .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
     .join('');
 }
