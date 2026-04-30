@@ -281,4 +281,5 @@ export interface CitizenGenAppRequest {
   whatOrderWanted?: string;
   sotAccepted?: YesNoValue;
   sotFullName?: string;
+  clientReference?: string;
 }
