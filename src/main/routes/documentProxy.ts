@@ -154,26 +154,31 @@ async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<C
   });
 }
 
-async function removeDraftDocument(req: Request, index: number): Promise<'removed' | 'stale'> {
+async function removeDraftDocument(req: Request, docId: string): Promise<'removed' | 'stale'> {
   const caseId = req.params.caseReference as string;
   const accessToken = getUserToken(req);
 
   return withCaseLock(caseId, async () => {
     const existing = await fetchFreshDocuments(caseId, accessToken);
 
-    if (index < 0 || index >= existing.length) {
+    const docToDelete = existing.find(d => d.id === docId);
+    if (!docToDelete) {
       return 'stale';
     }
 
-    const docToDelete = existing[index];
-    const updated = existing.filter((_, i) => i !== index);
+    const updated = existing.filter(d => d.id !== docId);
     await saveDraftDocuments(req, updated);
     await deleteDocument(docToDelete.value.document.document_url, accessToken);
     return 'removed';
   });
 }
 
-function buildUploadResponse(errors: ErrorTranslations, cdamDoc: CdamDocument, index: number): Record<string, unknown> {
+function buildUploadResponse(
+  errors: ErrorTranslations,
+  cdamDoc: CdamDocument,
+  docId: string,
+  index: number
+): Record<string, unknown> {
   const filename = cdamDoc.document_filename;
   const safeFilename = filename
     .replace(/&/g, '&amp;')
@@ -187,11 +192,14 @@ function buildUploadResponse(errors: ErrorTranslations, cdamDoc: CdamDocument, i
       messageHtml: errors.uploadSuccess(safeFilename),
     },
     file: {
-      filename: String(index),
+      // MOJ multi-file-upload uses this as the delete button's value attribute.
+      // Send the stable CCD collection id so deletes are idempotent and order-independent.
+      filename: docId,
       originalname: filename,
     },
     document: {
       index,
+      id: docId,
       document_filename: filename,
       size: cdamDoc.size,
       content_type: cdamDoc.content_type,
@@ -270,8 +278,9 @@ export default function documentProxyRoutes(app: Application): void {
         }
 
         const cdamDoc = await uploadDocument(req.file, getUserToken(req));
-        const index = await saveDraftWithNewDocument(req, toCcdDocument(cdamDoc));
-        return res.json(buildUploadResponse(errors, cdamDoc, index));
+        const entry = toCcdDocument(cdamDoc);
+        const index = await saveDraftWithNewDocument(req, entry);
+        return res.json(buildUploadResponse(errors, cdamDoc, entry.id as string, index));
       } catch (error) {
         logger.error('Failed to upload document to CDAM', {
           error: error instanceof Error ? error.message : String(error),
@@ -284,19 +293,14 @@ export default function documentProxyRoutes(app: Application): void {
   app.post('/case/:caseReference/:journey/:step/delete', oidcMiddleware, async (req: Request, res: Response) => {
     const errors = getErrorTranslations(req);
     try {
-      const indexParam = (req.body as Record<string, string>).delete;
-      const parsed = Number(indexParam);
-      if (Number.isNaN(parsed) || !Number.isInteger(parsed) || parsed < 0) {
+      const docId = (req.body as Record<string, string>).delete;
+      if (typeof docId !== 'string' || docId.length === 0) {
         return res.status(404).json({ error: { message: errors.documentNotFound } });
       }
 
-      // Stale-index detection happens inside the lock against fresh CCD data,
-      // so a concurrent delete that shifts indices surfaces as 409 (client refreshes)
-      // rather than silently deleting the wrong file.
-      const result = await removeDraftDocument(req, parsed);
-      if (result === 'stale') {
-        return res.status(409).json({ error: { message: errors.documentNotFound } });
-      }
+      // Delete is idempotent: a missing doc means it's already gone (concurrent
+      // delete from another tab/click). Treat as success so the client converges.
+      await removeDraftDocument(req, docId);
       return res.json({ success: true });
     } catch (error) {
       logger.error('Failed to delete document from CDAM', {

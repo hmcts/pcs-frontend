@@ -29,7 +29,7 @@
   {% if uploadedFiles %}
     {% for file in uploadedFiles %}
       {% set _ = uploadedItems.push({
-        fileName: file.document_url,
+        fileName: file.id,
         originalFileName: file.document_filename,
         message: { text: file.document_filename },
         deleteButton: { text: component.deleteButtonText or 'Remove' }
