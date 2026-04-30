@@ -5,6 +5,7 @@ import {
   checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
+  doYouWantToUploadDocumentToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
@@ -130,9 +131,8 @@ export class GenAppsAction implements IAction {
         ? generateRandomString(confirmOrder.input)
         : (confirmOrder.input as string);
     await performAction('inputText', confirmOrder.label, userInput);
-    FieldsStore.update(confirmOrder.label as string, userInput);
-    //FieldsStore.rename(confirmOrder.label as string, whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     FieldsStore.rename(confirmOrder.label as string, 'What order do you want the court to make and why?');
+    FieldsStore.update('What order do you want the court to make and why?', userInput);
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
   }
 
@@ -151,7 +151,7 @@ export class GenAppsAction implements IAction {
       option: sot.option
     });
     await performAction('inputText', sot.label, sot.input);
-    const button = FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'Yes' ? checkYourAnswersGenApps.continueToPaymentHiddenButton : checkYourAnswersGenApps.submitHiddenButton;
+    const button = FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'No' ? checkYourAnswersGenApps.submitHiddenButton : checkYourAnswersGenApps.continueToPaymentHiddenButton;
     await performAction('clickButton', button);
   }
 
@@ -237,7 +237,12 @@ export class GenAppsAction implements IAction {
   }
 
   private async validateCYA() {
-    const misMatchMap = compareMaps(cyaMap, FieldsStore.getAll());
+    const misMatchMap = compareMaps(cyaMap, FieldsStore.getAll(),
+      {
+        name1: 'CYA',
+        name2: 'FieldStore'
+      }
+    );
 
     await test.step('CYA Validation Started and the results are present in the console logs', async () => {
       if (misMatchMap.size > 0) {
@@ -250,7 +255,6 @@ export class GenAppsAction implements IAction {
         }
         console.log(`\n**********  END OF CYA FAILURE LIST. ***************`);
         throw new Error(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`);
-        // console.log(`CYA validations failed for ${misMatchMap.size} ${misMatchMap.size === 1 ? 'item' : 'items'}`);
       } else {
         console.log('\n✅ CHECK YOUR ANSWERS VALIDATION PASSED!\n');
       }
@@ -259,32 +263,25 @@ export class GenAppsAction implements IAction {
   }
 
   private async reviewCYA(page: Page, startPage: actionData) {
-    //const rows = page.locator('.govuk-summary-list__row');
-    // const rowCount = await rows.count();
 
-    //for (let i = 0; i < rowCount; i++) {
     const row = page.locator('.govuk-summary-list__row').nth(0);
     const questionText = await row.locator('dt').innerText();
 
     const changeLink = row.getByRole('link', { name: 'Change' });
-    // if ((await changeLink.count()) === 0) {
-    //   continue;
-    // }
+
 
     const href = await changeLink.getAttribute('href');
     expect(href, `Missing href for question: ${questionText}`).toBeTruthy();
 
-    // Click Change
+
     await Promise.all([page.waitForURL(new RegExp(href!)), changeLink.click()]);
 
     const pagesForThisQuestion = journeys[String(startPage)] ?? defaultJourney;
 
-    // Follow the allowed journey
     await this.followJourneyBackToCya(page, pagesForThisQuestion);
 
-    // Final safety check
     await expect(page).toHaveURL(/check-your-answers/);
-    //}
+
   }
 
   private async reviewAndUpdateCYA(page: Page, review: actionRecord) {
@@ -306,10 +303,8 @@ export class GenAppsAction implements IAction {
     await this.updatePreviouslyAnsweredPage(page);
     const pagesForThisQuestion = journeys[String(review.journey)] ?? defaultJourney;
 
-    // Follow the allowed journey
     await this.followJourneyBackToCya(page, pagesForThisQuestion);
 
-    // Final safety check
     await expect(page).toHaveURL(/check-your-answers/);
 
   }
@@ -337,11 +332,55 @@ export class GenAppsAction implements IAction {
             });
           } else {
             await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-            FieldsStore.delete(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion);
-            FieldsStore.delete(haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion);
+            FieldsStore.deleteKeys([doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion, haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion, 'What is your Help with Fees reference number?']);
           }
 
           break;
+        }
+      case 'doYouNeedHelpPayingTheFeeForThisApplication':
+        {
+          const feeOption1 = FieldsStore.get(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion as string) === 'I need help paying the fee' ? doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption : doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption;
+          await performAction('doYouNeedHelpPayingFee', {
+            question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+            option: feeOption1,
+          });
+          if (feeOption1 !== 'I need help paying the fee') {
+            FieldsStore.deleteKeys([haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion, 'What is your Help with Fees reference number?']);
+          } else {
+            await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
+            await performAction('confirmYouHaveAppliedForFeeHelp', {
+              question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+              option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
+              label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
+              input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
+            });
+          }
+          await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+          break;
+        }
+      case 'whatOrderDoYouWantTheCourtToMakeAndWhy':
+        {
+          FieldsStore.delete('What order do you want the court to make and why?');
+          await performAction('confirmOrderDoYouWant', {
+            label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
+            input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
+          });
+          await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+          break;
+
+        }
+      case 'haveYouAlreadyAppliedForHelpWithYourApplicationFee':
+        {
+          FieldsStore.delete('What is your Help with Fees reference number?');
+          await performAction('confirmYouHaveAppliedForFeeHelp', {
+            question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+            option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
+            label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
+            input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
+          });
+          await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+          break;
+
         }
 
       default:
@@ -358,8 +397,6 @@ export class GenAppsAction implements IAction {
       if (currentUrl.includes(cyaUrlPart)) {
         return;
       }
-
-
       const expectedPage = allowedPages[i];
       const onAllowedPage = currentUrl.includes(expectedPage);
 

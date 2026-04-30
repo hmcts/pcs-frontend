@@ -46,7 +46,7 @@ export default {
   'do-you-need-help-paying-the-fee': 'doYouNeedHelpPayingTheFee',
   'have-you-already-applied-for-help-with-fees': 'haveYouAlreadyAppliedForHelpWithFees',
   'have-the-other-parties-agreed-to-this-application': 'haveTheOtherPartiesAgreedToThisApplication',
-  'you-need-to-apply-for-help-with-your-application-fee': 'youNeedToApplyForHelpWithYouApplicationFee',
+  'you-need-to-apply-for-help-with-your-application-fee': 'youNeedToApplyForHelpWithYourApplicationFee',
   'what-order-do-you-want-the-court-to-make-and-why': 'whatOrderDoYouWantTheCourtToMakeAndWhy',
   'are-there-any-reasons-that-this-application-should-not-be-shared':
     'areThereAnyReasonsThatThisApplicationShouldNotBeShared',

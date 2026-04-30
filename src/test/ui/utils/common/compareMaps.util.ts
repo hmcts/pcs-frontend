@@ -1,8 +1,17 @@
 export function compareMaps<Key, Val>(
   map1: ReadonlyMap<Key, Val>,
   map2: ReadonlyMap<Key, Val>,
+  options?: {
+    name1?: string;
+    name2?: string;
+  },
   equals: (v1: Val, v2: Val) => boolean = (v1, v2) => Object.is(v1, v2)
 ): Map<Key, { a: Val; b: Val }> {
+
+
+  const firstMap = options?.name1 ?? 'map1';
+  const secondMap = options?.name2 ?? 'map2';
+
   const diff = new Map<Key, { a: Val; b: Val }>();
 
   const missingKeyInMap1: Key[] = []; // present in map2, missing in map1
@@ -27,10 +36,10 @@ export function compareMaps<Key, Val>(
   }
 
   if (missingKeyInMap1.length > 0) {
-    console.warn(`Keys present in map2 but missing in map1:`, missingKeyInMap1);
+    console.warn(`Keys present in ${secondMap} but missing in ${firstMap}:`, missingKeyInMap1);
   }
   if (missingKeyInMap2.length > 0) {
-    console.warn(`Keys present in map1 but missing in map2:`, missingKeyInMap2);
+    console.warn(`Keys present in ${firstMap} but missing in ${secondMap}:`, missingKeyInMap2);
   }
 
   return diff;

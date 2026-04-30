@@ -33,6 +33,19 @@ export const FieldsStore = {
     return fieldsMap.delete(key);
   },
 
+
+  deleteKeys(keys: string[]): boolean {
+    let deleted = false;
+
+    for (const key of keys) {
+      if (fieldsMap.delete(key)) {
+        deleted = true;
+      }
+    }
+
+    return deleted;
+  },
+
   rename(oldKey: string, newKey: string): boolean {
     if (!fieldsMap.has(oldKey) || fieldsMap.has(newKey)) {
       console.log(`Keys ${oldKey} nor ${newKey} is present`);

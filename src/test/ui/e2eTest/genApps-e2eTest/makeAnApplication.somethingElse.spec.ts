@@ -78,6 +78,23 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
-    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performAction('reviewAndUpdateCYA', {
+      changeOption: 'What order do you want the court to make and why?',
+      journey: 'journey4'
+    });
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    await performAction('reviewAndUpdateCYA', {
+      changeOption: 'What is your Help with Fees reference number?',
+      journey: 'journey2'
+    });
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    await performAction('selectStatementOfTruth', {
+      question: checkYourAnswersGenApps.statementOfTruthQuestion,
+      option: checkYourAnswersGenApps.iBelieveTheFactsHiddenCheckbox,
+      label: checkYourAnswersGenApps.yourFullNameTextLabel,
+      input: checkYourAnswersGenApps.yourFullNameTextInput,
+    });
   });
 });
