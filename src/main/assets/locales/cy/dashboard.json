@@ -13,7 +13,7 @@
   "findInformation": "cyFind information about my court",
 
   "taskGroups": {
-    "CLAIM": "cyThe claim",
+    "CLAIM": "cyThe claim against you",
     "HEARING": "cyHearing",
     "JUDGEMENT": "cyJudgement from the court",
     "NOTICE": "cyOrders and notices from the court",
@@ -42,7 +42,7 @@
       "NOT_STARTED": "cyNot started"
     },
     "Defendant": {
-      "ViewClaim": { "title": "cyThe claim against you" },
+      "ViewClaim": { "title": "cyView the claim" },
       "RespondToClaim": { "title": "cyRespond to the claim" },
       "ViewDocuments": { "title": "cyView documents" },
       "ReviewResponse": { "title": "cyReview the response" },
