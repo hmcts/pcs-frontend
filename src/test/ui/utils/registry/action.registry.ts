@@ -95,6 +95,7 @@ export class ActionRegistry {
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
+    ['uploadFiles', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
