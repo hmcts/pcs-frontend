@@ -21,11 +21,10 @@ export enum LanguageUsed {
 export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
 export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
-export type PenceAmount = string;
 
 export interface IncomeExpenseDetails {
   applies?: YesNoValue;
-  amount?: PenceAmount;
+  amount?: string;
   frequency?: FrequencyValue;
 }
 
@@ -44,17 +43,17 @@ export interface HouseholdCircumstances {
   otherTenantsDetails?: string;
   shareIncomeExpenseDetails?: YesNoValue;
   incomeFromJobs?: YesNoValue;
-  incomeFromJobsAmount?: PenceAmount;
+  incomeFromJobsAmount?: string;
   incomeFromJobsFrequency?: FrequencyValue;
   pension?: YesNoValue;
-  pensionAmount?: PenceAmount;
+  pensionAmount?: string;
   pensionFrequency?: FrequencyValue;
   universalCredit?: YesNoValue;
-  universalCreditAmount?: PenceAmount;
+  universalCreditAmount?: string;
   universalCreditFrequency?: FrequencyValue;
   ucApplicationDate?: string;
   otherBenefits?: YesNoValue;
-  otherBenefitsAmount?: PenceAmount;
+  otherBenefitsAmount?: string;
   otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
@@ -132,6 +131,16 @@ export interface CcdClaimantEnteredDefendantDetails {
   addressKnown?: YesNoValue;
 }
 
+export interface CcdSectionStatusValue {
+  sectionId: string;
+  status: string;
+}
+
+export interface CcdSectionStatusItem {
+  value: CcdSectionStatusValue;
+  id?: string;
+}
+
 /** Defendant party contact details (name/address known flags and values). */
 export interface CcdDefendantParty {
   firstName?: string;
@@ -175,6 +184,7 @@ export interface CcdDefendantResponses {
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
+  sectionStatuses?: CcdSectionStatusItem[];
 }
 
 export interface PossessionClaimResponse {

@@ -99,7 +99,15 @@
   },
   "dashboard": {
     "taskRoutes": {
-      "Task.AAA6.Claim.ViewClaim": "/case/:caseReference/view-the-claim"
+      "Task.AAA6.Claim.ViewClaim": "/case/:caseReference/view-the-claim",
+      "Defendant.RTC.StartNowAndDetails": "/case/:caseReference/respond-to-claim/start-now",
+      "Defendant.RTC.PersonalDetails": "/case/:caseReference/respond-to-claim/defendant-name-confirmation",
+      "Defendant.RTC.DisputeAndTenancy": "/case/:caseReference/respond-to-claim/dispute-claim-interstitial",
+      "Defendant.RTC.Payments": "/case/:caseReference/respond-to-claim/payment-interstitial",
+      "Defendant.RTC.SituationAndCircumstances": "/case/:caseReference/respond-to-claim/your-household-and-circumstances",
+      "Defendant.RTC.IncomeAndExpenditure": "/case/:caseReference/respond-to-claim/income-and-expenses",
+      "Defendant.RTC.UploadFiles": "/case/:caseReference/respond-to-claim/upload-docs",
+      "Defendant.RTC.CheckYourAnswersAndSubmit": "/case/:caseReference/respond-to-claim/language-used"
     }
   }
 }
