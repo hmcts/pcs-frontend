@@ -45,6 +45,7 @@
     "Defendant": {
       "ViewClaim": { "title": "View the claim" },
       "RespondToClaim": { "title": "Respond to the claim" },
+      "ViewResponse": { "title": "View the response" },
       "ViewDocuments": { "title": "View documents" },
       "ReviewResponse": { "title": "Review the response" },
       "SubmitResponse": { "title": "Submit the response" }

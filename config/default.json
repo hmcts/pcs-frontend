@@ -98,5 +98,11 @@
   },
   "xui": {
     "uri": "https://manage-case.aat.platform.hmcts.net"
+  },
+  "dashboard": {
+    "taskRoutes": {
+      "Defendant.RespondToClaim": "/case/:caseReference/respond-to-claim/start-now",
+      "Defendant.ViewResponse": "/case/:caseReference/view-response"
+    }
   }
 }
