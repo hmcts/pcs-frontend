@@ -40,14 +40,6 @@ const fieldsConfig: FormFieldConfig[] = [
             translationKey: {
               label: 'correctTypeLabel',
             },
-            validator: (value: unknown): boolean | string => {
-              if (typeof value !== 'string' || !value.trim()) {
-                return true;
-              }
-
-              const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
-              return !invalidCharacters.test(value) || 'errors.correctTypeInvalidCharacters';
-            },
           },
         },
       },

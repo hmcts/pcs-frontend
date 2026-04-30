@@ -1,3 +1,4 @@
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
@@ -5,7 +6,6 @@ import { flowConfig } from '../flow.config';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PaymentAgreement, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-made',

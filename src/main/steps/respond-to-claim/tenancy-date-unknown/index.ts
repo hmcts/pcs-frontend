@@ -1,15 +1,15 @@
 import { format, parseISO } from 'date-fns';
 
 import { formatDatePartsToISODate } from '../../utils';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
-import { isLegalRepresentativeUser } from 'steps/utils/userRole';
 
 const STEP_NAME = 'tenancy-date-unknown';
 
