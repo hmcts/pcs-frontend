@@ -1,4 +1,10 @@
-import { dashboard, feedback, haveYouAppliedForUniversalCredit, priorityDebts, regularIncome } from '../data/page-data';
+import {
+  dashboard,
+  feedback,
+  haveYouAppliedForUniversalCredit,
+  priorityDebts,
+  whatRegularIncomeDoYouReceive,
+} from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function priorityDebtsErrorValidation(): Promise<void> {
@@ -15,7 +21,7 @@ export async function priorityDebtsNavigationTests(): Promise<void> {
     pageSlug: priorityDebts.pageSlug,
   });
   if (process.env.REGULAR_INCOME === 'UNIVERSAL_CREDIT') {
-    await performValidation('pageNavigation', priorityDebts.backLink, regularIncome.mainHeader);
+    await performValidation('pageNavigation', priorityDebts.backLink, whatRegularIncomeDoYouReceive.mainHeader);
   } else {
     await performValidation('pageNavigation', priorityDebts.backLink, haveYouAppliedForUniversalCredit.mainHeader);
   }

@@ -1,4 +1,9 @@
-import { dashboard, feedback, haveYouAppliedForUniversalCredit, regularIncome } from '../data/page-data';
+import {
+  dashboard,
+  feedback,
+  haveYouAppliedForUniversalCredit,
+  whatRegularIncomeDoYouReceive,
+} from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise<void> {
@@ -78,7 +83,11 @@ export async function haveYouAppliedForUniversalCreditNavigationTests(): Promise
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: haveYouAppliedForUniversalCredit.pageSlug,
   });
-  await performValidation('pageNavigation', haveYouAppliedForUniversalCredit.backLink, regularIncome.mainHeader);
+  await performValidation(
+    'pageNavigation',
+    haveYouAppliedForUniversalCredit.backLink,
+    whatRegularIncomeDoYouReceive.mainHeader
+  );
   await performAction('clickRadioButton', haveYouAppliedForUniversalCredit.noRadioOption);
   await performValidation('pageNavigation', haveYouAppliedForUniversalCredit.saveForLaterButton, dashboard.mainHeader);
 }

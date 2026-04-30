@@ -650,6 +650,7 @@ export class RespondToClaimAction implements IAction {
       option: priorityDebtDetailsData.option,
     });
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  }
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
       await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);

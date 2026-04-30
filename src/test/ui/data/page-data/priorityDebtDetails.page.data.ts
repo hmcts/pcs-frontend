@@ -19,7 +19,7 @@ export const priorityDebtDetails = {
   enterTheTotalAmountErrorMessage: `Enter the total amount you owe for all your priority debts`,
   enterTheAmountYouPayErrorMessage: `Enter the amount you pay towards your priority debts each week or month`,
   enterTotalAmountInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
-  enterAmountYouPayInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00`,
+  enterAmountYouPayInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
   selectHowFrequentlyErrorMessage: `Select how frequently you pay the amount you entered above`,
   totalAmountYouOweMustBeLessThanBillionErrorMessage: `The total amount you owe for all your priority debts must be less than £1 billion`,
   amountYouPayMustBeLessThanBillionErrorMessage: `The amount you pay towards your priority debts each week or month must be less than £1 billion`,
