@@ -43,7 +43,7 @@
       "NOT_STARTED": "Not started"
     },
     "Defendant": {
-      "ViewClaim": { "title": "View the claim" },
+      "ViewClaim": { "title": "The claim against you" },
       "RespondToClaim": { "title": "Respond to the claim" },
       "ViewDocuments": { "title": "View documents" },
       "ReviewResponse": { "title": "Review the response" },

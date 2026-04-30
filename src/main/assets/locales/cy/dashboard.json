@@ -42,7 +42,7 @@
       "NOT_STARTED": "cyNot started"
     },
     "Defendant": {
-      "ViewClaim": { "title": "cyView the claim" },
+      "ViewClaim": { "title": "cyThe claim against you" },
       "RespondToClaim": { "title": "cyRespond to the claim" },
       "ViewDocuments": { "title": "cyView documents" },
       "ReviewResponse": { "title": "cyReview the response" },
