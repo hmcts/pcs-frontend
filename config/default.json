@@ -99,6 +99,8 @@
   },
   "dashboard": {
     "taskRoutes": {
+      "Defendant.UploadDocuments": "/case/:caseReference/upload-additional-documents",
+      "Defendant.ViewDocuments": "/case/:caseReference/view-documents",
       "Defendant.ViewClaim": "/case/:caseReference/view-the-claim"
     }
   }
