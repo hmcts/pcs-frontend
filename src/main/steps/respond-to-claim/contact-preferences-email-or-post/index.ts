@@ -22,7 +22,7 @@ export const step: StepDefinition = createFormStep({
   fields: [
     {
       name: 'contactByEmailOrPost',
-      type: 'radio',
+      type: 'checkbox',
       required: true,
       legendClasses: 'govuk-!-font-weight-bold govuk-!-font-size-24',
       translationKey: {
@@ -69,40 +69,37 @@ export const step: StepDefinition = createFormStep({
     const defendantResponses = caseData?.defendantResponses;
     const emailAddress = caseData?.defendantContactDetails?.party?.emailAddress;
 
-    const result: Record<string, unknown> = {};
+    const formData: Record<string, unknown> = {};
+    const selected: string[] = [];
 
-    if (defendantResponses?.contactByEmail === 'YES') {
-      result.contactByEmailOrPost = 'email';
-      if (emailAddress) {
-        result['contactByEmailOrPost.email'] = emailAddress;
-      }
-    } else if (defendantResponses?.contactByPost === 'YES') {
-      result.contactByEmailOrPost = 'post';
-    }
+    if (defendantResponses?.contactByEmail === 'YES') {selected.push('email');}
+    if (defendantResponses?.contactByPost === 'YES') {selected.push('post');}
 
-    return result;
+    if (selected.length > 0) {formData.contactByEmailOrPost = selected;}
+    if (selected.includes('email') && emailAddress) {formData['contactByEmailOrPost.email'] = emailAddress;}
+
+    return formData;
   },
 
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    const contactByEmailOrPost = req.body?.contactByEmailOrPost as 'email' | 'post' | undefined;
+    const emailForm = req.body as Record<string, unknown>;
+    const selectedRaw = emailForm.contactByEmailOrPost as string | string[] | undefined;
+    const selected = Array.isArray(selectedRaw) ? selectedRaw : selectedRaw ? [selectedRaw] : [];
+    const emailSelected = selected.includes('email');
+    const postSelected = selected.includes('post');
 
-    if (contactByEmailOrPost === 'email') {
-      response.defendantResponses.contactByEmail = 'YES';
-      response.defendantResponses.contactByPost = 'NO';
-      const email = (req.body?.['contactByEmailOrPost.email'] as string | undefined)?.trim();
+    response.defendantResponses.contactByEmail = emailSelected ? 'YES' : 'NO';
+    response.defendantResponses.contactByPost = postSelected ? 'YES' : 'NO';
+
+    if (emailSelected) {
+      const email = (emailForm['contactByEmailOrPost.email'] as string | undefined)?.trim();
       if (email) {
         response.defendantContactDetails.party.emailAddress = email;
       } else {
         delete response.defendantContactDetails.party.emailAddress;
       }
-    } else if (contactByEmailOrPost === 'post') {
-      response.defendantResponses.contactByEmail = 'NO';
-      response.defendantResponses.contactByPost = 'YES';
-      delete response.defendantContactDetails.party.emailAddress;
     } else {
-      delete response.defendantResponses.contactByEmail;
-      delete response.defendantResponses.contactByPost;
       delete response.defendantContactDetails.party.emailAddress;
     }
 
