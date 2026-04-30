@@ -88,17 +88,14 @@ function getAtPath<T>(obj: unknown, path: readonly [string, ...string[]]): T | u
   return cursor as T | undefined;
 }
 
-// Inner cast walks the nested object literal we're building, not the leaf
-// value (which may be an array). Empty path is unreachable because uploadCtx
-// 404s when uploadDocsPath is missing or empty.
+// Returns an object even when `value` is itself an array (e.g. a list of
+// documents) — `reduceRight` always wraps the leaf in at least one key from
+// `path`, so the result is always `{ <firstKey>: ... }`. The non-empty path
+// type makes that wrapping reachable; uploadCtx 404s before this is called.
 function setAtPath(path: readonly [string, ...string[]], value: unknown): Record<string, unknown> {
   return path.reduceRight<unknown>((acc, key) => ({ [key]: acc }), value) as Record<string, unknown>;
 }
 
-// Today's CcdCaseModel proxies top-level CCD fields via getters, so
-// validatedCase['possessionClaimResponse'] works through bracket access. If a
-// future refactor breaks that, switch getExistingDocuments to walk
-// validatedCase.data instead of validatedCase.
 function uploadCtx(req: Request): {
   path: readonly [string, ...string[]];
   draftEvent: { id: string; pageId: string };
@@ -119,14 +116,18 @@ function uploadCtx(req: Request): {
   };
 }
 
+// res.locals.validatedCase is a CcdCaseModel, not a plain object. It exposes
+// top-level CCD fields via getters, so bracket access (used by getAtPath)
+// resolves them. If a future refactor breaks that, walk validatedCase.data
+// instead.
 function getExistingDocuments(req: Request): CcdCollectionItem<CcdUploadedDocument>[] {
   return getAtPath<CcdCollectionItem<CcdUploadedDocument>[]>(req.res?.locals?.validatedCase, uploadCtx(req).path) ?? [];
 }
 
-// Per-case in-process mutex. Two concurrent uploads/deletes for the same case can
-// otherwise race on the read-modify-write of defendantDocuments and silently drop
-// entries. The lock serialises only the cheap append-and-save phase; CDAM uploads
-// run in parallel outside the lock.
+// Per-case in-process mutex. Two concurrent uploads/deletes for the same case
+// can otherwise race on the read-modify-write of the documents collection and
+// silently drop entries. The lock serialises only the cheap append-and-save
+// phase; CDAM uploads run in parallel outside the lock.
 const caseLocks = new Map<string, Promise<void>>();
 
 async function withCaseLock<T>(caseId: string, fn: () => Promise<T>): Promise<T> {
