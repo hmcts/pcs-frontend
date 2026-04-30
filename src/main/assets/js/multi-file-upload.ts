@@ -140,6 +140,13 @@ function clearErrorSummary(container: HTMLElement): void {
   clearInlineFieldError(container);
 }
 
+function removeFailedRows(container: HTMLElement): void {
+  container.querySelectorAll('.moj-multi-file-upload__row--error, .moj-multi-file-upload__error').forEach(el => {
+    const row = el.closest('.moj-multi-file-upload__row');
+    (row ?? el).remove();
+  });
+}
+
 function hasVisibleError(container: HTMLElement): boolean {
   const fileInput = getFileInput(container);
   const formGroup = fileInput?.closest<HTMLElement>('.govuk-form-group');
@@ -246,14 +253,7 @@ function initContainer(container: HTMLElement): void {
         }
 
         // Clear any failed upload rows (MOJ keeps them in the list)
-        container.querySelectorAll('.moj-multi-file-upload__row--error, .moj-multi-file-upload__error').forEach(el => {
-          const row = el.closest('.moj-multi-file-upload__row');
-          if (row) {
-            row.remove();
-          } else {
-            el.remove();
-          }
-        });
+        removeFailedRows(container);
 
         // MOJ component creates delete buttons with "Delete" text -- patch to match translation
         container.querySelectorAll<HTMLButtonElement>('.moj-multi-file-upload__delete').forEach(btn => {
@@ -279,6 +279,7 @@ function initContainer(container: HTMLElement): void {
           const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
           if (response?.error?.message) {
             showErrorSummary(container, response.error.message, errorSummaryTitle);
+            removeFailedRows(container);
           }
         } catch {
           // No structured server message — leave the row-level "Upload failed" alone
