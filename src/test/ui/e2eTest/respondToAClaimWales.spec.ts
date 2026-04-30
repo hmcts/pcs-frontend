@@ -32,6 +32,7 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
   uploadFiles,
+  whatAreYouClaimingFor,
   whatOtherRegularExpensesDoYouHave,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
@@ -376,7 +377,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //   await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Standard contract - NonRentArrears - @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - Yes @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -427,23 +428,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
     await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
+      option: counterClaim.yesRadioOption,
     });
-    await performAction('readYourHouseholdAndCircumstances');
-    await performAction('doYouHaveAnyDependantChildren', {
-      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
-    });
-    await performAction('doYouHaveAnyOtherDependants', {
-      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
-      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
-    });
-    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
-    });
-    await performAction('selectAlternativeAccommodation', {
-      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
-    });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
+    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
   });
 });
