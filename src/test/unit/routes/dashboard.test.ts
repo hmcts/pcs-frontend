@@ -83,9 +83,14 @@ jest.mock('@modules/i18n', () => ({
       'dashboard:taskGroups.CLAIM': 'Claim section',
       'dashboard:tasks.Defendant.ViewClaim.title': 'View claim title',
       'dashboard:tasks.Defendant.SubmitResponse.title': 'Submit response title',
+      'dashboard:tasks.Defendant.RespondToClaim.title': 'Respond to claim title',
+      'dashboard:tasks.Defendant.ViewResponse.title': 'View response title',
       'dashboard:tasks.task-1.title': 'Task one title',
       'dashboard:tasks.statuses.AVAILABLE': 'Available',
       'dashboard:tasks.statuses.NOT_AVAILABLE': 'Not available',
+      'dashboard:tasks.statuses.COMPLETED': 'Completed',
+      'dashboard:tasks.statuses.IN_PROGRESS': 'In progress',
+      'dashboard:tasks.statuses.NOT_STARTED': 'Not started',
       'dashboard:notifications.Defendant.CaseIssued.title': 'Case issued title',
       'dashboard:notifications.Defendant.CaseIssued.body': 'The claim has been issued to you.',
     };
@@ -263,6 +268,59 @@ describe('Dashboard Routes', () => {
       const [configuredTask] = renderArgs.taskGroups[0].tasks;
 
       expect(configuredTask.href).toBe('/case/1234567890123456/task-one');
+    });
+
+    it('should disable href for COMPLETED tasks and use configured href for AVAILABLE view-response', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+    
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskRoutes'
+          ? {
+              'Defendant.RespondToClaim': '/case/:caseReference/respond-to-claim/start-now',
+              'Defendant.ViewResponse': '/case/:caseReference/view-response',
+            }
+          : 'mock-secret'
+      );
+    
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [],
+        taskGroups: [
+          {
+            groupId: 'RESPONSE',
+            tasks: [
+              { templateId: 'Defendant.RespondToClaim', status: 'COMPLETED' },
+              { templateId: 'Defendant.ViewResponse', status: 'AVAILABLE' },
+            ],
+          },
+        ],
+        propertyAddress: null,
+      });
+    
+      dashboardRoutes(app);
+      const handler = getDashboardCaseHandler();
+    
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+    
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+    
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+    
+      const [responseGroup] = renderArgs.taskGroups;
+      const [respondToClaimTask, viewResponseTask] = responseGroup.tasks;
+    
+      expect(respondToClaimTask.href).toBeUndefined();
+      expect(viewResponseTask.href).toBe('/case/1234567890123456/view-response');
     });
 
     it('should fall back to default task href when config taskRoutes value is not an object', async () => {
