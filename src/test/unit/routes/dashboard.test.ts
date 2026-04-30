@@ -272,7 +272,7 @@ describe('Dashboard Routes', () => {
 
     it('should disable href for COMPLETED tasks and use configured href for AVAILABLE view-response', async () => {
       const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
-    
+
       configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
       configMock.get.mockImplementation((key: string) =>
         key === 'dashboard.taskRoutes'
@@ -282,7 +282,7 @@ describe('Dashboard Routes', () => {
             }
           : 'mock-secret'
       );
-    
+
       (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
         notifications: [],
         taskGroups: [
@@ -296,13 +296,13 @@ describe('Dashboard Routes', () => {
         ],
         propertyAddress: null,
       });
-    
+
       dashboardRoutes(app);
       const handler = getDashboardCaseHandler();
-    
+
       const res = { render: jest.fn() } as unknown as Response;
       const next: NextFunction = jest.fn();
-    
+
       await handler(
         dashboardCaseRequest({
           caseReference: '1234567890123456',
@@ -311,14 +311,14 @@ describe('Dashboard Routes', () => {
         res,
         next
       );
-    
+
       const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
         taskGroups: { tasks: { href?: string }[] }[];
       };
-    
+
       const [responseGroup] = renderArgs.taskGroups;
       const [respondToClaimTask, viewResponseTask] = responseGroup.tasks;
-    
+
       expect(respondToClaimTask.href).toBeUndefined();
       expect(viewResponseTask.href).toBe('/case/1234567890123456/view-response');
     });
