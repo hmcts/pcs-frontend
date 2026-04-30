@@ -61,6 +61,8 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.OCCUPATION_LICENCE_TYPE === 'STANDARD_CONTRACT'
   ) {
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
+  } else if (testInfo.title.includes('NonRentArrears')) {
+    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseNonRentStandard });
   } else {
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentOtherTenancy });
   }
@@ -79,7 +81,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Secure contract - Rent and Non-Rent Arrears @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -206,7 +208,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Respond to a claim - Wales - Standard contract - @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Standard contract - Rent and Non-Rent Arrears @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -372,5 +374,76 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //     radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     //   });
     //   await performValidation('mainHeader', yourCircumstances.mainHeader);
+  });
+
+  test('Respond to a claim - Wales - Standard contract - NonRentArrears - @noDefendants @regression', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
+    await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
+    await performAction('selectLandlordLicensed', {
+      question: landlordLicensed.isYourLandlordLicensedQuestion,
+      radioOption: landlordLicensed.iamNotSureRadioOption,
+    });
+    await performValidation('mainHeader', writtenTerms.mainHeader);
+    await performAction('selectWrittenTerms', {
+      question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
+      radioOption: writtenTerms.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
+    });
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyDateDetails.noRadioOption,
+      day: '01',
+      month: '12',
+      year: '2025',
+    });
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 });

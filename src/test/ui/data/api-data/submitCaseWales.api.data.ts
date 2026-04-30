@@ -241,5 +241,113 @@ export const submitCaseApiDataWales = {
     completionNextStep: 'SUBMIT_AND_PAY_NOW',
   },
 
+  submitCaseNonRentStandard: {
+    legislativeCountry: 'Wales',
+    claimantType: {
+      value: {
+        code: 'COMMUNITY_LANDLORD',
+        label: 'Community landlord',
+      },
+      list_items: [
+        {
+          code: 'PRIVATE_LANDLORD',
+          label: 'Private landlord',
+        },
+        {
+          code: 'COMMUNITY_LANDLORD',
+          label: 'Community landlord',
+        },
+        {
+          code: 'MORTGAGE_LENDER',
+          label: 'Mortgage lender',
+        },
+        {
+          code: 'OTHER',
+          label: 'Other',
+        },
+      ],
+      valueCode: 'COMMUNITY_LANDLORD',
+    },
+    claimAgainstTrespassers: 'NO',
+    orgNameFound: 'Yes',
+    claimantName: 'Possession Claims Solicitor Org',
+    isClaimantNameCorrect: 'YES',
+    walesRegistered: 'NO',
+    walesLicensed: 'NO',
+    walesLicensedAgentAppointed: 'NO',
+    claimantContactEmail: 'pcs-solicitor-automation@test.com',
+    isCorrectClaimantContactEmail: 'YES',
+    orgAddressFound: 'Yes',
+    organisationAddress: {
+      AddressLine1: 'Ministry Of Justice',
+      AddressLine2: 'Seventh Floor 102 Petty France',
+      PostTown: 'London',
+      PostCode: 'SW1H 9AJ',
+      Country: 'United Kingdom',
+    },
+    formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
+    isCorrectClaimantContactAddress: 'YES',
+    claimantProvidePhoneNumber: 'NO',
+    defendant1: {
+      nameKnown: 'NO',
+      addressKnown: 'NO',
+    },
+    addAnotherDefendant: 'NO',
+    occupationLicenceTypeWales: 'STANDARD_CONTRACT',
+    licenceStartDate: null,
+    licenceDocuments: [],
+    possessionGroundsWales_DiscretionaryGrounds: ['ANTISOCIAL_BEHAVIOUR_S157'],
+    possessionGroundsWales_MandatoryGrounds: ['FAILURE_TO_GIVE_UP_POSSESSION_S170'],
+    showReasonsForGroundsPageWales: 'Yes',
+    walesFailToGiveUpS170Reason: 'test',
+    showASBQuestionsPageWales: 'Yes',
+    walesAntisocialBehaviour: 'YES',
+    walesAntisocialBehaviourDetails: 'test',
+    walesIllegalPurposesUse: 'YES',
+    walesIllegalPurposesUseDetails: 'test',
+    walesOtherProhibitedConduct: 'NO',
+    preActionProtocolCompleted: 'NO',
+    mediationAttempted: 'NO',
+    settlementAttempted: 'NO',
+    walesNoticeServed: 'No',
+    claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
+    claimantCircumstancesSelect: 'NO',
+    hasDefendantCircumstancesInfo: 'NO',
+    prohibitedConductWalesClaim: 'NO',
+    claimingCostsWanted: 'NO',
+    additionalReasonsForPossession: {
+      hasReasons: 'NO',
+    },
+    hasUnderlesseeOrMortgagee: 'NO',
+    wantToUploadDocuments: 'YES',
+    applicationWithClaim: 'NO',
+    additionalDocuments: [
+      {
+        value: {
+          documentType: 'WITNESS_STATEMENT',
+          description: 'test doc',
+          document: {
+            document_url:
+              'http://dm-store-aat.service.core-compute-aat.internal/documents/e519d708-ef48-4a6f-9eb6-66cf12521c40',
+            document_binary_url:
+              'http://dm-store-aat.service.core-compute-aat.internal/documents/e519d708-ef48-4a6f-9eb6-66cf12521c40/binary',
+            document_filename: 'Screenshot 2026-04-30 at 10.15.28.png',
+            document_hash: '41888ad7755af78b414d5c964c063e5fcc879c0942dfe26ae1ad7dfcc188f084',
+          },
+        },
+        id: '532693d4-e3fc-4173-b055-7b6bc0622c7c',
+      },
+    ],
+    languageUsed: 'ENGLISH_AND_WELSH',
+    completionNextStep: 'SUBMIT_AND_PAY_NOW',
+    endButtonLabel: 'Submit claim',
+    statementOfTruth: {
+      completedBy: 'CLAIMANT',
+      fullNameClaimant: 'test',
+      positionClaimant: 'manager',
+      agreementClaimant: ['BELIEVE_TRUE'],
+    },
+  },
+
   submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };
