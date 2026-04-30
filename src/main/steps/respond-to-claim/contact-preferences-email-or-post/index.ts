@@ -72,11 +72,19 @@ export const step: StepDefinition = createFormStep({
     const formData: Record<string, unknown> = {};
     const selected: string[] = [];
 
-    if (defendantResponses?.contactByEmail === 'YES') {selected.push('email');}
-    if (defendantResponses?.contactByPost === 'YES') {selected.push('post');}
+    if (defendantResponses?.contactByEmail === 'YES') {
+      selected.push('email');
+    }
+    if (defendantResponses?.contactByPost === 'YES') {
+      selected.push('post');
+    }
 
-    if (selected.length > 0) {formData.contactByEmailOrPost = selected;}
-    if (selected.includes('email') && emailAddress) {formData['contactByEmailOrPost.email'] = emailAddress;}
+    if (selected.length > 0) {
+      formData.contactByEmailOrPost = selected;
+    }
+    if (selected.includes('email') && emailAddress) {
+      formData['contactByEmailOrPost.email'] = emailAddress;
+    }
 
     return formData;
   },
