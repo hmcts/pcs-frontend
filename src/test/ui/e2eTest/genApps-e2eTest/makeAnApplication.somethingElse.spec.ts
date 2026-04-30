@@ -79,13 +79,13 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('validateCYA');
     await performAction('reviewAndUpdateCYA', {
       changeOption: 'What order do you want the court to make and why?',
-      journey: 'journey4'
+      journey: 'journey4',
     });
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
     await performAction('reviewAndUpdateCYA', {
       changeOption: 'What is your Help with Fees reference number?',
-      journey: 'journey2'
+      journey: 'journey2',
     });
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');

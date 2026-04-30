@@ -3,7 +3,10 @@ import { FieldsStore } from '../../utils/actions/custom-actions';
 import { performAction } from '../../utils/controller';
 
 export async function checkYourAnswersGenAppsErrorValidation(): Promise<void> {
-  const dynamicButton = FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'Yes' ? checkYourAnswersGenApps.continueToPaymentHiddenButton : checkYourAnswersGenApps.submitHiddenButton;
+  const dynamicButton =
+    FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'Yes'
+      ? checkYourAnswersGenApps.continueToPaymentHiddenButton
+      : checkYourAnswersGenApps.submitHiddenButton;
   await performAction('inputErrorValidationGenApp', {
     validationType: checkYourAnswersGenApps.errorValidationType.three,
     inputArray: checkYourAnswersGenApps.errorValidationField.errorCheckBoxOption,

@@ -7,8 +7,6 @@ export function compareMaps<Key, Val>(
   },
   equals: (v1: Val, v2: Val) => boolean = (v1, v2) => Object.is(v1, v2)
 ): Map<Key, { a: Val; b: Val }> {
-
-
   const firstMap = options?.name1 ?? 'map1';
   const secondMap = options?.name2 ?? 'map2';
 

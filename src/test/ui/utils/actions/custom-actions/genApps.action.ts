@@ -148,10 +148,13 @@ export class GenAppsAction implements IAction {
   private async selectStatementOfTruth(sot: actionRecord) {
     await performAction('check', {
       question: sot.question,
-      option: sot.option
+      option: sot.option,
     });
     await performAction('inputText', sot.label, sot.input);
-    const button = FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'No' ? checkYourAnswersGenApps.submitHiddenButton : checkYourAnswersGenApps.continueToPaymentHiddenButton;
+    const button =
+      FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'No'
+        ? checkYourAnswersGenApps.submitHiddenButton
+        : checkYourAnswersGenApps.continueToPaymentHiddenButton;
     await performAction('clickButton', button);
   }
 
@@ -178,7 +181,11 @@ export class GenAppsAction implements IAction {
 
         case 'checkBox':
           await performAction('clickButton', validationArr.button);
-          await performValidation('errorMessage', !validationArr?.header ? validationArr.header = 'There is a problem' : validationArr.header, item.errMessage);
+          await performValidation(
+            'errorMessage',
+            !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header,
+            item.errMessage
+          );
           await performAction('check', { question: validationArr.question, option: validationArr.option });
           break;
       }
@@ -237,12 +244,10 @@ export class GenAppsAction implements IAction {
   }
 
   private async validateCYA() {
-    const misMatchMap = compareMaps(cyaMap, FieldsStore.getAll(),
-      {
-        name1: 'CYA',
-        name2: 'FieldStore'
-      }
-    );
+    const misMatchMap = compareMaps(cyaMap, FieldsStore.getAll(), {
+      name1: 'CYA',
+      name2: 'FieldStore',
+    });
 
     await test.step('CYA Validation Started and the results are present in the console logs', async () => {
       if (misMatchMap.size > 0) {
@@ -263,16 +268,13 @@ export class GenAppsAction implements IAction {
   }
 
   private async reviewCYA(page: Page, startPage: actionData) {
-
     const row = page.locator('.govuk-summary-list__row').nth(0);
     const questionText = await row.locator('dt').innerText();
 
     const changeLink = row.getByRole('link', { name: 'Change' });
 
-
     const href = await changeLink.getAttribute('href');
     expect(href, `Missing href for question: ${questionText}`).toBeTruthy();
-
 
     await Promise.all([page.waitForURL(new RegExp(href!)), changeLink.click()]);
 
@@ -281,7 +283,6 @@ export class GenAppsAction implements IAction {
     await this.followJourneyBackToCya(page, pagesForThisQuestion);
 
     await expect(page).toHaveURL(/check-your-answers/);
-
   }
 
   private async reviewAndUpdateCYA(page: Page, review: actionRecord) {
@@ -291,7 +292,7 @@ export class GenAppsAction implements IAction {
     for (let i = 0; i < rowCount; i++) {
       const row = page.locator('.govuk-summary-list__row').nth(i);
       const questionText = await row.locator('dt').innerText();
-      if (questionText === review.changeOption as string) {
+      if (questionText === (review.changeOption as string)) {
         const changeLink = row.getByRole('link', { name: 'Change' });
 
         const href = await changeLink.getAttribute('href');
@@ -306,82 +307,92 @@ export class GenAppsAction implements IAction {
     await this.followJourneyBackToCya(page, pagesForThisQuestion);
 
     await expect(page).toHaveURL(/check-your-answers/);
-
   }
 
   private async updatePreviouslyAnsweredPage(page: Page) {
-    const currentPage = stringToCamelCase(await page
-      .locator(
-        'legend h1.govuk-fieldset__heading, h1.govuk-heading-xl, h1.govuk-heading-l, h1.govuk-heading-m, legend.govuk-fieldset__legend--l'
-      )
-      .first().innerText());
+    const currentPage = stringToCamelCase(
+      await page
+        .locator(
+          'legend h1.govuk-fieldset__heading, h1.govuk-heading-xl, h1.govuk-heading-l, h1.govuk-heading-m, legend.govuk-fieldset__legend--l'
+        )
+        .first()
+        .innerText()
+    );
 
     switch (currentPage) {
-      case 'isTheCourtHearingInTheNext14Days':
-        {
-          const option1 = FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'Yes' ? isTheCourtHearingInTheNext14Days.noRadioOption : isTheCourtHearingInTheNext14Days.yesRadioOption;
-          await performAction('confirmIfCourtHearingInNext14Days', {
-            question: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
-            option: option1,
-          });
-          if (option1 === 'Yes') {
-            await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-            await performAction('doYouNeedHelpPayingFee', {
-              question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-              option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
-            });
-          } else {
-            await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-            FieldsStore.deleteKeys([doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion, haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion, 'What is your Help with Fees reference number?']);
-          }
-
-          break;
-        }
-      case 'doYouNeedHelpPayingTheFeeForThisApplication':
-        {
-          const feeOption1 = FieldsStore.get(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion as string) === 'I need help paying the fee' ? doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption : doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption;
+      case 'isTheCourtHearingInTheNext14Days': {
+        const option1 =
+          FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'Yes'
+            ? isTheCourtHearingInTheNext14Days.noRadioOption
+            : isTheCourtHearingInTheNext14Days.yesRadioOption;
+        await performAction('confirmIfCourtHearingInNext14Days', {
+          question: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
+          option: option1,
+        });
+        if (option1 === 'Yes') {
+          await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
           await performAction('doYouNeedHelpPayingFee', {
             question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-            option: feeOption1,
+            option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
           });
-          if (feeOption1 !== 'I need help paying the fee') {
-            FieldsStore.deleteKeys([haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion, 'What is your Help with Fees reference number?']);
-          } else {
-            await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
-            await performAction('confirmYouHaveAppliedForFeeHelp', {
-              question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
-              option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
-              label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
-              input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
-            });
-          }
+        } else {
           await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-          break;
+          FieldsStore.deleteKeys([
+            doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+            haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+            'What is your Help with Fees reference number?',
+          ]);
         }
-      case 'whatOrderDoYouWantTheCourtToMakeAndWhy':
-        {
-          FieldsStore.delete('What order do you want the court to make and why?');
-          await performAction('confirmOrderDoYouWant', {
-            label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
-            input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
-          });
-          await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-          break;
 
-        }
-      case 'haveYouAlreadyAppliedForHelpWithYourApplicationFee':
-        {
-          FieldsStore.delete('What is your Help with Fees reference number?');
+        break;
+      }
+      case 'doYouNeedHelpPayingTheFeeForThisApplication': {
+        const feeOption1 =
+          FieldsStore.get(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion as string) ===
+          'I need help paying the fee'
+            ? doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption
+            : doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption;
+        await performAction('doYouNeedHelpPayingFee', {
+          question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+          option: feeOption1,
+        });
+        if (feeOption1 !== 'I need help paying the fee') {
+          FieldsStore.deleteKeys([
+            haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+            'What is your Help with Fees reference number?',
+          ]);
+        } else {
+          await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
           await performAction('confirmYouHaveAppliedForFeeHelp', {
             question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
             option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
             label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
             input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
           });
-          await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-          break;
-
         }
+        await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+        break;
+      }
+      case 'whatOrderDoYouWantTheCourtToMakeAndWhy': {
+        FieldsStore.delete('What order do you want the court to make and why?');
+        await performAction('confirmOrderDoYouWant', {
+          label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
+          input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
+        });
+        await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+        break;
+      }
+      case 'haveYouAlreadyAppliedForHelpWithYourApplicationFee': {
+        FieldsStore.delete('What is your Help with Fees reference number?');
+        await performAction('confirmYouHaveAppliedForFeeHelp', {
+          question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+          option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
+          label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
+          input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
+        });
+        await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+        break;
+      }
 
       default:
         break;
@@ -400,15 +411,10 @@ export class GenAppsAction implements IAction {
       const expectedPage = allowedPages[i];
       const onAllowedPage = currentUrl.includes(expectedPage);
 
-      expect(
-        onAllowedPage,
-        `Unexpected page. Expected: ${expectedPage}, Actual: ${currentUrl}`
-      ).toBeTruthy();
-
+      expect(onAllowedPage, `Unexpected page. Expected: ${expectedPage}, Actual: ${currentUrl}`).toBeTruthy();
 
       const navButton = !currentUrl.includes('ask') ? 'Continue' : 'Start now';
       await performAction('clickButton', navButton);
-
     }
 
     throw new Error('Exceeded maximum steps before reaching CYA');

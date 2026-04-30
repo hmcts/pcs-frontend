@@ -13,12 +13,10 @@ export const checkYourAnswersGenApps = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
   errorValidationField: {
-    errorCheckBoxOption: [
-      { type: `none`, input: ``, errMessage: `Agree to the statement of truth` }
-    ],
+    errorCheckBoxOption: [{ type: `none`, input: ``, errMessage: `Agree to the statement of truth` }],
     errorTextField: [
       { type: `empty`, input: `EMPTY`, errMessage: `You must sign your name` },
-      { type: `moreThanMax`, input: 110, errMessage: `Your full name must be 100 characters or fewer` },      
+      { type: `moreThanMax`, input: 110, errMessage: `Your full name must be 100 characters or fewer` },
     ],
   },
 };

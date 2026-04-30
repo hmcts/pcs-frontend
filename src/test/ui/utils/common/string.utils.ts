@@ -60,12 +60,7 @@ export function stringToCamelCase(input: string): string {
   return input
     .toLowerCase()
     .replace(/[^a-z0-9\s]/gi, '') // remove punctuation
-    .split(/\s+/)                // split on spaces
-    .map((word, index) =>
-      index === 0
-        ? word
-        : word.charAt(0).toUpperCase() + word.slice(1)
-    )
+    .split(/\s+/) // split on spaces
+    .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
     .join('');
 }
-

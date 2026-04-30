@@ -33,7 +33,6 @@ export const FieldsStore = {
     return fieldsMap.delete(key);
   },
 
-
   deleteKeys(keys: string[]): boolean {
     let deleted = false;
 

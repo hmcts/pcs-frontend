@@ -89,7 +89,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('reviewCYA', 'journey1');
     await performAction('reviewAndUpdateCYA', {
       changeOption: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
-      journey: 'journey2'
+      journey: 'journey2',
     });
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
@@ -142,7 +142,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('validateCYA');
     await performAction('reviewAndUpdateCYA', {
       changeOption: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
-      journey: 'journey3'
+      journey: 'journey3',
     });
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
