@@ -494,7 +494,7 @@ export const submitCaseApiData = {
       wantToUploadDocuments: 'NO',
       applicationWithClaim: 'NO',
       notice_NoticeServiceMethod: 'EMAIL',
-      notice_NoticeEmailExplanation: null,
+      notice_NoticeEmailAddress: null,
       notice_NoticeEmailSentDateTime: null,
       notice_NoticeDocuments: [],
       alternativesToPossession: [],
