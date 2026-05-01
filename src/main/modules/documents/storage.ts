@@ -25,6 +25,10 @@ export interface DocumentStorage {
 }
 
 export function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[]): DisplayDocument[] {
+  if (!Array.isArray(docs)) {
+    return [];
+  }
+
   return docs.map((item, index) => ({
     index,
     id: item.id,
@@ -60,34 +64,30 @@ export function createCcdDraftStorage(opts: {
   };
 }
 
-export function sessionDocs(opts: { stepName: string; fieldName?: string }): DocumentStorage {
-  const fieldName = opts.fieldName ?? 'documents';
+// Documents live in their own session bucket (not under `formData[step]`) so the
+// form-builder POST handler — which replaces `formData[step]` wholesale with the
+// submitted body — cannot wipe the upload collection.
+export function sessionDocs(opts: { stepName: string }): DocumentStorage {
+  const readFromSession = (req: Request): CcdCollectionItem<CcdUploadedDocument>[] => {
+    const docs = req.session.uploadedDocs?.[opts.stepName];
+    return Array.isArray(docs) ? (docs as CcdCollectionItem<CcdUploadedDocument>[]) : [];
+  };
+
   return {
     async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-      return (
-        ((req.session.formData?.[opts.stepName] as Record<string, unknown>)?.[
-          fieldName
-        ] as CcdCollectionItem<CcdUploadedDocument>[]) ?? []
-      );
+      return readFromSession(req);
     },
 
     async readFresh(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
       await new Promise<void>((resolve, reject) => req.session.reload(err => (err ? reject(err) : resolve())));
-      return (
-        ((req.session.formData?.[opts.stepName] as Record<string, unknown>)?.[
-          fieldName
-        ] as CcdCollectionItem<CcdUploadedDocument>[]) ?? []
-      );
+      return readFromSession(req);
     },
 
     async save(req: Request, docs: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
-      if (!req.session.formData) {
-        req.session.formData = {};
+      if (!req.session.uploadedDocs) {
+        req.session.uploadedDocs = {};
       }
-      if (!req.session.formData[opts.stepName]) {
-        req.session.formData[opts.stepName] = {};
-      }
-      (req.session.formData[opts.stepName] as Record<string, unknown>)[fieldName] = docs;
+      req.session.uploadedDocs[opts.stepName] = docs;
       await new Promise<void>((resolve, reject) => req.session.save(err => (err ? reject(err) : resolve())));
     },
   };

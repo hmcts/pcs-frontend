@@ -120,6 +120,7 @@ export const step: StepDefinition = createFormStep({
     });
 
     delete req.session.formData;
+    delete req.session.uploadedDocs;
     delete req.session.genApp;
   },
 });

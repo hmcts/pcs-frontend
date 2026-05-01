@@ -6,6 +6,8 @@ import { flowConfig } from '../flow.config';
 import { getFormData } from '@modules/steps';
 import { CcdCollectionItem, CcdUploadedDocument, GenAppType, LanguageUsed } from '@services/ccdCase.interface';
 
+const UPLOAD_STEP_NAME = 'upload-documents-to-support-your-application';
+
 export type FieldDetails<T> = {
   stepName: string;
   fieldValue: T;
@@ -80,8 +82,8 @@ export default class VisibleFormDataView {
   }
 
   getUploadedDocuments(): CcdCollectionItem<CcdUploadedDocument>[] {
-    const docs = getFormData(this.req, 'upload-documents-to-support-your-application').documents;
-    return (docs as CcdCollectionItem<CcdUploadedDocument>[] | undefined) ?? [];
+    const docs = this.req.session.uploadedDocs?.[UPLOAD_STEP_NAME];
+    return Array.isArray(docs) ? (docs as CcdCollectionItem<CcdUploadedDocument>[]) : [];
   }
 
   private getField<T>(stepName: string, fieldName: string): FieldDetails<T> | undefined {

@@ -163,7 +163,7 @@ describe('sessionDocs', () => {
   function makeSessionReq(docs?: CcdCollectionItem<CcdUploadedDocument>[]): Request {
     return {
       session: {
-        formData: docs ? { [STEP_NAME]: { documents: docs } } : {},
+        uploadedDocs: docs ? { [STEP_NAME]: docs } : undefined,
         reload: jest.fn((cb: (err: null) => void) => cb(null)),
         save: jest.fn((cb: (err: null) => void) => cb(null)),
       },
@@ -171,7 +171,7 @@ describe('sessionDocs', () => {
   }
 
   describe('read', () => {
-    it('returns docs from session formData without reloading', async () => {
+    it('returns docs from the dedicated uploadedDocs bucket without reloading', async () => {
       const req = makeSessionReq([doc1]);
 
       const result = await storage.read(req);
@@ -180,8 +180,20 @@ describe('sessionDocs', () => {
       expect(req.session.reload as jest.Mock).not.toHaveBeenCalled();
     });
 
-    it('returns empty array when formData is absent', async () => {
+    it('returns empty array when uploadedDocs bucket is absent', async () => {
       const req = makeSessionReq();
+
+      expect(await storage.read(req)).toEqual([]);
+    });
+
+    it('returns empty array when bucket value is not an array', async () => {
+      const req = {
+        session: {
+          uploadedDocs: { [STEP_NAME]: '' as unknown as CcdCollectionItem<CcdUploadedDocument>[] },
+          reload: jest.fn(),
+          save: jest.fn(),
+        },
+      } as unknown as Request;
 
       expect(await storage.read(req)).toEqual([]);
     });
@@ -200,7 +212,7 @@ describe('sessionDocs', () => {
     it('rejects when session reload fails', async () => {
       const req = {
         session: {
-          formData: {},
+          uploadedDocs: {},
           reload: jest.fn((cb: (err: Error) => void) => cb(new Error('Redis down'))),
           save: jest.fn(),
         },
@@ -211,19 +223,19 @@ describe('sessionDocs', () => {
   });
 
   describe('save', () => {
-    it('writes docs to session and calls session.save', async () => {
+    it('writes docs into the dedicated uploadedDocs bucket and calls session.save', async () => {
       const req = makeSessionReq();
 
       await storage.save(req, [doc1, doc2]);
 
-      expect(req.session.formData?.[STEP_NAME]).toEqual({ documents: [doc1, doc2] });
+      expect(req.session.uploadedDocs?.[STEP_NAME]).toEqual([doc1, doc2]);
       expect(req.session.save as jest.Mock).toHaveBeenCalledTimes(1);
     });
 
     it('rejects when session save fails', async () => {
       const req = {
         session: {
-          formData: {},
+          uploadedDocs: {},
           reload: jest.fn(),
           save: jest.fn((cb: (err: Error) => void) => cb(new Error('save failed'))),
         },
@@ -246,6 +258,11 @@ describe('toDisplayDocuments', () => {
 
   it('returns empty array for empty input', () => {
     expect(toDisplayDocuments([])).toEqual([]);
+  });
+
+  it('returns empty array when input is not an array (defensive)', () => {
+    expect(toDisplayDocuments(undefined as unknown as CcdCollectionItem<CcdUploadedDocument>[])).toEqual([]);
+    expect(toDisplayDocuments('' as unknown as CcdCollectionItem<CcdUploadedDocument>[])).toEqual([]);
   });
 
   it('handles missing optional fields (contentType, size)', () => {
