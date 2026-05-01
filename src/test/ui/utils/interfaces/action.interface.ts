@@ -11,7 +11,6 @@ export interface IAction {
     page: Page,
     action: string,
     fieldName?: actionData | actionRecord,
-    value?: actionData | actionRecord,
-    extraValue?: actionData | actionRecord
+    value?: actionData | actionRecord
   ): Promise<void>;
 }
