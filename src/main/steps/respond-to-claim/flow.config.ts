@@ -5,64 +5,31 @@ import {
   getStepBeforeDisputePages,
   hasAnyRentArrearsGround,
   hasOnlyRentArrearsGrounds,
-  hasSelectedUniversalCredit,
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
-  isFinanceDetailsProvided,
   isFromIncomeAndExpenditure,
-  isNoticeDateProvided,
   isNoticeServed,
   isTenancyStartDateKnown,
-  isUniversalCreditSelected,
   isWalesProperty,
 } from '../utils';
+
+import {
+  hasConfirmedInstallmentOffer,
+  hasProvidedFinanceDetails,
+  isNoticeDateConfirmedAndNotProvided,
+  isNoticeDateConfirmedAndProvided,
+  shouldShowInstallmentPaymentsStep,
+  shouldShowUniversalCreditStep,
+} from './flowConditions';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
-function getContactByTelephoneAnswer(
-  req: Request,
-  currentStepData: Record<string, unknown> = {}
-): 'yes' | 'no' | undefined {
-  const currentAnswer = currentStepData.contactByTelephone;
-  if (currentAnswer === 'yes' || currentAnswer === 'no') {
-    return currentAnswer;
-  }
-
-  // Back-navigation fallback must always come from CCD data.
-  const fromCcd = req.res?.locals?.validatedCase?.isDefendantContactByPhone;
-  if (fromCcd === true) {
-    return 'yes';
-  }
-  if (fromCcd === false) {
-    return 'no';
-  }
-
-  return undefined;
-}
-
-function getConfirmNoticeGivenAnswer(
-  req: Request,
-  currentStepData: Record<string, unknown> = {}
-): 'YES' | 'NO' | 'NOT_SURE' | undefined {
-  const currentAnswer = currentStepData.possessionNoticeReceived;
-  if (currentAnswer === 'YES' || currentAnswer === 'NO' || currentAnswer === 'NOT_SURE') {
-    return currentAnswer;
-  }
-
-  const ccdAnswer =
-    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.possessionNoticeReceived;
-  if (ccdAnswer === 'YES' || ccdAnswer === 'NO' || ccdAnswer === 'NOT_SURE') {
-    return ccdAnswer;
-  }
-
-  return undefined;
-}
-
 export const flowConfig: JourneyFlowConfig = {
   basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaim',
+  useShowConditions: true,
   useSessionFormData: false,
   stepOrder: [
     'start-now',
@@ -70,12 +37,6 @@ export const flowConfig: JourneyFlowConfig = {
     'defendant-name-confirmation',
     'defendant-name-capture',
     'defendant-date-of-birth',
-    'counter-claim',
-    'payment-interstitial',
-    'repayments-made',
-    'repayments-agreed',
-    'installment-payments',
-    'how-much-afford-to-pay',
     'correspondence-address',
     'contact-preferences-email-or-post',
     'contact-preferences-telephone',
@@ -92,8 +53,12 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-date-when-not-provided',
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
-    'upload-document',
-    'support-needs',
+    'counter-claim',
+    'payment-interstitial',
+    'repayments-made',
+    'repayments-agreed',
+    'installment-payments',
+    'how-much-afford-to-pay',
     'your-household-and-circumstances',
     'do-you-have-any-dependant-children',
     'do-you-have-any-other-dependants',
@@ -108,6 +73,8 @@ export const flowConfig: JourneyFlowConfig = {
     'priority-debt-details',
     'what-other-regular-expenses-do-you-have',
     'other-considerations',
+    'upload-document',
+    'support-needs',
     'equality-and-diversity-start',
     'equality-and-diversity-end',
     'language-used',
@@ -115,280 +82,45 @@ export const flowConfig: JourneyFlowConfig = {
     'end-now',
   ],
   steps: {
-    'start-now': {
-      defaultNext: 'free-legal-advice',
-    },
-    'free-legal-advice': {
-      routes: [
-        {
-          // Route to defendant name confirmation if defendant is known
-          condition: async (req: Request) => isDefendantNameKnown(req),
-          nextStep: 'defendant-name-confirmation',
-        },
-        {
-          // Route to defendant name capture if defendant is unknown
-          condition: async (req: Request) => !(await isDefendantNameKnown(req)),
-          nextStep: 'defendant-name-capture',
-        },
-      ],
-      defaultNext: 'defendant-name-capture',
-    },
     'defendant-name-confirmation': {
-      defaultNext: 'defendant-date-of-birth',
+      showCondition: (req: Request) => isDefendantNameKnown(req),
     },
     'defendant-name-capture': {
-      defaultNext: 'defendant-date-of-birth',
-    },
-    'defendant-date-of-birth': {
-      previousStep: async (req: Request) => {
-        const nameKnown = await isDefendantNameKnown(req);
-        return nameKnown ? 'defendant-name-confirmation' : 'defendant-name-capture';
-      },
-      defaultNext: 'correspondence-address',
-    },
-    'correspondence-address': {
-      previousStep: 'defendant-date-of-birth',
-      defaultNext: 'contact-preferences-email-or-post',
-    },
-    'contact-preferences-email-or-post': {
-      previousStep: 'correspondence-address',
-      defaultNext: 'contact-preferences-telephone',
-    },
-    'contact-preferences-telephone': {
-      routes: [
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => getContactByTelephoneAnswer(req, currentStepData) === 'yes',
-          nextStep: 'contact-preferences-text-message',
-        },
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => getContactByTelephoneAnswer(req, currentStepData) === 'no',
-          nextStep: 'dispute-claim-interstitial',
-        },
-      ],
-      previousStep: 'contact-preferences-email-or-post',
+      showCondition: (req: Request) => !isDefendantNameKnown(req),
     },
     'contact-preferences-text-message': {
-      defaultNext: 'dispute-claim-interstitial',
-    },
-    'dispute-claim-interstitial': {
-      routes: [
-        {
-          condition: async (req: Request) => isWalesProperty(req),
-          nextStep: 'landlord-registered',
-        },
-        {
-          condition: async (req: Request) => !isWalesProperty(req),
-          nextStep: 'tenancy-type-details',
-        },
-      ],
-      defaultNext: 'tenancy-type-details',
+      showCondition: (req: Request) => req.res?.locals?.validatedCase?.isDefendantContactByPhone === true,
     },
     'landlord-registered': {
-      defaultNext: 'landlord-licensed',
-      previousStep: 'dispute-claim-interstitial',
+      showCondition: (req: Request) => isWalesProperty(req),
     },
     'landlord-licensed': {
-      defaultNext: 'written-terms',
+      showCondition: (req: Request) => isWalesProperty(req),
     },
     'written-terms': {
-      defaultNext: 'tenancy-type-details',
-      previousStep: 'landlord-licensed',
-    },
-    'tenancy-type-details': {
-      routes: [
-        {
-          condition: async (req: Request) => isTenancyStartDateKnown(req),
-          nextStep: 'tenancy-date-details',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => !(await isTenancyStartDateKnown(req)),
-          nextStep: 'tenancy-date-unknown',
-        },
-      ],
-      previousStep: async (req: Request) => {
-        const walesProperty = isWalesProperty(req);
-        if (walesProperty) {
-          return 'written-terms';
-        }
-        return 'dispute-claim-interstitial';
-      },
+      showCondition: (req: Request) => isWalesProperty(req),
     },
     'tenancy-date-unknown': {
-      routes: [
-        {
-          condition: async (req: Request) => isNoticeServed(req),
-          nextStep: 'confirmation-of-notice-given',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return rentArrears;
-          },
-          nextStep: 'rent-arrears-dispute',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return !rentArrears;
-          },
-          nextStep: 'non-rent-arrears-dispute',
-        },
-      ],
-      previousStep: 'tenancy-type-details',
+      showCondition: (req: Request) => !isTenancyStartDateKnown(req),
     },
     'tenancy-date-details': {
-      routes: [
-        {
-          condition: async (req: Request) => isNoticeServed(req),
-          nextStep: 'confirmation-of-notice-given',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return rentArrears;
-          },
-          nextStep: 'rent-arrears-dispute',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return !rentArrears;
-          },
-          nextStep: 'non-rent-arrears-dispute',
-        },
-      ],
-      previousStep: 'tenancy-type-details',
+      showCondition: (req: Request) => isTenancyStartDateKnown(req),
     },
     'confirmation-of-notice-given': {
-      routes: [
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven !== 'YES') {
-              return false;
-            }
-            const noticeDateProvided = await isNoticeDateProvided(req);
-            return noticeDateProvided;
-          },
-          nextStep: 'confirmation-of-notice-date-when-provided',
-        },
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven !== 'YES') {
-              return false;
-            }
-            const noticeDateProvided = await isNoticeDateProvided(req);
-            return !noticeDateProvided;
-          },
-          nextStep: 'confirmation-of-notice-date-when-not-provided',
-        },
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven === 'YES') {
-              return false;
-            }
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return rentArrears;
-          },
-          nextStep: 'rent-arrears-dispute',
-        },
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            const confirmNoticeGiven = getConfirmNoticeGivenAnswer(req, currentStepData);
-            if (confirmNoticeGiven === 'YES') {
-              return false;
-            }
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return !rentArrears;
-          },
-          nextStep: 'non-rent-arrears-dispute',
-        },
-      ],
-      previousStep: async (req: Request) => {
-        const tenancyStartDateKnown = await isTenancyStartDateKnown(req);
-        return tenancyStartDateKnown ? 'tenancy-date-details' : 'tenancy-date-unknown';
-      },
+      showCondition: (req: Request) => isNoticeServed(req),
     },
 
     'confirmation-of-notice-date-when-provided': {
-      routes: [
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return rentArrears;
-          },
-          nextStep: 'rent-arrears-dispute',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return !rentArrears;
-          },
-          nextStep: 'non-rent-arrears-dispute',
-        },
-      ],
-      previousStep: 'confirmation-of-notice-given',
+      showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
     'confirmation-of-notice-date-when-not-provided': {
-      routes: [
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return rentArrears;
-          },
-          nextStep: 'rent-arrears-dispute',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const rentArrears = await hasAnyRentArrearsGround(req);
-            return !rentArrears;
-          },
-          nextStep: 'non-rent-arrears-dispute',
-        },
-      ],
-      previousStep: 'confirmation-of-notice-given',
+      showCondition: (req: Request) => isNoticeDateConfirmedAndNotProvided(req),
     },
     'rent-arrears-dispute': {
-      defaultNext: 'counter-claim',
-      previousStep: (req: Request) => getStepBeforeDisputePages(req),
-      routes: [
-        {
-          condition: (req: Request): Promise<boolean> => hasOnlyRentArrearsGrounds(req),
-          nextStep: 'counter-claim',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => !(await hasOnlyRentArrearsGrounds(req)),
-          nextStep: 'non-rent-arrears-dispute',
-        },
-      ],
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
     'non-rent-arrears-dispute': {
+      showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
       defaultNext: 'counter-claim',
       previousStep: async (req: Request) => {
         const rentArrearsClaim = await hasAnyRentArrearsGround(req);
@@ -435,12 +167,13 @@ export const flowConfig: JourneyFlowConfig = {
             currentStepData: Record<string, unknown>
           ): Promise<boolean> =>
             currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
-          nextStep: 'upload-document',
+          nextStep: 'your-household-and-circumstances',
         },
       ],
       previousStep: 'repayments-made',
     },
     'installment-payments': {
+      showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
       previousStep: 'repayments-agreed',
       routes: [
         {
@@ -452,22 +185,15 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'how-much-afford-to-pay',
         },
       ],
-      defaultNext: 'upload-document',
+      defaultNext: 'your-household-and-circumstances',
     },
     'how-much-afford-to-pay': {
+      showCondition: (req: Request) => hasConfirmedInstallmentOffer(req),
       previousStep: 'installment-payments',
-      defaultNext: 'upload-document',
-    },
-    'upload-document': {
-      previousStep: (req: Request) => getPreviousStepForYourHouseholdAndCircumstances(req),
-      defaultNext: 'support-needs',
-    },
-    'support-needs': {
-      previousStep: 'upload-document',
       defaultNext: 'your-household-and-circumstances',
     },
     'your-household-and-circumstances': {
-      previousStep: 'support-needs',
+      previousStep: (req: Request) => getPreviousStepForYourHouseholdAndCircumstances(req),
       defaultNext: 'do-you-have-any-dependant-children',
     },
     'do-you-have-any-dependant-children': {
@@ -498,56 +224,30 @@ export const flowConfig: JourneyFlowConfig = {
       previousStep: 'exceptional-hardship',
       routes: [
         {
-          condition: async (req: Request): Promise<boolean> => {
-            return !(await isFinanceDetailsProvided(req));
-          },
+          condition: async (req: Request): Promise<boolean> => !hasProvidedFinanceDetails(req),
           nextStep: 'other-considerations',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const provided = await isFinanceDetailsProvided(req);
-            return provided;
-          },
+          condition: async (req: Request): Promise<boolean> => hasProvidedFinanceDetails(req),
           nextStep: 'what-regular-income-do-you-receive',
         },
       ],
       defaultNext: 'what-regular-income-do-you-receive',
     },
     'what-regular-income-do-you-receive': {
-      previousStep: 'income-and-expenses',
-      routes: [
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            const selected = await isUniversalCreditSelected(req);
-            return selected;
-          },
-          nextStep: 'priority-debts',
-        },
-        {
-          condition: async (req: Request): Promise<boolean> => {
-            return !(await isUniversalCreditSelected(req));
-          },
-          nextStep: 'have-you-applied-for-universal-credit',
-        },
-      ],
-      defaultNext: 'have-you-applied-for-universal-credit',
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'have-you-applied-for-universal-credit': {
-      previousStep: 'what-regular-income-do-you-receive',
-      defaultNext: 'priority-debts',
+      showCondition: (req: Request) => shouldShowUniversalCreditStep(req),
     },
     'priority-debts': {
-      previousStep: async (req: Request): Promise<string> => {
-        const selectedUniversalCredit = await hasSelectedUniversalCredit(req);
-        return selectedUniversalCredit ? 'what-regular-income-do-you-receive' : 'have-you-applied-for-universal-credit';
-      },
-      defaultNext: 'priority-debt-details',
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'priority-debt-details': {
-      previousStep: 'priority-debts',
-      defaultNext: 'what-other-regular-expenses-do-you-have',
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'what-other-regular-expenses-do-you-have': {
+      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
       previousStep: 'priority-debt-details',
       defaultNext: 'other-considerations',
     },
@@ -556,10 +256,18 @@ export const flowConfig: JourneyFlowConfig = {
         const fromIncomeExpenditure = await isFromIncomeAndExpenditure(req);
         return fromIncomeExpenditure ? 'income-and-expenses' : 'what-other-regular-expenses-do-you-have';
       },
+      defaultNext: 'upload-document',
+    },
+    'upload-document': {
+      previousStep: 'other-considerations',
+      defaultNext: 'support-needs',
+    },
+    'support-needs': {
+      previousStep: 'upload-document',
       defaultNext: 'equality-and-diversity-start',
     },
     'equality-and-diversity-start': {
-      previousStep: 'other-considerations',
+      previousStep: 'support-needs',
       routes: [
         {
           condition: async (
@@ -581,17 +289,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'equality-and-diversity-end',
     },
     'equality-and-diversity-end': {
-      previousStep: 'equality-and-diversity-start',
-      defaultNext: 'language-used',
-    },
-    'language-used': {
-      previousStep: (req: Request) =>
-        hasSkippedEqualityAndDiversityQuestions(req) ? 'equality-and-diversity-start' : 'equality-and-diversity-end',
-      defaultNext: 'check-your-answers',
-    },
-    'check-your-answers': {
-      previousStep: 'language-used',
-      defaultNext: 'end-now',
+      showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
     },
   },
 };
