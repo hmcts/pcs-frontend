@@ -259,9 +259,9 @@ export class CcdCaseModel {
     return this.defendantContactDetailsParty.nameKnown ?? '';
   }
 
-  /** User's confirmation of notice given (yes/no/imNotSure). Used for arrears back-navigation after resume. */
-  get defendantResponsesConfirmNoticeGiven(): string | undefined {
-    const raw = this.defendantResponses?.confirmNoticeGiven;
+  /** Defendant's answer to "were you given notice" (normalised to yes/no/imNotSure). Used for arrears back-navigation after resume. */
+  get defendantResponsesPossessionNoticeReceived(): string | undefined {
+    const raw = this.defendantResponses?.possessionNoticeReceived;
     if (raw === undefined || raw === null) {
       return undefined;
     }
@@ -280,10 +280,6 @@ export class CcdCaseModel {
     }
 
     return String(raw).trim();
-  }
-
-  get defendantResponsesNoticeDate(): string | undefined {
-    return this.defendantResponses?.noticeDate ?? undefined;
   }
 
   /**
