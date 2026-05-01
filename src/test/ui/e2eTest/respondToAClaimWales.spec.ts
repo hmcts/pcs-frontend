@@ -51,19 +51,20 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
   if (testInfo.title.includes('Secure')) {
     process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
-  } else if (testInfo.title.includes('Standard')) {
-    process.env.OCCUPATION_LICENCE_TYPE = 'STANDARD_CONTRACT';
   }
   submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
   claimantName = process.env.CLAIMANT_NAME;
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
   if (process.env.OCCUPATION_LICENCE_TYPE === 'SECURE_CONTRACT') {
+    process.env.RENT_NON_RENT = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
   } else if (testInfo.title.includes('NonRentArrears')) {
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseNonRentStandard });
   } else if (testInfo.title.includes('Standard contract - Rent and Non-Rent Arrears')) {
+    process.env.RENT_NON_RENT = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentNonRentStandard });
   } else {
+    process.env.RENT_ARREARS = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentOtherTenancy });
   }
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
