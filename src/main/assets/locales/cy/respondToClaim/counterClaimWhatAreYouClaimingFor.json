@@ -1,14 +1,14 @@
 {
-  "pageTitle": "CyWhat is your counterclaim?",
-  "heading": "CyWhat are you claiming for?",
+  "pageTitle": "cyWhat is your counterclaim?",
+  "heading": "cyWhat are you claiming for?",
   "options": {
-    "paymentOrCompensation": "CyA sum of money or compensation",
-    "somethingElse": "CySomething else",
-    "both": "CyBoth"
+    "paymentOrCompensation": "cyA sum of money or compensation",
+    "somethingElse": "cySomething else",
+    "both": "cyBoth"
   },
   "errors": {
     "claimType": {
-      "required": "CySelect if you’re claiming for a sum of money or compensation, both or something else"
+      "required": "cySelect if you’re claiming for a sum of money or compensation, both or something else"
     }
   }
 }

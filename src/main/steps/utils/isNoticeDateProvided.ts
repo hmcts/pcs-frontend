@@ -10,7 +10,7 @@ import type { Request } from 'express';
  *
  * Returns true if any notice date is provided, false otherwise.
  */
-export const isNoticeDateProvided = async (req: Request): Promise<boolean> => {
+export const isNoticeDateProvided = (req: Request): boolean => {
   const { noticeDate } = req.res?.locals?.validatedCase ?? { noticeDate: '' };
   return !!noticeDate;
 };
