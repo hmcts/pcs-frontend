@@ -102,6 +102,8 @@
       "ViewClaim": "/case/:caseReference/view-the-claim",
       "MakeGeneralApplication": "/case/:caseReference/make-an-application/choose-an-application",
       "ViewAllApplications": "/case/:caseReference/view-all-applications"
+      "ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
+      "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
     }
   }
 }
