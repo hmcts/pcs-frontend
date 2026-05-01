@@ -14,7 +14,7 @@
   "findInformation": "Find information about my court",
 
   "taskGroups": {
-    "CLAIM": "The claim",
+    "CLAIM": "The claim against you",
     "HEARING": "Hearing",
     "JUDGEMENT": "Judgement from the court",
     "NOTICE": "Orders and notices from the court",
