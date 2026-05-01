@@ -417,7 +417,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tenancyType: submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
-    await performAction('selectTenancyStartDateKnown', {
+    await performAction('enterTenancyStartDetailsUnKnown', {
       option: tenancyDateDetails.noRadioOption,
       day: '01',
       month: '12',

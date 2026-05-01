@@ -220,18 +220,6 @@ export const submitCaseApiDataWales = {
     rentDetails_FormattedCalculatedDailyCharge: '£32.85',
     rentDetails_PerDayCorrect: 'YES',
     showRentArrearsPage: 'Yes',
-    rentArrears_StatementDocuments: [
-      {
-        value: {
-          document_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/795aaec9-de48-4aea-b104-a32e38c161e8',
-          document_binary_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/795aaec9-de48-4aea-b104-a32e38c161e8/binary',
-          document_filename: 'Screenshot 2026-04-30 at 14.53.25.png',
-          document_hash: 'f30516ba639b49e1708d137f7a7fe7859dafc472f3091c9fe96be25819e551e8',
-        },
-      },
-    ],
     rentArrears_Total: '150000',
     rentArrears_ThirdPartyPayments: 'NO',
     arrearsJudgmentWanted: 'NO',
@@ -428,23 +416,6 @@ export const submitCaseApiDataWales = {
     hasUnderlesseeOrMortgagee: 'NO',
     wantToUploadDocuments: 'YES',
     applicationWithClaim: 'NO',
-    additionalDocuments: [
-      {
-        value: {
-          documentType: 'WITNESS_STATEMENT',
-          description: 'test doc',
-          document: {
-            document_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/e519d708-ef48-4a6f-9eb6-66cf12521c40',
-            document_binary_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/e519d708-ef48-4a6f-9eb6-66cf12521c40/binary',
-            document_filename: 'Screenshot 2026-04-30 at 10.15.28.png',
-            document_hash: '41888ad7755af78b414d5c964c063e5fcc879c0942dfe26ae1ad7dfcc188f084',
-          },
-        },
-        id: '532693d4-e3fc-4173-b055-7b6bc0622c7c',
-      },
-    ],
     languageUsed: 'ENGLISH_AND_WELSH',
     completionNextStep: 'SUBMIT_AND_PAY_NOW',
     endButtonLabel: 'Submit claim',
