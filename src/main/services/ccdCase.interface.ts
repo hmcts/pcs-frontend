@@ -178,7 +178,7 @@ export interface CcdCounterClaim {
   isClaimAmountKnown?: string;
   claimAmount?: string;
   estimatedMaxClaimAmount?: string;
-  counterClaimAgainst?: string[];
+  counterClaimAgainst?: CcdClaimParty[];
   aboutCounterclaimFor?: string;
   aboutCounterclaimReasons?: string;
   orderOtherThanSumRequested?: string;

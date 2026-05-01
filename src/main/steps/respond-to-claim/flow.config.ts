@@ -467,7 +467,7 @@ export const flowConfig: JourneyFlowConfig = {
       defaultNext: 'counter-claim-about',
     },
     'counter-claim-about': {
-           previousStep: async (req: Request) => getPreviousStepForCounterClaimAbout(req),
+      previousStep: async (req: Request) => getPreviousStepForCounterClaimAbout(req),
       routes: [
         {
           condition: async (req: Request) => isSomethingElseCounterClaim(req),

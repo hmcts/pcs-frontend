@@ -25,7 +25,7 @@ export const step: StepDefinition = createFormStep({
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.orderOtherThanSumRequested.required',
+      errorMessage: 'errors.orderOtherThanSumRequestedRequired',
       labelClasses: 'govuk-label--s',
       translationKey: {
         label: 'orderOtherThanSumRequestedLabel',
@@ -37,7 +37,7 @@ export const step: StepDefinition = createFormStep({
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.orderOtherThanSumFacts.required',
+      errorMessage: 'errors.orderOtherThanSumFactsRequired',
       labelClasses: 'govuk-label--s',
       translationKey: {
         label: 'orderOtherThanSumFactsLabel',
@@ -47,7 +47,9 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: (req: Request) => {
     const counterClaim =
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
-    if (!counterClaim) {return {};}
+    if (!counterClaim) {
+      return {};
+    }
     return {
       ...(counterClaim.orderOtherThanSumRequested
         ? { orderOtherThanSumRequested: counterClaim.orderOtherThanSumRequested }
@@ -58,8 +60,6 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async (req: Request) => {
     const orderOtherThanSumRequested = (req.body?.orderOtherThanSumRequested as string | undefined)?.trim();
     const orderOtherThanSumFacts = (req.body?.orderOtherThanSumFacts as string | undefined)?.trim();
-
-    if (!orderOtherThanSumRequested && !orderOtherThanSumFacts) {return;}
 
     const counterClaim: CcdCounterClaim = {
       ...(orderOtherThanSumRequested ? { orderOtherThanSumRequested } : {}),

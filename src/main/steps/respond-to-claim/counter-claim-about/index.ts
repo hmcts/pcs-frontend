@@ -25,7 +25,7 @@ export const step: StepDefinition = createFormStep({
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.aboutCounterclaimFor.required',
+      errorMessage: 'errors.aboutCounterclaimForRequired',
       labelClasses: 'govuk-label--s',
       translationKey: {
         label: 'aboutCounterclaimForLabel',
@@ -36,7 +36,7 @@ export const step: StepDefinition = createFormStep({
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.aboutCounterclaimReasons.required',
+      errorMessage: 'errors.aboutCounterclaimReasonsRequired',
       labelClasses: 'govuk-label--s',
       translationKey: {
         label: 'aboutCounterclaimReasonsLabel',
@@ -46,7 +46,9 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: (req: Request) => {
     const counterClaim =
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
-    if (!counterClaim) {return {};}
+    if (!counterClaim) {
+      return {};
+    }
     return {
       ...(counterClaim.aboutCounterclaimFor ? { aboutCounterclaimFor: counterClaim.aboutCounterclaimFor } : {}),
       ...(counterClaim.aboutCounterclaimReasons

@@ -6,11 +6,9 @@
   "aboutCounterclaimForLabel": "What is your counterclaim for?",
   "aboutCounterclaimReasonsLabel": "What are your reasons for making the counterclaim?",
   "errors": {
-    "aboutCounterclaimFor": {
-      "required": "Enter what your counterclaim is for"
-    },
-    "aboutCounterclaimReasons": {
-      "required": "Enter what your reasons are for making the counterclaim"
-    }
+    "aboutCounterclaimForRequired": "Enter what your counterclaim is for",
+    "aboutCounterclaimForMaxLength": "What your counterclaim is for must be 6800 characters or less",
+    "aboutCounterclaimReasonsRequired": "Enter what your reasons are for making the counterclaim",
+    "aboutCounterclaimReasonsMaxLength": "What your reasons are for making the counterclaim must be 6800 characters or less"
   }
 }
