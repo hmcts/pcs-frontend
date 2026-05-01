@@ -409,10 +409,7 @@ export const flowConfig: JourneyFlowConfig = {
           nextStep: 'your-household-and-circumstances',
         },
         {
-          condition: async (req: Request): Promise<boolean> => {
-            const provided = await hasOnlyRentArrearsGrounds(req);
-            return provided;
-          },
+          condition: hasOnlyRentArrearsGrounds,
           nextStep: 'payment-interstitial',
         },
       ],
