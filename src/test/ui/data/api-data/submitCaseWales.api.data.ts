@@ -150,6 +150,113 @@ export const submitCaseApiDataWales = {
     },
   },
 
+  submitCaseRentNonRentStandard: {
+    legislativeCountry: 'Wales',
+    claimantType: {
+      value: {
+        code: 'COMMUNITY_LANDLORD',
+        label: 'Community landlord',
+      },
+      list_items: [
+        {
+          code: 'PRIVATE_LANDLORD',
+          label: 'Private landlord',
+        },
+        {
+          code: 'COMMUNITY_LANDLORD',
+          label: 'Community landlord',
+        },
+        {
+          code: 'MORTGAGE_LENDER',
+          label: 'Mortgage lender',
+        },
+        {
+          code: 'OTHER',
+          label: 'Other',
+        },
+      ],
+      valueCode: 'COMMUNITY_LANDLORD',
+    },
+    claimAgainstTrespassers: 'NO',
+    orgNameFound: 'Yes',
+    claimantName: 'Possession Claims Solicitor Org',
+    isClaimantNameCorrect: 'YES',
+    walesRegistered: 'NO',
+    walesLicensed: 'NO',
+    walesLicensedAgentAppointed: 'NO',
+    claimantContactEmail: 'pcs-solicitor-automation@test.com',
+    isCorrectClaimantContactEmail: 'YES',
+    orgAddressFound: 'Yes',
+    organisationAddress: {
+      AddressLine1: 'Ministry Of Justice',
+      AddressLine2: 'Seventh Floor 102 Petty France',
+      PostTown: 'London',
+      PostCode: 'SW1H 9AJ',
+      Country: 'United Kingdom',
+    },
+    formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
+    isCorrectClaimantContactAddress: 'YES',
+    claimantProvidePhoneNumber: 'NO',
+    defendant1: {
+      nameKnown: 'NO',
+      addressKnown: 'NO',
+    },
+    addAnotherDefendant: 'NO',
+    occupationLicenceTypeWales: 'STANDARD_CONTRACT',
+    licenceStartDate: '2020-05-20',
+    licenceDocuments: [],
+    possessionGroundsWales_DiscretionaryGrounds: ['RENT_ARREARS_S157'],
+    possessionGroundsWales_MandatoryGrounds: ['FAILURE_TO_GIVE_UP_POSSESSION_S170'],
+    showReasonsForGroundsPageWales: 'Yes',
+    walesFailToGiveUpS170Reason: 'Test note',
+    preActionProtocolCompleted: 'NO',
+    mediationAttempted: 'NO',
+    settlementAttempted: 'NO',
+    walesNoticeServed: 'No',
+    rentDetails_CurrentRent: '100000',
+    rentDetails_Frequency: 'MONTHLY',
+    rentDetails_CalculatedDailyCharge: '3285',
+    rentSectionPaymentFrequency: 'MONTHLY',
+    rentDetails_FormattedCalculatedDailyCharge: '£32.85',
+    rentDetails_PerDayCorrect: 'YES',
+    showRentArrearsPage: 'Yes',
+    rentArrears_StatementDocuments: [
+      {
+        value: {
+          document_url:
+            'http://dm-store-aat.service.core-compute-aat.internal/documents/795aaec9-de48-4aea-b104-a32e38c161e8',
+          document_binary_url:
+            'http://dm-store-aat.service.core-compute-aat.internal/documents/795aaec9-de48-4aea-b104-a32e38c161e8/binary',
+          document_filename: 'Screenshot 2026-04-30 at 14.53.25.png',
+          document_hash: 'f30516ba639b49e1708d137f7a7fe7859dafc472f3091c9fe96be25819e551e8',
+        },
+      },
+    ],
+    rentArrears_Total: '150000',
+    rentArrears_ThirdPartyPayments: 'NO',
+    arrearsJudgmentWanted: 'NO',
+    claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
+    claimantCircumstancesSelect: 'NO',
+    hasDefendantCircumstancesInfo: 'NO',
+    prohibitedConductWalesClaim: 'NO',
+    claimingCostsWanted: 'YES',
+    hasUnderlesseeOrMortgagee: 'NO',
+    additionalReasonsForPossession: {
+      hasReasons: 'NO',
+    },
+    wantToUploadDocuments: 'NO',
+    applicationWithClaim: 'NO',
+    languageUsed: 'ENGLISH_AND_WELSH',
+    completionNextStep: 'SUBMIT_AND_PAY_NOW',
+    endButtonLabel: 'Submit claim',
+    statementOfTruth: {
+      completedBy: 'CLAIMANT',
+      fullNameClaimant: 'Test',
+      positionClaimant: 'Manager',
+      agreementClaimant: ['BELIEVE_TRUE'],
+    },
+  },
+
   submitCaseRentOtherTenancy: {
     legislativeCountry: 'Wales',
     claimantType: {

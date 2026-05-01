@@ -57,13 +57,12 @@ test.beforeEach(async ({ page }, testInfo) => {
   submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
   claimantName = process.env.CLAIMANT_NAME;
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
-  if (
-    process.env.OCCUPATION_LICENCE_TYPE === 'SECURE_CONTRACT' ||
-    process.env.OCCUPATION_LICENCE_TYPE === 'STANDARD_CONTRACT'
-  ) {
+  if (process.env.OCCUPATION_LICENCE_TYPE === 'SECURE_CONTRACT') {
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
   } else if (testInfo.title.includes('NonRentArrears')) {
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseNonRentStandard });
+  } else if (testInfo.title.includes('Standard contract - Rent and Non-Rent Arrears')) {
+    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentNonRentStandard });
   } else {
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentOtherTenancy });
   }
