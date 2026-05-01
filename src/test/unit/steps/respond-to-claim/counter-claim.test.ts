@@ -53,8 +53,10 @@ describe('counter-claim step (counterclaim docs upload)', () => {
       res: {
         locals: {
           validatedCase: {
-            possessionClaimResponse: {
-              defendantResponses: { counterClaimDocuments },
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { counterClaimDocuments },
+              },
             },
           },
         },

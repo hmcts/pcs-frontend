@@ -1,13 +1,15 @@
+import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../draftEvent';
 import { flowConfig } from '../flow.config';
 
-import { ccdDraftDocs, toDisplayDocuments } from '@modules/documents/storage';
+import { createCcdDraftStorage, toDisplayDocuments } from '@modules/documents/storage';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
-const storage = ccdDraftDocs({
-  event: { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
-  path: ['possessionClaimResponse', 'defendantResponses', 'defendantDocuments'],
+const storage = createCcdDraftStorage({
+  event: RESPOND_TO_CLAIM_DRAFT_EVENT,
+  getDocs: data => data.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [],
+  setDocs: docs => ({ possessionClaimResponse: { defendantResponses: { defendantDocuments: docs } } }),
 });
 
 export const step: StepDefinition = createFormStep({

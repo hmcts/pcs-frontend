@@ -2,6 +2,7 @@ import type { Request } from 'express';
 
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
+import { RESPOND_TO_CLAIM_DRAFT_EVENT } from './respond-to-claim/draftEvent';
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
@@ -38,7 +39,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
   respondToClaim: {
     name: 'respondToClaim',
     slug: 'respond-to-claim',
-    draftEvent: { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
+    draftEvent: RESPOND_TO_CLAIM_DRAFT_EVENT,
     default: {
       flowConfig: respondToClaimFlowConfig,
       stepRegistry: respondToClaimStepRegistry,
@@ -75,6 +76,10 @@ export function validateJourneyRegistry(registry: Record<string, JourneyConfig>)
 
 validateJourneyRegistry(journeyRegistry);
 
+export function getUserVariant(req: Request): JourneyVariant {
+  return getUserType(req) === 'legalrep' ? 'legalrep' : 'default';
+}
+
 export function journeyForSlug(slug: string): JourneyConfig | undefined {
   return Object.values(journeyRegistry).find(journey => journey.slug === slug);
 }
@@ -99,13 +104,8 @@ function getJourneyConfigForRequest(journeyName: string, req?: Request): Resolve
     return undefined;
   }
 
-  const userType = req ? getUserType(req) : 'citizen';
-
-  if (userType === 'legalrep' && journey.legalrep) {
-    return journey.legalrep;
-  }
-
-  return journey.default;
+  const variant = req ? getUserVariant(req) : 'default';
+  return journey[variant] ?? journey.default;
 }
 
 function getRegistrationStepNames(journey: JourneyConfig): string[] {

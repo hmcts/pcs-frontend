@@ -39,6 +39,7 @@ jest.mock('../../../main/services/cdamService', () => ({
 jest.mock('../../../main/steps/index', () => ({
   findStep: jest.fn(),
   journeyForSlug: jest.fn(),
+  getUserVariant: jest.fn().mockReturnValue('default'),
 }));
 
 jest.mock('../../../main/middleware', () => ({

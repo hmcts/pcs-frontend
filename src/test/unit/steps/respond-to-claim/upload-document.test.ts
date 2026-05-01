@@ -75,8 +75,10 @@ describe('upload-document step', () => {
       res: {
         locals: {
           validatedCase: {
-            possessionClaimResponse: {
-              defendantResponses: { defendantDocuments },
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { defendantDocuments },
+              },
             },
           },
         },

@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../respond-to-claim/draftEvent';
+
 import { type CcdCase, CcdCaseModel, type PossessionClaimResponse } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 
@@ -39,11 +41,8 @@ export const buildCcdCaseForPossessionClaimResponse = async (
       possessionClaimResponse,
     },
   };
-  // Inline literal (not journeyRegistry.respondToClaim.draftEvent) to avoid a
-  // circular import: this util is imported by 20+ respond-to-claim step index
-  // files, which are themselves in journeyRegistry's import graph.
   const updatedCase = await ccdCaseService.updateDraft(
-    { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
+    RESPOND_TO_CLAIM_DRAFT_EVENT,
     req.session?.user?.accessToken,
     ccdCase.id,
     ccdCase.data as Record<string, unknown>

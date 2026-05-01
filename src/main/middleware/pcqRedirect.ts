@@ -74,17 +74,17 @@ export function pcqRedirectMiddleware() {
       token,
     };
 
+    const { draftEvent } = journeyRegistry.respondToClaim;
+    if (!draftEvent) {
+      logger.warn('draftEvent not configured for respondToClaim journey, skipping PCQ update');
+      return next();
+    }
+
     try {
-      // Load-time invariant guarantees draftEvent presence on respondToClaim.
-      const updatedCase = await ccdCaseService.updateDraft(
-        journeyRegistry.respondToClaim.draftEvent!,
-        user.accessToken,
-        ccdCase.id,
-        {
-          ...ccdCase.data,
-          userPcqId: pcqId,
-        }
-      );
+      const updatedCase = await ccdCaseService.updateDraft(draftEvent, user.accessToken, ccdCase.id, {
+        ...ccdCase.data,
+        userPcqId: pcqId,
+      });
 
       res.locals.validatedCase = new CcdCaseModel(updatedCase);
     } catch (err) {

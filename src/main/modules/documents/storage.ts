@@ -1,9 +1,8 @@
 import type { Request } from 'express';
-import { get, set } from 'lodash';
 
 import { getUserToken } from '../../steps/utils';
 
-import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
+import type { CcdCaseData, CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 export interface CcdDraftEvent {
@@ -35,23 +34,61 @@ export function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[
   }));
 }
 
-export function ccdDraftDocs(opts: { event: CcdDraftEvent; path: readonly [string, ...string[]] }): DocumentStorage {
+export function createCcdDraftStorage(opts: {
+  event: CcdDraftEvent;
+  getDocs: (data: CcdCaseData) => CcdCollectionItem<CcdUploadedDocument>[];
+  setDocs: (docs: CcdCollectionItem<CcdUploadedDocument>[]) => Record<string, unknown>;
+}): DocumentStorage {
   return {
     async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-      return get(req.res?.locals?.validatedCase, opts.path) ?? [];
+      const data = (req.res?.locals?.validatedCase?.data ?? {}) as CcdCaseData;
+      return opts.getDocs(data) ?? [];
     },
 
     async readFresh(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
       const token = getUserToken(req);
       const caseId = req.params.caseReference as string;
       const fresh = await ccdCaseService.getCaseById(token, caseId, opts.event.id);
-      return get(fresh.data, opts.path) ?? [];
+      return opts.getDocs((fresh.data ?? {}) as CcdCaseData) ?? [];
     },
 
     async save(req: Request, docs: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
       const token = getUserToken(req);
       const caseId = req.params.caseReference as string;
-      await ccdCaseService.updateDraft(opts.event, token, caseId, set({}, opts.path, docs));
+      await ccdCaseService.updateDraft(opts.event, token, caseId, opts.setDocs(docs));
+    },
+  };
+}
+
+export function sessionDocs(opts: { stepName: string; fieldName?: string }): DocumentStorage {
+  const fieldName = opts.fieldName ?? 'documents';
+  return {
+    async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
+      return (
+        ((req.session.formData?.[opts.stepName] as Record<string, unknown>)?.[
+          fieldName
+        ] as CcdCollectionItem<CcdUploadedDocument>[]) ?? []
+      );
+    },
+
+    async readFresh(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
+      await new Promise<void>((resolve, reject) => req.session.reload(err => (err ? reject(err) : resolve())));
+      return (
+        ((req.session.formData?.[opts.stepName] as Record<string, unknown>)?.[
+          fieldName
+        ] as CcdCollectionItem<CcdUploadedDocument>[]) ?? []
+      );
+    },
+
+    async save(req: Request, docs: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
+      if (!req.session.formData) {
+        req.session.formData = {};
+      }
+      if (!req.session.formData[opts.stepName]) {
+        req.session.formData[opts.stepName] = {};
+      }
+      (req.session.formData[opts.stepName] as Record<string, unknown>)[fieldName] = docs;
+      await new Promise<void>((resolve, reject) => req.session.save(err => (err ? reject(err) : resolve())));
     },
   };
 }

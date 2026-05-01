@@ -5,8 +5,8 @@ import multer from 'multer';
 
 import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware';
-import { type JourneyVariant, findStep } from '../steps';
-import { getUserToken, getUserType } from '../steps/utils';
+import { findStep, getUserVariant } from '../steps';
+import { getUserToken } from '../steps/utils';
 
 import type { DocumentStorage } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
@@ -72,7 +72,7 @@ export function handleMulterError(
 function uploadCtx(req: Request): { storage: DocumentStorage } {
   const slug = req.params.journey as string | undefined;
   const stepName = req.params.step as string | undefined;
-  const variant: JourneyVariant = getUserType(req) === 'legalrep' ? 'legalrep' : 'default';
+  const variant = getUserVariant(req);
   const step = slug && stepName ? findStep(slug, stepName, variant) : undefined;
   if (!step?.documentStorage) {
     logger.warn('Upload requested without documentStorage', { slug, stepName, variant });

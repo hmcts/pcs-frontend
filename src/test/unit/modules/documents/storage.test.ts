@@ -7,7 +7,7 @@ jest.mock('../../../../main/services/ccdCaseService', () => ({
 
 import type { Request } from 'express';
 
-import { ccdDraftDocs, toDisplayDocuments } from '../../../../main/modules/documents/storage';
+import { createCcdDraftStorage, sessionDocs, toDisplayDocuments } from '../../../../main/modules/documents/storage';
 
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -51,10 +51,13 @@ function makeReq(overrides: Record<string, unknown> = {}): Request {
 }
 
 const EVENT = { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' };
-const PATH = ['possessionClaimResponse', 'defendantResponses', 'defendantDocuments'] as const;
 
-describe('ccdDraftDocs', () => {
-  const storage = ccdDraftDocs({ event: EVENT, path: PATH });
+describe('createCcdDraftStorage', () => {
+  const storage = createCcdDraftStorage({
+    event: EVENT,
+    getDocs: data => data.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [],
+    setDocs: docs => ({ possessionClaimResponse: { defendantResponses: { defendantDocuments: docs } } }),
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -62,13 +65,15 @@ describe('ccdDraftDocs', () => {
   });
 
   describe('read', () => {
-    it('returns docs from res.locals.validatedCase at the configured path', async () => {
+    it('returns docs from res.locals.validatedCase.data at the configured path', async () => {
       const req = makeReq({
         res: {
           locals: {
             validatedCase: {
-              possessionClaimResponse: {
-                defendantResponses: { defendantDocuments: [doc1] },
+              data: {
+                possessionClaimResponse: {
+                  defendantResponses: { defendantDocuments: [doc1] },
+                },
               },
             },
           },
@@ -82,7 +87,7 @@ describe('ccdDraftDocs', () => {
     });
 
     it('returns empty array when path does not exist in validatedCase', async () => {
-      const req = makeReq({ res: { locals: { validatedCase: {} } } });
+      const req = makeReq({ res: { locals: { validatedCase: { data: {} } } } });
 
       const result = await storage.read(req);
 
@@ -132,7 +137,7 @@ describe('ccdDraftDocs', () => {
   });
 
   describe('save', () => {
-    it('calls updateDraft with setAtPath-wrapped docs at configured path', async () => {
+    it('calls updateDraft with setDocs-wrapped docs at configured path', async () => {
       const req = makeReq();
       await storage.save(req, [doc1, doc2]);
 
@@ -147,6 +152,84 @@ describe('ccdDraftDocs', () => {
       const req = makeReq({ session: {} });
 
       await expect(storage.save(req, [])).rejects.toThrow('User not authenticated');
+    });
+  });
+});
+
+describe('sessionDocs', () => {
+  const STEP_NAME = 'upload-documents-to-support-your-application';
+  const storage = sessionDocs({ stepName: STEP_NAME });
+
+  function makeSessionReq(docs?: CcdCollectionItem<CcdUploadedDocument>[]): Request {
+    return {
+      session: {
+        formData: docs ? { [STEP_NAME]: { documents: docs } } : {},
+        reload: jest.fn((cb: (err: null) => void) => cb(null)),
+        save: jest.fn((cb: (err: null) => void) => cb(null)),
+      },
+    } as unknown as Request;
+  }
+
+  describe('read', () => {
+    it('returns docs from session formData without reloading', async () => {
+      const req = makeSessionReq([doc1]);
+
+      const result = await storage.read(req);
+
+      expect(result).toEqual([doc1]);
+      expect(req.session.reload as jest.Mock).not.toHaveBeenCalled();
+    });
+
+    it('returns empty array when formData is absent', async () => {
+      const req = makeSessionReq();
+
+      expect(await storage.read(req)).toEqual([]);
+    });
+  });
+
+  describe('readFresh', () => {
+    it('reloads session before reading', async () => {
+      const req = makeSessionReq([doc1]);
+
+      const result = await storage.readFresh(req);
+
+      expect(req.session.reload as jest.Mock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual([doc1]);
+    });
+
+    it('rejects when session reload fails', async () => {
+      const req = {
+        session: {
+          formData: {},
+          reload: jest.fn((cb: (err: Error) => void) => cb(new Error('Redis down'))),
+          save: jest.fn(),
+        },
+      } as unknown as Request;
+
+      await expect(storage.readFresh(req)).rejects.toThrow('Redis down');
+    });
+  });
+
+  describe('save', () => {
+    it('writes docs to session and calls session.save', async () => {
+      const req = makeSessionReq();
+
+      await storage.save(req, [doc1, doc2]);
+
+      expect(req.session.formData?.[STEP_NAME]).toEqual({ documents: [doc1, doc2] });
+      expect(req.session.save as jest.Mock).toHaveBeenCalledTimes(1);
+    });
+
+    it('rejects when session save fails', async () => {
+      const req = {
+        session: {
+          formData: {},
+          reload: jest.fn(),
+          save: jest.fn((cb: (err: Error) => void) => cb(new Error('save failed'))),
+        },
+      } as unknown as Request;
+
+      await expect(storage.save(req, [])).rejects.toThrow('save failed');
     });
   });
 });
