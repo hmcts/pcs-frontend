@@ -64,7 +64,12 @@ export const step: StepDefinition = createFormStep({
   extendGetContent: async req => {
     const counterClaim =
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
-    const claimAmountInPence = counterClaim?.claimAmount ?? counterClaim?.estimatedMaxClaimAmount;
+    const claimAmountInPence =
+      counterClaim?.isClaimAmountKnown === 'YES'
+        ? counterClaim?.claimAmount
+        : counterClaim?.isClaimAmountKnown === 'NO'
+          ? counterClaim?.estimatedMaxClaimAmount
+          : undefined;
 
     if (!counterClaim?.claimType) {
       logger.warn('Counterclaim fee unavailable: missing claimType');
