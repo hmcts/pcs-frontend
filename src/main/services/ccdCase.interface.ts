@@ -254,4 +254,5 @@ export interface CitizenGenAppRequest {
   needHwf?: YesNoValue;
   appliedForHwf?: YesNoValue;
   hwfReference?: string;
+  documents?: CcdCollectionItem<CcdUploadedDocument>[];
 }

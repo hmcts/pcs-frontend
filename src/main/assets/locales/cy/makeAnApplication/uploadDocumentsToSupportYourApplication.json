@@ -1,5 +1,13 @@
 {
   "pageTitle": "cyUpload documents to support your application",
   "caption": "cyMake an application",
-  "heading": "cyUpload documents to support your application"
+  "heading": "cyUpload documents to support your application (optional)",
+  "guidanceText": "cyYou should only upload documents that are relevant to your application such as a draft order or witness statement.",
+  "beforeUploadText": "cyBefore you upload the document, give it a name that tells the court what it is, for example 'Job offer letter'.",
+  "fileTypesText": "cyEach document must be less than 100MB. You can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.",
+  "uploadSubheading": "cyUpload a file",
+  "uploadLabel": "cyUpload a file",
+  "filesAddedHeading": "cyFiles added",
+  "uploadButton": "cyUpload file",
+  "deleteButton": "cyRemove"
 }

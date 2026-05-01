@@ -62,7 +62,7 @@ const mockT = (key: string, opts?: Record<string, unknown>) =>
 function makeReqWithDocs(overrides: Record<string, unknown>, docs: unknown[] = []) {
   return {
     session: { user: { accessToken: 'token' } },
-    params: { caseReference: '123456' },
+    params: { caseReference: '123456', journey: 'respond-to-claim' },
     t: mockT,
     res: {
       locals: {
@@ -399,6 +399,64 @@ describe('documentProxyRoutes', () => {
       await handler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(502);
+    });
+
+    it('returns 400 when total upload size exceeds 1024MB', async () => {
+      const oneGbMinusOneByte = 1024 * 1024 * 1024 - 1;
+      const hugeExistingDoc = {
+        value: {
+          document: {
+            document_url: 'http://dm/doc/huge-uuid',
+            document_binary_url: 'http://dm/doc/huge-uuid/binary',
+            document_filename: 'huge.pdf',
+          },
+          contentType: 'application/pdf',
+          size: oneGbMinusOneByte,
+        },
+      };
+
+      const req = makeReqWithDocs(
+        { file: { originalname: 'small.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 10 } },
+        [hugeExistingDoc]
+      );
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockUploadDocument).not.toHaveBeenCalled();
+    });
+
+    it('renames uploaded filename for make-an-application using case-derived defendant number', async () => {
+      const mockDoc = {
+        document_url: 'http://dm/doc/new-uuid',
+        document_binary_url: 'http://dm/doc/new-uuid/binary',
+        document_filename: 'my-note (GA1) - Defendant 2.pdf',
+        content_type: 'application/pdf',
+        size: 1024,
+      };
+      mockUploadDocument.mockResolvedValue(mockDoc);
+
+      const req = makeReqWithDocs({
+        params: { caseReference: '123456', journey: 'make-an-application' },
+        res: {
+          locals: {
+            validatedCase: {
+              data: { defendantNumber: 2 },
+            },
+          },
+        },
+        file: { originalname: 'my-note.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 1024 },
+      });
+      const res = { json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(mockUploadDocument).toHaveBeenCalledWith(
+        expect.objectContaining({ originalname: 'my-note.pdf' }),
+        'token',
+        'my-note (GA1) - Defendant 2.pdf'
+      );
     });
   });
 

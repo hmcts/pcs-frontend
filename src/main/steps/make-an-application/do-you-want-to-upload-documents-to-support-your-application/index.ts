@@ -32,5 +32,6 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    multipleApplicationsText: 'multipleApplicationsText',
   },
 });

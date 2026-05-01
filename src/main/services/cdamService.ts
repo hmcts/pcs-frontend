@@ -13,12 +13,17 @@ function getCdamUrl(): string {
   return config.get<string>('cdam.url');
 }
 
-export async function uploadDocument(file: Express.Multer.File, userToken: string): Promise<CdamDocument> {
+export async function uploadDocument(
+  file: Express.Multer.File,
+  userToken: string,
+  uploadFilename?: string
+): Promise<CdamDocument> {
   const cdamUrl = getCdamUrl();
+  const filenameToUpload = uploadFilename || file.originalname;
 
   const formData = new FormData();
   formData.append('files', file.buffer, {
-    filename: file.originalname,
+    filename: filenameToUpload,
     contentType: file.mimetype,
   });
   formData.append('classification', CLASSIFICATION);
@@ -37,7 +42,7 @@ export async function uploadDocument(file: Express.Multer.File, userToken: strin
     throw new Error('CDAM returned no document in response');
   }
 
-  const filename = raw.originalDocumentName || file.originalname;
+  const filename = raw.originalDocumentName || filenameToUpload;
 
   logger.info('Document uploaded to CDAM', { filename });
 

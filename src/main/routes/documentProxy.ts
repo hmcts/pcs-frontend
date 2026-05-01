@@ -8,9 +8,25 @@ import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.i
 import { ccdCaseService } from '@services/ccdCaseService';
 import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 import type { CdamDocument } from '@services/documentUpload.interface';
-import { UPLOAD_MAX_FILE_SIZE_BYTES, validateFileType } from '@utils/documentUploadValidation';
+import {
+  UPLOAD_MAX_FILE_SIZE_BYTES,
+  UPLOAD_MAX_FILE_SIZE_MB,
+  UPLOAD_MAX_TOTAL_SIZE_BYTES,
+  UPLOAD_MAX_TOTAL_SIZE_MB,
+  validateFileType,
+} from '@utils/documentUploadValidation';
 
 const logger = Logger.getLogger('document-proxy');
+const MAKE_AN_APPLICATION_JOURNEY = 'make-an-application';
+const UPLOAD_DOCUMENTS_STEP = 'upload-documents-to-support-your-application';
+
+interface StoredUploadDocument {
+  document_url: string;
+  document_binary_url: string;
+  document_filename: string;
+  size?: number;
+  content_type?: string;
+}
 
 export function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
   const result = validateFileType(file.mimetype, file.originalname);
@@ -40,7 +56,10 @@ function getErrorTranslations(req: Request) {
   const t = req.t;
   return {
     wrongType: t('errors.documentUpload.wrongFileTypeDocStore'),
-    tooLarge: t('errors.documentUpload.fileTooLargeDocStore'),
+    tooLarge: t('errors.documentUpload.fileTooLargeDocStore', { maxSize: String(UPLOAD_MAX_FILE_SIZE_MB) }),
+    totalTooLarge: t('errors.documentUpload.fileTotalTooLargeDocStore', {
+      maxSize: String(UPLOAD_MAX_TOTAL_SIZE_MB),
+    }),
     noFile: t('errors.documentUpload.noFileSelected'),
     uploadFailed: t('errors.documentUpload.uploadFailed'),
     deleteFailed: t('errors.documentUpload.fileDeleteFailed'),
@@ -48,6 +67,10 @@ function getErrorTranslations(req: Request) {
     downloadFailed: t('errors.documentUpload.downloadFailed'),
     uploadSuccess: (filename: string) => t('errors.documentUpload.uploadSuccess', { filename }),
   };
+}
+
+function getTotalDocumentSizeBytes(docs: StoredUploadDocument[]): number {
+  return docs.reduce((total, doc) => total + (doc.size || 0), 0);
 }
 
 export function handleMulterError(
@@ -72,52 +95,132 @@ export function handleMulterError(
   next(err);
 }
 
-function getExistingDocuments(req: Request): CcdCollectionItem<CcdUploadedDocument>[] {
-  const caseData = req.res?.locals?.validatedCase;
-  return caseData?.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [];
+function getJourney(req: Request): string {
+  return (req.params.journey as string) || '';
 }
 
-async function saveDraftDocuments(req: Request, documents: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
+function getDefendantNumberFromCaseData(req: Request): number {
+  const caseData = req.res?.locals?.validatedCase?.data as Record<string, unknown> | undefined;
+  const rawDefendantNumber = caseData?.defendantNumber;
+
+  if (typeof rawDefendantNumber === 'number' && Number.isInteger(rawDefendantNumber) && rawDefendantNumber > 0) {
+    return rawDefendantNumber;
+  }
+
+  if (typeof rawDefendantNumber === 'string') {
+    const parsed = Number(rawDefendantNumber);
+    if (Number.isInteger(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+
+  return 1;
+}
+
+function addGenAppFilenameSuffix(filename: string, defendantNumber: number): string {
+  const suffix = ` (GA1) - Defendant ${defendantNumber}`;
+  const lastDotIndex = filename.lastIndexOf('.');
+  const hasExtension = lastDotIndex > 0;
+  const baseName = hasExtension ? filename.slice(0, lastDotIndex) : filename;
+  const extension = hasExtension ? filename.slice(lastDotIndex) : '';
+
+  if (baseName.toLowerCase().endsWith(suffix.toLowerCase())) {
+    return filename;
+  }
+
+  return `${baseName}${suffix}${extension}`;
+}
+
+function getUploadFilename(req: Request, originalFilename: string): string {
+  if (getJourney(req) !== MAKE_AN_APPLICATION_JOURNEY) {
+    return originalFilename;
+  }
+
+  return addGenAppFilenameSuffix(originalFilename, getDefendantNumberFromCaseData(req));
+}
+
+function getSessionUploadDocuments(req: Request): StoredUploadDocument[] {
+  const formData = (req.session?.formData as Record<string, Record<string, unknown>> | undefined) || {};
+  const stepData = (formData[UPLOAD_DOCUMENTS_STEP] as Record<string, unknown> | undefined) || {};
+  return (stepData.documents as StoredUploadDocument[] | undefined) || [];
+}
+
+function getExistingDocuments(req: Request): StoredUploadDocument[] {
+  if (getJourney(req) === MAKE_AN_APPLICATION_JOURNEY) {
+    return getSessionUploadDocuments(req);
+  }
+
+  const caseData = req.res?.locals?.validatedCase;
+  const ccdDocs = caseData?.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [];
+  return ccdDocs.map(item => ({
+    document_url: item.value.document.document_url,
+    document_binary_url: item.value.document.document_binary_url,
+    document_filename: item.value.document.document_filename,
+    content_type: item.value.contentType,
+    size: item.value.size,
+  }));
+}
+
+function toCcdDocument(doc: StoredUploadDocument): CcdCollectionItem<CcdUploadedDocument> {
+  return {
+    value: {
+      document: {
+        document_url: doc.document_url,
+        document_binary_url: doc.document_binary_url,
+        document_filename: doc.document_filename,
+      },
+      contentType: doc.content_type,
+      size: doc.size,
+    },
+  };
+}
+
+async function saveDraftDocuments(req: Request, documents: StoredUploadDocument[]): Promise<void> {
+  if (getJourney(req) === MAKE_AN_APPLICATION_JOURNEY) {
+    if (!req.session) {
+      throw new Error('Session not available');
+    }
+    req.session.formData = req.session.formData || {};
+    const existingStepData = (req.session.formData[UPLOAD_DOCUMENTS_STEP] as Record<string, unknown> | undefined) || {};
+    req.session.formData[UPLOAD_DOCUMENTS_STEP] = {
+      ...existingStepData,
+      documents,
+    };
+    return;
+  }
+
   const caseId = req.params.caseReference as string;
   const accessToken = getUserToken(req);
 
   await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, {
     possessionClaimResponse: {
       defendantResponses: {
-        defendantDocuments: documents,
+        defendantDocuments: documents.map(toCcdDocument),
       },
     },
   });
 }
 
-function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocument> {
+function toStoredDocument(cdamDoc: CdamDocument): StoredUploadDocument {
   return {
-    value: {
-      document: {
-        document_url: cdamDoc.document_url,
-        document_binary_url: cdamDoc.document_binary_url,
-        document_filename: cdamDoc.document_filename,
-      },
-      contentType: cdamDoc.content_type,
-      size: cdamDoc.size,
-    },
+    document_url: cdamDoc.document_url,
+    document_binary_url: cdamDoc.document_binary_url,
+    document_filename: cdamDoc.document_filename,
+    content_type: cdamDoc.content_type,
+    size: cdamDoc.size,
   };
 }
 
-async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<CcdUploadedDocument>): Promise<number> {
+async function saveDraftWithNewDocument(req: Request, entry: StoredUploadDocument): Promise<number> {
   const existingDocs = getExistingDocuments(req);
   const updatedDocs = [...existingDocs, entry];
   await saveDraftDocuments(req, updatedDocs);
   return updatedDocs.length - 1;
 }
 
-async function removeDraftDocument(
-  req: Request,
-  index: number,
-  existingDocs: CcdCollectionItem<CcdUploadedDocument>[]
-): Promise<void> {
+async function removeDraftDocument(req: Request, index: number, existingDocs: StoredUploadDocument[]): Promise<void> {
   const docToDelete = existingDocs[index];
-  const documentUrl = docToDelete.value.document.document_url;
+  const documentUrl = docToDelete.document_url;
 
   // Save draft first (remove reference), then delete from CDAM.
   // If CDAM delete fails, orphaned document in CDAM is harmless.
@@ -159,7 +262,7 @@ function sanitiseFilename(filename: string): string {
   return filename.replace(/["\\\n\r]/g, '_');
 }
 
-function validateDocumentIndex(indexParam: string, docs: CcdCollectionItem<CcdUploadedDocument>[]): number | null {
+function validateDocumentIndex(indexParam: string, docs: StoredUploadDocument[]): number | null {
   const docIndex = Number(indexParam);
   if (Number.isNaN(docIndex) || !Number.isInteger(docIndex) || docIndex < 0 || docIndex >= docs.length) {
     return null;
@@ -182,12 +285,9 @@ export default function documentProxyRoutes(app: Application): void {
         }
 
         const doc = existingDocs[docIndex];
-        const { stream, contentType } = await getDocumentBinary(
-          doc.value.document.document_binary_url,
-          getUserToken(req)
-        );
+        const { stream, contentType } = await getDocumentBinary(doc.document_binary_url, getUserToken(req));
 
-        const filename = sanitiseFilename(doc.value.document.document_filename);
+        const filename = sanitiseFilename(doc.document_filename);
         res.setHeader('Content-Type', contentType);
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.setHeader('Content-Security-Policy', 'sandbox');
@@ -225,8 +325,15 @@ export default function documentProxyRoutes(app: Application): void {
           return res.status(400).json({ error: { message: errors.noFile } });
         }
 
-        const cdamDoc = await uploadDocument(req.file, getUserToken(req));
-        const index = await saveDraftWithNewDocument(req, toCcdDocument(cdamDoc));
+        const existingDocs = getExistingDocuments(req);
+        const newTotalSize = getTotalDocumentSizeBytes(existingDocs) + req.file.size;
+        if (newTotalSize > UPLOAD_MAX_TOTAL_SIZE_BYTES) {
+          return res.status(400).json({ error: { message: errors.totalTooLarge } });
+        }
+
+        const uploadFilename = getUploadFilename(req, req.file.originalname);
+        const cdamDoc = await uploadDocument(req.file, getUserToken(req), uploadFilename);
+        const index = await saveDraftWithNewDocument(req, toStoredDocument(cdamDoc));
         return res.json(buildUploadResponse(errors, cdamDoc, index));
       } catch (error) {
         logger.error('Failed to upload document to CDAM', {

@@ -4,8 +4,10 @@ import { BLOCKED_EXTENSIONS, getFileExtensionLower } from './fileExtensionValida
 
 export { BLOCKED_EXTENSIONS, getFileExtensionLower, isBlockedExtension } from './fileExtensionValidation';
 
-export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizeMB');
+export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizePerFileMB');
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;
+export const UPLOAD_MAX_TOTAL_SIZE_MB: number = config.get('documentUpload.maxTotalFileSizeMB');
+export const UPLOAD_MAX_TOTAL_SIZE_BYTES = UPLOAD_MAX_TOTAL_SIZE_MB * 1024 * 1024;
 
 const BLOCKED_MEDIA_PREFIXES = ['audio/', 'video/'] as const;
 

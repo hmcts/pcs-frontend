@@ -7,7 +7,7 @@ import { toYesNoEnum } from '../../utils';
 import { MAKE_AN_APPLICATION_ROUTE, flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { CitizenGenAppRequest } from '@services/ccdCase.interface';
+import { CcdCollectionItem, CcdUploadedDocument, CitizenGenAppRequest } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'check-your-answers';
 const stepNavigation = createStepNavigation(flowConfig);
@@ -28,6 +28,43 @@ function hasAlreadyAppliedForHwf(req: Request): 'yes' | 'no' | undefined {
   return getFormData(req, 'have-you-already-applied-for-help-with-fees').alreadyAppliedForHelp as 'yes' | 'no';
 }
 
+interface UploadedDocumentFormData {
+  document_url: string;
+  document_binary_url: string;
+  document_filename: string;
+  content_type?: string;
+  size?: number;
+}
+
+function wantsToUploadDocuments(req: Request): 'YES' | 'NO' | undefined {
+  return getFormData(req, 'do-you-want-to-upload-documents-to-support-your-application').uploadDocuments as
+    | 'YES'
+    | 'NO'
+    | undefined;
+}
+
+function getUploadedDocuments(req: Request): CcdCollectionItem<CcdUploadedDocument>[] {
+  const rawDocuments = getFormData(req, 'upload-documents-to-support-your-application').documents as
+    | UploadedDocumentFormData[]
+    | undefined;
+
+  if (!rawDocuments?.length) {
+    return [];
+  }
+
+  return rawDocuments.map(document => ({
+    value: {
+      document: {
+        document_url: document.document_url,
+        document_binary_url: document.document_binary_url,
+        document_filename: document.document_filename,
+      },
+      contentType: document.content_type,
+      size: document.size,
+    },
+  }));
+}
+
 export const step: StepDefinition = {
   url: `${MAKE_AN_APPLICATION_ROUTE}/check-your-answers`,
   name: STEP_NAME,
@@ -45,6 +82,8 @@ export const step: StepDefinition = {
         const hearingInNext14Days = isHearingInNext14Days(req);
         const helpWithFeesNeeded = isHelpWithFeesNeeded(req);
         const alreadyAppliedForHwf = hasAlreadyAppliedForHwf(req);
+        const uploadDocumentsChoice = wantsToUploadDocuments(req);
+        const uploadedDocuments = getUploadedDocuments(req);
 
         const summaryDataRows = [];
 
@@ -126,6 +165,46 @@ export const step: StepDefinition = {
           });
         }
 
+        if (uploadDocumentsChoice !== undefined) {
+          summaryDataRows.push({
+            key: {
+              text: t('answers.uploadDocumentsWanted.label'),
+            },
+            value: {
+              text: t(`answers.uploadDocumentsWanted.options.${uploadDocumentsChoice}`),
+            },
+            actions: {
+              items: [
+                {
+                  href: './do-you-want-to-upload-documents-to-support-your-application',
+                  text: t('change'),
+                  visuallyHiddenText: t('answers.uploadDocumentsWanted.changeHint'),
+                },
+              ],
+            },
+          });
+        }
+
+        if (uploadDocumentsChoice === 'YES' && uploadedDocuments.length > 0) {
+          summaryDataRows.push({
+            key: {
+              text: t('answers.uploadedDocuments.label'),
+            },
+            value: {
+              html: uploadedDocuments.map(document => document.value.document.document_filename).join('<br>'),
+            },
+            actions: {
+              items: [
+                {
+                  href: './upload-documents-to-support-your-application',
+                  text: t('change'),
+                  visuallyHiddenText: t('answers.uploadedDocuments.changeHint'),
+                },
+              ],
+            },
+          });
+        }
+
         return {
           summaryData: {
             rows: summaryDataRows,
@@ -151,6 +230,8 @@ export const step: StepDefinition = {
       const hearingInNext14Days = isHearingInNext14Days(req);
       const helpWithFeesNeeded = isHelpWithFeesNeeded(req);
       const alreadyAppliedForHwf = hasAlreadyAppliedForHwf(req);
+      const uploadDocumentsChoice = wantsToUploadDocuments(req);
+      const uploadedDocuments = getUploadedDocuments(req);
 
       const citizenGenAppRequest: CitizenGenAppRequest = {
         applicationType: formData['choose-an-application']['typeOfApplication'],
@@ -160,6 +241,7 @@ export const step: StepDefinition = {
         hwfReference: getFormData(req, 'have-you-already-applied-for-help-with-fees')[
           'alreadyAppliedForHelp.hwfReference'
         ] as string,
+        documents: uploadDocumentsChoice === 'YES' && uploadedDocuments.length > 0 ? uploadedDocuments : undefined,
       };
 
       await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
