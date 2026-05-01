@@ -18,11 +18,11 @@ export const step: StepDefinition = createFormStep({
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
         {
-          value: 'YES',
+          value: 'yes',
           translationKey: 'options.yes',
         },
         {
-          value: 'NO',
+          value: 'no',
           translationKey: 'options.no',
         },
       ],
@@ -32,5 +32,6 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    multipleApplicationsText: 'multipleApplicationsText',
   },
 });

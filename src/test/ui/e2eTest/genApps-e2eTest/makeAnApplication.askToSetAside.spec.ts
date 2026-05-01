@@ -55,7 +55,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
-    await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
     await performAction('confirmOtherPartiesAgreed', {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
       option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
@@ -66,6 +65,13 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: doYouWantToUploadDocumentsToSupportYourApplication.doYouWantToUploadDocumentQuestion,
       option: doYouWantToUploadDocumentsToSupportYourApplication.yesRadioOption,
     });
+    await performAction('confirmOrderDoYouWant', {
+      label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
+      input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
+    });
+    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
+    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
     await performAction('selectLanguageUsedToComplete', {

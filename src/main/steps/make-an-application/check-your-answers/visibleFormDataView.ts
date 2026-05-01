@@ -4,7 +4,9 @@ import { shouldShowStep } from '../../';
 import { flowConfig } from '../flow.config';
 
 import { getFormData } from '@modules/steps';
-import { GenAppType, LanguageUsed } from '@services/ccdCase.interface';
+import { CcdCollectionItem, CcdUploadedDocument, GenAppType, LanguageUsed } from '@services/ccdCase.interface';
+
+const UPLOAD_STEP_NAME = 'upload-documents-to-support-your-application';
 
 export type FieldDetails<T> = {
   stepName: string;
@@ -15,7 +17,7 @@ export default class VisibleFormDataView {
   constructor(readonly req: Request) {}
 
   getApplicationTypeField(): FieldDetails<GenAppType> | undefined {
-    return this.getField('choose-an-application', 'typeOfApplication');
+    return this.getField<GenAppType>('choose-an-application', 'typeOfApplication');
   }
 
   getHearingInNext14DaysField(): FieldDetails<'yes' | 'no'> | undefined {
@@ -23,29 +25,29 @@ export default class VisibleFormDataView {
   }
 
   getHelpWithFeesNeededField(): FieldDetails<'yes' | 'no'> | undefined {
-    return this.getField('do-you-need-help-paying-the-fee', 'helpWithFeesNeeded');
+    return this.getField<'yes' | 'no'>('do-you-need-help-paying-the-fee', 'helpWithFeesNeeded');
   }
 
   getAlreadyAppliedForHwfField(): FieldDetails<'yes' | 'no'> | undefined {
-    return this.getField('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf');
+    return this.getField<'yes' | 'no'>('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf');
   }
 
   getHwfReferenceField(): FieldDetails<string> | undefined {
     const alreadyAppliedForHwfField = this.getAlreadyAppliedForHwfField();
 
     if (alreadyAppliedForHwfField?.fieldValue === 'yes') {
-      return this.getField('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf.hwfReference');
+      return this.getField<string>('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf.hwfReference');
     } else {
       return undefined;
     }
   }
 
   getOtherPartiesAgreedField(): FieldDetails<'yes' | 'no'> | undefined {
-    return this.getField('have-the-other-parties-agreed-to-this-application', 'otherPartiesAgreed');
+    return this.getField<'yes' | 'no'>('have-the-other-parties-agreed-to-this-application', 'otherPartiesAgreed');
   }
 
   getAnyReasonsNotToShareField(): FieldDetails<'yes' | 'no'> | undefined {
-    return this.getField(
+    return this.getField<'yes' | 'no'>(
       'are-there-any-reasons-that-this-application-should-not-be-shared',
       'reasonsAppShouldNotBeShared'
     );
@@ -55,7 +57,7 @@ export default class VisibleFormDataView {
     const anyReasonsNotBeSharedField = this.getAnyReasonsNotToShareField();
 
     if (anyReasonsNotBeSharedField?.fieldValue === 'yes') {
-      return this.getField(
+      return this.getField<string>(
         'are-there-any-reasons-that-this-application-should-not-be-shared',
         'reasonsAppShouldNotBeShared.reasonForNotSharing'
       );
@@ -64,8 +66,24 @@ export default class VisibleFormDataView {
     }
   }
 
+  getWhatOrderWantedField(): FieldDetails<string> | undefined {
+    return this.getField<string>('what-order-do-you-want-the-court-to-make-and-why', 'whatOrderWanted');
+  }
+
+  getHasSupportingDocuments(): FieldDetails<'yes' | 'no'> | undefined {
+    return this.getField<'yes' | 'no'>(
+      'do-you-want-to-upload-documents-to-support-your-application',
+      'uploadDocuments'
+    );
+  }
+
   getWhichLanguageField(): FieldDetails<LanguageUsed> | undefined {
-    return this.getField('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
+    return this.getField<LanguageUsed>('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
+  }
+
+  getUploadedDocuments(): CcdCollectionItem<CcdUploadedDocument>[] {
+    const docs = this.req.session.uploadedDocs?.[UPLOAD_STEP_NAME];
+    return Array.isArray(docs) ? (docs as CcdCollectionItem<CcdUploadedDocument>[]) : [];
   }
 
   private getField<T>(stepName: string, fieldName: string): FieldDetails<T> | undefined {

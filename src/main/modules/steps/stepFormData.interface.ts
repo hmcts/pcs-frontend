@@ -1,5 +1,6 @@
-import { RequestHandler } from 'express';
+import { Request, RequestHandler } from 'express';
 
+import type { DocumentStorage } from '@modules/documents/storage';
 import { GetController, type SupportedLang } from '@modules/steps';
 
 export interface ErrorField {
@@ -23,4 +24,11 @@ export interface StepDefinition {
   postController?: { post: RequestHandler };
   middleware?: RequestHandler[];
   showCancelButton?: boolean;
+  // Storage adapter for upload steps — encapsulates where documents are persisted
+  // (CCD draft for respond-to-claim, session for make-an-application).
+  // Absent on every non-upload step. The upload handler refuses requests targeting
+  // a step that does not declare this.
+  documentStorage?: DocumentStorage;
+  // Optional upload filename transform for journey-specific naming rules.
+  uploadFilenameTransform?: (req: Request, originalName: string) => string;
 }

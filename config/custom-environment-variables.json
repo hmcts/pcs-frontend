@@ -74,5 +74,12 @@
   },
   "xui": {
     "uri": "XUI_BASE_URI"
+  },
+  "cdam": {
+    "url": "CDAM_URL"
+  },
+  "documentUpload": {
+    "maxFileSizePerFileMB": "DOCUMENT_UPLOAD_MAX_FILE_SIZE_PER_FILE_MB",
+    "maxTotalFileSizeMB": "DOCUMENT_UPLOAD_MAX_TOTAL_FILE_SIZE_MB"
   }
 }

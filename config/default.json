@@ -97,6 +97,13 @@
   "xui": {
     "uri": "https://manage-case.aat.platform.hmcts.net"
   },
+  "cdam": {
+    "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+  },
+  "documentUpload": {
+    "maxFileSizePerFileMB": 100,
+    "maxTotalFileSizeMB": 1024
+  },
   "dashboard": {
     "taskRoutes": {
       "Defendant.ViewClaim": "/case/:caseReference/view-the-claim"

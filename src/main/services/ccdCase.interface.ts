@@ -145,14 +145,32 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
-/** Defendant responses (e.g. receivedFreeLegalAdvice). */
+/** CCD SDK Document type -- flat reference with URLs. */
+export interface CcdDocumentReference {
+  document_url: string;
+  document_binary_url: string;
+  document_filename: string;
+  document_hash?: string;
+  category_id?: string;
+}
+
+/** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
+export interface CcdUploadedDocument {
+  document: CcdDocumentReference;
+  contentType?: string;
+  size?: number;
+}
+
+export interface CcdCollectionItem<T> {
+  id?: string;
+  value: T;
+}
+
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
   tenancyTypeCorrect?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
-  confirmNoticeGiven?: string;
-  noticeDate?: string;
   tenancyStartDateCorrect?: string;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
@@ -173,6 +191,8 @@ export interface CcdDefendantResponses {
   householdCircumstances?: HouseholdCircumstances;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
+  defendantDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
+  counterClaimDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   languageUsed?: LanguageUsed;
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
   otherConsiderations?: YesNoValue;
@@ -262,11 +282,6 @@ export interface StartCallbackData {
   event_id: string;
 }
 
-export interface CcdCollectionItem<T> {
-  value: T;
-  id: string;
-}
-
 export interface CcdTemplateKeyValue {
   key: string;
   value: string;
@@ -295,10 +310,10 @@ export interface CcdDashboardData {
 }
 
 export enum GenAppType {
-  SUSPEND,
-  ADJOURN,
-  SET_ASIDE,
-  SOMETHING_ELSE,
+  SUSPEND = 'SUSPEND',
+  ADJOURN = 'ADJOURN',
+  SET_ASIDE = 'SET_ASIDE',
+  SOMETHING_ELSE = 'SOMETHING_ELSE',
 }
 
 export interface CitizenGenAppRequest {
@@ -311,4 +326,10 @@ export interface CitizenGenAppRequest {
   withoutNotice?: YesNoValue;
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
+  whatOrderWanted?: string;
+  hasSupportingDocuments?: YesNoValue;
+  uploadedDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
+  sotAccepted?: YesNoValue;
+  sotFullName?: string;
+  clientReference?: string;
 }

@@ -1,3 +1,4 @@
+import escapeHTML from 'escape-html';
 import type { Request } from 'express';
 import { TFunction } from 'i18next';
 
@@ -15,7 +16,8 @@ export type SummaryListRow = {
     text: string;
   };
   value: {
-    text: string;
+    text?: string;
+    html?: string;
   };
   actions: {
     items: SummaryListRowAction[];
@@ -28,13 +30,23 @@ export type SummaryListRowAction = {
   visuallyHiddenText: string;
 };
 
-function createSummaryListRow(summaryFieldConfig: SummaryFieldData, t: TFunction): SummaryListRow {
+function createSummaryListRow(
+  summaryFieldConfig: SummaryFieldData,
+  t: TFunction,
+  keepLineBreaks: boolean = false
+): SummaryListRow {
   return {
     key: {
       text: summaryFieldConfig.fieldLabel,
     },
     value: {
-      text: summaryFieldConfig.fieldValue,
+      ...(keepLineBreaks
+        ? {
+            html: escapeHTML(summaryFieldConfig.fieldValue).replace(/\n/g, '<br>'),
+          }
+        : {
+            text: summaryFieldConfig.fieldValue,
+          }),
     },
     actions: {
       items: [
@@ -168,9 +180,62 @@ export function buildSummaryListRows(req: Request, t: TFunction): SummaryListRow
           fieldValue: reasonForNotSharingField.fieldValue,
           changeHint: t('answers.reasonForNotSharing.changeHint'),
         },
+        t,
+        true
+      )
+    );
+  }
+
+  const whatOrderWantedField = visibleFormData.getWhatOrderWantedField();
+  if (whatOrderWantedField) {
+    summaryListRows.push(
+      createSummaryListRow(
+        {
+          stepName: whatOrderWantedField.stepName,
+          fieldLabel: t('answers.whatOrderWanted.label'),
+          fieldValue: whatOrderWantedField.fieldValue,
+          changeHint: t('answers.whatOrderWanted.changeHint'),
+        },
+        t,
+        true
+      )
+    );
+  }
+
+  const hasSupportingDocumentsField = visibleFormData.getHasSupportingDocuments();
+  if (hasSupportingDocumentsField) {
+    summaryListRows.push(
+      createSummaryListRow(
+        {
+          stepName: hasSupportingDocumentsField.stepName,
+          fieldLabel: t('answers.hasSupportingDocuments.label'),
+          fieldValue: t(`options.${hasSupportingDocumentsField.fieldValue}`),
+          changeHint: t('answers.hasSupportingDocuments.changeHint'),
+        },
         t
       )
     );
+  }
+
+  const uploadedDocuments = visibleFormData.getUploadedDocuments();
+  if (hasSupportingDocumentsField?.fieldValue === 'yes' && uploadedDocuments.length > 0) {
+    summaryListRows.push({
+      key: {
+        text: t('answers.uploadedDocuments.label'),
+      },
+      value: {
+        html: uploadedDocuments.map(document => document.value.document.document_filename).join('<br>'),
+      },
+      actions: {
+        items: [
+          {
+            href: './upload-documents-to-support-your-application',
+            text: t('change'),
+            visuallyHiddenText: t('answers.uploadedDocuments.changeHint'),
+          },
+        ],
+      },
+    });
   }
 
   const whichLanguageField = visibleFormData.getWhichLanguageField();
