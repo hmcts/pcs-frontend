@@ -162,6 +162,7 @@ function cdamToCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploaded
     },
   };
 }
+
 function buildUploadResponse(
   errors: ErrorTranslations,
   cdamDoc: CdamDocument,
