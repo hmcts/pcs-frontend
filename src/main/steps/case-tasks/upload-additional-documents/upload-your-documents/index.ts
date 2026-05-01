@@ -10,16 +10,17 @@ import { getFlowConfigForJourney } from '@steps';
 
 const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'upload-your-documents';
+const templatePath = 'case-tasks/upload-additional-documents/upload-your-documents/uploadYourDocuments.njk';
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
 export const step: StepDefinition = {
   url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
   name: stepName,
-  view: 'upload-additional-documents/upload-your-documents.njk',
+  view: templatePath,
   stepDir: __dirname,
   getController: () =>
     createGetController(
-      'upload-additional-documents/upload-your-documents.njk',
+      templatePath,
       stepName,
       stepNavigation,
       (req: Request) => ({

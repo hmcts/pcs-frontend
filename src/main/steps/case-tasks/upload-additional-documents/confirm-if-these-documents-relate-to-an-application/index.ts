@@ -10,16 +10,18 @@ import { getFlowConfigForJourney } from '@steps';
 
 const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'confirm-if-these-documents-relate-to-an-application';
+const templatePath =
+  'case-tasks/upload-additional-documents/confirm-if-these-documents-relate-to-an-application/confirmIfTheseDocumentsRelateToAnApplication.njk';
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
 export const step: StepDefinition = {
   url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
   name: stepName,
-  view: 'upload-additional-documents/confirm-if-these-documents-relate-to-an-application.njk',
+  view: templatePath,
   stepDir: __dirname,
   getController: () =>
     createGetController(
-      'upload-additional-documents/confirm-if-these-documents-relate-to-an-application.njk',
+      templatePath,
       stepName,
       stepNavigation,
       (req: Request) => ({
