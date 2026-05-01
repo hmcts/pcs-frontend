@@ -100,10 +100,10 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('uses valid static previous step for household interstitial path', async () => {
+  it('uses dynamic previous step for your-household-and-circumstances (defaults to repayments-agreed with no payment data)', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'support-needs'
+      'repayments-agreed'
     );
   });
 
