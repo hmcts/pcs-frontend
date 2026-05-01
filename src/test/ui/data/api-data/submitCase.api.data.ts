@@ -473,7 +473,7 @@ export const submitCaseApiData = {
       tenancy_TenancyLicenceDate: null,
       tenancy_TenancyLicenceDocuments: [],
       secureOrFlexibleDiscretionaryGrounds: ['DOMESTIC_VIOLENCE'],
-      secureOrFlexibleMandatoryGrounds: [],
+      secureAntisocialAdditionalGrounds: [],
       secureOrFlexibleMandatoryGroundsAlt: [],
       secureOrFlexibleDiscretionaryGroundsAlt: [],
       domesticViolenceGround: 'Domestic violence test',
