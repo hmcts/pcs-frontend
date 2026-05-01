@@ -64,9 +64,10 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const stepNavigation = createStepNavigation(flowConfig);
+  const stepUrl = flowConfig.entryStepIdAtBasePath === stepName ? basePath : path.join(basePath, stepName);
 
   return {
-    url: path.join(basePath, stepName),
+    url: stepUrl,
     name: stepName,
     view: viewPath,
     stepDir,
