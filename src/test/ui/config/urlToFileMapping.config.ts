@@ -56,10 +56,5 @@ export default {
   'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
-<<<<<<< TestAutomation-HDPI-3521
-  'language-used': 'languageUsed',
-  'other-considerations': 'otherConsiderations',
   'counter-claim': 'counterClaim',
-=======
->>>>>>> HDPI-3521-counterclaim-screen
 };
