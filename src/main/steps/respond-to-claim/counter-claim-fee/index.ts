@@ -3,7 +3,11 @@ import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { Logger } from '@modules/logger';
 import type { CcdCounterClaim, PossessionClaimResponse, VerticalYesNoValue } from '@services/ccdCase.interface';
+import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+
+const logger = Logger.getLogger('counterClaimFeeStep');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim-fee',
@@ -56,5 +60,23 @@ export const step: StepDefinition = createFormStep({
       defendantResponses: { counterClaim: { ...counterClaim } },
     };
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  extendGetContent: async req => {
+    const counterClaim = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+    const claimAmountInPence = counterClaim?.claimAmount ?? counterClaim?.estimatedMaxClaimAmount;
+
+    if (!counterClaim?.claimType) {
+      logger.warn('Counterclaim fee unavailable: missing claimType');
+      return { counterClaimFee: Number.NaN };
+    }
+
+    try {
+      const feeType = getCounterClaimFeeType(counterClaim.claimType, claimAmountInPence);
+      const counterClaimFee = await getFee(feeType);
+      return { counterClaimFee };
+    } catch {
+      logger.warn('Counterclaim fee unavailable: lookup failed');
+      return { counterClaimFee: Number.NaN };
+    }
   },
 });

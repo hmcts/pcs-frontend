@@ -17,7 +17,60 @@ export interface FeeLookupParams {
 export enum FeeType {
   genAppStandardFee,
   genAppMaxFee,
+  counterClaimFlatFeeFEE0450,
+  counterClaimFee0506,
+  counterClaimFee0507,
+  counterClaimFee0508,
+  counterClaimFee0509,
+  counterClaimFee0510,
+  counterClaimFee0511,
+  counterClaimFee0512,
+  counterClaimFee0513,
+  counterClaimFee0514
 }
+
+export const getCounterClaimFeeType = (claimType?: string, claimAmountInPence?: string): FeeType => {
+  if (claimType === 'SOMETHING_ELSE') {
+    return FeeType.counterClaimFlatFeeFEE0450;
+  }
+
+  if (claimType !== 'PAYMENT_OR_COMPENSATION' && claimType !== 'BOTH') {
+    throw new Error(`Unsupported counterclaim claim type: ${claimType}`);
+  }
+
+  const amountInPence = Number(claimAmountInPence);
+  if (Number.isNaN(amountInPence) || amountInPence < 0) {
+    return FeeType.counterClaimFee0506;
+  }
+
+  const amountInPounds = amountInPence / 100;
+
+  if (amountInPounds <= 300) {
+    return FeeType.counterClaimFee0514;
+  }
+  if (amountInPounds <= 500) {
+    return FeeType.counterClaimFee0513;
+  }
+  if (amountInPounds <= 1_000) {
+    return FeeType.counterClaimFee0512;
+  }
+  if (amountInPounds <= 1_500) {
+    return FeeType.counterClaimFee0511;
+  }
+  if (amountInPounds <= 3_000) {
+    return FeeType.counterClaimFee0510;
+  }
+  if (amountInPounds <= 5_000) {
+    return FeeType.counterClaimFee0509;
+  }
+  if (amountInPounds <= 10_000) {
+    return FeeType.counterClaimFee0508;
+  }
+  if (amountInPounds <= 200_000) {
+    return FeeType.counterClaimFee0507;
+  }
+  return FeeType.counterClaimFee0506;
+};
 
 interface FeeLookupResponse {
   code: string;
@@ -49,8 +102,8 @@ export const getFee = async (feeType: FeeType): Promise<number> => {
 
     logger.debug(`Fee service response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.fee_amount;
-  } catch (e) {
-    logger.error('Error fetching fee ', e);
+  } catch {
+    logger.warn('Fee lookup request failed');
     throw new Error('Error fetching fee');
   }
 };
