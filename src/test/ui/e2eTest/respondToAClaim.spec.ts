@@ -238,7 +238,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.continueButton);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
@@ -384,7 +384,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.continueButton);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
@@ -490,7 +490,7 @@ test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes
     option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
   });
   await performValidation('mainHeader', counterClaimFee.mainHeader);
-  await performAction('clickButton', counterClaimFee.continueButton);
+  await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
@@ -603,7 +603,7 @@ test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - 
     amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
   });
   await performValidation('mainHeader', counterClaimFee.mainHeader);
-  await performAction('clickButton', counterClaimFee.continueButton);
+  await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
@@ -747,7 +747,7 @@ test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided
     amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
   });
   await performValidation('mainHeader', counterClaimFee.mainHeader);
-  await performAction('clickButton', counterClaimFee.continueButton);
+  await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),
@@ -869,7 +869,7 @@ test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - N
     option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
   });
   await performValidation('mainHeader', counterClaimFee.mainHeader);
-  await performAction('clickButton', counterClaimFee.continueButton);
+  await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),
@@ -1004,7 +1004,7 @@ test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - 
     option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
   });
   await performValidation('mainHeader', counterClaimFee.mainHeader);
-  await performAction('clickButton', counterClaimFee.continueButton);
+  await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),
@@ -1112,7 +1112,7 @@ test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes Noti
     option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
   });
   await performValidation('mainHeader', counterClaimFee.mainHeader);
-  await performAction('clickButton', counterClaimFee.continueButton);
+  await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),

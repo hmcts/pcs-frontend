@@ -12,7 +12,7 @@ export const counterClaimSpecificSumOfMoney = {
   enterHowMuchYouAreClaimingErrorMessage: `Enter how much you are claiming for`,
   ifYouDontKnowParagraph: `If you do not know the specific sum you're claiming for, the court needs to know what you believe the maximum value of your claim will be.`,
   ifYouDontKnowExactAmountHiddenParagraph: `If you do not know the exact amount, give an estimate.`,
-  maximumValueOfYourClaimHiddenQuestion: `Maximum value of your claim`,
+  maximumValueOfYourClaimHiddenQuestion: `What’s the maximum value of your claim?`,
   enterMaximumValueOfYourClaimInput: `1000.00`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   specificSumRequiredErrorMessage: `Select if you are claiming for a specific sum of money`,
