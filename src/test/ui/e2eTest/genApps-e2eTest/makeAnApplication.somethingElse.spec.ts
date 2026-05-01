@@ -59,15 +59,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
       option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
     });
-    await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('confirmOrderDoYouWant', {
       label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
       input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
     });
-    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
-    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
-    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
     await performAction('confirmDocumentToUpload', {
       question: doYouWantToUploadDocumentsToSupportYourApplication.doYouWantToUploadDocumentQuestion,
       option: doYouWantToUploadDocumentsToSupportYourApplication.yesRadioOption,
