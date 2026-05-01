@@ -1,3 +1,4 @@
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -13,6 +14,8 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    circumstanceHeading: 'circumstanceHeading',
+    circumstanceQuestion: 'circumstanceQuestion',
   },
   fields: [
     {
@@ -50,6 +53,7 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/currentCircumstances.njk`,
   extendGetContent: req => {
     const t = getTranslationFunction(req, 'your-circumstances', ['common']);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     return {
       introParagraph: t('introParagraph'),
@@ -57,6 +61,7 @@ export const step: StepDefinition = createFormStep({
       bullet1: t('bullet1'),
       bullet2: t('bullet2'),
       bullet3: t('bullet3'),
+      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
   beforeRedirect: async req => {

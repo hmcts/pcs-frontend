@@ -1,0 +1,21 @@
+{
+  "caseNumber": "cyCase number: {{caseNumber}}",
+  "pageTitle": "cyThe defendant’s situation",
+  "hardshipHeading": "cyExceptional hardship",
+  "introParagraph1": "cyYou can use this section to explain any exceptional hardship the defendant may experience if they were asked to leave their home.",
+  "introParagraph2": "cyIf this applies to you, a judge might allow you to stay in your home for longer.",
+  "introParagraph3": "cyAny details the defendant provides will be considered by a judge when making their decision, but it is up to them to decide if exceptional hardship applies.",
+  "forExample": "cyFor example, the defendant might have:",
+  "bullet1": "cygone through a divorce or separation",
+  "bullet2": "cylost their job or been made redundant",
+  "bullet3": "cyexperienced a bereavement or long-term illness",
+  "bullet4": "cybeen declared bankrupt",
+  "question": "cyWould the defendant experience exceptional hardship if they were asked to leave their home?",
+
+  "textAreaLabel": "cyGive details about the exceptional hardship the defendant would experience",
+  "errors": {
+    "exceptionalHardship": "cySelect if the defendant would experience exceptional hardship if they were asked to leave their home",
+    "exceptionalHardshipDetails": "cyGive details about the exceptional hardship the defendant would experience",
+    "exceptionalHardshipDetailsInvalidCharacters": "cyThe details of the exceptional hardship the defendant would experience must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+  }
+}

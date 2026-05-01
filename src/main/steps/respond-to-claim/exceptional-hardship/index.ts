@@ -1,3 +1,4 @@
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -13,6 +14,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    hardshipHeading: 'hardshipHeading',
   },
   fields: [
     {
@@ -50,6 +52,7 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/exceptionalHardship.njk`,
   extendGetContent: req => {
     const t = getTranslationFunction(req, 'exceptional-hardship', ['common']);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     return {
       introParagraph1: t('introParagraph1'),
@@ -60,6 +63,7 @@ export const step: StepDefinition = createFormStep({
       bullet2: t('bullet2'),
       bullet3: t('bullet3'),
       bullet4: t('bullet4'),
+      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
   beforeRedirect: async req => {
