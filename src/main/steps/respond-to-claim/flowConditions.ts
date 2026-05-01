@@ -57,7 +57,8 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
 }
 
 function getCounterClaimNeedHelpWithFees(req: Request) {
-  return req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim?.needHelpWithFees;
+  return req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim
+    ?.needHelpWithFees;
 }
 
 export function shouldShowCounterClaimHelpWithFeesStep(req: Request): boolean {
