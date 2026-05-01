@@ -316,4 +316,5 @@ export interface CitizenGenAppRequest {
   withoutNotice?: YesNoValue;
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
+  whatOrderWanted?: string;
 }
