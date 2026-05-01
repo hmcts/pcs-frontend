@@ -1,12 +1,16 @@
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
+import { getDashboardUrl } from '@routes/dashboard';
 
 export const step = createFormStep({
-  stepName: 'start',
+  stepName: 'start-now',
   journeyFolder: 'uploadAdditionalDocuments',
   stepDir: __dirname,
   flowConfig,
+  extendGetContent: async req => ({
+    backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/dashboard',
+  }),
   fields: [
     {
       name: 'documentsRelateToGeneralApplication',

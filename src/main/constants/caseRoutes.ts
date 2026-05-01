@@ -9,7 +9,7 @@ export const VIEW_THE_CLAIM_ROUTE = '/case/:caseReference/view-the-claim';
 
 export const UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE = '/case/:caseReference/upload-additional-documents';
 
-export const UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE = UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE;
+export const UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE = `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/start-now`;
 
 export const VIEW_DOCUMENTS_ROUTE = '/case/:caseReference/view-documents';
 

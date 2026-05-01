@@ -7,12 +7,11 @@ export const uploadYourDocumentsStep = 'upload-your-documents';
 
 export const flowConfig: JourneyFlowConfig = {
   basePath: UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE,
-  entryStepIdAtBasePath: 'start',
   journeyName: 'uploadAdditionalDocuments',
   useSessionFormData: false,
-  stepOrder: ['start', confirmIfTheseDocumentsRelateToAnApplicationStep, uploadYourDocumentsStep],
+  stepOrder: ['start-now', confirmIfTheseDocumentsRelateToAnApplicationStep, uploadYourDocumentsStep],
   steps: {
-    start: {
+    'start-now': {
       routes: [
         {
           condition: async (_req, _form, data) => data.documentsRelateToGeneralApplication === 'yes',
