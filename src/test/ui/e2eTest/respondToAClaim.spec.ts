@@ -1,5 +1,3 @@
-import config from 'config';
-
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
@@ -44,7 +42,7 @@ import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
@@ -188,7 +186,7 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim @noDefendants @regression @accessibility', async () => {
+  test('Respond to a claim @noDefendants @regression @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -206,7 +204,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
@@ -231,6 +229,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknown');
+    //This is a placeholder page
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -326,6 +325,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
+
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
     //incomeAndExpenses - no - Upload docs
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -345,7 +345,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      options: [contactPreferenceEmailOrPost.byEmailCheckbox, contactPreferenceEmailOrPost.byPostCheckbox],
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
@@ -424,7 +424,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
-  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known -  RegularIncome - Universal Credit @secureFlexible @regression', async () => {
+
+  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     //Income and expenses - yes - no option On regular Income - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
@@ -439,7 +440,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
@@ -555,7 +556,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -675,6 +676,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
+
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -693,7 +695,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -795,6 +797,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
+
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
     //universal credit with all other options - priority debts
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
@@ -814,7 +817,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -922,7 +925,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
-  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No - PriorityDebts - Yes @regression', async () => {
+
+  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -938,7 +942,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -1035,112 +1039,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
-  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.mainHeader,
-      option: defendantNameConfirmation.yesRadioOption,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirth.dayInputText,
-      dobMonth: defendantDateOfBirth.monthInputText,
-      dobYear: defendantDateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.yesRadioOption,
-    });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.noRadioOption,
-    });
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
-    await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
-    });
-    await performAction('selectTenancyStartDateKnown', {
-      option: tenancyDateDetails.yesRadioOption,
-    });
-    await performAction('selectNoticeDetails', {
-      option: confirmationOfNoticeGiven.yesRadioOption,
-    });
-    await performAction('enterNoticeDateKnown', {
-      day: '25',
-      month: '2',
-      year: '2020',
-    });
-    await performAction('rentArrears', {
-      option: rentArrears.noRadioOption,
-      rentAmount: rentArrears.rentAmountTextInput,
-    });
-    // placeholder page, so need to be replaced with custom action when actual page is implemented
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-    await performAction('readPaymentInterstitial');
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    });
-    await performAction('installmentPayments', {
-      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-      radioOption: installmentPayments.noRadioOption,
-    });
-    await performAction('readYourHouseholdAndCircumstances');
-    await performAction('doYouHaveAnyDependantChildren', {
-      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
-    });
-    await performAction('doYouHaveAnyOtherDependants', {
-      otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
-    });
-    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
-    });
-    await performAction('selectAlternativeAccommodation', {
-      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
-    });
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
-      yourCircumstancesOption: yourCircumstances.noRadioOption,
-    });
-    await performAction('exceptionalHardship', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
-    });
-    await performAction('selectIncomeAndExpenses', {
-      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
-    });
-    await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performAction('selectUniversalCredit', {
-      question: haveYouAppliedForUniversalCredit.mainHeader,
-      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
-    });
-    await performAction('selectPriorityDebts', {
-      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
-      option: priorityDebts.noRadioOption,
-    });
-    await performAction('selectWhatOtherRegularExpensesDoYouHave');
-    await performAction('otherConsiderations', {
-      question: otherConsiderations.mainHeader,
-      option: otherConsiderations.noRadioOption,
-    });
-    await performAction('clickButton', uploadFiles.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
-    });
-  });
+
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
@@ -1157,7 +1056,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -1251,6 +1150,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
+
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
@@ -1267,7 +1167,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -1333,8 +1233,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performAction('selectUniversalCredit', {
       question: haveYouAppliedForUniversalCredit.mainHeader,
-      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
-      ...getRelativeDate(-5),
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
     });
     await performAction('selectPriorityDebts', {
       question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
