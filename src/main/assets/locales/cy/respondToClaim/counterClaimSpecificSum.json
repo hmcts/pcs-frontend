@@ -13,13 +13,13 @@
       "required": "CyEnter how much you are claiming for",
       "largeAmount": "CyThe amount you are claiming for must be less than £1 billion",
       "negative": "CyThe amount you are claiming for must be £0.00 or above",
-      "invalidFormat": "CyEnter how much you are claiming for in the correct format, for example £148.00 or £148.50"
+      "invalidFormat": "CyEnter how much you are claiming for in the correct format, for example 148.00 or 148.50"
     },
     "estimatedMaxClaimAmount": {
       "required": "CyEnter the maximum value of your claim",
       "largeAmount": "CyThe maximum value you are claiming for must be less than £1 billion",
       "negative": "CyThe maximum value you are claiming for must be £0.00 or above",
-      "invalidFormat": "CyEnter the maximum value of your claim in the correct format, for example £148.00 or £148.50"
+      "invalidFormat": "CyEnter the maximum value of your claim in the correct format, for example 148.00 or 148.50"
     }
   }
 }
