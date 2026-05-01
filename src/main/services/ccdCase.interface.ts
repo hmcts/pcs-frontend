@@ -151,8 +151,6 @@ export interface CcdDefendantResponses {
   tenancyTypeCorrect?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
-  confirmNoticeGiven?: string;
-  noticeDate?: string;
   tenancyStartDateCorrect?: string;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
@@ -311,4 +309,5 @@ export interface CitizenGenAppRequest {
   withoutNotice?: YesNoValue;
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
+  whatOrderWanted?: string;
 }
