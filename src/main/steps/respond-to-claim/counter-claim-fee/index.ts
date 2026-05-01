@@ -1,9 +1,9 @@
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
+import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { Logger } from '@modules/logger';
 import type { CcdCounterClaim, PossessionClaimResponse, VerticalYesNoValue } from '@services/ccdCase.interface';
 import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 
@@ -62,7 +62,8 @@ export const step: StepDefinition = createFormStep({
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: async req => {
-    const counterClaim = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+    const counterClaim =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
     const claimAmountInPence = counterClaim?.claimAmount ?? counterClaim?.estimatedMaxClaimAmount;
 
     if (!counterClaim?.claimType) {

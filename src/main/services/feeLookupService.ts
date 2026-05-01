@@ -26,7 +26,7 @@ export enum FeeType {
   counterClaimFee0511,
   counterClaimFee0512,
   counterClaimFee0513,
-  counterClaimFee0514
+  counterClaimFee0514,
 }
 
 export const getCounterClaimFeeType = (claimType?: string, claimAmountInPence?: string): FeeType => {
