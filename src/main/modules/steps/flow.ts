@@ -257,6 +257,7 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
 
     const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
     const formData = req.session?.formData || {};
+
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
     if (missingDependency) {
