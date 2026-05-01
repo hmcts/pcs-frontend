@@ -1,3 +1,4 @@
+import { noEmojiValidator } from '../../utils/fieldValidators';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -86,13 +87,7 @@ export const step: StepDefinition = createFormStep({
         autocomplete: 'given-name',
         spellcheck: false,
       },
-      validator: (value: unknown): boolean | string => {
-        if (typeof value !== 'string' || !value.trim()) {
-          return true;
-        }
-        const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
-        return !invalidCharacters.test(value) || 'errors.firstNameInvalidCharacters';
-      },
+      validator: noEmojiValidator('errors.firstNameInvalidCharacters'),
     },
     {
       name: 'lastName',
@@ -107,13 +102,7 @@ export const step: StepDefinition = createFormStep({
         autocomplete: 'family-name',
         spellcheck: false,
       },
-      validator: (value: unknown): boolean | string => {
-        if (typeof value !== 'string' || !value.trim()) {
-          return true;
-        }
-        const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
-        return !invalidCharacters.test(value) || 'errors.lastNameInvalidCharacters';
-      },
+      validator: noEmojiValidator('errors.lastNameInvalidCharacters'),
     },
   ],
 });
