@@ -12,20 +12,7 @@ export const flowConfig: JourneyFlowConfig = {
   stepOrder: ['start-now', confirmIfTheseDocumentsRelateToAnApplicationStep, uploadYourDocumentsStep],
   steps: {
     'start-now': {
-      routes: [
-        {
-          condition: async (_req, _form, data) => data.documentsRelateToGeneralApplication === 'yes',
-          nextStep: confirmIfTheseDocumentsRelateToAnApplicationStep,
-        },
-        {
-          condition: async (_req, _form, data) => data.documentsRelateToGeneralApplication === 'no',
-          nextStep: uploadYourDocumentsStep,
-        },
-        {
-          condition: async () => true,
-          nextStep: uploadYourDocumentsStep,
-        },
-      ],
+      defaultNext: confirmIfTheseDocumentsRelateToAnApplicationStep,
     },
     [confirmIfTheseDocumentsRelateToAnApplicationStep]: {},
     [uploadYourDocumentsStep]: {},

@@ -1,31 +1,44 @@
+import type { Request, Response } from 'express';
+
+import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createGetController, createStepNavigation } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
+import { getFlowConfigForJourney } from '@steps';
 
-export const step = createFormStep({
-  stepName: 'start-now',
-  journeyFolder: 'uploadAdditionalDocuments',
+const journeyName = 'uploadAdditionalDocuments';
+const stepName = 'start-now';
+const templatePath = 'case-tasks/upload-additional-documents/start-now/startNow.njk';
+const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
+
+export const step: StepDefinition = {
+  url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/start-now`,
+  name: stepName,
+  view: templatePath,
   stepDir: __dirname,
-  flowConfig,
-  extendGetContent: async req => ({
-    backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/dashboard',
-  }),
-  fields: [
-    {
-      name: 'documentsRelateToGeneralApplication',
-      type: 'radio',
-      required: true,
-      translationKey: { label: 'question' },
-      legendClasses: 'govuk-fieldset__legend--m',
-      options: [
-        { value: 'yes', translationKey: 'options.yes.label', hint: 'options.yes.hint' },
-        { value: 'no', translationKey: 'options.no.label', hint: 'options.no.hint' },
-      ],
+  getController: () =>
+    createGetController(
+      templatePath,
+      stepName,
+      stepNavigation,
+      (req: Request) => ({
+        backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/dashboard',
+        dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+        url: req.originalUrl || '',
+      }),
+      journeyName
+    ),
+  postController: {
+    post: async (req: Request, res: Response) => {
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
+
+      if (!redirectPath) {
+        return res.status(404).render('not-found');
+      }
+
+      res.redirect(303, redirectPath);
     },
-  ],
-  translationKeys: {
-    pageTitle: 'pageTitle',
-    heading: 'heading',
   },
-});
+};
