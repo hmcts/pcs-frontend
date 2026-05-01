@@ -24,6 +24,16 @@
           "ViewResponse": { "title": "cyView the response" },
           "Information": { "title": "cyResponse information" }
         },
+        "RTC": {
+          "StartNowAndDetails": { "title": "cyRead information about responding and free legal advice" },
+          "PersonalDetails": { "title": "cyYour details" },
+          "DisputeAndTenancy": { "title": "cy[claimant]’s claim" },
+          "Payments": { "title": "cyPayments and agreements" },
+          "SituationAndCircumstances": { "title": "cyYour household and circumstances" },
+          "IncomeAndExpenditure": { "title": "cyYour income and expenses" },
+          "UploadFiles": { "title": "cyUpload documents" },
+          "CheckYourAnswersAndSubmit": { "title": "cyCheck your answers and submit" }
+        },
         "Hearing": {
           "ViewHearing": { "title": "cyView the hearing" },
           "UploadDocuments": { "title": "cyUpload documents" },

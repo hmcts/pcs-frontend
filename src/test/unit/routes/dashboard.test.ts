@@ -78,8 +78,12 @@ jest.mock('../../../main/middleware/oidc', () => ({
 
 jest.mock('../../../main/services/pcsApi', () => {
   const STATUS_MAP = {
-    AVAILABLE: { text: 'Available' },
-    NOT_AVAILABLE: { text: 'Not available' },
+    NOT_AVAILABLE: { tag: { text: 'Not available yet', classes: 'govuk-tag--grey' } },
+    AVAILABLE: { tag: { text: 'Available', classes: 'govuk-tag--blue' } },
+    ACTION_NEEDED: { tag: { text: 'Action needed', classes: 'govuk-tag--red' } },
+    IN_PROGRESS: { tag: { text: 'In progress', classes: 'govuk-tag--red' } },
+    OPTIONAL: { tag: { text: 'Optional', classes: 'govuk-tag--blue' } },
+    COMPLETED: { text: 'Done' },
   };
 
   const TASK_GROUP_MAP = {
@@ -308,6 +312,110 @@ describe('Dashboard Routes', () => {
         'Failed to fetch dashboard data for case 1234567890123456. Error was: Error: API failure'
       );
     });
+
+    it('maps in-progress and completed task statuses for task list display', async () => {
+      (getDashboardTaskGroups as jest.Mock).mockResolvedValueOnce([
+        {
+          groupId: 'GROUP_ONE',
+          tasks: [
+            {
+              templateId: 'respond-to-claim-section',
+              templateValues: {},
+              status: 'IN_PROGRESS',
+            },
+            {
+              templateId: 'respond-to-claim-section-complete',
+              templateValues: {},
+              status: 'COMPLETED',
+            },
+          ],
+        },
+      ]);
+
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: { validatedCase: { id: '1234567890123456', data: {} } },
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: {
+          tasks: {
+            href?: string;
+            status: { text?: string; tag?: { text: string; classes?: string } };
+          }[];
+        }[];
+      };
+
+      const [inProgressTask, completedTask] = renderArgs.taskGroups[0].tasks;
+
+      expect(inProgressTask.status).toEqual({ tag: { text: 'In progress', classes: 'govuk-tag--red' } });
+      expect(inProgressTask.href).toBe('/dashboard/1234567890123456/group_one/respond-to-claim-section');
+
+      expect(completedTask.status).toEqual({ text: 'Done' });
+      expect(completedTask.href).toBe('/dashboard/1234567890123456/group_one/respond-to-claim-section-complete');
+    });
+
+    it('maps check-your-answers task availability with and without navigation link', async () => {
+      (getDashboardTaskGroups as jest.Mock).mockResolvedValueOnce([
+        {
+          groupId: 'GROUP_ONE',
+          tasks: [
+            {
+              templateId: 'check-your-answers-and-submit',
+              templateValues: {},
+              status: 'NOT_AVAILABLE',
+            },
+            {
+              templateId: 'check-your-answers-and-submit',
+              templateValues: {},
+              status: 'AVAILABLE',
+            },
+          ],
+        },
+      ]);
+
+      dashboardRoutes(app);
+
+      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        req: any,
+        res: Response
+      ) => Promise<void>;
+
+      const res = {
+        locals: { validatedCase: { id: '1234567890123456', data: {} } },
+        render: jest.fn(),
+      } as unknown as Response;
+
+      await handler({}, res);
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: {
+          tasks: {
+            href?: string;
+            status: { text?: string; tag?: { text: string; classes?: string } };
+          }[];
+        }[];
+      };
+
+      const [notAvailableTask, availableTask] = renderArgs.taskGroups[0].tasks;
+
+      expect(notAvailableTask.status).toEqual({ tag: { text: 'Not available yet', classes: 'govuk-tag--grey' } });
+      expect(notAvailableTask.href).toBeUndefined();
+
+      expect(availableTask.status).toEqual({ tag: { text: 'Available', classes: 'govuk-tag--blue' } });
+      expect(availableTask.href).toBe('/dashboard/1234567890123456/group_one/check-your-answers-and-submit');
+    });
   });
 
   describe('getDashboardUrl helper', () => {
@@ -322,7 +430,7 @@ describe('Dashboard Routes', () => {
     });
 
     it('should return null when case reference is undefined', () => {
-      const result = getDashboardUrl(undefined);
+      const result = getDashboardUrl();
       expect(result).toBeNull();
     });
 

@@ -16,7 +16,7 @@ export const STATUS_MAP: Record<DashboardTask['status'], { text?: string; tag?: 
     ACTION_NEEDED: { tag: { text: 'Action needed', classes: 'govuk-tag--red' } },
     IN_PROGRESS: { tag: { text: 'In progress', classes: 'govuk-tag--red' } },
     OPTIONAL: { tag: { text: 'Optional', classes: 'govuk-tag--blue' } },
-    COMPLETED: { text: 'Completed' },
+    COMPLETED: { text: 'Done' },
   };
 
 export const TASK_GROUP_MAP: Record<DashboardTaskGroup['groupId'], string> = {

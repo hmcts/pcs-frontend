@@ -25,6 +25,16 @@
           "ViewResponse": { "title": "View the response" },
           "Information": { "title": "Response information" }
         },
+        "RTC": {
+          "StartNowAndDetails": { "title": "Read information about responding and free legal advice" },
+          "PersonalDetails": { "title": "Your details" },
+          "DisputeAndTenancy": { "title": "[claimant]’s claim" },
+          "Payments": { "title": "Payments and agreements" },
+          "SituationAndCircumstances": { "title": "Your household and circumstances" },
+          "IncomeAndExpenditure": { "title": "Your income and expenses" },
+          "UploadFiles": { "title": "Upload documents" },
+          "CheckYourAnswersAndSubmit": { "title": "Check your answers and submit" }
+        },
         "Hearing": {
           "ViewHearing": { "title": "View the hearing" },
           "UploadDocuments": { "title": "Upload documents" },
