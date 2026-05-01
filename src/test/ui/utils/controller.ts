@@ -133,8 +133,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
 export async function performAction(
   action: string,
   fieldName?: actionData | actionRecord,
-  value?: actionData | actionRecord,
-  extraValue?: actionData | actionRecord
+  value?: actionData | actionRecord
 ): Promise<void> {
   const executor = getExecutor();
   await validatePageIfNavigated(action);
@@ -162,7 +161,7 @@ export async function performAction(
   }`;
 
   await test.step(stepText, async () => {
-    await actionInstance.execute(executor.page, action, fieldName, value, extraValue);
+    await actionInstance.execute(executor.page, action, fieldName, value);
   });
   await validatePageIfNavigated(action);
   await attachSauceJourneyStepScreenshot(executor.page);

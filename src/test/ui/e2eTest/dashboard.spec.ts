@@ -45,11 +45,10 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       ['clickLinkAndVerifySameTabTitle', dashboard.getDebtRespiteLink, dashboard.breathingSpaceHeader],
       ['clickLinkAndVerifySameTabTitle', dashboard.findInfoAboutMyCourtLink, dashboard.findACourtOrTribunalHeader]
     );
-    await performAction(
-      'clickLinkAndVerifySameTabTitle',
-      dashboard.viewTheClaimLink,
-      viewTheClaim.mainHeader,
-      dashboard.theClaimSubHeader
-    );
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      fieldName: dashboard.viewTheClaimLink,
+      header: viewTheClaim.mainHeader,
+      sectionHeader: dashboard.theClaimSubHeader,
+    });
   });
 });
