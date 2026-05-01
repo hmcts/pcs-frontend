@@ -10,7 +10,6 @@ import {
   isWalesProperty,
 } from '../utils';
 
-import { isMoneyCounterClaim } from './utils';
 import {
   hasConfirmedInstallmentOffer,
   hasProvidedFinanceDetails,
@@ -19,6 +18,8 @@ import {
   shouldShowInstallmentPaymentsStep,
   shouldShowUniversalCreditStep,
 } from './flowConditions';
+import { isMoneyCounterClaim } from './utils';
+
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
