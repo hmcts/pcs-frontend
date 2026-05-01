@@ -91,7 +91,7 @@ describe('findStep', () => {
   });
 
   it('carries documentStorage adapter from createFormStep config onto the StepDefinition', () => {
-    const step = findStep('respond-to-claim', 'counter-claim', 'default');
+    const step = findStep('respond-to-claim', 'upload-document', 'default');
 
     expect(step?.documentStorage).toBeDefined();
     expect(typeof step?.documentStorage?.read).toBe('function');
