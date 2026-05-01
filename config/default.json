@@ -105,6 +105,8 @@
   },
   "dashboard": {
     "taskRoutes": {
+      "Defendant.ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
+      "Defendant.ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
       "Defendant.ViewClaim": "/case/:caseReference/view-the-claim"
     }
   }
