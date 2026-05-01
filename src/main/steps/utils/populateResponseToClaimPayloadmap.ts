@@ -42,7 +42,8 @@ export const buildCcdCaseForPossessionClaimResponse = async (
   const updatedCase = await ccdCaseService.updateDraftRespondToClaim(
     req.session?.user?.accessToken,
     ccdCase.id,
-    ccdCase.data as Record<string, unknown>
+    ccdCase.data as Record<string, unknown>,
+    req.session.clientContext
   );
 
   if (req.res?.locals) {

@@ -117,6 +117,11 @@ export interface CcdClaimGroundSummaryItem {
   id: string;
 }
 
+export interface CcdDefendantItem {
+  value: CcdDefendantParty;
+  id: string;
+}
+
 /** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
 export interface CcdClaimantOrganisation {
   value: string;
@@ -218,6 +223,7 @@ export interface CcdCaseData {
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
   citizenGenAppRequest?: CitizenGenAppRequest;
+  allDefendants?: CcdDefendantItem[];
 }
 
 /** Case representation used by services: id + case_data. */

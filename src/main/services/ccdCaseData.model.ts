@@ -8,6 +8,7 @@ import {
   CcdDefendantResponses,
   PossessionClaimResponse,
   YesNoEnum,
+  CcdDefendantItem,
 } from '@services/ccdCase.interface';
 
 export type { CcdCase, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
@@ -301,5 +302,9 @@ export class CcdCaseModel {
       this.notice_NoticeOtherElectronicDateTime ||
       undefined
     );
+  }
+
+  get allDefendants(): CcdDefendantItem[] | undefined {
+    return this.data.allDefendants;
   }
 }

@@ -7,8 +7,9 @@ import {
   isDefendantNameKnown,
   isNoticeDateProvided,
   isNoticeServed,
+  isSingleLinkedDefendant,
   isTenancyStartDateKnown,
-  isWalesProperty,
+  isWalesProperty
 } from '../utils';
 
 import { flowConfig as citizenFlowConfig } from './flow.config';
@@ -20,8 +21,8 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
   journeyName: 'respondToClaimLegalrep',
   stepOrder: [
     'start-now',
+    'select-defendant',
     'defendant-name-confirmation',
-    'defendant-name-capture',
     'defendant-date-of-birth',
     'counter-claim',
     'payment-interstitial',
@@ -63,23 +64,26 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'start-now': {
       routes: [
         {
-          condition: async (req: Request) => isDefendantNameKnown(req),
+          condition: async (req: Request) => isSingleLinkedDefendant(req),
           nextStep: 'defendant-name-confirmation',
         },
         {
-          condition: async (req: Request) => !isDefendantNameKnown(req),
-          nextStep: 'defendant-name-capture',
+          condition: async (req: Request) => !isSingleLinkedDefendant(req),
+          nextStep: 'select-defendant',
         },
       ],
-      defaultNext: 'defendant-name-capture',
+      defaultNext: 'select-defendant',
+    },
+    'select-defendant': {
+      defaultNext: 'defendant-date-of-birth',
+      previousStep: 'start-now',
     },
     'defendant-name-confirmation': {
       defaultNext: 'defendant-date-of-birth',
-      previousStep: 'start-now',
-    },
-    'defendant-name-capture': {
-      defaultNext: 'defendant-date-of-birth',
-      previousStep: 'start-now',
+      previousStep: async (req: Request) => {
+        const singleDefendant = await isSingleLinkedDefendant(req);
+        return singleDefendant ? 'start-now' : 'select-defendant';
+      },
     },
     'defendant-date-of-birth': {
       previousStep: async (req: Request) => {

@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-export const LEGAL_REPRESENTATIVE_USER_ROLES = ['solicitor'] as const;
+export const LEGAL_REPRESENTATIVE_USER_ROLES = ['caseworker-pcs-solicitor'] as const;
 
 export type UserType = 'citizen' | 'legalrep';
 

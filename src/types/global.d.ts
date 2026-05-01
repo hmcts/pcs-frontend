@@ -14,6 +14,10 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   refreshToken: string;
 }
 
+export interface ClientContextHeaders {
+  selectedPartyId: string;
+}
+
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
@@ -23,6 +27,7 @@ interface CustomSessionData extends SessionData {
   ccdCase?: CcdCase;
   destroy(callback: (err?: Error) => void): void;
   returnTo?: string;
+  clientContext?: ClientContextHeaders;
 }
 
 declare module 'express-session' {
