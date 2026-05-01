@@ -100,7 +100,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('uses dynamic previous step for your-household-and-circumstances (defaults to repayments-agreed with no payment data)', async () => {
+  it('routes back from your-household-and-circumstances to repayments-agreed when no payment steps visible', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
       'repayments-agreed'
