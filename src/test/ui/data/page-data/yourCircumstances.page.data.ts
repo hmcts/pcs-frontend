@@ -16,6 +16,8 @@ export const yourCircumstances = {
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   backLink: `Back`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
+  emojiTextInput: `👉 😄`,
+  emojiGiveGiveDetailsAboutYourCircumstancesErrorMessage: `Give details about your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   selectCircumstancesErrorMessage: `Select if you’d like to share anything about your circumstances`,
   mustBe500CharactersOrFewerErrorMessage: `Must be 500 characters or fewer`,
   feedbackLink: `feedback (opens in new tab)`,

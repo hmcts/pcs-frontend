@@ -7,14 +7,14 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
   await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
-    message: doYouHaveAnyDependantChildren.selectIfYouHaveAnyDependantChildrenErrorMessage,
+    message: doYouHaveAnyDependantChildren.selectIfYouHaveAnyDependentChildrenErrorMessage,
   });
 
   await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
   await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
-    message: doYouHaveAnyDependantChildren.giveDetailsAboutYourDependantChildrenErrorMessage,
+    message: doYouHaveAnyDependantChildren.giveDetailsAboutYourDependentChildrenErrorMessage,
   });
 
   await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
@@ -23,6 +23,19 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
     message: doYouHaveAnyDependantChildren.mustBeUnderCharacterLimitErrorMessage,
+  });
+
+  //Test: emoji
+  await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
+  await performAction(
+    'inputText',
+    doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
+    doYouHaveAnyDependantChildren.emojiTextInput
+  );
+  await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
+    message: doYouHaveAnyDependantChildren.emojiExplainPartsOfClaimErrorMessage,
   });
 }
 

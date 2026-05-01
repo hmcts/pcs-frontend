@@ -26,6 +26,7 @@ import {
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
+  otherConsiderations,
   paymentInterstitial,
   rentArrears,
   repaymentsAgreed,
@@ -94,6 +95,7 @@ export class RespondToClaimAction implements IAction {
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
+      ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -142,7 +144,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
     await performAction('clickRadioButton', {
-      question: correspondenceAddress.correspondenceAddressConfirmHintText,
+      question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
     });
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
@@ -173,20 +175,38 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord) {
-    await performAction('clickRadioButton', {
-      question: contactPreferenceData.question,
-      option: contactPreferenceData.radioOption,
-    });
-    if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailRadioOption) {
-      await performAction(
-        'inputText',
-        contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-        contactPreferenceData.emailAddress
-      );
+    if (Array.isArray(contactPreferenceData.options)) {
+      for (const option of contactPreferenceData.options) {
+        await performAction('check', {
+          question: contactPreferenceData.question,
+          option,
+        });
+        if (option === contactPreferenceEmailOrPost.byEmailCheckbox && contactPreferenceData.emailAddress) {
+          await performAction(
+            'inputText',
+            contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+            contactPreferenceData.emailAddress
+          );
+        }
+      }
+    }
+    // Handle single selection
+    else if (contactPreferenceData.radioOption) {
+      await performAction('check', {
+        question: contactPreferenceData.question,
+        option: contactPreferenceData.radioOption,
+      });
+
+      if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailCheckbox) {
+        await performAction(
+          'inputText',
+          contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+          contactPreferenceData.emailAddress
+        );
+      }
     }
     await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   }
-
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: contactPreferencesTelephone.areYouHappyToContactQuestion,
@@ -385,9 +405,9 @@ export class RespondToClaimAction implements IAction {
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', noticeDateWhenProvided.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
+        ['inputText', noticeDateWhenNotProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenNotProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenNotProvided.yearTextLabel, noticeData.year]
       );
     }
     await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
@@ -535,7 +555,7 @@ export class RespondToClaimAction implements IAction {
 
   private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: yourCircumstancesData.question,
+      question: yourCircumstancesData.wouldYouLikeToShareHeader,
       option: yourCircumstancesData.yourCircumstancesOption,
     });
     if (yourCircumstancesData.yourCircumstancesOption === yourCircumstances.yesRadioOption) {
@@ -630,6 +650,21 @@ export class RespondToClaimAction implements IAction {
       option: languageScreenData.radioOption,
     });
     await performAction('clickButton', languageUsed.saveAndContinueButton);
+  }
+
+  private async otherConsiderations(otherConsiderationsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: otherConsiderationsData.question,
+      option: otherConsiderationsData.option,
+    });
+    if (otherConsiderationsData.option === otherConsiderations.yesRadioOption) {
+      await performAction(
+        'inputText',
+        otherConsiderations.giveDetailsHiddenTextLabel,
+        otherConsiderationsData.courtInfo
+      );
+    }
+    await performAction('clickButton', otherConsiderations.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
