@@ -263,6 +263,8 @@ function createMockVisibleFormDataView() {
     getOtherPartiesAgreedField: jest.fn(),
     getAnyReasonsNotToShareField: jest.fn(),
     getReasonForNotSharingField: jest.fn(),
+    getUploadDocumentsChoiceField: jest.fn(),
+    getUploadedDocuments: jest.fn(),
     getWhichLanguageField: jest.fn(),
   };
 }
@@ -276,5 +278,7 @@ function resetMockVisibleFormDataView() {
   (mockVisibleFormDataView.getOtherPartiesAgreedField as jest.Mock).mockReset();
   (mockVisibleFormDataView.getAnyReasonsNotToShareField as jest.Mock).mockReset();
   (mockVisibleFormDataView.getReasonForNotSharingField as jest.Mock).mockReset();
+  (mockVisibleFormDataView.getUploadDocumentsChoiceField as jest.Mock).mockReset();
+  (mockVisibleFormDataView.getUploadedDocuments as jest.Mock).mockReset();
   (mockVisibleFormDataView.getWhichLanguageField as jest.Mock).mockReset();
 }

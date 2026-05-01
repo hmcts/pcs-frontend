@@ -59,7 +59,7 @@
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/properties-volume": "1.4.0",
-    "@launchdarkly/node-server-sdk": "9.10.12",
+    "@launchdarkly/node-server-sdk": "9.10.13",
     "@ministryofjustice/frontend": "^8.0.1",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/instrumentation-winston": "0.60.0",
@@ -94,7 +94,7 @@
     "uuid": "14.0.0",
     "validator": "13.15.35",
     "winston": "3.19.0",
-    "zod": "3.25.76",
+    "zod": "4.4.1",
     "zod-i18n-map": "2.27.0"
   },
   "devDependencies": {
@@ -152,7 +152,7 @@
     "nodemon": "3.1.14",
     "playwright": "1.59.1",
     "playwright-core": "1.59.1",
-    "postcss": "8.5.12",
+    "postcss": "8.5.13",
     "prettier": "3.8.3",
     "sass": "1.99.0",
     "sass-loader": "16.0.7",
@@ -167,7 +167,7 @@
     "typescript": "5.9.3",
     "webpack": "5.106.2",
     "webpack-cli": "7.0.2",
-    "webpack-dev-middleware": "7.4.5",
+    "webpack-dev-middleware": "8.0.3",
     "webpack-hot-middleware": "2.26.1"
   },
   "resolutions": {

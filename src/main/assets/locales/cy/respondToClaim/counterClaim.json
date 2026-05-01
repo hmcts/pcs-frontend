@@ -1,1 +1,13 @@
-{}
+{
+  "pageTitle": "cy Upload counterclaim files",
+  "caption": "cy Make a counterclaim",
+  "heading": "cy Upload documents (optional)",
+  "guidanceText": "cy Upload any documents that you think are relevant to your counterclaim.",
+  "beforeUploadHeading": "cy Before you upload your documents",
+  "beforeUploadText": "cy Give your document a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "cy Upload a file",
+  "filesAddedHeading": "cy Uploaded files",
+  "uploadButton": "cy Upload file",
+  "deleteButton": "cy Remove",
+  "noFilesUploaded": "cy No files uploaded"
+}

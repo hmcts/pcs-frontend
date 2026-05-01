@@ -11,14 +11,6 @@ export type FieldDetails<T> = {
   fieldValue: T;
 };
 
-interface UploadedDocumentFormData {
-  document_url: string;
-  document_binary_url: string;
-  document_filename: string;
-  content_type?: string;
-  size?: number;
-}
-
 export default class VisibleFormDataView {
   constructor(readonly req: Request) {}
 
@@ -81,25 +73,8 @@ export default class VisibleFormDataView {
   }
 
   getUploadedDocuments(): CcdCollectionItem<CcdUploadedDocument>[] {
-    const rawDocuments = getFormData(this.req, 'upload-documents-to-support-your-application').documents as
-      | UploadedDocumentFormData[]
-      | undefined;
-
-    if (!rawDocuments?.length) {
-      return [];
-    }
-
-    return rawDocuments.map(document => ({
-      value: {
-        document: {
-          document_url: document.document_url,
-          document_binary_url: document.document_binary_url,
-          document_filename: document.document_filename,
-        },
-        contentType: document.content_type,
-        size: document.size,
-      },
-    }));
+    const docs = getFormData(this.req, 'upload-documents-to-support-your-application').documents;
+    return (docs as CcdCollectionItem<CcdUploadedDocument>[] | undefined) ?? [];
   }
 
   private getField<T>(stepName: string, fieldName: string): FieldDetails<T> | undefined {

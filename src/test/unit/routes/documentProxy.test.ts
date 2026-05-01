@@ -36,11 +36,10 @@ jest.mock('../../../main/services/cdamService', () => ({
   getDocumentBinary: jest.fn(),
 }));
 
-jest.mock('../../../main/services/ccdCaseService', () => ({
-  ccdCaseService: {
-    getCaseById: jest.fn(),
-    updateDraftRespondToClaim: jest.fn().mockResolvedValue({ id: '123', data: {} }),
-  },
+jest.mock('../../../main/steps/index', () => ({
+  findStep: jest.fn(),
+  journeyForSlug: jest.fn(),
+  getUserVariant: jest.fn().mockReturnValue('default'),
 }));
 
 jest.mock('../../../main/middleware', () => ({
@@ -60,31 +59,32 @@ const mockDeleteDocument = deleteDocument as jest.Mock;
 const mockT = (key: string, opts?: Record<string, unknown>) =>
   opts?.filename !== undefined ? `${key}:${opts.filename as string}` : key;
 
-function makeReqWithDocs(overrides: Record<string, unknown>, docs: unknown[] = []) {
-  // Mirror the docs into the getCaseById refetch so save/remove see the same state.
-  // Tests that want to simulate a stale snapshot can override the mock after this.
-  const { ccdCaseService } = require('../../../main/services/ccdCaseService');
-  (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
-    id: '123456',
-    data: {
-      possessionClaimResponse: {
-        defendantResponses: {
-          defendantDocuments: docs,
-        },
-      },
-    },
+// Build a DocumentStorage adapter mock and wire the findStep mock to return it.
+// Tests that want to simulate specific state drive it via mockReadFresh.mockResolvedValueOnce.
+function makeStorageMock(initialDocs: unknown[] = []) {
+  const mockRead = jest.fn().mockResolvedValue(initialDocs);
+  const mockReadFresh = jest.fn().mockResolvedValue(initialDocs);
+  const mockSave = jest.fn().mockResolvedValue(undefined);
+
+  const { findStep } = require('../../../main/steps/index');
+  (findStep as jest.Mock).mockReturnValue({
+    documentStorage: { read: mockRead, readFresh: mockReadFresh, save: mockSave },
   });
+
+  return { mockRead, mockReadFresh, mockSave };
+}
+
+function makeReqWithDocs(overrides: Record<string, unknown>, docs: unknown[] = []) {
+  makeStorageMock(docs);
   return {
     session: { user: { accessToken: 'token' } },
-    params: { caseReference: '123456', journey: 'respond-to-claim' },
+    params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
     t: mockT,
     res: {
       locals: {
         validatedCase: {
           possessionClaimResponse: {
-            defendantResponses: {
-              defendantDocuments: docs,
-            },
+            defendantResponses: { defendantDocuments: docs },
           },
         },
       },
@@ -106,27 +106,12 @@ const existingDoc = {
   },
 };
 
-function freshCaseWith(docs: unknown[]) {
-  return {
-    id: '123456',
-    data: {
-      possessionClaimResponse: {
-        defendantResponses: {
-          defendantDocuments: docs,
-        },
-      },
-    },
-  };
-}
-
 describe('documentProxyRoutes', () => {
   let mockApp: Application;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    const { ccdCaseService } = require('../../../main/services/ccdCaseService');
-    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue(freshCaseWith([]));
-    (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockResolvedValue({ id: '123', data: {} });
+    makeStorageMock([]);
     mockApp = {
       get: jest.fn(),
       post: jest.fn(),
@@ -164,7 +149,9 @@ describe('documentProxyRoutes', () => {
     });
 
     it('returns 404 for invalid index', async () => {
-      const req = makeReqWithDocs({ params: { caseReference: '123456', index: 'abc' } });
+      const req = makeReqWithDocs({
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: 'abc' },
+      });
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -173,7 +160,10 @@ describe('documentProxyRoutes', () => {
     });
 
     it('returns 404 when index out of range', async () => {
-      const req = makeReqWithDocs({ params: { caseReference: '123456', index: '5' } }, [existingDoc]);
+      const req = makeReqWithDocs(
+        { params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: '5' } },
+        [existingDoc]
+      );
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -186,7 +176,10 @@ describe('documentProxyRoutes', () => {
       const mockStream = { pipe: jest.fn(), on: jest.fn() };
       (getDocumentBinary as jest.Mock).mockResolvedValue({ stream: mockStream, contentType: 'application/pdf' });
 
-      const req = makeReqWithDocs({ params: { caseReference: '123456', index: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs(
+        { params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: '0' } },
+        [existingDoc]
+      );
       const res = {
         setHeader: jest.fn(),
         headersSent: false,
@@ -207,7 +200,10 @@ describe('documentProxyRoutes', () => {
       const { getDocumentBinary } = require('@services/cdamService');
       (getDocumentBinary as jest.Mock).mockRejectedValue(new Error('CDAM down'));
 
-      const req = makeReqWithDocs({ params: { caseReference: '123456', index: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs(
+        { params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: '0' } },
+        [existingDoc]
+      );
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -378,14 +374,13 @@ describe('documentProxyRoutes', () => {
       const response = res.json as jest.Mock;
       const body = response.mock.calls[0][0];
 
-      // Should return index and filename, NOT CDAM URLs
       expect(body.document.index).toBe(0);
       expect(body.document.document_filename).toBe('test.pdf');
       expect(body.document.document_url).toBeUndefined();
       expect(body.document.document_binary_url).toBeUndefined();
     });
 
-    it('appends to existing documents and saves draft', async () => {
+    it('appends to existing documents via adapter save', async () => {
       const mockDoc = {
         document_url: 'http://dm/doc/new-uuid',
         document_binary_url: 'http://dm/doc/new-uuid/binary',
@@ -395,31 +390,33 @@ describe('documentProxyRoutes', () => {
       };
       mockUploadDocument.mockResolvedValue(mockDoc);
 
+      const { mockReadFresh, mockSave } = makeStorageMock([existingDoc]);
+      mockReadFresh.mockResolvedValue([existingDoc]);
+
       const req = makeReqWithDocs(
         { file: { originalname: 'new.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 2048 } },
         [existingDoc]
       );
+      // Rewire so the dynamic mock is in effect
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: { read: jest.fn().mockResolvedValue([existingDoc]), readFresh: mockReadFresh, save: mockSave },
+      });
+
       const res = { json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
 
-      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
-      expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith('token', '123456', {
-        possessionClaimResponse: {
-          defendantResponses: {
-            defendantDocuments: expect.arrayContaining([
-              existingDoc,
-              expect.objectContaining({ value: expect.any(Object) }),
-            ]),
-          },
-        },
-      });
+      expect(mockSave).toHaveBeenCalledWith(
+        req,
+        expect.arrayContaining([existingDoc, expect.objectContaining({ value: expect.any(Object) })])
+      );
 
       const body = (res.json as jest.Mock).mock.calls[0][0];
       expect(body.document.index).toBe(1);
     });
 
-    it('assigns a generated UUID id to the new collection item (so CCD treats it as stable across round-trips)', async () => {
+    it('assigns a generated UUID id to the new collection item', async () => {
       mockUploadDocument.mockResolvedValue({
         document_url: 'http://dm/doc/new-uuid',
         document_binary_url: 'http://dm/doc/new-uuid/binary',
@@ -431,13 +428,23 @@ describe('documentProxyRoutes', () => {
       const req = makeReqWithDocs({
         file: { originalname: 'new.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 2048 },
       });
+
+      // Override AFTER makeReqWithDocs so this mock wins
+      const mockSave = jest.fn().mockResolvedValue(undefined);
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: {
+          read: jest.fn().mockResolvedValue([]),
+          readFresh: jest.fn().mockResolvedValue([]),
+          save: mockSave,
+        },
+      });
+
       const res = { json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
 
-      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
-      const savedDocs = (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mock.calls[0][2].possessionClaimResponse
-        .defendantResponses.defendantDocuments;
+      const savedDocs = (mockSave as jest.Mock).mock.calls[0][1];
       expect(savedDocs).toHaveLength(1);
       expect(savedDocs[0].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
     });
@@ -481,7 +488,7 @@ describe('documentProxyRoutes', () => {
       expect(mockUploadDocument).not.toHaveBeenCalled();
     });
 
-    it('renames uploaded filename for make-an-application using case-derived defendant number', async () => {
+    it('uses step-level uploadFilenameTransform when configured', async () => {
       const mockDoc = {
         document_url: 'http://dm/doc/new-uuid',
         document_binary_url: 'http://dm/doc/new-uuid/binary',
@@ -492,15 +499,17 @@ describe('documentProxyRoutes', () => {
       mockUploadDocument.mockResolvedValue(mockDoc);
 
       const req = makeReqWithDocs({
-        params: { caseReference: '123456', journey: 'make-an-application' },
-        res: {
-          locals: {
-            validatedCase: {
-              data: { defendantNumber: 2 },
-            },
-          },
-        },
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
         file: { originalname: 'my-note.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 1024 },
+      });
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: {
+          read: jest.fn().mockResolvedValue([]),
+          readFresh: jest.fn().mockResolvedValue([]),
+          save: jest.fn().mockResolvedValue(undefined),
+        },
+        uploadFilenameTransform: (_req: Request, originalName: string) => `${originalName}-transformed`,
       });
       const res = { json: jest.fn() } as unknown as Response;
 
@@ -509,7 +518,7 @@ describe('documentProxyRoutes', () => {
       expect(mockUploadDocument).toHaveBeenCalledWith(
         expect.objectContaining({ originalname: 'my-note.pdf' }),
         'token',
-        'my-note (GA1) - Defendant 2.pdf'
+        'my-note.pdf-transformed'
       );
     });
   });
@@ -532,7 +541,7 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(404);
     });
 
-    it('returns success (idempotent) when docId is not found in fresh CCD state', async () => {
+    it('returns success (idempotent) when docId is not found in fresh state', async () => {
       const req = makeReqWithDocs({ body: { delete: 'unknown-id' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
@@ -542,30 +551,45 @@ describe('documentProxyRoutes', () => {
       expect(mockDeleteDocument).not.toHaveBeenCalled();
     });
 
-    it('deletes by docId using server-side CDAM URL and saves draft', async () => {
+    it('deletes by docId using server-side CDAM URL and saves via adapter', async () => {
       mockDeleteDocument.mockResolvedValue(undefined);
 
       const req = makeReqWithDocs({ body: { delete: 'existing-doc-id' } }, [existingDoc]);
+
+      // Override AFTER makeReqWithDocs so this mock wins
+      const mockReadFresh = jest.fn().mockResolvedValue([existingDoc]);
+      const mockSave = jest.fn().mockResolvedValue(undefined);
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: {
+          read: jest.fn().mockResolvedValue([existingDoc]),
+          readFresh: mockReadFresh,
+          save: mockSave,
+        },
+      });
+
       const res = { json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
 
-      // Should use the CDAM URL from CCD data, not from browser
       expect(mockDeleteDocument).toHaveBeenCalledWith('http://dm/doc/existing-uuid', 'token');
+      expect(mockSave).toHaveBeenCalledWith(req, []);
       expect(res.json).toHaveBeenCalledWith({ success: true });
-
-      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
-      expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith('token', '123456', {
-        possessionClaimResponse: {
-          defendantResponses: {
-            defendantDocuments: [],
-          },
-        },
-      });
     });
 
     it('returns 502 when delete fails', async () => {
       mockDeleteDocument.mockRejectedValue(new Error('CDAM down'));
+
+      const mockReadFresh = jest.fn().mockResolvedValue([existingDoc]);
+      const mockSave = jest.fn().mockResolvedValue(undefined);
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: {
+          read: jest.fn().mockResolvedValue([existingDoc]),
+          readFresh: mockReadFresh,
+          save: mockSave,
+        },
+      });
 
       const req = makeReqWithDocs({ body: { delete: 'existing-doc-id' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
@@ -586,6 +610,17 @@ describe('documentProxyRoutes', () => {
 
     it('logs non-Error rejections with String()', async () => {
       mockDeleteDocument.mockRejectedValue('string-error');
+
+      const mockReadFresh = jest.fn().mockResolvedValue([existingDoc]);
+      const mockSave = jest.fn().mockResolvedValue(undefined);
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: {
+          read: jest.fn().mockResolvedValue([existingDoc]),
+          readFresh: mockReadFresh,
+          save: mockSave,
+        },
+      });
 
       const req = makeReqWithDocs({ body: { delete: 'existing-doc-id' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
@@ -642,28 +677,22 @@ describe('documentProxyRoutes', () => {
       expect(mockUploadDocument).not.toHaveBeenCalled();
     });
 
-    it('upload: handles missing validatedCase (empty existing docs)', async () => {
-      mockUploadDocument.mockResolvedValue({
-        document_url: 'http://dm/doc/u',
-        document_binary_url: 'http://dm/doc/u/binary',
-        document_filename: 'test.pdf',
-        content_type: 'application/pdf',
-        size: 10,
-      });
+    it('upload: returns 404 when step has no documentStorage', async () => {
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({ documentStorage: undefined });
 
       const req = {
         session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123' },
+        params: { caseReference: '123', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
         res: { locals: {} },
         file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 10 },
       } as unknown as Request;
-      const res = { json: jest.fn() } as unknown as Response;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await uploadHandler(req, res);
 
-      const body = (res.json as jest.Mock).mock.calls[0][0];
-      expect(body.document.index).toBe(0);
+      expect(res.status).toHaveBeenCalledWith(404);
     });
 
     it('upload: logs non-Error rejections with String()', async () => {
@@ -679,10 +708,10 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(502);
     });
 
-    it('delete: unknown docId against empty fresh CCD state returns success (idempotent)', async () => {
+    it('delete: unknown docId against empty fresh state returns success (idempotent)', async () => {
       const req = {
         session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123' },
+        params: { caseReference: '123', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
         res: { locals: {} },
         body: { delete: 'unknown-id' },
@@ -722,25 +751,17 @@ describe('documentProxyRoutes', () => {
     }
 
     it('three parallel uploads do not lose entries — refetch sees previous saves', async () => {
-      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
       const persisted: unknown[] = [];
+      const { findStep } = require('../../../main/steps/index');
 
-      // Each getCaseById call returns the current persisted snapshot — simulating the
-      // START callback after each save. Without the lock, all three would read the
-      // same starting state and only one entry would survive.
-      (ccdCaseService.getCaseById as jest.Mock).mockImplementation(async () => ({
-        id: '123456',
-        data: {
-          possessionClaimResponse: {
-            defendantResponses: { defendantDocuments: [...persisted] },
-          },
-        },
-      }));
-      (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockImplementation(async (_t, _c, payload) => {
-        const docs = payload.possessionClaimResponse.defendantResponses.defendantDocuments;
+      const readFresh = jest.fn().mockImplementation(async () => [...persisted]);
+      const save = jest.fn().mockImplementation(async (_req: unknown, docs: unknown[]) => {
         persisted.length = 0;
         persisted.push(...docs);
-        return { id: '123', data: {} };
+      });
+
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: { read: jest.fn().mockResolvedValue([]), readFresh, save },
       });
 
       mockUploadDocument
@@ -748,25 +769,22 @@ describe('documentProxyRoutes', () => {
         .mockResolvedValueOnce(makeCdamDoc('b', 'b.pdf', 2))
         .mockResolvedValueOnce(makeCdamDoc('c', 'c.pdf', 3));
 
-      const reqA = makeReqWithDocs({ file: makeFile('a.pdf', 1) });
-      const reqB = makeReqWithDocs({ file: makeFile('b.pdf', 2) });
-      const reqC = makeReqWithDocs({ file: makeFile('c.pdf', 3) });
-      // Re-arm the mocks once after the makeReqWithDocs() helpers (which last-write-win
-      // each set getCaseById back to []), so the dynamic implementation above is in effect.
-      (ccdCaseService.getCaseById as jest.Mock).mockImplementation(async () => ({
-        id: '123456',
-        data: {
-          possessionClaimResponse: {
-            defendantResponses: { defendantDocuments: [...persisted] },
-          },
-        },
-      }));
+      const baseReq = {
+        session: { user: { accessToken: 'token' } },
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
+        t: mockT,
+        res: { locals: {} },
+      };
 
       const resA = { json: jest.fn() } as unknown as Response;
       const resB = { json: jest.fn() } as unknown as Response;
       const resC = { json: jest.fn() } as unknown as Response;
 
-      await Promise.all([uploadHandler(reqA, resA), uploadHandler(reqB, resB), uploadHandler(reqC, resC)]);
+      await Promise.all([
+        uploadHandler({ ...baseReq, file: makeFile('a.pdf', 1) } as unknown as Request, resA),
+        uploadHandler({ ...baseReq, file: makeFile('b.pdf', 2) } as unknown as Request, resB),
+        uploadHandler({ ...baseReq, file: makeFile('c.pdf', 3) } as unknown as Request, resC),
+      ]);
 
       expect(persisted).toHaveLength(3);
       const filenames = persisted
@@ -775,73 +793,65 @@ describe('documentProxyRoutes', () => {
       expect(filenames).toEqual(['a.pdf', 'b.pdf', 'c.pdf']);
     });
 
-    it('parallel save + delete are serialized — delete sees the just-uploaded file', async () => {
-      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
+    it('parallel save + delete are serialized — correct final state', async () => {
       const persisted: unknown[] = [existingDoc];
+      const { findStep } = require('../../../main/steps/index');
 
-      (ccdCaseService.getCaseById as jest.Mock).mockImplementation(async () => ({
-        id: '123456',
-        data: {
-          possessionClaimResponse: {
-            defendantResponses: { defendantDocuments: [...persisted] },
-          },
-        },
-      }));
-      (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockImplementation(async (_t, _c, payload) => {
-        const docs = payload.possessionClaimResponse.defendantResponses.defendantDocuments;
+      const readFresh = jest.fn().mockImplementation(async () => [...persisted]);
+      const save = jest.fn().mockImplementation(async (_req: unknown, docs: unknown[]) => {
         persisted.length = 0;
         persisted.push(...docs);
-        return { id: '123', data: {} };
       });
+
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: { read: jest.fn().mockResolvedValue([existingDoc]), readFresh, save },
+      });
+
       mockDeleteDocument.mockResolvedValue(undefined);
       mockUploadDocument.mockResolvedValue(makeCdamDoc('new', 'new.pdf', 99));
 
-      const uploadReq = {
+      const baseReq = {
         session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123456' },
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
         res: { locals: {} },
-        file: makeFile('new.pdf', 99),
-      } as unknown as Request;
-      const deleteReq = {
-        session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123456' },
-        t: mockT,
-        res: { locals: {} },
-        body: { delete: 'existing-doc-id' },
-      } as unknown as Request;
+      };
 
       const uploadRes = { json: jest.fn() } as unknown as Response;
       const deleteRes = { json: jest.fn() } as unknown as Response;
 
-      await Promise.all([uploadHandler(uploadReq, uploadRes), deleteHandler(deleteReq, deleteRes)]);
+      await Promise.all([
+        uploadHandler({ ...baseReq, file: makeFile('new.pdf', 99) } as unknown as Request, uploadRes),
+        deleteHandler({ ...baseReq, body: { delete: 'existing-doc-id' } } as unknown as Request, deleteRes),
+      ]);
 
       expect(persisted).toHaveLength(1);
       const remaining = persisted[0] as { value: { document: { document_filename: string } } };
       expect(['existing.pdf', 'new.pdf']).toContain(remaining.value.document.document_filename);
     });
 
-    it('refetches inside the lock — uses fresh CCD state, not stale res.locals.validatedCase', async () => {
-      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
-      // res.locals.validatedCase shows empty, but the fresh fetch has one doc — confirm
-      // the save is built on the fresh fetch (length 2 after append), not on the stale snapshot.
-      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
-        id: '123456',
-        data: {
-          possessionClaimResponse: {
-            defendantResponses: { defendantDocuments: [existingDoc] },
-          },
-        },
+    it('readFresh is called inside the lock — fresh state used, not stale read', async () => {
+      const { findStep } = require('../../../main/steps/index');
+      const staleDoc = {
+        id: 'stale',
+        value: { document: { document_url: 'x', document_binary_url: 'x/b', document_filename: 'stale.pdf' } },
+      };
+      const freshDoc = existingDoc;
+
+      const readFresh = jest.fn().mockResolvedValue([freshDoc]);
+      const save = jest.fn().mockResolvedValue(undefined);
+
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: { read: jest.fn().mockResolvedValue([staleDoc]), readFresh, save },
       });
+
       mockUploadDocument.mockResolvedValue(makeCdamDoc('new', 'new.pdf', 99));
 
       const req = {
         session: { user: { accessToken: 'token' } },
-        params: { caseReference: '123456' },
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
-        res: {
-          locals: { validatedCase: { possessionClaimResponse: { defendantResponses: { defendantDocuments: [] } } } },
-        },
+        res: { locals: { validatedCase: {} } },
         file: makeFile('new.pdf', 99),
       } as unknown as Request;
       const res = { json: jest.fn() } as unknown as Response;
@@ -849,20 +859,11 @@ describe('documentProxyRoutes', () => {
       await uploadHandler(req, res);
 
       const body = (res.json as jest.Mock).mock.calls[0][0];
-      expect(body.document.index).toBe(1); // 0 = existingDoc, 1 = the new one
-      expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith(
-        'token',
-        '123456',
-        expect.objectContaining({
-          possessionClaimResponse: expect.objectContaining({
-            defendantResponses: expect.objectContaining({
-              defendantDocuments: expect.arrayContaining([
-                existingDoc,
-                expect.objectContaining({ value: expect.any(Object) }),
-              ]),
-            }),
-          }),
-        })
+      // readFresh returned [freshDoc], so after append the new doc is at index 1
+      expect(body.document.index).toBe(1);
+      expect(save).toHaveBeenCalledWith(
+        req,
+        expect.arrayContaining([freshDoc, expect.objectContaining({ value: expect.any(Object) })])
       );
     });
   });
