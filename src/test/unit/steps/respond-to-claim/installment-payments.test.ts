@@ -14,11 +14,11 @@ jest.mock('../../../../main/modules/i18n', () => ({
 jest.mock('../../../../main/modules/steps/flow', () => ({
   stepNavigation: {
     getBackUrl: jest.fn(async () => null),
-    getNextStepUrl: jest.fn(async () => '/next-step'),
+    getNextStepUrl: jest.fn(async () => '/case/1234567890123456/respond-to-claim/how-much-afford-to-pay'),
   },
   createStepNavigation: jest.fn(() => ({
     getBackUrl: jest.fn(async () => '/previous-step'),
-    getNextStepUrl: jest.fn(async () => '/next-step'),
+    getNextStepUrl: jest.fn(async () => '/case/1234567890123456/respond-to-claim/how-much-afford-to-pay'),
   })),
 }));
 
@@ -120,6 +120,6 @@ describe('respond-to-claim installment-payments step', () => {
         paymentAgreement: { repayArrearsInstalments: 'YES' },
       },
     });
-    expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/how-much-afford-to-pay');
   });
 });

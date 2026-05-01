@@ -194,6 +194,9 @@ describe('respond-to-claim installments step', () => {
         },
       }
     );
-    expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/1234567890123456/respond-to-claim/check-your-answers?section=payments'
+    );
   });
 });

@@ -40,7 +40,7 @@ jest.mock('@modules/i18n', () => ({
 jest.mock('@modules/steps/flow', () => ({
   createStepNavigation: jest.fn(() => ({
     getBackUrl: jest.fn(async () => '/previous-step'),
-    getNextStepUrl: jest.fn(async () => '/next-step'),
+    getNextStepUrl: jest.fn(async () => '/case/123/respond-to-claim/defendant-date-of-birth'),
   })),
 }));
 
@@ -171,6 +171,6 @@ describe('respond-to-claim defendant-name-capture step', () => {
       },
     });
     expect(req.session.formData?.['defendant-name-capture']).toBeUndefined();
-    expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/defendant-date-of-birth');
   });
 });
