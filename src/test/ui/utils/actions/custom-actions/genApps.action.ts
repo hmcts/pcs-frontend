@@ -151,8 +151,14 @@ export class GenAppsAction implements IAction {
       option: sot.option,
     });
     await performAction('inputText', sot.label, sot.input);
+
+    const key = isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string;
+
+    const isKeyPresent = FieldsStore.has(key);
+    const value = isKeyPresent ? FieldsStore.get(key) : undefined;
+
     const button =
-      FieldsStore.get(isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string) === 'No'
+      isKeyPresent && value === 'No'
         ? checkYourAnswersGenApps.submitHiddenButton
         : checkYourAnswersGenApps.continueToPaymentHiddenButton;
     await performAction('clickButton', button);
