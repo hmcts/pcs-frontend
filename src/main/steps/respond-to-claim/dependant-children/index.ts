@@ -9,7 +9,7 @@ import type {
   PossessionClaimResponse,
   YesNoValue,
 } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'do-you-have-any-dependant-children',
@@ -24,7 +24,7 @@ export const step: StepDefinition = createFormStep({
     paragraph: 'dependantChildrenParagraph',
     caseNumber: 'caseNumber',
     dependantHeading: 'dependantHeading',
-    dependantQuestion: 'dependantQuestion'
+    dependantQuestion: 'dependantQuestion',
   },
   beforeRedirect: async req => {
     const dependantChildren: string = req.body?.dependantChildren;
@@ -110,13 +110,12 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: async req => {
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
-      const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-  
-      const t = getTranslationFunction(req, 'do-you-have-any-dependant-children', ['common']);
-  
-      return {
-        caseNumber: t('caseNumber', { caseNumber })
-      };
-    },
+    const t = getTranslationFunction(req, 'do-you-have-any-dependant-children', ['common']);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
+  },
 });

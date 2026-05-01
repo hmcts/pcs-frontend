@@ -8,7 +8,7 @@
     "imNotSure": "cyDefendant is not sure"
   },
   "noticeDateLabel": "cyWhen did the defendant receive notice from {{claimantName}} ? (Optional)",
-    "errors": {
+  "errors": {
     "date": {
       "day": "cyDay",
       "month": "cyMonth",

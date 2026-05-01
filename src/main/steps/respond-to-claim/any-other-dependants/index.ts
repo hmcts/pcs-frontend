@@ -1,3 +1,4 @@
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -9,7 +10,6 @@ import type {
   PossessionClaimResponse,
   YesNoValue,
 } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'do-you-have-any-other-dependants',
@@ -24,7 +24,7 @@ export const step: StepDefinition = createFormStep({
     paragraph: 'otherDependantsParagraph',
     caseNumber: 'caseNumber',
     dependantHeading: 'dependantHeading',
-    dependantQuestion: 'dependantQuestion'
+    dependantQuestion: 'dependantQuestion',
   },
   beforeRedirect: async req => {
     const otherDependants: string = req.body?.otherDependants;
@@ -109,14 +109,13 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-    extendGetContent: async req => {
-    
+  extendGetContent: async req => {
     const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-    
+
     const t = getTranslationFunction(req, 'do-you-have-any-other-dependants', ['common']);
 
     return {
-      caseNumber: t('caseNumber', { caseNumber })
+      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
 });

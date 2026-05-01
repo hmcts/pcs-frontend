@@ -9,7 +9,7 @@
     "imNotSure": "Defendant is not sure"
   },
   "noticeDateLabel": "When did the defendant receive notice from {{claimantName}} ? (Optional)",
-    "errors": {
+  "errors": {
     "date": {
       "day": "Day",
       "month": "Month",
