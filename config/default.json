@@ -102,7 +102,7 @@
   "dashboard": {
     "taskRoutes": {
       "Defendant.RespondToClaim": "/case/:caseReference/respond-to-claim/start-now",
-      "Defendant.ViewResponse": "/case/:caseReference/view-response"
+      "Defendant.ViewResponse": "/case/:caseReference/view-the-response",
       "Defendant.ViewClaim": "/case/:caseReference/view-the-claim"
     }
   }
