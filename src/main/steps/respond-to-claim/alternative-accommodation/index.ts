@@ -1,8 +1,9 @@
 import { formatDatePartsToISODate, parseISOToDateParts } from '../../utils';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
@@ -16,6 +17,9 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     question: 'question',
     pageTitle: 'pageTitle',
+    heading: 'heading',
+    accommodationQuestion: 'accommodationQuestion',
+    accommodationHeading: 'accommodationHeading',
   },
   fields: [
     {
@@ -95,5 +99,16 @@ export const step: StepDefinition = createFormStep({
     };
 
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  extendGetContent: async req => {
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    const t = getTranslationFunction(req, 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home', [
+      'common',
+    ]);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
   },
 });
