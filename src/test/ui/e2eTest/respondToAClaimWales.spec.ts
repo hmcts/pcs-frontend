@@ -235,7 +235,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
-    await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiDataWales.submitCaseRentNonRentStandard.isClaimantNameCorrect
+    );
     await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
     await performAction('selectLandlordLicensed', {
       question: landlordLicensed.isYourLandlordLicensedQuestion,
@@ -247,7 +250,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: writtenTerms.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales,
+      tenancyType: submitCaseApiDataWales.submitCaseRentNonRentStandard.occupationLicenceTypeWales,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('selectTenancyStartDateKnown', {
@@ -403,7 +406,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
-    await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiDataWales.submitCaseNonRentStandard.isClaimantNameCorrect
+    );
     await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
     await performAction('selectLandlordLicensed', {
       question: landlordLicensed.isYourLandlordLicensedQuestion,
@@ -415,7 +421,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: writtenTerms.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales,
+      tenancyType: submitCaseApiDataWales.submitCaseNonRentStandard.occupationLicenceTypeWales,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnown', {
