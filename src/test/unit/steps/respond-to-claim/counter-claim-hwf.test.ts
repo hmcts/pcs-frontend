@@ -96,6 +96,22 @@ describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-
     });
   });
 
+  describe('hwfReference field config', () => {
+    it('has maxLength 60 on hwfReference subfield, triggering hwfReferenceMaxLength locale key', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fields = (step as any).fields as {
+        name: string;
+        options?: { value: string; subFields?: Record<string, { maxLength?: number; errorMessage?: string }> }[];
+      }[];
+      const alreadyAppliedField = fields.find(f => f.name === 'alreadyAppliedForHelp');
+      const yesOption = alreadyAppliedField?.options?.find(o => o.value === 'yes');
+      const hwfReferenceSubfield = yesOption?.subFields?.['hwfReference'];
+
+      expect(hwfReferenceSubfield?.maxLength).toBe(60);
+      expect(hwfReferenceSubfield?.errorMessage).toBe('errors.hwfReference');
+    });
+  });
+
   describe('getInitialFormData (CCD pre-population)', () => {
     it('pre-populates YES with HWF reference from CCD', () => {
       const req = {
