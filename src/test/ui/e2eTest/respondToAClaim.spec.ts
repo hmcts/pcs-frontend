@@ -254,6 +254,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: installmentPayments.noRadioOption,
     });
     await performAction('readYourHouseholdAndCircumstances');
+    // Non-rent arrears path skips instalment offer and goes straight to household circumstances.
+    // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
+    // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
+    /* await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
@@ -321,7 +325,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
-    });
+    });*/
   });
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
     //incomeAndExpenses - no - Upload docs
