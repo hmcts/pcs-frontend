@@ -34,7 +34,7 @@ export class ActionRegistry {
     ['clickTab', new ClickTabAction()],
     ['inputText', new InputTextAction()],
     ['select', new SelectAction()],
-    ['UploadFile', new UploadFileAction()],
+    ['uploadFile', new UploadFileAction()],
     ['login', new LoginAction()],
     ['createUser', new LoginAction()],
     ['navigateToUrl', new NavigateToUrlAction()],

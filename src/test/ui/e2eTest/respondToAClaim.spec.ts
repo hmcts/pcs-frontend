@@ -131,6 +131,10 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   }
 
+  if (testInfo.title.includes('@secureFlexible') || testInfo.title.includes('@assured')) {
+    process.env.INCOME_AND_EXPENSES = 'YES';
+  }
+
   if (testInfo.title.includes('@noDefendants')) {
     claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     process.env.CLAIMANT_NAME = claimantName;
@@ -176,9 +180,9 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim Debug', async () => {
+  test('Respond to a claim @noDefendants @regression @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    /*await performAction('inputDefendantDetails', {
+    await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
@@ -293,14 +297,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-*/
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/other-considerations`);
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('uploadFiles', {  files: ['tenancyLicence.docx'] });
+    await performAction('uploadFiles', { files: ['tenancyLicence.docx'] });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);

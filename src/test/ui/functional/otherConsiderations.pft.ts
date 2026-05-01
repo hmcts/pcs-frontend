@@ -1,4 +1,4 @@
-import { otherConsiderations, whatOtherRegularExpensesDoYouHave } from '../data/page-data';
+import { incomeAndExpenses, otherConsiderations, whatOtherRegularExpensesDoYouHave } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function otherConsiderationsErrorValidation(): Promise<void> {
@@ -17,5 +17,13 @@ export async function otherConsiderationsErrorValidation(): Promise<void> {
 }
 
 export async function otherConsiderationsNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', otherConsiderations.backLink, whatOtherRegularExpensesDoYouHave.mainHeader);
+  if (process.env.INCOME_AND_EXPENSES) {
+    await performValidation(
+      'pageNavigation',
+      otherConsiderations.backLink,
+      whatOtherRegularExpensesDoYouHave.mainHeader
+    );
+  } else {
+    await performValidation('pageNavigation', otherConsiderations.backLink, incomeAndExpenses.mainHeader);
+  }
 }

@@ -393,7 +393,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       courtInfo: otherConsiderations.detailsTextInput,
     });
 
-    await softErrorMessageValidation('uploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
+    await softErrorMessageValidation('uploadDocuments', NO_EMV_READ_ONLY);
     await performValidation('mainHeader', uploadFiles.mainHeader);
     await performAction('clickButton', uploadFiles.continueButton);
 
@@ -575,7 +575,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       courtInfo: otherConsiderations.detailsTextInput,
     });
 
-    await softErrorMessageValidation('uploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
+    await softErrorMessageValidation('uploadDocuments', NO_EMV_READ_ONLY);
     await performValidation('mainHeader', uploadFiles.mainHeader);
     await performAction('clickButton', uploadFiles.continueButton);
 
