@@ -6,6 +6,7 @@ const uploadInstances = new WeakMap<HTMLElement, MultiFileUpload>();
 
 interface DisplayDocument {
   index: number;
+  id?: string;
   document_filename: string;
   content_type?: string;
   size?: number;
@@ -350,11 +351,16 @@ function rebuildHiddenInputs(hiddenContainer: HTMLElement, uploadContainer: HTML
   const rows = uploadContainer.querySelectorAll('.moj-multi-file-upload__row:not(.moj-multi-file-upload__row--error)');
   rows.forEach((row, index) => {
     const filenameEl = row.querySelector('.moj-multi-file-upload__filename');
+    const deleteButton = row.querySelector<HTMLButtonElement>('.moj-multi-file-upload__delete');
+    const documentId = deleteButton?.value?.trim();
     if (filenameEl) {
       const input = document.createElement('input');
       input.type = 'hidden';
       input.name = 'uploadedDocuments[]';
-      input.value = JSON.stringify({ index, document_filename: filenameEl.textContent?.trim() || '' });
+      input.value = JSON.stringify({
+        ...(documentId ? { id: documentId } : { index }),
+        document_filename: filenameEl.textContent?.trim() || '',
+      });
       input.dataset.documentIndex = String(index);
       hiddenContainer.appendChild(input);
     }

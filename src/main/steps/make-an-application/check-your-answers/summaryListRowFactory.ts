@@ -1,3 +1,4 @@
+import escapeHTML from 'escape-html';
 import type { Request } from 'express';
 import { TFunction } from 'i18next';
 
@@ -29,13 +30,23 @@ export type SummaryListRowAction = {
   visuallyHiddenText: string;
 };
 
-function createSummaryListRow(summaryFieldConfig: SummaryFieldData, t: TFunction): SummaryListRow {
+function createSummaryListRow(
+  summaryFieldConfig: SummaryFieldData,
+  t: TFunction,
+  keepLineBreaks: boolean = false
+): SummaryListRow {
   return {
     key: {
       text: summaryFieldConfig.fieldLabel,
     },
     value: {
-      text: summaryFieldConfig.fieldValue,
+      ...(keepLineBreaks
+        ? {
+            html: escapeHTML(summaryFieldConfig.fieldValue).replace(/\n/g, '<br>'),
+          }
+        : {
+            text: summaryFieldConfig.fieldValue,
+          }),
     },
     actions: {
       items: [
@@ -169,20 +180,37 @@ export function buildSummaryListRows(req: Request, t: TFunction): SummaryListRow
           fieldValue: reasonForNotSharingField.fieldValue,
           changeHint: t('answers.reasonForNotSharing.changeHint'),
         },
-        t
+        t,
+        true
       )
     );
   }
 
-  const uploadDocumentsChoiceField = visibleFormData.getUploadDocumentsChoiceField();
-  if (uploadDocumentsChoiceField) {
+  const whatOrderWantedField = visibleFormData.getWhatOrderWantedField();
+  if (whatOrderWantedField) {
     summaryListRows.push(
       createSummaryListRow(
         {
-          stepName: uploadDocumentsChoiceField.stepName,
-          fieldLabel: t('answers.uploadDocumentsWanted.label'),
-          fieldValue: t(`answers.uploadDocumentsWanted.options.${uploadDocumentsChoiceField.fieldValue}`),
-          changeHint: t('answers.uploadDocumentsWanted.changeHint'),
+          stepName: whatOrderWantedField.stepName,
+          fieldLabel: t('answers.whatOrderWanted.label'),
+          fieldValue: whatOrderWantedField.fieldValue,
+          changeHint: t('answers.whatOrderWanted.changeHint'),
+        },
+        t,
+        true
+      )
+    );
+  }
+
+  const hasSupportingDocumentsField = visibleFormData.getHasSupportingDocuments();
+  if (hasSupportingDocumentsField) {
+    summaryListRows.push(
+      createSummaryListRow(
+        {
+          stepName: hasSupportingDocumentsField.stepName,
+          fieldLabel: t('answers.hasSupportingDocuments.label'),
+          fieldValue: t(`options.${hasSupportingDocumentsField.fieldValue}`),
+          changeHint: t('answers.hasSupportingDocuments.changeHint'),
         },
         t
       )
@@ -190,7 +218,7 @@ export function buildSummaryListRows(req: Request, t: TFunction): SummaryListRow
   }
 
   const uploadedDocuments = visibleFormData.getUploadedDocuments();
-  if (uploadDocumentsChoiceField?.fieldValue === 'YES' && uploadedDocuments.length > 0) {
+  if (hasSupportingDocumentsField?.fieldValue === 'yes' && uploadedDocuments.length > 0) {
     summaryListRows.push({
       key: {
         text: t('answers.uploadedDocuments.label'),

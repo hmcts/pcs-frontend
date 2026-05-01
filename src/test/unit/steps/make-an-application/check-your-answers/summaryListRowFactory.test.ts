@@ -205,7 +205,7 @@ describe('buildSummaryListRows', () => {
   it('creates summary list row for reason for not sharing field', () => {
     (mockVisibleFormDataView.getReasonForNotSharingField as jest.Mock).mockReturnValue({
       stepName: 'hwf-applied-for',
-      fieldValue: 'This is an example reason',
+      fieldValue: 'This is an <i>example</i> reason\nwith a line break',
     });
 
     const summaryListRows = buildSummaryListRows(req, t);
@@ -221,10 +221,109 @@ describe('buildSummaryListRows', () => {
         ],
       },
       key: { text: 'translation for: answers.reasonForNotSharing.label' },
-      value: { text: 'This is an example reason' },
+      value: { html: 'This is an &lt;i&gt;example&lt;/i&gt; reason<br>with a line break' },
     };
 
     expect(summaryListRows).toEqual([expected]);
+  });
+
+  it('creates summary list row for reason for what order wanted field', () => {
+    (mockVisibleFormDataView.getWhatOrderWantedField as jest.Mock).mockReturnValue({
+      stepName: 'what-order',
+      fieldValue: 'This is an <i>example</i> wanted order\nwith a line break',
+    });
+
+    const summaryListRows = buildSummaryListRows(req, t);
+
+    const expected = {
+      actions: {
+        items: [
+          {
+            href: './what-order',
+            text: 'translation for: change',
+            visuallyHiddenText: 'translation for: answers.whatOrderWanted.changeHint',
+          },
+        ],
+      },
+      key: { text: 'translation for: answers.whatOrderWanted.label' },
+      value: { html: 'This is an &lt;i&gt;example&lt;/i&gt; wanted order<br>with a line break' },
+    };
+
+    expect(summaryListRows).toEqual([expected]);
+  });
+
+  it('creates summary list row for has supporting documents field', () => {
+    (mockVisibleFormDataView.getHasSupportingDocuments as jest.Mock).mockReturnValue({
+      stepName: 'has-supporting-documents',
+      fieldValue: 'no',
+    });
+
+    const summaryListRows = buildSummaryListRows(req, t);
+
+    const expected = {
+      actions: {
+        items: [
+          {
+            href: './has-supporting-documents',
+            text: 'translation for: change',
+            visuallyHiddenText: 'translation for: answers.hasSupportingDocuments.changeHint',
+          },
+        ],
+      },
+      key: { text: 'translation for: answers.hasSupportingDocuments.label' },
+      value: { text: 'translation for: options.no' },
+    };
+
+    expect(summaryListRows).toEqual([expected]);
+  });
+
+  it('creates summary list row for uploaded documents when user said yes', () => {
+    (mockVisibleFormDataView.getHasSupportingDocuments as jest.Mock).mockReturnValue({
+      stepName: 'has-supporting-documents',
+      fieldValue: 'yes',
+    });
+    (mockVisibleFormDataView.getUploadedDocuments as jest.Mock).mockReturnValue([
+      { id: '1', value: { document: { document_filename: 'first.pdf' } } },
+      { id: '2', value: { document: { document_filename: 'second.pdf' } } },
+    ]);
+
+    const summaryListRows = buildSummaryListRows(req, t);
+
+    const uploadedDocumentsRow = summaryListRows.find(
+      row => row.key.text === 'translation for: answers.uploadedDocuments.label'
+    );
+
+    expect(uploadedDocumentsRow).toEqual({
+      key: { text: 'translation for: answers.uploadedDocuments.label' },
+      value: { html: 'first.pdf<br>second.pdf' },
+      actions: {
+        items: [
+          {
+            href: './upload-documents-to-support-your-application',
+            text: 'translation for: change',
+            visuallyHiddenText: 'translation for: answers.uploadedDocuments.changeHint',
+          },
+        ],
+      },
+    });
+  });
+
+  it('does not create uploaded documents row when user said no', () => {
+    (mockVisibleFormDataView.getHasSupportingDocuments as jest.Mock).mockReturnValue({
+      stepName: 'has-supporting-documents',
+      fieldValue: 'no',
+    });
+    (mockVisibleFormDataView.getUploadedDocuments as jest.Mock).mockReturnValue([
+      { id: '1', value: { document: { document_filename: 'first.pdf' } } },
+    ]);
+
+    const summaryListRows = buildSummaryListRows(req, t);
+
+    const uploadedDocumentsRow = summaryListRows.find(
+      row => row.key.text === 'translation for: answers.uploadedDocuments.label'
+    );
+
+    expect(uploadedDocumentsRow).toBeUndefined();
   });
 
   it('creates summary list row for reason for which language field', () => {
@@ -263,7 +362,8 @@ function createMockVisibleFormDataView() {
     getOtherPartiesAgreedField: jest.fn(),
     getAnyReasonsNotToShareField: jest.fn(),
     getReasonForNotSharingField: jest.fn(),
-    getUploadDocumentsChoiceField: jest.fn(),
+    getWhatOrderWantedField: jest.fn(),
+    getHasSupportingDocuments: jest.fn(),
     getUploadedDocuments: jest.fn(),
     getWhichLanguageField: jest.fn(),
   };
@@ -278,7 +378,8 @@ function resetMockVisibleFormDataView() {
   (mockVisibleFormDataView.getOtherPartiesAgreedField as jest.Mock).mockReset();
   (mockVisibleFormDataView.getAnyReasonsNotToShareField as jest.Mock).mockReset();
   (mockVisibleFormDataView.getReasonForNotSharingField as jest.Mock).mockReset();
-  (mockVisibleFormDataView.getUploadDocumentsChoiceField as jest.Mock).mockReset();
+  (mockVisibleFormDataView.getWhatOrderWantedField as jest.Mock).mockReset();
+  (mockVisibleFormDataView.getHasSupportingDocuments as jest.Mock).mockReset();
   (mockVisibleFormDataView.getUploadedDocuments as jest.Mock).mockReset();
   (mockVisibleFormDataView.getWhichLanguageField as jest.Mock).mockReset();
 }

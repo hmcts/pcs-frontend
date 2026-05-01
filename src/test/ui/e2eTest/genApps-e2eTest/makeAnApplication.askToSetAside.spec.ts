@@ -55,13 +55,15 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
-    await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
     await performAction('confirmOtherPartiesAgreed', {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
       option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
     });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
-    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performAction('confirmOrderDoYouWant', {
+      label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
+      input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
+    });
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
     await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);

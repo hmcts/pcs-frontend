@@ -312,10 +312,10 @@ export interface CcdDashboardData {
 }
 
 export enum GenAppType {
-  SUSPEND,
-  ADJOURN,
-  SET_ASIDE,
-  SOMETHING_ELSE,
+  SUSPEND = 'SUSPEND',
+  ADJOURN = 'ADJOURN',
+  SET_ASIDE = 'SET_ASIDE',
+  SOMETHING_ELSE = 'SOMETHING_ELSE',
 }
 
 export interface CitizenGenAppRequest {
@@ -324,9 +324,14 @@ export interface CitizenGenAppRequest {
   needHwf?: YesNoValue;
   appliedForHwf?: YesNoValue;
   hwfReference?: string;
-  documents?: CcdCollectionItem<CcdUploadedDocument>[];
   otherPartiesAgreed?: YesNoValue;
   withoutNotice?: YesNoValue;
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
+  whatOrderWanted?: string;
+  hasSupportingDocuments?: YesNoValue;
+  uploadedDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
+  sotAccepted?: YesNoValue;
+  sotFullName?: string;
+  clientReference?: string;
 }
