@@ -1,6 +1,6 @@
 import config from 'config';
 
-import { getRootGreeting, validateAccessCode } from '@services/pcsApi/pcsApiService';
+import { getRootGreeting, validateAccessCode, validateAccessCodeDetailed } from '@services/pcsApi/pcsApiService';
 
 jest.mock('config', () => ({
   get: jest.fn(),
@@ -106,5 +106,53 @@ describe('pcsApiService', () => {
     const result = await validateAccessCode(accessToken, caseId, accessCode);
 
     expect(result).toBe(false);
+  });
+
+  describe('validateAccessCodeDetailed', () => {
+    const accessToken = 'test-access-token';
+    const caseId = '1234567890123456';
+    const accessCode = 'ABCD12345678';
+
+    test('should return valid true on 200 response', async () => {
+      mockHttp.post.mockResolvedValue({ status: 200 });
+      const result = await validateAccessCodeDetailed(accessToken, caseId, accessCode);
+      expect(result).toEqual({ valid: true });
+    });
+
+    test('should return not_found error on 404 response', async () => {
+      mockHttp.post.mockResolvedValue({ status: 404 });
+      const result = await validateAccessCodeDetailed(accessToken, caseId, accessCode);
+      expect(result).toEqual({ valid: false, error: 'not_found' });
+    });
+
+    test('should return expired error on 410 response', async () => {
+      mockHttp.post.mockResolvedValue({ status: 410 });
+      const result = await validateAccessCodeDetailed(accessToken, caseId, accessCode);
+      expect(result).toEqual({ valid: false, error: 'expired' });
+    });
+
+    test('should return already_used error on 409 response', async () => {
+      mockHttp.post.mockResolvedValue({ status: 409 });
+      const result = await validateAccessCodeDetailed(accessToken, caseId, accessCode);
+      expect(result).toEqual({ valid: false, error: 'already_used' });
+    });
+
+    test('should return mismatch error on 422 response', async () => {
+      mockHttp.post.mockResolvedValue({ status: 422 });
+      const result = await validateAccessCodeDetailed(accessToken, caseId, accessCode);
+      expect(result).toEqual({ valid: false, error: 'mismatch' });
+    });
+
+    test('should return unknown error on unexpected status', async () => {
+      mockHttp.post.mockResolvedValue({ status: 500 });
+      const result = await validateAccessCodeDetailed(accessToken, caseId, accessCode);
+      expect(result).toEqual({ valid: false, error: 'unknown' });
+    });
+
+    test('should return unknown error when request throws', async () => {
+      mockHttp.post.mockRejectedValue(new Error('Network error'));
+      const result = await validateAccessCodeDetailed(accessToken, caseId, accessCode);
+      expect(result).toEqual({ valid: false, error: 'unknown' });
+    });
   });
 });
