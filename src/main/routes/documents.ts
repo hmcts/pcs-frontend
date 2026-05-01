@@ -1,12 +1,13 @@
 import { Application, Request, Response } from 'express';
 
+import { UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE, VIEW_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
 
 export default function documentsRoutes(app: Application): void {
-  app.get('/case/:caseReference/upload-additional-documents', oidcMiddleware, (req: Request, res: Response) => {
+  app.get(UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE, oidcMiddleware, (req: Request, res: Response) => {
     res.render('upload-additional-documents');
   });
-  app.get('/case/:caseReference/view-documents', oidcMiddleware, (req: Request, res: Response) => {
+  app.get(VIEW_DOCUMENTS_ROUTE, oidcMiddleware, (req: Request, res: Response) => {
     res.render('view-documents');
   });
 }

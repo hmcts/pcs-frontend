@@ -26,11 +26,11 @@
     "Defendant": {
       "CaseIssued": {
         "title": "cyCase issued",
-        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/claim/Defendant.ViewClaim\">View the claim</a>. Respond by {{responseEndDate}}."
+        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">View the claim</a>. Respond by {{responseEndDate}}."
       },
       "ResponseToClaim": {
         "title": "cyResponse to claim",
-        "body": "<a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/response/Defendant.RespondToClaim\">{{ctaLabel}}</a>"
+        "body": "<a class=\"govuk-link\" href=\"{{respondToClaimUrl}}\">{{ctaLabel}}</a>"
       }
     }
   },

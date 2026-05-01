@@ -3,6 +3,7 @@ import type { Application, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../HttpError';
+import { UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { getTranslationFunction } from '@modules/i18n';
@@ -10,7 +11,7 @@ import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { DashboardTaskGroup } from '@services/dashboard.interface';
 import { sanitiseCaseReference } from '@utils/caseReference';
-import { DASHBOARD_TASK_PATH_PATTERNS } from '@utils/dashboardTaskPaths';
+import { getDashboardTaskPath } from '@utils/dashboardTaskPaths';
 import { getTagClasses, isLinkableStatus } from '@utils/dashboardTaskStatus';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
@@ -51,7 +52,7 @@ function getIWantToLinks(caseId: string): { key: string; href: string }[] {
     },
     {
       key: 'uploadAdditionalDocuments',
-      href: `/case/${caseId}/upload-additional-documents`,
+      href: UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', caseId),
     },
   ];
 }
@@ -65,11 +66,7 @@ function getTaskUrl(
   if (taskStatus === 'NOT_AVAILABLE') {
     return undefined;
   }
-  const pattern = DASHBOARD_TASK_PATH_PATTERNS[templateId];
-  if (pattern) {
-    return pattern.replace(/:caseReference/g, caseReference);
-  }
-  return `/dashboard/${caseReference}/${taskGroupId}/${templateId}`;
+  return getDashboardTaskPath(templateId, caseReference, taskGroupId);
 }
 
 export const getDashboardUrl = (caseReference?: string | number): string | null => {

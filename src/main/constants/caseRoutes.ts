@@ -1,0 +1,14 @@
+/**
+ * Canonical `/case/:caseReference/...` path patterns shared by Express routes and dashboard links.
+ */
+import { RESPOND_TO_CLAIM_ROUTE } from '../steps/respond-to-claim/flow.config';
+
+export { RESPOND_TO_CLAIM_ROUTE };
+
+export const VIEW_THE_CLAIM_ROUTE = '/case/:caseReference/view-the-claim';
+
+export const UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE = '/case/:caseReference/upload-additional-documents';
+
+export const VIEW_DOCUMENTS_ROUTE = '/case/:caseReference/view-documents';
+
+export const RESPOND_TO_CLAIM_START_ROUTE = `${RESPOND_TO_CLAIM_ROUTE}/start-now`;
