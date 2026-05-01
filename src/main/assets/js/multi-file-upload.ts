@@ -1,6 +1,6 @@
 import { MultiFileUpload } from '@ministryofjustice/frontend';
 
-import { isBlockedExtension } from '@utils/fileExtensionValidation';
+import { isAllowedExtension, isBlockedExtension } from '@utils/fileExtensionValidation';
 
 const uploadInstances = new WeakMap<HTMLElement, MultiFileUpload>();
 
@@ -15,8 +15,25 @@ function getCsrfToken(): string {
   return document.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value || '';
 }
 
-function getOrCreateErrorSummary(form: HTMLFormElement, title: string): HTMLDivElement {
-  let summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
+// MOJ multi-file-upload error pattern (https://design-patterns.service.justice.gov.uk/components/multi-file-upload/):
+// - Page-level error summary at the top of the grid column / main, linking to the file input.
+// - Inline govuk-error-message inside the input's form-group, with form-group--error and aria-describedby on the input.
+
+function getPageAnchor(): HTMLElement {
+  return (
+    document.querySelector<HTMLElement>('.govuk-grid-column-two-thirds') ??
+    document.querySelector<HTMLElement>('main') ??
+    document.body
+  );
+}
+
+function getFileInput(container: HTMLElement): HTMLInputElement | null {
+  return container.querySelector<HTMLInputElement>('.moj-multi-file-upload__input');
+}
+
+function getOrCreateErrorSummary(title: string): HTMLDivElement {
+  const anchor = getPageAnchor();
+  let summary = anchor.querySelector<HTMLDivElement>(':scope > .govuk-error-summary');
   if (summary) {
     return summary;
   }
@@ -32,44 +49,111 @@ function getOrCreateErrorSummary(form: HTMLFormElement, title: string): HTMLDivE
     <div class="govuk-error-summary__body">
       <ul class="govuk-list govuk-error-summary__list"></ul>
     </div>`;
-  form.insertBefore(summary, form.firstChild);
+  anchor.insertBefore(summary, anchor.firstChild);
   return summary;
 }
 
-function showErrorSummary(form: HTMLFormElement, message: string, title = 'There is a problem'): void {
-  const summary = getOrCreateErrorSummary(form, title);
-  const list = summary.querySelector<HTMLUListElement>('.govuk-error-summary__list');
-  if (!list) {
+function setInlineFieldError(container: HTMLElement, message: string): void {
+  const fileInput = getFileInput(container);
+  if (!fileInput) {
     return;
   }
-  list.innerHTML = '';
-  const li = document.createElement('li');
-  const a = document.createElement('a');
-  a.href = '#documents';
-  a.textContent = message;
-  li.appendChild(a);
-  list.appendChild(li);
-  summary.hidden = false;
+  const formGroup = fileInput.closest<HTMLElement>('.govuk-form-group');
+  if (!formGroup) {
+    return;
+  }
+
+  formGroup.classList.add('govuk-form-group--error');
+  const errorId = `${fileInput.id}-error`;
+  let errorEl = formGroup.querySelector<HTMLParagraphElement>(`#${CSS.escape(errorId)}`);
+  if (!errorEl) {
+    errorEl = document.createElement('p');
+    errorEl.id = errorId;
+    errorEl.className = 'govuk-error-message';
+    // Anchor inside the form-group, immediately before the dropzone (or input,
+    // pre-MOJ-init). MOJ's setupDropzone() moves the input INTO a runtime-created
+    // .moj-multi-file-upload__dropzone, so insertBefore(input) post-init would
+    // put the error inside the dropzone box — wrong place visually. Insert
+    // before the dropzone wrapper instead so the error sits between label and
+    // dashed box, matching the MOJ design pattern.
+    const anchor = formGroup.querySelector<HTMLElement>('.moj-multi-file-upload__dropzone') ?? fileInput;
+    anchor.parentNode?.insertBefore(errorEl, anchor);
+  }
+  errorEl.innerHTML = '<span class="govuk-visually-hidden">Error:</span> ';
+  errorEl.appendChild(document.createTextNode(message));
+
+  const ids = (fileInput.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+  if (!ids.includes(errorId)) {
+    ids.push(errorId);
+    fileInput.setAttribute('aria-describedby', ids.join(' '));
+  }
 }
 
-function clearErrorSummary(form: HTMLFormElement): void {
-  const summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
-  if (!summary) {
+function clearInlineFieldError(container: HTMLElement): void {
+  const fileInput = getFileInput(container);
+  if (!fileInput) {
     return;
   }
+  const formGroup = fileInput.closest<HTMLElement>('.govuk-form-group');
+  if (!formGroup) {
+    return;
+  }
+  formGroup.classList.remove('govuk-form-group--error');
+  const errorId = `${fileInput.id}-error`;
+  formGroup.querySelector(`#${CSS.escape(errorId)}`)?.remove();
+
+  const ids = (fileInput.getAttribute('aria-describedby') || '').split(/\s+/).filter(id => id && id !== errorId);
+  if (ids.length === 0) {
+    fileInput.removeAttribute('aria-describedby');
+  } else {
+    fileInput.setAttribute('aria-describedby', ids.join(' '));
+  }
+}
+
+function showErrorSummary(container: HTMLElement, message: string, title = 'There is a problem'): void {
+  const summary = getOrCreateErrorSummary(title);
   const list = summary.querySelector<HTMLUListElement>('.govuk-error-summary__list');
   if (list) {
     list.innerHTML = '';
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    const fileInput = getFileInput(container);
+    a.href = fileInput ? `#${fileInput.id}` : '#';
+    a.textContent = message;
+    li.appendChild(a);
+    list.appendChild(li);
   }
-  summary.hidden = true;
+  summary.hidden = false;
+  setInlineFieldError(container, message);
+}
+
+function clearErrorSummary(container: HTMLElement): void {
+  const anchor = getPageAnchor();
+  const summary = anchor.querySelector<HTMLDivElement>(':scope > .govuk-error-summary');
+  if (summary) {
+    const list = summary.querySelector<HTMLUListElement>('.govuk-error-summary__list');
+    if (list) {
+      list.innerHTML = '';
+    }
+    summary.hidden = true;
+  }
+  clearInlineFieldError(container);
+}
+
+function removeFailedRows(container: HTMLElement): void {
+  container.querySelectorAll('.moj-multi-file-upload__row--error, .moj-multi-file-upload__error').forEach(el => {
+    const row = el.closest('.moj-multi-file-upload__row');
+    (row ?? el).remove();
+  });
 }
 
 function hasVisibleError(container: HTMLElement): boolean {
-  const form = container.closest('form');
-  if (!form) {
-    return false;
+  const fileInput = getFileInput(container);
+  const formGroup = fileInput?.closest<HTMLElement>('.govuk-form-group');
+  if (formGroup?.classList.contains('govuk-form-group--error')) {
+    return true;
   }
-  const summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
+  const summary = getPageAnchor().querySelector<HTMLDivElement>(':scope > .govuk-error-summary');
   return !!summary && !summary.hidden;
 }
 
@@ -131,19 +215,28 @@ function initContainer(container: HTMLElement): void {
     deleteUrl,
     hooks: {
       entryHook: (_upload: InstanceType<typeof MultiFileUpload>, file: File) => {
-        clearErrorSummary(form);
+        clearErrorSummary(container);
+        // Mirror server's validateFileType precedence:
+        //   1. blocked media (AC04)         → wrong-type message
+        //   2. extension not in allowlist   → wrong-type message
+        //   3. file too large               → too-large message
+        // Pre-flight here saves the round-trip; server still validates as defence in depth.
         if (isBlockedExtension(file.name)) {
-          showErrorSummary(form, wrongTypeMessage, errorSummaryTitle);
+          showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
           throw new Error('blocked');
         }
+        if (!isAllowedExtension(file.name)) {
+          showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
+          throw new Error('invalid_type');
+        }
         if (file.size > maxBytes) {
-          showErrorSummary(form, tooLargeMessage, errorSummaryTitle);
+          showErrorSummary(container, tooLargeMessage, errorSummaryTitle);
           throw new Error('too_large');
         }
       },
 
       exitHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {
-        clearErrorSummary(form);
+        clearErrorSummary(container);
         try {
           const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
           const doc: DisplayDocument | undefined = response?.document;
@@ -160,14 +253,7 @@ function initContainer(container: HTMLElement): void {
         }
 
         // Clear any failed upload rows (MOJ keeps them in the list)
-        container.querySelectorAll('.moj-multi-file-upload__row--error, .moj-multi-file-upload__error').forEach(el => {
-          const row = el.closest('.moj-multi-file-upload__row');
-          if (row) {
-            row.remove();
-          } else {
-            el.remove();
-          }
-        });
+        removeFailedRows(container);
 
         // MOJ component creates delete buttons with "Delete" text -- patch to match translation
         container.querySelectorAll<HTMLButtonElement>('.moj-multi-file-upload__delete').forEach(btn => {
@@ -185,55 +271,63 @@ function initContainer(container: HTMLElement): void {
       },
 
       errorHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {
-        let message = wrongTypeMessage;
+        // Per AC04/AC05: show the error-summary banner only for AC-defined messages
+        // returned by the server (wrongType / tooLarge as structured JSON).
+        // Non-AC failures (abort, network drop, CDAM unreachable, 5xx) leave the MOJ
+        // row-level "Upload failed" indicator as the sole signal — no misleading banner.
         try {
           const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
           if (response?.error?.message) {
-            message = response.error.message;
+            showErrorSummary(container, response.error.message, errorSummaryTitle);
+            removeFailedRows(container);
           }
         } catch {
-          // Use default message
+          // No structured server message — leave the row-level "Upload failed" alone
         }
-        showErrorSummary(form, message, errorSummaryTitle);
       },
 
       deleteHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File | undefined, xhr: XMLHttpRequest) => {
+        if (xhr.status === 409) {
+          // Stale index — another delete already shifted the list. Reload so
+          // the page rebuilds from the current draft state and the user can retry.
+          window.location.reload();
+          return;
+        }
         if (xhr.status >= 200 && xhr.status < 300) {
-          clearErrorSummary(form);
-          // Remove hidden input by index - reindex remaining inputs
+          clearErrorSummary(container);
           try {
             const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
             if (response?.success) {
-              // Rebuild hidden inputs from remaining file rows
               rebuildHiddenInputs(hiddenContainer, container);
             }
           } catch {
             // Cleanup failed
           }
         } else {
-          showErrorSummary(form, deleteFailedMessage, errorSummaryTitle);
+          showErrorSummary(container, deleteFailedMessage, errorSummaryTitle);
         }
       },
     },
   });
   uploadInstances.set(container, instance);
 
-  // MOJ injects a second <label for="..."> styled as a button inside the dropzone, which
-  // together with the outer govuk-label trips axe's form-field-multiple-labels rule. Strip
-  // the `for` (so only one label points to the input), hide it from the a11y tree, and
-  // attach a click handler that late-binds to the live input -- MOJ replaces the <input>
-  // with a clone after every upload, so a cached reference would go stale.
+  // MOJ injects a <label for="documents"> styled as a button inside the dropzone. A label
+  // with no matching control (or with a duplicate for= reference) triggers WAVE "Orphaned
+  // form label". Replace the element with a real <button> so semantics are correct and no
+  // label rule fires. MOJ replaces the <input> with a clone after every upload, so the
+  // click handler uses a live querySelector rather than a cached reference.
   const dropzone = container.querySelector('.moj-multi-file-upload__dropzone');
   const duplicateLabel = dropzone?.querySelector<HTMLLabelElement>('label.govuk-button--secondary');
-  // Use `aria-hidden` as an "already processed" sentinel so HMR / re-inits don't stack
-  // duplicate click listeners on the same label.
-  if (duplicateLabel && duplicateLabel.getAttribute('aria-hidden') !== 'true') {
-    duplicateLabel.removeAttribute('for');
-    duplicateLabel.setAttribute('aria-hidden', 'true');
-    duplicateLabel.addEventListener('click', event => {
+  if (duplicateLabel) {
+    const chooseFilesButton = document.createElement('button');
+    chooseFilesButton.type = 'button';
+    chooseFilesButton.className = duplicateLabel.className;
+    chooseFilesButton.textContent = duplicateLabel.textContent?.trim() || 'Choose files';
+    chooseFilesButton.addEventListener('click', event => {
       event.preventDefault();
       container.querySelector<HTMLInputElement>('.moj-multi-file-upload__input')?.click();
     });
+    duplicateLabel.replaceWith(chooseFilesButton);
   }
 
   form.addEventListener('submit', event => {

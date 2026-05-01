@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 import { Application, Request, Response } from 'express';
 import multer from 'multer';
 
@@ -161,44 +163,77 @@ function getExistingDocuments(req: Request): StoredUploadDocument[] {
   }));
 }
 
-function toCcdDocument(doc: StoredUploadDocument): CcdCollectionItem<CcdUploadedDocument> {
-  return {
-    value: {
-      document: {
-        document_url: doc.document_url,
-        document_binary_url: doc.document_binary_url,
-        document_filename: doc.document_filename,
-      },
-      contentType: doc.content_type,
-      size: doc.size,
-    },
+// Per-case in-process mutex. Two concurrent uploads/deletes for the same case can
+// otherwise race on the read-modify-write of defendantDocuments and silently drop
+// entries. The lock serialises only the cheap append-and-save phase; CDAM uploads
+// run in parallel outside the lock.
+const caseLocks = new Map<string, Promise<void>>();
+
+async function withCaseLock<T>(caseId: string, fn: () => Promise<T>): Promise<T> {
+  const previous = caseLocks.get(caseId) ?? Promise.resolve();
+  let release!: () => void;
+  const myTail = previous.then(() => new Promise<void>(resolve => (release = resolve)));
+  caseLocks.set(caseId, myTail);
+  try {
+    await previous;
+    return await fn();
+  } finally {
+    release();
+    if (caseLocks.get(caseId) === myTail) {
+      caseLocks.delete(caseId);
+    }
+  }
+}
+
+async function fetchFreshDocuments(
+  caseId: string,
+  accessToken: string
+): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
+  const fresh = await ccdCaseService.getCaseById(accessToken, caseId);
+  return fresh.data?.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [];
+}
+
+async function saveGenAppDraftDocuments(req: Request, documents: StoredUploadDocument[]): Promise<void> {
+  if (!req.session) {
+    throw new Error('Session not available');
+  }
+  req.session.formData = req.session.formData || {};
+  const existingStepData = (req.session.formData[UPLOAD_DOCUMENTS_STEP] as Record<string, unknown> | undefined) || {};
+  req.session.formData[UPLOAD_DOCUMENTS_STEP] = {
+    ...existingStepData,
+    documents,
   };
 }
 
-async function saveDraftDocuments(req: Request, documents: StoredUploadDocument[]): Promise<void> {
-  if (getJourney(req) === MAKE_AN_APPLICATION_JOURNEY) {
-    if (!req.session) {
-      throw new Error('Session not available');
-    }
-    req.session.formData = req.session.formData || {};
-    const existingStepData = (req.session.formData[UPLOAD_DOCUMENTS_STEP] as Record<string, unknown> | undefined) || {};
-    req.session.formData[UPLOAD_DOCUMENTS_STEP] = {
-      ...existingStepData,
-      documents,
-    };
-    return;
-  }
-
+async function saveRespondDraftDocuments(
+  req: Request,
+  documents: CcdCollectionItem<CcdUploadedDocument>[]
+): Promise<void> {
   const caseId = req.params.caseReference as string;
   const accessToken = getUserToken(req);
 
   await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, {
     possessionClaimResponse: {
       defendantResponses: {
-        defendantDocuments: documents.map(toCcdDocument),
+        defendantDocuments: documents,
       },
     },
   });
+}
+
+function cdamToCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocument> {
+  return {
+    id: randomUUID(),
+    value: {
+      document: {
+        document_url: cdamDoc.document_url,
+        document_binary_url: cdamDoc.document_binary_url,
+        document_filename: cdamDoc.document_filename,
+      },
+      contentType: cdamDoc.content_type,
+      size: cdamDoc.size,
+    },
+  };
 }
 
 function toStoredDocument(cdamDoc: CdamDocument): StoredUploadDocument {
@@ -211,28 +246,62 @@ function toStoredDocument(cdamDoc: CdamDocument): StoredUploadDocument {
   };
 }
 
-async function saveDraftWithNewDocument(req: Request, entry: StoredUploadDocument): Promise<number> {
-  const existingDocs = getExistingDocuments(req);
+async function saveDraftWithNewGenAppDocument(req: Request, entry: StoredUploadDocument): Promise<number> {
+  const existingDocs = getSessionUploadDocuments(req);
   const updatedDocs = [...existingDocs, entry];
-  await saveDraftDocuments(req, updatedDocs);
+  await saveGenAppDraftDocuments(req, updatedDocs);
   return updatedDocs.length - 1;
 }
 
-async function removeDraftDocument(req: Request, index: number, existingDocs: StoredUploadDocument[]): Promise<void> {
-  const docToDelete = existingDocs[index];
-  const documentUrl = docToDelete.document_url;
+async function saveDraftWithNewRespondDocument(
+  req: Request,
+  entry: CcdCollectionItem<CcdUploadedDocument>
+): Promise<number> {
+  const caseId = req.params.caseReference as string;
+  const accessToken = getUserToken(req);
 
-  // Save draft first (remove reference), then delete from CDAM.
-  // If CDAM delete fails, orphaned document in CDAM is harmless.
-  // If draft save fails, document reference remains valid.
-  const updatedDocs = existingDocs.filter((_, i) => i !== index);
-  await saveDraftDocuments(req, updatedDocs);
-
-  const userToken = getUserToken(req);
-  await deleteDocument(documentUrl, userToken);
+  return withCaseLock(caseId, async () => {
+    const existing = await fetchFreshDocuments(caseId, accessToken);
+    const updated = [...existing, entry];
+    await saveRespondDraftDocuments(req, updated);
+    return updated.length - 1;
+  });
 }
 
-function buildUploadResponse(errors: ErrorTranslations, cdamDoc: CdamDocument, index: number): Record<string, unknown> {
+async function removeGenAppDraftDocument(req: Request, index: number): Promise<void> {
+  const existingDocs = getSessionUploadDocuments(req);
+  const docToDelete = existingDocs[index];
+
+  const updatedDocs = existingDocs.filter((_, i) => i !== index);
+  await saveGenAppDraftDocuments(req, updatedDocs);
+  await deleteDocument(docToDelete.document_url, getUserToken(req));
+}
+
+async function removeRespondDraftDocument(req: Request, docId: string): Promise<'removed' | 'stale'> {
+  const caseId = req.params.caseReference as string;
+  const accessToken = getUserToken(req);
+
+  return withCaseLock(caseId, async () => {
+    const existing = await fetchFreshDocuments(caseId, accessToken);
+
+    const docToDelete = existing.find(d => d.id === docId);
+    if (!docToDelete) {
+      return 'stale';
+    }
+
+    const updated = existing.filter(d => d.id !== docId);
+    await saveRespondDraftDocuments(req, updated);
+    await deleteDocument(docToDelete.value.document.document_url, accessToken);
+    return 'removed';
+  });
+}
+
+function buildUploadResponse(
+  errors: ErrorTranslations,
+  cdamDoc: CdamDocument,
+  docId: string,
+  index: number
+): Record<string, unknown> {
   const filename = cdamDoc.document_filename;
   const safeFilename = filename
     .replace(/&/g, '&amp;')
@@ -246,11 +315,14 @@ function buildUploadResponse(errors: ErrorTranslations, cdamDoc: CdamDocument, i
       messageHtml: errors.uploadSuccess(safeFilename),
     },
     file: {
-      filename: String(index),
+      // MOJ multi-file-upload uses this as the delete button's value attribute.
+      // Send the stable CCD collection id so deletes are idempotent and order-independent.
+      filename: docId,
       originalname: filename,
     },
     document: {
       index,
+      id: docId,
       document_filename: filename,
       size: cdamDoc.size,
       content_type: cdamDoc.content_type,
@@ -333,8 +405,15 @@ export default function documentProxyRoutes(app: Application): void {
 
         const uploadFilename = getUploadFilename(req, req.file.originalname);
         const cdamDoc = await uploadDocument(req.file, getUserToken(req), uploadFilename);
-        const index = await saveDraftWithNewDocument(req, toStoredDocument(cdamDoc));
-        return res.json(buildUploadResponse(errors, cdamDoc, index));
+
+        if (getJourney(req) === MAKE_AN_APPLICATION_JOURNEY) {
+          const index = await saveDraftWithNewGenAppDocument(req, toStoredDocument(cdamDoc));
+          return res.json(buildUploadResponse(errors, cdamDoc, String(index), index));
+        }
+
+        const entry = cdamToCcdDocument(cdamDoc);
+        const index = await saveDraftWithNewRespondDocument(req, entry);
+        return res.json(buildUploadResponse(errors, cdamDoc, entry.id as string, index));
       } catch (error) {
         logger.error('Failed to upload document to CDAM', {
           error: error instanceof Error ? error.message : String(error),
@@ -347,14 +426,22 @@ export default function documentProxyRoutes(app: Application): void {
   app.post('/case/:caseReference/:journey/:step/delete', oidcMiddleware, async (req: Request, res: Response) => {
     const errors = getErrorTranslations(req);
     try {
-      const existingDocs = getExistingDocuments(req);
-      const deleteIndex = validateDocumentIndex((req.body as Record<string, string>).delete, existingDocs);
-
-      if (deleteIndex === null) {
+      const docId = (req.body as Record<string, string>).delete;
+      if (typeof docId !== 'string' || docId.length === 0) {
         return res.status(404).json({ error: { message: errors.documentNotFound } });
       }
 
-      await removeDraftDocument(req, deleteIndex, existingDocs);
+      if (getJourney(req) === MAKE_AN_APPLICATION_JOURNEY) {
+        const existingDocs = getSessionUploadDocuments(req);
+        const deleteIndex = validateDocumentIndex(docId, existingDocs);
+        if (deleteIndex === null) {
+          return res.status(404).json({ error: { message: errors.documentNotFound } });
+        }
+        await removeGenAppDraftDocument(req, deleteIndex);
+      } else {
+        await removeRespondDraftDocument(req, docId);
+      }
+
       return res.json({ success: true });
     } catch (error) {
       logger.error('Failed to delete document from CDAM', {

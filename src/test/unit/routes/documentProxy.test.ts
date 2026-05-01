@@ -38,6 +38,7 @@ jest.mock('../../../main/services/cdamService', () => ({
 
 jest.mock('../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
+    getCaseById: jest.fn(),
     updateDraftRespondToClaim: jest.fn().mockResolvedValue({ id: '123', data: {} }),
   },
 }));
@@ -60,6 +61,19 @@ const mockT = (key: string, opts?: Record<string, unknown>) =>
   opts?.filename !== undefined ? `${key}:${opts.filename as string}` : key;
 
 function makeReqWithDocs(overrides: Record<string, unknown>, docs: unknown[] = []) {
+  // Mirror the docs into the getCaseById refetch so save/remove see the same state.
+  // Tests that want to simulate a stale snapshot can override the mock after this.
+  const { ccdCaseService } = require('../../../main/services/ccdCaseService');
+  (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+    id: '123456',
+    data: {
+      possessionClaimResponse: {
+        defendantResponses: {
+          defendantDocuments: docs,
+        },
+      },
+    },
+  });
   return {
     session: { user: { accessToken: 'token' } },
     params: { caseReference: '123456', journey: 'respond-to-claim' },
@@ -80,6 +94,7 @@ function makeReqWithDocs(overrides: Record<string, unknown>, docs: unknown[] = [
 }
 
 const existingDoc = {
+  id: 'existing-doc-id',
   value: {
     document: {
       document_url: 'http://dm/doc/existing-uuid',
@@ -91,11 +106,27 @@ const existingDoc = {
   },
 };
 
+function freshCaseWith(docs: unknown[]) {
+  return {
+    id: '123456',
+    data: {
+      possessionClaimResponse: {
+        defendantResponses: {
+          defendantDocuments: docs,
+        },
+      },
+    },
+  };
+}
+
 describe('documentProxyRoutes', () => {
   let mockApp: Application;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    const { ccdCaseService } = require('../../../main/services/ccdCaseService');
+    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue(freshCaseWith([]));
+    (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockResolvedValue({ id: '123', data: {} });
     mockApp = {
       get: jest.fn(),
       post: jest.fn(),
@@ -388,6 +419,29 @@ describe('documentProxyRoutes', () => {
       expect(body.document.index).toBe(1);
     });
 
+    it('assigns a generated UUID id to the new collection item (so CCD treats it as stable across round-trips)', async () => {
+      mockUploadDocument.mockResolvedValue({
+        document_url: 'http://dm/doc/new-uuid',
+        document_binary_url: 'http://dm/doc/new-uuid/binary',
+        document_filename: 'new.pdf',
+        content_type: 'application/pdf',
+        size: 2048,
+      });
+
+      const req = makeReqWithDocs({
+        file: { originalname: 'new.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 2048 },
+      });
+      const res = { json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
+      const savedDocs = (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mock.calls[0][2].possessionClaimResponse
+        .defendantResponses.defendantDocuments;
+      expect(savedDocs).toHaveLength(1);
+      expect(savedDocs[0].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    });
+
     it('returns 502 when cdamService throws', async () => {
       mockUploadDocument.mockRejectedValue(new Error('CDAM down'));
 
@@ -478,19 +532,20 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(404);
     });
 
-    it('returns 404 when index out of range', async () => {
-      const req = makeReqWithDocs({ body: { delete: '5' } }, [existingDoc]);
+    it('returns success (idempotent) when docId is not found in fresh CCD state', async () => {
+      const req = makeReqWithDocs({ body: { delete: 'unknown-id' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ success: true });
+      expect(mockDeleteDocument).not.toHaveBeenCalled();
     });
 
-    it('deletes by index using server-side CDAM URL and saves draft', async () => {
+    it('deletes by docId using server-side CDAM URL and saves draft', async () => {
       mockDeleteDocument.mockResolvedValue(undefined);
 
-      const req = makeReqWithDocs({ body: { delete: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs({ body: { delete: 'existing-doc-id' } }, [existingDoc]);
       const res = { json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -512,7 +567,7 @@ describe('documentProxyRoutes', () => {
     it('returns 502 when delete fails', async () => {
       mockDeleteDocument.mockRejectedValue(new Error('CDAM down'));
 
-      const req = makeReqWithDocs({ body: { delete: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs({ body: { delete: 'existing-doc-id' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -520,8 +575,8 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(502);
     });
 
-    it('returns 404 when delete index is negative', async () => {
-      const req = makeReqWithDocs({ body: { delete: '-1' } }, [existingDoc]);
+    it('returns 404 when delete docId is empty', async () => {
+      const req = makeReqWithDocs({ body: { delete: '' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -532,7 +587,7 @@ describe('documentProxyRoutes', () => {
     it('logs non-Error rejections with String()', async () => {
       mockDeleteDocument.mockRejectedValue('string-error');
 
-      const req = makeReqWithDocs({ body: { delete: '0' } }, [existingDoc]);
+      const req = makeReqWithDocs({ body: { delete: 'existing-doc-id' } }, [existingDoc]);
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -624,19 +679,191 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(502);
     });
 
-    it('delete: handles missing validatedCase (empty docs -> 404)', async () => {
+    it('delete: unknown docId against empty fresh CCD state returns success (idempotent)', async () => {
       const req = {
         session: { user: { accessToken: 'token' } },
         params: { caseReference: '123' },
         t: mockT,
         res: { locals: {} },
-        body: { delete: '0' },
+        body: { delete: 'unknown-id' },
       } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await deleteHandler(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ success: true });
+    });
+  });
+
+  describe('concurrency safety (mutex + refetch)', () => {
+    let uploadHandler: (req: Request, res: Response) => Promise<void>;
+    let deleteHandler: (req: Request, res: Response) => Promise<void>;
+
+    beforeEach(() => {
+      const postCalls = (mockApp.post as jest.Mock).mock.calls;
+      const uploadCall = postCalls.find((c: unknown[]) => (c[0] as string).includes('/upload'));
+      const deleteCall = postCalls.find((c: unknown[]) => (c[0] as string).includes('/delete'));
+      uploadHandler = uploadCall[uploadCall.length - 1];
+      deleteHandler = deleteCall[deleteCall.length - 1];
+    });
+
+    function makeFile(name: string, size: number) {
+      return { originalname: name, mimetype: 'application/pdf', buffer: Buffer.from(''), size };
+    }
+
+    function makeCdamDoc(uuid: string, name: string, size: number) {
+      return {
+        document_url: `http://dm/doc/${uuid}`,
+        document_binary_url: `http://dm/doc/${uuid}/binary`,
+        document_filename: name,
+        content_type: 'application/pdf',
+        size,
+      };
+    }
+
+    it('three parallel uploads do not lose entries — refetch sees previous saves', async () => {
+      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
+      const persisted: unknown[] = [];
+
+      // Each getCaseById call returns the current persisted snapshot — simulating the
+      // START callback after each save. Without the lock, all three would read the
+      // same starting state and only one entry would survive.
+      (ccdCaseService.getCaseById as jest.Mock).mockImplementation(async () => ({
+        id: '123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { defendantDocuments: [...persisted] },
+          },
+        },
+      }));
+      (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockImplementation(async (_t, _c, payload) => {
+        const docs = payload.possessionClaimResponse.defendantResponses.defendantDocuments;
+        persisted.length = 0;
+        persisted.push(...docs);
+        return { id: '123', data: {} };
+      });
+
+      mockUploadDocument
+        .mockResolvedValueOnce(makeCdamDoc('a', 'a.pdf', 1))
+        .mockResolvedValueOnce(makeCdamDoc('b', 'b.pdf', 2))
+        .mockResolvedValueOnce(makeCdamDoc('c', 'c.pdf', 3));
+
+      const reqA = makeReqWithDocs({ file: makeFile('a.pdf', 1) });
+      const reqB = makeReqWithDocs({ file: makeFile('b.pdf', 2) });
+      const reqC = makeReqWithDocs({ file: makeFile('c.pdf', 3) });
+      // Re-arm the mocks once after the makeReqWithDocs() helpers (which last-write-win
+      // each set getCaseById back to []), so the dynamic implementation above is in effect.
+      (ccdCaseService.getCaseById as jest.Mock).mockImplementation(async () => ({
+        id: '123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { defendantDocuments: [...persisted] },
+          },
+        },
+      }));
+
+      const resA = { json: jest.fn() } as unknown as Response;
+      const resB = { json: jest.fn() } as unknown as Response;
+      const resC = { json: jest.fn() } as unknown as Response;
+
+      await Promise.all([uploadHandler(reqA, resA), uploadHandler(reqB, resB), uploadHandler(reqC, resC)]);
+
+      expect(persisted).toHaveLength(3);
+      const filenames = persisted
+        .map(d => (d as { value: { document: { document_filename: string } } }).value.document.document_filename)
+        .sort();
+      expect(filenames).toEqual(['a.pdf', 'b.pdf', 'c.pdf']);
+    });
+
+    it('parallel save + delete are serialized — delete sees the just-uploaded file', async () => {
+      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
+      const persisted: unknown[] = [existingDoc];
+
+      (ccdCaseService.getCaseById as jest.Mock).mockImplementation(async () => ({
+        id: '123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { defendantDocuments: [...persisted] },
+          },
+        },
+      }));
+      (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockImplementation(async (_t, _c, payload) => {
+        const docs = payload.possessionClaimResponse.defendantResponses.defendantDocuments;
+        persisted.length = 0;
+        persisted.push(...docs);
+        return { id: '123', data: {} };
+      });
+      mockDeleteDocument.mockResolvedValue(undefined);
+      mockUploadDocument.mockResolvedValue(makeCdamDoc('new', 'new.pdf', 99));
+
+      const uploadReq = {
+        session: { user: { accessToken: 'token' } },
+        params: { caseReference: '123456' },
+        t: mockT,
+        res: { locals: {} },
+        file: makeFile('new.pdf', 99),
+      } as unknown as Request;
+      const deleteReq = {
+        session: { user: { accessToken: 'token' } },
+        params: { caseReference: '123456' },
+        t: mockT,
+        res: { locals: {} },
+        body: { delete: 'existing-doc-id' },
+      } as unknown as Request;
+
+      const uploadRes = { json: jest.fn() } as unknown as Response;
+      const deleteRes = { json: jest.fn() } as unknown as Response;
+
+      await Promise.all([uploadHandler(uploadReq, uploadRes), deleteHandler(deleteReq, deleteRes)]);
+
+      expect(persisted).toHaveLength(1);
+      const remaining = persisted[0] as { value: { document: { document_filename: string } } };
+      expect(['existing.pdf', 'new.pdf']).toContain(remaining.value.document.document_filename);
+    });
+
+    it('refetches inside the lock — uses fresh CCD state, not stale res.locals.validatedCase', async () => {
+      const { ccdCaseService } = require('../../../main/services/ccdCaseService');
+      // res.locals.validatedCase shows empty, but the fresh fetch has one doc — confirm
+      // the save is built on the fresh fetch (length 2 after append), not on the stale snapshot.
+      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+        id: '123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { defendantDocuments: [existingDoc] },
+          },
+        },
+      });
+      mockUploadDocument.mockResolvedValue(makeCdamDoc('new', 'new.pdf', 99));
+
+      const req = {
+        session: { user: { accessToken: 'token' } },
+        params: { caseReference: '123456' },
+        t: mockT,
+        res: {
+          locals: { validatedCase: { possessionClaimResponse: { defendantResponses: { defendantDocuments: [] } } } },
+        },
+        file: makeFile('new.pdf', 99),
+      } as unknown as Request;
+      const res = { json: jest.fn() } as unknown as Response;
+
+      await uploadHandler(req, res);
+
+      const body = (res.json as jest.Mock).mock.calls[0][0];
+      expect(body.document.index).toBe(1); // 0 = existingDoc, 1 = the new one
+      expect(ccdCaseService.updateDraftRespondToClaim).toHaveBeenCalledWith(
+        'token',
+        '123456',
+        expect.objectContaining({
+          possessionClaimResponse: expect.objectContaining({
+            defendantResponses: expect.objectContaining({
+              defendantDocuments: expect.arrayContaining([
+                existingDoc,
+                expect.objectContaining({ value: expect.any(Object) }),
+              ]),
+            }),
+          }),
+        })
+      );
     });
   });
 });

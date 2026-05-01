@@ -1,0 +1,115 @@
+import type { Request } from 'express';
+
+import { shouldShowStep } from '../../';
+import { flowConfig } from '../flow.config';
+
+import { getFormData } from '@modules/steps';
+import { CcdCollectionItem, CcdUploadedDocument, GenAppType, LanguageUsed } from '@services/ccdCase.interface';
+
+export type FieldDetails<T> = {
+  stepName: string;
+  fieldValue: T;
+};
+
+interface UploadedDocumentFormData {
+  document_url: string;
+  document_binary_url: string;
+  document_filename: string;
+  content_type?: string;
+  size?: number;
+}
+
+export default class VisibleFormDataView {
+  constructor(readonly req: Request) {}
+
+  getApplicationTypeField(): FieldDetails<GenAppType> | undefined {
+    return this.getField('choose-an-application', 'typeOfApplication');
+  }
+
+  getHearingInNext14DaysField(): FieldDetails<'yes' | 'no'> | undefined {
+    return this.getField('is-the-court-hearing-in-the-next-14-days', 'hearingInNext14Days');
+  }
+
+  getHelpWithFeesNeededField(): FieldDetails<'yes' | 'no'> | undefined {
+    return this.getField('do-you-need-help-paying-the-fee', 'helpWithFeesNeeded');
+  }
+
+  getAlreadyAppliedForHwfField(): FieldDetails<'yes' | 'no'> | undefined {
+    return this.getField('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf');
+  }
+
+  getHwfReferenceField(): FieldDetails<string> | undefined {
+    const alreadyAppliedForHwfField = this.getAlreadyAppliedForHwfField();
+
+    if (alreadyAppliedForHwfField?.fieldValue === 'yes') {
+      return this.getField('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf.hwfReference');
+    } else {
+      return undefined;
+    }
+  }
+
+  getOtherPartiesAgreedField(): FieldDetails<'yes' | 'no'> | undefined {
+    return this.getField('have-the-other-parties-agreed-to-this-application', 'otherPartiesAgreed');
+  }
+
+  getAnyReasonsNotToShareField(): FieldDetails<'yes' | 'no'> | undefined {
+    return this.getField(
+      'are-there-any-reasons-that-this-application-should-not-be-shared',
+      'reasonsAppShouldNotBeShared'
+    );
+  }
+
+  getReasonForNotSharingField(): FieldDetails<string> | undefined {
+    const anyReasonsNotBeSharedField = this.getAnyReasonsNotToShareField();
+
+    if (anyReasonsNotBeSharedField?.fieldValue === 'yes') {
+      return this.getField(
+        'are-there-any-reasons-that-this-application-should-not-be-shared',
+        'reasonsAppShouldNotBeShared.reasonForNotSharing'
+      );
+    } else {
+      return undefined;
+    }
+  }
+
+  getWhichLanguageField(): FieldDetails<LanguageUsed> | undefined {
+    return this.getField('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
+  }
+
+  getUploadDocumentsChoiceField(): FieldDetails<'YES' | 'NO'> | undefined {
+    return this.getField('do-you-want-to-upload-documents-to-support-your-application', 'uploadDocuments');
+  }
+
+  getUploadedDocuments(): CcdCollectionItem<CcdUploadedDocument>[] {
+    const rawDocuments = getFormData(this.req, 'upload-documents-to-support-your-application').documents as
+      | UploadedDocumentFormData[]
+      | undefined;
+
+    if (!rawDocuments?.length) {
+      return [];
+    }
+
+    return rawDocuments.map(document => ({
+      value: {
+        document: {
+          document_url: document.document_url,
+          document_binary_url: document.document_binary_url,
+          document_filename: document.document_filename,
+        },
+        contentType: document.content_type,
+        size: document.size,
+      },
+    }));
+  }
+
+  private getField<T>(stepName: string, fieldName: string): FieldDetails<T> | undefined {
+    if (!shouldShowStep(this.req, stepName, flowConfig)) {
+      return undefined;
+    }
+
+    return {
+      stepName,
+      fieldValue: getFormData(this.req, stepName)[fieldName] as T,
+    };
+  }
+}

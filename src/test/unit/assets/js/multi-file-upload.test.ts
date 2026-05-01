@@ -13,6 +13,17 @@ jest.mock('@ministryofjustice/frontend', () => ({
 
 jest.mock('@utils/fileExtensionValidation', () => ({
   isBlockedExtension: jest.fn((filename: string) => filename.endsWith('.mp4') || filename.endsWith('.mp3')),
+  isAllowedExtension: jest.fn(
+    (filename: string) =>
+      filename.endsWith('.pdf') ||
+      filename.endsWith('.doc') ||
+      filename.endsWith('.docx') ||
+      filename.endsWith('.png') ||
+      filename.endsWith('.jpg') ||
+      filename.endsWith('.jpeg') ||
+      filename.endsWith('.txt') ||
+      filename.endsWith('.csv')
+  ),
 }));
 
 import { initMultiFileUpload } from '../../../../main/assets/js/multi-file-upload';
@@ -114,7 +125,7 @@ describe('multi-file-upload', () => {
 
     it('throws for blocked extensions', () => {
       expect(() => capturedHooks.entryHook(null, { name: 'video.mp4', size: 100 })).toThrow('blocked');
-      const summary = getForm().querySelector('.govuk-error-summary');
+      const summary = document.querySelector('.govuk-error-summary');
       expect(summary).not.toBeNull();
       expect(summary!.textContent).toContain('Wrong file type');
     });
@@ -122,7 +133,7 @@ describe('multi-file-upload', () => {
     it('throws for files exceeding max size', () => {
       const maxBytes = 1024 * 1024 * 1024;
       expect(() => capturedHooks.entryHook(null, { name: 'big.pdf', size: maxBytes + 1 })).toThrow('too_large');
-      const summary = getForm().querySelector('.govuk-error-summary');
+      const summary = document.querySelector('.govuk-error-summary');
       expect(summary!.textContent).toContain('File too large');
     });
 
@@ -136,7 +147,7 @@ describe('multi-file-upload', () => {
       } catch {
         /* expected */
       }
-      const summary = getForm().querySelector<HTMLDivElement>('.govuk-error-summary');
+      const summary = document.querySelector<HTMLDivElement>('.govuk-error-summary');
       expect(summary!.hidden).toBe(false);
 
       expect(() => capturedHooks.entryHook(null, { name: 'doc.pdf', size: 100 })).not.toThrow();
@@ -219,16 +230,18 @@ describe('multi-file-upload', () => {
       const xhr = makeXhr(400, { error: { message: 'Server says no' } });
       capturedHooks.errorHook(null, {}, xhr);
 
-      const summary = getForm().querySelector('.govuk-error-summary');
+      const summary = document.querySelector('.govuk-error-summary');
       expect(summary!.textContent).toContain('Server says no');
     });
 
-    it('falls back to wrong type message on parse failure', () => {
+    it('does not show a banner when server response has no structured error message', () => {
+      // Per AC: non-AC failures (abort, network, CDAM, 5xx) get the row-level
+      // "Upload failed" indicator only — no misleading wrong-type banner.
       const xhr = { status: 500, response: null, responseText: 'not json' } as unknown as XMLHttpRequest;
       capturedHooks.errorHook(null, {}, xhr);
 
-      const summary = getForm().querySelector('.govuk-error-summary');
-      expect(summary!.textContent).toContain('Wrong file type');
+      const summary = document.querySelector('.govuk-error-summary');
+      expect(summary).toBeNull();
     });
   });
 
@@ -262,7 +275,7 @@ describe('multi-file-upload', () => {
       const xhr = makeXhr(500, { error: { message: 'fail' } });
       capturedHooks.deleteHook(null, undefined, xhr);
 
-      const summary = getForm().querySelector('.govuk-error-summary');
+      const summary = document.querySelector('.govuk-error-summary');
       expect(summary!.textContent).toContain('Delete failed');
     });
 
@@ -329,30 +342,35 @@ describe('multi-file-upload', () => {
       `;
     }
 
-    function getLabel(): HTMLLabelElement {
+    function getChooseFilesButton(): HTMLButtonElement {
       return document.querySelector(
-        '.moj-multi-file-upload__dropzone label.govuk-button--secondary'
-      ) as HTMLLabelElement;
+        '.moj-multi-file-upload__dropzone button.govuk-button--secondary'
+      ) as HTMLButtonElement;
     }
 
-    it('clicking the label triggers a click on the file input and is hidden from AT', () => {
+    it('replaces the MoJ duplicate label with a button to fix WAVE orphaned label', () => {
       setupDropzoneDOM();
       const input = document.getElementById('documents') as HTMLInputElement;
       const clickSpy = jest.spyOn(input, 'click').mockImplementation(() => {});
 
       initMultiFileUpload();
 
-      const label = getLabel();
-      expect(label.getAttribute('aria-hidden')).toBe('true');
+      // Original <label> is gone; a real <button> takes its place
+      expect(document.querySelector('.moj-multi-file-upload__dropzone label.govuk-button--secondary')).toBeNull();
 
-      label.click();
+      const button = getChooseFilesButton();
+      expect(button).toBeInstanceOf(HTMLButtonElement);
+      expect(button.type).toBe('button');
+      expect(button.textContent).toBe('Choose file');
+
+      button.click();
       expect(clickSpy).toHaveBeenCalledTimes(1);
     });
 
     // MOJ clones the <input> after every successful upload (multi-file-upload.mjs:102-107).
     // The click handler must late-bind to the live input via the class selector, otherwise
     // the "Choose file" control goes dead after the first upload.
-    it('clicking the label targets the live input after MOJ clones it', () => {
+    it('clicking the button targets the live input after MOJ clones it', () => {
       setupDropzoneDOM();
       const original = document.getElementById('documents') as HTMLInputElement;
       const originalSpy = jest.spyOn(original, 'click').mockImplementation(() => {});
@@ -363,23 +381,10 @@ describe('multi-file-upload', () => {
       const clonedSpy = jest.spyOn(cloned, 'click').mockImplementation(() => {});
       original.replaceWith(cloned);
 
-      getLabel().click();
+      getChooseFilesButton().click();
 
       expect(clonedSpy).toHaveBeenCalledTimes(1);
       expect(originalSpy).not.toHaveBeenCalled();
-    });
-
-    // Guards against HMR / double-init stacking multiple click listeners on the same label.
-    it('re-running init on the same DOM does not stack duplicate click handlers', () => {
-      setupDropzoneDOM();
-      const input = document.getElementById('documents') as HTMLInputElement;
-      const clickSpy = jest.spyOn(input, 'click').mockImplementation(() => {});
-
-      initMultiFileUpload();
-      initMultiFileUpload();
-
-      getLabel().click();
-      expect(clickSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

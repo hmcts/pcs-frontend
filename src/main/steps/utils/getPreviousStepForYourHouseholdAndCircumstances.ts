@@ -1,6 +1,5 @@
 import type { Request } from 'express';
 
-import { isRentArrearsClaim } from './isRentArrearsClaim';
 import { normalizeYesNoValue } from './normalizeYesNoValue';
 
 import type { YesNoNotSureValue, YesNoValue } from '@services/ccdCase.interface';
@@ -66,22 +65,10 @@ export async function getPreviousStepForYourHouseholdAndCircumstances(req: Reque
     return 'repayments-agreed';
   }
 
-  const rentArrearsClaim = await isRentArrearsClaim(req);
-  if (!rentArrearsClaim) {
-    return 'repayments-agreed';
-  }
-
   const instalOffer = normalizeYesNoValue(paymentAgreement?.repayArrearsInstalments);
 
-  if (instalOffer === 'YES') {
-    if (hasInstalmentAmountOrFrequency(paymentAgreement)) {
-      return 'how-much-afford-to-pay';
-    }
-    return 'installment-payments';
-  }
-
-  if (instalOffer === 'NO') {
-    return 'installment-payments';
+  if (instalOffer === 'YES' && hasInstalmentAmountOrFrequency(paymentAgreement)) {
+    return 'how-much-afford-to-pay';
   }
 
   return 'installment-payments';

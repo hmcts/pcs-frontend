@@ -15,13 +15,23 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  <div class="govuk-notification-banner" role="region" aria-labelledby="experimental-banner">
-    <div class="govuk-notification-banner__content">
-      <p class="govuk-notification-banner__heading" id="experimental-banner">
-        Placeholder page
-      </p>
+    <p class="govuk-body">{{ weUsuallySendACopyOfYourApplication }}</p>
+    <p class="govuk-body">{{ inSomeExceptionalCircumstances }}</p>
+
+    <p class="govuk-body">{{ forExampleIf }}</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ itIsUrgent }}</li>
+      <li>{{ couldUndermineTheOrder }}</li>
+      <li>{{ youBelieveYouAreAtRisk }}</li>
+    </ul>
+
+    <div class="govuk-warning-text">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-visually-hidden">{{ warningHiddenText }}</span>
+        {{ weWillAskYouToProvideTheReason }}
+      </strong>
     </div>
-  </div>
 
   <form method="post" action="{{ url }}" novalidate>
 

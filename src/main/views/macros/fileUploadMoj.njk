@@ -13,7 +13,11 @@
       id: component.id,
       name: component.name,
       classes: "moj-multi-file-upload__input",
-      label: component.label,
+      label: {
+        text: component.label.text,
+        classes: component.label.classes
+      },
+      errorMessage: component.errorMessage,
       attributes: { accept: component.accept }
     }) }}
     {{ govukButton({
@@ -26,7 +30,7 @@
   {% if uploadedFiles %}
     {% for file in uploadedFiles %}
       {% set _ = uploadedItems.push({
-        fileName: file.document_url,
+        fileName: file.id,
         originalFileName: file.document_filename,
         message: { text: file.document_filename },
         deleteButton: { text: component.deleteButtonText or 'Remove' }

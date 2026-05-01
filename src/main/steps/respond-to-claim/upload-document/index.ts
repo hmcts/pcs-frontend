@@ -9,6 +9,7 @@ import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/doc
 
 interface DisplayDocument {
   index: number;
+  id?: string;
   document_filename: string;
   content_type?: string;
   size?: number;
@@ -17,6 +18,7 @@ interface DisplayDocument {
 function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[]): DisplayDocument[] {
   return docs.map((item, index) => ({
     index,
+    id: item.id,
     document_filename: item.value.document.document_filename,
     content_type: item.value.contentType,
     size: item.value.size,
