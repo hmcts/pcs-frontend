@@ -1,8 +1,9 @@
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils/yesNoEnum';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
@@ -42,7 +43,9 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     infoParagraph1: 'infoParagraph1',
     infoParagraph2: 'infoParagraph2',
+    infoParagraph3: 'infoParagraph3',
     question: 'question',
+    caseNumber: 'caseNumber',
   },
 
   fields: [
@@ -58,4 +61,12 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  extendGetContent: req => {
+    const t = getTranslationFunction(req, 'income-and-expenses', ['common']);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
+  },
 });
