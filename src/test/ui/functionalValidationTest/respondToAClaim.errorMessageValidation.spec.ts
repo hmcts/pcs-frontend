@@ -291,7 +291,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
-    await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimSpecificSumErrorValidation);
+    await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
     await performAction('counterClaimSpecificSumOfMoney', {
       question: counterClaimSpecificSumOfMoney.mainHeader,
       option: counterClaimSpecificSumOfMoney.yesRadioOption,
@@ -301,7 +301,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('counterClaimFee', NO_EMV_READ_ONLY);
 
     await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.continueButton);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
 
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
@@ -527,7 +527,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('counterClaimFee', NO_EMV_READ_ONLY);
     await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.continueButton);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
 
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
