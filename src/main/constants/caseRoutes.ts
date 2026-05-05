@@ -13,4 +13,8 @@ export const UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE = `${UPLOAD_ADDITIONAL_DOCUMENTS_
 
 export const VIEW_DOCUMENTS_ROUTE = '/case/:caseReference/view-documents';
 
+export const VIEW_HEARING_DOCUMENTS_ROUTE = '/case/:caseReference/view-hearing-documents';
+
+export const VIEW_ORDERS_AND_NOTICES_ROUTE = '/case/:caseReference/view-orders-and-notices';
+
 export const RESPOND_TO_CLAIM_START_ROUTE = `${RESPOND_TO_CLAIM_ROUTE}/start-now`;
