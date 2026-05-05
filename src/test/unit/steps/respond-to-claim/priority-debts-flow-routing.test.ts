@@ -1,19 +1,12 @@
+import type { Request } from 'express';
+
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 
-describe('respond-to-claim priority-debts flow routing', () => {
-  const previousStep = flowConfig.steps['priority-debts'].previousStep;
-  const defaultNext = flowConfig.steps['priority-debts'].defaultNext;
+import { getNextStep, getPreviousStep } from '@modules/steps/flow';
 
-  it('uses priority-debt-details as default next step', () => {
-    expect(defaultNext).toBe('priority-debt-details');
-  });
-
-  it('uses regular-income as previous step when user is receiving UC as income (amount present)', async () => {
-    if (!previousStep || typeof previousStep === 'string') {
-      throw new Error('expected previousStep function');
-    }
-
-    const req = {
+describe('respond-to-claim priority-debts flow routing (showCondition paradigm)', () => {
+  const createReq = (householdCircumstances: Record<string, unknown>): Request =>
+    ({
       res: {
         locals: {
           validatedCase: {
@@ -21,9 +14,8 @@ describe('respond-to-claim priority-debts flow routing', () => {
               possessionClaimResponse: {
                 defendantResponses: {
                   householdCircumstances: {
-                    universalCredit: 'YES',
-                    universalCreditAmount: '20000',
-                    universalCreditFrequency: 'MONTHLY',
+                    shareIncomeExpenseDetails: 'YES',
+                    ...householdCircumstances,
                   },
                 },
               },
@@ -31,132 +23,35 @@ describe('respond-to-claim priority-debts flow routing', () => {
           },
         },
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
+    }) as unknown as Request;
 
-    const result = await previousStep(req, {});
-    expect(result).toBe('what-regular-income-do-you-receive');
+  describe('forward navigation from priority-debts', () => {
+    it('goes to priority-debt-details when priorityDebts is YES', async () => {
+      const req = createReq({ priorityDebts: 'YES' });
+      await expect(getNextStep(req, 'priority-debts', flowConfig, {})).resolves.toBe('priority-debt-details');
+    });
+
+    it('skips priority-debt-details and goes to regular-expenses when priorityDebts is NO', async () => {
+      const req = createReq({ priorityDebts: 'NO' });
+      await expect(getNextStep(req, 'priority-debts', flowConfig, {})).resolves.toBe(
+        'what-other-regular-expenses-do-you-have'
+      );
+    });
   });
 
-  it('uses have-you-applied-for-universal-credit as previous step when user answered NO to UC application', async () => {
-    if (!previousStep || typeof previousStep === 'string') {
-      throw new Error('expected previousStep function');
-    }
+  describe('back navigation to priority-debts', () => {
+    it('uses regular-income as previous step when UC is selected in case data', async () => {
+      const req = createReq({ universalCredit: 'YES' });
+      await expect(getPreviousStep(req, 'priority-debts', flowConfig, {})).resolves.toBe(
+        'what-regular-income-do-you-receive'
+      );
+    });
 
-    const req = {
-      res: {
-        locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    hasAppliedForUniversalCredit: 'NO',
-                    universalCreditAmount: null,
-                    universalCreditFrequency: null,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
-
-    const result = await previousStep(req, {});
-    expect(result).toBe('have-you-applied-for-universal-credit');
-  });
-
-  it('uses regular-income as previous step when UC income is selected, even if applied-for-UC answer is NO', async () => {
-    if (!previousStep || typeof previousStep === 'string') {
-      throw new Error('expected previousStep function');
-    }
-
-    const req = {
-      res: {
-        locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    universalCredit: 'NO',
-                    universalCreditAmount: '20000',
-                    universalCreditFrequency: 'MONTHLY',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
-
-    const result = await previousStep(req, {});
-    expect(result).toBe('what-regular-income-do-you-receive');
-  });
-
-  it('prefers regular-income over have-you-applied-for-universal-credit when user receives UC as income (skipped UC application page)', async () => {
-    if (!previousStep || typeof previousStep === 'string') {
-      throw new Error('expected previousStep function');
-    }
-
-    const req = {
-      res: {
-        locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    universalCredit: 'YES',
-                    universalCreditAmount: '20000',
-                    universalCreditFrequency: 'MONTHLY',
-                    // Stale data from a previous path through the UC application page
-                    hasAppliedForUniversalCredit: 'YES',
-                    ucApplicationDate: '2024-01-15',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
-
-    const result = await previousStep(req, {});
-    expect(result).toBe('what-regular-income-do-you-receive');
-  });
-
-  it('uses have-you-applied-for-universal-credit as previous step when user answered YES to UC application', async () => {
-    if (!previousStep || typeof previousStep === 'string') {
-      throw new Error('expected previousStep function');
-    }
-
-    const req = {
-      res: {
-        locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  householdCircumstances: {
-                    hasAppliedForUniversalCredit: 'YES',
-                    ucApplicationDate: '2024-01-15',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
-
-    const result = await previousStep(req, {});
-    expect(result).toBe('have-you-applied-for-universal-credit');
+    it('uses have-you-applied-for-universal-credit as previous step when UC is not selected', async () => {
+      const req = createReq({ universalCredit: 'NO' });
+      await expect(getPreviousStep(req, 'priority-debts', flowConfig, {})).resolves.toBe(
+        'have-you-applied-for-universal-credit'
+      );
+    });
   });
 });
