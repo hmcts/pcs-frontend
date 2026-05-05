@@ -148,7 +148,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.continueButton);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -284,7 +284,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.continueButton);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     //Below code is disabled due to bug https://tools.hmcts.net/jira/browse/HDPI-6339
     /*await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
