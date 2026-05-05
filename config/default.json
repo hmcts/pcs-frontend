@@ -104,7 +104,8 @@
       "MakeGeneralApplication": "/case/:caseReference/make-an-application/choose-an-application",
       "ViewAllApplications": "/case/:caseReference/view-all-applications",
       "ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
-      "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices"
+      "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
+      "ViewDocuments": "/case/:caseReference/view-documents"
     }
   }
 }

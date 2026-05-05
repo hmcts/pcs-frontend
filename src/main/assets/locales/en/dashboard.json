@@ -27,11 +27,11 @@
     "Defendant": {
       "CaseIssued": {
         "title": "Case issued",
-        "body": "Your case has been issued. <a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/claim/Defendant.ViewClaim\">View the claim</a>. Respond by {{responseEndDate}}."
+        "body": "Your case has been issued. <a class=\"govuk-link\" href=\"/case/{{caseReference}}/view-the-claim\">View the claim</a>. Respond by {{responseEndDate}}."
       },
       "ResponseToClaim": {
         "title": "Response to claim",
-        "body": "<a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/response/Defendant.RespondToClaim\">{{ctaLabel}}</a>"
+        "body": "<a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">{{ctaLabel}}</a>"
       }
     }
   },
@@ -47,13 +47,14 @@
     "ViewDocuments": { "title": "View documents" },
     "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
     "ViewAllApplications": { "title": "View all applications" },
-    "Defendant": {
-      "RespondToClaim": { "title": "Respond to the claim" },
-      "ViewDocuments": { "title": "View documents" },
-      "ViewHearingDocuments": { "title": "View hearing documents" },
-      "ViewOrdersAndNotices": { "title": "View orders and notices" },
-      "ReviewResponse": { "title": "Review the response" },
-      "SubmitResponse": { "title": "Submit the response" }
-    }
+    "RespondToClaim": { "title": "Respond to the claim" },
+    "ViewHearingDocuments": { "title": "View hearing documents" },
+    "ViewOrdersAndNotices": { "title": "View orders and notices" },
+    "ReviewResponse": { "title": "Review the response" },
+    "SubmitResponse": { "title": "Submit the response" }
+  },
+  "viewDocuments": {
+    "pageTitle": "View documents",
+    "noDocuments": "There are no documents to display."
   }
 }

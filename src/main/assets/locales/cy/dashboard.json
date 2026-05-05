@@ -26,11 +26,11 @@
     "Defendant": {
       "CaseIssued": {
         "title": "cyCase issued",
-        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/claim/Defendant.ViewClaim\">View the claim</a>. Respond by {{responseEndDate}}."
+        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"/case/{{caseReference}}/view-the-claim\">View the claim</a>. Respond by {{responseEndDate}}."
       },
       "ResponseToClaim": {
         "title": "cyResponse to claim",
-        "body": "<a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/response/Defendant.RespondToClaim\">{{ctaLabel}}</a>"
+        "body": "<a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">{{ctaLabel}}</a>"
       }
     }
   },
@@ -46,13 +46,14 @@
     "ViewDocuments": { "title": "cyView documents" },
     "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
     "ViewAllApplications": { "title": "cyView all applications" },
-    "Defendant": {
-      "RespondToClaim": { "title": "cyRespond to the claim" },
-      "ViewDocuments": { "title": "cyView documents" },
-      "ViewHearingDocuments": { "title": "cyView hearing documents" },
-      "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
-      "ReviewResponse": { "title": "cyReview the response" },
-      "SubmitResponse": { "title": "cySubmit the response" }
-    }
+    "RespondToClaim": { "title": "cyRespond to the claim" },
+    "ViewHearingDocuments": { "title": "cyView hearing documents" },
+    "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
+    "ReviewResponse": { "title": "cyReview the response" },
+    "SubmitResponse": { "title": "cySubmit the response" }
+  },
+  "viewDocuments": {
+    "pageTitle": "cyView documents",
+    "noDocuments": "cyThere are no documents to display."
   }
 }
