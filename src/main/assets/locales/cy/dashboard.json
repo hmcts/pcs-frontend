@@ -14,7 +14,7 @@
 
   "taskGroups": {
     "CLAIM": "cyThe claim",
-    "HEARING": "cyHearing",
+    "HEARING": "cyCourt hearings",
     "JUDGEMENT": "cyJudgement from the court",
     "NOTICE": "cyOrders and notices from the court",
     "RESPONSE": "cyYour response",
@@ -50,6 +50,8 @@
       "RespondToClaim": { "title": "cyRespond to the claim" },
       "ViewResponse": { "title": "cyView the response" },
       "ViewDocuments": { "title": "cyView documents" },
+      "ViewHearingDocuments": { "title": "cyView hearing documents" },
+      "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
       "ReviewResponse": { "title": "cyReview the response" },
       "SubmitResponse": { "title": "cySubmit the response" }
     }
