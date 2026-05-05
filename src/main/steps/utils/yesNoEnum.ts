@@ -11,6 +11,10 @@ export type YesNoNotSureFormValue = 'yes' | 'no' | 'notSure';
  * Converts frontend 'yes'/'no' string to backend CCD enum 'Yes'/'No'
  * @param value - Frontend radio button value ('yes' or 'no')
  * @returns CCD enum value ('YES' or 'NO')
+ * @example
+ * toYesNoEnum('yes') // returns 'YES'
+ * toYesNoEnum('no')  // returns 'NO'
+ * toYesNoEnum(undefined)  // returns undefined
  */
 export function toYesNoEnum(value: 'yes' | 'no' | undefined): YesNoValue | undefined {
   if (!value) {
