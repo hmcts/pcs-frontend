@@ -239,8 +239,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimFee.mainHeader);
     await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
     // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
-    await performAction('readPaymentInterstitial');
+    /* await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
@@ -253,7 +254,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
       radioOption: installmentPayments.noRadioOption,
     });
-    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('readYourHouseholdAndCircumstances');*/
     // Non-rent arrears path skips instalment offer and goes straight to household circumstances.
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
     // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
