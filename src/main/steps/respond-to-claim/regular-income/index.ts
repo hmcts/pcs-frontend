@@ -225,7 +225,6 @@ export const step: StepDefinition = createFormStep({
   },
 
   translationKeys: {
-    caption: 'caption',
     heading: 'heading',
     pageTitle: 'pageTitle',
     hintText: 'hintText',
