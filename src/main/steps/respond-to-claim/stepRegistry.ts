@@ -9,6 +9,7 @@ import { step as contactPreferencesTelephone } from './contact-preferences-telep
 import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
+import { step as counterClaimAbout } from './counter-claim-about';
 import { step as counterClaimHaveYouAlreadyAppliedForHelpWithYourFees } from './counter-claim-have-you-already-applied-for-help-with-your-fees';
 import { step as counterClaimYouNeedToApplyForHelpWithYourFees } from './counter-claim-you-need-to-apply-for-help-with-your-fees/';
 import { step as yourCircumstances } from './current-circumstances';
@@ -74,6 +75,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'counter-claim': counterClaim,
+  'counter-claim-about': counterClaimAbout,
   'counter-claim-have-you-already-applied-for-help-with-your-fees':
     counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   'counter-claim-you-need-to-apply-for-help-with-your-fees': counterClaimYouNeedToApplyForHelpWithYourFees,

@@ -54,3 +54,15 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
 
   return !isUniversalCreditSelected(req) && !hasSelectedUniversalCredit(req);
 }
+
+export function hasAppliedForCounterClaimHwf(req: Request): boolean {
+  const caseData = req.res?.locals?.validatedCase?.data;
+  const counterClaim = caseData?.possessionClaimResponse?.defendantResponses?.counterClaim;
+  return counterClaim?.appliedForHwf === 'YES';
+}
+
+export function hasNotAppliedForCounterClaimHwf(req: Request): boolean {
+  const caseData = req.res?.locals?.validatedCase?.data;
+  const counterClaim = caseData?.possessionClaimResponse?.defendantResponses?.counterClaim;
+  return counterClaim?.appliedForHwf === 'NO';
+}

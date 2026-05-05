@@ -198,37 +198,53 @@ describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-
   });
 });
 
-describe('respond-to-claim counter-claim HWF routing', () => {
-  const stepConfig = flowConfig.steps['counter-claim-have-you-already-applied-for-help-with-your-fees'];
-  const routes = stepConfig.routes || [];
-  const yesRouteCondition = routes[0]?.condition;
-
+describe('respond-to-claim counter-claim HWF show conditions', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const req = {} as any;
-
-  it('routes to payment-interstitial when user answers YES', async () => {
-    if (!yesRouteCondition) {
-      throw new Error('expected yes route condition');
-    }
-    const result = await yesRouteCondition(req, {}, { alreadyAppliedForHelp: 'yes' });
-
-    expect(result).toBe(true);
-    expect(routes[0]?.nextStep).toBe('payment-interstitial');
+  const makeReq = (appliedForHwf: string | undefined): any => ({
+    res: {
+      locals: {
+        validatedCase: {
+          data: {
+            possessionClaimResponse: {
+              defendantResponses: {
+                counterClaim: appliedForHwf !== undefined ? { appliedForHwf } : undefined,
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
-  it('does not route to payment-interstitial when user answers NO', async () => {
-    if (!yesRouteCondition) {
-      throw new Error('expected yes route condition');
-    }
-    const result = await yesRouteCondition(req, {}, { alreadyAppliedForHelp: 'no' });
-    expect(result).toBe(false);
+  describe('counter-claim-about showCondition', () => {
+    const showCondition = flowConfig.steps['counter-claim-about']?.showCondition;
+
+    it('is visible when appliedForHwf is YES', () => {
+      expect(showCondition?.(makeReq('YES'))).toBe(true);
+    });
+
+    it('is not visible when appliedForHwf is NO', () => {
+      expect(showCondition?.(makeReq('NO'))).toBe(false);
+    });
+
+    it('is not visible when counterClaim data is absent', () => {
+      expect(showCondition?.(makeReq(undefined))).toBe(false);
+    });
   });
 
-  it('falls through to counter-claim-you-need-to-apply as default next', () => {
-    expect(stepConfig.defaultNext).toBe('counter-claim-you-need-to-apply-for-help-with-your-fees');
-  });
+  describe('counter-claim-you-need-to-apply showCondition', () => {
+    const showCondition = flowConfig.steps['counter-claim-you-need-to-apply-for-help-with-your-fees']?.showCondition;
 
-  it('uses counter-claim as previous step', () => {
-    expect(stepConfig.previousStep).toBe('counter-claim');
+    it('is visible when appliedForHwf is NO', () => {
+      expect(showCondition?.(makeReq('NO'))).toBe(true);
+    });
+
+    it('is not visible when appliedForHwf is YES', () => {
+      expect(showCondition?.(makeReq('YES'))).toBe(false);
+    });
+
+    it('is not visible when counterClaim data is absent', () => {
+      expect(showCondition?.(makeReq(undefined))).toBe(false);
+    });
   });
 });

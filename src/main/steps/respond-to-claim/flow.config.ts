@@ -11,7 +11,9 @@ import {
 } from '../utils';
 
 import {
+  hasAppliedForCounterClaimHwf,
   hasConfirmedInstallmentOffer,
+  hasNotAppliedForCounterClaimHwf,
   hasProvidedFinanceDetails,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
@@ -52,6 +54,7 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute',
     'counter-claim',
     'counter-claim-have-you-already-applied-for-help-with-your-fees',
+    'counter-claim-about',
     'counter-claim-you-need-to-apply-for-help-with-your-fees',
     'payment-interstitial',
     'repayments-made',
@@ -127,27 +130,11 @@ export const flowConfig: JourneyFlowConfig = {
         return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
       },
     },
-    'counter-claim-have-you-already-applied-for-help-with-your-fees': {
-      previousStep: 'counter-claim',
-      routes: [
-        {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => currentStepData.alreadyAppliedForHelp === 'yes',
-          nextStep: 'payment-interstitial',
-        },
-      ],
-      defaultNext: 'counter-claim-you-need-to-apply-for-help-with-your-fees',
+    'counter-claim-about': {
+      showCondition: (req: Request) => hasAppliedForCounterClaimHwf(req),
     },
     'counter-claim-you-need-to-apply-for-help-with-your-fees': {
-      previousStep: 'counter-claim-have-you-already-applied-for-help-with-your-fees',
-      defaultNext: 'end-now',
-    },
-    'payment-interstitial': {
-      previousStep: 'counter-claim-have-you-already-applied-for-help-with-your-fees',
-      defaultNext: 'repayments-made',
+      showCondition: (req: Request) => hasNotAppliedForCounterClaimHwf(req),
     },
     'repayments-agreed': {
       routes: [
