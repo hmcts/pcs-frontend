@@ -1,16 +1,13 @@
 import { formatDatePartsToISODate, parseISOToDateParts } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/alternativeAccommodation.njk`,
   translationKeys: {
     caption: 'caption',

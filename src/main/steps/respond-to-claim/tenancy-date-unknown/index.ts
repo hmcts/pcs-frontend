@@ -3,19 +3,17 @@ import { format, parseISO } from 'date-fns';
 import { formatDatePartsToISODate } from '../../utils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
 const STEP_NAME = 'tenancy-date-unknown';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/tenancyDateUnknown.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',

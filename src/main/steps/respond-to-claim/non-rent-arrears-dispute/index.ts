@@ -1,18 +1,16 @@
 import type { Request } from 'express';
 
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'non-rent-arrears-dispute',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/nonRentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',

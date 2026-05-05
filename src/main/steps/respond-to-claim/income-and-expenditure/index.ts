@@ -1,16 +1,13 @@
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils/yesNoEnum';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'income-and-expenses',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/incomeAndExpenditure.njk`,
 
   getInitialFormData: req => {

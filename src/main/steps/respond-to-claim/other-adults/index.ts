@@ -1,15 +1,12 @@
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-any-other-adults-live-in-your-home',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/otherAdults.njk`,
   translationKeys: {
     question: 'question',

@@ -3,9 +3,8 @@ import type { Request } from 'express';
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type {
   FrequencyValue,
@@ -95,11 +94,9 @@ const regularExpenseKeys = [
   'otherExpenses',
 ] as const;
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-other-regular-expenses-do-you-have',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   showCancelButton: false,
   translationKeys: {
     heading: 'heading',

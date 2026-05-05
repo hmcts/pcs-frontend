@@ -1,9 +1,9 @@
 import { normalizeYesNoValue } from '../../utils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
 
@@ -17,11 +17,9 @@ function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): Yes
   return undefined;
 }
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'installment-payments',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/instalmentOffer.njk`,
   beforeRedirect: async req => {
     const repayArrearsInstalments = repayArrearsInstalmentsFromConfirmOffer(
