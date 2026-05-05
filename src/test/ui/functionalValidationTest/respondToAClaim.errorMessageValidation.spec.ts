@@ -27,9 +27,9 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
+  supportNeeds,
   tenancyDateDetails,
   tenancyTypeDetails,
-  uploadFiles,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
@@ -393,9 +393,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       courtInfo: otherConsiderations.detailsTextInput,
     });
 
-    await softErrorMessageValidation('uploadDocuments', NO_EMV_READ_ONLY);
-    await performValidation('mainHeader', uploadFiles.mainHeader);
-    await performAction('clickButton', uploadFiles.continueButton);
+    await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
+    await softErrorMessageValidation('supportNeeds', NO_EMV_PLACEHOLDER_PAGE);
 
     await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -575,9 +576,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       courtInfo: otherConsiderations.detailsTextInput,
     });
 
-    await softErrorMessageValidation('uploadDocuments', NO_EMV_READ_ONLY);
-    await performValidation('mainHeader', uploadFiles.mainHeader);
-    await performAction('clickButton', uploadFiles.continueButton);
+    await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
+    await softErrorMessageValidation('supportNeeds', NO_EMV_PLACEHOLDER_PAGE);
 
     await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);

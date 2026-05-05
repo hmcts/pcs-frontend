@@ -672,7 +672,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
-    if (uploadDocs.files) {
+    if (uploadDocs?.files) {
       await performAction('uploadFile', uploadDocs.files);
     }
     await performAction('clickButton', uploadFiles.saveAndContinueButton);
