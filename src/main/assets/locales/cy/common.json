@@ -79,6 +79,16 @@
       "yearMustBeSameOrAfter": "cyThe year must be the same as or after {{minYear}}",
       "missingOne": "cyDate must include a {{missingField}}",
       "missingTwo": "cyDate must include a {{first}} and {{second}}"
+    },
+    "documentUpload": {
+      "wrongFileTypeDocStore": "cyThe selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
+      "fileTooLargeDocStore": "cyThe selected file must be smaller than 1GB",
+      "noFileSelected": "cySelect a file to upload",
+      "uploadFailed": "cyThe file could not be uploaded – try again",
+      "fileDeleteFailed": "cyThe file could not be removed – try again",
+      "documentUrlRequired": "cySelect a file to remove",
+      "uploadSuccess": "cy{{filename}} has been uploaded",
+      "errorSummaryTitle": "cyThere is a problem"
     }
   },
   "months": {
@@ -108,6 +118,27 @@
     "minutes": "cyminutes",
     "second": "cysecond",
     "seconds": "cyseconds"
+  },
+  "characterCount": {
+    "charactersUnderLimitText": {
+      "one": "cyYou have %{count} character remaining",
+      "other": "cyYou have %{count} characters remaining"
+    },
+    "charactersAtLimitText": "cyYou have 0 characters remaining",
+    "charactersOverLimitText": {
+      "one": "cyYou have %{count} character too many",
+      "other": "cyYou have %{count} characters too many"
+    },
+    "wordsUnderLimitText": {
+      "one": "cyYou have %{count} word remaining",
+      "other": "cyYou have %{count} words remaining"
+    },
+    "wordsAtLimitText": "cyYou have 0 words remaining",
+    "wordsOverLimitText": {
+      "one": "cyYou have %{count} word too many",
+      "other": "cyYou have %{count} words too many"
+    },
+    "textareaDescriptionText": "cyYou can enter up to %{count} characters"
   },
   "errorPages": {
     "403": {
