@@ -43,7 +43,7 @@ export const buildCcdCaseForPossessionClaimResponse = async (
     req.session?.user?.accessToken,
     ccdCase.id,
     ccdCase.data as Record<string, unknown>,
-    req.session.clientContext
+    req.session?.clientContext
   );
 
   if (req.res?.locals) {

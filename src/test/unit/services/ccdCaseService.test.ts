@@ -5,6 +5,7 @@ import { HTTPError } from '../../../main/HttpError';
 import { http } from '@modules/http';
 import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { ClientContextHeaders } from '../../../types/global';
 
 jest.mock('config');
 jest.mock('@modules/http');
@@ -150,6 +151,39 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('CCD case service error');
+    });
+
+    it('should retrieve case by ID with client context headers', async () => {
+      const caseId = '1234567890123456';
+      const mockCaseData = { applicantForename: 'John', applicantSurname: 'Doe' };
+
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: mockCaseData,
+          },
+        },
+      });
+
+      const clientContextHeaders: ClientContextHeaders = {
+        selectedPartyId: "abc"
+      }
+
+      const result = await ccdCaseService.getCaseById(accessToken, caseId, undefined, clientContextHeaders);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/respondPossessionClaim?ignore-warning=false`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+            'Client-Context': "{\"selectedPartyId\":\"abc\"}"
+          }),
+        })
+      );
+      expect(result).toEqual({
+        id: caseId,
+        data: mockCaseData,
+      });
     });
   });
 
@@ -492,5 +526,43 @@ describe('updateCase', () => {
     await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
       'CCD callback rejected request: Invalid submission: immutable field nameKnown'
     );
+  });
+
+  it('should call CCD validate endpoint with client context headers and return merged data with caller-supplied id', async () => {
+    const caseId = '1234567890123456';
+    const mockData = { defendantName: 'John Doe' };
+
+    mockPost.mockResolvedValue({
+      data: { data: mockData, _links: { self: { href: 'self' } } },
+    });
+
+    const clientContextHeaders: ClientContextHeaders = {
+      selectedPartyId: "abc"
+    }
+
+    const result = await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, mockData, clientContextHeaders);
+
+    expect(mockPost).toHaveBeenCalledWith(
+      `${mockUrl}/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,
+      {
+        event: {
+          id: 'respondPossessionClaim',
+          summary: 'Citizen respondPossessionClaim draft save summary',
+          description: 'Citizen respondPossessionClaim draft save description',
+        },
+        case_reference: caseId,
+        event_data: mockData,
+        ignore_warning: false,
+      },
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: `Bearer ${accessToken}`,
+          experimental: true,
+          'Client-Context': "{\"selectedPartyId\":\"abc\"}"
+        }),
+      })
+    );
+
+    expect(result).toEqual({ id: caseId, data: mockData });
   });
 });

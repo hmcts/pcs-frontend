@@ -194,7 +194,7 @@ export const ccdCaseService = {
       logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
       const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
 
-      if(clientContextHeaders) {
+      if (clientContextHeaders) {
        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
       }
 
@@ -306,8 +306,7 @@ export const ccdCaseService = {
   async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
     if (!ccdCase.id) {
       throw new HTTPError('Cannot Submit Response to Case, CCD Case Not found', 500);
-    } 
-
+    }
     const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
@@ -329,7 +328,6 @@ export const ccdCaseService = {
   },
 
   async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {
-    
     const eventUrl = `${getBaseUrl()}/cases/${ccdCaseId}/event-triggers/respondPossessionClaim?ignore-warning=false`;
     logger.info('getExistingCaseData event URL', { eventUrl });
     try {

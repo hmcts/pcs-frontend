@@ -5,6 +5,7 @@ import {
   hasSelectedUniversalCredit,
   isFinanceDetailsProvided,
   isNoticeDateProvided,
+  isSingleLinkedDefendant,
   isUniversalCreditSelected,
   normalizeYesNoValue,
 } from '../utils';
@@ -53,4 +54,8 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
   }
 
   return !isUniversalCreditSelected(req) && !hasSelectedUniversalCredit(req);
+}
+
+export function hasSingleLinkedDefendant(req: Request): boolean {
+   return isSingleLinkedDefendant(req);
 }

@@ -1,18 +1,14 @@
 import type { Request } from 'express';
 
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { CcdDefendantItem } from '@services/ccdCase.interface';
+import { CcdDefendantItem, RadioItems } from '@services/ccdCase.interface';
 
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'select-defendant',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  basePath: '/respond-to-claim',
-  flowConfig,
   customTemplate: `${__dirname}/selectDefendant.njk`,
   beforeRedirect: async req => {
     const selectedDefendant = req.body?.selectDefendant as string | undefined; // the radio button
@@ -29,6 +25,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     contactUs: 'contactUs',
+    detailsHeading: 'detailsHeading',
   },
   getInitialFormData: (req: Request) => {
     // figure out laters
@@ -70,12 +67,3 @@ function addRadioButtonForAllDefendants(allDefendants: CcdDefendantItem[] | unde
         })          
     }   
 }
-
-type RadioItems = {
-  component: {
-    items: {
-      text: string;
-      value: string;
-    }[];
-  };
-};

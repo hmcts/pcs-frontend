@@ -23,6 +23,15 @@ export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
+export type RadioItems = {
+  component: {
+    items: {
+      text: string;
+      value: string;
+    }[];
+  };
+};
+
 export interface IncomeExpenseDetails {
   applies?: YesNoValue;
   amount?: PenceAmount;
