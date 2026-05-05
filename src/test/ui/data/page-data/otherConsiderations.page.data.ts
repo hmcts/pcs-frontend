@@ -1,5 +1,4 @@
 export const otherConsiderations = {
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   mainHeader: `Is there anything else you want to tell the court as part of your response?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
