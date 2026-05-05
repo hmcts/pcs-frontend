@@ -100,13 +100,6 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('uses valid static previous step for household interstitial path', async () => {
-    const req = createReq({});
-    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'repayments-agreed'
-    );
-  });
-
   const rentArrearsData = {
     claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
   };
@@ -143,6 +136,14 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     await expect(getNextStep(noArrearsReq, 'repayments-agreed', flowConfig, {})).resolves.toBe(
       'your-household-and-circumstances'
+    );
+
+    await expect(getPreviousStep(noArrearsReq, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
+      'counter-claim'
+    );
+
+    await expect(getPreviousStep(rentArrearsReq, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
+      'installment-payments'
     );
   });
 
