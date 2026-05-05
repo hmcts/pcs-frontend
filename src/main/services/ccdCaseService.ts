@@ -38,7 +38,12 @@ import { HTTPError } from '../HttpError';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { CaseState } from '@services/ccdCase.interface';
-import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
+import type {
+  CcdCase,
+  CcdCaseData,
+  CcdUserCases,
+  StartCallbackData,
+} from '@services/ccdCase.interface';
 import type { DashboardNotification, DashboardTaskGroup } from '@services/dashboard.interface';
 import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
 
@@ -174,7 +179,7 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseById(accessToken: string, caseId: string, eventId: string = 'respondPossessionClaim'): Promise<CcdCase> {
+  async getCaseByIdForEvent(accessToken: string, caseId: string, eventId: string = 'respondPossessionClaim'): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
@@ -188,9 +193,32 @@ export const ccdCaseService = {
         data: caseData,
       };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
+      const httpError = convertAxiosErrorToHttpError(error, 'getCaseByIdForEvent');
 
       // coerce 400 and 404 to 404 so we can return a 404 error to the client
+      if (httpError.status === 400 || httpError.status === 404) {
+        throw new HTTPError('Case not found', 404);
+      }
+      throw httpError;
+    }
+  },
+
+  async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
+    const caseUrl = `${getBaseUrl()}/cases/${caseId}`;
+
+    try {
+      logger.debug(`[ccdCaseService] Fetching case by id forread view: ${caseId}`);
+      const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
+      logger.debug(`[ccdCaseService]read case response for ${caseId}: ${JSON.stringify(response.data, null, 2)}`);
+      const caseData = response.data.data ?? {};
+
+      return {
+        id: String(response.data.id ?? caseId),
+        data: caseData,
+      };
+    } catch (error) {
+      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
+
       if (httpError.status === 400 || httpError.status === 404) {
         throw new HTTPError('Case not found', 404);
       }
