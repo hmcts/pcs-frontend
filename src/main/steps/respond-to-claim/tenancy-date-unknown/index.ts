@@ -17,6 +17,7 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/tenancyDateUnknown.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    heading: 'heading',
     caption: 'caption',
     question: 'question',
     hint: 'hint',
@@ -37,8 +38,7 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   getInitialFormData: req => {
-    const tenancyStartDateRaw = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses
-      ?.tenancyStartDate as string | undefined;
+    const tenancyStartDateRaw = req.res?.locals?.validatedCase?.defendantResponsesTenancyStartDate;
 
     if (!tenancyStartDateRaw) {
       return {};

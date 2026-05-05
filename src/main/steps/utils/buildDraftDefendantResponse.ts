@@ -47,15 +47,22 @@ export const saveDraftDefendantResponse = async (req: Request, response: Possess
   });
 
   // Refresh validatedCase with the merged response from the backend.
-  // NOTE: this merge is shallow. updatedCase.data only carries the defendant slice
-  // (defendantContactDetails + defendantResponses), so claimantOrganisations and
-  // claimantEnteredDefendantDetails are STRIPPED from in-request validatedCase here.
-  // Safe in practice because the next request runs a fresh START callback that
-  // re-populates them. Don't read claimant fields off validatedCase post-save in the
-  // same request — they're gone until the next START.
+  // updatedCase.data only carries the defendant slice (defendantContactDetails +
+  // defendantResponses). Deep-merge possessionClaimResponse so that claimant-side
+  // fields (claimantOrganisations, claimantEnteredDefendantDetails) survive — they
+  // are not echoed back by the BE mid-event by design.
   if (req.res?.locals) {
     const mergedId = updatedCase.id || caseId;
-    const mergedData = { ...req.res.locals.validatedCase?.data, ...updatedCase.data };
+    const existingData = req.res.locals.validatedCase?.data ?? {};
+    const existingPCR = existingData.possessionClaimResponse ?? {};
+    const updatedPCR = updatedCase.data?.possessionClaimResponse ?? {};
+
+    const mergedData = {
+      ...existingData,
+      ...updatedCase.data,
+      possessionClaimResponse: { ...existingPCR, ...updatedPCR },
+    };
+
     req.res.locals.validatedCase = new CcdCaseModel({ id: mergedId, data: mergedData });
   }
 };

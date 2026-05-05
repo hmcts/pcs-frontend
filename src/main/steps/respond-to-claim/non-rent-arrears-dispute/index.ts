@@ -15,6 +15,7 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/nonRentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    heading: 'heading',
     caption: 'caption',
   },
   beforeRedirect: async req => {

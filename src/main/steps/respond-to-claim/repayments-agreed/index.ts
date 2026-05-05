@@ -43,10 +43,27 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    question: 'question',
   },
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const paymentAgreement = caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+    const pcr = caseData?.possessionClaimResponse as
+      | {
+          defendantResponses?: {
+            paymentAgreement?: {
+              repaymentPlanAgreed?: 'YES' | 'NO' | 'NOT_SURE' | null;
+              repaymentAgreedDetails?: string;
+            };
+          };
+          paymentAgreement?: {
+            repaymentPlanAgreed?: 'YES' | 'NO' | 'NOT_SURE' | null;
+            repaymentAgreedDetails?: string;
+          };
+        }
+      | undefined;
+    // Defensive read: prefer nested defendantResponses.paymentAgreement (current shape),
+    // fall back to flat pcr.paymentAgreement for legacy cases that may pre-date the move.
+    const paymentAgreement = pcr?.defendantResponses?.paymentAgreement ?? pcr?.paymentAgreement;
     const repaymentPlanAgreed = paymentAgreement?.repaymentPlanAgreed;
     const repaymentAgreedDetails = paymentAgreement?.repaymentAgreedDetails;
 
@@ -80,7 +97,7 @@ export const step: StepDefinition = createFormStep({
       type: 'radio',
       required: true,
       isPageHeading: true,
-      translationKey: { label: 'heading' },
+      translationKey: { label: 'question' },
       legendClasses: 'govuk-fieldset__legend--l',
       options: [
         {
@@ -92,7 +109,6 @@ export const step: StepDefinition = createFormStep({
               type: 'character-count',
               maxLength: 500,
               required: true,
-              isPageHeading: false,
               labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
               translationKey: {
                 label: 'textAreaLabel',

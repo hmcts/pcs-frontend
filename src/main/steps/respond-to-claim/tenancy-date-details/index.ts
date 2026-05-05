@@ -22,6 +22,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     caption: 'caption',
     pageTitle: 'pageTitle',
+    heading: 'heading',
     question: 'question',
     hintText: 'hintText',
     subHeading: 'subHeading',
@@ -90,15 +91,7 @@ export const step: StepDefinition = createFormStep({
     if (enumValue) {
       response.defendantResponses.tenancyStartDateCorrect = enumValue;
 
-      if (confirmValue === 'yes') {
-        const caseData = req.res?.locals?.validatedCase?.data;
-        const existingStartDate = getTenancyStartDate(caseData);
-        if (existingStartDate) {
-          response.defendantResponses.tenancyStartDate = existingStartDate;
-        } else {
-          delete response.defendantResponses.tenancyStartDate;
-        }
-      } else if (confirmValue === 'no') {
+      if (confirmValue === 'no') {
         const day = (req.body?.['confirmTenancyDate.tenancyStartDate-day'] as string | undefined) ?? '';
         const month = (req.body?.['confirmTenancyDate.tenancyStartDate-month'] as string | undefined) ?? '';
         const year = (req.body?.['confirmTenancyDate.tenancyStartDate-year'] as string | undefined) ?? '';
