@@ -134,6 +134,10 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   }
+  //other considrations back link navigation
+  if (testInfo.title.includes('@secureFlexible') || testInfo.title.includes('@assured')) {
+    process.env.INCOME_AND_EXPENSES = 'YES';
+  }
 
   if (testInfo.title.includes('@noDefendants')) {
     claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
