@@ -79,9 +79,7 @@ export const step: StepDefinition = createFormStep({
     try {
       const feeType = getCounterClaimFeeType(counterClaim.claimType, claimAmountInPence);
       const directCode = DIRECT_LOOKUP_FEE_CODES[feeType];
-      const counterClaimFee = directCode
-        ? await getFeeDirect(directCode, claimAmountInPence)
-        : await getFee(feeType);
+      const counterClaimFee = directCode ? await getFeeDirect(directCode, claimAmountInPence) : await getFee(feeType);
       return { counterClaimFee };
     } catch {
       logger.warn('Counterclaim fee unavailable: lookup failed');
