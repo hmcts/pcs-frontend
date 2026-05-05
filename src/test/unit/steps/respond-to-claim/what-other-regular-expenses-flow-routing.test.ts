@@ -1,9 +1,11 @@
+import type { Request } from 'express';
+
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 
-describe('respond-to-claim what-other-regular-expenses-do-you-have back navigation', () => {
-  const previousStep = flowConfig.steps['what-other-regular-expenses-do-you-have'].previousStep;
+import { getPreviousStep } from '@modules/steps/flow';
 
-  const reqWithPriorityDebts = (priorityDebts: 'YES' | 'NO') =>
+describe('respond-to-claim what-other-regular-expenses-do-you-have back navigation (showCondition paradigm)', () => {
+  const reqWithPriorityDebts = (priorityDebts: 'YES' | 'NO'): Request =>
     ({
       res: {
         locals: {
@@ -11,27 +13,27 @@ describe('respond-to-claim what-other-regular-expenses-do-you-have back navigati
             data: {
               possessionClaimResponse: {
                 defendantResponses: {
-                  householdCircumstances: { priorityDebts },
+                  householdCircumstances: {
+                    shareIncomeExpenseDetails: 'YES',
+                    priorityDebts,
+                  },
                 },
               },
             },
           },
         },
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
-
-  if (!previousStep || typeof previousStep !== 'function') {
-    throw new Error('expected previousStep function');
-  }
+    }) as unknown as Request;
 
   it('returns priority-debt-details when user has priority debts', async () => {
-    const result = await previousStep(reqWithPriorityDebts('YES'), {});
-    expect(result).toBe('priority-debt-details');
+    await expect(
+      getPreviousStep(reqWithPriorityDebts('YES'), 'what-other-regular-expenses-do-you-have', flowConfig, {})
+    ).resolves.toBe('priority-debt-details');
   });
 
   it('returns priority-debts when user has no priority debts', async () => {
-    const result = await previousStep(reqWithPriorityDebts('NO'), {});
-    expect(result).toBe('priority-debts');
+    await expect(
+      getPreviousStep(reqWithPriorityDebts('NO'), 'what-other-regular-expenses-do-you-have', flowConfig, {})
+    ).resolves.toBe('priority-debts');
   });
 });
