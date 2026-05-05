@@ -135,12 +135,15 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+        possessionClaimResponse: {
+          defendantResponses: {
+            makeCounterClaim: 'YES',
+          },
+        },
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'YES' })).resolves.toBe(
-      'what-are-you-claiming-for'
-    );
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('what-are-you-claiming-for');
   });
 
   const rentArrearsData = {

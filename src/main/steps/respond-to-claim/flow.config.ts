@@ -2,6 +2,7 @@ import { type Request } from 'express';
 
 import {
   hasAnyRentArrearsGround,
+  hasMadeCounterClaim,
   hasOnlyRentArrearsGrounds,
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
@@ -51,6 +52,7 @@ export const flowConfig: JourneyFlowConfig = {
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
     'counter-claim',
+    'what-are-you-claiming-for',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -105,7 +107,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       showCondition: (req: Request) => isNoticeServed(req),
     },
-
     'confirmation-of-notice-date-when-provided': {
       showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
@@ -116,97 +117,19 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
     'non-rent-arrears-dispute': {
-<<<<<<< HEAD
-      defaultNext: 'counter-claim',
-      previousStep: async (req: Request) => {
-        const rentArrearsClaim = await hasAnyRentArrearsGround(req);
-        if (rentArrearsClaim) {
-          return 'rent-arrears-dispute';
-        }
-        return getStepBeforeDisputePages(req);
-      },
+      showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
     },
-    'counter-claim': {
-      routes: [
-        {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => currentStepData.makeCounterClaim === 'YES',
-          nextStep: 'what-are-you-claiming-for',
-        },
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            if (currentStepData.makeCounterClaim !== 'NO') {
-              return false;
-            }
-            const rentArrearsClaim = await hasAnyRentArrearsGround(req);
-            return !rentArrearsClaim;
-          },
-          nextStep: 'your-household-and-circumstances',
-        },
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            if (currentStepData.makeCounterClaim !== 'NO') {
-              return false;
-            }
-            const rentArrearsClaim = await hasAnyRentArrearsGround(req);
-            return rentArrearsClaim;
-          },
-          nextStep: 'payment-interstitial',
-        },
-      ],
-      previousStep: async (req: Request) => {
-        const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
-        return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
-      },
+    'what-are-you-claiming-for': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'payment-interstitial': {
-      previousStep: 'counter-claim',
-      defaultNext: 'repayments-made',
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
     'repayments-made': {
-      previousStep: 'payment-interstitial',
-      defaultNext: 'repayments-agreed',
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
     'repayments-agreed': {
-      routes: [
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            if (currentStepData.repaymentsAgreed !== 'no') {
-              return false;
-            }
-            return hasAnyRentArrearsGround(req);
-          },
-          nextStep: 'installment-payments',
-        },
-        {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> =>
-            currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
-          nextStep: 'your-household-and-circumstances',
-        },
-      ],
-      previousStep: 'repayments-made',
-=======
-      showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
->>>>>>> origin
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
     'installment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
@@ -231,10 +154,6 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
-    },
-    'what-are-you-claiming-for': {
-      previousStep: 'counter-claim',
-      defaultNext: 'end-now',
     },
   },
 };
