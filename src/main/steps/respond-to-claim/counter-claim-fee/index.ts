@@ -5,7 +5,7 @@ import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCounterClaim, PossessionClaimResponse, VerticalYesNoValue } from '@services/ccdCase.interface';
-import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+import { DIRECT_LOOKUP_FEE_CODES, getCounterClaimFeeType, getFee, getFeeDirect } from '@services/feeLookupService';
 
 const logger = Logger.getLogger('counterClaimFeeStep');
 
@@ -78,7 +78,10 @@ export const step: StepDefinition = createFormStep({
 
     try {
       const feeType = getCounterClaimFeeType(counterClaim.claimType, claimAmountInPence);
-      const counterClaimFee = await getFee(feeType);
+      const directCode = DIRECT_LOOKUP_FEE_CODES[feeType];
+      const counterClaimFee = directCode
+        ? await getFeeDirect(directCode, claimAmountInPence)
+        : await getFee(feeType);
       return { counterClaimFee };
     } catch {
       logger.warn('Counterclaim fee unavailable: lookup failed');

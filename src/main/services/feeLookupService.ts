@@ -79,6 +79,13 @@ interface FeeLookupResponse {
   fee_amount: number;
 }
 
+interface FeeDirectResponse {
+  current_version: {
+    flat_amount?: { amount: number };
+    percentage_amount?: { percentage: number };
+  };
+}
+
 function getBaseUrl(): string {
   return config.get('feeService.url');
 }
@@ -99,9 +106,28 @@ export const getFee = async (feeType: FeeType): Promise<number> => {
 
   try {
     const response = await axios.get<FeeLookupResponse>(url, { params: feeLookupParams });
-
-    logger.debug(`Fee service response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.fee_amount;
+  } catch {
+    logger.warn('Fee lookup request failed');
+    throw new Error('Error fetching fee');
+  }
+};
+
+export const DIRECT_LOOKUP_FEE_CODES: Partial<Record<FeeType, string>> = {
+  [FeeType.counterClaimFee0506]: 'FEE0506',
+  [FeeType.counterClaimFee0507]: 'FEE0507',
+  [FeeType.counterClaimFee0508]: 'FEE0508',
+};
+
+export const getFeeDirect = async (feeCode: string, claimAmountInPence?: string): Promise<number> => {
+  const url = `${getBaseUrl()}/fees-register/fees/${feeCode}`;
+
+  try {
+    const response = await axios.get<FeeDirectResponse>(url);
+    const cv = response.data.current_version;
+    if (cv.flat_amount) return cv.flat_amount.amount;
+    if (cv.percentage_amount) return (Number(claimAmountInPence) / 100) * (cv.percentage_amount.percentage / 100);
+    throw new Error(`Unknown fee amount type for ${feeCode}`);
   } catch {
     logger.warn('Fee lookup request failed');
     throw new Error('Error fetching fee');
