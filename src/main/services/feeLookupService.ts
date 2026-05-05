@@ -125,8 +125,12 @@ export const getFeeDirect = async (feeCode: string, claimAmountInPence?: string)
   try {
     const response = await axios.get<FeeDirectResponse>(url);
     const cv = response.data.current_version;
-    if (cv.flat_amount) return cv.flat_amount.amount;
-    if (cv.percentage_amount) return (Number(claimAmountInPence) / 100) * (cv.percentage_amount.percentage / 100);
+    if (cv.flat_amount) {
+      return cv.flat_amount.amount;
+    }
+    if (cv.percentage_amount) {
+      return (Number(claimAmountInPence) / 100) * (cv.percentage_amount.percentage / 100);
+    }
     throw new Error(`Unknown fee amount type for ${feeCode}`);
   } catch {
     logger.warn('Fee lookup request failed');
