@@ -21,9 +21,6 @@
       {{ govukInsetText({ text: insetText }) }}
     {% endif %}
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">{{ detailsHeading }}</p>
-      <ul class="govuk-list govuk-list--bullet">
-          <li>{{ tenancyType }}</li>
-      </ul>
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
         {{ govukRadios(field.component) }}

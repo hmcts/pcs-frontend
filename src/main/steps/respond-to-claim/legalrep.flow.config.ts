@@ -75,7 +75,7 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
       defaultNext: 'select-defendant',
     },
     'select-defendant': {
-      defaultNext: 'defendant-date-of-birth',
+      defaultNext: 'defendant-name-confirmation',
       previousStep: 'start-now',
     },
     'defendant-name-confirmation': {
