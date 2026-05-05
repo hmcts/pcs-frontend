@@ -17,4 +17,8 @@ export const VIEW_HEARING_DOCUMENTS_ROUTE = '/case/:caseReference/view-hearing-d
 
 export const VIEW_ORDERS_AND_NOTICES_ROUTE = '/case/:caseReference/view-orders-and-notices';
 
+export const VIEW_ALL_APPLICATIONS_ROUTE = '/case/:caseReference/view-all-applications';
+
+export const MAKE_GENERAL_APPLICATION_ROUTE = '/case/:caseReference/make-an-application/choose-an-application';
+
 export const RESPOND_TO_CLAIM_START_ROUTE = `${RESPOND_TO_CLAIM_ROUTE}/start-now`;

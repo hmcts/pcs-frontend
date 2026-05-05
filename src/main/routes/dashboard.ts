@@ -3,7 +3,7 @@ import type { Application, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../HttpError';
-import { UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
+import { MAKE_GENERAL_APPLICATION_ROUTE, UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { getTranslationFunction } from '@modules/i18n';
@@ -48,7 +48,7 @@ function getIWantToLinks(caseId: string): { key: string; href: string }[] {
   return [
     {
       key: 'askCourtToMakeOrder',
-      href: `/case/${caseId}/make-an-application/choose-an-application`,
+      href: MAKE_GENERAL_APPLICATION_ROUTE.replace(':caseReference', caseId),
     },
     {
       key: 'uploadAdditionalDocuments',
@@ -178,6 +178,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
         propertyAddress,
         dashboardCaseReference,
+        dashboardUrl: getDashboardUrl(caseReference),
         iWantToLinks: getIWantToLinks(caseReference),
         helpSupportLinks: HELP_SUPPORT_LINKS,
       });

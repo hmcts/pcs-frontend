@@ -1,7 +1,9 @@
 /** Maps CCD dashboard task `templateId` values to case path patterns in `caseRoutes`. */
 import {
+  MAKE_GENERAL_APPLICATION_ROUTE,
   RESPOND_TO_CLAIM_START_ROUTE,
   UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE,
+  VIEW_ALL_APPLICATIONS_ROUTE,
   VIEW_DOCUMENTS_ROUTE,
   VIEW_HEARING_DOCUMENTS_ROUTE,
   VIEW_ORDERS_AND_NOTICES_ROUTE,
@@ -15,6 +17,8 @@ export const DASHBOARD_TASK_PATH_PATTERNS: Readonly<Record<string, string>> = {
   'Defendant.RespondToClaim': RESPOND_TO_CLAIM_START_ROUTE,
   'Defendant.ViewHearingDocuments': VIEW_HEARING_DOCUMENTS_ROUTE,
   'Defendant.ViewOrdersAndNotices': VIEW_ORDERS_AND_NOTICES_ROUTE,
+  'Defendant.ViewAllApplications': VIEW_ALL_APPLICATIONS_ROUTE,
+  'Defendant.MakeGeneralApplication': MAKE_GENERAL_APPLICATION_ROUTE,
 };
 
 /**
