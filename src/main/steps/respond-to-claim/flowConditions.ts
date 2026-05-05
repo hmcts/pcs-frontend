@@ -4,10 +4,8 @@ import {
   fromYesNoEnum,
   getValidatedCaseHouseholdCircumstances,
   hasAnyRentArrearsGround,
-  hasSelectedUniversalCredit,
   isFinanceDetailsProvided,
   isNoticeDateProvided,
-  isUniversalCreditSelected,
   normalizeYesNoValue,
 } from '../utils';
 
@@ -54,7 +52,8 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
     return false;
   }
 
-  return !isUniversalCreditSelected(req) && !hasSelectedUniversalCredit(req);
+  const hc = getValidatedCaseHouseholdCircumstances(req);
+  return fromYesNoEnum(hc?.universalCredit) !== 'yes';
 }
 
 export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
