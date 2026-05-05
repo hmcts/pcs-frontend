@@ -95,31 +95,30 @@ export const step: StepDefinition = createFormStep({
   fields: fieldsConfig,
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const existingTenancyTypeCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeCorrect as
-      | YesNoNotSureValue
-      | undefined;
+    const existingTenancyTypeConfirmation = caseData?.possessionClaimResponse?.defendantResponses
+      ?.tenancyTypeConfirmation as YesNoNotSureValue | undefined;
     const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses?.tenancyType as
       | string
       | undefined;
 
-    if (!existingTenancyTypeCorrect) {
+    if (!existingTenancyTypeConfirmation) {
       return {};
     }
 
-    const formValue = CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect];
+    const formValue = CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeConfirmation];
     if (!formValue) {
       return {};
     }
 
     const initial: Record<string, unknown> = { tenancyTypeConfirm: formValue };
-    if (existingTenancyTypeCorrect === 'NO' && existingCorrectedTenancyType) {
+    if (existingTenancyTypeConfirmation === 'NO' && existingCorrectedTenancyType) {
       initial['tenancyTypeConfirm.correctType'] = existingCorrectedTenancyType;
     }
     return initial;
   },
   beforeRedirect: async req => {
     const tenancyTypeConfirm = req.body?.tenancyTypeConfirm as string | undefined;
-    const tenancyTypeCorrect = tenancyTypeConfirm ? TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm] : undefined;
+    const tenancyTypeConfirmation = tenancyTypeConfirm ? TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm] : undefined;
     const correctedTenancyTypeText = (
       (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
       (req.body?.correctType as string | undefined)
@@ -135,7 +134,7 @@ export const step: StepDefinition = createFormStep({
 
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: {
-        tenancyTypeCorrect,
+        tenancyTypeConfirmation,
         tenancyType,
       },
     };
@@ -143,13 +142,13 @@ export const step: StepDefinition = createFormStep({
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
   },
   extendGetContent: async (req, formContent) => {
-    const existingTenancyTypeCorrect = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
-      ?.tenancyTypeCorrect as YesNoNotSureValue;
+    const existingTenancyTypeConfirmation = req.res?.locals.validatedCase?.data?.possessionClaimResponse
+      ?.defendantResponses?.tenancyTypeConfirmation as YesNoNotSureValue;
     const existingCorrectedTenancyType = req.res?.locals.validatedCase?.data?.possessionClaimResponse
       ?.defendantResponses?.tenancyType as string;
     const tenancyTypeConfirm =
       (req.body?.tenancyTypeConfirm as string) ||
-      (existingTenancyTypeCorrect ? CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect] : '') ||
+      (existingTenancyTypeConfirmation ? CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeConfirmation] : '') ||
       '';
     const correctType =
       (req.body?.['tenancyTypeConfirm.correctType'] as string) ||

@@ -148,10 +148,10 @@ export interface CcdDefendantParty {
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
-  tenancyTypeCorrect?: YesNoNotSureValue;
+  tenancyTypeConfirmation?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
-  tenancyStartDateCorrect?: string;
+  tenancyStartDateConfirmation?: string;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;

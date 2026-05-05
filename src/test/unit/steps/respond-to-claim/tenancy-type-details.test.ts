@@ -38,7 +38,7 @@ type TenancyTypeDetailsStep = {
         validatedCase?: {
           data?: {
             possessionClaimResponse?: {
-              defendantResponses?: { tenancyTypeCorrect?: string; tenancyType?: string };
+              defendantResponses?: { tenancyTypeConfirmation?: string; tenancyType?: string };
             };
           };
         };
@@ -56,7 +56,7 @@ type TenancyTypeDetailsStep = {
             data?: {
               possessionClaimResponse?: {
                 claimantOrganisations?: { value?: string }[];
-                defendantResponses?: { tenancyTypeCorrect?: string; tenancyType?: string };
+                defendantResponses?: { tenancyTypeConfirmation?: string; tenancyType?: string };
               };
               legislativeCountry?: string;
               tenancy_TypeOfTenancyLicence?: string;
@@ -81,13 +81,13 @@ describe('respond-to-claim tenancy-type-details step', () => {
   });
 
   describe('getInitialFormData', () => {
-    const makeReq = (tenancyTypeCorrect?: string, tenancyType?: string) => ({
+    const makeReq = (tenancyTypeConfirmation?: string, tenancyType?: string) => ({
       res: {
         locals: {
           validatedCase: {
             data: {
               possessionClaimResponse: {
-                defendantResponses: { tenancyTypeCorrect, tenancyType },
+                defendantResponses: { tenancyTypeConfirmation, tenancyType },
               },
             },
           },
@@ -112,12 +112,12 @@ describe('respond-to-claim tenancy-type-details step', () => {
       });
     });
 
-    it('returns empty object when CCD has no tenancyTypeCorrect', () => {
+    it('returns empty object when CCD has no tenancyTypeConfirmation', () => {
       const result = testedStep.getInitialFormData(makeReq(undefined));
       expect(result).toEqual({});
     });
 
-    it('returns empty object when tenancyTypeCorrect is an unrecognised value', () => {
+    it('returns empty object when tenancyTypeConfirmation is an unrecognised value', () => {
       const result = testedStep.getInitialFormData(makeReq('UNKNOWN'));
       expect(result).toEqual({});
     });
@@ -130,17 +130,20 @@ describe('respond-to-claim tenancy-type-details step', () => {
       ['notSure', 'NOT_SURE'],
       ['maybe', undefined],
       [undefined, undefined],
-    ])('maps tenancyTypeConfirm=%s to tenancyTypeCorrect=%s', async (tenancyTypeConfirm, tenancyTypeCorrect) => {
-      const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
+    ])(
+      'maps tenancyTypeConfirm=%s to tenancyTypeConfirmation=%s',
+      async (tenancyTypeConfirm, tenancyTypeConfirmation) => {
+        const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
 
-      await testedStep.beforeRedirect(req);
+        await testedStep.beforeRedirect(req);
 
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-        defendantResponses: {
-          tenancyTypeCorrect,
-        },
-      });
-    });
+        expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
+          defendantResponses: {
+            tenancyTypeConfirmation,
+          },
+        });
+      }
+    );
   });
 
   describe('extendGetContent', () => {

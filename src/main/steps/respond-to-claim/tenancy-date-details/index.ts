@@ -60,7 +60,7 @@ export const step: StepDefinition = createFormStep({
   ],
   getInitialFormData: req => {
     const validatedCase = req.res?.locals?.validatedCase;
-    const existingDateIsCorrect = validatedCase?.defendantResponsesTenancyStartDateCorrect as string | undefined;
+    const existingDateIsCorrect = validatedCase?.defendantResponsesTenancyStartDateConfirmation as string | undefined;
     const existingTenancyStartDate = validatedCase?.defendantResponsesTenancyStartDate as string | undefined;
 
     if (!existingDateIsCorrect) {
@@ -103,16 +103,16 @@ export const step: StepDefinition = createFormStep({
     let tenancyStartDate: string | undefined;
 
     if (confirmValue === 'yes') {
-      defendantResponses.tenancyStartDateCorrect = 'YES';
+      defendantResponses.tenancyStartDateConfirmation = 'YES';
       tenancyStartDate = existingStartDate;
     } else if (confirmValue === 'no') {
-      defendantResponses.tenancyStartDateCorrect = 'NO';
+      defendantResponses.tenancyStartDateConfirmation = 'NO';
       const day = (req.body?.['confirmTenancyDate.tenancyStartDate-day'] as string | undefined) ?? '';
       const month = (req.body?.['confirmTenancyDate.tenancyStartDate-month'] as string | undefined) ?? '';
       const year = (req.body?.['confirmTenancyDate.tenancyStartDate-year'] as string | undefined) ?? '';
       tenancyStartDate = formatDatePartsToISODate(day, month, year) ?? undefined;
     } else if (confirmValue === 'notSure') {
-      defendantResponses.tenancyStartDateCorrect = 'NOT_SURE';
+      defendantResponses.tenancyStartDateConfirmation = 'NOT_SURE';
       tenancyStartDate = ' ';
     }
 
