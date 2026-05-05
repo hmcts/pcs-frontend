@@ -1,6 +1,8 @@
 import { Request } from 'express';
 
 import {
+  fromYesNoEnum,
+  getValidatedCaseHouseholdCircumstances,
   hasAnyRentArrearsGround,
   hasSelectedUniversalCredit,
   isFinanceDetailsProvided,
@@ -53,4 +55,13 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
   }
 
   return !isUniversalCreditSelected(req) && !hasSelectedUniversalCredit(req);
+}
+
+export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
+  if (!hasProvidedFinanceDetails(req)) {
+    return false;
+  }
+
+  const hc = getValidatedCaseHouseholdCircumstances(req);
+  return fromYesNoEnum(hc?.priorityDebts) === 'yes';
 }
