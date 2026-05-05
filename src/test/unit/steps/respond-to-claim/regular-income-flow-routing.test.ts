@@ -42,15 +42,15 @@ describe('respond-to-claim regular-income flow routing (showCondition paradigm)'
 
   describe('getNextStep navigation from what-regular-income-do-you-receive', () => {
     it('skips UC question and goes to priority-debts when universalCredit is YES', async () => {
-      await expect(
-        getNextStep(createReq('YES'), 'what-regular-income-do-you-receive', flowConfig, {})
-      ).resolves.toBe('priority-debts');
+      await expect(getNextStep(createReq('YES'), 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
+        'priority-debts'
+      );
     });
 
     it('shows UC question when universalCredit is NO', async () => {
-      await expect(
-        getNextStep(createReq('NO'), 'what-regular-income-do-you-receive', flowConfig, {})
-      ).resolves.toBe('have-you-applied-for-universal-credit');
+      await expect(getNextStep(createReq('NO'), 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
+        'have-you-applied-for-universal-credit'
+      );
     });
 
     it('shows UC question when universalCredit is absent', async () => {
