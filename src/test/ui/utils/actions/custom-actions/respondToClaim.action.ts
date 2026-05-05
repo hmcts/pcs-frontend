@@ -8,6 +8,7 @@ import {
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
   correspondenceAddress,
+  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -70,6 +71,10 @@ export class RespondToClaimAction implements IAction {
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
       ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
+      [
+        'counterClaimHaveYouAppliedForHelpWithFee',
+        () => this.counterClaimHaveYouAppliedForHelpWithFee(fieldName as actionRecord),
+      ],
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
@@ -476,6 +481,23 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  }
+
+  private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question:
+        counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
+      option: helpWithFee.helpWithFeeOption,
+    });
+
+    if (helpWithFee.helpWithFeeOption === 'Yes') {
+      await performAction(
+        'inputText',
+        counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.enterHelpWithFeeReferenceHiddenTextLabel,
+        helpWithFee.feeReference
+      );
+    }
+    await performAction('clickButton', counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.saveAndContinueButton);
   }
 
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {

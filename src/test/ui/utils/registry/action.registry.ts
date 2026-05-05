@@ -82,7 +82,7 @@ export class ActionRegistry {
     ['exceptionalHardship', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
-
+    ['counterClaimHaveYouAppliedForHelpWithFee', new RespondToClaimAction()],
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
     ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],

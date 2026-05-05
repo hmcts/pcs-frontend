@@ -1,6 +1,6 @@
 export const counterClaimHaveYouAlreadyAppliedForHelpWithYourFees = {
   mainHeader: `Have you already applied for help with your counterclaim fee?`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
+  stoOrDelayAnEvictionParagraph: `Stop or delay and eviction`,
   backLink: `Back`,
   haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion: `Have you already applied for help with your counterclaim fee?`,
   yesRadioOption: `Yes`,
@@ -11,11 +11,12 @@ export const counterClaimHaveYouAlreadyAppliedForHelpWithYourFees = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouHaveAlreadyAppliedForHelpAdultsErrorMessage: `Select if you have already applied for help with your counterclaim fee?`,
   enterHelpWithFeeReferenceHiddenTextLabel: 'Enter your help with fees reference number',
+  helpWithFeeReferenceTextInput: `HWF-A1B-23C`,
   mustBe500ErrorMessage: `.....`,
   youWillHaveReceivedThisNumberHiddenParagraph: `You will have received this number when you applied for Help with Fees. This reference must not have been used for a previous application.`,
   exampleHiddenHintText: `For example, HWF-A1B-23C`,
   feedbackLink: `feedback (opens in new tab)`,
-  pageSlug: `.....`,
+  pageSlug: `counter-claim-have-you-already-applied-for-help-with-your-fees`,
   emojiTextInput: `👉 😄`,
-  emojiErrorMessage: `........ must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
+  emojiErrorMessage: `Enter your Help with Fees reference number must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
 };

@@ -38,6 +38,9 @@ export default {
   'do-you-have-any-dependant-children': 'doYouHaveAnyDependantChildren',
   'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
   'choose-an-application': 'chooseAnApplication',
+  'counter-claim-you-need-to-apply-for-help-with-your-fees': 'counterclaimYouNeedToApplyForHelpWithYourFees',
+  'counter-claim-have-you-already-applied-for-help-with-your-fees':
+    'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
   'language-used': 'languageUsed',
   'other-considerations': 'otherConsiderations',
   /* 'check-your-answers': 'checkYourAnswers', */
