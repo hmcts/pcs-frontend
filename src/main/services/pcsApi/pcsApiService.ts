@@ -1,7 +1,5 @@
 import config from 'config';
 
-import { type DashboardNotification, type DashboardTaskGroup } from '../dashboard.interface';
-
 import { http } from '@modules/http';
 
 function getBaseUrl(): string {
@@ -14,26 +12,14 @@ export const getRootGreeting = async (): Promise<string> => {
   return response.data;
 };
 
-export const getDashboardNotifications = async (caseReference: number): Promise<DashboardNotification[]> => {
-  const pcsApiURL = getBaseUrl();
-  const response = await http.get<DashboardNotification[]>(`${pcsApiURL}/dashboard/${caseReference}/notifications`);
-  return response.data;
-};
+export type AccessCodeValidationError = 'not_found' | 'expired' | 'already_used' | 'mismatch' | 'unknown';
+export type AccessCodeValidationResult = { valid: true } | { valid: false; error: AccessCodeValidationError };
 
-export const getDashboardTaskGroups = async (caseReference: number): Promise<DashboardTaskGroup[]> => {
-  const pcsApiURL = getBaseUrl();
-  const response = await http.get<DashboardTaskGroup[]>(`${pcsApiURL}/dashboard/${caseReference}/tasks`);
-  return response.data;
-};
-
-export type PinValidationError = 'not_found' | 'expired' | 'already_used' | 'mismatch' | 'unknown';
-export type PinValidationResult = { valid: true } | { valid: false; error: PinValidationError };
-
-export const validateAccessCodeDetailed = async (
+export const validateAccessCode = async (
   accessToken: string,
   caseId: string,
   accessCode: string
-): Promise<PinValidationResult> => {
+): Promise<AccessCodeValidationResult> => {
   const pcsApiURL = getBaseUrl();
   try {
     const response = await http.post(
@@ -67,30 +53,5 @@ export const validateAccessCodeDetailed = async (
     }
   } catch {
     return { valid: false, error: 'unknown' };
-  }
-};
-
-export const validateAccessCode = async (accessToken: string, caseId: string, accessCode: string): Promise<boolean> => {
-  const pcsApiURL = getBaseUrl();
-  try {
-    const response = await http.post(
-      `${pcsApiURL}/cases/${caseId}/validate-access-code`,
-      { accessCode },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    // Verify successful response status (2xx)
-    if (response.status >= 200 && response.status < 300) {
-      return true;
-    }
-
-    return false;
-  } catch {
-    return false;
   }
 };

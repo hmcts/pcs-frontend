@@ -3,10 +3,10 @@ import type { Application, Request, Response } from 'express';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { Logger } from '@modules/logger';
-import { type PinValidationError, validateAccessCodeDetailed } from '@services/pcsApi/pcsApiService';
+import { type AccessCodeValidationError, validateAccessCode } from '@services/pcsApi/pcsApiService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
-const logger = Logger.getLogger('pinAndPost');
+const logger = Logger.getLogger('citizenCaseLink');
 
 const CLAIM_NUMBER_REGEX = /^[\d-]+$/;
 const ACCESS_CODE_REGEX = /^[a-zA-Z0-9]+$/;
@@ -20,7 +20,7 @@ interface FormErrors {
   accessCode?: FieldError;
 }
 
-const API_ERROR_MESSAGES: Record<PinValidationError, { field: 'claimNumber' | 'accessCode'; text: string }> = {
+const API_ERROR_MESSAGES: Record<AccessCodeValidationError, { field: 'claimNumber' | 'accessCode'; text: string }> = {
   not_found: {
     field: 'claimNumber',
     text: 'We cannot find that claim number. Enter the claim number that you received from the court',
@@ -55,7 +55,7 @@ function buildErrorList(errors: FormErrors): { text: string; href: string }[] {
 }
 
 function renderForm(res: Response, errors: FormErrors = {}, claimNumber = '', accessCode = ''): void {
-  res.render('pinAndPost', {
+  res.render('accessCode', {
     errors,
     errorList: buildErrorList(errors),
     claimNumber,
@@ -63,12 +63,8 @@ function renderForm(res: Response, errors: FormErrors = {}, claimNumber = '', ac
   });
 }
 
-export default function pinAndPostRoutes(app: Application): void {
-  app.get('/access-your-case', oidcMiddleware, (req: Request, res: Response) => {
-    const validatedCaseId = req.session.validatedCaseId;
-    if (validatedCaseId) {
-      return safeRedirect303(res, `/dashboard/${validatedCaseId}`, '/', ['/dashboard']);
-    }
+export default function citizenCaseLinkRoutes(app: Application): void {
+  app.get('/access-your-case', oidcMiddleware, (_req: Request, res: Response) => {
     return renderForm(res);
   });
 
@@ -119,17 +115,16 @@ export default function pinAndPostRoutes(app: Application): void {
     }
 
     try {
-      const result = await validateAccessCodeDetailed(userAccessToken, caseId, accessCode);
+      const result = await validateAccessCode(userAccessToken, caseId, accessCode);
 
       if (result.valid) {
         logger.info(`Access code validated successfully for case ${caseId}`);
-        req.session.validatedCaseId = caseId;
         return safeRedirect303(res, `/dashboard/${caseId}`, '/', ['/dashboard']);
       }
 
       const { field, text } = API_ERROR_MESSAGES[result.error];
       errors[field] = { text };
-      logger.warn(`Pin validation failed for case ${caseId}: ${result.error}`);
+      logger.warn(`Access code validation failed for case ${caseId}: ${result.error}`);
       return renderForm(res, errors, claimNumber, accessCode);
     } catch (err) {
       logger.error(`Failed to validate access code for case ${caseId}:`, err);
