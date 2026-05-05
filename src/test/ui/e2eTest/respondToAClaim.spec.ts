@@ -1223,6 +1223,12 @@ test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDi
   // placeholder page, so need to be replaced with custom action when actual page is implemented
   await performValidation('mainHeader', counterClaim.mainHeader);
   await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('selectWhatAreYouClaimingFor', {
+    question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+  });
+  await performValidation('mainHeader', counterClaimFee.mainHeader);
+  await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   await performAction('readPaymentInterstitial');
   await performAction('repaymentsMade', {
     question: repaymentsMade.getmainHeader(claimantName),
