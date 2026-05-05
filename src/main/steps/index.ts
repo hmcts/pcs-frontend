@@ -2,11 +2,13 @@ import type { Request } from 'express';
 
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
+import { RESPOND_TO_CLAIM_DRAFT_EVENT } from './respond-to-claim/draftEvent';
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
 import { getUserType } from './utils';
 
+import type { CcdDraftEvent } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -20,14 +22,24 @@ export interface ResolvedJourneyConfig {
 
 export interface JourneyConfig {
   name: string;
+  slug: string;
+  draftEvent?: CcdDraftEvent;
   default: ResolvedJourneyConfig;
   legalrep?: ResolvedJourneyConfig;
 }
+
+// JourneyVariant intentionally diverges from UserType ('citizen' | 'legalrep').
+// 'citizen' maps to 'default' — the registry key chosen so journeys without a
+// legalrep variant don't have to declare a 'citizen' key. Callers map at the
+// call site (see uploadCtx in documentProxy.ts).
+export type JourneyVariant = 'default' | 'legalrep';
 
 // Journey registry - add new journeys here
 export const journeyRegistry: Record<string, JourneyConfig> = {
   respondToClaim: {
     name: 'respondToClaim',
+    slug: 'respond-to-claim',
+    draftEvent: RESPOND_TO_CLAIM_DRAFT_EVENT,
     default: {
       flowConfig: respondToClaimFlowConfig,
       stepRegistry: respondToClaimStepRegistry,
@@ -39,12 +51,51 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
   },
   makeAnApplication: {
     name: 'makeAnApplication',
+    slug: 'make-an-application',
+    // draftEvent omitted until BE confirms gen-app draft event/page id.
+    // Activating gen-app uploads also requires teaching caseReferenceParamMiddleware
+    // about journey-specific load events — see JOURNEY-AGNOSTIC-UPLOADS-PLAN-V3.md.
     default: {
       flowConfig: makeAnApplicationFlowConfig,
       stepRegistry: makeAnApplicationStepRegistry,
     },
   },
 };
+
+// Startup invariants — fail loud at module load, not at request time.
+// Exported for unit testing without re-importing the whole registry.
+export function validateJourneyRegistry(registry: Record<string, JourneyConfig>): void {
+  const seenSlugs = new Set<string>();
+  for (const journey of Object.values(registry)) {
+    if (seenSlugs.has(journey.slug)) {
+      throw new Error(`Duplicate journey slug "${journey.slug}" in journeyRegistry`);
+    }
+    seenSlugs.add(journey.slug);
+  }
+}
+
+validateJourneyRegistry(journeyRegistry);
+
+export function getUserVariant(req: Request): JourneyVariant {
+  return getUserType(req) === 'legalrep' ? 'legalrep' : 'default';
+}
+
+export function journeyForSlug(slug: string): JourneyConfig | undefined {
+  return Object.values(journeyRegistry).find(journey => journey.slug === slug);
+}
+
+// Variant-scoped step lookup. Variant is required (no default) to force every
+// caller to think about citizen vs legalrep — a silent default would let a
+// caller miss a legalrep-only step the day the registries diverge. Today the
+// citizen and legalrep stepRegistries are the same imported object, so both
+// variants resolve to the same step.
+export function findStep(slug: string, stepName: string, variant: JourneyVariant): StepDefinition | undefined {
+  const journey = journeyForSlug(slug);
+  if (!journey) {
+    return undefined;
+  }
+  return journey[variant]?.stepRegistry[stepName];
+}
 
 function getJourneyConfigForRequest(journeyName: string, req?: Request): ResolvedJourneyConfig | undefined {
   const journey = journeyRegistry[journeyName];
@@ -53,13 +104,8 @@ function getJourneyConfigForRequest(journeyName: string, req?: Request): Resolve
     return undefined;
   }
 
-  const userType = req ? getUserType(req) : 'citizen';
-
-  if (userType === 'legalrep' && journey.legalrep) {
-    return journey.legalrep;
-  }
-
-  return journey.default;
+  const variant = req ? getUserVariant(req) : 'default';
+  return journey[variant] ?? journey.default;
 }
 
 function getRegistrationStepNames(journey: JourneyConfig): string[] {
