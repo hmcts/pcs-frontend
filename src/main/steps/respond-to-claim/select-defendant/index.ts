@@ -8,7 +8,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   customTemplate: `${__dirname}/selectDefendant.njk`,
   beforeRedirect: async req => {
-    const selectedDefendant = req.body?.selectDefendant as string | undefined; // the radio button
+    const selectedDefendant = req.body?.selectDefendant as string | undefined;
 
     if (!selectedDefendant) {
       return;
