@@ -17,7 +17,7 @@ export async function otherConsiderationsErrorValidation(): Promise<void> {
 }
 
 export async function otherConsiderationsNavigationTests(): Promise<void> {
-  if (process.env.INCOME_AND_EXPENSES) {
+  if (process.env.INCOME_AND_EXPENSES === 'YES') {
     await performValidation(
       'pageNavigation',
       otherConsiderations.backLink,
