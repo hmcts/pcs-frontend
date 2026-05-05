@@ -1,9 +1,11 @@
 import type { Request } from 'express';
 
+import { HTTPError } from '../../HttpError';
 import { getUserToken } from '../../steps/utils';
 
 import type { CcdCaseData, CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { toCaseReference16 } from '@utils/caseReference';
 
 export interface CcdDraftEvent {
   id: string;
@@ -47,14 +49,20 @@ export function createCcdDraftStorage(opts: {
 
     async readFresh(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
       const token = getUserToken(req);
-      const caseId = req.params.caseReference as string;
+      const caseId = toCaseReference16(req.params.caseReference);
+      if (!caseId) {
+        throw new HTTPError('Invalid case reference format', 404);
+      }
       const fresh = await ccdCaseService.getCaseById(token, caseId, opts.event.id);
       return opts.getDocs((fresh.data ?? {}) as CcdCaseData) ?? [];
     },
 
     async save(req: Request, docs: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
       const token = getUserToken(req);
-      const caseId = req.params.caseReference as string;
+      const caseId = toCaseReference16(req.params.caseReference);
+      if (!caseId) {
+        throw new HTTPError('Invalid case reference format', 404);
+      }
       await ccdCaseService.updateDraft(opts.event, token, caseId, opts.setDocs(docs));
     },
   };
