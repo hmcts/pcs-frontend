@@ -1,10 +1,7 @@
-import type { Request } from 'express';
-
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CcdDefendantItem, RadioItems } from '@services/ccdCase.interface';
-
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'select-defendant',
@@ -18,7 +15,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     req.session.clientContext = {
-      selectedPartyId: selectedDefendant
+      selectedPartyId: selectedDefendant,
     };
   },
   translationKeys: {
@@ -27,16 +24,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     contactUs: 'contactUs',
     detailsHeading: 'detailsHeading',
   },
-  getInitialFormData: (req: Request) => {
-    // figure out laters
-    return {};
-  },
   extendGetContent: async (req, formContent) => {
     const allDefendants: CcdDefendantItem[] | undefined = req.res?.locals?.validatedCase?.allDefendants;
-    
-   const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioItems | undefined;
-     
-    addRadioButtonForAllDefendants(allDefendants, radio);    
+
+    const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioItems | undefined;
+
+    addRadioButtonForAllDefendants(allDefendants, radio);
 
     return {
       ...formContent,
@@ -58,12 +51,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 });
 
 function addRadioButtonForAllDefendants(allDefendants: CcdDefendantItem[] | undefined, radio: RadioItems | undefined) {
-      if (radio?.component) {
-        allDefendants?.forEach(defendant => {
-        radio.component.items.push({
-          value: defendant.id,
-          text: defendant.value.firstName + " " + defendant.value.lastName
-        });          
-        })          
-    }   
+  if (radio?.component) {
+    allDefendants?.forEach(defendant => {
+      radio.component.items.push({
+        value: defendant.id,
+        text: defendant.value.firstName + ' ' + defendant.value.lastName,
+      });
+    });
+  }
 }

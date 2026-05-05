@@ -1,12 +1,9 @@
 import type { Request } from 'express';
 
 import { flowConfig as citizenFlowConfig } from './flow.config';
-import {
-  hasSingleLinkedDefendant,
-} from './flowConditions';
+import { hasSingleLinkedDefendant } from './flowConditions';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
-
 
 const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'start-now',

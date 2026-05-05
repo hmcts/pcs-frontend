@@ -1,11 +1,11 @@
 import config from 'config';
 
 import { HTTPError } from '../../../main/HttpError';
+import { ClientContextHeaders } from '../../../types/global';
 
 import { http } from '@modules/http';
 import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
-import { ClientContextHeaders } from '../../../types/global';
 
 jest.mock('config');
 jest.mock('@modules/http');
@@ -166,8 +166,8 @@ describe('ccdCaseService', () => {
       });
 
       const clientContextHeaders: ClientContextHeaders = {
-        selectedPartyId: "abc"
-      }
+        selectedPartyId: 'abc',
+      };
 
       const result = await ccdCaseService.getCaseById(accessToken, caseId, undefined, clientContextHeaders);
 
@@ -176,7 +176,7 @@ describe('ccdCaseService', () => {
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: `Bearer ${accessToken}`,
-            'Client-Context': "{\"selectedPartyId\":\"abc\"}"
+            'Client-Context': '{"selectedPartyId":"abc"}',
           }),
         })
       );
@@ -537,8 +537,8 @@ describe('updateCase', () => {
     });
 
     const clientContextHeaders: ClientContextHeaders = {
-      selectedPartyId: "abc"
-    }
+      selectedPartyId: 'abc',
+    };
 
     const result = await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, mockData, clientContextHeaders);
 
@@ -558,7 +558,7 @@ describe('updateCase', () => {
         headers: expect.objectContaining({
           Authorization: `Bearer ${accessToken}`,
           experimental: true,
-          'Client-Context': "{\"selectedPartyId\":\"abc\"}"
+          'Client-Context': '{"selectedPartyId":"abc"}',
         }),
       })
     );

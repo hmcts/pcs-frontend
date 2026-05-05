@@ -57,5 +57,5 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
 }
 
 export function hasSingleLinkedDefendant(req: Request): boolean {
-   return isSingleLinkedDefendant(req);
+  return isSingleLinkedDefendant(req);
 }

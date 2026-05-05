@@ -33,6 +33,7 @@
 import { AxiosError } from 'axios';
 import config from 'config';
 
+import { ClientContextHeaders } from '../../types/global';
 import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
@@ -41,8 +42,6 @@ import { CaseState } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
 import type { DashboardNotification, DashboardTaskGroup } from '@services/dashboard.interface';
 import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
-
-import { ClientContextHeaders } from '../../types/global';
 
 const logger = Logger.getLogger('ccdCaseService');
 
@@ -71,7 +70,7 @@ export type CaseHeaders = {
     Accept: string;
     'Content-Type': string;
     'Client-Context'?: string;
-  }
+  };
 };
 
 function getCaseHeaders(token: string): CaseHeaders {
@@ -186,8 +185,12 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseById(accessToken: string, caseId: string, eventId: string = 'respondPossessionClaim', clientContextHeaders?: ClientContextHeaders): Promise<CcdCase> {
-
+  async getCaseById(
+    accessToken: string,
+    caseId: string,
+    eventId: string = 'respondPossessionClaim',
+    clientContextHeaders?: ClientContextHeaders
+  ): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
@@ -195,7 +198,7 @@ export const ccdCaseService = {
       const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
 
       if (clientContextHeaders) {
-       caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
       }
 
       const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
@@ -368,11 +371,11 @@ export const ccdCaseService = {
       ignore_warning: false,
     };
 
-      const caseHeaders: CaseHeaders = getCaseHeaders(accessToken  || '');
+    const caseHeaders: CaseHeaders = getCaseHeaders(accessToken || '');
 
-      if(clientContextHeaders) {
-       caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
-      }
+    if (clientContextHeaders) {
+      caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+    }
 
     try {
       const response = await http.post<{ data: CcdCaseData }>(url, payload, caseHeaders);

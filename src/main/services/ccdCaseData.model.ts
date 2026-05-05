@@ -4,11 +4,11 @@ import {
   CcdCaseData,
   CcdClaimGroundSummaryItem,
   CcdClaimantEnteredDefendantDetails,
+  CcdDefendantItem,
   CcdDefendantParty,
   CcdDefendantResponses,
   PossessionClaimResponse,
   YesNoEnum,
-  CcdDefendantItem,
 } from '@services/ccdCase.interface';
 
 export type { CcdCase, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
