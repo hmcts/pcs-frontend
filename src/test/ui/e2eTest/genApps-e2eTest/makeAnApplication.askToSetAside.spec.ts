@@ -39,7 +39,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('Select an Application - Ask to Set aside @regression @PR', async () => {
+  test('Select an Application - Ask to Set aside @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
@@ -93,7 +93,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Select an Application - Ask to Set aside - You need to apply for application fee @PR', async () => {
+  test('Select an Application - Ask to Set aside - You need to apply for application fee', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
