@@ -99,7 +99,9 @@
   },
   "dashboard": {
     "taskRoutes": {
-      "Task.AAA6.Claim.ViewClaim": "/case/:caseReference/view-the-claim"
+      "Defendant.ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
+      "Defendant.ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
+      "Defendant.ViewClaim": "/case/:caseReference/view-the-claim"
     }
   }
 }
