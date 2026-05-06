@@ -9,7 +9,7 @@
         <div class="govuk-error-summary" data-module="govuk-error-summary">
           <div role="alert">
             <h2 class="govuk-error-summary__title">
-              There is a problem
+              {{ t('common:errors.title') }}
             </h2>
             <div class="govuk-error-summary__body">
               <ul class="govuk-list govuk-error-summary__list">
@@ -24,23 +24,23 @@
         </div>
       {% endif %}
 
-      <h1 class="govuk-heading-l">Access your case</h1>
+      <h1 class="govuk-heading-l">{{ t('accessCode:pageTitle') }}</h1>
 
-      <p class="govuk-body">Access and manage your case using your claim number and access code. These will be in letter, email or pack sent by the court.</p>
+      <p class="govuk-body">{{ t('accessCode:description') }}</p>
 
       <form method="POST" action="/access-your-case" novalidate>
         {{ csrfProtection(csrfToken) }}
 
         <div class="govuk-form-group {% if errors.claimNumber %}govuk-form-group--error{% endif %}">
           <label class="govuk-label govuk-label--m" for="claimNumber">
-            Enter your claim number
+            {{ t('accessCode:claimNumber.label') }}
           </label>
           <div class="govuk-hint">
-            This is a 16-digit number
+            {{ t('accessCode:claimNumber.hint') }}
           </div>
           {% if errors.claimNumber %}
             <p id="claimNumber-error" class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ errors.claimNumber.text }}
+              <span class="govuk-visually-hidden">{{ t('accessCode:errorPrefix') }}</span> {{ errors.claimNumber.text }}
             </p>
           {% endif %}
           <input
@@ -56,14 +56,14 @@
 
         <div class="govuk-form-group {% if errors.accessCode %}govuk-form-group--error{% endif %}">
           <label class="govuk-label govuk-label--m" for="accessCode">
-            Enter your access code
+            {{ t('accessCode:accessCode.label') }}
           </label>
           <div class="govuk-hint">
-            This has 12 characters
+            {{ t('accessCode:accessCode.hint') }}
           </div>
           {% if errors.accessCode %}
             <p id="accessCode-error" class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ errors.accessCode.text }}
+              <span class="govuk-visually-hidden">{{ t('accessCode:errorPrefix') }}</span> {{ errors.accessCode.text }}
             </p>
           {% endif %}
           <input
@@ -78,7 +78,7 @@
         </div>
 
         <button type="submit" class="govuk-button" data-module="govuk-button">
-          Continue
+          {{ t('common:buttons.continue') }}
         </button>
       </form>
 

@@ -74,7 +74,7 @@ export default function citizenCaseLinkRoutes(app: Application): void {
     const userAccessToken = req.session.user?.accessToken;
 
     if (!userAccessToken) {
-      logger.error('No user access token in session on pin and post page');
+      logger.error('No user access token in session on access-your-case page');
       return res.status(401).render('error', { error: 'Authentication required' });
     }
 
