@@ -23,5 +23,5 @@ export const rentArrears = {
   enterAmountInCorrectFormatErrorMessage: `Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write £148.00)`,
   whenTheyMadeTheirClaimParagraph: `When they made their claim, ${process.env.CLAIMANT_NAME} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
   viewACopyOfRentLink: `View a copy of the rent statement (opens in new tab)`,
-  amountYouOweHeader: `Amount you owe in rent arrears given by ${process.env.CLAIMANT_NAME}`,
+  amountYouOweHeader: `Amount you owe in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
 };
