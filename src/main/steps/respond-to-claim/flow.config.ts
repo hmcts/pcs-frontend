@@ -72,15 +72,6 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute': {
       showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
     },
-    'payment-interstitial': {
-      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
-    },
-    'repayments-made': {
-      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
-    },
-    'repayments-agreed': {
-      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
-    },
     'installment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
     },
