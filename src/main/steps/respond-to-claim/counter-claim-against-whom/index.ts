@@ -9,11 +9,11 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCounterClaim, PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
-  stepName: 'counter-claim-against-who',
+  stepName: 'counter-claim-against-whom',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,
-  customTemplate: `${__dirname}/counterClaimAgainstWho.njk`,
+  customTemplate: `${__dirname}/counterClaimAgainstWhom.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
   },

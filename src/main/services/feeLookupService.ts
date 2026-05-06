@@ -107,8 +107,8 @@ export const getFee = async (feeType: FeeType): Promise<number> => {
   try {
     const response = await axios.get<FeeLookupResponse>(url, { params: feeLookupParams });
     return response.data.fee_amount;
-  } catch {
-    logger.warn('Fee lookup request failed');
+  } catch (e) {
+    logger.error('Fee lookup request failed', { err: e, url, params: feeLookupParams });
     throw new Error('Error fetching fee');
   }
 };
@@ -132,8 +132,8 @@ export const getFeeDirect = async (feeCode: string, claimAmountInPence?: string)
       return (Number(claimAmountInPence) / 100) * (cv.percentage_amount.percentage / 100);
     }
     throw new Error(`Unknown fee amount type for ${feeCode}`);
-  } catch {
-    logger.warn('Fee lookup request failed');
+  } catch (e) {
+    logger.error('Fee lookup request failed', { err: e, url, feeCode });
     throw new Error('Error fetching fee');
   }
 };
