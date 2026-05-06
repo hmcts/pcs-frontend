@@ -1,14 +1,14 @@
 {
-  "pageTitle": "CyAbout your counterclaim",
-  "heading": "CyAbout your counterclaim",
-  "infoParagraph1": "CyYou will be able to upload any evidence you have on the next page.",
-  "infoParagraph2": "CyThe claimant will be able to see your answers.",
-  "aboutCounterclaimForLabel": "CyWhat is your counterclaim for?",
-  "aboutCounterclaimReasonsLabel": "CyWhat are your reasons for making the counterclaim?",
+  "pageTitle": "cyAbout your counterclaim",
+  "heading": "cyAbout your counterclaim",
+  "infoParagraph1": "cyYou will be able to upload any evidence you have on the next page.",
+  "infoParagraph2": "cyThe claimant will be able to see your answers.",
+  "aboutCounterclaimForLabel": "cyWhat is your counterclaim for?",
+  "aboutCounterclaimReasonsLabel": "cyWhat are your reasons for making the counterclaim?",
   "errors": {
-    "aboutCounterclaimForRequired": "CyEnter what your counterclaim is for",
-    "aboutCounterclaimForMaxLength": "CyWhat your counterclaim is for must be 6800 characters or less",
-    "aboutCounterclaimReasonsRequired": "CyEnter what your reasons are for making the counterclaim",
-    "aboutCounterclaimReasonsMaxLength": "CyWhat your reasons are for making the counterclaim must be 6800 characters or less"
+    "aboutCounterclaimForRequired": "cyEnter what your counterclaim is for",
+    "aboutCounterclaimForMaxLength": "cyWhat your counterclaim is for must be 6800 characters or less",
+    "aboutCounterclaimReasonsRequired": "cyEnter what your reasons are for making the counterclaim",
+    "aboutCounterclaimReasonsMaxLength": "cyWhat your reasons are for making the counterclaim must be 6800 characters or less"
   }
 }

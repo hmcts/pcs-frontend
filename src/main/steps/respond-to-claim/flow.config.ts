@@ -6,6 +6,7 @@ import {
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
   isNoticeServed,
+  isSomethingElseCounterClaim,
   isTenancyStartDateKnown,
   isWalesProperty,
 } from '../utils';
@@ -61,6 +62,7 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-have-you-applied-for-help',
     'counter-claim-against-whom',
     'counter-claim-about',
+    'counter-claim-order-other-than-sum',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -138,6 +140,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counter-claim-about': {
       showCondition: (req: Request) => shouldShowCounterClaimAboutStep(req),
+    },
+    'counter-claim-order-other-than-sum': {
+      showCondition: (req: Request) => isSomethingElseCounterClaim(req),
     },
     'installment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
