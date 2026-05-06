@@ -1,13 +1,11 @@
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCounterClaim, PossessionClaimResponse, VerticalYesNoValue } from '@services/ccdCase.interface';
 import { DIRECT_LOOKUP_FEE_CODES, getCounterClaimFeeType, getFee, getFeeDirect } from '@services/feeLookupService';
 
-const logger = Logger.getLogger('counterClaimFeeStep');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim-fee',
@@ -72,18 +70,12 @@ export const step: StepDefinition = createFormStep({
           : undefined;
 
     if (!counterClaim?.claimType) {
-      logger.warn('Counterclaim fee unavailable: missing claimType');
-      return { counterClaimFee: Number.NaN };
+      throw new Error('Counterclaim fee unavailable: missing claimType');
     }
 
-    try {
-      const feeType = getCounterClaimFeeType(counterClaim.claimType, claimAmountInPence);
-      const directCode = DIRECT_LOOKUP_FEE_CODES[feeType];
-      const counterClaimFee = directCode ? await getFeeDirect(directCode, claimAmountInPence) : await getFee(feeType);
-      return { counterClaimFee };
-    } catch {
-      logger.warn('Counterclaim fee unavailable: lookup failed');
-      return { counterClaimFee: Number.NaN };
-    }
+    const feeType = getCounterClaimFeeType(counterClaim.claimType, claimAmountInPence);
+    const directCode = DIRECT_LOOKUP_FEE_CODES[feeType];
+    const counterClaimFee = directCode ? await getFeeDirect(directCode, claimAmountInPence) : await getFee(feeType);
+    return { counterClaimFee };
   },
 });
