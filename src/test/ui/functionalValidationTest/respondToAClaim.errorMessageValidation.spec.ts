@@ -6,6 +6,7 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -38,6 +39,7 @@ import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirma
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
+import { counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation } from '../functional/counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
@@ -281,6 +283,19 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
 
+    await softErrorMessageValidation('counterClaim', NO_EMV_READ_ONLY);
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+
+    await performAction(
+      'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
+      counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation
+    );
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
+      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+    });
+
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
 
@@ -489,6 +504,15 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('counterClaim', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
+
+    await performAction(
+      'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
+      counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation
+    );
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
+      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+    });
 
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');

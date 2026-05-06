@@ -12,7 +12,6 @@ export const counterClaimHaveYouAlreadyAppliedForHelpWithYourFees = {
   selectIfYouHaveAlreadyAppliedForHelpAdultsErrorMessage: `Select if you have already applied for help with your counterclaim fee?`,
   enterHelpWithFeeReferenceHiddenTextLabel: 'Enter your help with fees reference number',
   helpWithFeeReferenceTextInput: `HWF-A1B-23C`,
-  mustBe500ErrorMessage: `.....`,
   youWillHaveReceivedThisNumberHiddenParagraph: `You will have received this number when you applied for Help with Fees. This reference must not have been used for a previous application.`,
   exampleHiddenHintText: `For example, HWF-A1B-23C`,
   feedbackLink: `feedback (opens in new tab)`,

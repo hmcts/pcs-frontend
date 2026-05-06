@@ -179,7 +179,7 @@ test.afterEach(async () => {
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  //Income and expenses - yes - Only Universal CREDIT - Priority debt
+  //Income and expenses - yes - Only Universal CREDIT - Priority debt, < 2 named parties - CounterClaimAppliedForHelp - Yes - about your counterclaim
   test('Respond to a claim @noDefendants @regression @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -233,7 +233,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
-    await performAction('mainHeader', counterClaimAbout.mainHeader);
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     // Non-rent arrears path skips instalment offer and goes straight to household circumstances.
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
     // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
@@ -309,6 +310,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('Respond to a claim - CounterclaimHelpWithFee - No @noDefendants @regression @crossbrowser', async () => {
+    //< 2 named parties - CounterClaimAppliedForHelp - No - You need to apply for help with your fees
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -366,9 +368,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
     //incomeAndExpenses - no - Upload docs
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameTextInput,
-      lName: defendantNameCapture.lastNameTextInput,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
@@ -414,6 +416,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
@@ -466,12 +470,65 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
+  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - CounterClaimAppliedForHelp - No @assured @regression', async () => {
+    // > 3 named parties - CounterClaimAppliedForHelp - No - You need to apply for help with your fees
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      options: [contactPreferenceEmailOrPost.byEmailCheckbox, contactPreferenceEmailOrPost.byPostCheckbox],
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect
+    );
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+    await performAction('enterTenancyStartDetailsUnKnown');
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknown');
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.noRadioOption,
+    });
+    await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
+  });
+
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
-    //Income and expenses - yes - no option On regular Income - universal credit
+    //Income and expenses - yes - no option On regular Income - universal credit, < 2 named parties (2 defendants , 1 name unknown) - Yes - About your counterclaim
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameTextInput,
-      lName: defendantNameCapture.lastNameTextInput,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails');
     await performAction('selectCorrespondenceAddressUnKnown', {
@@ -517,6 +574,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     // Downstream flow up to 'instalmentPayments' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
@@ -623,6 +682,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     // Downstream flow up to 'repaymentsAgreed' page should be modified since it's Non rent arrears test case.HDPI-5732
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
@@ -760,6 +821,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1121,6 +1184,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
+
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1190,6 +1254,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
+    //> 3 named parties - CounterClaimAppliedForHelp - Yes - Who are you claiming against
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,

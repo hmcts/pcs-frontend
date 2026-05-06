@@ -6,6 +6,8 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimAbout,
+  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
@@ -134,6 +136,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
+      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+    });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),

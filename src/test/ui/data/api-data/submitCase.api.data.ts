@@ -386,7 +386,25 @@ export const submitCaseApiData = {
         nameKnown: 'NO',
         addressKnown: 'NO',
       },
-      addAnotherDefendant: 'NO',
+      addAnotherDefendant: 'YES',
+      additionalDefendants: [
+        {
+          value: {
+            nameKnown: 'YES',
+            firstName: 'Jeremiah',
+            lastName: 'Fisher',
+            addressKnown: 'NO',
+          },
+        },
+        {
+          value: {
+            nameKnown: 'YES',
+            firstName: 'Conrad',
+            lastName: 'Fisher',
+            addressKnown: 'NO',
+          },
+        },
+      ],
       tenancy_TypeOfTenancyLicence: process.env.TENANCY_TYPE,
       tenancy_TenancyLicenceDate: null,
       tenancy_TenancyLicenceDocuments: [],
