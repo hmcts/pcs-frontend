@@ -40,6 +40,7 @@ export interface StepConfig {
 export type SectionApplicabilityCondition = (req: Request) => Promise<boolean>;
 
 export interface SectionConfig {
+  id: string;
   titleKey: string;
   steps: string[];
   isApplicable?: SectionApplicabilityCondition;
@@ -53,5 +54,5 @@ export interface JourneyFlowConfig {
   stepOrder?: string[];
   nonSectionStepOrder?: string[];
   steps: Record<string, StepConfig>;
-  sections?: Record<string, SectionConfig>;
+  sections?: SectionConfig[];
 }

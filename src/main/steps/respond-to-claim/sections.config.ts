@@ -1,12 +1,27 @@
 import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 import { hasAnyRentArrearsGround } from '../utils';
 
-export const respondToClaimSections = {
-  startNowAndDetails: {
+export const RESPOND_TO_CLAIM_SECTION_IDS = [
+  'startNowAndDetails',
+  'personalDetails',
+  'disputeAndTenancy',
+  'payments',
+  'situationAndCircumstances',
+  'incomeAndExpenditure',
+  'uploadFiles',
+  'checkYourAnswersAndSubmit',
+] as const;
+
+export type RespondToClaimSectionId = (typeof RESPOND_TO_CLAIM_SECTION_IDS)[number];
+
+export const respondToClaimSections: SectionConfig[] = [
+  {
+    id: 'startNowAndDetails',
     titleKey: 'taskList.startNowAndDetails',
     steps: ['start-now', 'free-legal-advice'],
   },
-  personalDetails: {
+  {
+    id: 'personalDetails',
     titleKey: 'taskList.personalDetails',
     steps: [
       'defendant-name-confirmation',
@@ -18,7 +33,8 @@ export const respondToClaimSections = {
       'contact-preferences-text-message',
     ],
   },
-  disputeAndTenancy: {
+  {
+    id: 'disputeAndTenancy',
     titleKey: 'taskList.disputeAndTenancy',
     steps: [
       'dispute-claim-interstitial',
@@ -36,7 +52,8 @@ export const respondToClaimSections = {
       'counter-claim',
     ],
   },
-  payments: {
+  {
+    id: 'payments',
     titleKey: 'taskList.payments',
     steps: [
       'payment-interstitial',
@@ -47,7 +64,8 @@ export const respondToClaimSections = {
     ],
     isApplicable: async req => hasAnyRentArrearsGround(req),
   },
-  situationAndCircumstances: {
+  {
+    id: 'situationAndCircumstances',
     titleKey: 'taskList.situationAndCircumstances',
     steps: [
       'your-household-and-circumstances',
@@ -59,7 +77,8 @@ export const respondToClaimSections = {
       'exceptional-hardship',
     ],
   },
-  incomeAndExpenditure: {
+  {
+    id: 'incomeAndExpenditure',
     titleKey: 'taskList.incomeAndExpenditure',
     steps: [
       'income-and-expenses',
@@ -71,14 +90,14 @@ export const respondToClaimSections = {
       'other-considerations',
     ],
   },
-  uploadFiles: {
+  {
+    id: 'uploadFiles',
     titleKey: 'taskList.uploadFiles',
     steps: ['upload-docs'],
   },
-  checkYourAnswersAndSubmit: {
+  {
+    id: 'checkYourAnswersAndSubmit',
     titleKey: 'taskList.checkYourAnswersAndSubmit',
     steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used', 'check-your-answers'],
   },
-} satisfies Record<string, SectionConfig>;
-
-export type RespondToClaimSectionId = keyof typeof respondToClaimSections;
+];

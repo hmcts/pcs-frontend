@@ -2,19 +2,14 @@ import type { Request } from 'express';
 
 import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 
-type SectionsMap = Record<string, SectionConfig>;
+type Sections = SectionConfig[];
 
-export function getSectionForStep(stepSlug: string, sections: SectionsMap): string | null {
-  for (const [sectionId, section] of Object.entries(sections)) {
-    if (section.steps.includes(stepSlug)) {
-      return sectionId;
-    }
-  }
-  return null;
+export function getSectionForStep(stepSlug: string, sections: Sections): string | null {
+  return sections.find(section => section.steps.includes(stepSlug))?.id ?? null;
 }
 
-export function getStepsInSection(sectionId: string, sections: SectionsMap): string[] {
-  return sections[sectionId]?.steps ?? [];
+export function getStepsInSection(sectionId: string, sections: Sections): string[] {
+  return sections.find(section => section.id === sectionId)?.steps ?? [];
 }
 
 /**
@@ -22,12 +17,12 @@ export function getStepsInSection(sectionId: string, sections: SectionsMap): str
  * a user reaches in the journey for that section. Use for stable task-list entry when that matches
  * product intent; otherwise resolve entry from flow routing.
  */
-export function getFirstStepInSection(sectionId: string, sections: SectionsMap): string | null {
-  return sections[sectionId]?.steps[0] ?? null;
+export function getFirstStepInSection(sectionId: string, sections: Sections): string | null {
+  return sections.find(section => section.id === sectionId)?.steps[0] ?? null;
 }
 
-export async function isSectionApplicable(sectionId: string, sections: SectionsMap, req: Request): Promise<boolean> {
-  const section = sections[sectionId];
+export async function isSectionApplicable(sectionId: string, sections: Sections, req: Request): Promise<boolean> {
+  const section = sections.find(s => s.id === sectionId);
   if (!section) {
     return false;
   }
@@ -44,11 +39,7 @@ export async function isSectionApplicable(sectionId: string, sections: SectionsM
  *   section-mapped (e.g. terminal routes like `end-now` that are omitted from section metadata).
  * - If the current step is not in any section, returns false (no section boundary to detect).
  */
-export function isLastStepInSection(
-  currentStepSlug: string,
-  nextStepSlug: string | null,
-  sections: SectionsMap
-): boolean {
+export function isLastStepInSection(currentStepSlug: string, nextStepSlug: string | null, sections: Sections): boolean {
   if (!nextStepSlug) {
     return true;
   }
@@ -65,13 +56,13 @@ export function isLastStepInSection(
 
 export function getSectionCoverage(
   stepSlugs: string[],
-  sections: SectionsMap
+  sections: Sections
 ): {
   unmappedSteps: string[];
   duplicateAssignments: string[];
 } {
   const stepToSectionCount = new Map<string, number>();
-  for (const section of Object.values(sections)) {
+  for (const section of sections) {
     for (const step of section.steps) {
       stepToSectionCount.set(step, (stepToSectionCount.get(step) ?? 0) + 1);
     }

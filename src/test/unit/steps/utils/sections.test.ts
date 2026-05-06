@@ -10,17 +10,19 @@ import {
   isSectionApplicable,
 } from '../../../../main/steps/utils/sections';
 
-const testSections: Record<string, SectionConfig> = {
-  sectionA: {
+const testSections: SectionConfig[] = [
+  {
+    id: 'sectionA',
     titleKey: 'sectionA',
     steps: ['step-a1', 'step-a2'],
   },
-  sectionB: {
+  {
+    id: 'sectionB',
     titleKey: 'sectionB',
     steps: ['step-b1'],
     isApplicable: async req => Boolean(req.res?.locals?.validatedCase),
   },
-};
+];
 
 describe('sections utils', () => {
   describe('getSectionForStep', () => {
@@ -109,13 +111,14 @@ describe('sections utils', () => {
     });
 
     it('detects unmapped and duplicate mappings', () => {
-      const overlappingSections: Record<string, SectionConfig> = {
+      const overlappingSections: SectionConfig[] = [
         ...testSections,
-        sectionC: {
+        {
+          id: 'sectionC',
           titleKey: 'sectionC',
           steps: ['step-a2'],
         },
-      };
+      ];
 
       expect(getSectionCoverage(['step-a1', 'step-a2', 'step-b1', 'step-z1'], overlappingSections)).toEqual({
         unmappedSteps: ['step-z1'],

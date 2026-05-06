@@ -291,7 +291,7 @@ export function getStepOrder(flowConfig: JourneyFlowConfig): string[] {
     throw new Error('JourneyFlowConfig requires stepOrder when sections are not configured');
   }
 
-  const sectionSteps = Object.values(flowConfig.sections).flatMap(section => section.steps);
+  const sectionSteps = flowConfig.sections.flatMap(section => section.steps);
   const nonSectionSteps = flowConfig.nonSectionStepOrder ?? [];
   return [...sectionSteps, ...nonSectionSteps];
 }

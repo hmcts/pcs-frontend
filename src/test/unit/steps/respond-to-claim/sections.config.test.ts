@@ -1,8 +1,13 @@
 import type { Request } from 'express';
 
-import { respondToClaimSections } from '../../../../main/steps/respond-to-claim/sections.config';
+import {
+  RESPOND_TO_CLAIM_SECTION_IDS,
+  respondToClaimSections,
+} from '../../../../main/steps/respond-to-claim/sections.config';
 import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegistry';
 import { getSectionCoverage } from '../../../../main/steps/utils/sections';
+
+const findSection = (id: string) => respondToClaimSections.find(section => section.id === id);
 
 describe('respond-to-claim sections config', () => {
   it('maps every sectioned flow step to exactly one section', () => {
@@ -18,7 +23,7 @@ describe('respond-to-claim sections config', () => {
     const flowStepKeys = new Set(Object.keys(stepRegistry));
     const sectionStepsNotInFlow: string[] = [];
 
-    for (const section of Object.values(respondToClaimSections)) {
+    for (const section of respondToClaimSections) {
       for (const slug of section.steps) {
         if (!flowStepKeys.has(slug)) {
           sectionStepsNotInFlow.push(slug);
@@ -29,12 +34,21 @@ describe('respond-to-claim sections config', () => {
     expect(sectionStepsNotInFlow).toEqual([]);
   });
 
+  it('section ids match the canonical id list (no missing or extra sections)', () => {
+    expect(respondToClaimSections.map(section => section.id)).toEqual([...RESPOND_TO_CLAIM_SECTION_IDS]);
+  });
+
+  it('has no duplicate section ids', () => {
+    const ids = respondToClaimSections.map(section => section.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it('maps upload section steps', () => {
-    expect(respondToClaimSections.uploadFiles.steps).toEqual(['upload-docs']);
+    expect(findSection('uploadFiles')?.steps).toEqual(['upload-docs']);
   });
 
   it('maps end-of-journey steps into final section', () => {
-    expect(respondToClaimSections.checkYourAnswersAndSubmit.steps).toEqual([
+    expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',
@@ -55,7 +69,7 @@ describe('respond-to-claim sections config', () => {
       },
     } as unknown as Request;
 
-    await expect(respondToClaimSections.payments.isApplicable?.(req)).resolves.toBe(true);
+    await expect(findSection('payments')?.isApplicable?.(req)).resolves.toBe(true);
   });
 
   it('treats payments section as not applicable for non-rent arrears claims', async () => {
@@ -71,6 +85,6 @@ describe('respond-to-claim sections config', () => {
       },
     } as unknown as Request;
 
-    await expect(respondToClaimSections.payments.isApplicable?.(req)).resolves.toBe(false);
+    await expect(findSection('payments')?.isApplicable?.(req)).resolves.toBe(false);
   });
 });

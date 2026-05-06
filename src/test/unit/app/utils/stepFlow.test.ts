@@ -111,12 +111,13 @@ describe('stepFlow', () => {
     it('should derive order from sections when stepOrder is not provided', async () => {
       const flowConfig: JourneyFlowConfig = {
         useShowConditions: true,
-        sections: {
-          sectionA: {
+        sections: [
+          {
+            id: 'sectionA',
             titleKey: 'sectionA',
             steps: ['step1', 'step2'],
           },
-        },
+        ],
         nonSectionStepOrder: ['end-now'],
         steps: {
           step2: {
