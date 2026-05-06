@@ -8,7 +8,7 @@
   },
   "errors": {
     "claimType": {
-      "required": "Select if you're claiming for a sum of money or compensation, both or something else"
+      "required": "Select if you’re claiming for a sum of money or compensation, both or something else"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "pageTitle": "Counterclaim fee",
-  "counterClaimFeeCostParagraph":"Based on the information provided, it will cost £X to make your counterclaim.",
+  "counterClaimFeeCostParagraph":"Based on the information provided, it will cost {{counterClaimFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to make your counterclaim.",
   "counterClaimFeeHeading": "Help with court fees",
   "counterClaimFeeHelpParagraph":"You may be able to get help paying the fee if you (one or more of the following):",
   "counterClaimFeeBulletBenefits":"are on certain benefits",

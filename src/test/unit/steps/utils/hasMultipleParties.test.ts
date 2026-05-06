@@ -11,12 +11,12 @@ describe('hasMultipleParties', () => {
             data: {
               possessionClaimResponse: {
                 currentDefendantPartyId: 'def-1',
-                claimParties: [
-                  { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant', role: 'DEFENDANT' } },
-                  { id: 'def-2', value: { firstName: 'Other', lastName: 'Defendant', role: 'DEFENDANT' } },
-                  { id: 'claim-1', value: { orgName: 'Landlord Org', role: 'CLAIMANT' } },
-                ],
               },
+              allDefendants: [
+                { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } },
+                { id: 'def-2', value: { firstName: 'Other', lastName: 'Defendant' } },
+              ],
+              allClaimants: [{ id: 'claim-1', value: { orgName: 'Landlord Org' } }],
             },
           },
         },
@@ -34,11 +34,9 @@ describe('hasMultipleParties', () => {
             data: {
               possessionClaimResponse: {
                 currentDefendantPartyId: 'def-1',
-                claimParties: [
-                  { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant', role: 'DEFENDANT' } },
-                  { id: 'claim-1', value: { orgName: 'Landlord Org', role: 'CLAIMANT' } },
-                ],
               },
+              allDefendants: [{ id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } }],
+              allClaimants: [{ id: 'claim-1', value: { orgName: 'Landlord Org' } }],
             },
           },
         },
@@ -56,13 +54,15 @@ describe('hasMultipleParties', () => {
             data: {
               possessionClaimResponse: {
                 currentDefendantPartyId: 'def-1',
-                claimParties: [
-                  { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant', role: 'DEFENDANT' } },
-                  { id: 'claim-1', value: { orgName: 'Landlord Org', role: 'CLAIMANT' } },
-                  { id: 'claim-2', value: { role: 'CLAIMANT' } },
-                  { id: 'def-2', value: { firstName: 'Other', role: 'DEFENDANT' } },
-                ],
               },
+              allDefendants: [
+                { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } },
+                { id: 'def-2', value: { firstName: 'Other' } },
+              ],
+              allClaimants: [
+                { id: 'claim-1', value: { orgName: 'Landlord Org' } },
+                { id: 'claim-2', value: {} },
+              ],
             },
           },
         },
@@ -80,12 +80,12 @@ describe('hasMultipleParties', () => {
             data: {
               possessionClaimResponse: {
                 currentDefendantPartyId: 'def-1',
-                claimParties: [
-                  { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant', role: 'DEFENDANT' } },
-                  { id: 'def-2', value: { role: 'DEFENDANT' } },
-                  { id: 'claim-1', value: { orgName: 'Landlord Org', role: 'CLAIMANT' } },
-                ],
               },
+              allDefendants: [
+                { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } },
+                { id: 'def-2', value: {} },
+              ],
+              allClaimants: [{ id: 'claim-1', value: { orgName: 'Landlord Org' } }],
             },
           },
         },

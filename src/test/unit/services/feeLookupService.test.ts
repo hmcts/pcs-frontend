@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 
-import { FeeLookupParams, FeeType, getFee } from '@services/feeLookupService';
+import { FeeLookupParams, FeeType, getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 
 jest.mock('axios');
 jest.mock('config');
@@ -68,6 +68,33 @@ describe('feeLookupService', () => {
       });
 
       expect(getFee(FeeType.genAppStandardFee)).rejects.toThrow('Error fetching fee');
+    });
+  });
+
+  describe('getCounterClaimFeeType', () => {
+    it('returns FEE0450 for SOMETHING_ELSE claim type', () => {
+      expect(getCounterClaimFeeType('SOMETHING_ELSE')).toEqual(FeeType.counterClaimFlatFeeFEE0450);
+    });
+
+    it('returns FEE0514 for amount up to 300', () => {
+      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '30000')).toEqual(FeeType.counterClaimFee0514);
+    });
+
+    it('returns FEE0507 for amount between 10,000.01 and 200,000', () => {
+      expect(getCounterClaimFeeType('BOTH', '1000001')).toEqual(FeeType.counterClaimFee0507);
+      expect(getCounterClaimFeeType('BOTH', '20000000')).toEqual(FeeType.counterClaimFee0507);
+    });
+
+    it('returns FEE0506 when amount exceeds 200,000', () => {
+      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '20000001')).toEqual(FeeType.counterClaimFee0506);
+    });
+
+    it('throws when claim type is unsupported', () => {
+      expect(() => getCounterClaimFeeType('UNKNOWN')).toThrow('Unsupported counterclaim claim type: UNKNOWN');
+    });
+
+    it('falls back to FEE0506 when amount is missing for money claim types', () => {
+      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION')).toEqual(FeeType.counterClaimFee0506);
     });
   });
 });
