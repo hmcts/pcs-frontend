@@ -31,6 +31,8 @@ import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-detai
 import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
 import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
+import type { YesNoNotSureValue } from '@services/ccdCaseData.model';
+
 type TenancyTypeDetailsStep = {
   getInitialFormData: (req: {
     res?: {
@@ -38,7 +40,7 @@ type TenancyTypeDetailsStep = {
         validatedCase?: {
           data?: {
             possessionClaimResponse?: {
-              defendantResponses?: { tenancyTypeConfirmation?: string; tenancyType?: string };
+              defendantResponses?: { tenancyTypeConfirmation?: YesNoNotSureValue; tenancyType?: string };
             };
           };
         };
@@ -56,7 +58,7 @@ type TenancyTypeDetailsStep = {
             data?: {
               possessionClaimResponse?: {
                 claimantOrganisations?: { value?: string }[];
-                defendantResponses?: { tenancyTypeConfirmation?: string; tenancyType?: string };
+                defendantResponses?: { tenancyTypeConfirmation?: YesNoNotSureValue; tenancyType?: string };
               };
               legislativeCountry?: string;
               tenancy_TypeOfTenancyLicence?: string;
@@ -81,7 +83,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
   });
 
   describe('getInitialFormData', () => {
-    const makeReq = (tenancyTypeConfirmation?: string, tenancyType?: string) => ({
+    const makeReq = (tenancyTypeConfirmation?: YesNoNotSureValue, tenancyType?: string) => ({
       res: {
         locals: {
           validatedCase: {
@@ -95,7 +97,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
       },
     });
 
-    it.each([
+    it.each<[YesNoNotSureValue, string]>([
       ['YES', 'yes'],
       ['NO', 'no'],
       ['NOT_SURE', 'notSure'],
@@ -118,7 +120,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
     });
 
     it('returns empty object when tenancyTypeConfirmation is an unrecognised value', () => {
-      const result = testedStep.getInitialFormData(makeReq('UNKNOWN'));
+      const result = testedStep.getInitialFormData(makeReq('UNKNOWN' as YesNoNotSureValue));
       expect(result).toEqual({});
     });
   });

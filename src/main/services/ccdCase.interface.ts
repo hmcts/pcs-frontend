@@ -151,7 +151,7 @@ export interface CcdDefendantResponses {
   tenancyTypeConfirmation?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
-  tenancyStartDateConfirmation?: string;
+  tenancyStartDateConfirmation?: YesNoNotSureValue;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;
