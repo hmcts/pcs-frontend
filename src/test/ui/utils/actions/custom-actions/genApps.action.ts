@@ -14,7 +14,7 @@ import {
 } from '../../../data/page-data/genApps-page-data';
 import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString } from '../../common/string.utils';
-import { performAction, performActions, performValidation } from '../../controller';
+import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { FieldsStore } from './recordAnsweredFields.action';
@@ -36,8 +36,8 @@ export class GenAppsAction implements IAction {
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
       ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
-      ['uploadDocuments', () => this.uploadDocuments(fieldName as actionRecord)],
       ['confirmOrderDoYouWant', () => this.confirmOrderDoYouWant(fieldName as actionRecord)],
+      ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
       ['validateCYA', () => this.validateCYA()],
     ]);
@@ -150,20 +150,9 @@ export class GenAppsAction implements IAction {
     await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
   }
 
-  private async uploadDocuments(documentsData: actionRecord) {
-    if (Array.isArray(documentsData.documents)) {
-      for (let fileIndex = 0; fileIndex < documentsData.documents.length; fileIndex++) {
-        const document = documentsData.documents[fileIndex];
-        await performActions(
-          'Add Document',
-          ['uploadFile', document.fileName],
-          [
-            'select',
-            { dropdown: uploadDocumentsToSupportYourApplication.typeOfDocumentHiddenTextLabel, index: fileIndex },
-            document.type,
-          ]
-        );
-      }
+  private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
+    if (uploadDocs.files) {
+      await performAction('uploadFile', uploadDocs.files);
     }
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
   }

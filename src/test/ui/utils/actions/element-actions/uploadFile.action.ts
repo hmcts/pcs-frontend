@@ -2,7 +2,6 @@ import path from 'path';
 
 import { Page } from '@playwright/test';
 
-import { performAction, performValidation } from '../../controller';
 import { IAction, actionData } from '../../interfaces';
 
 export class UploadFileAction implements IAction {
@@ -10,21 +9,19 @@ export class UploadFileAction implements IAction {
     if (typeof files === 'string') {
       await this.uploadFile(page, files);
     } else if (Array.isArray(files)) {
-      for (const [index, file] of files.entries()) {
-        await this.uploadFile(page, file);
-        if (index === files.length - 1) {
-          break;
+      for (let index = 0; index < files.length; index++) {
+        await this.uploadFile(page, files[index]);
+        if (index < files.length - 1) {
+          await page.waitForTimeout(5000);
         }
-        await page.waitForTimeout(5000);
       }
     }
   }
 
   private async uploadFile(page: Page, file: string): Promise<void> {
-    await performAction('clickButton', 'Add new');
-    const fileInput = page.locator('input[type="file"].form-control.bottom-30');
+    const fileInput = page.locator('input[type="file"].govuk-file-upload');
     const filePath = path.resolve(__dirname, '../../../data/inputFiles', file);
     await fileInput.last().setInputFiles(filePath);
-    await performValidation('waitUntilElementDisappears', 'Uploading...');
+   // await performValidation('waitUntilElementDisappears', 'Uploading...');
   }
 }

@@ -34,7 +34,7 @@ export class ActionRegistry {
     ['clickTab', new ClickTabAction()],
     ['inputText', new InputTextAction()],
     ['select', new SelectAction()],
-    ['UploadFile', new UploadFileAction()],
+    ['uploadFile', new UploadFileAction()],
     ['login', new LoginAction()],
     ['createUser', new LoginAction()],
     ['navigateToUrl', new NavigateToUrlAction()],
@@ -82,6 +82,7 @@ export class ActionRegistry {
     ['exceptionalHardship', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
+    ['otherConsiderations', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
@@ -97,8 +98,7 @@ export class ActionRegistry {
     ['confirmDocumentToUpload', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
-    ['languageUsed', new RespondToClaimAction()],
-    ['otherConsiderations', new RespondToClaimAction()],
+    ['uploadFiles', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {

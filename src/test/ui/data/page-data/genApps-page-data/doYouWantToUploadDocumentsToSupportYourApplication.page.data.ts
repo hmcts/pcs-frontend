@@ -1,6 +1,6 @@
 export const doYouWantToUploadDocumentsToSupportYourApplication = {
-  mainHeader: `Do you want to upload documents to support your application?`,
-  doYouWantToUploadDocumentQuestion: `Do you want to upload documents to support your application? (Optional)`,
+  mainHeader: `Do you want to upload documents to support your application? (Optional)`,
+  doYouWantToUploadDocumentQuestion: `Do you want to upload documents to support your application?`,
   ifYouSelectedMultipleApplicationParagraph: `If you've selected multiple applications, you should upload documents that relate to all of them`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
