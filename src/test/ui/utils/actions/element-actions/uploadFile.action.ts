@@ -22,6 +22,6 @@ export class UploadFileAction implements IAction {
     const fileInput = page.locator('input[type="file"].govuk-file-upload');
     const filePath = path.resolve(__dirname, '../../../data/inputFiles', file);
     await fileInput.last().setInputFiles(filePath);
-   // await performValidation('waitUntilElementDisappears', 'Uploading...');
+    // await performValidation('waitUntilElementDisappears', 'Uploading...');
   }
 }
