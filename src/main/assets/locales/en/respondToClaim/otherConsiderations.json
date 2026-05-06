@@ -6,6 +6,6 @@
     "otherConsiderations": "Select if there is anything else you want to tell the court",
     "otherConsiderationsDetails": "Enter details about what you want to tell the court",
     "otherConsiderationsInvalid": "Give details about what else you want to tell the court must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
-    "otherConsiderationsDetailsMaxLength": "Give details about what else you want to tell the court must be 6400 characters or less"
+    "otherConsiderationsDetailsMaxLength": "Details about what else you want to tell the court must be 6400 characters or less"
   }
 }
