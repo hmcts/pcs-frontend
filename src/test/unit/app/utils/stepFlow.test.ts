@@ -130,6 +130,97 @@ describe('stepFlow', () => {
     });
   });
 
+  describe('getNextStep with section-first navigation', () => {
+    const mockReq = {} as Request;
+
+    it('skips a whole section whose isApplicable resolves false', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [
+          { id: 'a', titleKey: 'a', steps: ['step-a1'] },
+          { id: 'b', titleKey: 'b', steps: ['step-b1', 'step-b2'], isApplicable: async () => false },
+          { id: 'c', titleKey: 'c', steps: ['step-c1'] },
+        ],
+        steps: {},
+      };
+
+      await expect(getNextStep(mockReq, 'step-a1', flowConfig, {})).resolves.toBe('step-c1');
+    });
+
+    it('walks remaining steps within the current section before moving to the next section', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [
+          { id: 'a', titleKey: 'a', steps: ['step-a1', 'step-a2', 'step-a3'] },
+          { id: 'b', titleKey: 'b', steps: ['step-b1'] },
+        ],
+        steps: {
+          'step-a2': { showCondition: _req => false },
+        },
+      };
+
+      await expect(getNextStep(mockReq, 'step-a1', flowConfig, {})).resolves.toBe('step-a3');
+    });
+
+    it('falls through to nonSectionStepOrder once all subsequent sections are exhausted', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [
+          { id: 'a', titleKey: 'a', steps: ['step-a1'] },
+          { id: 'b', titleKey: 'b', steps: ['step-b1'], isApplicable: async () => false },
+        ],
+        nonSectionStepOrder: ['end-now'],
+        steps: {},
+      };
+
+      await expect(getNextStep(mockReq, 'step-a1', flowConfig, {})).resolves.toBe('end-now');
+    });
+
+    it('passes req to section.isApplicable', async () => {
+      const isApplicable = jest.fn().mockResolvedValue(false);
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [
+          { id: 'a', titleKey: 'a', steps: ['step-a1'] },
+          { id: 'b', titleKey: 'b', steps: ['step-b1'], isApplicable },
+        ],
+        nonSectionStepOrder: ['end-now'],
+        steps: {},
+      };
+
+      await expect(getNextStep(mockReq, 'step-a1', flowConfig, {})).resolves.toBe('end-now');
+      expect(isApplicable).toHaveBeenCalledWith(mockReq);
+    });
+
+    it('still applies showCondition within an applicable section', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [
+          { id: 'a', titleKey: 'a', steps: ['step-a1'] },
+          { id: 'b', titleKey: 'b', steps: ['step-b1', 'step-b2'] },
+        ],
+        steps: {
+          'step-b1': { showCondition: _req => false },
+          'step-b2': { showCondition: _req => true },
+        },
+      };
+
+      await expect(getNextStep(mockReq, 'step-a1', flowConfig, {})).resolves.toBe('step-b2');
+    });
+
+    it('throws when current step is not in any section or nonSectionStepOrder', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [{ id: 'a', titleKey: 'a', steps: ['step-a1'] }],
+        steps: {},
+      };
+
+      await expect(getNextStep(mockReq, 'unknown', flowConfig, {})).rejects.toThrow(
+        'Step unknown not found in stepOrder'
+      );
+    });
+  });
+
   describe('getNextStep without show conditions', () => {
     const mockReq = {} as Request;
 
@@ -400,6 +491,62 @@ describe('stepFlow', () => {
       await expect(getPreviousStep(mockReq, 'step99', flowConfig, {})).rejects.toThrow(
         'Step step99 not found in stepOrder'
       );
+    });
+  });
+
+  describe('getPreviousStep with section-first navigation', () => {
+    const mockReq = {} as Request;
+
+    it('skips back through sections whose isApplicable resolves false', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [
+          { id: 'a', titleKey: 'a', steps: ['step-a1'] },
+          { id: 'b', titleKey: 'b', steps: ['step-b1'], isApplicable: async () => false },
+          { id: 'c', titleKey: 'c', steps: ['step-c1'] },
+        ],
+        steps: {},
+      };
+
+      await expect(getPreviousStep(mockReq, 'step-c1', flowConfig, {})).resolves.toBe('step-a1');
+    });
+
+    it('walks earlier steps within the current section before crossing into a previous section', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [
+          { id: 'a', titleKey: 'a', steps: ['step-a1'] },
+          { id: 'b', titleKey: 'b', steps: ['step-b1', 'step-b2', 'step-b3'] },
+        ],
+        steps: {
+          'step-b2': { showCondition: _req => false },
+        },
+      };
+
+      await expect(getPreviousStep(mockReq, 'step-b3', flowConfig, {})).resolves.toBe('step-b1');
+    });
+
+    it('returns null when no earlier visible step exists', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [{ id: 'a', titleKey: 'a', steps: ['step-a1'], isApplicable: async () => false }],
+        nonSectionStepOrder: ['end-now'],
+        steps: {},
+      };
+
+      await expect(getPreviousStep(mockReq, 'end-now', flowConfig, {})).resolves.toBeNull();
+    });
+
+    it('respects preventBack on the current step', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        sections: [{ id: 'a', titleKey: 'a', steps: ['step-a1', 'step-a2'] }],
+        steps: {
+          'step-a2': { preventBack: true },
+        },
+      };
+
+      await expect(getPreviousStep(mockReq, 'step-a2', flowConfig, {})).resolves.toBeNull();
     });
   });
 

@@ -105,7 +105,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   };
 
   it('uses valid static previous step for household interstitial path', async () => {
-    const req = createReq({});
+    const req = createReq({ data: rentArrearsData });
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
       'repayments-agreed'
     );
@@ -149,6 +149,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('routes installment-payments forward from CCD state', async () => {
     const req = createReq({
       data: {
+        ...rentArrearsData,
         possessionClaimResponse: {
           defendantResponses: {
             paymentAgreement: { repayArrearsInstalments: 'YES' },
@@ -167,6 +168,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('routes installment-payments forward when repayArrearsInstalments is stored at possessionClaimResponse.paymentAgreement', async () => {
     const req = createReq({
       data: {
+        ...rentArrearsData,
         possessionClaimResponse: {
           paymentAgreement: { repayArrearsInstalments: 'YES' },
         },
@@ -177,7 +179,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   });
 
   it('routes installment-payments forward from the submitted answer before CCD state is refreshed', async () => {
-    const req = createReq({});
+    const req = createReq({ data: rentArrearsData });
     req.body = { confirmInstallmentOffer: 'yes' };
 
     await expect(getNextStep(req, 'installment-payments', flowConfig, {}, req.body)).resolves.toBe(
