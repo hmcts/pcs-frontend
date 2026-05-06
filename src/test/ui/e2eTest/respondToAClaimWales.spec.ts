@@ -65,7 +65,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentOtherTenancy });
   }
   //other considrations back link navigation
-  if (testInfo.title.includes('income - no')) {
+  if (testInfo.title.includes('Income - no')) {
     process.env.INCOME_AND_EXPENSES = 'NO';
   } else {
     process.env.INCOME_AND_EXPENSES = 'YES';
@@ -85,7 +85,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Secure contract - Income - no @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
