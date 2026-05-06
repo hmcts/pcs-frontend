@@ -64,6 +64,12 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else {
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentOtherTenancy });
   }
+  //other considrations back link navigation
+  if (testInfo.title.includes('income - no')) {
+    process.env.INCOME_AND_EXPENSES = 'NO';
+  } else {
+    process.env.INCOME_AND_EXPENSES = 'YES';
+  }
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);

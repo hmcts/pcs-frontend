@@ -132,7 +132,10 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   }
 
-  if (testInfo.title.includes('@secureFlexible') || testInfo.title.includes('@assured')) {
+  //other considrations back link navigation
+  if (testInfo.title.includes('income - no')) {
+    process.env.INCOME_AND_EXPENSES = 'NO';
+  } else {
     process.env.INCOME_AND_EXPENSES = 'YES';
   }
 
@@ -304,7 +307,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });*/
   });
 
-  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
+  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown income-no @assured @regression', async () => {
     //incomeAndExpenses - no - Upload docs
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
