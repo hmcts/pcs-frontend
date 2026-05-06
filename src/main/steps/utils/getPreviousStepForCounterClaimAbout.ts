@@ -13,7 +13,7 @@ export async function getPreviousStepForCounterClaimAbout(req: Request): Promise
   const needHelpWithFees = getNeedHelpWithFees(req);
 
   if (needHelpWithFees === 'NO' && (await hasMultipleParties(req))) {
-    return 'counter-claim-against-who';
+    return 'counter-claim-against-whom';
   }
 
   return 'counter-claim-fee';

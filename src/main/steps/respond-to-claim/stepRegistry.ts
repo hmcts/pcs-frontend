@@ -10,7 +10,7 @@ import { step as contactPreferencesTextMessage } from './contact-preferences-tex
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
 import { step as counterClaimAbout } from './counter-claim-about';
-import { step as counterClaimAgainstWho } from './counter-claim-against-who';
+import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
 import { step as counterClaimFee } from './counter-claim-fee';
 import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
@@ -82,7 +82,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'counter-claim-specific-sum': counterClaimSpecificSum,
   'counter-claim-fee': counterClaimFee,
   'counter-claim-about': counterClaimAbout,
-  'counter-claim-against-who': counterClaimAgainstWho,
+  'counter-claim-against-whom': counterClaimAgainstWhom,
   'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,

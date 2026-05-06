@@ -59,7 +59,7 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-specific-sum',
     'counter-claim-fee',
     'counter-claim-have-you-applied-for-help',
-    'counter-claim-against-who',
+    'counter-claim-against-whom',
     'counter-claim-about',
     'payment-interstitial',
     'repayments-made',
@@ -133,7 +133,7 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-have-you-applied-for-help': {
       showCondition: (req: Request) => shouldShowCounterClaimHelpWithFeesStep(req),
     },
-    'counter-claim-against-who': {
+    'counter-claim-against-whom': {
       showCondition: (req: Request) => shouldShowCounterClaimAgainstWhoStep(req),
     },
     'counter-claim-about': {
