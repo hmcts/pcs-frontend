@@ -11,7 +11,9 @@ import {
 } from '../utils';
 
 import {
+  hasAppliedForCounterClaimHwf,
   hasConfirmedInstallmentOffer,
+  hasNotAppliedForCounterClaimHwf,
   hasProvidedFinanceDetails,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
@@ -51,6 +53,9 @@ export const flowConfig: JourneyFlowConfig = {
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
     'counter-claim',
+    'counter-claim-have-you-already-applied-for-help-with-your-fees',
+    'counter-claim-you-need-to-apply-for-help-with-your-fees',
+    'counter-claim-about',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -117,6 +122,12 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'non-rent-arrears-dispute': {
       showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
+    },
+    'counter-claim-about': {
+      showCondition: (req: Request) => hasAppliedForCounterClaimHwf(req),
+    },
+    'counter-claim-you-need-to-apply-for-help-with-your-fees': {
+      showCondition: (req: Request) => hasNotAppliedForCounterClaimHwf(req),
     },
     'installment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),

@@ -2,7 +2,9 @@ import type { Request } from 'express';
 
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import {
+  hasAppliedForCounterClaimHwf,
   hasConfirmedInstallmentOffer,
+  hasNotAppliedForCounterClaimHwf,
   hasProvidedFinanceDetails,
   shouldShowInstallmentPaymentsStep,
   shouldShowUniversalCreditStep,
@@ -309,5 +311,67 @@ describe('respond-to-claim navigation from CCD case data', () => {
     await expect(getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
       'have-you-applied-for-universal-credit'
     );
+  });
+
+  it('routes counter-claim HWF step to counter-claim-about when user applied for HWF (YES)', async () => {
+    const req = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaim: { appliedForHwf: 'YES' },
+          },
+        },
+      },
+    });
+
+    await expect(
+      getNextStep(req, 'counter-claim-have-you-already-applied-for-help-with-your-fees', flowConfig, {})
+    ).resolves.toBe('counter-claim-about');
+  });
+
+  it('routes counter-claim HWF step to you-need-to-apply when user has not applied for HWF (NO)', async () => {
+    const req = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaim: { appliedForHwf: 'NO' },
+          },
+        },
+      },
+    });
+
+    await expect(
+      getNextStep(req, 'counter-claim-have-you-already-applied-for-help-with-your-fees', flowConfig, {})
+    ).resolves.toBe('counter-claim-you-need-to-apply-for-help-with-your-fees');
+  });
+
+  it('HWF show condition helpers are derived from CCD counterClaim data', () => {
+    const appliedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaim: { appliedForHwf: 'YES' },
+          },
+        },
+      },
+    });
+    const notAppliedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaim: { appliedForHwf: 'NO' },
+          },
+        },
+      },
+    });
+    const noDataReq = createReq({});
+
+    expect(hasAppliedForCounterClaimHwf(appliedReq)).toBe(true);
+    expect(hasAppliedForCounterClaimHwf(notAppliedReq)).toBe(false);
+    expect(hasAppliedForCounterClaimHwf(noDataReq)).toBe(false);
+
+    expect(hasNotAppliedForCounterClaimHwf(notAppliedReq)).toBe(true);
+    expect(hasNotAppliedForCounterClaimHwf(appliedReq)).toBe(false);
+    expect(hasNotAppliedForCounterClaimHwf(noDataReq)).toBe(false);
   });
 });

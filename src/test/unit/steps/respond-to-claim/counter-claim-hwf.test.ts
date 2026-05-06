@@ -1,0 +1,250 @@
+jest.mock('../../../../main/modules/steps', () => ({
+  createFormStep: jest.fn(config => config),
+}));
+
+const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
+jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
+  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+}));
+
+import { step } from '../../../../main/steps/respond-to-claim/counter-claim-have-you-already-applied-for-help-with-your-fees';
+import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
+
+type CounterClaimHwfStep = {
+  getInitialFormData: (req: {
+    res?: {
+      locals?: {
+        validatedCase?: {
+          data?: {
+            possessionClaimResponse?: {
+              defendantResponses?: {
+                counterClaim?: {
+                  appliedForHwf?: string;
+                  hwfReferenceNumber?: string;
+                };
+              };
+            };
+          };
+        };
+      };
+    };
+  }) => Record<string, unknown>;
+  beforeRedirect: (req: { body?: Record<string, unknown> }) => Promise<void>;
+};
+
+const testedStep = step as unknown as CounterClaimHwfStep;
+
+describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-your-fees', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('beforeRedirect (CCD payload writes)', () => {
+    it('saves YES with HWF reference number', async () => {
+      const req = {
+        body: {
+          alreadyAppliedForHelp: 'yes',
+          'alreadyAppliedForHelp.hwfReference': 'HWF-A1B-23C',
+        },
+      };
+
+      await testedStep.beforeRedirect(req);
+
+      expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
+        defendantResponses: {
+          counterClaim: {
+            appliedForHwf: 'YES',
+            hwfReferenceNumber: 'HWF-A1B-23C',
+          },
+        },
+      });
+    });
+
+    it('saves NO with empty HWF reference number', async () => {
+      const req = {
+        body: {
+          alreadyAppliedForHelp: 'no',
+        },
+      };
+
+      await testedStep.beforeRedirect(req);
+
+      expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
+        defendantResponses: {
+          counterClaim: {
+            appliedForHwf: 'NO',
+            hwfReferenceNumber: '',
+          },
+        },
+      });
+    });
+
+    it('does not persist when selection is missing', async () => {
+      const req = { body: {} };
+
+      await testedStep.beforeRedirect(req);
+
+      expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    });
+
+    it('does not persist when body is undefined', async () => {
+      const req = { body: undefined };
+
+      await testedStep.beforeRedirect(req);
+
+      expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('hwfReference field config', () => {
+    it('has maxLength 60 on hwfReference subfield, triggering hwfReferenceMaxLength locale key', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fields = (step as any).fields as {
+        name: string;
+        options?: { value: string; subFields?: Record<string, { maxLength?: number; errorMessage?: string }> }[];
+      }[];
+      const alreadyAppliedField = fields.find(f => f.name === 'alreadyAppliedForHelp');
+      const yesOption = alreadyAppliedField?.options?.find(o => o.value === 'yes');
+      const hwfReferenceSubfield = yesOption?.subFields?.['hwfReference'];
+
+      expect(hwfReferenceSubfield?.maxLength).toBe(60);
+      expect(hwfReferenceSubfield?.errorMessage).toBe('errors.hwfReference');
+    });
+  });
+
+  describe('getInitialFormData (CCD pre-population)', () => {
+    it('pre-populates YES with HWF reference from CCD', () => {
+      const req = {
+        res: {
+          locals: {
+            validatedCase: {
+              data: {
+                possessionClaimResponse: {
+                  defendantResponses: {
+                    counterClaim: {
+                      appliedForHwf: 'YES',
+                      hwfReferenceNumber: 'HWF-X9Y-88Z',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      expect(testedStep.getInitialFormData(req)).toEqual({
+        alreadyAppliedForHelp: 'yes',
+        'alreadyAppliedForHelp.hwfReference': 'HWF-X9Y-88Z',
+      });
+    });
+
+    it('pre-populates YES with empty string when hwfReferenceNumber is missing', () => {
+      const req = {
+        res: {
+          locals: {
+            validatedCase: {
+              data: {
+                possessionClaimResponse: {
+                  defendantResponses: {
+                    counterClaim: {
+                      appliedForHwf: 'YES',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      expect(testedStep.getInitialFormData(req)).toEqual({
+        alreadyAppliedForHelp: 'yes',
+        'alreadyAppliedForHelp.hwfReference': '',
+      });
+    });
+
+    it('pre-populates NO without HWF reference', () => {
+      const req = {
+        res: {
+          locals: {
+            validatedCase: {
+              data: {
+                possessionClaimResponse: {
+                  defendantResponses: {
+                    counterClaim: {
+                      appliedForHwf: 'NO',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      expect(testedStep.getInitialFormData(req)).toEqual({ alreadyAppliedForHelp: 'no' });
+    });
+
+    it('returns empty object when no CCD value exists', () => {
+      const req = { res: { locals: { validatedCase: { data: {} } } } };
+      expect(testedStep.getInitialFormData(req)).toEqual({});
+    });
+
+    it('returns empty object when validatedCase is missing', () => {
+      const req = { res: { locals: {} } };
+      expect(testedStep.getInitialFormData(req)).toEqual({});
+    });
+  });
+});
+
+describe('respond-to-claim counter-claim HWF show conditions', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const makeReq = (appliedForHwf: string | undefined): any => ({
+    res: {
+      locals: {
+        validatedCase: {
+          data: {
+            possessionClaimResponse: {
+              defendantResponses: {
+                counterClaim: appliedForHwf !== undefined ? { appliedForHwf } : undefined,
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  describe('counter-claim-about showCondition', () => {
+    const showCondition = flowConfig.steps['counter-claim-about']?.showCondition;
+
+    it('is visible when appliedForHwf is YES', () => {
+      expect(showCondition?.(makeReq('YES'))).toBe(true);
+    });
+
+    it('is not visible when appliedForHwf is NO', () => {
+      expect(showCondition?.(makeReq('NO'))).toBe(false);
+    });
+
+    it('is not visible when counterClaim data is absent', () => {
+      expect(showCondition?.(makeReq(undefined))).toBe(false);
+    });
+  });
+
+  describe('counter-claim-you-need-to-apply showCondition', () => {
+    const showCondition = flowConfig.steps['counter-claim-you-need-to-apply-for-help-with-your-fees']?.showCondition;
+
+    it('is visible when appliedForHwf is NO', () => {
+      expect(showCondition?.(makeReq('NO'))).toBe(true);
+    });
+
+    it('is not visible when appliedForHwf is YES', () => {
+      expect(showCondition?.(makeReq('YES'))).toBe(false);
+    });
+
+    it('is not visible when counterClaim data is absent', () => {
+      expect(showCondition?.(makeReq(undefined))).toBe(false);
+    });
+  });
+});
