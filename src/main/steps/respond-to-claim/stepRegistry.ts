@@ -105,5 +105,3 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'language-used': languageUsed,
   'check-your-answers': checkYourAnswers,
 };
-
-//SDM REMOVE

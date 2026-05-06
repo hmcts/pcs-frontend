@@ -20,5 +20,3 @@ export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
-
-//SDM REMOVE

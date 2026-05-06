@@ -188,4 +188,3 @@ export const flowConfig: JourneyFlowConfig = {
     },
   },
 };
-// SDM REMOVE
