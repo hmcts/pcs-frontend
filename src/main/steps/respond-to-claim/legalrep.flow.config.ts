@@ -9,7 +9,6 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'start-now',
   'select-defendant',
   'defendant-name-confirmation',
-  'defendant-name-capture',
   'defendant-date-of-birth',
   'correspondence-address',
   'contact-preferences-email-or-post',
