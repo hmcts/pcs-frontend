@@ -5,7 +5,6 @@ export const uploadFiles = {
   beforeYouUploadYourFilesParagraph: `Before you upload your files`,
   giveYourFileANameParagraph: `Give your file a name that explains what it is. For example, 'Receipt of  payment from Jane Smith'`,
   uploadFileParagraph: `Upload a file`,
-  //noFileChosenParagraph: `No file chosen`,
   chooseFileButton: `Choose files`,
   saveAndContinueButton: `Save and continue`,
   saveAndForLaterButton: `Save for later`,
