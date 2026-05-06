@@ -1,11 +1,12 @@
 import type { Request } from 'express';
 
+import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import {
   RESPOND_TO_CLAIM_SECTION_IDS,
   respondToClaimSections,
 } from '../../../../main/steps/respond-to-claim/sections.config';
 import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegistry';
-import { getSectionCoverage } from '../../../../main/steps/utils/sections';
+import { getSectionCoverage, getSectionForStep } from '../../../../main/steps/utils/sections';
 
 const findSection = (id: string) => respondToClaimSections.find(section => section.id === id);
 
@@ -86,5 +87,42 @@ describe('respond-to-claim sections config', () => {
     } as unknown as Request;
 
     await expect(findSection('payments')?.isApplicable?.(req)).resolves.toBe(false);
+  });
+
+  describe('section coherence — no cross-section navigation references', () => {
+    const sectionFor = (slug: string) => getSectionForStep(slug, respondToClaimSections);
+
+    it('every routes[].nextStep stays within the same section (or targets a non-section step)', () => {
+      const violations: string[] = [];
+
+      for (const [fromSlug, step] of Object.entries(flowConfig.steps)) {
+        const fromSection = sectionFor(fromSlug);
+        for (const route of step.routes ?? []) {
+          const toSection = sectionFor(route.nextStep);
+          if (toSection !== null && fromSection !== null && fromSection !== toSection) {
+            violations.push(`${fromSlug} (${fromSection}) -> ${route.nextStep} (${toSection})`);
+          }
+        }
+      }
+
+      expect(violations).toEqual([]);
+    });
+
+    it('every string previousStep stays within the same section (or targets a non-section step)', () => {
+      const violations: string[] = [];
+
+      for (const [slug, step] of Object.entries(flowConfig.steps)) {
+        if (typeof step.previousStep !== 'string') {
+          continue;
+        }
+        const fromSection = sectionFor(slug);
+        const toSection = sectionFor(step.previousStep);
+        if (toSection !== null && fromSection !== null && fromSection !== toSection) {
+          violations.push(`${slug} (${fromSection}) -> previousStep ${step.previousStep} (${toSection})`);
+        }
+      }
+
+      expect(violations).toEqual([]);
+    });
   });
 });
