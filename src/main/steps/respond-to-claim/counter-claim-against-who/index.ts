@@ -6,7 +6,7 @@ import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CcdClaimParty, CcdCounterClaim, PossessionClaimResponse } from '@services/ccdCase.interface';
+import type { CcdCounterClaim, PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim-against-who',
@@ -33,17 +33,19 @@ export const step: StepDefinition = createFormStep({
   ],
   extendGetContent: (req: Request, formContent) => {
     const claimantName = getClaimantName(req);
-    const response = req.res?.locals?.validatedCase?.data?.possessionClaimResponse;
-    const alreadySaved = response?.defendantResponses?.counterClaim?.counterClaimAgainst ?? [];
+    const data = req.res?.locals?.validatedCase?.data;
+    const alreadySaved = data?.possessionClaimResponse?.defendantResponses?.counterClaim?.counterClaimAgainst ?? [];
     const submitted = req.body?.counterClaimAgainst;
     const checkedIds: string[] = submitted
       ? Array.isArray(submitted)
         ? submitted
         : [submitted]
       : alreadySaved.map(p => p.id);
-    const parties = (response?.claimParties ?? []).filter(p => p.id !== response?.currentDefendantPartyId);
-    const claimant = parties.find(p => p.value?.orgName === claimantName);
-    const orderedParties = claimant ? [claimant, ...parties.filter(p => p !== claimant)] : parties;
+    const defendants = (data?.allDefendants ?? []).filter(
+      p => p.id !== data?.possessionClaimResponse?.currentDefendantPartyId
+    );
+    const claimant = data?.allClaimants?.find(p => p.value?.orgName === claimantName);
+    const orderedParties = claimant ? [claimant, ...defendants.filter(p => p !== claimant)] : defendants;
 
     const checkboxItems = orderedParties
       .map(p => {
@@ -64,11 +66,13 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async req => {
     const raw = req.body?.counterClaimAgainst;
     const submittedIds: string[] = Array.isArray(raw) ? raw : [raw];
-    const allParties = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.claimParties ?? [];
+    const data = req.res?.locals?.validatedCase?.data;
+    const allParties = [...(data?.allClaimants ?? []), ...(data?.allDefendants ?? [])];
 
-    const counterClaimAgainst: CcdClaimParty[] = submittedIds
-      .map(id => allParties.find(p => p.id === id))
-      .filter(p => p !== undefined);
+    const counterClaimAgainst = submittedIds.flatMap(id => {
+      const party = allParties.find(p => p.id === id);
+      return party ? [party] : [];
+    });
 
     const counterClaim: CcdCounterClaim = { counterClaimAgainst };
     const possessionClaimResponse: PossessionClaimResponse = {
