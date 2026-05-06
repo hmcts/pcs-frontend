@@ -2,10 +2,11 @@ import type { Request } from 'express';
 
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
@@ -74,6 +75,7 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   showCancelButton: false,
+  customTemplate: `${__dirname}/regularIncome.njk`,
 
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
@@ -229,6 +231,8 @@ export const step: StepDefinition = createFormStep({
     heading: 'heading',
     pageTitle: 'pageTitle',
     hintText: 'hintText',
+    caseNumber: 'caseNumber',
+    question: 'question',
   },
 
   fields: [
@@ -417,4 +421,12 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  extendGetContent: req => {
+    const t = getTranslationFunction(req, 'what-regular-income-do-you-receive', ['common']);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
+  },
 });
