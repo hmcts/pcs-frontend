@@ -84,17 +84,6 @@ describe('cdamService', () => {
       });
     });
 
-    it('uses provided upload filename override when posting to CDAM', async () => {
-      mockPost.mockResolvedValue(cdamResponse);
-      const overrideFilename = 'renamed (GA1) - Defendant 1.pdf';
-
-      await uploadDocument(createMockFile({ originalname: 'original.pdf' }), userToken, overrideFilename);
-
-      const postedFormData = mockPost.mock.calls[0][1] as { getBuffer?: () => Buffer };
-      const multipartPayload = postedFormData.getBuffer?.().toString('utf8') || '';
-      expect(multipartPayload).toContain(`filename="${overrideFilename}"`);
-    });
-
     it('uses file originalname when CDAM returns no document name', async () => {
       const response = {
         data: {

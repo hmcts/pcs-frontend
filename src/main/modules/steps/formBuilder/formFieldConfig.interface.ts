@@ -135,8 +135,6 @@ export interface FormBuilderConfig {
   // Storage adapter for upload steps. When set, formBuilder auto-wires uploadUrl/deleteUrl
   // onto the fileUpload field component from req.originalUrl.
   documentStorage?: DocumentStorage;
-  // Optional upload filename transform for journey-specific naming rules.
-  uploadFilenameTransform?: (req: Request, originalName: string) => string;
 }
 
 export interface ComponentConfig {

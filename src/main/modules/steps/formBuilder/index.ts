@@ -55,7 +55,6 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     showCancelButton,
     customTemplate,
     documentStorage,
-    uploadFilenameTransform,
   } = config;
 
   if (!flowConfig) {
@@ -74,7 +73,6 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     stepDir,
     showCancelButton,
     documentStorage,
-    uploadFilenameTransform,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);

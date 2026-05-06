@@ -82,10 +82,7 @@ export function handleMulterError(
   next(err);
 }
 
-function uploadCtx(req: Request): {
-  storage: DocumentStorage;
-  transformFilename?: (req: Request, originalName: string) => string;
-} {
+function uploadCtx(req: Request): { storage: DocumentStorage } {
   const slug = req.params.journey as string | undefined;
   const stepName = req.params.step as string | undefined;
   const variant = getUserVariant(req);
@@ -94,7 +91,7 @@ function uploadCtx(req: Request): {
     logger.warn('Upload requested without documentStorage', { slug, stepName, variant });
     throw new HTTPError('Not found', 404);
   }
-  return { storage: step.documentStorage, transformFilename: step.uploadFilenameTransform };
+  return { storage: step.documentStorage };
 }
 
 // Per-case in-process mutex. Two concurrent uploads/deletes for the same case
@@ -277,10 +274,7 @@ export default function documentProxyRoutes(app: Application): void {
           return res.status(400).json({ error: { message: errors.totalTooLarge } });
         }
 
-        const uploadFilename = ctx.transformFilename
-          ? ctx.transformFilename(req, req.file.originalname)
-          : req.file.originalname;
-        const cdamDoc = await uploadDocument(req.file, getUserToken(req), uploadFilename);
+        const cdamDoc = await uploadDocument(req.file, getUserToken(req));
         const entry = cdamToCcdDocument(cdamDoc);
         const index = await saveDraftWithNewDocument(req, entry);
         return res.json(buildUploadResponse(errors, cdamDoc, entry.id as string, index));

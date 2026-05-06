@@ -1,4 +1,4 @@
-import { Request, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 
 import type { DocumentStorage } from '@modules/documents/storage';
 import { GetController, type SupportedLang } from '@modules/steps';
@@ -29,6 +29,4 @@ export interface StepDefinition {
   // Absent on every non-upload step. The upload handler refuses requests targeting
   // a step that does not declare this.
   documentStorage?: DocumentStorage;
-  // Optional upload filename transform for journey-specific naming rules.
-  uploadFilenameTransform?: (req: Request, originalName: string) => string;
 }
