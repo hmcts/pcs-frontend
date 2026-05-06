@@ -34,6 +34,22 @@
         "title": "Your response",
         "body": "You should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}//respond-to-claim/start-now\">{{ctaLabel}}</a>"
       },
+      "ResponseNotStarted": {
+        "title": "Your response",
+        "body": "You should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Start your response</a>"
+      },
+      "ResponseInProgress": {
+        "title": "Your response",
+        "body": "You should complete your response before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Continue with your response</a>"
+      },
+      "ResponseSubmitted": {
+        "title": "Your response",
+        "body": "You have responded to the claim."
+      },
+      "ResponseUnknown": {
+        "title": "Your response",
+        "body": "Your response status is unavailable right now."
+      },
       "NoHearingArranged": {
         "title": "A property possession claim has been made against you",
         "body": "The court will arrange the hearing and contact you with details."

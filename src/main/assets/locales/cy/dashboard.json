@@ -29,9 +29,13 @@
         "title": "cyCase issued",
         "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">View the claim</a>. Respond by {{responseEndDate}}."
       },
-      "ResponseToClaim": {
+      "ResponseSubmitted": {
         "title": "cyYour response",
-        "body": "cyYou should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}//respond-to-claim/start-now\">{{ctaLabel}}</a>"
+        "body": "cyYou have responded to the claim."
+      },
+      "ResponseUnknown": {
+        "title": "cyYour response",
+        "body": "cyYour response status is unavailable right now."
       },
       "NoHearingArranged": {
         "title": "cyA property possession claim has been made against you",
