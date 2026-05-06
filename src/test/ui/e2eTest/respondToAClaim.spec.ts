@@ -526,7 +526,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
-  test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression @PR', async () => {
+  test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute - RegularIncome - Universal Credit @secureFlexible @regression @PR', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
@@ -915,7 +915,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression @PR', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No - PriorityDebts - Yes @regression @PR', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
