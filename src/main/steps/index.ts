@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/upload-additional-documents/flow.config';
+import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
@@ -42,6 +44,13 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     default: {
       flowConfig: makeAnApplicationFlowConfig,
       stepRegistry: makeAnApplicationStepRegistry,
+    },
+  },
+  uploadAdditionalDocuments: {
+    name: 'uploadAdditionalDocuments',
+    default: {
+      flowConfig: uploadAdditionalDocumentsFlowConfig,
+      stepRegistry: uploadAdditionalDocumentsStepRegistry,
     },
   },
 };

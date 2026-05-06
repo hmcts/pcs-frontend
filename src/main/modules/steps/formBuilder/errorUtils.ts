@@ -144,6 +144,9 @@ export async function renderWithErrors(
   const lang = getRequestLanguage(req);
   const t: TFunction = getTranslationFunction(req, stepName, ['common']);
 
+  const navigationBackUrl = await navigation.getBackUrl(req, stepName);
+  const backUrl = typeof formContent.backUrl === 'string' ? formContent.backUrl : navigationBackUrl;
+
   // formContent already includes errorSummary from buildFormContent, so we don't need to rebuild it
   // res.render() sends the response directly and doesn't return a value
   res.status(400).render(viewPath, {
@@ -152,7 +155,7 @@ export async function renderWithErrors(
     // errorSummary,
     stepName,
     journeyFolder,
-    backUrl: await navigation.getBackUrl(req, stepName),
+    backUrl,
     lang,
     pageUrl: req.originalUrl || '/',
     t,

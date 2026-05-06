@@ -64,9 +64,10 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
   const stepNavigation = createStepNavigation(flowConfig);
+  const stepUrl = flowConfig.entryStepIdAtBasePath === stepName ? basePath : path.join(basePath, stepName);
 
   return {
-    url: path.join(basePath, stepName),
+    url: stepUrl,
     name: stepName,
     view: viewPath,
     stepDir,
@@ -100,6 +101,9 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         ) as BuiltFormContent;
         const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
         const result = extraContent ? { ...formContent, ...extraContent } : formContent;
+        const navigationBackUrl = await stepNavigation.getBackUrl(req, stepName);
+        const resultProps = result as Record<string, unknown>;
+        const backUrl = typeof resultProps.backUrl === 'string' ? resultProps.backUrl : navigationBackUrl;
         return {
           ...result,
           ccdId: req.res?.locals.validatedCase?.id,
@@ -108,7 +112,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),
-          backUrl: await stepNavigation.getBackUrl(req, stepName),
+          backUrl,
           showCancelButton,
           url: req.originalUrl, // Form action URL - POST to current page
         };

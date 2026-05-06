@@ -1,4 +1,5 @@
 {
+  "serviceName": "cyPossession Claims",
   "caseReferenceLabel": "cyCase number:",
   "iWantToHeading": "cyI want to...",
   "askCourtToMakeOrder": "cyAsk the court to make an order (make a general application)",
@@ -17,6 +18,7 @@
     "HEARING": "cyCourt hearings",
     "JUDGEMENT": "cyJudgement from the court",
     "NOTICE": "cyOrders and notices from the court",
+    "DOCUMENTS": "cyDocuments",
     "RESPONSE": "cyYour response",
     "APPLICATIONS": "cyApplications"
   },
@@ -25,7 +27,7 @@
     "Defendant": {
       "CaseIssued": {
         "title": "cyCase issued",
-        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/claim/Defendant.ViewClaim\">View the claim</a>. Respond by {{responseEndDate}}."
+        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">View the claim</a>. Respond by {{responseEndDate}}."
       },
       "ResponseToClaim": {
         "title": "cyYour response",
@@ -52,8 +54,11 @@
       "ViewDocuments": { "title": "cyView documents" },
       "ViewHearingDocuments": { "title": "cyView hearing documents" },
       "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
+      "UploadDocuments": { "title": "cyUpload documents" },
       "ReviewResponse": { "title": "cyReview the response" },
-      "SubmitResponse": { "title": "cySubmit the response" }
+      "SubmitResponse": { "title": "cySubmit the response" },
+      "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
+      "ViewAllApplications": { "title": "cyView all applications" }
     }
   }
 }
