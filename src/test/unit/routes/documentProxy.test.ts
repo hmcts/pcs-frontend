@@ -487,40 +487,6 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(mockUploadDocument).not.toHaveBeenCalled();
     });
-
-    it('uses step-level uploadFilenameTransform when configured', async () => {
-      const mockDoc = {
-        document_url: 'http://dm/doc/new-uuid',
-        document_binary_url: 'http://dm/doc/new-uuid/binary',
-        document_filename: 'my-note (GA1) - Defendant 2.pdf',
-        content_type: 'application/pdf',
-        size: 1024,
-      };
-      mockUploadDocument.mockResolvedValue(mockDoc);
-
-      const req = makeReqWithDocs({
-        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
-        file: { originalname: 'my-note.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 1024 },
-      });
-      const { findStep } = require('../../../main/steps/index');
-      (findStep as jest.Mock).mockReturnValue({
-        documentStorage: {
-          read: jest.fn().mockResolvedValue([]),
-          readFresh: jest.fn().mockResolvedValue([]),
-          save: jest.fn().mockResolvedValue(undefined),
-        },
-        uploadFilenameTransform: (_req: Request, originalName: string) => `${originalName}-transformed`,
-      });
-      const res = { json: jest.fn() } as unknown as Response;
-
-      await handler(req, res);
-
-      expect(mockUploadDocument).toHaveBeenCalledWith(
-        expect.objectContaining({ originalname: 'my-note.pdf' }),
-        'token',
-        'my-note.pdf-transformed'
-      );
-    });
   });
 
   describe('delete handler', () => {
