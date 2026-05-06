@@ -54,8 +54,8 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute',
     'counter-claim',
     'counter-claim-have-you-already-applied-for-help-with-your-fees',
-    'counter-claim-about',
     'counter-claim-you-need-to-apply-for-help-with-your-fees',
+    'counter-claim-about',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -123,44 +123,11 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute': {
       showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
     },
-    'counter-claim': {
-      defaultNext: 'counter-claim-have-you-already-applied-for-help-with-your-fees',
-      previousStep: async (req: Request) => {
-        const onlyRentArrears = await hasOnlyRentArrearsGrounds(req);
-        return onlyRentArrears ? 'rent-arrears-dispute' : 'non-rent-arrears-dispute';
-      },
-    },
     'counter-claim-about': {
       showCondition: (req: Request) => hasAppliedForCounterClaimHwf(req),
     },
     'counter-claim-you-need-to-apply-for-help-with-your-fees': {
       showCondition: (req: Request) => hasNotAppliedForCounterClaimHwf(req),
-    },
-    'repayments-agreed': {
-      routes: [
-        {
-          condition: async (
-            req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> => {
-            if (currentStepData.repaymentsAgreed !== 'no') {
-              return false;
-            }
-            return hasAnyRentArrearsGround(req);
-          },
-          nextStep: 'installment-payments',
-        },
-        {
-          condition: async (
-            _req: Request,
-            _formData: Record<string, unknown>,
-            currentStepData: Record<string, unknown>
-          ): Promise<boolean> =>
-            currentStepData.repaymentsAgreed === 'yes' || currentStepData.repaymentsAgreed === 'imNotSure',
-          nextStep: 'your-household-and-circumstances',
-        },
-      ],
     },
     'installment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
