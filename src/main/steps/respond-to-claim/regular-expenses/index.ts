@@ -5,7 +5,7 @@ import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type {
   FrequencyValue,
@@ -13,6 +13,7 @@ import type {
   IncomeExpenseDetails,
   PossessionClaimResponse,
 } from '@services/ccdCase.interface';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 const createAmountValidator =
   (largeAmountErrorKey: string, negativeErrorKey: string) =>
@@ -105,6 +106,7 @@ export const step: StepDefinition = createFormStep({
     heading: 'heading',
     pageTitle: 'pageTitle',
     hintText: 'hintText',
+    caseNumber: 'caseNumber',
   },
 
   fields: [
@@ -518,5 +520,13 @@ export const step: StepDefinition = createFormStep({
       },
     };
     await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  extendGetContent: req => {
+    const t = getTranslationFunction(req, 'what-other-regular-expenses-do-you-have', ['common']);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
   },
 });

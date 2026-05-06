@@ -1,3 +1,4 @@
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -9,7 +10,6 @@ import type {
   PossessionClaimResponse,
   YesNoValue,
 } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'do-you-have-any-dependant-children',
