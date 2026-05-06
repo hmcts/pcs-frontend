@@ -42,7 +42,6 @@ describe('documentUtils', () => {
           {
             id: '1',
             filename: 'claim-form.pdf',
-            href: 'http://doc-store/claim-form/binary',
             submittedOn: 'Submitted on 24 June 2026',
           },
         ],
@@ -53,7 +52,6 @@ describe('documentUtils', () => {
           {
             id: '3',
             filename: 'rent-statement.pdf',
-            href: 'http://doc-store/rent-statement',
             submittedOn: 'Submitted on 25 June 2026',
           },
         ],
@@ -82,7 +80,6 @@ describe('documentUtils', () => {
           {
             id: '1',
             filename: 'rent-statement.pdf',
-            href: 'http://doc-store/rent-statement/binary',
             submittedOn: null,
           },
         ],
@@ -119,7 +116,6 @@ describe('documentUtils', () => {
           {
             id: '1',
             filename: 'notice.pdf',
-            href: 'http://doc-store/notice/binary',
             submittedOn: null,
           },
         ],
@@ -130,7 +126,6 @@ describe('documentUtils', () => {
           {
             id: '2',
             filename: 'certificate.pdf',
-            href: 'http://doc-store/certificate/binary',
             submittedOn: null,
           },
         ],
@@ -167,13 +162,11 @@ describe('documentUtils', () => {
           {
             id: '1',
             filename: 'rent-statement-mock.pdf',
-            href: 'http://dm-store/documents/111/binary',
             submittedOn: null,
           },
           {
             id: '2',
             filename: 'tenancy-agreement-mock.pdf',
-            href: 'http://dm-store/documents/222/binary',
             submittedOn: null,
           },
         ],
@@ -203,7 +196,6 @@ describe('documentUtils', () => {
           {
             id: '1',
             filename: 'certificate.pdf',
-            href: 'http://doc-store/certificate/binary',
             submittedOn: 'Submitted on 24 June 2026',
           },
         ],

@@ -40,12 +40,15 @@ describe('viewDocuments route', () => {
     (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
       id: '1777570813792018',
       data: {
-        statementsOfCase: [
+        allDocuments: [
           {
             id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
-            document_filename: 'claim-form.pdf',
-            document_binary_url: 'http://doc-store/claim-form/binary',
-            upload_timestamp: '2026-06-24',
+            value: {
+              document_filename: 'claim-form.pdf',
+              document_binary_url: 'http://doc-store/claim-form/binary',
+              upload_timestamp: '2026-06-24',
+              category_id: 'statementsOfCase',
+            },
           },
         ],
       },
@@ -77,7 +80,6 @@ describe('viewDocuments route', () => {
               expect.objectContaining({
                 id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
                 filename: 'claim-form.pdf',
-                href: 'http://doc-store/claim-form/binary',
                 submittedOn: 'Submitted on 24 June 2026',
               }),
             ],
