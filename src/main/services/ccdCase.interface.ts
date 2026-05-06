@@ -124,14 +124,10 @@ export interface CcdClaimantOrganisation {
 }
 
 /** Parties involved in the claim  */
-export interface CcdClaimParty {
-  id: string;
-  value: {
-    firstName?: string;
-    lastName?: string;
-    orgName?: string;
-    role: string;
-  };
+export interface CcdParty {
+  firstName?: string;
+  lastName?: string;
+  orgName?: string;
 }
 
 /** Claimant-entered defendant details captured when the claim was created. */
@@ -205,7 +201,6 @@ export interface PossessionClaimResponse {
   };
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
-  claimParties?: CcdClaimParty[];
   currentDefendantPartyId?: string;
 }
 
@@ -238,6 +233,8 @@ export interface CcdCaseData {
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
+  allClaimants?: CcdCollectionItem<CcdParty>[];
+  allDefendants?: CcdCollectionItem<CcdParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
   dashboardData?: CcdDashboardData;
 }
