@@ -33,9 +33,7 @@ import {
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
-  uploadDocuments,
-  whatAreYouClaimingFor,
-  whatOtherRegularExpensesDoYouHave,
+  uploadFiles,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
@@ -272,12 +270,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -332,9 +330,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
-    });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -362,10 +360,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
     });
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -391,7 +390,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
@@ -420,9 +419,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
-    });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -455,12 +454,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -490,7 +489,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -512,9 +511,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       disputeOption: nonRentArrearsDispute.yesRadioOption,
       disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
     });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
-    });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -572,12 +571,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -606,7 +605,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -625,9 +624,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
-    });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -663,12 +662,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -677,50 +676,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-  });
-
-  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - CounterClaim - Yes @secureFlexible @regression', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameTextInput,
-      lName: defendantNameCapture.lastNameTextInput,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirth.dayInputText,
-      dobMonth: defendantDateOfBirth.monthInputText,
-      dobYear: defendantDateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-      postcode: correspondenceAddress.walesPostcodeTextInput,
-    });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.noRadioOption,
-    });
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
-    );
-    await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
-      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
-    });
-    await performAction('enterTenancyStartDetailsUnKnown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('disputingOtherPartsOfTheClaim', {
-      disputeOption: nonRentArrearsDispute.noRadioOption,
-    });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.yesRadioOption,
-    });
-    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
-    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
@@ -742,7 +697,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -763,9 +718,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('rentArrears', {
       option: rentArrears.yesRadioOption,
     });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
-    });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -834,12 +789,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -866,7 +821,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -891,9 +846,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: rentArrears.noRadioOption,
       rentAmount: rentArrears.rentAmountTextInput,
     });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
-    });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -939,12 +894,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -971,7 +926,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -993,9 +948,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('rentArrears', {
       option: rentArrears.imNotSureRadioOption,
     });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
-    });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1048,12 +1003,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1080,7 +1035,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostRadioOption,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -1105,9 +1060,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
-    });
+    // placeholder page, so need to be replaced with custom action when actual page is implemented
+    await performValidation('mainHeader', counterClaim.mainHeader);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1150,12 +1105,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', priorityDebts.continueButton);
     await performValidation('mainHeader', priorityDebtDetails.mainHeader);
     await performAction('clickButton', priorityDebtDetails.continueButton);
-    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.continueButton);
-    await performValidation('mainHeader', otherConsiderations.mainHeader);
-    await performAction('clickButton', otherConsiderations.continueButton);
-    await performValidation('mainHeader', uploadDocuments.mainHeader);
-    await performAction('clickButton', uploadDocuments.continueButton);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);

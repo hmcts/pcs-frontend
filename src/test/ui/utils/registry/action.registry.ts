@@ -80,8 +80,8 @@ export class ActionRegistry {
     ['selectWhatRegularIncomeDoYouReceive', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
-    ['selectCounterClaim', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
+
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
     ['confirmIfCourtHearingInNext14Days', new GenAppsAction()],
