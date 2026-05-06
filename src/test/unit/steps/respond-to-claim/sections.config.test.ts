@@ -35,9 +35,9 @@ describe('respond-to-claim sections config', () => {
 
   it('maps end-of-journey steps into final section', () => {
     expect(respondToClaimSections.checkYourAnswersAndSubmit.steps).toEqual([
-      'language-used',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
+      'language-used',
       'check-your-answers',
     ]);
   });

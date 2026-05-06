@@ -77,7 +77,7 @@ export const respondToClaimSections = {
   },
   checkYourAnswersAndSubmit: {
     titleKey: 'taskList.checkYourAnswersAndSubmit',
-    steps: ['language-used', 'equality-and-diversity-start', 'equality-and-diversity-end', 'check-your-answers'],
+    steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used', 'check-your-answers'],
   },
 } satisfies Record<string, SectionConfig>;
 
