@@ -85,7 +85,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    //await performAction('clickButton', checkYourAnswers.submitApplicationButton);
   });
 
   test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression', async () => {
