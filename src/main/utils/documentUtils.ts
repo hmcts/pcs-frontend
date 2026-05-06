@@ -10,12 +10,12 @@ const DOCUMENT_FOLDER_TITLES = {
 type DocumentFolderKey = keyof typeof DOCUMENT_FOLDER_TITLES;
 
 type CaseData = {
-  allDocuments?: Array<{
+  allDocuments?: {
     id?: string;
     value: CcdCaseDocument & {
       category_id?: string;
     };
-  }>;
+  }[];
 };
 
 export interface ViewDocumentItem {
