@@ -48,5 +48,4 @@ export * from './whatRegularIncomeDoYouReceive.page.data';
 export * from './otherConsiderations.page.data';
 export * from './uploadFiles.page.data';
 export * from './counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.page.data';
-export * from './whoAreYouMakingTheCounterClaimAgainst.page.data';
 export * from './counterclaimYouNeedToApplyForHelpWithYourFees.page.data';
