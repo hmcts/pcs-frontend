@@ -19,7 +19,8 @@
     "JUDGEMENT": "cyJudgement from the court",
     "NOTICE": "cyOrders and notices from the court",
     "RESPONSE": "cyThe response",
-    "APPLICATIONS": "cyApplications"
+    "APPLICATIONS": "cyApplications",
+    "DOCUMENTS": "cyDocuments"
   },
 
   "notifications": {
@@ -43,6 +44,7 @@
       "NOT_STARTED": "cyNot started"
     },
     "ViewClaim": { "title": "cyView the claim" },
+    "UploadDocuments": { "title": "cyUpload documents" },
     "ViewDocuments": { "title": "cyView documents" },
     "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
     "ViewAllApplications": { "title": "cyView all applications" },
