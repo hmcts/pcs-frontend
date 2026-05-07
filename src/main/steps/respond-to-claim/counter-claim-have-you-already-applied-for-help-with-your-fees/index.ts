@@ -76,7 +76,7 @@ export const step: StepDefinition = createFormStep({
       defendantResponses: {
         counterClaim: {
           appliedForHwf,
-          hwfReferenceNumber: hwfReference ?? '',
+          hwfReferenceNumber: appliedForHwf === 'YES' ? (hwfReference ?? '') : '',
         },
       },
     };
