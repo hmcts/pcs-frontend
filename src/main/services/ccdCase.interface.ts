@@ -151,8 +151,6 @@ export interface CcdDefendantResponses {
   tenancyTypeCorrect?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
-  confirmNoticeGiven?: string;
-  noticeDate?: string;
   tenancyStartDateCorrect?: string;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
@@ -177,6 +175,7 @@ export interface CcdDefendantResponses {
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
+  makeCounterClaim?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
