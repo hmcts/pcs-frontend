@@ -2,6 +2,7 @@ import { type Request } from 'express';
 
 import {
   hasAnyRentArrearsGround,
+  hasMadeCounterClaim,
   hasOnlyRentArrearsGrounds,
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
@@ -53,6 +54,7 @@ export const flowConfig: JourneyFlowConfig = {
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
     'counter-claim',
+    'what-are-you-claiming-for',
     'counter-claim-have-you-already-applied-for-help-with-your-fees',
     'counter-claim-you-need-to-apply-for-help-with-your-fees',
     'counter-claim-about',
@@ -110,7 +112,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       showCondition: (req: Request) => isNoticeServed(req),
     },
-
     'confirmation-of-notice-date-when-provided': {
       showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
@@ -123,11 +124,23 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute': {
       showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
     },
-    'counter-claim-about': {
-      showCondition: (req: Request) => hasAppliedForCounterClaimHwf(req),
+    'what-are-you-claiming-for': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'counter-claim-you-need-to-apply-for-help-with-your-fees': {
       showCondition: (req: Request) => hasNotAppliedForCounterClaimHwf(req),
+    },
+    'counter-claim-about': {
+      showCondition: (req: Request) => hasAppliedForCounterClaimHwf(req),
+    },
+    'payment-interstitial': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
+    },
+    'repayments-made': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
+    },
+    'repayments-agreed': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
     'installment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
