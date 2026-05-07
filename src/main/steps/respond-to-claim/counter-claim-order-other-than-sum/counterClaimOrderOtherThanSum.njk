@@ -24,9 +24,6 @@
     {% endfor %}
 
     {{ stepButtons(saveAndContinue, saveForLater) }}
-    <p class="govuk-body">
-      <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
-    </p>
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}

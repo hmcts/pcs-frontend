@@ -190,8 +190,8 @@ export interface CcdCounterClaim {
   needHelpWithFees?: VerticalYesNoValue;
   claimType?: string;
   isClaimAmountKnown?: string;
-  claimAmount?: string;
-  estimatedMaxClaimAmount?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
   counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
   counterClaimFor?: string;
   counterClaimReasons?: string;
