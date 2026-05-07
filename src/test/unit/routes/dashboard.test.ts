@@ -82,11 +82,11 @@ jest.mock('@modules/i18n', () => ({
     const strings: Record<string, string> = {
       'dashboard:taskGroups.CLAIM': 'Claim section',
       'dashboard:taskGroups.DOCUMENTS': 'Documents section',
-      'dashboard:tasks.Defendant.ViewClaim.title': 'View claim title',
-      'dashboard:tasks.Defendant.UploadDocuments.title': 'Upload docs title',
-      'dashboard:tasks.Defendant.SubmitResponse.title': 'Submit response title',
-      'dashboard:tasks.Defendant.RespondToClaim.title': 'Respond to claim title',
-      'dashboard:tasks.Defendant.ViewResponse.title': 'View response title',
+      'dashboard:tasks.ViewClaim.title': 'View claim title',
+      'dashboard:tasks.UploadDocuments.title': 'Upload docs title',
+      'dashboard:tasks.SubmitResponse.title': 'Submit response title',
+      'dashboard:tasks.RespondToClaim.title': 'Respond to claim title',
+      'dashboard:tasks.ViewResponse.title': 'View response title',
       'dashboard:tasks.task-1.title': 'Task one title',
       'dashboard:tasks.statuses.AVAILABLE': 'Available',
       'dashboard:tasks.statuses.NOT_AVAILABLE': 'Not available',
@@ -126,8 +126,8 @@ describe('Dashboard Routes', () => {
         {
           groupId: 'CLAIM',
           tasks: [
-            { templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' },
-            { templateId: 'Defendant.SubmitResponse', status: 'NOT_AVAILABLE' },
+            { templateId: 'ViewClaim', status: 'AVAILABLE' },
+            { templateId: 'SubmitResponse', status: 'NOT_AVAILABLE' },
           ],
         },
       ],
@@ -236,7 +236,7 @@ describe('Dashboard Routes', () => {
         taskGroups: [
           {
             groupId: 'DOCUMENTS',
-            tasks: [{ templateId: 'Defendant.UploadDocuments', status: 'AVAILABLE' }],
+            tasks: [{ templateId: 'UploadDocuments', status: 'AVAILABLE' }],
           },
         ],
         propertyAddress: null,

@@ -11,14 +11,14 @@ import {
 } from '../constants/caseRoutes';
 
 export const DASHBOARD_TASK_PATH_PATTERNS: Readonly<Record<string, string>> = {
-  'Defendant.UploadDocuments': UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE,
-  'Defendant.ViewDocuments': VIEW_DOCUMENTS_ROUTE,
-  'Defendant.ViewClaim': VIEW_THE_CLAIM_ROUTE,
-  'Defendant.RespondToClaim': RESPOND_TO_CLAIM_START_ROUTE,
-  'Defendant.ViewHearingDocuments': VIEW_HEARING_DOCUMENTS_ROUTE,
-  'Defendant.ViewOrdersAndNotices': VIEW_ORDERS_AND_NOTICES_ROUTE,
-  'Defendant.ViewAllApplications': VIEW_ALL_APPLICATIONS_ROUTE,
-  'Defendant.MakeGeneralApplication': MAKE_GENERAL_APPLICATION_ROUTE,
+  UploadDocuments: UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE,
+  ViewDocuments: VIEW_DOCUMENTS_ROUTE,
+  ViewClaim: VIEW_THE_CLAIM_ROUTE,
+  RespondToClaim: RESPOND_TO_CLAIM_START_ROUTE,
+  ViewHearingDocuments: VIEW_HEARING_DOCUMENTS_ROUTE,
+  ViewOrdersAndNotices: VIEW_ORDERS_AND_NOTICES_ROUTE,
+  ViewAllApplications: VIEW_ALL_APPLICATIONS_ROUTE,
+  MakeGeneralApplication: MAKE_GENERAL_APPLICATION_ROUTE,
 };
 
 /**
@@ -36,9 +36,9 @@ export function getDashboardTaskPath(templateId: string, caseReference: string, 
 /** Named URL placeholders for `dashboard.json` notification bodies (i18n `{{viewClaimUrl}}`, etc.). */
 export function getNotificationUrlPlaceholders(caseReference: string): Record<string, string> {
   return {
-    viewClaimUrl: getDashboardTaskPath('Defendant.ViewClaim', caseReference, 'claim'),
-    respondToClaimUrl: getDashboardTaskPath('Defendant.RespondToClaim', caseReference, 'response'),
-    viewDocumentsUrl: getDashboardTaskPath('Defendant.ViewDocuments', caseReference, 'documents'),
-    uploadDocumentsUrl: getDashboardTaskPath('Defendant.UploadDocuments', caseReference, 'documents'),
+    viewClaimUrl: getDashboardTaskPath('ViewClaim', caseReference, 'claim'),
+    respondToClaimUrl: getDashboardTaskPath('RespondToClaim', caseReference, 'response'),
+    viewDocumentsUrl: getDashboardTaskPath('ViewDocuments', caseReference, 'documents'),
+    uploadDocumentsUrl: getDashboardTaskPath('UploadDocuments', caseReference, 'documents'),
   };
 }

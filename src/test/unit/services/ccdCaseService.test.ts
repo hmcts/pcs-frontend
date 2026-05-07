@@ -326,7 +326,7 @@ describe('ccdCaseService', () => {
                       tasks: [
                         {
                           id: 't1',
-                          value: { templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' },
+                          value: { templateId: 'ViewClaim', status: 'AVAILABLE' },
                         },
                       ],
                     },
@@ -359,7 +359,7 @@ describe('ccdCaseService', () => {
         taskGroups: [
           {
             groupId: 'CLAIM',
-            tasks: [{ templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' }],
+            tasks: [{ templateId: 'ViewClaim', status: 'AVAILABLE' }],
           },
         ],
         propertyAddress: '1 Test Street, London, SW1A 1AA',
