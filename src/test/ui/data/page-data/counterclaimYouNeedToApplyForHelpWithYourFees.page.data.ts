@@ -1,12 +1,12 @@
 export const counterclaimYouNeedToApplyForHelpWithYourFees = {
   mainHeader: `You need to apply for help with your counterclaim fee`,
-  stoOrDelayAnEvictionParagraph: `Stop or delay and eviction`,
+  stoOrDelayAnEvictionParagraph: `Stop or delay an eviction`,
   backLink: `Back`,
   saveForLaterButton: `Save for later`,
 
   cymraegLink: `Cymraeg`,
   youNeedToParagraph: `You need to`,
-  applyForHelpWithFeeLink: `apply for help with fees (opens in new tab)`,
+  applyForHelpWithFeeLink: `apply for Help with Fees (opens in new tab)`,
   beforeYouCanContinueParagraph: `before you can continue with this counterclaim.`,
   enterTheCourtFormNumberParagraph: `Enter the court form number 'XXX' when asked. This will be one of the first questions when you apply for help with your fees.`,
   afterYouHaveAppliedParagraph: `After you have applied you will receive a Help with Fees reference number. You should enter the reference number when you return to this counterclaim.`,

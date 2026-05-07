@@ -1,6 +1,6 @@
 export const counterClaimHaveYouAlreadyAppliedForHelpWithYourFees = {
   mainHeader: `Have you already applied for help with your counterclaim fee?`,
-  stoOrDelayAnEvictionParagraph: `Stop or delay and eviction`,
+  stoOrDelayAnEvictionParagraph: `Stop or delay an eviction`,
   backLink: `Back`,
   haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion: `Have you already applied for help with your counterclaim fee?`,
   yesRadioOption: `Yes`,
