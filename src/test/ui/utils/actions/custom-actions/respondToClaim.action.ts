@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
+  accessYourCase,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -41,6 +42,7 @@ import {
   yourCircumstances,
   yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
+import { pins } from '../../actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -96,6 +98,7 @@ export class RespondToClaimAction implements IAction {
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
+      ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -667,6 +670,17 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  }
+
+  private async accessYourCase(accessCode: actionRecord): Promise<void> {
+    const pin = pins[0];
+    if (!pin) {
+      throw new Error('PIN is not available. Ensure fetchPINsAPI is called before enterAccessCode');
+    }
+    await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
+
+    await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
+    await performAction('clickButton', accessYourCase.continueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
