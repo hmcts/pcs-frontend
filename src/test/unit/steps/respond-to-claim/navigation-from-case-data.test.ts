@@ -105,11 +105,11 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('uses valid static previous step for household interstitial path', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'counter-claim'
+      'counter-claim-have-you-already-applied-for-help-with-your-fees'
     );
   });
 
-  it('routes counter-claim NO to household interstitial for non-rent-arrears-only claims', async () => {
+  it('routes counter-claim forward to HWF step when what-are-you-claiming-for is skipped (non-rent-arrears-only)', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
@@ -117,11 +117,11 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'your-household-and-circumstances'
+      'counter-claim-have-you-already-applied-for-help-with-your-fees'
     );
   });
 
-  it('routes counter-claim NO to payment interstitial for rent-arrears claims', async () => {
+  it('routes counter-claim forward to HWF step when what-are-you-claiming-for is skipped (rent-arrears)', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }, { value: { isRentArrears: 'NO' } }],
@@ -129,7 +129,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'payment-interstitial'
+      'counter-claim-have-you-already-applied-for-help-with-your-fees'
     );
   });
 
