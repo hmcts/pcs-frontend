@@ -5507,7 +5507,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.15.2, axios@npm:^1.7.5":
+"axios@npm:1.16.0":
+  version: 1.16.0
+  resolution: "axios@npm:1.16.0"
+  dependencies:
+    follow-redirects: "npm:^1.16.0"
+    form-data: "npm:^4.0.5"
+    proxy-from-env: "npm:^2.1.0"
+  checksum: 10/cf8b521ff732c21550b38c8739aef556ea5e14b268468bb89e4307416ab262b462e582474e810963a3d61c2392ab47ad35c11d05eff027de7c97113bc7411623
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.7.5":
   version: 1.15.2
   resolution: "axios@npm:1.15.2"
   dependencies:
@@ -8124,7 +8135,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.15.11":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.15.11, follow-redirects@npm:^1.16.0":
   version: 1.16.0
   resolution: "follow-redirects@npm:1.16.0"
   peerDependenciesMeta:
@@ -11885,7 +11896,7 @@ __metadata:
     allure-commandline: "npm:2.38.1"
     allure-js-commons: "npm:3.7.2"
     allure-playwright: "npm:3.7.2"
-    axios: "npm:1.15.2"
+    axios: "npm:1.16.0"
     body-parser: "npm:2.2.2"
     chokidar: "npm:5.0.0"
     config: "npm:4.4.1"
