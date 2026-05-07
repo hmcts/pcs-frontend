@@ -8,6 +8,8 @@ import {
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
   correspondenceAddress,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -96,6 +98,8 @@ export class RespondToClaimAction implements IAction {
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
+      ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
+      ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -269,9 +273,6 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async readPaymentInterstitial(): Promise<void> {
-    await performAction('clickRadioButton', { question: 'What are you claiming for?', option: 'Something else' });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', 'Save and continue');
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
@@ -670,6 +671,36 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  }
+
+  private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: claim.question,
+      option: claim.option,
+    });
+    await performAction('clickButton', counterClaimWhatAreYouClaimingFor.saveAndContinueButton);
+  }
+
+  private async counterClaimSpecificSumOfMoney(sumOfMoney: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: sumOfMoney.question,
+      option: sumOfMoney.option,
+    });
+
+    if (sumOfMoney.option === counterClaimSpecificSumOfMoney.yesRadioOption) {
+      await performAction(
+        'inputText',
+        counterClaimSpecificSumOfMoney.howMuchAreYouClaimingHiddenQuestion,
+        sumOfMoney.amount
+      );
+    } else {
+      await performAction(
+        'inputText',
+        counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,
+        sumOfMoney.amount
+      );
+    }
+    await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

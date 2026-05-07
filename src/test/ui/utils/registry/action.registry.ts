@@ -98,6 +98,8 @@ export class ActionRegistry {
     ['confirmOrderDoYouWant', new GenAppsAction()],
     ['languageUsed', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
+    ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
+    ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {
