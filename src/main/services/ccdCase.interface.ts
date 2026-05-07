@@ -176,6 +176,7 @@ export interface CcdDefendantResponses {
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
+  makeCounterClaim?: YesNoValue;
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */

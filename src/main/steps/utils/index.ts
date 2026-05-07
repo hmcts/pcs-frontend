@@ -19,3 +19,4 @@ export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepr
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
+export { hasMadeCounterClaim } from './hasMadeCounterClaim';

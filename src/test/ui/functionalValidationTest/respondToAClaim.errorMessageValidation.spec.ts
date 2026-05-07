@@ -43,6 +43,7 @@ import { contactPreferencesTelephoneErrorValidation } from '../functional/contac
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
 import { counterClaimSpecificSumErrorValidation } from '../functional/counterClaimSpecificSumOfMoney.pft';
 import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/counterClaimWhatAreYouClaimingFor.pft';
+import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
@@ -282,9 +283,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('rentArrears', rentArrearsErrorValidation);
     await performAction('rentArrears', { option: rentArrears.yesRadioOption });
 
-    await softErrorMessageValidation('counterClaim', NO_EMV_READ_ONLY);
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.yesRadioOption,
+    });
 
     await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
     await performAction('selectWhatAreYouClaimingFor', {
@@ -508,17 +510,17 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
 
-    await softErrorMessageValidation('counterClaim', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-
-    await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
+    await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.yesRadioOption,
+      });
+    await  softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
     await performAction('selectWhatAreYouClaimingFor', {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
 
-    await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
+    await await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
     await performAction('counterClaimSpecificSumOfMoney', {
       question: counterClaimSpecificSumOfMoney.mainHeader,
       option: counterClaimSpecificSumOfMoney.noRadioOption,
