@@ -3,17 +3,17 @@ import path from 'path';
 
 import { user } from '../data/user-data';
 
-/** Matches Jenkins nightly `E2E_TARGET_ENV` and full slug URL templates. */
-const NIGHTLY_ENV_SLUGS = new Set(['aat', 'demo', 'perftest', 'ithc']);
+/** CNP environment names where IdAM/S2S URLs follow the standard `*.platform.hmcts.net` pattern (matches Jenkins `E2E_TARGET_ENV`). */
+const KNOWN_CNP_ENVIRONMENT_NAMES = new Set(['aat', 'demo', 'perftest', 'ithc']);
 
 /** Derives IdAM / S2S URLs from `ENVIRONMENT` when unset (CNP nightly or local). */
 export function applyPlaywrightServiceUrls(): void {
-  const e = (process.env.ENVIRONMENT || '').toLowerCase();
+  const normalizedCnpEnvironment = (process.env.ENVIRONMENT || '').toLowerCase();
 
-  if (NIGHTLY_ENV_SLUGS.has(e)) {
-    process.env.IDAM_WEB_URL ||= `https://idam-api.${e}.platform.hmcts.net`;
-    process.env.IDAM_TESTING_SUPPORT_URL ||= `https://idam-testing-support-api.${e}.platform.hmcts.net`;
-    process.env.S2S_URL ||= `http://rpe-service-auth-provider-${e}.service.core-compute-${e}.internal/testing-support/lease`;
+  if (KNOWN_CNP_ENVIRONMENT_NAMES.has(normalizedCnpEnvironment)) {
+    process.env.IDAM_WEB_URL ||= `https://idam-api.${normalizedCnpEnvironment}.platform.hmcts.net`;
+    process.env.IDAM_TESTING_SUPPORT_URL ||= `https://idam-testing-support-api.${normalizedCnpEnvironment}.platform.hmcts.net`;
+    process.env.S2S_URL ||= `http://rpe-service-auth-provider-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal/testing-support/lease`;
   } else {
     process.env.IDAM_WEB_URL ||= 'https://idam-api.aat.platform.hmcts.net';
     process.env.IDAM_TESTING_SUPPORT_URL ||= 'https://idam-testing-support-api.aat.platform.hmcts.net';

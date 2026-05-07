@@ -155,23 +155,22 @@ def selectedSauceSuites() {
 }
 
 def validateInputs() {
-  if (!getE2eMatrix().any { params[it.flag] }) {
+  if (!browserToggleParamNames().any { params[it] }) {
     error('E2E matrix: enable at least one browser/device option (e.g. CHROME_TESTS).')
   }
 }
 
 def handleEnvironmentSetting() {
-  def target = (params.E2E_TARGET_ENV?.trim() ?: 'aat').toLowerCase()
-  env.ENVIRONMENT = target
-  env.TEST_URL = "https://pcs.${target}.platform.hmcts.net/"
+  def cnpEnvironment = (params.E2E_TARGET_ENV?.trim() ?: 'aat').toLowerCase()
+  env.ENVIRONMENT = cnpEnvironment
+  env.TEST_URL = "https://pcs.${cnpEnvironment}.platform.hmcts.net/"
   env.E2E_TEST_SCOPE = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@nightly'
   env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
 }
 
 def setFunctionalTestEnvVars() {
-  def slug = env.ENVIRONMENT
-  env.PCS_API_URL = "http://pcs-api-${slug}.service.core-compute-${slug}.internal"
-  env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-${slug}.service.core-compute-${slug}.internal"
+  env.PCS_API_URL = "http://pcs-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
+  env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
   env.SAUCE_GREP = (params.SAUCE_GREP?.trim()) ?: '@crossbrowser'
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
   env.ENABLE_AXE_AUDIT = params.ENABLE_AXE_AUDIT
@@ -194,15 +193,16 @@ def runE2ETests(yarnBuilder) {
   }
 }
 
-def getE2eMatrix() {
+/** Names of boolean pipeline params that select browser/device E2E stages (must stay in sync with `runE2ETests`). */
+def browserToggleParamNames() {
   [
-    [flag: 'CHROME_TESTS'],
-    [flag: 'FIREFOX_TESTS'],
-    [flag: 'WEBKIT_TESTS'],
-    [flag: 'EDGE_TESTS'],
-    [flag: 'MOBILE_ANDROID_TESTS'],
-    [flag: 'MOBILE_IOS_TESTS'],
-    [flag: 'MOBILE_IPAD_TESTS'],
+    'CHROME_TESTS',
+    'FIREFOX_TESTS',
+    'WEBKIT_TESTS',
+    'EDGE_TESTS',
+    'MOBILE_ANDROID_TESTS',
+    'MOBILE_IOS_TESTS',
+    'MOBILE_IPAD_TESTS',
   ]
 }
 
