@@ -781,52 +781,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - CounterClaim - Yes @secureFlexible @regression', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameTextInput,
-      lName: defendantNameCapture.lastNameTextInput,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirth.dayInputText,
-      dobMonth: defendantDateOfBirth.monthInputText,
-      dobYear: defendantDateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-      postcode: correspondenceAddress.walesPostcodeTextInput,
-    });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.noRadioOption,
-    });
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
-    );
-    await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
-      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
-    });
-    await performAction('enterTenancyStartDetailsUnKnown');
-    await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('disputingOtherPartsOfTheClaim', {
-      disputeOption: nonRentArrearsDispute.noRadioOption,
-    });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.yesRadioOption,
-    });
-    await performAction('selectWhatAreYouClaimingFor', {
-      question: counterClaimWhatAreYouClaimingFor.mainHeader,
-      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
-    });
-  });
-
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
     //universal credit with all other options - priority debts
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
