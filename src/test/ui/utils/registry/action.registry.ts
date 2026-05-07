@@ -98,6 +98,10 @@ export class ActionRegistry {
     ['recordUserEntry', new RecordAnswers()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
     ['languageUsed', new RespondToClaimAction()],
+    ['confirmOrderDoYouWant', new GenAppsAction()],
+    ['reviewCYA', new GenAppsAction()],
+    ['selectStatementOfTruth', new GenAppsAction()],
+    ['reviewAndUpdateCYA', new GenAppsAction()],
     ['otherConsiderations', new RespondToClaimAction()],
   ]);
 
