@@ -41,6 +41,7 @@ import { contactPreferenceEmailOrPostErrorValidation } from '../functional/conta
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
 import { counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation } from '../functional/counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.pft';
+import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
@@ -280,9 +281,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('rentArrears', rentArrearsErrorValidation);
     await performAction('rentArrears', { option: rentArrears.yesRadioOption });
 
-    await softErrorMessageValidation('counterClaim', NO_EMV_READ_ONLY);
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
 
     await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
@@ -499,9 +501,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
 
-    await softErrorMessageValidation('counterClaim', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
+     await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+      });
 
     await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
