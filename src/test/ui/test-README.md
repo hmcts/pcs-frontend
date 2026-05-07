@@ -138,6 +138,9 @@ await performValidationGroup(
 - CHANGE_ID
 - PCS_API_CHANGE_ID
 - DATA_STORE_URL_BASE
+- PCS_API_URL
+
+For **Jenkins nightly**, pick `E2E_TARGET_ENV` (`aat`, `demo`, `perftest`, or `ithc`). That drives Azure Key Vault `pcs-<env>`, `ENVIRONMENT` for Playwright, `TEST_URL`, and internal `PCS_API_URL` / `DATA_STORE_URL_BASE`. IdAM and S2S URLs are derived in `global-setup.config.ts` from `ENVIRONMENT`.
 
 ```bash
 yarn test:functional
