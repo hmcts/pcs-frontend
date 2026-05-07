@@ -2,6 +2,7 @@ import { type Request } from 'express';
 
 import {
   hasAnyRentArrearsGround,
+  hasMadeCounterClaim,
   hasOnlyRentArrearsGrounds,
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
@@ -59,7 +60,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       showCondition: (req: Request) => isNoticeServed(req),
     },
-
     'confirmation-of-notice-date-when-provided': {
       showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
@@ -71,6 +71,18 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'non-rent-arrears-dispute': {
       showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
+    },
+    'what-are-you-claiming-for': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'payment-interstitial': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
+    },
+    'repayments-made': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
+    },
+    'repayments-agreed': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
     'installment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),

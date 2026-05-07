@@ -80,6 +80,7 @@ export class ActionRegistry {
     ['selectWhatRegularIncomeDoYouReceive', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
+    ['selectCounterClaim', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
@@ -96,6 +97,10 @@ export class ActionRegistry {
     ['recordUserEntry', new RecordAnswers()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
     ['languageUsed', new RespondToClaimAction()],
+    ['confirmOrderDoYouWant', new GenAppsAction()],
+    ['reviewCYA', new GenAppsAction()],
+    ['selectStatementOfTruth', new GenAppsAction()],
+    ['reviewAndUpdateCYA', new GenAppsAction()],
     ['otherConsiderations', new RespondToClaimAction()],
   ]);
 

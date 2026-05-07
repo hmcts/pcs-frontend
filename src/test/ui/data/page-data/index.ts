@@ -45,4 +45,6 @@ export * from './equalityAndDiversityStart.page.data';
 export * from './priorityDebtDetails.page.data';
 export * from './whatOtherRegularExpensesDoYouHave.page.data';
 export * from './whatRegularIncomeDoYouReceive.page.data';
+export * from './uploadDocuments.page.data';
+export * from './whatAreYouClaimingFor.page.data';
 export * from './uploadFiles.page.data';

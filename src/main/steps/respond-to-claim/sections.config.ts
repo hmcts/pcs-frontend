@@ -34,6 +34,7 @@ export const respondToClaimSections = {
       'rent-arrears-dispute',
       'non-rent-arrears-dispute',
       'counter-claim',
+      'what-are-you-claiming-for',
     ],
   },
   payments: {
