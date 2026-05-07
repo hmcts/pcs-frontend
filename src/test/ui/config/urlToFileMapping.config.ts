@@ -56,4 +56,7 @@ export default {
   'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
+  'language-used': 'languageUsed',
+  'other-considerations': 'otherConsiderations',
+  'upload-document': 'uploadFiles',
 };

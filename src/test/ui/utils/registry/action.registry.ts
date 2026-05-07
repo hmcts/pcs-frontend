@@ -83,6 +83,7 @@ export class ActionRegistry {
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
+    ['uploadFiles', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
