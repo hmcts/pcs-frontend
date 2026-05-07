@@ -17,7 +17,7 @@ export interface DisplayDocument {
   id?: string;
   document_filename: string;
   content_type?: string;
-  size?: number;
+  sizeInBytes?: number;
 }
 
 export interface DocumentStorage {
@@ -32,7 +32,7 @@ export function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[
     id: item.id,
     document_filename: item.value.document.document_filename,
     content_type: item.value.contentType,
-    size: item.value.sizeInBytes,
+    sizeInBytes: item.value.sizeInBytes,
   }));
 }
 

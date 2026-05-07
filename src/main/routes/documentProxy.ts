@@ -180,7 +180,7 @@ function buildUploadResponse(
       index,
       id: docId,
       document_filename: filename,
-      size: cdamDoc.size,
+      sizeInBytes: cdamDoc.size,
       content_type: cdamDoc.content_type,
     },
   };
