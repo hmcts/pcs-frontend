@@ -179,7 +179,7 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt, < 2 named parties - CounterClaimAppliedForHelp - Yes - about your counterclaim
-  test('Respond to a claim @noDefendants @regression @crossbrowser @PR', async () => {
+  test('Respond to a claim @noDefendants @regression @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -308,7 +308,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });*/
   });
 
-  test('Respond to a claim - CounterclaimHelpWithFee - No @noDefendants @regression @crossbrowser @PR', async () => {
+  test('Respond to a claim - CounterclaimHelpWithFee - No @noDefendants @regression @crossbrowser', async () => {
     //< 2 named parties - CounterClaimAppliedForHelp - No - You need to apply for help with your fees
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -1140,7 +1140,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression @PR', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -1255,7 +1255,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression @PR', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
     //> 3 named parties - CounterClaimAppliedForHelp - Yes - Who are you claiming against
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
