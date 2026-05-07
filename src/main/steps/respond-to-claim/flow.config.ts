@@ -129,6 +129,9 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-what-are-you-claiming-for': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
+    'counter-claim-fee': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
