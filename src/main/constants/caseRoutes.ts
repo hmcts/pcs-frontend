@@ -22,3 +22,5 @@ export const VIEW_ALL_APPLICATIONS_ROUTE = '/case/:caseReference/view-all-applic
 export const MAKE_GENERAL_APPLICATION_ROUTE = '/case/:caseReference/make-an-application/choose-an-application';
 
 export const RESPOND_TO_CLAIM_START_ROUTE = `${RESPOND_TO_CLAIM_ROUTE}/start-now`;
+
+export const VIEW_RESPONSE_ROUTE = '/case/:caseReference/view-response';

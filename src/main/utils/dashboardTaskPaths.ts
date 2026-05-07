@@ -1,5 +1,6 @@
 /** Maps CCD dashboard task `templateId` values to case path patterns in `caseRoutes`. */
 import {
+  VIEW_RESPONSE_ROUTE,
   MAKE_GENERAL_APPLICATION_ROUTE,
   RESPOND_TO_CLAIM_START_ROUTE,
   UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE,
@@ -11,6 +12,7 @@ import {
 } from '../constants/caseRoutes';
 
 export const DASHBOARD_TASK_PATH_PATTERNS: Readonly<Record<string, string>> = {
+  ViewResponse: VIEW_RESPONSE_ROUTE,
   UploadDocuments: UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE,
   ViewDocuments: VIEW_DOCUMENTS_ROUTE,
   ViewClaim: VIEW_THE_CLAIM_ROUTE,

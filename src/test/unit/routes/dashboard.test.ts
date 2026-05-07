@@ -285,8 +285,8 @@ describe('Dashboard Routes', () => {
           {
             groupId: 'RESPONSE',
             tasks: [
-              { templateId: 'Defendant.RespondToClaim', status: 'COMPLETED' },
-              { templateId: 'Defendant.ViewResponse', status: 'AVAILABLE' },
+              { templateId: 'RespondToClaim', status: 'COMPLETED' },
+              { templateId: 'ViewResponse', status: 'AVAILABLE' },
             ],
           },
         ],
