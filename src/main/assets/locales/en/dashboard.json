@@ -55,6 +55,13 @@
   },
   "viewDocuments": {
     "pageTitle": "View documents",
-    "noDocuments": "There are no documents to display."
+    "noDocuments": "There are no documents to display.",
+    "submittedOn": "Submitted on",
+    "folders": {
+      "statementsOfCase": "Statements of case",
+      "propertyDocuments": "Property documents",
+      "evidence": "Evidence",
+      "correspondence": "Correspondence"
+    }
   }
 }

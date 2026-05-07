@@ -206,6 +206,7 @@ describe('documentUtils', () => {
   it('formats submitted dates for display', () => {
     expect(formatSubmittedOn('2026-06-24')).toBe('Submitted on 24 June 2026');
     expect(formatSubmittedOn('2026-05-01T23:12:01.361668')).toBe('Submitted on 1 May 2026');
+    expect(formatSubmittedOn('2026-06-24', 'cy-GB', 'cySubmitted on')).toBe('cySubmitted on 24 Mehefin 2026');
     expect(formatSubmittedOn('not-a-date')).toBeNull();
   });
 

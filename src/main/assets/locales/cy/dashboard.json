@@ -54,6 +54,13 @@
   },
   "viewDocuments": {
     "pageTitle": "cyView documents",
-    "noDocuments": "cyThere are no documents to display."
+    "noDocuments": "cyThere are no documents to display.",
+    "submittedOn": "cySubmitted on",
+    "folders": {
+      "statementsOfCase": "cyStatements of case",
+      "propertyDocuments": "cyProperty documents",
+      "evidence": "cyEvidence",
+      "correspondence": "cyCorrespondence"
+    }
   }
 }

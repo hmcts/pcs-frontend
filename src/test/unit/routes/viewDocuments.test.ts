@@ -32,6 +32,7 @@ describe('viewDocuments route', () => {
     viewDocumentsRoute(app);
 
     expect(app.get).toHaveBeenCalledWith('/case/:caseId/view-documents', expect.anything(), expect.anything());
+    expect(app.get).toHaveBeenCalledWith('/case/:caseId/view-documents/:documentId', expect.anything(), expect.anything());
   });
 
   it('should render the view-documents template with extracted folders', async () => {
@@ -54,7 +55,9 @@ describe('viewDocuments route', () => {
       },
     });
 
-    const handler = (app.get as jest.Mock).mock.calls[0][2] as RouteHandler;
+    const handler = (app.get as jest.Mock).mock.calls.find(
+      call => call[0] === '/case/:caseId/view-documents'
+    )?.[2] as RouteHandler;
     const res = {
       render: jest.fn(),
     } as unknown as Response;
@@ -64,6 +67,16 @@ describe('viewDocuments route', () => {
         params: { caseId: '1777570813792018' },
         language: 'en',
         session: { user: { accessToken: 'token' } },
+        t: (key: string) =>
+          (
+            {
+              'dashboard:viewDocuments.submittedOn': 'Submitted on',
+              'dashboard:viewDocuments.folders.statementsOfCase': 'Statements of case',
+              'dashboard:viewDocuments.folders.propertyDocuments': 'Property documents',
+              'dashboard:viewDocuments.folders.evidence': 'Evidence',
+              'dashboard:viewDocuments.folders.correspondence': 'Correspondence',
+            } as Record<string, string>
+          )[key],
       } as unknown as Request,
       res,
       jest.fn()
@@ -87,5 +100,32 @@ describe('viewDocuments route', () => {
         ],
       })
     );
+  });
+
+  it('should render empty view-document template for document page', async () => {
+    viewDocumentsRoute(app);
+
+    const handler = (app.get as jest.Mock).mock.calls.find(
+      call => call[0] === '/case/:caseId/view-documents/:documentId'
+    )?.[2] as RouteHandler;
+    const res = {
+      render: jest.fn(),
+    } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(
+      {
+        params: {
+          caseId: '1777570813792018',
+          documentId: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+        },
+        session: { user: { accessToken: 'token' } },
+      } as unknown as Request,
+      res,
+      next
+    );
+
+    expect(res.render).toHaveBeenCalledWith('view-document');
+    expect(next).not.toHaveBeenCalled();
   });
 });

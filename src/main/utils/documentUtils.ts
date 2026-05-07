@@ -29,8 +29,17 @@ export interface ViewDocumentFolder {
   documents: ViewDocumentItem[];
 }
 
-export function extractViewDocumentFolders(caseData: CaseData, locale = 'en-GB'): ViewDocumentFolder[] {
-  const folders = createFolders();
+interface ExtractViewDocumentOptions {
+  locale?: string;
+  submittedOnPrefix?: string;
+  folderTitles?: Partial<Record<DocumentFolderKey, string>>;
+}
+
+export function extractViewDocumentFolders(
+  caseData: CaseData,
+  { locale = 'en-GB', submittedOnPrefix = 'Submitted on', folderTitles }: ExtractViewDocumentOptions = {}
+): ViewDocumentFolder[] {
+  const folders = createFolders(folderTitles);
 
   for (const { id, value } of caseData.allDocuments ?? []) {
     const documentId = id?.trim();
@@ -48,19 +57,26 @@ export function extractViewDocumentFolders(caseData: CaseData, locale = 'en-GB')
     folders[value.category_id].documents.push({
       id: documentId,
       filename,
-      submittedOn: formatSubmittedOn(value.upload_timestamp, locale),
+      submittedOn: formatSubmittedOn(value.upload_timestamp, locale, submittedOnPrefix),
     });
   }
 
   return Object.values(folders).filter(folder => folder.documents.length > 0);
 }
 
-function createFolders(): Record<DocumentFolderKey, ViewDocumentFolder> {
+function createFolders(
+  folderTitles?: Partial<Record<DocumentFolderKey, string>>
+): Record<DocumentFolderKey, ViewDocumentFolder> {
+  const titles = {
+    ...DOCUMENT_FOLDER_TITLES,
+    ...folderTitles,
+  };
+
   return {
-    statementsOfCase: { title: DOCUMENT_FOLDER_TITLES.statementsOfCase, documents: [] },
-    propertyDocuments: { title: DOCUMENT_FOLDER_TITLES.propertyDocuments, documents: [] },
-    evidence: { title: DOCUMENT_FOLDER_TITLES.evidence, documents: [] },
-    correspondence: { title: DOCUMENT_FOLDER_TITLES.correspondence, documents: [] },
+    statementsOfCase: { title: titles.statementsOfCase, documents: [] },
+    propertyDocuments: { title: titles.propertyDocuments, documents: [] },
+    evidence: { title: titles.evidence, documents: [] },
+    correspondence: { title: titles.correspondence, documents: [] },
   };
 }
 
@@ -68,7 +84,7 @@ function isDocumentFolderKey(value: unknown): value is DocumentFolderKey {
   return typeof value === 'string' && value in DOCUMENT_FOLDER_TITLES;
 }
 
-export function formatSubmittedOn(dateValue?: string, locale = 'en-GB'): string | null {
+export function formatSubmittedOn(dateValue?: string, locale = 'en-GB', submittedOnPrefix = 'Submitted on'): string | null {
   if (!dateValue) {
     return null;
   }
@@ -79,7 +95,7 @@ export function formatSubmittedOn(dateValue?: string, locale = 'en-GB'): string 
     return null;
   }
 
-  return `Submitted on ${new Intl.DateTimeFormat(locale, {
+  return `${submittedOnPrefix} ${new Intl.DateTimeFormat(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
