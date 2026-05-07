@@ -53,6 +53,7 @@
     },
     "ViewClaim": { "title": "cyView the claim" },
     "RespondToClaim": { "title": "cyRespond to the claim" },
+    "ViewResponse": { "title": "cyView the response" },
     "ViewDocuments": { "title": "cyView documents" },
     "ViewHearingDocuments": { "title": "cyView hearing documents" },
     "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
