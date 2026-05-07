@@ -41,10 +41,12 @@ const doc2: CcdCollectionItem<CcdUploadedDocument> = {
   },
 };
 
+const VALID_CASE_REF = '1234567890123456';
+
 function makeReq(overrides: Record<string, unknown> = {}): Request {
   return {
     session: { user: { accessToken: 'test-token' } },
-    params: { caseReference: 'case-123' },
+    params: { caseReference: VALID_CASE_REF },
     res: { locals: {} },
     ...overrides,
   } as unknown as Request;
@@ -61,7 +63,7 @@ describe('createCcdDraftStorage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUpdateDraft.mockResolvedValue({ id: 'case-123', data: {} });
+    mockUpdateDraft.mockResolvedValue({ id: VALID_CASE_REF, data: {} });
   });
 
   describe('read', () => {
@@ -106,7 +108,7 @@ describe('createCcdDraftStorage', () => {
   describe('readFresh', () => {
     it('calls getCaseById with configured event id and returns docs at path', async () => {
       mockGetCaseById.mockResolvedValue({
-        id: 'case-123',
+        id: VALID_CASE_REF,
         data: {
           possessionClaimResponse: {
             defendantResponses: { defendantDocuments: [doc1, doc2] },
@@ -117,12 +119,12 @@ describe('createCcdDraftStorage', () => {
       const req = makeReq();
       const result = await storage.readFresh(req);
 
-      expect(mockGetCaseById).toHaveBeenCalledWith('test-token', 'case-123', EVENT.id);
+      expect(mockGetCaseById).toHaveBeenCalledWith('test-token', VALID_CASE_REF, EVENT.id);
       expect(result).toEqual([doc1, doc2]);
     });
 
     it('returns empty array when path not present in fresh response', async () => {
-      mockGetCaseById.mockResolvedValue({ id: 'case-123', data: {} });
+      mockGetCaseById.mockResolvedValue({ id: VALID_CASE_REF, data: {} });
 
       const result = await storage.readFresh(makeReq());
 
@@ -134,6 +136,13 @@ describe('createCcdDraftStorage', () => {
 
       await expect(storage.readFresh(req)).rejects.toThrow('User not authenticated');
     });
+
+    it('throws 404 when case reference is not 16 digits', async () => {
+      const req = makeReq({ params: { caseReference: 'not-a-case-id' } });
+
+      await expect(storage.readFresh(req)).rejects.toThrow('Invalid case reference format');
+      expect(mockGetCaseById).not.toHaveBeenCalled();
+    });
   });
 
   describe('save', () => {
@@ -141,7 +150,7 @@ describe('createCcdDraftStorage', () => {
       const req = makeReq();
       await storage.save(req, [doc1, doc2]);
 
-      expect(mockUpdateDraft).toHaveBeenCalledWith(EVENT, 'test-token', 'case-123', {
+      expect(mockUpdateDraft).toHaveBeenCalledWith(EVENT, 'test-token', VALID_CASE_REF, {
         possessionClaimResponse: {
           defendantResponses: { defendantDocuments: [doc1, doc2] },
         },
@@ -152,6 +161,13 @@ describe('createCcdDraftStorage', () => {
       const req = makeReq({ session: {} });
 
       await expect(storage.save(req, [])).rejects.toThrow('User not authenticated');
+    });
+
+    it('throws 404 when case reference is not 16 digits', async () => {
+      const req = makeReq({ params: { caseReference: '123' } });
+
+      await expect(storage.save(req, [])).rejects.toThrow('Invalid case reference format');
+      expect(mockUpdateDraft).not.toHaveBeenCalled();
     });
   });
 });
