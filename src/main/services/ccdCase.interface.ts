@@ -303,10 +303,10 @@ export interface CcdDashboardData {
 }
 
 export enum GenAppType {
-  SUSPEND,
-  ADJOURN,
-  SET_ASIDE,
-  SOMETHING_ELSE,
+  SUSPEND = 'SUSPEND',
+  ADJOURN = 'ADJOURN',
+  SET_ASIDE = 'SET_ASIDE',
+  SOMETHING_ELSE = 'SOMETHING_ELSE',
 }
 
 export interface CitizenGenAppRequest {
@@ -320,4 +320,7 @@ export interface CitizenGenAppRequest {
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
   whatOrderWanted?: string;
+  sotAccepted?: YesNoValue;
+  sotFullName?: string;
+  clientReference?: string;
 }
