@@ -84,7 +84,11 @@ function isDocumentFolderKey(value: unknown): value is DocumentFolderKey {
   return typeof value === 'string' && value in DOCUMENT_FOLDER_TITLES;
 }
 
-export function formatSubmittedOn(dateValue?: string, locale = 'en-GB', submittedOnPrefix = 'Submitted on'): string | null {
+export function formatSubmittedOn(
+  dateValue?: string,
+  locale = 'en-GB',
+  submittedOnPrefix = 'Submitted on'
+): string | null {
   if (!dateValue) {
     return null;
   }

@@ -32,7 +32,11 @@ describe('viewDocuments route', () => {
     viewDocumentsRoute(app);
 
     expect(app.get).toHaveBeenCalledWith('/case/:caseId/view-documents', expect.anything(), expect.anything());
-    expect(app.get).toHaveBeenCalledWith('/case/:caseId/view-documents/:documentId', expect.anything(), expect.anything());
+    expect(app.get).toHaveBeenCalledWith(
+      '/case/:caseId/view-documents/:documentId',
+      expect.anything(),
+      expect.anything()
+    );
   });
 
   it('should render the view-documents template with extracted folders', async () => {
@@ -69,13 +73,13 @@ describe('viewDocuments route', () => {
         session: { user: { accessToken: 'token' } },
         t: (key: string) =>
           (
-            {
+            ({
               'dashboard:viewDocuments.submittedOn': 'Submitted on',
               'dashboard:viewDocuments.folders.statementsOfCase': 'Statements of case',
               'dashboard:viewDocuments.folders.propertyDocuments': 'Property documents',
               'dashboard:viewDocuments.folders.evidence': 'Evidence',
               'dashboard:viewDocuments.folders.correspondence': 'Correspondence',
-            } as Record<string, string>
+            }) as Record<string, string>
           )[key],
       } as unknown as Request,
       res,
