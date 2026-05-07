@@ -29,6 +29,18 @@
         "title": "cyCase issued",
         "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">View the claim</a>. Respond by {{responseEndDate}}."
       },
+      "ResponseToClaim": {
+        "title": "cyResponse to claim",
+        "body": "<a class=\"govuk-link\" href=\"{{respondToClaimUrl}}\">{{ctaLabel}}</a>"
+      },
+      "ResponseNotStarted": {
+        "title": "cyYour response",
+        "body": "cyYou should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Start your response</a>"
+      },
+      "ResponseInProgress": {
+        "title": "cyYour response",
+        "body": "cyYou should complete your response before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Continue with your response</a>"
+      },
       "ResponseSubmitted": {
         "title": "cyYour response",
         "body": "cyYou have responded to the claim."

@@ -31,8 +31,8 @@
         "body": "Your case has been issued. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">View the claim</a>. Respond by {{responseEndDate}}."
       },
       "ResponseToClaim": {
-        "title": "Your response",
-        "body": "You should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}//respond-to-claim/start-now\">{{ctaLabel}}</a>"
+        "title": "Response to claim",
+        "body": "<a class=\"govuk-link\" href=\"{{respondToClaimUrl}}\">{{ctaLabel}}</a>"
       },
       "ResponseNotStarted": {
         "title": "Your response",
