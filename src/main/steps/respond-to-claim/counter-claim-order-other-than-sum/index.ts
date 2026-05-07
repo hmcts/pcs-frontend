@@ -21,26 +21,26 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'orderOtherThanSumRequested',
+      name: 'otherOrderRequestDetails',
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.orderOtherThanSumRequestedRequired',
+      errorMessage: 'errors.otherOrderRequestDetailsRequired',
       labelClasses: 'govuk-label--s',
       translationKey: {
-        label: 'orderOtherThanSumRequestedLabel',
+        label: 'otherOrderRequestDetailsLabel',
         hint: 'characterCountHint',
       },
     },
     {
-      name: 'orderOtherThanSumFacts',
+      name: 'otherOrderRequestFacts',
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.orderOtherThanSumFactsRequired',
+      errorMessage: 'errors.otherOrderRequestFactsRequired',
       labelClasses: 'govuk-label--s',
       translationKey: {
-        label: 'orderOtherThanSumFactsLabel',
+        label: 'otherOrderRequestFactsLabel',
       },
     },
   ],
@@ -51,19 +51,19 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
     return {
-      ...(counterClaim.orderOtherThanSumRequested
-        ? { orderOtherThanSumRequested: counterClaim.orderOtherThanSumRequested }
+      ...(counterClaim.otherOrderRequestDetails
+        ? { otherOrderRequestDetails: counterClaim.otherOrderRequestDetails }
         : {}),
-      ...(counterClaim.orderOtherThanSumFacts ? { orderOtherThanSumFacts: counterClaim.orderOtherThanSumFacts } : {}),
+      ...(counterClaim.otherOrderRequestFacts ? { otherOrderRequestFacts: counterClaim.otherOrderRequestFacts } : {}),
     };
   },
   beforeRedirect: async (req: Request) => {
-    const orderOtherThanSumRequested = (req.body?.orderOtherThanSumRequested as string | undefined)?.trim();
-    const orderOtherThanSumFacts = (req.body?.orderOtherThanSumFacts as string | undefined)?.trim();
+    const otherOrderRequestDetails = (req.body?.otherOrderRequestDetails as string | undefined)?.trim();
+    const otherOrderRequestFacts = (req.body?.otherOrderRequestFacts as string | undefined)?.trim();
 
     const counterClaim: CcdCounterClaim = {
-      ...(orderOtherThanSumRequested ? { orderOtherThanSumRequested } : {}),
-      ...(orderOtherThanSumFacts ? { orderOtherThanSumFacts } : {}),
+      ...(otherOrderRequestDetails ? { otherOrderRequestDetails } : {}),
+      ...(otherOrderRequestFacts ? { otherOrderRequestFacts } : {}),
     };
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: { counterClaim: { ...counterClaim } },

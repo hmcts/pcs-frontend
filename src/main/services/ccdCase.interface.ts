@@ -193,10 +193,10 @@ export interface CcdCounterClaim {
   claimAmount?: string;
   estimatedMaxClaimAmount?: string;
   counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
-  aboutCounterclaimFor?: string;
-  aboutCounterclaimReasons?: string;
-  orderOtherThanSumRequested?: string;
-  orderOtherThanSumFacts?: string;
+  counterClaimFor?: string;
+  counterClaimReasons?: string;
+  otherOrderRequestDetails?: string;
+  otherOrderRequestFacts?: string;
 }
 
 export interface PossessionClaimResponse {

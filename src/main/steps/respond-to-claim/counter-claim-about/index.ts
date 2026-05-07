@@ -21,25 +21,25 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      name: 'aboutCounterclaimFor',
+      name: 'counterClaimFor',
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.aboutCounterclaimForRequired',
+      errorMessage: 'errors.counterClaimForRequired',
       labelClasses: 'govuk-label--s',
       translationKey: {
-        label: 'aboutCounterclaimForLabel',
+        label: 'counterClaimForLabel',
       },
     },
     {
-      name: 'aboutCounterclaimReasons',
+      name: 'counterClaimReasons',
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.aboutCounterclaimReasonsRequired',
+      errorMessage: 'errors.counterClaimReasonsRequired',
       labelClasses: 'govuk-label--s',
       translationKey: {
-        label: 'aboutCounterclaimReasonsLabel',
+        label: 'counterClaimReasonsLabel',
       },
     },
   ],
@@ -50,19 +50,19 @@ export const step: StepDefinition = createFormStep({
       return {};
     }
     return {
-      ...(counterClaim.aboutCounterclaimFor ? { aboutCounterclaimFor: counterClaim.aboutCounterclaimFor } : {}),
-      ...(counterClaim.aboutCounterclaimReasons
-        ? { aboutCounterclaimReasons: counterClaim.aboutCounterclaimReasons }
+      ...(counterClaim.counterClaimFor ? { counterClaimFor: counterClaim.counterClaimFor } : {}),
+      ...(counterClaim.counterClaimReasons
+        ? { counterClaimReasons: counterClaim.counterClaimReasons }
         : {}),
     };
   },
   beforeRedirect: async (req: Request) => {
-    const aboutCounterclaimFor = (req.body?.aboutCounterclaimFor as string | undefined)?.trim();
-    const aboutCounterclaimReasons = (req.body?.aboutCounterclaimReasons as string | undefined)?.trim();
+    const counterClaimFor = (req.body?.counterClaimFor as string | undefined)?.trim();
+    const counterClaimReasons = (req.body?.counterClaimReasons as string | undefined)?.trim();
 
     const counterClaim: CcdCounterClaim = {
-      ...(aboutCounterclaimFor ? { aboutCounterclaimFor } : {}),
-      ...(aboutCounterclaimReasons ? { aboutCounterclaimReasons } : {}),
+      ...(counterClaimFor ? { counterClaimFor } : {}),
+      ...(counterClaimReasons ? { counterClaimReasons } : {}),
     };
     const possessionClaimResponse: PossessionClaimResponse = {
       defendantResponses: { counterClaim: { ...counterClaim } },

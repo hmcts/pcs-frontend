@@ -4,12 +4,12 @@
   "infoParagraph1": "You will be able to upload any evidence you have on the next page.",
   "infoParagraph2": "The claimant will be able to see your answers.",
   "characterCountHint": "For example, 'for the landlord to conduct remedial works'",
-  "orderOtherThanSumRequestedLabel": "What orders are you asking the court to make?",
-  "orderOtherThanSumFactsLabel": "What facts would you like the court to consider when deciding the claim?",
+  "otherOrderRequestDetailsLabel": "What orders are you asking the court to make?",
+  "otherOrderRequestFactsLabel": "What facts would you like the court to consider when deciding the claim?",
   "errors": {
-    "orderOtherThanSumRequestedRequired": "Enter what orders you are asking the court to make",
-    "orderOtherThanSumRequestedMaxLength": "What orders you are asking the court to make must be 6800 characters or less",
-    "orderOtherThanSumFactsRequired": "Enter what facts you would like the court to consider when deciding the claim",
-    "orderOtherThanSumFactsMaxLength": "What facts you would like the court to consider must be 6800 characters or less"
+    "otherOrderRequestDetailsRequired": "Enter what orders you are asking the court to make",
+    "otherOrderRequestDetailsMaxLength": "What orders you are asking the court to make must be 6800 characters or less",
+    "otherOrderRequestFactsRequired": "Enter what facts you would like the court to consider when deciding the claim",
+    "otherOrderRequestFactsMaxLength": "What facts you would like the court to consider must be 6800 characters or less"
   }
 }
