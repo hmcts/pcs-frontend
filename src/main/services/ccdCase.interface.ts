@@ -175,6 +175,7 @@ export interface CcdDefendantResponses {
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
+  makeCounterClaim?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
