@@ -12,14 +12,5 @@ export const uploadDocumentsToSupportYourApplication = {
   uploadAFileLabel: `Upload a file`,
   dragAndDropFilesParagraph: `Drag and drop files here or`,
   chooseFilesButton: `Choose files`,
-  removeHiddenButton: `Remove`,
-  thereIsAProblemErrorMessageHeader: `There is a problem`,
-  errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
-  errorValidationField: {
-    errorRadioOption: {
-      type: `none`,
-      input: ``,
-      errMessage: `Confirm if you want to upload documents to support your application`,
-    },
-  },
+  removeHiddenButton: `Remove`
 };
