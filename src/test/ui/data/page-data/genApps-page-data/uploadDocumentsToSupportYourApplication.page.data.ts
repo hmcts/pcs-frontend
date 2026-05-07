@@ -12,5 +12,5 @@ export const uploadDocumentsToSupportYourApplication = {
   uploadAFileLabel: `Upload a file`,
   dragAndDropFilesParagraph: `Drag and drop files here or`,
   chooseFilesButton: `Choose files`,
-  removeHiddenButton: `Remove`
+  removeHiddenButton: `Remove`,
 };
