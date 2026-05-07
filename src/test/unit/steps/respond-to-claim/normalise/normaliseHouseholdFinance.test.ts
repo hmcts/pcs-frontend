@@ -38,6 +38,33 @@ describe('normaliseHouseholdFinance', () => {
     });
   });
 
+  it('drops regular expense fields when shareIncomeExpenseDetails is NO', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        householdCircumstances: {
+          shareIncomeExpenseDetails: 'NO',
+          householdBills: { applies: 'YES', amount: '5000', frequency: 'MONTHLY' },
+          loanPayments: { applies: 'YES', amount: '2000', frequency: 'WEEKLY' },
+          childSpousalMaintenance: { applies: 'YES', amount: '1500', frequency: 'MONTHLY' },
+          mobilePhone: { applies: 'YES', amount: '2500', frequency: 'MONTHLY' },
+          groceryShopping: { applies: 'YES', amount: '8000', frequency: 'MONTHLY' },
+          fuelParkingTransport: { applies: 'YES', amount: '3000', frequency: 'MONTHLY' },
+          schoolCosts: { applies: 'YES', amount: '4000', frequency: 'MONTHLY' },
+          clothing: { applies: 'YES', amount: '2000', frequency: 'MONTHLY' },
+          otherExpenses: { applies: 'YES', amount: '1000', frequency: 'WEEKLY' },
+          dependantChildren: 'YES',
+        },
+      },
+    };
+
+    normaliseHouseholdFinance(response);
+
+    expect(response.defendantResponses?.householdCircumstances).toEqual({
+      shareIncomeExpenseDetails: 'NO',
+      dependantChildren: 'YES',
+    });
+  });
+
   it('drops the finance branch when shareIncomeExpenseDetails is undefined', () => {
     const response: PossessionClaimResponse = {
       defendantResponses: {

@@ -18,7 +18,6 @@ export function normaliseHouseholdFinance(response: PossessionClaimResponse): vo
   }
 }
 
-// Extracted because the block is 15 lines — kept inline would dwarf the rule above.
 const dropEntireFinanceBranch = (hc: HouseholdCircumstances): void => {
   delete hc.incomeFromJobs;
   delete hc.incomeFromJobsAmount;
@@ -35,4 +34,13 @@ const dropEntireFinanceBranch = (hc: HouseholdCircumstances): void => {
   delete hc.otherBenefitsFrequency;
   delete hc.moneyFromElsewhere;
   delete hc.moneyFromElsewhereDetails;
+  delete hc.householdBills;
+  delete hc.loanPayments;
+  delete hc.childSpousalMaintenance;
+  delete hc.mobilePhone;
+  delete hc.groceryShopping;
+  delete hc.fuelParkingTransport;
+  delete hc.schoolCosts;
+  delete hc.clothing;
+  delete hc.otherExpenses;
 };
