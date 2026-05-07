@@ -44,17 +44,15 @@
       "COMPLETED": "Completed",
       "NOT_STARTED": "Not started"
     },
-    "Defendant": {
-      "ViewClaim": { "title": "View the claim" },
-      "RespondToClaim": { "title": "Respond to the claim" },
-      "ViewDocuments": { "title": "View documents" },
-      "ViewHearingDocuments": { "title": "View hearing documents" },
-      "ViewOrdersAndNotices": { "title": "View orders and notices" },
-      "UploadDocuments": { "title": "Upload documents" },
-      "ReviewResponse": { "title": "Review the response" },
-      "SubmitResponse": { "title": "Submit the response" },
-      "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
-      "ViewAllApplications": { "title": "View all applications" }
-    }
+    "ViewClaim": { "title": "View the claim" },
+    "RespondToClaim": { "title": "Respond to the claim" },
+    "ViewDocuments": { "title": "View documents" },
+    "ViewHearingDocuments": { "title": "View hearing documents" },
+    "ViewOrdersAndNotices": { "title": "View orders and notices" },
+    "UploadDocuments": { "title": "Upload documents" },
+    "ReviewResponse": { "title": "Review the response" },
+    "SubmitResponse": { "title": "Submit the response" },
+    "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
+    "ViewAllApplications": { "title": "View all applications" }
   }
 }

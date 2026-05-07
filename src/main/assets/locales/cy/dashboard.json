@@ -43,17 +43,15 @@
       "COMPLETED": "cyCompleted",
       "NOT_STARTED": "cyNot started"
     },
-    "Defendant": {
-      "ViewClaim": { "title": "cyView the claim" },
-      "RespondToClaim": { "title": "cyRespond to the claim" },
-      "ViewDocuments": { "title": "cyView documents" },
-      "ViewHearingDocuments": { "title": "cyView hearing documents" },
-      "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
-      "UploadDocuments": { "title": "cyUpload documents" },
-      "ReviewResponse": { "title": "cyReview the response" },
-      "SubmitResponse": { "title": "cySubmit the response" },
-      "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
-      "ViewAllApplications": { "title": "cyView all applications" }
-    }
+    "ViewClaim": { "title": "cyView the claim" },
+    "RespondToClaim": { "title": "cyRespond to the claim" },
+    "ViewDocuments": { "title": "cyView documents" },
+    "ViewHearingDocuments": { "title": "cyView hearing documents" },
+    "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
+    "UploadDocuments": { "title": "cyUpload documents" },
+    "ReviewResponse": { "title": "cyReview the response" },
+    "SubmitResponse": { "title": "cySubmit the response" },
+    "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
+    "ViewAllApplications": { "title": "cyView all applications" }
   }
 }
