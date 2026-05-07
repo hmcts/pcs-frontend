@@ -2,7 +2,7 @@
   "caption": "Respond to a property possession claim",
   "caseNumber": "Case number: {{caseNumber}}",
   "heading": "Income",
-  "question": "What regular income does the defendant receive?",
+  "subheading": "What regular income does the defendant receive?",
   "groupName": "Regular income options",
   "hintText": "Select all that apply. The information the defendant provides must be truthful and accurate.",
   "options": {
@@ -10,9 +10,6 @@
     "moneyFromElsewhere": "Money from somewhere else (for example, child maintenance payments or someone in the defendant's household gives them money)"
   },
   "subFields": {
-    "amount": "Amount received",
-    "frequency": "Received every:",
-    "moneyFromElsewhereDetailsLabel": "Give details",
     "moneyFromElsewhereDetailsHint": "Give details about the other sources of income and how much the defendant usually receives a month"
   },
   "errors": {

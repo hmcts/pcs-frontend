@@ -2,7 +2,7 @@
   "caption": "cyRespond to a property possession claim",
   "caseNumber": "cyCase number: {{caseNumber}}",
   "heading": "cyIncome",
-  "question": "cyWhat regular income does the defendant receive?",
+  "subheading": "cyWhat regular income does the defendant receive?",
   "groupName": "cyRegular income options",
   "hintText": "cySelect all that apply. The information the defendant provides must be truthful and accurate.",
   "options": {
@@ -10,9 +10,6 @@
     "moneyFromElsewhere": "cyMoney from somewhere else (for example, child maintenance payments or someone in the defendant's household gives them money)"
   },
   "subFields": {
-    "amount": "cyAmount received",
-    "frequency": "cyReceived every:",
-    "moneyFromElsewhereDetailsLabel": "cyGive details",
     "moneyFromElsewhereDetailsHint": "cyGive details about the other sources of income and how much the defendant usually receives a month"
   },
   "errors": {

@@ -107,6 +107,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     hintText: 'hintText',
     caseNumber: 'caseNumber',
+    subheading: 'subheading',
   },
 
   fields: [

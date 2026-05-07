@@ -75,7 +75,6 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   showCancelButton: false,
-  customTemplate: `${__dirname}/regularIncome.njk`,
 
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
@@ -232,7 +231,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     hintText: 'hintText',
     caseNumber: 'caseNumber',
-    question: 'question',
+    subheading: 'subheading',
   },
 
   fields: [
