@@ -143,7 +143,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('counter-claim-what-are-you-claiming-for');
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe(
+      'counter-claim-what-are-you-claiming-for'
+    );
   });
 
   const rentArrearsData = {
