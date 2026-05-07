@@ -107,13 +107,6 @@ export default function citizenCaseLinkRoutes(app: Application): void {
     // Strip hyphens to get the internal 16-digit case ID
     const caseId = claimNumber.replace(/-/g, '');
 
-    if (!/^\d{16}$/.test(caseId)) {
-      errors.claimNumber = {
-        text: 'Claim number must only include numbers 0 to 9 and special characters such as hyphens',
-      };
-      return renderForm(res, errors, claimNumber, accessCode);
-    }
-
     try {
       const result = await validateAccessCode(userAccessToken, caseId, accessCode);
 
