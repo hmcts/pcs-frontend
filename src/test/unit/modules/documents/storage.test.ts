@@ -24,7 +24,7 @@ const doc1: CcdCollectionItem<CcdUploadedDocument> = {
       document_filename: 'file1.pdf',
     },
     contentType: 'application/pdf',
-    size: 1024,
+    sizeInBytes: 1024,
   },
 };
 
@@ -37,7 +37,7 @@ const doc2: CcdCollectionItem<CcdUploadedDocument> = {
       document_filename: 'file2.pdf',
     },
     contentType: 'application/pdf',
-    size: 2048,
+    sizeInBytes: 2048,
   },
 };
 

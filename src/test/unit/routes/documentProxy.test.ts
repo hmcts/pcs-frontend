@@ -102,7 +102,7 @@ const existingDoc = {
       document_filename: 'existing.pdf',
     },
     contentType: 'application/pdf',
-    size: 500,
+    sizeInBytes: 500,
   },
 };
 

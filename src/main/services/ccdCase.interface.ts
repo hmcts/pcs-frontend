@@ -158,7 +158,7 @@ export interface CcdDocumentReference {
 export interface CcdUploadedDocument {
   document: CcdDocumentReference;
   contentType?: string;
-  size?: number;
+  sizeInBytes?: number;
 }
 
 export interface CcdCollectionItem<T> {

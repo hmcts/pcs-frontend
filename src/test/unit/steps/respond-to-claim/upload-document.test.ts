@@ -106,7 +106,7 @@ describe('upload-document step', () => {
               document_filename: 'evidence.pdf',
             },
             contentType: 'application/pdf',
-            size: 1024,
+            sizeInBytes: 1024,
           },
         },
       ];

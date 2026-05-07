@@ -32,7 +32,7 @@ export function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[
     id: item.id,
     document_filename: item.value.document.document_filename,
     content_type: item.value.contentType,
-    size: item.value.size,
+    size: item.value.sizeInBytes,
   }));
 }
 

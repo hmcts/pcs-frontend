@@ -147,7 +147,7 @@ function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocu
         document_filename: cdamDoc.document_filename,
       },
       contentType: cdamDoc.content_type,
-      size: cdamDoc.size,
+      sizeInBytes: cdamDoc.size,
     },
   };
 }
