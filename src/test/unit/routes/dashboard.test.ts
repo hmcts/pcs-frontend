@@ -316,7 +316,7 @@ describe('Dashboard Routes', () => {
       const [respondToClaimTask, viewResponseTask] = responseGroup.tasks;
 
       expect(respondToClaimTask.href).toBeUndefined();
-      expect(viewResponseTask.href).toBe('/case/1234567890123456/view-response');
+      expect(viewResponseTask.href).toBe('/case/1234567890123456/view-the-response');
     });
 
     it('should fall back to default task href when config taskRoutes value is not an object', async () => {
