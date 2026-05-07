@@ -5,18 +5,23 @@ jest.mock('../../../../main/modules/steps', () => ({
 
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim';
 
-describe('counter-claim step (placeholder)', () => {
-  const testedStep = step as unknown as { stepName: string; fields: unknown[]; documentStorage?: unknown };
+describe('counter-claim step', () => {
+  const testedStep = step as unknown as {
+    stepName: string;
+    fields: { name: string; type: string }[];
+    documentStorage?: unknown;
+  };
 
   it('has correct step name', () => {
     expect(testedStep.stepName).toBe('counter-claim');
   });
 
-  it('has no fields (placeholder)', () => {
-    expect(testedStep.fields).toEqual([]);
+  it('exposes the makeCounterClaim radio field', () => {
+    expect(testedStep.fields).toHaveLength(1);
+    expect(testedStep.fields[0]).toMatchObject({ name: 'makeCounterClaim', type: 'radio' });
   });
 
-  it('has no documentStorage (placeholder — upload removed)', () => {
+  it('has no documentStorage (upload removed)', () => {
     expect(testedStep.documentStorage).toBeUndefined();
   });
 });
