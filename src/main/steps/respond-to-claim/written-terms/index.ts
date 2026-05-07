@@ -3,9 +3,10 @@ import type { Request } from 'express';
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 const STEP_NAME = 'written-terms';
 
@@ -19,6 +20,8 @@ export const step: StepDefinition = createFormStep({
     caption: 'caption',
     pageTitle: 'pageTitle',
     introText: 'introText',
+    heading: 'heading',
+    termsQuestion: 'termsQuestion'
   },
   fields: [
     {
@@ -56,5 +59,13 @@ export const step: StepDefinition = createFormStep({
     };
 
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  extendGetContent: req => {
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+    const t = getTranslationFunction(req, 'written-terms', ['common']);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
   },
 });

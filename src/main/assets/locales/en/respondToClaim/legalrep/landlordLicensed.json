@@ -1,0 +1,16 @@
+{
+  "caption": "Respond to a property possession claim",
+  "caseNumber": "Case number: {{caseNumber}}",
+  "pageTitle": "Landlord licensing, registration and written terms",
+  "paragraph": "You can check if the landlord is licensed by searching the <a href=\"https://rentsmart.gov.wales/en/check-register/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Public Register (opens in new tab)</a>.",
+  "question": " ",
+  "heading": "Licensed landlord",
+  "landlordQuestion": "Is the landlord licensed?",
+
+  "options": {
+    "imNotSure": "Defendant not sure"
+  },
+  "errors": {
+    "confirmLandlordLicensed": "Select if you agree with the landlord’s claim to be licensed"
+  }
+}

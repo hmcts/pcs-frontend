@@ -1,9 +1,10 @@
 import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 const STEP_NAME = 'landlord-registered';
 
@@ -19,6 +20,7 @@ export const step: StepDefinition = createFormStep({
     question: 'question',
     publicRegisterLinkText: 'publicRegisterLinkText',
     introText: 'introText',
+    heading: 'heading'
   },
   fields: [
     {
@@ -59,5 +61,13 @@ export const step: StepDefinition = createFormStep({
     };
 
     await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+  },
+    extendGetContent: req => {
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+    const t = getTranslationFunction(req, 'landlord-registered', ['common']);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
   },
 });
