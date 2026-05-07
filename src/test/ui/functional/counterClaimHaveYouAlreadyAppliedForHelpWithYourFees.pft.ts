@@ -1,4 +1,9 @@
-import { counterClaim, counterClaimHaveYouAlreadyAppliedForHelpWithYourFees } from '../data/page-data';
+import {
+  counterClaim,
+  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
+  dashboard,
+  feedback,
+} from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation(): Promise<void> {
@@ -24,9 +29,24 @@ export async function counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorV
 }
 
 export async function counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.pageSlug,
+  });
   await performValidation(
     'pageNavigation',
     counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.backLink,
     counterClaim.mainHeader
+  );
+  await performAction('clickRadioButton', counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption);
+  await performAction(
+    'inputText',
+    counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.enterHelpWithFeeReferenceHiddenTextLabel,
+    counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput
+  );
+  await performValidation(
+    'pageNavigation',
+    counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.saveForLaterButton,
+    dashboard.mainHeader
   );
 }
