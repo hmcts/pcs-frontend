@@ -22,7 +22,7 @@ export const step: StepDefinition = createFormStep({
       type: 'radio',
       required: true,
       translationKey: { label: 'question' },
-      legendClasses: 'govuk-fieldset__legend--m',
+      legendClasses: 'govuk-visually-hidden',
       errorMessage: 'errors.alreadyAppliedForHelp',
       options: [
         {
