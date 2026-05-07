@@ -6,6 +6,7 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimAbout,
   counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameCapture,
@@ -283,11 +284,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
 
-    await softErrorMessageValidation('counterClaim', NO_EMV_READ_ONLY);
-    await performValidation('mainHeader', counterClaim.mainHeader);
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
-
-    await performAction(
+    await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
       counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation
     );
@@ -295,7 +292,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
-
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
 
@@ -505,7 +503,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performValidation('mainHeader', counterClaim.mainHeader);
     await performAction('clickButton', counterClaim.saveAndContinueButton);
 
-    await performAction(
+    await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
       counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation
     );
@@ -513,6 +511,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
 
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
