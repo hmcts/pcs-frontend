@@ -8,6 +8,7 @@ import {
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
   correspondenceAddress,
+  counterClaim,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -70,6 +71,7 @@ export class RespondToClaimAction implements IAction {
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
       ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
+      ['selectCounterClaim', () => this.selectCounterClaim(fieldName as actionRecord)],
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
@@ -315,6 +317,14 @@ export class RespondToClaimAction implements IAction {
       option: howMuchToPayData.radioOption,
     });
     await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
+  }
+
+  private async selectCounterClaim(counterClaimOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterClaim.doYouWantToMakeACounterclaim,
+      option: counterClaimOption.option,
+    });
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
   }
 
   private async selectIncomeAndExpenses(incomeAndExpenseData: actionRecord): Promise<void> {
