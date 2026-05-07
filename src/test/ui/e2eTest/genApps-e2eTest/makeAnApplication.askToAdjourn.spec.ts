@@ -2,7 +2,7 @@ import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   askToAdjournTheCourtHearing,
-  checkYourAnswers,
+  checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentToSupportYourApplication,
@@ -78,14 +78,27 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
     });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
-    await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performAction('reviewCYA', 'journey1');
+    await performAction('reviewAndUpdateCYA', {
+      changeOption: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
+      journey: 'journey2',
+    });
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    await performAction('selectStatementOfTruth', {
+      question: checkYourAnswersGenApps.statementOfTruthQuestion,
+      option: checkYourAnswersGenApps.iBelieveTheFactsHiddenCheckbox,
+      label: checkYourAnswersGenApps.yourFullNameTextLabel,
+      input: checkYourAnswersGenApps.yourFullNameTextInput,
+    });
   });
 
   test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression', async () => {
@@ -119,12 +132,25 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
     await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.noRadioOption);
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
     });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
+    await performAction('reviewAndUpdateCYA', {
+      changeOption: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
+      journey: 'journey3',
+    });
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    await performAction('selectStatementOfTruth', {
+      question: checkYourAnswersGenApps.statementOfTruthQuestion,
+      option: checkYourAnswersGenApps.iBelieveTheFactsHiddenCheckbox,
+      label: checkYourAnswersGenApps.yourFullNameTextLabel,
+      input: checkYourAnswersGenApps.yourFullNameTextInput,
+    });
   });
 });
