@@ -51,9 +51,7 @@ export const step: StepDefinition = createFormStep({
     }
     return {
       ...(counterClaim.counterClaimFor ? { counterClaimFor: counterClaim.counterClaimFor } : {}),
-      ...(counterClaim.counterClaimReasons
-        ? { counterClaimReasons: counterClaim.counterClaimReasons }
-        : {}),
+      ...(counterClaim.counterClaimReasons ? { counterClaimReasons: counterClaim.counterClaimReasons } : {}),
     };
   },
   beforeRedirect: async (req: Request) => {
