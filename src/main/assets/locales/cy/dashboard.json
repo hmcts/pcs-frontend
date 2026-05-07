@@ -14,7 +14,7 @@
 
   "taskGroups": {
     "CLAIM": "cyThe claim against you",
-    "HEARING": "cyCourt Hearing",
+    "HEARING": "cyCourt hearings",
     "JUDGEMENT": "cyJudgement from the court",
     "NOTICE": "cyOrders and notices from the court",
     "RESPONSE": "cyThe response",
