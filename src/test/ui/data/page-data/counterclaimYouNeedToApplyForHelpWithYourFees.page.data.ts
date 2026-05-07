@@ -3,7 +3,6 @@ export const counterclaimYouNeedToApplyForHelpWithYourFees = {
   stoOrDelayAnEvictionParagraph: `Stop or delay an eviction`,
   backLink: `Back`,
   saveForLaterButton: `Save for later`,
-
   cymraegLink: `Cymraeg`,
   youNeedToParagraph: `You need to`,
   applyForHelpWithFeeLink: `apply for Help with Fees (opens in new tab)`,
@@ -11,7 +10,9 @@ export const counterclaimYouNeedToApplyForHelpWithYourFees = {
   enterTheCourtFormNumberParagraph: `Enter the court form number 'XXX' when asked. This will be one of the first questions when you apply for help with your fees.`,
   afterYouHaveAppliedParagraph: `After you have applied you will receive a Help with Fees reference number. You should enter the reference number when you return to this counterclaim.`,
   ifYouReceiveAnyBenefit: `If you receive any benefit that qualifies you for Help with Fees, you must include evidence of it when you apply online for Help with Fees.`,
-  Paragraph: `If you have your Help with Fees reference number you can`,
+  ifYouHaveParagraph: `If you have your`,
+  helpWithFeesLink: `Help with Fees reference number`,
+  enterNowParagraph: `, you can enter it now.`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `counter-claim-you-need-to-apply-for-help-with-your-fees`,
 };
