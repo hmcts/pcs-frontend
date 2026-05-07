@@ -80,6 +80,9 @@ export class ActionRegistry {
     ['selectWhatRegularIncomeDoYouReceive', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
+    ['selectUniversalCredit', new RespondToClaimAction()],
+    ['selectPriorityDebts', new RespondToClaimAction()],
+    ['enterPriorityDebtDetails', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
 

@@ -17,6 +17,7 @@ import {
   doYouHaveAnyOtherDependants,
   exceptionalHardship,
   freeLegalAdvice,
+  haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
   incomeAndExpenses,
   installmentPayments,
@@ -28,6 +29,8 @@ import {
   noticeDateWhenProvided,
   otherConsiderations,
   paymentInterstitial,
+  priorityDebtDetails,
+  priorityDebts,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
@@ -94,6 +97,9 @@ export class RespondToClaimAction implements IAction {
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
+      ['selectUniversalCredit', () => this.selectUniversalCredit(fieldName as actionRecord)],
+      ['selectPriorityDebts', () => this.selectPriorityDebts(fieldName as actionRecord)],
+      ['enterPriorityDebtDetails', () => this.enterPriorityDebtDetails(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
     ]);
@@ -621,6 +627,48 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
+  private async selectUniversalCredit(universalCreditDateData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      option: universalCreditDateData.creditRadioOption,
+    });
+    if (
+      universalCreditDateData.creditRadioOption === 'Yes' &&
+      universalCreditDateData?.day &&
+      universalCreditDateData?.month &&
+      universalCreditDateData?.year
+    ) {
+      await performActions(
+        'Enter Date',
+        ['inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, universalCreditDateData.day],
+        ['inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, universalCreditDateData.month],
+        ['inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, universalCreditDateData.year]
+      );
+    }
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  }
+
+  private async selectPriorityDebts(priorityDebtsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebtsData.option,
+    });
+    await performAction('clickButton', priorityDebts.saveAndContinueButton);
+  }
+
+  private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      priorityDebtDetails.whatIsTheTotalAmountQuestion,
+      priorityDebtDetailsData.totalAmount
+    );
+    await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetailsData.payAmount);
+    await performAction('clickRadioButton', {
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetailsData.option,
+    });
+    await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  }
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
       await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
