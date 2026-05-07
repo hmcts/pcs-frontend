@@ -1,3 +1,6 @@
+import { Request } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
@@ -41,5 +44,12 @@ export const step: StepDefinition = createFormStep({
     fillInTheForm: 'noticeTextList.fillInTheForm',
     findYourLocalCourt: 'noticeTextList.findYourLocalCourt',
     sendTheFormToTheCourt: 'noticeTextList.sendTheFormToTheCourt',
+  },
+  beforeGet: async (req: Request) => {
+    if (!req.session.genApp?.applicationId) {
+      req.session.genApp = {
+        applicationId: uuidv4(),
+      };
+    }
   },
 });

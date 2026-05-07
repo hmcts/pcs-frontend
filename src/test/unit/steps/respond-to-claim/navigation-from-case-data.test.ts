@@ -103,8 +103,47 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('routes back from your-household-and-circumstances to repayments-agreed when no payment steps visible', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'repayments-agreed'
+      'counter-claim'
     );
+  });
+
+  it('routes counter-claim NO to household interstitial for non-rent-arrears-only claims', async () => {
+    const req = createReq({
+      data: {
+        claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+      },
+    });
+
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
+      'your-household-and-circumstances'
+    );
+  });
+
+  it('routes counter-claim NO to payment interstitial for rent-arrears claims', async () => {
+    const req = createReq({
+      data: {
+        claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }, { value: { isRentArrears: 'NO' } }],
+      },
+    });
+
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
+      'payment-interstitial'
+    );
+  });
+
+  it('routes counter-claim YES to what-are-you-claiming-for', async () => {
+    const req = createReq({
+      data: {
+        claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+        possessionClaimResponse: {
+          defendantResponses: {
+            makeCounterClaim: 'YES',
+          },
+        },
+      },
+    });
+
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('what-are-you-claiming-for');
   });
 
   const rentArrearsData = {
