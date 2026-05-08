@@ -20,7 +20,8 @@
     "NOTICE": "cyOrders and notices from the court",
     "DOCUMENTS": "cyDocuments",
     "RESPONSE": "cyThe response",
-    "APPLICATIONS": "cyApplications"
+    "APPLICATIONS": "cyApplications",
+    "DOCUMENTS": "cyDocuments"
   },
 
   "notifications": {
@@ -44,14 +45,25 @@
       "NOT_STARTED": "cyNot started"
     },
     "ViewClaim": { "title": "cyView the claim" },
-    "RespondToClaim": { "title": "cyRespond to the claim" },
+    "UploadDocuments": { "title": "cyUpload documents" },
     "ViewDocuments": { "title": "cyView documents" },
+    "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
+    "ViewAllApplications": { "title": "cyView all applications" },
+    "RespondToClaim": { "title": "cyRespond to the claim" },
     "ViewHearingDocuments": { "title": "cyView hearing documents" },
     "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
-    "UploadDocuments": { "title": "cyUpload documents" },
     "ReviewResponse": { "title": "cyReview the response" },
-    "SubmitResponse": { "title": "cySubmit the response" },
-    "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
-    "ViewAllApplications": { "title": "cyView all applications" }
+    "SubmitResponse": { "title": "cySubmit the response" }
+  },
+  "viewDocuments": {
+    "pageTitle": "cyView documents",
+    "noDocuments": "cyThere are no documents to display.",
+    "submittedOn": "cySubmitted on",
+    "folders": {
+      "statementsOfCase": "cyStatements of case",
+      "propertyDocuments": "cyProperty documents",
+      "evidence": "cyEvidence",
+      "correspondence": "cyCorrespondence"
+    }
   }
 }

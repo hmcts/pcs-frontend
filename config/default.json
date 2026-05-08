@@ -104,5 +104,20 @@
   },
   "xui": {
     "uri": "https://manage-case.aat.platform.hmcts.net"
+<<<<<<< HDPI-5710
+=======
+  },
+  "dashboard": {
+    "taskRoutes": {
+      "ViewClaim": "/case/:caseReference/view-the-claim",
+      "RespondToClaim": "/case/:caseReference/respond-to-claim/start-now",
+      "MakeGeneralApplication": "/case/:caseReference/make-an-application/choose-an-application",
+      "UploadDocuments": "/case/:caseReference/upload-your-documents",
+      "ViewAllApplications": "/case/:caseReference/view-all-applications",
+      "ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
+      "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
+      "ViewDocuments": "/case/:caseReference/view-documents"
+    }
+>>>>>>> HDPI-5549
   }
 }

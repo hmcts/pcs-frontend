@@ -1,12 +1,60 @@
 {% extends "template.njk" %}
-
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% block serviceNavigation %}
+  {{ govukServiceNavigation({
+    serviceName: t('dashboard:serviceName'),
+    serviceUrl: dashboardUrl if dashboardUrl else "/dashboard",
+    navigation: [
+      {
+        text: t('logout', 'Log out'),
+        href: "/logout"
+      }
+    ],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}
 
 {% block pageTitle %}
-View documents
+{{ t('dashboard:viewDocuments.pageTitle') }}
 {% endblock %}
 
 {% block content %}
-  <h1 class="govuk-heading-l">View documents</h1>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ t('dashboard:viewDocuments.pageTitle') }}</h1>
+      <p class="govuk-body-m">{{ t('dashboard:caseReferenceLabel') }} {{ caseReference | caseReferenceDisplay }}</p>
+    </div>
 
+    <div class="govuk-grid-column-two-thirds">
+      {% if documentFolders | length > 0 %}
+        {% for folder in documentFolders %}
+          <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+              <h2 class="govuk-summary-card__title">{{ folder.title }}</h2>
+            </div>
 
+            <div class="govuk-summary-card__content">
+              <dl class="govuk-summary-list">
+                {% for document in folder.documents %}
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__value govuk-!-width-two-thirds">
+                      <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ document.id }}" target="_blank" rel="noopener noreferrer">{{ document.filename }}</a>
+                      {% if document.submittedOn %}
+                        <div class="govuk-hint govuk-!-margin-bottom-2">{{ t('dashboard:viewDocuments.submittedOn') }} {{ document.submittedOn | date }}</div>
+                      {% endif %}
+                    </dt>
+                  </div>
+                {% endfor %}
+              </dl>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="govuk-body">{{ t('dashboard:viewDocuments.noDocuments') }}</p>
+      {% endif %}
+    </div>
+
+    <div class="govuk-grid-column-one-third"></div>
+  </div>
 {% endblock %}

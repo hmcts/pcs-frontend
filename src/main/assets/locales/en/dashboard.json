@@ -21,7 +21,8 @@
     "NOTICE": "Orders and notices from the court",
     "DOCUMENTS": "Documents",
     "RESPONSE": "The response",
-    "APPLICATIONS": "Applications"
+    "APPLICATIONS": "Applications",
+    "DOCUMENTS": "Documents"
   },
 
   "notifications": {
@@ -45,14 +46,25 @@
       "NOT_STARTED": "Not started"
     },
     "ViewClaim": { "title": "View the claim" },
-    "RespondToClaim": { "title": "Respond to the claim" },
+    "UploadDocuments": { "title": "Upload documents" },
     "ViewDocuments": { "title": "View documents" },
+    "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
+    "ViewAllApplications": { "title": "View all applications" },
+    "RespondToClaim": { "title": "Respond to the claim" },
     "ViewHearingDocuments": { "title": "View hearing documents" },
     "ViewOrdersAndNotices": { "title": "View orders and notices" },
-    "UploadDocuments": { "title": "Upload documents" },
     "ReviewResponse": { "title": "Review the response" },
-    "SubmitResponse": { "title": "Submit the response" },
-    "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
-    "ViewAllApplications": { "title": "View all applications" }
+    "SubmitResponse": { "title": "Submit the response" }
+  },
+  "viewDocuments": {
+    "pageTitle": "View documents",
+    "noDocuments": "There are no documents to display.",
+    "submittedOn": "Submitted on",
+    "folders": {
+      "statementsOfCase": "Statements of case",
+      "propertyDocuments": "Property documents",
+      "evidence": "Evidence",
+      "correspondence": "Correspondence"
+    }
   }
 }

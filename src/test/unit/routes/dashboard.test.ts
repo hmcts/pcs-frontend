@@ -81,10 +81,11 @@ jest.mock('@modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => {
     const strings: Record<string, string> = {
       'dashboard:taskGroups.CLAIM': 'Claim section',
-      'dashboard:taskGroups.DOCUMENTS': 'Documents section',
-      'dashboard:tasks.ViewClaim.title': 'View claim title',
-      'dashboard:tasks.UploadDocuments.title': 'Upload docs title',
-      'dashboard:tasks.SubmitResponse.title': 'Submit response title',
+      'dashboard:taskGroups.DOCUMENTS': 'Document section',
+      'dashboard:tasks.Defendant.ViewClaim.title': 'View claim title',
+      'dashboard:tasks.Defendant.SubmitResponse.title': 'Submit response title',
+      'dashboard:tasks.UploadDocuments.title': 'Upload documents',
+      'dashboard:tasks.ViewDocuments.title': 'View documents',
       'dashboard:tasks.task-1.title': 'Task one title',
       'dashboard:tasks.statuses.AVAILABLE': 'Available',
       'dashboard:tasks.statuses.NOT_AVAILABLE': 'Not available',
@@ -261,7 +262,66 @@ describe('Dashboard Routes', () => {
       expect(configuredTask.href).toBe('/case/1234567890123456/upload-additional-documents/start-now');
     });
 
-    it('should fall back to dashboard URL for unmapped task templateId', async () => {
+    it('should map DOCUMENTS task group routes for UploadDocuments and ViewDocuments', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskRoutes'
+          ? {
+              UploadDocuments: '/case/:caseReference/upload-additional-documents',
+              ViewDocuments: '/case/:caseReference/view-documents',
+            }
+          : 'mock-secret'
+      );
+
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [],
+        taskGroups: [
+          {
+            groupId: 'DOCUMENTS',
+            tasks: [
+              { templateId: 'UploadDocuments', status: 'AVAILABLE' },
+              { templateId: 'ViewDocuments', status: 'NOT_AVAILABLE' },
+            ],
+          },
+        ],
+        propertyAddress: null,
+      });
+
+      dashboardRoutes(app);
+
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { groupId: string; title: string; tasks: { href?: string }[] }[];
+      };
+      const [docGroup] = renderArgs.taskGroups;
+
+      expect(docGroup.groupId).toBe('DOCUMENTS');
+      expect(docGroup.title).toBe('Document section');
+      expect(docGroup.tasks[0].href).toBe('/case/1234567890123456/upload-additional-documents');
+      expect(docGroup.tasks[1].href).toBeUndefined();
+    });
+
+    it('should fall back to default task href when config taskRoutes value is not an object', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskRoutes' ? 'not-an-object' : 'mock-secret'
+      );
+
       (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
         notifications: [],
         taskGroups: [
