@@ -97,7 +97,7 @@ describe('viewDocuments route', () => {
               expect.objectContaining({
                 id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
                 filename: 'claim-form.pdf',
-                submittedOn: 'Submitted on 24 June 2026',
+                submittedOn: '2026-06-24',
               }),
             ],
           }),

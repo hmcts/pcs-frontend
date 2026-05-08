@@ -30,14 +30,12 @@ export interface ViewDocumentFolder {
 }
 
 interface ExtractViewDocumentOptions {
-  locale?: string;
-  submittedOnPrefix?: string;
   folderTitles?: Partial<Record<DocumentFolderKey, string>>;
 }
 
 export function extractViewDocumentFolders(
   caseData: CaseData,
-  { locale = 'en-GB', submittedOnPrefix = 'Submitted on', folderTitles }: ExtractViewDocumentOptions = {}
+  { folderTitles }: ExtractViewDocumentOptions = {}
 ): ViewDocumentFolder[] {
   const folders = createFolders(folderTitles);
 
@@ -57,7 +55,7 @@ export function extractViewDocumentFolders(
     folders[value.category_id].documents.push({
       id: documentId,
       filename,
-      submittedOn: formatSubmittedOn(value.upload_timestamp, locale, submittedOnPrefix),
+      submittedOn: value.upload_timestamp?.trim() || null,
     });
   }
 
@@ -82,33 +80,4 @@ function createFolders(
 
 function isDocumentFolderKey(value: unknown): value is DocumentFolderKey {
   return typeof value === 'string' && value in DOCUMENT_FOLDER_TITLES;
-}
-
-export function formatSubmittedOn(
-  dateValue?: string,
-  locale = 'en-GB',
-  submittedOnPrefix = 'Submitted on'
-): string | null {
-  if (!dateValue) {
-    return null;
-  }
-
-  const date = new Date(normaliseDateValue(dateValue));
-
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  return `${submittedOnPrefix} ${new Intl.DateTimeFormat(locale, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(date)}`;
-}
-
-function normaliseDateValue(value: string): string {
-  return value.replace(
-    /(\.\d{3})\d+(Z?)$/,
-    (_, milliseconds: string, zoneSuffix: string) => `${milliseconds}${zoneSuffix}`
-  );
 }

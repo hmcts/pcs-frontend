@@ -18,15 +18,12 @@ export default function viewDocumentsRoutes(app: Application): void {
 
     try {
       const caseData = await ccdCaseService.getCaseById(accessToken, caseReference);
-      const locale = req.language === 'cy' ? 'cy-GB' : 'en-GB';
 
       res.render('view-documents', {
         dashboardUrl: getDashboardUrl(caseReference),
         backUrl: getDashboardUrl(caseReference),
         caseReference,
         documentFolders: extractViewDocumentFolders(caseData.data, {
-          locale,
-          submittedOnPrefix: req.t('dashboard:viewDocuments.submittedOn'),
           folderTitles: {
             statementsOfCase: req.t('dashboard:viewDocuments.folders.statementsOfCase'),
             propertyDocuments: req.t('dashboard:viewDocuments.folders.propertyDocuments'),

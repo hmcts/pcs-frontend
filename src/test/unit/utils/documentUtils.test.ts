@@ -1,5 +1,5 @@
 import { formatCaseReferenceForDisplay } from '@utils/caseReference';
-import { extractViewDocumentFolders, formatSubmittedOn } from '@utils/documentUtils';
+import { extractViewDocumentFolders } from '@utils/documentUtils';
 
 describe('documentUtils', () => {
   it('extracts documents only from supported categories', () => {
@@ -42,7 +42,7 @@ describe('documentUtils', () => {
           {
             id: '1',
             filename: 'claim-form.pdf',
-            submittedOn: 'Submitted on 24 June 2026',
+            submittedOn: '2026-06-24T10:00:00.000Z',
           },
         ],
       },
@@ -52,7 +52,7 @@ describe('documentUtils', () => {
           {
             id: '3',
             filename: 'rent-statement.pdf',
-            submittedOn: 'Submitted on 25 June 2026',
+            submittedOn: '2026-06-25',
           },
         ],
       },
@@ -196,18 +196,11 @@ describe('documentUtils', () => {
           {
             id: '1',
             filename: 'certificate.pdf',
-            submittedOn: 'Submitted on 24 June 2026',
+            submittedOn: '2026-06-24T10:00:00.000Z',
           },
         ],
       },
     ]);
-  });
-
-  it('formats submitted dates for display', () => {
-    expect(formatSubmittedOn('2026-06-24')).toBe('Submitted on 24 June 2026');
-    expect(formatSubmittedOn('2026-05-01T23:12:01.361668')).toBe('Submitted on 1 May 2026');
-    expect(formatSubmittedOn('2026-06-24', 'cy-GB', 'cySubmitted on')).toBe('cySubmitted on 24 Mehefin 2026');
-    expect(formatSubmittedOn('not-a-date')).toBeNull();
   });
 
   it('formats case references with spaces', () => {

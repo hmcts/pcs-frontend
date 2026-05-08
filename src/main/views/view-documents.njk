@@ -41,7 +41,7 @@
                     <dt class="govuk-summary-list__value govuk-!-width-two-thirds">
                       <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ document.id }}" target="_blank" rel="noopener noreferrer">{{ document.filename }}</a>
                       {% if document.submittedOn %}
-                        <div class="govuk-hint govuk-!-margin-bottom-2">{{ document.submittedOn }}</div>
+                        <div class="govuk-hint govuk-!-margin-bottom-2">{{ t('dashboard:viewDocuments.submittedOn') }} {{ document.submittedOn | date }}</div>
                       {% endif %}
                     </dt>
                   </div>
