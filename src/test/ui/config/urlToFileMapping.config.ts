@@ -56,5 +56,7 @@ export default {
   'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
+  'what-are-you-claiming-for': 'counterClaimWhatAreYouClaimingFor',
+  'counter-claim-specific-sum': 'counterClaimSpecificSumOfMoney',
   'counter-claim': 'counterClaim',
 };
