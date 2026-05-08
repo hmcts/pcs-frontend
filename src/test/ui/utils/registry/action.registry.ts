@@ -85,6 +85,8 @@ export class ActionRegistry {
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
+    ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
+    ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
@@ -100,16 +102,11 @@ export class ActionRegistry {
     ['confirmDocumentToUpload', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
-    ['languageUsed', new RespondToClaimAction()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
     ['reviewCYA', new GenAppsAction()],
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
     ['uploadFiles', new GenAppsAction()],
-    ['otherConsiderations', new RespondToClaimAction()],
-    ['uploadFiles', new RespondToClaimAction()],
-    ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
-    ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

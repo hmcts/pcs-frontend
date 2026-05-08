@@ -1,7 +1,7 @@
 export const uploadDocumentsToSupportYourApplication = {
   mainHeader: `Upload documents to support your application (optional)`,
   youShouldOnlyUploadDocumentsParagraph: `You should only upload documents that are relevant to your application such as a draft order or witness statement.`,
-  beforeYouUploadTheDocumentParagraph: `Before you upload the document, give it a name that tells the court what it is, for example 'Job offer letter'.`,
+  beforeYouUploadTheDocumentParagraph: `Before you upload the document, give it a name that tells the court what it is, for example ‘Job offer letter’.`,
   eachDocumentParagraph: `Each document must be less than 100MB. You can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.`,
   UploadAFileHeader: `Upload a file`,
   continueButton: `Continue`,
