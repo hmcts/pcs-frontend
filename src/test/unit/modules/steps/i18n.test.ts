@@ -72,15 +72,30 @@ describe('steps/i18n', () => {
       expect(mockLogger.warn).not.toHaveBeenCalled();
     });
 
-    it('should return early if namespace already loaded', async () => {
-      const getResourceBundle = jest.fn().mockReturnValue({ key: 'value' });
+    it('should reload the bundle even when one is already loaded for the namespace', async () => {
+      // Different journeys can share a step name (e.g. "start-now"), which means
+      // they share an i18next namespace. We must not skip loading just because a
+      // bundle already exists, otherwise the previous journey's translations win.
+      const mockLocalesDir = '/test/locales';
+      const mockTranslations = { title: 'Reloaded Title' };
+      const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
+
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const addResourceBundle = jest.fn();
+      // Simulate that a bundle for this namespace already exists (loaded by another journey).
+      const getResourceBundle = jest.fn().mockReturnValue({ stale: 'value' });
       const req = {
-        i18n: { getResourceBundle },
+        i18n: { getResourceBundle, addResourceBundle, loadNamespaces },
       } as any;
+
+      jest.spyOn(fs, 'access').mockResolvedValue(undefined);
+      jest.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify(mockTranslations));
 
       await loadStepNamespace(req, 'test-step', 'folder');
 
-      expect(getResourceBundle).toHaveBeenCalled();
+      expect(addResourceBundle).toHaveBeenCalledWith('en', 'testStep', mockTranslations, true, true);
     });
 
     it('should return early if locales directory not found', async () => {
