@@ -182,7 +182,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.post<T, R, D>(url, data, config); // lgtm[js/request-forgery]
+    return this.instance.post<T, R, D>(url, data, config);
   }
 
   public put<T = unknown, R = AxiosResponse<T>, D = unknown>(
