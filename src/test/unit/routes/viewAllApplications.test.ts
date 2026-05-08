@@ -1,12 +1,12 @@
 import type { Application, Request, Response } from 'express';
 
-import uploadAdditionalDocumentsRoute from '@routes/uploadAdditionalDocuments';
+import viewAllApplicationsRoute from '@routes/viewAllApplications';
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
 }));
 
-describe('uploadAdditionalDocuments route', () => {
+describe('viewAllApplications route', () => {
   let app: Application;
 
   beforeEach(() => {
@@ -19,24 +19,24 @@ describe('uploadAdditionalDocuments route', () => {
     jest.clearAllMocks();
   });
 
-  it('should register GET /case/:caseReference/upload-additional-documents with oidc middleware', () => {
-    uploadAdditionalDocumentsRoute(app);
+  it('should register GET /case/:caseReference/view-all-applications with oidc middleware', () => {
+    viewAllApplicationsRoute(app);
 
     expect(app.get).toHaveBeenCalledWith(
-      '/case/:caseReference/upload-additional-documents',
+      '/case/:caseReference/view-all-applications',
       expect.any(Function),
       expect.any(Function)
     );
   });
 
-  it('should render the upload-additional-documents template', () => {
-    uploadAdditionalDocumentsRoute(app);
+  it('should render the view-all-applications template', () => {
+    viewAllApplicationsRoute(app);
 
     const handler = (app.get as jest.Mock).mock.calls[0][2] as (req: Request, res: Response) => void;
     const res = { render: jest.fn() } as unknown as Response;
 
     handler({} as Request, res);
 
-    expect(res.render).toHaveBeenCalledWith('upload-additional-documents');
+    expect(res.render).toHaveBeenCalledWith('view-all-applications');
   });
 });

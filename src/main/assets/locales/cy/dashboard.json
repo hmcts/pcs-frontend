@@ -1,4 +1,5 @@
 {
+  "serviceName": "cyPossession Claims",
   "caseReferenceLabel": "cyCase number:",
   "iWantToHeading": "cyI want to...",
   "askCourtToMakeOrder": "cyAsk the court to make an order (make a general application)",
@@ -17,19 +18,21 @@
     "HEARING": "cyCourt hearings",
     "JUDGEMENT": "cyJudgement from the court",
     "NOTICE": "cyOrders and notices from the court",
+    "DOCUMENTS": "cyDocuments",
     "RESPONSE": "cyThe response",
-    "APPLICATIONS": "cyApplications"
+    "APPLICATIONS": "cyApplications",
+    "DOCUMENTS": "cyDocuments"
   },
 
   "notifications": {
     "Defendant": {
       "CaseIssued": {
         "title": "cyCase issued",
-        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/claim/Defendant.ViewClaim\">View the claim</a>. Respond by {{responseEndDate}}."
+        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">View the claim</a>. Respond by {{responseEndDate}}."
       },
       "ResponseToClaim": {
         "title": "cyResponse to claim",
-        "body": "<a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/response/Defendant.RespondToClaim\">{{ctaLabel}}</a>"
+        "body": "<a class=\"govuk-link\" href=\"{{respondToClaimUrl}}\">{{ctaLabel}}</a>"
       }
     }
   },
@@ -41,14 +44,26 @@
       "COMPLETED": "cyCompleted",
       "NOT_STARTED": "cyNot started"
     },
-    "Defendant": {
-      "ViewClaim": { "title": "cyView the claim" },
-      "RespondToClaim": { "title": "cyRespond to the claim" },
-      "ViewDocuments": { "title": "cyView documents" },
-      "ViewHearingDocuments": { "title": "cyView hearing documents" },
-      "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
-      "ReviewResponse": { "title": "cyReview the response" },
-      "SubmitResponse": { "title": "cySubmit the response" }
+    "ViewClaim": { "title": "cyView the claim" },
+    "UploadDocuments": { "title": "cyUpload documents" },
+    "ViewDocuments": { "title": "cyView documents" },
+    "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
+    "ViewAllApplications": { "title": "cyView all applications" },
+    "RespondToClaim": { "title": "cyRespond to the claim" },
+    "ViewHearingDocuments": { "title": "cyView hearing documents" },
+    "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
+    "ReviewResponse": { "title": "cyReview the response" },
+    "SubmitResponse": { "title": "cySubmit the response" }
+  },
+  "viewDocuments": {
+    "pageTitle": "cyView documents",
+    "noDocuments": "cyThere are no documents to display.",
+    "submittedOn": "cySubmitted on",
+    "folders": {
+      "statementsOfCase": "cyStatements of case",
+      "propertyDocuments": "cyProperty documents",
+      "evidence": "cyEvidence",
+      "correspondence": "cyCorrespondence"
     }
   }
 }
