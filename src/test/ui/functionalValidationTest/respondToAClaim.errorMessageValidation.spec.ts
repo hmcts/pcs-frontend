@@ -531,21 +531,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performValidation('mainHeader', counterClaimFee.mainHeader);
     await performAction('clickButton', counterClaimFee.saveAndContinueButton);
 
-    await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
-    await performAction('readPaymentInterstitial');
-
-    await softErrorMessageValidation('repaymentsMade', repaymentsMadeErrorValidation);
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-
-    await softErrorMessageValidation('repaymentsAgreed', repaymentsAgreedErrorValidation);
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
-    });
-
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
 
