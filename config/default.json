@@ -104,8 +104,6 @@
   },
   "xui": {
     "uri": "https://manage-case.aat.platform.hmcts.net"
-<<<<<<< HDPI-5710
-=======
   },
   "dashboard": {
     "taskRoutes": {
@@ -118,6 +116,5 @@
       "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
       "ViewDocuments": "/case/:caseReference/view-documents"
     }
->>>>>>> HDPI-5549
   }
 }
