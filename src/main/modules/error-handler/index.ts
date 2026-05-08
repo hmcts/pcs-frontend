@@ -1,6 +1,7 @@
 import type { Express, NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { ApplicationError } from '../../ApplicationError';
 import { HTTPError } from '../../HttpError';
 import { getTranslationFunction, populateCommonTranslations } from '../i18n';
 
@@ -74,12 +75,18 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
     }
 
     const t = getTranslationFunction(req, ['common']);
-    const { title: errorTitle, paragraph: errorParagraph } = getErrorMessages(status, t);
 
     res.locals.message = httpError.message;
     res.locals.error = env === 'development' ? httpError : {};
-    res.locals.errorTitle = errorTitle;
-    res.locals.errorParagraph = errorParagraph;
+
+    if (err instanceof ApplicationError) {
+      res.locals.errorTitle = t(`applicationErrors.${err.errorCode}.title`);
+      res.locals.errorParagraph = t(`applicationErrors.${err.errorCode}.paragraph`);
+    } else {
+      const { title: errorTitle, paragraph: errorParagraph } = getErrorMessages(status, t);
+      res.locals.errorTitle = errorTitle;
+      res.locals.errorParagraph = errorParagraph;
+    }
 
     populateCommonTranslations(req, res, t);
     res.status(status);

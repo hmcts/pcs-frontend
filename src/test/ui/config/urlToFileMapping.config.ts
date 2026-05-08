@@ -41,9 +41,9 @@ export default {
   'counter-claim-you-need-to-apply-for-help-with-your-fees': 'counterclaimYouNeedToApplyForHelpWithYourFees',
   'counter-claim-have-you-already-applied-for-help-with-your-fees':
     'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
+  'check-your-answers': 'checkYourAnswersGenApps',
   'language-used': 'languageUsed',
   'other-considerations': 'otherConsiderations',
-  /* 'check-your-answers': 'checkYourAnswers', */
   'ask-to-adjourn-the-court-hearing': 'askToAdjournTheCourtHearing',
   'ask-the-court-to-set-aside-the-order': 'askTheCourtToSetAsideTheOrder',
   'ask-the-court-to-make-an-order': 'askTheCourtToMakeAnOrder',
@@ -51,7 +51,7 @@ export default {
   'do-you-need-help-paying-the-fee': 'doYouNeedHelpPayingTheFee',
   'have-you-already-applied-for-help-with-fees': 'haveYouAlreadyAppliedForHelpWithFees',
   'have-the-other-parties-agreed-to-this-application': 'haveTheOtherPartiesAgreedToThisApplication',
-  'you-need-to-apply-for-help-with-your-application-fee': 'youNeedToApplyForHelpWithYouApplicationFee',
+  'you-need-to-apply-for-help-with-your-application-fee': 'youNeedToApplyForHelpWithYourApplicationFee',
   'what-order-do-you-want-the-court-to-make-and-why': 'whatOrderDoYouWantTheCourtToMakeAndWhy',
   'are-there-any-reasons-that-this-application-should-not-be-shared':
     'areThereAnyReasonsThatThisApplicationShouldNotBeShared',
