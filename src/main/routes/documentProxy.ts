@@ -23,6 +23,9 @@ import {
 
 const logger = Logger.getLogger('document-proxy');
 
+/** Thrown from saveDraftWithNewDocument when total draft size would exceed the cap (CDAM doc is deleted first). */
+const DOCUMENT_TOTAL_SIZE_EXCEEDED = 'DOCUMENT_TOTAL_SIZE_EXCEEDED';
+
 export function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
   const result = validateFileType(file.mimetype, file.originalname);
   if (result === 'ok') {
@@ -119,9 +122,21 @@ async function withCaseLock<T>(caseId: string, fn: () => Promise<T>): Promise<T>
 async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<CcdUploadedDocument>): Promise<number> {
   const caseId = req.params.caseReference as string;
   const { storage } = uploadCtx(req);
+  const token = getUserToken(req);
 
   return withCaseLock(caseId, async () => {
     const existing = await storage.readFresh(req);
+    const newTotalSize = getTotalDocumentSizeBytes(existing) + (entry.value.size || 0);
+    if (newTotalSize > UPLOAD_MAX_TOTAL_SIZE_BYTES) {
+      try {
+        await deleteDocument(entry.value.document.document_url, token);
+      } catch (deleteErr) {
+        logger.error('Failed to delete CDAM document after total-size cap rejection', {
+          error: deleteErr instanceof Error ? deleteErr.message : String(deleteErr),
+        });
+      }
+      throw new HTTPError(DOCUMENT_TOTAL_SIZE_EXCEEDED, 400);
+    }
     const updated = [...existing, entry];
     await storage.save(req, updated);
     return updated.length - 1;
@@ -267,13 +282,7 @@ export default function documentProxyRoutes(app: Application): void {
           return res.status(400).json({ error: { message: errors.noFile } });
         }
 
-        const ctx = uploadCtx(req);
-        const existingDocs = await ctx.storage.read(req);
-        const newTotalSize = getTotalDocumentSizeBytes(existingDocs) + req.file.size;
-        if (newTotalSize > UPLOAD_MAX_TOTAL_SIZE_BYTES) {
-          return res.status(400).json({ error: { message: errors.totalTooLarge } });
-        }
-
+        uploadCtx(req);
         const cdamDoc = await uploadDocument(req.file, getUserToken(req));
         const entry = cdamToCcdDocument(cdamDoc);
         const index = await saveDraftWithNewDocument(req, entry);
@@ -281,6 +290,9 @@ export default function documentProxyRoutes(app: Application): void {
       } catch (error) {
         if (error instanceof HTTPError && error.status === 404) {
           return res.status(404).json({ error: { message: errors.documentNotFound } });
+        }
+        if (error instanceof HTTPError && error.status === 400 && error.message === DOCUMENT_TOTAL_SIZE_EXCEEDED) {
+          return res.status(400).json({ error: { message: errors.totalTooLarge } });
         }
         logger.error('Failed to upload document to CDAM', {
           error: error instanceof Error ? error.message : String(error),
@@ -298,11 +310,7 @@ export default function documentProxyRoutes(app: Application): void {
         return res.status(404).json({ error: { message: errors.documentNotFound } });
       }
 
-      const removeResult = await removeDraftDocument(req, docId);
-      if (removeResult === 'stale') {
-        return res.json({ success: true });
-      }
-
+      await removeDraftDocument(req, docId);
       return res.json({ success: true });
     } catch (error) {
       if (error instanceof HTTPError && error.status === 404) {

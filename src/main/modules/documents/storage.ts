@@ -74,10 +74,16 @@ export function createCcdDraftStorage(opts: {
 
 // Documents live in their own session bucket (not under `formData[step]`) so the
 // form-builder POST handler — which replaces `formData[step]` wholesale with the
-// submitted body — cannot wipe the upload collection.
+// submitted body — cannot wipe the upload collection. The bucket is keyed by
+// `[caseReference][stepName]` so docs uploaded against one case can never leak
+// into another case the same user is also working on.
 export function sessionDocs(opts: { stepName: string }): DocumentStorage {
   const readFromSession = (req: Request): CcdCollectionItem<CcdUploadedDocument>[] => {
-    const docs = req.session.uploadedDocs?.[opts.stepName];
+    const caseRef = toCaseReference16(req.params?.caseReference);
+    if (!caseRef) {
+      return [];
+    }
+    const docs = req.session.uploadedDocs?.[caseRef]?.[opts.stepName];
     return Array.isArray(docs) ? (docs as CcdCollectionItem<CcdUploadedDocument>[]) : [];
   };
 
@@ -92,10 +98,17 @@ export function sessionDocs(opts: { stepName: string }): DocumentStorage {
     },
 
     async save(req: Request, docs: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
+      const caseRef = toCaseReference16(req.params?.caseReference);
+      if (!caseRef) {
+        throw new HTTPError('Invalid case reference format', 404);
+      }
       if (!req.session.uploadedDocs) {
         req.session.uploadedDocs = {};
       }
-      req.session.uploadedDocs[opts.stepName] = docs;
+      if (!req.session.uploadedDocs[caseRef]) {
+        req.session.uploadedDocs[caseRef] = {} as Record<string, unknown[]>;
+      }
+      (req.session.uploadedDocs[caseRef] as Record<string, unknown[]>)[opts.stepName] = docs;
       await new Promise<void>((resolve, reject) => req.session.save(err => (err ? reject(err) : resolve())));
     },
   };
