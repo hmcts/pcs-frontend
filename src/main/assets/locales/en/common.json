@@ -45,10 +45,6 @@
     "month": "Month",
     "year": "Year"
   },
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
   "warningHiddenText": "Warning",
   "errors": {
     "title": "There is a problem",
@@ -140,6 +136,12 @@
     "500": {
       "title": "Sorry, we’re having technical problems",
       "paragraph": "Please try again in a few minutes."
+    }
+  },
+  "applicationErrors": {
+    "noApplicationIdInSession": {
+      "title": "Application not available",
+      "paragraph": "This application is not available. It may have already been submitted in a different window."
     }
   }
 }
