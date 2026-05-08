@@ -1,17 +1,14 @@
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
 
 import { Logger } from '@modules/logger';
-import { createFormStep } from '@modules/steps';
+import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
 const logger = Logger.getLogger('OtherConsiderationsStep');
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'other-considerations',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/otherConsiderations.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',

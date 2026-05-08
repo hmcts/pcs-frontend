@@ -2,9 +2,8 @@ import type { Request } from 'express';
 
 import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
 
-import { createFormStep } from '@modules/steps';
+import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCounterClaim, PossessionClaimResponse } from '@services/ccdCase.interface';
 
@@ -52,11 +51,9 @@ const validateEstimatedMaxClaimAmount = createAmountValidator(
   'errors.estimatedMaxClaimAmount.invalidFormat'
 );
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-specific-sum',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/counterClaimSpecificSum.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',

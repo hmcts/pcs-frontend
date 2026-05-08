@@ -1,19 +1,16 @@
 import { HTTPError } from '../../../HttpError';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
 
 import { Logger } from '@modules/logger';
-import { createFormStep } from '@modules/steps';
+import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 const logger = Logger.getLogger('equalityAndDiversityStart');
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'equality-and-diversity-start',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   fields: [],
   customTemplate: `${__dirname}/equalityAndDiversityStart.njk`,
   beforeRedirect: async req => {
