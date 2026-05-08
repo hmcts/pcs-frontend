@@ -44,7 +44,7 @@
       "NOT_STARTED": "cyNot started"
     },
     "ViewClaim": { "title": "cyView the claim" },
-    "UploadDocuments": { "title": "cyUpload documents" },
+    "UploadAdditionalDocuments": { "title": "cyUpload additional documents" },
     "ViewDocuments": { "title": "cyView documents" },
     "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
     "ViewAllApplications": { "title": "cyView all applications" },
