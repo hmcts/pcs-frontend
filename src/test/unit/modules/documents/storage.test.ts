@@ -219,7 +219,7 @@ describe('sessionDocs', () => {
       expect(await storage.read(req)).toEqual([]);
     });
 
-    it('returns empty array when caseReference is missing', async () => {
+    it('throws 404 when caseReference is missing', async () => {
       const req = {
         params: {},
         session: {
@@ -229,7 +229,7 @@ describe('sessionDocs', () => {
         },
       } as unknown as Request;
 
-      expect(await storage.read(req)).toEqual([]);
+      await expect(storage.read(req)).rejects.toThrow('Invalid case reference format');
     });
 
     it('does not leak docs from a different case in the same session', async () => {

@@ -60,7 +60,7 @@ function getErrorTranslations(req: Request) {
 }
 
 function getTotalDocumentSizeBytes(docs: CcdCollectionItem<CcdUploadedDocument>[]): number {
-  return docs.reduce((total, doc) => total + (doc.value.size || 0), 0);
+  return docs.reduce((total, doc) => total + (doc.value.sizeInBytes || 0), 0);
 }
 
 export function handleMulterError(
@@ -126,7 +126,7 @@ async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<C
 
   return withCaseLock(caseId, async () => {
     const existing = await storage.readFresh(req);
-    const newTotalSize = getTotalDocumentSizeBytes(existing) + (entry.value.size || 0);
+    const newTotalSize = getTotalDocumentSizeBytes(existing) + (entry.value.sizeInBytes ?? 0);
     if (newTotalSize > UPLOAD_MAX_TOTAL_SIZE_BYTES) {
       try {
         await deleteDocument(entry.value.document.document_url, token);

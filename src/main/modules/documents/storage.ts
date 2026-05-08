@@ -81,7 +81,7 @@ export function sessionDocs(opts: { stepName: string }): DocumentStorage {
   const readFromSession = (req: Request): CcdCollectionItem<CcdUploadedDocument>[] => {
     const caseRef = toCaseReference16(req.params?.caseReference);
     if (!caseRef) {
-      return [];
+      throw new HTTPError('Invalid case reference format', 404);
     }
     const docs = req.session.uploadedDocs?.[caseRef]?.[opts.stepName];
     return Array.isArray(docs) ? (docs as CcdCollectionItem<CcdUploadedDocument>[]) : [];
