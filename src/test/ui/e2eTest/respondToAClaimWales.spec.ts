@@ -35,6 +35,7 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
   uploadFiles,
+  whatAreYouClaimingFor,
   whatOtherRegularExpensesDoYouHave,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
@@ -140,6 +141,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
+    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
+    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -269,6 +272,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
+    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
+    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),

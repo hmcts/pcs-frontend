@@ -6,6 +6,10 @@ export async function paymentInterstitialNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: paymentInterstitial.pageSlug,
   });
-  await performValidation('pageNavigation', paymentInterstitial.backLink, counterClaimAbout.mainHeader);
+  if (process.env.SELECT_COUNTER_CLAIM === 'YES') {
+    await performValidation('pageNavigation', paymentInterstitial.backLink, counterClaimAbout.mainHeader);
+  } else {
+    await performValidation('pageNavigation', paymentInterstitial.backLink, counterClaimAbout.mainHeader);
+  }
   await performValidation('pageNavigation', paymentInterstitial.cancelLink, dashboard.mainHeader);
 }

@@ -35,6 +35,7 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
   uploadFiles,
+  whatAreYouClaimingFor,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -146,6 +147,9 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   }
 
+  //Page navigation for paymentInterstitial
+  process.env.SELECT_COUNTER_CLAIM = 'YES';
+
   if (testInfo.title.includes('@noDefendants')) {
     claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     process.env.CLAIMANT_NAME = claimantName;
@@ -240,6 +244,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
+    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
+    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
     await performAction('doYouHaveAnyDependantChildren', {
@@ -416,6 +422,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
+    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
+    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -557,6 +565,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
+    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
+    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -649,6 +659,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
+    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
+    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -1125,6 +1137,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
+    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
+    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
