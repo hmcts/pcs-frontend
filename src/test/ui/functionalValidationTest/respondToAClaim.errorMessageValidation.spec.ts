@@ -7,8 +7,8 @@ import {
   correspondenceAddress,
   counterClaim,
   counterClaimAbout,
-  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   counterClaimFee,
+  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -290,17 +290,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-
-    await softErrorMessageValidation(
-      'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
-      counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation
-    );
-    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
-      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
-      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
-    });
-    await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
     await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
     await performAction('selectWhatAreYouClaimingFor', {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
@@ -525,25 +514,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
     await performAction('selectCounterClaim', {
-      option: counterClaim.yesRadioOption,
+      option: counterClaim.noRadioOption,
     });
-    await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
-    await performAction('selectWhatAreYouClaimingFor', {
-      question: counterClaimWhatAreYouClaimingFor.mainHeader,
-      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
-    });
-
-    await await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
-    await performAction('counterClaimSpecificSumOfMoney', {
-      question: counterClaimSpecificSumOfMoney.mainHeader,
-      option: counterClaimSpecificSumOfMoney.noRadioOption,
-      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
-    });
-
-    await softErrorMessageValidation('counterClaimFee', NO_EMV_READ_ONLY);
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
-
     await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
       counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation
@@ -554,22 +526,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
-
-    await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
-    await performAction('readPaymentInterstitial');
-
-    await softErrorMessageValidation('repaymentsMade', repaymentsMadeErrorValidation);
-    await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
-    });
-
-    await softErrorMessageValidation('repaymentsAgreed', repaymentsAgreedErrorValidation);
-    await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
-      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
-    });
-
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
 

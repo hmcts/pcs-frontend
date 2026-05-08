@@ -7,11 +7,11 @@ import {
   correspondenceAddress,
   counterClaim,
   counterClaimAbout,
-  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
-  counterclaimYouNeedToApplyForHelpWithYourFees,
   counterClaimFee,
+  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
+  counterclaimYouNeedToApplyForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -542,6 +542,100 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.noRadioOption,
     });
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
+  });
+
+  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - CounterClaimAppliedForHelp - Yes @assured @regression', async () => {
+    // > 3 named parties - CounterClaimAppliedForHelp - No - You need to apply for help with your fees
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.yesRadioOption,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      options: [contactPreferenceEmailOrPost.byEmailCheckbox, contactPreferenceEmailOrPost.byPostCheckbox],
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect
+    );
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+    await performAction('enterTenancyStartDetailsUnKnown');
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknown');
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
+      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+    });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
+    });
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
   });
 
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {

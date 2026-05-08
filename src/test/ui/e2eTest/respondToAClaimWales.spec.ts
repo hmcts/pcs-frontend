@@ -7,11 +7,11 @@ import {
   correspondenceAddress,
   counterClaim,
   counterClaimAbout,
-  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
-  counterclaimYouNeedToApplyForHelpWithYourFees,
   counterClaimFee,
+  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
+  counterclaimYouNeedToApplyForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
@@ -470,6 +470,22 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - No - counterClaimHaveYouAppliedForHelpWithFee - No @noDefendants @regression', async () => {
