@@ -100,13 +100,10 @@ export class ActionRegistry {
     ['confirmDocumentToUpload', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
-    ['languageUsed', new RespondToClaimAction()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
     ['reviewCYA', new GenAppsAction()],
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
-    ['otherConsiderations', new RespondToClaimAction()],
-    ['uploadFiles', new RespondToClaimAction()],
     ['uploadFiles', new GenAppsAction()],
   ]);
 

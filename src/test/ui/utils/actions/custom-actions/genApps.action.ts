@@ -38,7 +38,6 @@ export class GenAppsAction implements IAction {
       ],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
       ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
-      ['confirmOrderDoYouWant', () => this.confirmOrderDoYouWant(fieldName as actionRecord)],
       ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectStatementOfTruth', () => this.selectStatementOfTruth(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
@@ -140,6 +139,22 @@ export class GenAppsAction implements IAction {
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
   }
 
+  private async confirmDocumentToUpload(confirmUpload: actionRecord) {
+    await performAction('recordUserEntry', confirmUpload);
+    await performAction('clickRadioButton', {
+      question: confirmUpload.question,
+      option: confirmUpload.option,
+    });
+    await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
+  }
+
+  private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
+    if (uploadDocs.files) {
+      await performAction('uploadFile', uploadDocs.files);
+    }
+    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+  }
+
   private async selectLanguageUsedToComplete(selectLanguageData: actionRecord) {
     await performAction('recordUserEntry', selectLanguageData);
     await performAction('clickRadioButton', {
@@ -166,22 +181,6 @@ export class GenAppsAction implements IAction {
         ? checkYourAnswersGenApps.submitHiddenButton
         : checkYourAnswersGenApps.continueToPaymentHiddenButton;
     await performAction('clickButton', button);
-  }
-
-  private async confirmDocumentToUpload(confirmUpload: actionRecord) {
-    await performAction('recordUserEntry', confirmUpload);
-    await performAction('clickRadioButton', {
-      question: confirmUpload.question,
-      option: confirmUpload.option,
-    });
-    await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
-  }
-
-  private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
-    if (uploadDocs.files) {
-      await performAction('uploadFile', uploadDocs.files);
-    }
-    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
@@ -405,7 +404,7 @@ export class GenAppsAction implements IAction {
           label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
           input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
         });
-        await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+        await performValidation('mainHeader', doYouWantToUploadDocumentsToSupportYourApplication.mainHeader);
         break;
       }
       case 'haveYouAlreadyAppliedForHelpWithYourApplicationFee': {
