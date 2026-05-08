@@ -7,7 +7,7 @@ import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
-    updateDraftRespondToClaim: jest.fn(),
+    updateDraft: jest.fn(),
   },
 }));
 
@@ -28,7 +28,7 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
       },
     };
 
-    (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockResolvedValue(updatedCase);
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValue(updatedCase);
 
     const req = {
       session: {
@@ -56,7 +56,7 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
   });
 
   it('preserves the existing case id when draft save response omits it', async () => {
-    (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockResolvedValue({
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValue({
       data: {
         possessionClaimResponse: {
           defendantResponses: {
@@ -94,7 +94,7 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
   });
 
   it('merges partial draft save response with existing validated case data', async () => {
-    (ccdCaseService.updateDraftRespondToClaim as jest.Mock).mockResolvedValue({
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValue({
       id: '1773071952538472',
       data: {
         possessionClaimResponse: {
