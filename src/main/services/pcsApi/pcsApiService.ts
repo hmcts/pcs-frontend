@@ -21,9 +21,14 @@ export const validateAccessCode = async (
   accessCode: string
 ): Promise<AccessCodeValidationResult> => {
   const pcsApiURL = getBaseUrl();
+  const normalizedCaseId = caseId.trim().replace(/-/g, '');
+  if (!/^\d{16,20}$/.test(normalizedCaseId)) {
+    return { valid: false, error: 'mismatch' };
+  }
+  const encodedCaseId = encodeURIComponent(normalizedCaseId);
   try {
     const response = await http.post(
-      `${pcsApiURL}/cases/${caseId}/validate-access-code`,
+      `${pcsApiURL}/cases/${encodedCaseId}/validate-access-code`,
       { accessCode },
       {
         headers: {
