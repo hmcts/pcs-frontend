@@ -1,40 +1,53 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/stepButtons.njk" import stepButtons %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% from "macros/fileUploadMoj.njk" import fileUploadMoj %}
 
-{% block pageTitle %}
-  {{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
-{% endblock %}
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  <span class="govuk-caption-xl">{{ caption }}</span>
-  {% if heading %}
-    <h1 class="govuk-heading-l">{{ heading }}</h1>
-  {% endif %}
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  <p class="govuk-body">{{ guidanceText }}</p>
+  <h2 class="govuk-heading-s">{{ whatCounterClaimIsHeading }}</h2>
+  <p class="govuk-body">{{ whatCounterClaimIsParagraph1 }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ whatCounterClaimIsBullet1 }}</li>
+    <li>{{ whatCounterClaimIsBullet2 }}</li>
+  </ul>
+  <p class="govuk-body">{{ whatCounterClaimIsParagraph2 }}</p>
+  <p class="govuk-body">{{ whatCounterClaimIsParagraph3 }}</p>
+  <p class="govuk-body">
+      {{ whatCounterClaimIsLinkText | safe }}
+  </p>
 
-  <h2 class="govuk-heading-s">{{ beforeUploadHeading }}</h2>
-  <p class="govuk-body">{{ beforeUploadText }}</p>
+  <h2 class="govuk-heading-s">{{ whenMakeCounterClaimHeading }}</h2>
+  <p class="govuk-body">{{ whenMakeCounterClaimParagraph1 }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ whenMakeCounterClaimBullet1 }}</li>
+    <li>{{ whenMakeCounterClaimBullet2 }}</li>
+  </ul>
+  <p class="govuk-body">{{ whenMakeCounterClaimParagraph2 }}</p>
+  <p class="govuk-body">{{ whenMakeCounterClaimParagraph3 | safe  }}</p>
+  <h2 class="govuk-heading-s">{{ counterClaimFeesHeading }}</h2>
+  <p class="govuk-body">
+    {{ counterClaimFeesParagraph1 | safe }}
+  </p>
+  <p class="govuk-body">{{ counterClaimFeesParagraph2 }}</p>
+  <p class="govuk-body">
+      {{ counterClaimFeesCourtFeesLinkText | safe  }}
+  </p>
 
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
-      {% if field.componentType == 'fileUpload' %}
-        {{ fileUploadMoj(
-          field.component,
-          field.component.uploadButtonText,
-          field.component.filesAddedHeading,
-          field.component.value
-        ) }}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
       {% endif %}
     {% endfor %}
-
     {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>

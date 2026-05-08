@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 
+import { isRentArrearsClaim } from './isRentArrearsClaim';
 import { normalizeYesNoValue } from './normalizeYesNoValue';
 
 import type { YesNoNotSureValue, YesNoValue } from '@services/ccdCase.interface';
@@ -54,6 +55,11 @@ function hasInstalmentAmountOrFrequency(paymentAgreement: PaymentAgreementShape 
 }
 
 export async function getPreviousStepForYourHouseholdAndCircumstances(req: Request): Promise<string> {
+  const rentArrearsClaim = await isRentArrearsClaim(req);
+  if (!rentArrearsClaim) {
+    return 'counter-claim';
+  }
+
   const paymentAgreement = getPaymentAgreementFromCase(req);
   const repaymentPlanAgreed = paymentAgreement?.repaymentPlanAgreed;
 
