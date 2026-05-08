@@ -106,7 +106,7 @@ describe('upload-document step', () => {
               document_filename: 'evidence.pdf',
             },
             contentType: 'application/pdf',
-            size: 1024,
+            sizeInBytes: 1024,
           },
         },
       ];
@@ -120,7 +120,7 @@ describe('upload-document step', () => {
         id: 'doc-1',
         document_filename: 'evidence.pdf',
         content_type: 'application/pdf',
-        size: 1024,
+        sizeInBytes: 1024,
       });
       expect(documents[0]).not.toHaveProperty('document_url');
       expect(documents[0]).not.toHaveProperty('document_binary_url');

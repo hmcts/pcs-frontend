@@ -170,7 +170,7 @@ function cdamToCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploaded
         document_filename: cdamDoc.document_filename,
       },
       contentType: cdamDoc.content_type,
-      size: cdamDoc.size,
+      sizeInBytes: cdamDoc.size,
     },
   };
 }
@@ -203,7 +203,7 @@ function buildUploadResponse(
       index,
       id: docId,
       document_filename: filename,
-      size: cdamDoc.size,
+      sizeInBytes: cdamDoc.size,
       content_type: cdamDoc.content_type,
     },
   };

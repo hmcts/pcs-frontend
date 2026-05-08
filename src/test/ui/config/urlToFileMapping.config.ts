@@ -57,5 +57,7 @@ export default {
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
   'upload-document': 'uploadFiles',
+  'what-are-you-claiming-for': 'counterClaimWhatAreYouClaimingFor',
+  'counter-claim-specific-sum': 'counterClaimSpecificSumOfMoney',
   'counter-claim': 'counterClaim',
 };
