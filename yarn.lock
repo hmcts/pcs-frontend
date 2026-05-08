@@ -3839,6 +3839,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/escape-html@npm:1.0.3":
+  version: 1.0.3
+  resolution: "@types/escape-html@npm:1.0.3"
+  checksum: 10/d6666f80cfb4c63665f39d9b27a51505c3f6c18206d9bbab9445b99e2f5ac4a47c9d38d3fd9e43a9fd1f770d4b87d288821df8e20a2c187062a5b984c7645022
+  languageName: node
+  linkType: hard
+
 "@types/eslint-scope@npm:^3.7.7":
   version: 3.7.7
   resolution: "@types/eslint-scope@npm:3.7.7"
@@ -7297,7 +7304,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"escape-html@npm:^1.0.3, escape-html@npm:~1.0.3":
+"escape-html@npm:1.0.3, escape-html@npm:^1.0.3, escape-html@npm:~1.0.3":
   version: 1.0.3
   resolution: "escape-html@npm:1.0.3"
   checksum: 10/6213ca9ae00d0ab8bccb6d8d4e0a98e76237b2410302cf7df70aaa6591d509a2a37ce8998008cbecae8fc8ffaadf3fb0229535e6a145f3ce0b211d060decbb24
@@ -8477,10 +8484,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:17.5.0":
-  version: 17.5.0
-  resolution: "globals@npm:17.5.0"
-  checksum: 10/c405a95e1ecf14a1a17caaecd4dadbad38166b3c1b514e07924604ee224e922c043fc93ae21164d124dae5536e5a812566355469e34a689601db7d3d424dc8e7
+"globals@npm:17.6.0":
+  version: 17.6.0
+  resolution: "globals@npm:17.6.0"
+  checksum: 10/2bf0febf31c942edee6f4eca7e939a9c885f8ecfb767048b1c4dd2a32008d0ab136e6076665d76b44b29c2571bbbc1681371caab05fd8ee0067c7618e841b89d
   languageName: node
   linkType: hard
 
@@ -11877,6 +11884,7 @@ __metadata:
     "@types/config": "npm:4.4.0"
     "@types/connect-redis": "npm:0.0.23"
     "@types/cookie-parser": "npm:1.4.10"
+    "@types/escape-html": "npm:1.0.3"
     "@types/express": "npm:5.0.6"
     "@types/express-session": "npm:1.19.0"
     "@types/git-rev-sync": "npm:2.0.2"
@@ -11907,6 +11915,7 @@ __metadata:
     css-loader: "npm:7.1.4"
     date-fns: "npm:4.1.0"
     dotenv: "npm:17.4.2"
+    escape-html: "npm:1.0.3"
     eslint: "npm:9.39.4"
     eslint-config-prettier: "npm:10.1.8"
     eslint-import-resolver-typescript: "npm:4.4.4"
@@ -11916,7 +11925,7 @@ __metadata:
     express-session: "npm:1.19.0"
     git-rev-sync: "npm:3.0.2"
     glob: "npm:13.0.6"
-    globals: "npm:17.5.0"
+    globals: "npm:17.6.0"
     govuk-frontend: "npm:6.1.0"
     helmet: "npm:8.1.0"
     html-webpack-plugin: "npm:5.6.7"
