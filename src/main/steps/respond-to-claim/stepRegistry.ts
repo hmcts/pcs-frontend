@@ -10,8 +10,11 @@ import { step as contactPreferencesTextMessage } from './contact-preferences-tex
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
 import { step as counterClaimAbout } from './counter-claim-about';
+import { step as counterClaimFee } from './counter-claim-fee';
 import { step as counterClaimHaveYouAlreadyAppliedForHelpWithYourFees } from './counter-claim-have-you-already-applied-for-help-with-your-fees';
-import { step as counterClaimYouNeedToApplyForHelpWithYourFees } from './counter-claim-you-need-to-apply-for-help-with-your-fees/';
+import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
+import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
+import { step as counterClaimYouNeedToApplyForHelpWithYourFees } from './counter-claim-you-need-to-apply-for-help-with-your-fees';
 import { step as yourCircumstances } from './current-circumstances';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
@@ -47,7 +50,6 @@ import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
 import { step as uploadDocs } from './upload-docs';
-import { step as whatAreYouClaimingFor } from './what-are-you-claiming-for';
 import { step as writtenTerms } from './written-terms';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -76,7 +78,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'counter-claim': counterClaim,
-  'what-are-you-claiming-for': whatAreYouClaimingFor,
+  'counter-claim-what-are-you-claiming-for': counterClaimWhatAreYouClaimingFor,
+  'counter-claim-specific-sum': counterClaimSpecificSum,
+  'counter-claim-fee': counterClaimFee,
   'counter-claim-have-you-already-applied-for-help-with-your-fees':
     counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   'counter-claim-you-need-to-apply-for-help-with-your-fees': counterClaimYouNeedToApplyForHelpWithYourFees,
