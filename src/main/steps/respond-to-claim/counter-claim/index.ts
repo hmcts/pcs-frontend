@@ -1,48 +1,83 @@
-import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../draftEvent';
+import type { Request } from 'express';
+
+import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
-import { createCcdDraftStorage, toDisplayDocuments } from '@modules/documents/storage';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
-
-const storage = createCcdDraftStorage({
-  event: RESPOND_TO_CLAIM_DRAFT_EVENT,
-  getDocs: data => data.possessionClaimResponse?.defendantResponses?.counterClaimDocuments ?? [],
-  setDocs: docs => ({ possessionClaimResponse: { defendantResponses: { counterClaimDocuments: docs } } }),
-});
+import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import { FeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim',
   journeyFolder: 'respondToClaim',
-  documentStorage: storage,
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/counterClaim.njk`,
-  fields: [
-    {
-      name: 'documents',
-      type: 'file',
-      required: false,
-      accept: ACCEPT_ATTRIBUTE_EXTENSIONS,
-      maxFileSize: UPLOAD_MAX_FILE_SIZE_MB,
-      labelClasses: 'govuk-label--s',
-      translationKey: { label: 'uploadLabel' },
-    },
-  ],
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
-    heading: 'heading',
-    guidanceText: 'guidanceText',
-    beforeUploadHeading: 'beforeUploadHeading',
-    beforeUploadText: 'beforeUploadText',
-    uploadLabel: 'uploadLabel',
-    filesAddedHeading: 'filesAddedHeading',
-    uploadButton: 'uploadButton',
-    deleteButton: 'deleteButton',
+    question: 'question',
+    whatCounterClaimIsHeading: 'whatCounterClaimIsHeading',
+    whatCounterClaimIsParagraph1: 'whatCounterClaimIsParagraph1',
+    whatCounterClaimIsBullet1: 'whatCounterClaimIsBullet1',
+    whatCounterClaimIsBullet2: 'whatCounterClaimIsBullet2',
+    whatCounterClaimIsParagraph2: 'whatCounterClaimIsParagraph2',
+    whatCounterClaimIsParagraph3: 'whatCounterClaimIsParagraph3',
+    whatCounterClaimIsLinkText: 'whatCounterClaimIsLinkText',
+    whatCounterClaimIsLinkHref: 'whatCounterClaimIsLinkHref',
+    whenMakeCounterClaimHeading: 'whenMakeCounterClaimHeading',
+    whenMakeCounterClaimParagraph1: 'whenMakeCounterClaimParagraph1',
+    whenMakeCounterClaimBullet1: 'whenMakeCounterClaimBullet1',
+    whenMakeCounterClaimBullet2: 'whenMakeCounterClaimBullet2',
+    whenMakeCounterClaimParagraph2: 'whenMakeCounterClaimParagraph2',
+    whenMakeCounterClaimParagraph3: 'whenMakeCounterClaimParagraph3',
+    counterClaimFeesHeading: 'counterClaimFeesHeading',
+    counterClaimFeesParagraph1: 'counterClaimFeesParagraph1',
+    counterClaimFeesParagraph2: 'counterClaimFeesParagraph2',
+    counterClaimFeesCourtFeesLinkText: 'counterClaimFeesCourtFeesLinkText',
   },
-  getInitialFormData: async req => ({ documents: toDisplayDocuments(await storage.read(req)) }),
-  // No extendGetContent — formBuilder auto-wires uploadUrl/deleteUrl when documentStorage is set.
-  // No beforeRedirect — documents are saved to CCD on upload/delete via documentProxy.
+  fields: [
+    {
+      name: 'makeCounterClaim',
+      type: 'radio',
+      required: true,
+      legendClasses: 'govuk-fieldset__legend--m',
+      translationKey: {
+        label: 'question',
+      },
+      errorMessage: 'errors.makeCounterClaim',
+      options: [
+        { value: 'YES', translationKey: 'options.yes' },
+        { value: 'NO', translationKey: 'options.no' },
+      ],
+    },
+  ],
+  beforeRedirect: async req => {
+    const makeCounterClaim: YesNoValue = req.body?.makeCounterClaim;
+    if (!makeCounterClaim) {
+      return;
+    }
+
+    const possessionClaimResponse: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim,
+      },
+    };
+
+    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+  },
+  getInitialFormData: req => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const makeCounterClaim: YesNoValue | undefined =
+      caseData?.possessionClaimResponse?.defendantResponses?.makeCounterClaim;
+
+    return makeCounterClaim !== undefined ? { makeCounterClaim } : {};
+  },
+  extendGetContent: async (req: Request) => {
+    const counterClaimFlatFeeFEE0450 = await getFee(FeeType.counterClaimFlatFeeFEE0450);
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    return { counterClaimFlatFeeFEE0450, claimantName };
+  },
 });

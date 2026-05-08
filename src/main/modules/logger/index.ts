@@ -58,7 +58,7 @@ const myFormat = printf((info: Record<string, unknown> & { [key: symbol]: unknow
   const additionalValues = Array.isArray(info[splatSymbol]) ? (info[splatSymbol] as unknown[]) : [];
   const mergedStringValue = extractMergedStringMetadata(metadata);
   const allAdditionalValues = mergedStringValue ? [mergedStringValue, ...additionalValues] : additionalValues;
-  const jsonMetadata = JSON.stringify(metadata);
+  const jsonMetadata = stringifyLogValue(metadata);
   const deduplicatedExtraValues = allAdditionalValues.filter(value => {
     const stringifiedValue = stringifyLogValue(value);
     if (stringifiedValue.length === 0) {
