@@ -45,7 +45,7 @@
       "NOT_STARTED": "Not started"
     },
     "ViewClaim": { "title": "View the claim" },
-    "UploadAdditionalDocuments": { "title": "Upload additional documents" },
+    "UploadDocuments": { "title": "Upload additional documents" },
     "ViewDocuments": { "title": "View documents" },
     "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
     "ViewAllApplications": { "title": "View all applications" },
