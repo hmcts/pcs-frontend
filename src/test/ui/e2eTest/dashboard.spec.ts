@@ -1,7 +1,7 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
-import { uploadAdditionalDocuments } from '../data/page-data/documents-page-data';
+import { uploadAdditionalDocuments, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
@@ -46,17 +46,25 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       ['clickLinkAndVerifySameTabTitle', dashboard.getDebtRespiteLink, dashboard.breathingSpaceHeader],
       ['clickLinkAndVerifySameTabTitle', dashboard.findInfoAboutMyCourtLink, dashboard.findACourtOrTribunalHeader]
     );
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.courtHearingSubHeader });
-    await performAction(
-      'clickLinkAndVerifySameTabTitle',
-      dashboard.viewHearingDocumentsLink,
-      viewHearingDocuments.mainHeader
-    );
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.ordersNoticesFromCourtSubHeader });
-    await performAction(
-      'clickLinkAndVerifySameTabTitle',
-      dashboard.viewOrdersAndNoticesLink,
-      viewOrdersAndNotices.mainHeader
-    );
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.courtHearingSubHeader,
+      fieldName: dashboard.viewHearingDocumentsLink,
+      header: viewHearingDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.ordersNoticesFromCourtSubHeader,
+      fieldName: dashboard.viewOrdersAndNoticesLink,
+      header: viewOrdersAndNotices.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.uploadAdditionalDocumentsLink,
+      header: uploadAdditionalDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.viewDocumentsLink,
+      header: viewDocuments.mainHeader,
+    });
   });
 });

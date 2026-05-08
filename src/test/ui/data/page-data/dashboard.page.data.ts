@@ -28,4 +28,6 @@ export const dashboard = {
   viewHearingDocumentsLink: `View hearing documents`,
   ordersNoticesFromCourtSubHeader: `Orders and notices from the court`,
   viewOrdersAndNoticesLink: `View orders and notices`,
+  documentsSubHeader: `Documents`,
+  viewDocumentsLink: `View documents`,
 };
