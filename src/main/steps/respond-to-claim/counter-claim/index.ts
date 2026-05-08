@@ -1,7 +1,7 @@
-import { createRespondToClaimFormStep } from '../formStep';
 import type { Request } from 'express';
 
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
