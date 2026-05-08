@@ -35,3 +35,4 @@ nodejs:
     OTEL_SERVICE_NAME: 'pcs-frontend'
     OTEL_ENABLED: true
     XUI_BASE_URI: 'https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net'
+    FEE_SERVICE_URL: 'http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
