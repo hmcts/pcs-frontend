@@ -102,7 +102,7 @@ const existingDoc = {
       document_filename: 'existing.pdf',
     },
     contentType: 'application/pdf',
-    size: 500,
+    sizeInBytes: 500,
   },
 };
 
@@ -472,7 +472,7 @@ describe('documentProxyRoutes', () => {
             document_filename: 'huge.pdf',
           },
           contentType: 'application/pdf',
-          size: oneGbMinusOneByte,
+          sizeInBytes: oneGbMinusOneByte,
         },
       };
 
@@ -856,7 +856,7 @@ describe('documentProxyRoutes', () => {
       ]);
 
       expect(persisted).toHaveLength(1);
-      expect((persisted[0] as { value: { size?: number } }).value.size).toBe(sixHundredMb);
+      expect((persisted[0] as { value: { sizeInBytes?: number } }).value.sizeInBytes).toBe(sixHundredMb);
       expect(mockDeleteDocument).toHaveBeenCalledTimes(1);
       const rejected = [resA, resB].filter(r =>
         (r.status as jest.Mock).mock.calls.some(([code]: [number]) => code === 400)

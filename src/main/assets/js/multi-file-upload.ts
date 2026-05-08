@@ -9,7 +9,7 @@ interface DisplayDocument {
   id?: string;
   document_filename: string;
   content_type?: string;
-  size?: number;
+  sizeInBytes?: number;
 }
 
 function getCsrfToken(): string {

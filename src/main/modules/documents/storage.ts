@@ -17,7 +17,7 @@ export interface DisplayDocument {
   id?: string;
   document_filename: string;
   content_type?: string;
-  size?: number;
+  sizeInBytes?: number;
 }
 
 export interface DocumentStorage {
@@ -36,7 +36,7 @@ export function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[
     id: item.id,
     document_filename: item.value.document.document_filename,
     content_type: item.value.contentType,
-    size: item.value.size,
+    sizeInBytes: item.value.sizeInBytes,
   }));
 }
 
@@ -81,7 +81,7 @@ export function sessionDocs(opts: { stepName: string }): DocumentStorage {
   const readFromSession = (req: Request): CcdCollectionItem<CcdUploadedDocument>[] => {
     const caseRef = toCaseReference16(req.params?.caseReference);
     if (!caseRef) {
-      return [];
+      throw new HTTPError('Invalid case reference format', 404);
     }
     const docs = req.session.uploadedDocs?.[caseRef]?.[opts.stepName];
     return Array.isArray(docs) ? (docs as CcdCollectionItem<CcdUploadedDocument>[]) : [];

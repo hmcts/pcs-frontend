@@ -24,7 +24,7 @@ const doc1: CcdCollectionItem<CcdUploadedDocument> = {
       document_filename: 'file1.pdf',
     },
     contentType: 'application/pdf',
-    size: 1024,
+    sizeInBytes: 1024,
   },
 };
 
@@ -37,7 +37,7 @@ const doc2: CcdCollectionItem<CcdUploadedDocument> = {
       document_filename: 'file2.pdf',
     },
     contentType: 'application/pdf',
-    size: 2048,
+    sizeInBytes: 2048,
   },
 };
 
@@ -219,7 +219,7 @@ describe('sessionDocs', () => {
       expect(await storage.read(req)).toEqual([]);
     });
 
-    it('returns empty array when caseReference is missing', async () => {
+    it('throws 404 when caseReference is missing', async () => {
       const req = {
         params: {},
         session: {
@@ -229,7 +229,7 @@ describe('sessionDocs', () => {
         },
       } as unknown as Request;
 
-      expect(await storage.read(req)).toEqual([]);
+      await expect(storage.read(req)).rejects.toThrow('Invalid case reference format');
     });
 
     it('does not leak docs from a different case in the same session', async () => {
@@ -323,8 +323,8 @@ describe('toDisplayDocuments', () => {
     const result = toDisplayDocuments([doc1, doc2]);
 
     expect(result).toEqual([
-      { index: 0, id: 'id-1', document_filename: 'file1.pdf', content_type: 'application/pdf', size: 1024 },
-      { index: 1, id: 'id-2', document_filename: 'file2.pdf', content_type: 'application/pdf', size: 2048 },
+      { index: 0, id: 'id-1', document_filename: 'file1.pdf', content_type: 'application/pdf', sizeInBytes: 1024 },
+      { index: 1, id: 'id-2', document_filename: 'file2.pdf', content_type: 'application/pdf', sizeInBytes: 2048 },
     ]);
   });
 
@@ -337,7 +337,7 @@ describe('toDisplayDocuments', () => {
     expect(toDisplayDocuments('' as unknown as CcdCollectionItem<CcdUploadedDocument>[])).toEqual([]);
   });
 
-  it('handles missing optional fields (contentType, size)', () => {
+  it('handles missing optional fields (contentType, sizeInBytes)', () => {
     const doc: CcdCollectionItem<CcdUploadedDocument> = {
       id: 'id-x',
       value: {
@@ -353,6 +353,6 @@ describe('toDisplayDocuments', () => {
 
     expect(result[0].document_filename).toBe('nodoc.pdf');
     expect(result[0].content_type).toBeUndefined();
-    expect(result[0].size).toBeUndefined();
+    expect(result[0].sizeInBytes).toBeUndefined();
   });
 });

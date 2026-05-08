@@ -1,4 +1,4 @@
-import { counterClaim, dashboard, feedback, paymentInterstitial } from '../data/page-data';
+import { counterClaimFee, dashboard, feedback, paymentInterstitial } from '../data/page-data';
 import { performValidation } from '../utils/controller';
 
 export async function paymentInterstitialNavigationTests(): Promise<void> {
@@ -6,6 +6,6 @@ export async function paymentInterstitialNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: paymentInterstitial.pageSlug,
   });
-  await performValidation('pageNavigation', paymentInterstitial.backLink, counterClaim.mainHeader);
+  await performValidation('pageNavigation', paymentInterstitial.backLink, counterClaimFee.mainHeader);
   await performValidation('pageNavigation', paymentInterstitial.cancelLink, dashboard.mainHeader);
 }
