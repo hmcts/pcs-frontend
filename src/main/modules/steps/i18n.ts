@@ -76,10 +76,6 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
   const stepNamespace = getStepNamespace(stepName);
   const lang = getMainRequestLanguage(req);
 
-  if (req.i18n.getResourceBundle(lang, stepNamespace)) {
-    return;
-  }
-
   const localesDir = await findLocalesDir();
   if (!localesDir) {
     if (isDevelopment) {
