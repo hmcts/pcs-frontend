@@ -23,6 +23,13 @@ export async function repaymentsMadeErrorValidation(): Promise<void> {
     header: repaymentsMade.thereIsAProblemErrorMessageHeader,
     message: repaymentsMade.mustBeUnderCharacterLimitErrorMessage,
   });
+  // emoji
+  await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.emojiTextInput);
+  await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: repaymentsMade.thereIsAProblemErrorMessageHeader,
+    message: repaymentsMade.emojiErrorMessage,
+  });
 }
 
 export async function repaymentsMadeNavigationTests(): Promise<void> {

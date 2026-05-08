@@ -35,7 +35,7 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
   await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
-    message: doYouHaveAnyDependantChildren.emojiExplainPartsOfClaimErrorMessage,
+    message: doYouHaveAnyDependantChildren.emojiErrorMessage,
   });
 }
 
