@@ -8,6 +8,9 @@ import {
   counterClaim,
   counterClaimAbout,
   counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
+  counterClaimFee,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -42,6 +45,8 @@ import { contactPreferencesTelephoneErrorValidation } from '../functional/contac
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
 import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
 import { counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation } from '../functional/counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.pft';
+import { counterClaimSpecificSumErrorValidation } from '../functional/counterClaimSpecificSumOfMoney.pft';
+import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/counterClaimWhatAreYouClaimingFor.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
@@ -283,7 +288,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
     await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
+      option: counterClaim.yesRadioOption,
     });
 
     await softErrorMessageValidation(
@@ -296,6 +301,23 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+
+    await softErrorMessageValidation('counterClaimFee', NO_EMV_READ_ONLY);
+
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
 
@@ -503,8 +525,24 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
     await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
+      option: counterClaim.yesRadioOption,
     });
+    await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+    });
+
+    await await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+
+    await softErrorMessageValidation('counterClaimFee', NO_EMV_READ_ONLY);
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
 
     await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',

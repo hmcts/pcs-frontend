@@ -9,6 +9,9 @@ import {
   counterClaimAbout,
   counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   counterclaimYouNeedToApplyForHelpWithYourFees,
+  counterClaimFee,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
@@ -35,7 +38,6 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
   uploadFiles,
-  whatAreYouClaimingFor,
   whatOtherRegularExpensesDoYouHave,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
@@ -141,8 +143,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
-    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -272,8 +283,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
-    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),

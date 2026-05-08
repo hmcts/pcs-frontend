@@ -9,6 +9,9 @@ import {
   counterClaimAbout,
   counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   counterclaimYouNeedToApplyForHelpWithYourFees,
+  counterClaimFee,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -35,7 +38,6 @@ import {
   tenancyDateDetails,
   tenancyTypeDetails,
   uploadFiles,
-  whatAreYouClaimingFor,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -146,6 +148,12 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   }
+  //other considrations back link navigation
+  if (testInfo.title.includes('income - no')) {
+    process.env.INCOME_AND_EXPENSES = 'NO';
+  } else {
+    process.env.INCOME_AND_EXPENSES = 'YES';
+  }
 
   //Page navigation for paymentInterstitial
   process.env.SELECT_COUNTER_CLAIM = 'YES';
@@ -244,10 +252,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
-    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
-    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
+    await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
@@ -422,8 +439,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
-    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -565,8 +591,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
-    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -659,8 +689,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
-    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -780,14 +819,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
     await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
+      option: counterClaim.yesRadioOption,
     });
-    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
-      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
-      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
-    await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -1137,8 +1181,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-    await performValidation('mainHeader', whatAreYouClaimingFor.mainHeader);
-    await performAction('clickButton', whatAreYouClaimingFor.continueButton);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    await performValidation('mainHeader', counterClaimFee.mainHeader);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),

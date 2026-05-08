@@ -149,6 +149,10 @@ export interface CcdDefendantParty {
 export interface CcdCounterClaim {
   appliedForHwf?: YesNoValue;
   hwfReferenceNumber?: string;
+  claimType?: string;
+  isClaimAmountKnown?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
 }
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
