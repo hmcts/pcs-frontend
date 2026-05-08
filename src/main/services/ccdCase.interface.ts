@@ -149,6 +149,10 @@ export interface CcdDefendantParty {
 export interface CcdCounterClaim {
   appliedForHwf?: YesNoValue;
   hwfReferenceNumber?: string;
+  claimType?: string;
+  isClaimAmountKnown?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
 }
 
 /** Defendant responses (e.g. receivedFreeLegalAdvice). */
@@ -176,7 +180,6 @@ export interface CcdDefendantResponses {
   counterClaim?: CcdCounterClaim;
   paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
-  counterClaim?: CcdCounterClaim;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
   languageUsed?: LanguageUsed;
@@ -184,14 +187,6 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
-}
-
-/** Counter-claim data captured across the counterclaim journey screens. */
-export interface CcdCounterClaim {
-  claimType?: string;
-  isClaimAmountKnown?: string;
-  claimAmount?: PenceAmount;
-  estimatedMaxClaimAmount?: PenceAmount;
 }
 
 export interface PossessionClaimResponse {
