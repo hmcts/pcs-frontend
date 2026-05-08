@@ -40,8 +40,8 @@ import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirma
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
-import { counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation } from '../functional/counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.pft';
 import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
+import { counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation } from '../functional/counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
@@ -502,9 +502,9 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
-     await performAction('selectCounterClaim', {
+    await performAction('selectCounterClaim', {
       option: counterClaim.noRadioOption,
-      });
+    });
 
     await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
