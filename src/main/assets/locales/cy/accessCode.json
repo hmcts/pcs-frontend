@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cyAccess your case",
+  "description": "cyAccess and manage your case using your claim number and access code. These will be in a letter, email or pack sent by the court.",
+  "claimNumber": {
+    "label": "cyEnter your claim number",
+    "hint": "cyThis is a 16-digit number"
+  },
+  "accessCode": {
+    "label": "cyEnter your access code",
+    "hint": "cyThis has 12 characters"
+  },
+  "errorPrefix": "cyError:"
+}
