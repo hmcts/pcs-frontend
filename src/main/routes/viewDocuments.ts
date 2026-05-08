@@ -5,7 +5,12 @@ import { oidcMiddleware } from '../middleware';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { documentService } from '@services/documentService';
 import { extractViewDocumentFolders } from '@utils/documentUtils';
+
+function toSafeFilename(value: string): string {
+  return value.replace(/"/g, '');
+}
 
 export default function viewDocumentsRoutes(app: Application): void {
   app.get('/case/:caseId/view-documents', oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
@@ -44,14 +49,36 @@ export default function viewDocumentsRoutes(app: Application): void {
     '/case/:caseId/view-documents/:documentId',
     oidcMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
+      const caseReference = typeof req.params.caseId === 'string' ? req.params.caseId : '';
+      const documentId = typeof req.params.documentId === 'string' ? req.params.documentId.trim() : '';
       const accessToken = req.session.user?.accessToken;
 
       if (!accessToken) {
         return next(new HTTPError('Authentication required', 401));
       }
+      if (!documentId) {
+        return next(new HTTPError('Document not found', 404));
+      }
 
       try {
-        return res.render('view-document');
+        const { stream, contentType, contentLength, contentDisposition, filename } =
+          await documentService.getDocumentStream(accessToken, caseReference, documentId);
+
+        res.setHeader('Content-Type', contentType || 'application/octet-stream');
+        if (contentLength) {
+          res.setHeader('Content-Length', contentLength);
+        }
+        res.setHeader(
+          'Content-Disposition',
+          contentDisposition || `inline; filename="${toSafeFilename(filename)}"`
+        );
+
+        stream.on('error', () => {
+          if (!res.headersSent) {
+            next(new HTTPError('Failed to stream document', 502));
+          }
+        });
+        stream.pipe(res);
       } catch (error) {
         return next(error);
       }

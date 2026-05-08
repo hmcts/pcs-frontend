@@ -1,7 +1,9 @@
 import type { Application, Request, Response } from 'express';
+import { PassThrough } from 'stream';
 
 import viewDocumentsRoute from '@routes/viewDocuments';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { documentService } from '@services/documentService';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void>;
 
@@ -12,6 +14,12 @@ jest.mock('../../../main/middleware', () => ({
 jest.mock('../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
     getCaseById: jest.fn(),
+  },
+}));
+
+jest.mock('@services/documentService', () => ({
+  documentService: {
+    getDocumentStream: jest.fn(),
   },
 }));
 
@@ -106,14 +114,23 @@ describe('viewDocuments route', () => {
     );
   });
 
-  it('should render empty view-document template for document page', async () => {
+  it('should stream document binary for document page', async () => {
     viewDocumentsRoute(app);
+
+    const stream = new PassThrough();
+    const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
+    (documentService.getDocumentStream as jest.Mock).mockResolvedValue({
+      stream,
+      contentType: 'application/pdf',
+      contentLength: '1234',
+      filename: 'claim-form.pdf',
+    });
 
     const handler = (app.get as jest.Mock).mock.calls.find(
       call => call[0] === '/case/:caseId/view-documents/:documentId'
     )?.[2] as RouteHandler;
     const res = {
-      render: jest.fn(),
+      setHeader: jest.fn(),
     } as unknown as Response;
     const next = jest.fn();
 
@@ -129,7 +146,15 @@ describe('viewDocuments route', () => {
       next
     );
 
-    expect(res.render).toHaveBeenCalledWith('view-document');
+    expect(documentService.getDocumentStream).toHaveBeenCalledWith(
+      'token',
+      '1777570813792018',
+      '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa'
+    );
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Length', '1234');
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', 'inline; filename="claim-form.pdf"');
+    expect(pipeSpy).toHaveBeenCalledWith(res);
     expect(next).not.toHaveBeenCalled();
   });
 });
