@@ -131,6 +131,9 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-do-you-want-to-upload-files': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
+    'counter-claim-upload-files': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
