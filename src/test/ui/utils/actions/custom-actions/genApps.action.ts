@@ -436,7 +436,7 @@ export class GenAppsAction implements IAction {
       const expectedPage = allowedPages[i];
       const onAllowedPage = currentUrl.includes(expectedPage);
 
-      expect(onAllowedPage, `Unexpected page. Expected: ${expectedPage}, Actual: ${currentUrl}`).toBeTruthy();
+      expect(onAllowedPage, `Expected: ${expectedPage}, Actual: ${currentUrl}`).toBeTruthy();
 
       const navButton = !currentUrl.includes('ask') ? 'Continue' : 'Start now';
       await performAction('clickButton', navButton);
