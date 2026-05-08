@@ -63,6 +63,7 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-against-whom',
     'counter-claim-about',
     'counter-claim-order-other-than-sum',
+    'counter-claim-upload-documents',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',

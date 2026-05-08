@@ -1,6 +1,5 @@
 import type { Request } from 'express';
 
-import { getClaimantName } from '../../utils/getClaimantName';
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
@@ -32,7 +31,6 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   extendGetContent: (req: Request, formContent) => {
-    const claimantName = getClaimantName(req);
     const data = req.res?.locals?.validatedCase?.data;
     const alreadySaved = data?.possessionClaimResponse?.defendantResponses?.counterClaim?.counterClaimAgainst ?? [];
     const submitted = req.body?.counterClaimAgainst;
@@ -44,8 +42,7 @@ export const step: StepDefinition = createFormStep({
     const defendants = (data?.allDefendants ?? []).filter(
       p => p.id !== data?.possessionClaimResponse?.currentDefendantPartyId
     );
-    const claimant = data?.allClaimants?.find(p => p.value?.orgName === claimantName);
-    const orderedParties = claimant ? [claimant, ...defendants.filter(p => p !== claimant)] : defendants;
+    const orderedParties = [...(data?.allClaimants ?? []), ...defendants];
 
     const checkboxItems = orderedParties
       .map(p => {
