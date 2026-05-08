@@ -2,6 +2,7 @@ import { type Request } from 'express';
 
 import {
   hasAnyRentArrearsGround,
+  hasMadeCounterClaim,
   hasOnlyRentArrearsGrounds,
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
@@ -18,6 +19,7 @@ import {
   shouldShowInstallmentPaymentsStep,
   shouldShowUniversalCreditStep,
 } from './flowConditions';
+import { isMoneyCounterClaim } from './utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
@@ -51,6 +53,9 @@ export const flowConfig: JourneyFlowConfig = {
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
     'counter-claim',
+    'counter-claim-what-are-you-claiming-for',
+    'counter-claim-specific-sum',
+    'counter-claim-fee',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -118,6 +123,24 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'non-rent-arrears-dispute': {
       showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
+    },
+    'counter-claim-specific-sum': {
+      showCondition: (req: Request) => isMoneyCounterClaim(req),
+    },
+    'counter-claim-what-are-you-claiming-for': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-fee': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'payment-interstitial': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
+    },
+    'repayments-made': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
+    },
+    'repayments-agreed': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
     'installment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
