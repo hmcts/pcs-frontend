@@ -53,6 +53,9 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute',
     'counter-claim',
     'what-are-you-claiming-for',
+    'counter-claim-about',
+    'counter-claim-do-you-want-to-upload-files',
+    'counter-claim-upload-files',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -120,6 +123,12 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
     },
     'what-are-you-claiming-for': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-about': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-do-you-want-to-upload-files': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'payment-interstitial': {

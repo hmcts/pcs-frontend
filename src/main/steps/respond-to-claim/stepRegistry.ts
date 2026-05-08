@@ -9,6 +9,9 @@ import { step as contactPreferencesTelephone } from './contact-preferences-telep
 import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
+import { step as counterClaimAbout } from './counter-claim-about';
+import { step as counterClaimDoYouWantToUploadFiles } from './counter-claim-do-you-want-to-upload-files';
+import { step as counterClaimUploadFiles } from './counter-claim-upload-files';
 import { step as yourCircumstances } from './current-circumstances';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
@@ -74,6 +77,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'counter-claim': counterClaim,
   'what-are-you-claiming-for': whatAreYouClaimingFor,
+  'counter-claim-about': counterClaimAbout,
+  'counter-claim-do-you-want-to-upload-files': counterClaimDoYouWantToUploadFiles,
+  'counter-claim-upload-files': counterClaimUploadFiles,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
