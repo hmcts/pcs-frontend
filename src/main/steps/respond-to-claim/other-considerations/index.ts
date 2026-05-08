@@ -1,7 +1,7 @@
 import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import { Logger } from '@modules/logger';
-import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
 const logger = Logger.getLogger('OtherConsiderationsStep');
