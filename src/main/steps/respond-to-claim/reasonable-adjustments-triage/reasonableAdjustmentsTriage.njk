@@ -1,0 +1,77 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% block pageTitle %}
+  {{ pageTitle | safe }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+  <h2 class="govuk-heading-s">{{ askingForReasonableAdjustmentHeading }}</h2>
+
+  <p class="govuk-body">{{ askingForReasonableAdjustmentParagraph1 }}</p>
+  <p class="govuk-body">{{ askingForReasonableAdjustmentParagraph2 }}</p>
+  <p class="govuk-body">{{ askingForReasonableAdjustmentParagraph3 }}</p>
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
+    <li>{{ askingForReasonableAdjustmentListItem1 }}</li>
+    <li>{{ askingForReasonableAdjustmentListItem2 }}</li>
+    <li>{{ askingForReasonableAdjustmentListItem3 }}</li>
+    <li>{{ askingForReasonableAdjustmentListItem4 }}</li>
+  </ul>
+  <p class="govuk-body">{{ askingForReasonableAdjustmentParagraph4 }}</p>
+  <p class="govuk-body govuk-!-margin-bottom-6 govuk-!-font-weight-bold">{{ askingForSomethingElseHeading }}</p>
+  <p class="govuk-body">{{ askingForSomethingElseParagraph1 }}</p>
+  <p class="govuk-body">{{ askingForSomethingElseParagraph2 }}</p>
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
+    <li>{{ askingForSomethingElseListItem1 }}</li>
+    <li>{{ askingForSomethingElseListItem2 }}</li>
+    <li>{{ askingForSomethingElseListItem3 }}</li>
+  </ul>
+  <p class="govuk-body">{{ askingForSomethingElseParagraph3 }}</p>
+  <p class="govuk-body govuk-!-font-weight-bold">{{ contactByEmailHeading }}</p>
+  <p class="govuk-body">
+     {{ contactByEmailParagraph1Prefix }}
+     <a
+       class="govuk-link"
+       href="https://www.gov.uk/find-court-tribunal "
+       target="_blank"
+       rel="noopener noreferrer">
+       {{ contactByEmailParagraph1LinkText }}
+     </a>
+     {{ contactByEmailParagraph1Suffix }}
+  </p>
+  <p class="govuk-body">{{  contactByEmailParagraph2 }}</p>
+  <p class="govuk-body govuk-!-font-weight-bold">{{  contactByPhoneHeading }}</p>
+  <p class="govuk-body">{{ contactByPhoneParagraph1 }}</p>
+  <p class="govuk-body">{{ contactByPhoneParagraph2 }}</p>
+  <p class="govuk-body">
+     <a
+      class="govuk-link"
+      href="https://www.gov.uk/call-charges"
+      target="_blank"
+      rel="noopener noreferrer">
+      {{ contactByPhoneParagraph3 }}
+     </a>
+  </p>
+
+  <form method="post" action="{{ url }}">
+    <div class="govuk-button-group govuk-!-padding-top-6">
+      {{ govukButton({
+          text: 'Continue to the questions',
+          type: "button"
+      }) }}
+        {{ govukButton({
+              text: 'I do not need support at this time',
+              classes: 'govuk-button--secondary',
+              name: 'reasonableAdjustmentsChoice',
+              value: 'skip'
+            }) }}
+    </div>
+    {{ csrfProtection(csrfToken) }}
+  </form>
+{% endblock %}

@@ -32,6 +32,7 @@ import { step as otherConsiderations } from './other-considerations';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
+import { step as reasonableAdjustmentsTriage } from './reasonable-adjustments-triage';
 import { step as regularExpenses } from './regular-expenses';
 import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
@@ -93,6 +94,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'what-other-regular-expenses-do-you-have': regularExpenses,
   'other-considerations': otherConsiderations,
   'upload-docs': uploadDocs,
+  'reasonable-adjustments=triage': reasonableAdjustmentsTriage,
   'equality-and-diversity-start': equalityAndDiversityStart,
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,
