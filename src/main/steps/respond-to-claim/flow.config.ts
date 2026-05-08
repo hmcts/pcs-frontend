@@ -19,6 +19,7 @@ import {
   shouldShowInstallmentPaymentsStep,
   shouldShowUniversalCreditStep,
 } from './flowConditions';
+import { isMoneyCounterClaim } from './utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
@@ -52,7 +53,9 @@ export const flowConfig: JourneyFlowConfig = {
     'rent-arrears-dispute',
     'non-rent-arrears-dispute',
     'counter-claim',
-    'what-are-you-claiming-for',
+    'counter-claim-what-are-you-claiming-for',
+    'counter-claim-specific-sum',
+    'counter-claim-fee',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -108,6 +111,7 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       showCondition: (req: Request) => isNoticeServed(req),
     },
+
     'confirmation-of-notice-date-when-provided': {
       showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
@@ -120,7 +124,13 @@ export const flowConfig: JourneyFlowConfig = {
     'non-rent-arrears-dispute': {
       showCondition: (req: Request) => !hasOnlyRentArrearsGrounds(req),
     },
-    'what-are-you-claiming-for': {
+    'counter-claim-specific-sum': {
+      showCondition: (req: Request) => isMoneyCounterClaim(req),
+    },
+    'counter-claim-what-are-you-claiming-for': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-fee': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'payment-interstitial': {
