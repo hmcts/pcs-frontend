@@ -1,5 +1,7 @@
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../constants/caseRoutes';
 
+import { isViewAllApplicationsAvailable } from './flowConditions';
+
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const confirmIfTheseDocumentsRelateToAnApplicationStep = 'confirm-if-these-documents-relate-to-an-application';
@@ -12,7 +14,13 @@ export const flowConfig: JourneyFlowConfig = {
   stepOrder: ['start-now', confirmIfTheseDocumentsRelateToAnApplicationStep, uploadYourDocumentsStep],
   steps: {
     'start-now': {
-      defaultNext: confirmIfTheseDocumentsRelateToAnApplicationStep,
+      routes: [
+        {
+          condition: isViewAllApplicationsAvailable,
+          nextStep: confirmIfTheseDocumentsRelateToAnApplicationStep,
+        },
+        { nextStep: uploadYourDocumentsStep },
+      ],
     },
     [confirmIfTheseDocumentsRelateToAnApplicationStep]: {},
     [uploadYourDocumentsStep]: {},
