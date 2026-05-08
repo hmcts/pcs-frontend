@@ -12,6 +12,7 @@ import VisibleFormDataView from './visibleFormDataView';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
+import { toCaseReference16 } from '@utils/caseReference';
 
 const STEP_NAME = 'check-your-answers';
 
@@ -120,7 +121,10 @@ export const step: StepDefinition = createFormStep({
     });
 
     delete req.session.formData;
-    delete req.session.uploadedDocs;
+    const caseRef = toCaseReference16(req.params?.caseReference);
+    if (caseRef && req.session.uploadedDocs?.[caseRef]) {
+      delete req.session.uploadedDocs[caseRef];
+    }
     delete req.session.genApp;
   },
 });

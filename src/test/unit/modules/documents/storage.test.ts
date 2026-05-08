@@ -174,12 +174,14 @@ describe('createCcdDraftStorage', () => {
 
 describe('sessionDocs', () => {
   const STEP_NAME = 'upload-documents-to-support-your-application';
+  const OTHER_CASE_REF = '9999999999999999';
   const storage = sessionDocs({ stepName: STEP_NAME });
 
-  function makeSessionReq(docs?: CcdCollectionItem<CcdUploadedDocument>[]): Request {
+  function makeSessionReq(docs?: CcdCollectionItem<CcdUploadedDocument>[], caseRef: string = VALID_CASE_REF): Request {
     return {
+      params: { caseReference: caseRef },
       session: {
-        uploadedDocs: docs ? { [STEP_NAME]: docs } : undefined,
+        uploadedDocs: docs ? { [caseRef]: { [STEP_NAME]: docs } } : undefined,
         reload: jest.fn((cb: (err: null) => void) => cb(null)),
         save: jest.fn((cb: (err: null) => void) => cb(null)),
       },
@@ -204,8 +206,37 @@ describe('sessionDocs', () => {
 
     it('returns empty array when bucket value is not an array', async () => {
       const req = {
+        params: { caseReference: VALID_CASE_REF },
         session: {
-          uploadedDocs: { [STEP_NAME]: '' as unknown as CcdCollectionItem<CcdUploadedDocument>[] },
+          uploadedDocs: {
+            [VALID_CASE_REF]: { [STEP_NAME]: '' as unknown as CcdCollectionItem<CcdUploadedDocument>[] },
+          },
+          reload: jest.fn(),
+          save: jest.fn(),
+        },
+      } as unknown as Request;
+
+      expect(await storage.read(req)).toEqual([]);
+    });
+
+    it('returns empty array when caseReference is missing', async () => {
+      const req = {
+        params: {},
+        session: {
+          uploadedDocs: { [VALID_CASE_REF]: { [STEP_NAME]: [doc1] } },
+          reload: jest.fn(),
+          save: jest.fn(),
+        },
+      } as unknown as Request;
+
+      expect(await storage.read(req)).toEqual([]);
+    });
+
+    it('does not leak docs from a different case in the same session', async () => {
+      const req = {
+        params: { caseReference: OTHER_CASE_REF },
+        session: {
+          uploadedDocs: { [VALID_CASE_REF]: { [STEP_NAME]: [doc1, doc2] } },
           reload: jest.fn(),
           save: jest.fn(),
         },
@@ -227,6 +258,7 @@ describe('sessionDocs', () => {
 
     it('rejects when session reload fails', async () => {
       const req = {
+        params: { caseReference: VALID_CASE_REF },
         session: {
           uploadedDocs: {},
           reload: jest.fn((cb: (err: Error) => void) => cb(new Error('Redis down'))),
@@ -244,12 +276,36 @@ describe('sessionDocs', () => {
 
       await storage.save(req, [doc1, doc2]);
 
-      expect(req.session.uploadedDocs?.[STEP_NAME]).toEqual([doc1, doc2]);
+      expect(req.session.uploadedDocs?.[VALID_CASE_REF]?.[STEP_NAME]).toEqual([doc1, doc2]);
       expect(req.session.save as jest.Mock).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not overwrite another case bucket when saving for a different case', async () => {
+      const req = {
+        params: { caseReference: OTHER_CASE_REF },
+        session: {
+          uploadedDocs: { [VALID_CASE_REF]: { [STEP_NAME]: [doc1] } },
+          reload: jest.fn(),
+          save: jest.fn((cb: (err: null) => void) => cb(null)),
+        },
+      } as unknown as Request;
+
+      await storage.save(req, [doc2]);
+
+      expect(req.session.uploadedDocs?.[VALID_CASE_REF]?.[STEP_NAME]).toEqual([doc1]);
+      expect(req.session.uploadedDocs?.[OTHER_CASE_REF]?.[STEP_NAME]).toEqual([doc2]);
+    });
+
+    it('throws 404 when case reference is not 16 digits', async () => {
+      const req = makeSessionReq(undefined, 'not-a-case-id');
+
+      await expect(storage.save(req, [doc1])).rejects.toThrow('Invalid case reference format');
+      expect(req.session.save as jest.Mock).not.toHaveBeenCalled();
     });
 
     it('rejects when session save fails', async () => {
       const req = {
+        params: { caseReference: VALID_CASE_REF },
         session: {
           uploadedDocs: {},
           reload: jest.fn(),
