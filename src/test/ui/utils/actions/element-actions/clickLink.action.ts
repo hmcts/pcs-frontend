@@ -1,14 +1,30 @@
 import { Page } from '@playwright/test';
 
 import { VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
-import { IAction } from '../../interfaces';
+import { IAction, actionRecord } from '../../interfaces';
+
+type ClickLinkParams =
+  | string
+  | {
+      fieldName: string;
+      header?: string;
+      sectionHeader?: string;
+    };
 
 export class ClickLinkAction implements IAction {
-  async execute(page: Page, action: string, fieldName: string, header?: string): Promise<void> {
+  async execute(
+    page: Page,
+    action: string,
+    fieldName: string | actionRecord | ClickLinkParams,
+    header?: string
+  ): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['clickLink', () => this.clickLink(page, fieldName)],
-      ['clickLinkAndVerifySameTabTitle', () => this.clickLinkAndVerifySameTabTitle(page, fieldName!, header!)],
-      ['clickLinkAndVerifyNewTabTitle', () => this.clickLinkAndVerifyNewTabTitle(page, fieldName!, header!)],
+      ['clickLink', () => this.clickLink(page, fieldName as string)],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        () => this.clickLinkAndVerifySameTabTitle(page, fieldName as string | ClickLinkParams, header!),
+      ],
+      ['clickLinkAndVerifyNewTabTitle', () => this.clickLinkAndVerifyNewTabTitle(page, fieldName as string, header!)],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -23,10 +39,32 @@ export class ClickLinkAction implements IAction {
     await locator.click();
   }
 
-  private async clickLinkAndVerifySameTabTitle(page: Page, fieldName: string, expectedHeader: string): Promise<void> {
-    const link = page.locator(`a:text-is("${fieldName}")`);
+  private async clickLinkAndVerifySameTabTitle(
+    page: Page,
+    fieldName: string | ClickLinkParams,
+    fallbackHeader?: string
+  ): Promise<void> {
+    let name: string;
+    let expectedHeader: string;
+    let sectionHeader: string | undefined;
+    if (typeof fieldName === 'string') {
+      name = fieldName;
+      expectedHeader = fallbackHeader!;
+    } else {
+      name = fieldName.fieldName;
+      expectedHeader = fieldName.header!;
+      sectionHeader = fieldName.sectionHeader;
+    }
+    let link;
+    if (sectionHeader) {
+      const section = page.locator(`h2:text-is("${sectionHeader}") + ul`);
+      link = section.locator(`a:text-is("${name}")`);
+    } else {
+      link = page.locator(`a:text-is("${name}")`).first();
+    }
     await link.waitFor({ state: 'visible', timeout: VERY_SHORT_TIMEOUT });
-    await Promise.all([page.waitForLoadState('domcontentloaded'), link.click()]);
+    await link.click();
+    await page.waitForFunction(() => document.title && document.title.length > 0);
     const pageTitle = await page.title();
     if (!pageTitle.includes(expectedHeader)) {
       throw new Error(

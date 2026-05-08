@@ -2,6 +2,7 @@ export default {
   'start-now': 'startNow',
   'free-legal-advice': 'freeLegalAdvice',
   home: 'home',
+  'what-other-regular-expenses-do-you-have': 'whatOtherRegularExpensesDoYouHave',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
   'defendant-name-confirmation': 'defendantNameConfirmation',
@@ -37,7 +38,9 @@ export default {
   'do-you-have-any-dependant-children': 'doYouHaveAnyDependantChildren',
   'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
   'choose-an-application': 'chooseAnApplication',
-  /* 'check-your-answers': 'checkYourAnswers', */
+  'check-your-answers': 'checkYourAnswersGenApps',
+  'language-used': 'languageUsed',
+  'other-considerations': 'otherConsiderations',
   'ask-to-adjourn-the-court-hearing': 'askToAdjournTheCourtHearing',
   'ask-the-court-to-set-aside-the-order': 'askTheCourtToSetAsideTheOrder',
   'ask-the-court-to-make-an-order': 'askTheCourtToMakeAnOrder',
@@ -45,7 +48,7 @@ export default {
   'do-you-need-help-paying-the-fee': 'doYouNeedHelpPayingTheFee',
   'have-you-already-applied-for-help-with-fees': 'haveYouAlreadyAppliedForHelpWithFees',
   'have-the-other-parties-agreed-to-this-application': 'haveTheOtherPartiesAgreedToThisApplication',
-  'you-need-to-apply-for-help-with-your-application-fee': 'youNeedToApplyForHelpWithYouApplicationFee',
+  'you-need-to-apply-for-help-with-your-application-fee': 'youNeedToApplyForHelpWithYourApplicationFee',
   'what-order-do-you-want-the-court-to-make-and-why': 'whatOrderDoYouWantTheCourtToMakeAndWhy',
   'are-there-any-reasons-that-this-application-should-not-be-shared':
     'areThereAnyReasonsThatThisApplicationShouldNotBeShared',
@@ -53,5 +56,7 @@ export default {
   'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
-  'language-used': 'languageUsed',
+  'what-are-you-claiming-for': 'counterClaimWhatAreYouClaimingFor',
+  'counter-claim-specific-sum': 'counterClaimSpecificSumOfMoney',
+  'counter-claim': 'counterClaim',
 };

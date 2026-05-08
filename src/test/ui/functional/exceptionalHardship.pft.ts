@@ -17,6 +17,13 @@ export async function yourExceptionalHardShipErrorValidation(): Promise<void> {
     header: exceptionalHardship.thereIsAProblemErrorMessageHeader,
     message: exceptionalHardship.mustBe500CharactersOrFewerErrorMessage,
   });
+  //emoji validation
+  await performAction('inputText', exceptionalHardship.giveDetailsHiddenTextLabel, exceptionalHardship.emojiTextInput);
+  await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: exceptionalHardship.thereIsAProblemErrorMessageHeader,
+    message: exceptionalHardship.emojiGiveDetailsAboutExceptionalHardshipErrorMessage,
+  });
 }
 
 export async function yourExceptionalHardshipNavigationTests(): Promise<void> {

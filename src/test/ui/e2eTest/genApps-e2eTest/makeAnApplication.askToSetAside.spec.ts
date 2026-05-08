@@ -1,9 +1,7 @@
-import config from 'config';
-
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import {
   askTheCourtToSetAsideTheOrder,
-  checkYourAnswers,
+  checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentToSupportYourApplication,
@@ -12,14 +10,17 @@ import {
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
+  youNeedToApplyForHelpWithYourApplicationFee,
 } from '../../data/page-data/genApps-page-data';
+import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
+  FieldsStore.clear();
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
   await performAction('fetchPINsAPI');
@@ -44,7 +45,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: chooseAnApplication.setAsideRadioOption,
     });
     await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
-    //The below are placeholder pages
     await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
       question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
@@ -57,25 +57,60 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
-    await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
     await performAction('confirmOtherPartiesAgreed', {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
       option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
     });
     await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
-    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performAction('confirmOrderDoYouWant', {
+      label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
+      input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
+    });
     await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
     await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
     await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
-      option: whichLanguageDidYouUseToCompleteThisService.welshRadioOption,
+      option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
     });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
-    // await performAction('clickButton', checkYourAnswers.submitApplicationButton);
+    await performAction('reviewAndUpdateCYA', {
+      changeOption: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+      journey: 'journey2',
+    });
+    await performAction('retrieveCYATableData');
+    await performAction('validateCYA');
+    await performAction('selectStatementOfTruth', {
+      question: checkYourAnswersGenApps.statementOfTruthQuestion,
+      option: checkYourAnswersGenApps.iBelieveTheFactsHiddenCheckbox,
+      label: checkYourAnswersGenApps.yourFullNameTextLabel,
+      input: checkYourAnswersGenApps.yourFullNameTextInput,
+    });
+  });
+
+  test('Select an Application - Ask to Set aside - You need to apply for application fee', async () => {
+    await performAction('chooseAnApplication', {
+      question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
+      option: chooseAnApplication.setAsideRadioOption,
+    });
+    await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performAction('doYouNeedHelpPayingFee', {
+      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+    });
+    await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
+    await performAction('confirmYouHaveAppliedForFeeHelp', {
+      question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
+      option: haveYouAlreadyAppliedForHelpWithFees.noRadioOption,
+      label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
+      input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
+    });
+    await performValidation('mainHeader', youNeedToApplyForHelpWithYourApplicationFee.mainHeader);
   });
 });

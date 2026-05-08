@@ -302,6 +302,121 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.getExistingCaseData(accessToken, '')).rejects.toThrow(HTTPError);
     });
   });
+
+  describe('getDashboardView', () => {
+    const caseId = '1234567890123456';
+
+    it('GETs dashboardView event trigger and returns transformed dashboard data', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: {
+              dashboardData: {
+                notifications: [
+                  {
+                    id: 'n1',
+                    value: {
+                      templateId: 'Defendant.CaseIssued',
+                      templateValues: [{ id: 'k1', value: { key: 'foo', value: 'bar' } }],
+                    },
+                  },
+                ],
+                taskGroups: [
+                  {
+                    id: 'g1',
+                    value: {
+                      groupId: 'CLAIM',
+                      tasks: [
+                        {
+                          id: 't1',
+                          value: { templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' },
+                        },
+                      ],
+                    },
+                  },
+                ],
+                propertyAddress: {
+                  AddressLine1: '1 Test Street',
+                  PostTown: 'London',
+                  PostCode: 'SW1A 1AA',
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const result = await ccdCaseService.getDashboardView(accessToken, caseId);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/dashboardView?ignore-warning=false`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+
+      expect(result).toEqual({
+        notifications: [{ templateId: 'Defendant.CaseIssued', templateValues: { foo: 'bar' } }],
+        taskGroups: [
+          {
+            groupId: 'CLAIM',
+            tasks: [{ templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' }],
+          },
+        ],
+        propertyAddress: '1 Test Street, London, SW1A 1AA',
+      });
+    });
+
+    it('returns empty notifications and task groups when dashboardData is absent', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: {},
+          },
+        },
+      });
+
+      const result = await ccdCaseService.getDashboardView(accessToken, caseId);
+
+      expect(result).toEqual({
+        notifications: [],
+        taskGroups: [],
+        propertyAddress: undefined,
+      });
+    });
+
+    it('maps 404 from CCD to Case not found HTTPError', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 404, data: {} },
+        message: 'Not found',
+      });
+
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Case not found');
+    });
+
+    it('maps 400 from CCD to Case not found HTTPError', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 400, data: {} },
+        message: 'Bad request',
+      });
+
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Case not found');
+    });
+
+    it('maps other HTTP errors to CCD case service HTTPError', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 500, data: {} },
+        message: 'Server error',
+      });
+
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
+    });
+  });
 });
 
 describe('updateCase', () => {
