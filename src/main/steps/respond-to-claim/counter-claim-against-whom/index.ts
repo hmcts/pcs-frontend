@@ -47,9 +47,7 @@ export const step: StepDefinition = createFormStep({
     const checkboxItems = orderedParties
       .filter(p => p.value?.orgName || p.value?.firstName || p.value?.lastName)
       .map(p => {
-        const displayName = [p.value?.orgName, p.value?.firstName, p.value?.lastName]
-          .join(' ')
-          .trim();
+        const displayName = [p.value?.orgName, p.value?.firstName, p.value?.lastName].join(' ').trim();
         return { value: p.id, text: displayName, checked: checkedIds.includes(p.id) };
       });
 
