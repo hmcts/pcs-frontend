@@ -16,4 +16,12 @@ export const accessYourCase = {
   accessCodeMustOnlyIncludeLettersAndNumbersErrorMessage:
     'Access code must only include letters a to z, and numbers 0 to 9',
   accessCodeMustBe12CharactersErrorMessage: 'Access code must be 12 characters',
+  caseNumberIncorrectFormatInput: '1234-5678-ABCD-1234',
+  accessCodeIncorrectFormatInput: 'validcode123',
+  incorrectLengthClaimNumberInput: '1234-5678-9012',
+  incorrectLengthTooLongClaimNumberInput: '1234-5678-9012-3456-7890-1234',
+  caseNumberCorrectFormatInput: '1234-5678-9012-1234',
+  accessCodeIncorrectFormatSpecialCharInput: 'invalid@code!',
+  incorrectShortAccessCodeInput: 'short123',
+  incorrectLongAccessCodeInput: 'toolongcode123456',
 };
