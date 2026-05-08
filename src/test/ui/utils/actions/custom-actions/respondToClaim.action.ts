@@ -696,7 +696,7 @@ export class RespondToClaimAction implements IAction {
     await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
     await performAction('clickButton', accessYourCase.continueButton);
   }
-  
+
   private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: claim.question,
