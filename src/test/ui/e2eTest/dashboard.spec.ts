@@ -4,6 +4,7 @@ import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data'
 import { uploadAdditionalDocuments, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
+import { viewTheClaim } from '../data/page-data/theClaim-page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
@@ -47,14 +48,9 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       ['clickLinkAndVerifySameTabTitle', dashboard.findInfoAboutMyCourtLink, dashboard.findACourtOrTribunalHeader]
     );
     await performAction('clickLinkAndVerifySameTabTitle', {
-      sectionHeader: dashboard.courtHearingSubHeader,
-      fieldName: dashboard.viewHearingDocumentsLink,
-      header: viewHearingDocuments.mainHeader,
-    });
-    await performAction('clickLinkAndVerifySameTabTitle', {
-      sectionHeader: dashboard.ordersNoticesFromCourtSubHeader,
-      fieldName: dashboard.viewOrdersAndNoticesLink,
-      header: viewOrdersAndNotices.mainHeader,
+      sectionHeader: dashboard.theClaimSubHeader,
+      fieldName: dashboard.viewTheClaimLink,
+      header: viewTheClaim.mainHeader,
     });
     await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.documentsSubHeader,
@@ -65,6 +61,16 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       sectionHeader: dashboard.documentsSubHeader,
       fieldName: dashboard.viewDocumentsLink,
       header: viewDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.courtHearingSubHeader,
+      fieldName: dashboard.viewHearingDocumentsLink,
+      header: viewHearingDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.ordersNoticesFromCourtSubHeader,
+      fieldName: dashboard.viewOrdersAndNoticesLink,
+      header: viewOrdersAndNotices.mainHeader,
     });
   });
 });
