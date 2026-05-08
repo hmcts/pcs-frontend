@@ -22,6 +22,7 @@ export const validateAccessCode = async (
 ): Promise<AccessCodeValidationResult> => {
   const pcsApiURL = getBaseUrl();
   try {
+    // lgtm[js/request-forgery] - base URL is from server config, caseId is validated to digits only
     const response = await http.post(
       `${pcsApiURL}/cases/${caseId}/validate-access-code`,
       { accessCode },
