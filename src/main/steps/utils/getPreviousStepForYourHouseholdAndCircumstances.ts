@@ -73,15 +73,8 @@ export async function getPreviousStepForYourHouseholdAndCircumstances(req: Reque
 
   const instalOffer = normalizeYesNoValue(paymentAgreement?.repayArrearsInstalments);
 
-  if (instalOffer === 'YES') {
-    if (hasInstalmentAmountOrFrequency(paymentAgreement)) {
-      return 'how-much-afford-to-pay';
-    }
-    return 'installment-payments';
-  }
-
-  if (instalOffer === 'NO') {
-    return 'installment-payments';
+  if (instalOffer === 'YES' && hasInstalmentAmountOrFrequency(paymentAgreement)) {
+    return 'how-much-afford-to-pay';
   }
 
   return 'installment-payments';
