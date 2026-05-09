@@ -56,6 +56,14 @@
         "channel": "default",
         "event": "general application",
         "keyword": "GAOnNotice"
+      },
+      "counterClaimFlatFeeFEE0450": {
+        "service": "other",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "civil",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "AnyOtherRemedy"
       }
     }
   },
@@ -96,6 +104,12 @@
   },
   "xui": {
     "uri": "https://manage-case.aat.platform.hmcts.net"
+  },
+  "cdam": {
+    "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+  },
+  "documentUpload": {
+    "maxFileSizeMB": 1024
   },
   "dashboard": {
     "taskRoutes": {
