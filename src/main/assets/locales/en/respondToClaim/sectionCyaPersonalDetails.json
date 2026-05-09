@@ -1,18 +1,37 @@
 {
   "pageTitle": "Check your answers",
+  "cardTitle": "Personal details",
   "back": "Back",
   "change": "Change",
   "buttons": {
     "saveAndContinue": "Save and continue",
     "saveForLater": "Save for later"
   },
+  "options": {
+    "YES": "Yes",
+    "NO": "No"
+  },
   "rows": {
     "defendantNameConfirmation": {
-      "label": "Is the name on the claim correct?",
-      "changeHidden": "whether the name on the claim is correct",
+      "label": "Is your name {{name}}?",
+      "changeHidden": "your name"
+    },
+    "dateOfBirth": {
+      "label": "What is your date of birth?",
+      "changeHidden": "your date of birth"
+    },
+    "correspondenceAddressConfirmation": {
+      "label": "Is your correspondence address {{address}}?",
+      "changeHidden": "your correspondence address"
+    },
+    "contactBy": {
+      "label": "How do you want to receive updates?",
+      "changeHidden": "how you want to receive updates",
       "options": {
-        "YES": "Yes",
-        "NO": "No"
+        "email": "By email",
+        "post": "By post",
+        "phone": "By phone",
+        "text": "By text"
       }
     }
   }

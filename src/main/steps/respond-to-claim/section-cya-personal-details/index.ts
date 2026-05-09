@@ -31,7 +31,7 @@ export const step: StepDefinition = {
 
         return {
           summaryData: {
-            card: { title: { text: t('taskList.personalDetails') } },
+            card: { title: { text: t('cardTitle') } },
             rows: buildSectionCyaRows(req, t),
           },
           formAction: `/case/${caseRef}/respond-to-claim/${stepName}`,
