@@ -34,7 +34,9 @@ export const respondToClaimSections = {
       'rent-arrears-dispute',
       'non-rent-arrears-dispute',
       'counter-claim',
-      'what-are-you-claiming-for',
+      'counter-claim-what-are-you-claiming-for',
+      'counter-claim-specific-sum',
+      'counter-claim-fee',
     ],
   },
   payments: {
@@ -74,7 +76,7 @@ export const respondToClaimSections = {
   },
   uploadFiles: {
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-docs'],
+    steps: ['upload-document', 'support-needs'],
   },
   checkYourAnswersAndSubmit: {
     titleKey: 'taskList.checkYourAnswersAndSubmit',

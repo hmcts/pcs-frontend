@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../respond-to-claim/draftEvent';
+
 import { type CcdCase, CcdCaseModel, type PossessionClaimResponse } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 
@@ -39,7 +41,8 @@ export const buildCcdCaseForPossessionClaimResponse = async (
       possessionClaimResponse,
     },
   };
-  const updatedCase = await ccdCaseService.updateDraftRespondToClaim(
+  const updatedCase = await ccdCaseService.updateDraft(
+    RESPOND_TO_CLAIM_DRAFT_EVENT,
     req.session?.user?.accessToken,
     ccdCase.id,
     ccdCase.data as Record<string, unknown>
