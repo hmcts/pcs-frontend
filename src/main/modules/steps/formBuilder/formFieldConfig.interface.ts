@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 
-import type { DocumentStorage } from '@modules/documents/storage';
-
 import type { FormBuilderFlowConfig } from './flowConfig';
+
+import type { DocumentStorage } from '@modules/documents/storage';
 
 export type FormFieldType =
   | 'radio'
