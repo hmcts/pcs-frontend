@@ -149,10 +149,10 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: CcdCaseData
+  data: CcdCaseData | Record<string, unknown>
 ): Promise<CcdCase> {
   const payload = {
-    data,
+    data: data as Record<string, unknown>,
     event: {
       id: eventId,
       summary: `Citizen ${eventId} summary`,
@@ -250,7 +250,7 @@ export const ccdCaseService = {
    * @param data - Initial case data
    * @returns Created case with merged data from CCD
    */
-  async createCase(accessToken: string | undefined, data: CcdCaseData): Promise<CcdCase> {
+  async createCase(accessToken: string | undefined, data: Record<string, unknown>): Promise<CcdCase> {
     // Phase 1: START - Get event token
     const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
@@ -323,21 +323,24 @@ export const ccdCaseService = {
     }
   },
 
-  async saveDraftRespondToClaim(accessToken: string | undefined, caseId: string, data: CcdCaseData): Promise<CcdCase> {
+  async updateDraft(
+    draftEvent: { id: string; pageId: string },
+    accessToken: string | undefined,
+    caseId: string,
+    data: Record<string, unknown>
+  ): Promise<CcdCase> {
     if (!caseId) {
       throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
     }
 
-    const eventId = 'respondPossessionClaim';
-    const pageId = 'respondToPossessionDraftSavePage';
-    const ccdPageId = `${eventId}${pageId}`;
+    const ccdPageId = `${draftEvent.id}${draftEvent.pageId}`;
     const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/validate?pageId=${ccdPageId}`;
 
     const payload = {
       event: {
-        id: eventId,
-        summary: `Citizen ${eventId} draft save summary`,
-        description: `Citizen ${eventId} draft save description`,
+        id: draftEvent.id,
+        summary: `Citizen ${draftEvent.id} draft save summary`,
+        description: `Citizen ${draftEvent.id} draft save description`,
       },
       case_reference: caseId,
       event_data: data,
@@ -351,7 +354,7 @@ export const ccdCaseService = {
         data: response.data?.data ?? {},
       };
     } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'save draft response to claim');
+      throw convertAxiosErrorToHttpError(error, `save draft ${draftEvent.id}`);
     }
   },
 

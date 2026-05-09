@@ -9,7 +9,7 @@ jest.mock('../../../../main/steps/respond-to-claim/normalise', () => ({
 // Mock the CCD service
 jest.mock('../../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
-    saveDraftRespondToClaim: jest.fn().mockResolvedValue({ id: '123', data: {} }),
+    updateDraft: jest.fn().mockResolvedValue({ id: '123', data: {} }),
   },
 }));
 
@@ -36,9 +36,14 @@ describe('saveDraftDefendantResponse wrapper', () => {
     await saveDraftDefendantResponse(req, response);
 
     expect(mockNormaliseRespondToClaimDraft).toHaveBeenCalledWith(response);
-    expect(ccdCaseService.saveDraftRespondToClaim).toHaveBeenCalledWith('tok', '123', {
-      possessionClaimResponse: response, // Uses mocked normaliser return
-    });
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
+      'tok',
+      '123',
+      {
+        possessionClaimResponse: response, // Uses mocked normaliser return
+      }
+    );
   });
 
   it('sends normalised response to CCD service', async () => {
@@ -55,9 +60,14 @@ describe('saveDraftDefendantResponse wrapper', () => {
 
     await saveDraftDefendantResponse(req, originalResponse);
 
-    expect(ccdCaseService.saveDraftRespondToClaim).toHaveBeenCalledWith('tok', '123', {
-      possessionClaimResponse: normalisedResponse, // Normalised version sent
-    });
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
+      'tok',
+      '123',
+      {
+        possessionClaimResponse: normalisedResponse, // Normalised version sent
+      }
+    );
   });
 
   it('extracts accessToken and caseId from request correctly', async () => {
@@ -69,7 +79,8 @@ describe('saveDraftDefendantResponse wrapper', () => {
 
     await saveDraftDefendantResponse(req, response);
 
-    expect(ccdCaseService.saveDraftRespondToClaim).toHaveBeenCalledWith(
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
       'custom-token',
       'custom-case-id',
       expect.any(Object)

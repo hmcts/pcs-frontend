@@ -2,6 +2,7 @@ import { cloneDeep } from 'lodash';
 
 import type { Normaliser } from './Normaliser';
 import { normaliseContactPreferences } from './normaliseContactPreferences';
+import { normaliseCounterClaim } from './normaliseCounterClaim';
 import { normaliseHouseholdFinance } from './normaliseHouseholdFinance';
 import { normaliseNoticeDetails } from './normaliseNoticeDetails';
 import { normaliseRepaymentAgreement } from './normaliseRepaymentAgreement';
@@ -13,6 +14,7 @@ const normalisers: readonly Normaliser[] = [
   normaliseNoticeDetails,
   normaliseHouseholdFinance,
   normaliseContactPreferences,
+  normaliseCounterClaim,
 ];
 
 // Returns a new object — the input is never modified.

@@ -100,7 +100,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('uses valid static previous step for household interstitial path', async () => {
+  it('routes back from your-household-and-circumstances to repayments-agreed when no payment steps visible', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
       'counter-claim'
@@ -143,7 +143,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('what-are-you-claiming-for');
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe(
+      'counter-claim-what-are-you-claiming-for'
+    );
   });
 
   const rentArrearsData = {

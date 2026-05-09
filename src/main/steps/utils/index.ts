@@ -10,8 +10,13 @@ export { isFinanceDetailsProvided } from './isFinanceDetailsProvided';
 export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
-export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
-export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
+export {
+  LEGAL_REPRESENTATIVE_USER_ROLES,
+  getUserRoles,
+  getUserToken,
+  getUserType,
+  isLegalRepresentativeUser,
+} from './userRole';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
 export { penceToPounds, poundsToPence } from './currencyConversion';

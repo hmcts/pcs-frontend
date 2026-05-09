@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { cloneDeep } from 'lodash';
 
+import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../respond-to-claim/draftEvent';
 import { normaliseRespondToClaimDraft } from '../respond-to-claim/normalise';
 
 import { PossessionClaimResponse } from '@services/ccdCase.interface';
@@ -42,7 +43,7 @@ export const saveDraftDefendantResponse = async (req: Request, response: Possess
   const accessToken = req.session?.user?.accessToken || '';
   const caseId = req.res?.locals.validatedCase?.id || '';
 
-  const updatedCase = await ccdCaseService.saveDraftRespondToClaim(accessToken, caseId, {
+  const updatedCase = await ccdCaseService.updateDraft(RESPOND_TO_CLAIM_DRAFT_EVENT, accessToken, caseId, {
     possessionClaimResponse: normalised,
   });
 
