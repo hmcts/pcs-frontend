@@ -168,8 +168,15 @@ function ragStatus(summary: AllureSummary): string {
 }
 
 function inferEnvironment(): string {
-  const explicitEnv = process.env.E2E_TARGET_ENV?.trim() || process.env.ENVIRONMENT?.trim() || process.env.E2E_ENV?.trim();
-  return explicitEnv || process.env.TEST_URL?.match(/https?:\/\/(?:[^./]+\.)?pcs(?:-[^./]+)?[.-]([a-z0-9-]+)\.platform\.hmcts\.net/i)?.[1]?.toLowerCase() || 'unknown';
+  const explicitEnv =
+    process.env.E2E_TARGET_ENV?.trim() || process.env.ENVIRONMENT?.trim() || process.env.E2E_ENV?.trim();
+  return (
+    explicitEnv ||
+    process.env.TEST_URL?.match(
+      /https?:\/\/(?:[^./]+\.)?pcs(?:-[^./]+)?[.-]([a-z0-9-]+)\.platform\.hmcts\.net/i
+    )?.[1]?.toLowerCase() ||
+    'unknown'
+  );
 }
 
 function latestResultSummary(tests: AllureTestRecord[]): { failed: number; broken: number; pass_rate: number } {
