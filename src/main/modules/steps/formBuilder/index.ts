@@ -57,6 +57,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     showCancelButton,
     customTemplate,
     basePath: configuredBasePath,
+    documentStorage,
   } = config;
 
   if (!flowConfig) {
@@ -74,6 +75,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     view: viewPath,
     stepDir,
     showCancelButton,
+    documentStorage,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
         await loadStepNamespace(req, stepName, journeyFolder);
@@ -102,6 +104,18 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           nunjucksEnv,
           interpolationValues as Record<string, unknown>
         ) as BuiltFormContent;
+
+        // Auto-wire upload/delete URLs for upload steps — identical in every upload step,
+        // so handled once here instead of duplicating extendGetContent on each step.
+        if (documentStorage) {
+          const urlBase = req.originalUrl.split('?')[0];
+          const fileField = formContent.fields?.find(f => f.componentType === 'fileUpload');
+          if (fileField?.component) {
+            fileField.component.uploadUrl = `${urlBase}/upload`;
+            fileField.component.deleteUrl = `${urlBase}/delete`;
+          }
+        }
+
         const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
         const result = extraContent ? { ...formContent, ...extraContent } : formContent;
         return {
