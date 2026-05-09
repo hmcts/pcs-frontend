@@ -1,4 +1,4 @@
-import { flowConfig as citizenFlowConfig } from './flow.config';
+import { RESPOND_TO_CLAIM_ROUTE, flowConfig as citizenFlowConfig } from './flow.config';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
@@ -49,8 +49,15 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'end-now',
 ];
 
+// Legal-rep journey is a flat, linear stepOrder. It is intentionally NOT sectionalised
+// (citizen is). Construct explicitly instead of spreading citizenFlowConfig so we don't
+// silently inherit `sections` / `nonSectionStepOrder` and have the engine pick
+// section-traversal over our linear stepOrder.
 export const legalrepFlowConfig: JourneyFlowConfig = {
-  ...citizenFlowConfig,
+  basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaimLegalrep',
+  useShowConditions: true,
+  useSessionFormData: false,
   stepOrder: legalrepStepOrder,
+  steps: citizenFlowConfig.steps,
 };
