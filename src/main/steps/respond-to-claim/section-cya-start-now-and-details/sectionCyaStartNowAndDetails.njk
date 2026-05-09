@@ -1,7 +1,7 @@
 {% extends "stepsTemplate.njk" %}
 
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "govuk/components/button/macro.njk"        import govukButton %}
+{% from "macros/stepButtons.njk"                   import stepButtons %}
 {% from "macros/csrf.njk"                          import csrfProtection %}
 
 {% block pageTitle %}{{ t('pageTitle') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
@@ -13,18 +13,6 @@
 
   <form method="post" action="{{ formAction }}" novalidate>
     {{ csrfProtection(csrfToken) }}
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: t('buttons.saveAndContinue'),
-        attributes: { type: 'submit', name: 'action', value: 'saveAndContinue' },
-        preventDoubleClick: true
-      }) }}
-      {{ govukButton({
-        text: t('buttons.saveForLater'),
-        classes: 'govuk-button--secondary',
-        attributes: { type: 'submit', name: 'action', value: 'saveForLater' },
-        preventDoubleClick: true
-      }) }}
-    </div>
+    {{ stepButtons(t('buttons.saveAndContinue'), t('buttons.saveForLater')) }}
   </form>
 {% endblock %}
