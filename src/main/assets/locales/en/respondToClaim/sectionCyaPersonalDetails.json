@@ -16,23 +16,35 @@
       "label": "Is your name {{name}}?",
       "changeHidden": "your name"
     },
+    "defendantName": {
+      "label": "Your name",
+      "changeHidden": "your name"
+    },
     "dateOfBirth": {
       "label": "What is your date of birth?",
       "changeHidden": "your date of birth"
     },
     "correspondenceAddressConfirmation": {
       "label": "Is your correspondence address {{address}}?",
+      "fallbackLabel": "Correspondence address",
       "changeHidden": "your correspondence address"
     },
-    "contactBy": {
+    "contactByEmailOrPost": {
       "label": "How do you want to receive updates?",
       "changeHidden": "how you want to receive updates",
       "options": {
         "email": "By email",
         "post": "By post",
-        "phone": "By phone",
-        "text": "By text"
+        "none": "None"
       }
+    },
+    "contactByPhone": {
+      "label": "Phone number",
+      "changeHidden": "your phone preference"
+    },
+    "contactByText": {
+      "label": "Receive updates by text message",
+      "changeHidden": "whether you want to receive text messages"
     }
   }
 }

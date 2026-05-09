@@ -16,23 +16,35 @@
       "label": "cy Is your name {{name}}?",
       "changeHidden": "cy your name"
     },
+    "defendantName": {
+      "label": "cy Your name",
+      "changeHidden": "cy your name"
+    },
     "dateOfBirth": {
       "label": "cy What is your date of birth?",
       "changeHidden": "cy your date of birth"
     },
     "correspondenceAddressConfirmation": {
       "label": "cy Is your correspondence address {{address}}?",
+      "fallbackLabel": "cy Correspondence address",
       "changeHidden": "cy your correspondence address"
     },
-    "contactBy": {
+    "contactByEmailOrPost": {
       "label": "cy How do you want to receive updates?",
       "changeHidden": "cy how you want to receive updates",
       "options": {
         "email": "cy By email",
         "post": "cy By post",
-        "phone": "cy By phone",
-        "text": "cy By text"
+        "none": "cy None"
       }
+    },
+    "contactByPhone": {
+      "label": "cy Phone number",
+      "changeHidden": "cy your phone preference"
+    },
+    "contactByText": {
+      "label": "cy Receive updates by text message",
+      "changeHidden": "cy whether you want to receive text messages"
     }
   }
 }
