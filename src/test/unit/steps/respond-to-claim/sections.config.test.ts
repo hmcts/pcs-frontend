@@ -12,7 +12,7 @@ const findSection = (id: string) => respondToClaimSections.find(section => secti
 
 describe('respond-to-claim sections config', () => {
   it('maps every sectioned flow step to exactly one section', () => {
-    const nonSectionStepSlugs = new Set(['end-now']);
+    const nonSectionStepSlugs = new Set(flowConfig.nonSectionStepOrder ?? []);
     const flowStepSlugs = Object.keys(stepRegistry).filter(stepSlug => !nonSectionStepSlugs.has(stepSlug));
     const coverage = getSectionCoverage(flowStepSlugs, respondToClaimSections);
 
