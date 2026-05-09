@@ -1,0 +1,20 @@
+{
+  "pageTitle": "cy Check your answers",
+  "back": "cy Back",
+  "change": "cy Change",
+  "buttons": {
+    "saveAndContinue": "cy Save and continue",
+    "saveForLater": "cy Save for later"
+  },
+  "rows": {
+    "freeLegalAdvice": {
+      "label": "cy Have you had free legal advice?",
+      "changeHidden": "cy free legal advice",
+      "options": {
+        "YES": "cy Yes",
+        "NO": "cy No",
+        "PREFER_NOT_TO_SAY": "cy Prefer not to say"
+      }
+    }
+  }
+}

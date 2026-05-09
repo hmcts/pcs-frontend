@@ -152,5 +152,8 @@
       "title": "cyApplication not available",
       "paragraph": "cyThis application is not available. It may have already been submitted in a different window."
     }
+  },
+  "taskList": {
+    "startNowAndDetails": "cy Read information about responding and free legal advice"
   }
 }

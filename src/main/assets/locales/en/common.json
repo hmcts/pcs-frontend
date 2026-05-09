@@ -153,5 +153,8 @@
       "title": "Application not available",
       "paragraph": "This application is not available. It may have already been submitted in a different window."
     }
+  },
+  "taskList": {
+    "startNowAndDetails": "Read information about responding and free legal advice"
   }
 }

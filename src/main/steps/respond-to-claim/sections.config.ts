@@ -7,7 +7,7 @@ const sectionDefs = [
   {
     id: 'startNowAndDetails',
     titleKey: 'taskList.startNowAndDetails',
-    steps: ['start-now', 'free-legal-advice'],
+    steps: ['start-now', 'free-legal-advice', 'section-cya-start-now-and-details'],
   },
   {
     id: 'personalDetails',

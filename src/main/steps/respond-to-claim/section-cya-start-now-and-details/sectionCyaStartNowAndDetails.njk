@@ -1,0 +1,38 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk"        import govukButton %}
+{% from "govuk/components/back-link/macro.njk"     import govukBackLink %}
+{% from "macros/csrf.njk"                          import csrfProtection %}
+
+{% block pageTitle %}{{ t('pageTitle') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block beforeContent %}
+  {{ super() }}
+  {% if backUrl %}
+    {{ govukBackLink({ text: t('back', 'Back'), href: backUrl }) }}
+  {% endif %}
+{% endblock %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-l">{{ t('pageTitle') }}</h1>
+
+  {{ govukSummaryList(summaryData) }}
+
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.saveAndContinue'),
+        attributes: { type: 'submit', name: 'action', value: 'saveAndContinue' },
+        preventDoubleClick: true
+      }) }}
+      {{ govukButton({
+        text: t('buttons.saveForLater'),
+        classes: 'govuk-button--secondary',
+        attributes: { type: 'submit', name: 'action', value: 'saveForLater' },
+        preventDoubleClick: true
+      }) }}
+    </div>
+  </form>
+{% endblock %}
