@@ -161,9 +161,8 @@ def validateInputs() {
 }
 
 def handleEnvironmentSetting() {
-  def cnpEnvironment = (params.E2E_TARGET_ENV?.trim() ?: 'aat').toLowerCase()
-  env.ENVIRONMENT = cnpEnvironment
-  env.TEST_URL = "https://pcs.${cnpEnvironment}.platform.hmcts.net/"
+  env.ENVIRONMENT = (params.E2E_TARGET_ENV?.trim() ?: 'aat').toLowerCase()
+  env.TEST_URL = "https://pcs.${env.ENVIRONMENT}.platform.hmcts.net/"
   env.E2E_TEST_SCOPE = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@nightly'
   env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
 }
