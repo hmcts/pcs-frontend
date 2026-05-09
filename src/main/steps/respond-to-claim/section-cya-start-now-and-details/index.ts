@@ -41,11 +41,16 @@ export const step: StepDefinition = {
     ),
   postController: {
     post: async (req: Request, res: Response) => {
-      const caseRef = req.res?.locals.validatedCase?.id;
       // req.body.action ∈ {'saveAndContinue', 'saveForLater'}.
-      // Phase 1a: both routes redirect to /task-list. Phase 3 may branch
-      // on the action when the real task list renders status.
-      res.redirect(303, `/case/${caseRef}/respond-to-claim/task-list`);
+      // Until the real task list is wired (Phase 3), both buttons just
+      // continue the journey via the engine's natural section walk —
+      // i.e. the first visible step of the next applicable section.
+      // Phase 3 will branch on req.body.action and redirect to /task-list.
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
+      if (!redirectPath) {
+        return res.status(404).render('not-found');
+      }
+      res.redirect(303, redirectPath);
     },
   },
 };
