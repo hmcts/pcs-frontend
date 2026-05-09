@@ -8,6 +8,9 @@ import type { CcdCase } from '@services/ccdCase.interface';
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),
   loadStepNamespace: jest.fn(),
+  getRequestLanguage: jest.fn(() => 'en'),
+  getCommonTranslations: jest.fn(() => ({})),
+  getStepTranslations: jest.fn(() => ({})),
 }));
 
 describe('counter-claim-do-you-want-to-upload-files submit-time CCD payloads', () => {
@@ -33,6 +36,7 @@ describe('counter-claim-do-you-want-to-upload-files submit-time CCD payloads', (
 
     const res = {
       redirect: jest.fn(),
+      render: jest.fn(),
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
     } as unknown as Response;
