@@ -300,7 +300,7 @@ export const ccdCaseService = {
       throw new HTTPError('Cannot submit general application, case ID not specified', 500);
     }
 
-    const eventId = 'citizenCreateGenApp';
+    const eventId = 'makeAnApplication';
     const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
