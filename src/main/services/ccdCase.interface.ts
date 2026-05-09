@@ -176,6 +176,7 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  counterClaimWantToUploadFiles?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {

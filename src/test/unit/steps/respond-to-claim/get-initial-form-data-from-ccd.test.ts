@@ -5,6 +5,7 @@ import { step as noticeReceivedDateWhenProvidedStep } from '../../../../main/ste
 import { step as contactByEmailOrPostStep } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
 import { step as contactByTelephoneStep } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
 import { step as correspondenceAddressStep } from '../../../../main/steps/respond-to-claim/correspondence-address';
+import { step as counterClaimDoYouWantToUploadFilesStep } from '../../../../main/steps/respond-to-claim/counter-claim-do-you-want-to-upload-files';
 import { step as landlordLicensedStep } from '../../../../main/steps/respond-to-claim/landlord-licensed';
 import { step as tenancyDateDetailsStep } from '../../../../main/steps/respond-to-claim/tenancy-date-details';
 
@@ -258,6 +259,52 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
       month: '09',
       year: '2024',
     });
+  });
+
+  it('prefills counter-claim-do-you-want-to-upload-files YES from CCD case data', async () => {
+    const validatedCase = new CcdCaseModel({
+      id: '1771325608502536',
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaimWantToUploadFiles: 'YES',
+          },
+        },
+      },
+    } as CcdCase);
+    const { req, res } = createReqRes(validatedCase, {
+      'counter-claim-do-you-want-to-upload-files': { counterClaimWantToUploadFiles: 'NO' },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const controller = (counterClaimDoYouWantToUploadFilesStep.getController as any)();
+    await controller.get(req, res);
+
+    const renderData = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ counterClaimWantToUploadFiles: 'YES' }));
+    expect(renderData.counterClaimWantToUploadFiles).toBe('YES');
+  });
+
+  it('prefills counter-claim-do-you-want-to-upload-files NO from CCD case data', async () => {
+    const validatedCase = new CcdCaseModel({
+      id: '1771325608502536',
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaimWantToUploadFiles: 'NO',
+          },
+        },
+      },
+    } as CcdCase);
+    const { req, res } = createReqRes(validatedCase);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const controller = (counterClaimDoYouWantToUploadFilesStep.getController as any)();
+    await controller.get(req, res);
+
+    const renderData = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ counterClaimWantToUploadFiles: 'NO' }));
+    expect(renderData.counterClaimWantToUploadFiles).toBe('NO');
   });
 
   it('does not fall back to session values when CCD initial data intentionally returns empty object', async () => {
