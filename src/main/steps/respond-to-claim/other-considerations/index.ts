@@ -1,11 +1,9 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
-import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CaseData, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
-const logger = Logger.getLogger('OtherConsiderationsStep');
+import type { CaseData, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'other-considerations',
@@ -18,25 +16,26 @@ export const step: StepDefinition = createFormStep({
     heading: 'heading',
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const otherConsiderations: YesNoValue | undefined = req.body?.otherConsiderations;
 
-    if (!otherConsiderations) {
-      logger.warn('Invalid or missing otherConsiderations value', {
-        otherConsiderations,
-      });
-      return;
+    if (otherConsiderations === 'YES') {
+      response.defendantResponses.otherConsiderations = 'YES';
+      const details = req.body?.['otherConsiderations.otherConsiderationsDetails'] as string | undefined;
+      if (details) {
+        response.defendantResponses.otherConsiderationsDetails = details;
+      } else {
+        delete response.defendantResponses.otherConsiderationsDetails;
+      }
+    } else if (otherConsiderations === 'NO') {
+      response.defendantResponses.otherConsiderations = 'NO';
+      delete response.defendantResponses.otherConsiderationsDetails;
+    } else {
+      delete response.defendantResponses.otherConsiderations;
+      delete response.defendantResponses.otherConsiderationsDetails;
     }
 
-    const otherConsiderationsDetails: string | undefined =
-      otherConsiderations === 'YES' ? req.body?.['otherConsiderations.otherConsiderationsDetails'] : undefined;
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        otherConsiderations,
-        otherConsiderationsDetails: otherConsiderationsDetails ?? '',
-      },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
