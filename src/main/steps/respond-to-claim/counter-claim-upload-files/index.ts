@@ -8,8 +8,7 @@ import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/doc
 
 const storage = createCcdDraftStorage({
   event: RESPOND_TO_CLAIM_DRAFT_EVENT,
-  getDocs: data =>
-    data.possessionClaimResponse?.defendantResponses?.counterClaimDocuments ?? [],
+  getDocs: data => data.possessionClaimResponse?.defendantResponses?.counterClaimDocuments ?? [],
   setDocs: docs => ({
     possessionClaimResponse: {
       defendantResponses: { counterClaimDocuments: docs },
