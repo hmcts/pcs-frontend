@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -7,7 +8,7 @@ const SECTION_ID = 'personalDetails';
 
 export type SummaryListRow = {
   key: { text: string };
-  value: { text: string };
+  value: { text?: string; html?: string };
   actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
 };
 
@@ -39,6 +40,25 @@ function formatDob(iso?: string): string {
     return iso;
   }
   return `${parseInt(day, 10)} ${parseInt(month, 10)} ${year}`;
+}
+
+// GDS pattern: single value as text, multiple values as a bullet-less list
+// rendered with class govuk-list (matches the existing make-an-application
+// CYA escape-then-render approach). Inputs that may carry user-supplied
+// content (email address, phone number) are escaped via escape-html.
+function multiSelectValue(
+  items: string[],
+  userSuppliedItems: Set<string> = new Set()
+): { text?: string; html?: string } {
+  if (items.length === 0) {
+    return { text: '' };
+  }
+  if (items.length === 1) {
+    const item = items[0];
+    return userSuppliedItems.has(item) ? { html: escapeHtml(item) } : { text: item };
+  }
+  const lis = items.map(item => `<li>${userSuppliedItems.has(item) ? escapeHtml(item) : item}</li>`).join('\n');
+  return { html: `<ul class="govuk-list">\n${lis}\n</ul>` };
 }
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
@@ -75,7 +95,6 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   const rows: SummaryListRow[] = [];
 
   // Branch 1: claim recorded the defendant name → user CONFIRMED it (yes/no).
-  // The defendant-name-confirmation step's showCondition is `nameKnown === 'YES'`.
   if (nameConfirmation && claimDefendantName) {
     rows.push({
       key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
@@ -85,12 +104,10 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
       },
     });
   } else if (partyName?.trim()) {
-    // Branch 2: claim's defendant name was NOT 'YES' (empty/undefined/'NO') →
-    // user took the defendant-name-capture path (showCondition: nameKnown !== 'YES').
-    // The captured name lives on defendantContactDetailsPartyName.
+    // Branch 2: user CAPTURED their name via defendant-name-capture (showCondition: nameKnown !== 'YES').
     rows.push({
       key: { text: t('rows.defendantName.label') },
-      value: { text: partyName.trim() },
+      value: { html: escapeHtml(partyName.trim()) },
       actions: { items: [change('defendant-name-capture', 'rows.defendantName.changeHidden')] },
     });
   }
@@ -104,63 +121,71 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   }
 
   if (correspondenceAddressConfirmation) {
-    // Question shows the address being confirmed (the existing/property address).
-    // If user said NO and provided a corrected address, show that as the value;
-    // otherwise show the YES/NO answer.
     const addressInQuestion = propertyAddress || partyAddress;
-    const value =
+    const value: { text?: string; html?: string } =
       correspondenceAddressConfirmation === 'NO' && partyAddress
-        ? partyAddress
-        : t(`options.${correspondenceAddressConfirmation}`);
+        ? { html: escapeHtml(partyAddress) }
+        : { text: t(`options.${correspondenceAddressConfirmation}`) };
     rows.push({
       key: {
         text: addressInQuestion
           ? t('rows.correspondenceAddressConfirmation.label', { address: addressInQuestion })
           : t('rows.correspondenceAddressConfirmation.fallbackLabel'),
       },
-      value: { text: value },
+      value,
       actions: {
         items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')],
       },
     });
   }
 
-  // Email / Post — single combined row showing the methods chosen.
+  // Email / Post — multi-select. Single selection renders as text;
+  // multiple selections render as a govuk-list (GDS multi-select CYA pattern).
   if (contactByEmail || contactByPost) {
-    const methods: string[] = [];
+    const items: string[] = [];
+    const userSupplied = new Set<string>();
     if (contactByEmail === 'YES') {
-      methods.push(
-        emailAddress
-          ? `${t('rows.contactByEmailOrPost.options.email')} (${emailAddress})`
-          : t('rows.contactByEmailOrPost.options.email')
-      );
+      const emailLabel = t('rows.contactByEmailOrPost.options.email');
+      if (emailAddress?.trim()) {
+        const item = `${emailLabel} (${emailAddress.trim()})`;
+        items.push(item);
+        userSupplied.add(item);
+      } else {
+        items.push(emailLabel);
+      }
     }
     if (contactByPost === 'YES') {
-      methods.push(t('rows.contactByEmailOrPost.options.post'));
+      items.push(t('rows.contactByEmailOrPost.options.post'));
     }
     rows.push({
       key: { text: t('rows.contactByEmailOrPost.label') },
-      value: { text: methods.length ? methods.join(', ') : t('rows.contactByEmailOrPost.options.none') },
+      value:
+        items.length === 0
+          ? { text: t('rows.contactByEmailOrPost.options.none') }
+          : multiSelectValue(items, userSupplied),
       actions: {
         items: [change('contact-preferences-email-or-post', 'rows.contactByEmailOrPost.changeHidden')],
       },
     });
   }
 
-  // Phone — its own row. Value is the number when YES, otherwise the No answer.
+  // Phone — value is the phone number when YES, otherwise the No answer.
   if (contactByPhone) {
-    const value = contactByPhone === 'YES' && phoneNumber?.trim() ? phoneNumber.trim() : t(`options.${contactByPhone}`);
+    const value: { text?: string; html?: string } =
+      contactByPhone === 'YES' && phoneNumber?.trim()
+        ? { html: escapeHtml(phoneNumber.trim()) }
+        : { text: t(`options.${contactByPhone}`) };
     rows.push({
       key: { text: t('rows.contactByPhone.label') },
-      value: { text: value },
+      value,
       actions: {
         items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')],
       },
     });
   }
 
-  // Text — only displayed when phone is YES (matches contact-preferences-text-message
-  // showCondition AND the contact-preferences normaliser, which drops contactByText
+  // Text — only when phone is YES (matches showCondition AND
+  // the contact-preferences normaliser that drops contactByText
   // when contactByPhone !== 'YES').
   if (contactByPhone === 'YES' && contactByText) {
     rows.push({
