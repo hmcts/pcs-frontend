@@ -35,7 +35,6 @@
     "imNotSure": "cyI'm not sure"
   },
   "change": "cyChange",
-  "chooseOption": "cyChoose an option",
   "back": "cyBack",
   "options": {
     "yes": "cyYes",
@@ -46,10 +45,6 @@
     "month": "cyMonth",
     "year": "cyYear"
   },
-  "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
-  },
   "warningHiddenText": "cyWarning",
   "errors": {
     "title": "cyThere is a problem",
@@ -57,6 +52,7 @@
     "defaultRequired": "cyThis field is required",
     "defaultInvalid": "cyInvalid format",
     "defaultMaxLength": "cyMust be {max} characters or fewer",
+    "chooseOption": "cyChoose an option",
     "email": {
       "required": "cyEnter an email address",
       "invalid": "cyEnter a valid email address"
@@ -69,16 +65,23 @@
       "month": "cyMonth",
       "year": "cyYear",
       "required": "cyEnter a date",
-      "notRealDate": "cyEnter a valid date",
-      "invalidDay": "cyEnter a valid day",
-      "invalidMonth": "cyEnter a valid month",
-      "invalidYear": "cyEnter a valid year",
+      "notRealDate": "cyDate must be a real date",
       "futureDate": "cyDate must be in the past",
       "pastDate": "cyDate must be in the future",
       "invalidValue": "cyEnter a valid value",
       "yearMustBeSameOrAfter": "cyThe year must be the same as or after {{minYear}}",
       "missingOne": "cyDate must include a {{missingField}}",
       "missingTwo": "cyDate must include a {{first}} and {{second}}"
+    },
+    "documentUpload": {
+      "wrongFileTypeDocStore": "cyThe selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
+      "fileTooLargeDocStore": "cyThe selected file must be smaller than 1GB",
+      "noFileSelected": "cySelect a file to upload",
+      "uploadFailed": "cyThe file could not be uploaded – try again",
+      "fileDeleteFailed": "cyThe file could not be removed – try again",
+      "documentUrlRequired": "cySelect a file to remove",
+      "uploadSuccess": "cy{{filename}} has been uploaded",
+      "errorSummaryTitle": "cyThere is a problem"
     }
   },
   "months": {
@@ -142,6 +145,12 @@
     "500": {
       "title": "cySorry, we’re having technical problems",
       "paragraph": "cyPlease try again in a few minutes."
+    }
+  },
+  "applicationErrors": {
+    "noApplicationIdInSession": {
+      "title": "cyApplication not available",
+      "paragraph": "cyThis application is not available. It may have already been submitted in a different window."
     }
   }
 }

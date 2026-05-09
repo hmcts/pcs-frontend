@@ -145,7 +145,27 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
-/** Defendant responses (e.g. receivedFreeLegalAdvice). */
+/** CCD SDK Document type -- flat reference with URLs. */
+export interface CcdDocumentReference {
+  document_url: string;
+  document_binary_url: string;
+  document_filename: string;
+  document_hash?: string;
+  category_id?: string;
+}
+
+/** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
+export interface CcdUploadedDocument {
+  document: CcdDocumentReference;
+  contentType?: string;
+  sizeInBytes?: number;
+}
+
+export interface CcdCollectionItem<T> {
+  id?: string;
+  value: T;
+}
+
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
   tenancyTypeCorrect?: YesNoNotSureValue;
@@ -169,12 +189,24 @@ export interface CcdDefendantResponses {
   disputeClaimDetails?: string;
   paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
+  counterClaim?: CcdCounterClaim;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
+  defendantDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
+  counterClaimDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   languageUsed?: LanguageUsed;
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
+  makeCounterClaim?: YesNoValue;
+}
+
+/** Counter-claim data captured across the counterclaim journey screens. */
+export interface CcdCounterClaim {
+  claimType?: string;
+  isClaimAmountKnown?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
 }
 
 export interface PossessionClaimResponse {
@@ -260,11 +292,6 @@ export interface StartCallbackData {
   event_id: string;
 }
 
-export interface CcdCollectionItem<T> {
-  value: T;
-  id: string;
-}
-
 export interface CcdTemplateKeyValue {
   key: string;
   value: string;
@@ -293,10 +320,10 @@ export interface CcdDashboardData {
 }
 
 export enum GenAppType {
-  SUSPEND,
-  ADJOURN,
-  SET_ASIDE,
-  SOMETHING_ELSE,
+  SUSPEND = 'SUSPEND',
+  ADJOURN = 'ADJOURN',
+  SET_ASIDE = 'SET_ASIDE',
+  SOMETHING_ELSE = 'SOMETHING_ELSE',
 }
 
 export interface CitizenGenAppRequest {
@@ -310,4 +337,7 @@ export interface CitizenGenAppRequest {
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
   whatOrderWanted?: string;
+  sotAccepted?: YesNoValue;
+  sotFullName?: string;
+  clientReference?: string;
 }

@@ -45,7 +45,7 @@ describe('respond-to-claim sections config', () => {
   });
 
   it('maps upload section steps', () => {
-    expect(findSection('uploadFiles')?.steps).toEqual(['upload-docs']);
+    expect(findSection('uploadFiles')?.steps).toEqual(['upload-document', 'support-needs']);
   });
 
   it('maps end-of-journey steps into final section', () => {

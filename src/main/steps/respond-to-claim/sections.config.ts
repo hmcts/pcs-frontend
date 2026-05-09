@@ -50,6 +50,9 @@ export const respondToClaimSections: SectionConfig[] = [
       'rent-arrears-dispute',
       'non-rent-arrears-dispute',
       'counter-claim',
+      'counter-claim-what-are-you-claiming-for',
+      'counter-claim-specific-sum',
+      'counter-claim-fee',
     ],
   },
   {
@@ -93,7 +96,7 @@ export const respondToClaimSections: SectionConfig[] = [
   {
     id: 'uploadFiles',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-docs'],
+    steps: ['upload-document', 'support-needs'],
   },
   {
     id: 'checkYourAnswersAndSubmit',
