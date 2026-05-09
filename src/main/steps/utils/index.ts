@@ -26,3 +26,4 @@ export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
+export { counterClaimUploadWanted } from './counterClaimUploadWanted';

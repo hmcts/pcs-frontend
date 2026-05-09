@@ -1,6 +1,7 @@
 import { type Request } from 'express';
 
 import {
+  counterClaimUploadWanted,
   hasAnyRentArrearsGround,
   hasMadeCounterClaim,
   hasOnlyRentArrearsGrounds,
@@ -143,7 +144,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'counter-claim-upload-files': {
-      showCondition: (req: Request) => hasMadeCounterClaim(req),
+      showCondition: (req: Request) => hasMadeCounterClaim(req) && counterClaimUploadWanted(req),
     },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
