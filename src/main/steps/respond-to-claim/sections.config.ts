@@ -1,20 +1,9 @@
+import type { Request } from 'express';
+
 import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 import { hasAnyRentArrearsGround } from '../utils';
 
-export const RESPOND_TO_CLAIM_SECTION_IDS = [
-  'startNowAndDetails',
-  'personalDetails',
-  'disputeAndTenancy',
-  'payments',
-  'situationAndCircumstances',
-  'incomeAndExpenditure',
-  'uploadFiles',
-  'checkYourAnswersAndSubmit',
-] as const;
-
-export type RespondToClaimSectionId = (typeof RESPOND_TO_CLAIM_SECTION_IDS)[number];
-
-export const respondToClaimSections: SectionConfig[] = [
+const sectionDefs = [
   {
     id: 'startNowAndDetails',
     titleKey: 'taskList.startNowAndDetails',
@@ -65,7 +54,7 @@ export const respondToClaimSections: SectionConfig[] = [
       'installment-payments',
       'how-much-afford-to-pay',
     ],
-    isApplicable: async req => hasAnyRentArrearsGround(req),
+    isApplicable: async (req: Request) => hasAnyRentArrearsGround(req),
   },
   {
     id: 'situationAndCircumstances',
@@ -103,4 +92,13 @@ export const respondToClaimSections: SectionConfig[] = [
     titleKey: 'taskList.checkYourAnswersAndSubmit',
     steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used', 'check-your-answers'],
   },
-];
+] as const;
+
+export type RespondToClaimSectionId = (typeof sectionDefs)[number]['id'];
+
+export const RESPOND_TO_CLAIM_SECTION_IDS: readonly RespondToClaimSectionId[] = sectionDefs.map(s => s.id);
+
+export const respondToClaimSections: SectionConfig[] = sectionDefs.map(s => ({
+  ...s,
+  steps: [...s.steps],
+}));
