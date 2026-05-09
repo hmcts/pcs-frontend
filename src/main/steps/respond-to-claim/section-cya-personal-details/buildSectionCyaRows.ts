@@ -52,7 +52,6 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   const nameConfirmation = validatedCase.defendantResponsesDefendantNameConfirmation;
   const partyName = validatedCase.defendantContactDetailsPartyName;
   const claimDefendantName = validatedCase.claimantEnteredDefendantDetailsName;
-  const claimNameKnown = validatedCase.claimantEnteredDefendantDetailsNameKnown;
   const dateOfBirth = validatedCase.defendantResponsesDateOfBirth;
 
   // correspondenceAddressConfirmation has no flattened getter — read from the deep path.
@@ -75,7 +74,8 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
 
   const rows: SummaryListRow[] = [];
 
-  // Branch 1: claim recorded the defendant name → user CONFIRMED it (yes/no)
+  // Branch 1: claim recorded the defendant name → user CONFIRMED it (yes/no).
+  // The defendant-name-confirmation step's showCondition is `nameKnown === 'YES'`.
   if (nameConfirmation && claimDefendantName) {
     rows.push({
       key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
@@ -84,8 +84,10 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
         items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')],
       },
     });
-  } else if (claimNameKnown === 'NO' && partyName?.trim()) {
-    // Branch 2: claim's defendant name was unknown → user CAPTURED their name
+  } else if (partyName?.trim()) {
+    // Branch 2: claim's defendant name was NOT 'YES' (empty/undefined/'NO') →
+    // user took the defendant-name-capture path (showCondition: nameKnown !== 'YES').
+    // The captured name lives on defendantContactDetailsPartyName.
     rows.push({
       key: { text: t('rows.defendantName.label') },
       value: { text: partyName.trim() },
