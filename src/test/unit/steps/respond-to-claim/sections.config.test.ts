@@ -30,7 +30,7 @@ describe('respond-to-claim sections config', () => {
   });
 
   it('maps upload section steps', () => {
-    expect(respondToClaimSections.uploadFiles.steps).toEqual(['upload-docs']);
+    expect(respondToClaimSections.uploadFiles.steps).toEqual(['upload-document', 'support-needs']);
   });
 
   it('maps end-of-journey steps into final section', () => {
