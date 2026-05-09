@@ -219,6 +219,17 @@ describe('stepFlow', () => {
         'Step unknown not found in stepOrder'
       );
     });
+
+    it('prefers stepOrder over sections when both are present (flat dispatch wins)', async () => {
+      const flowConfig: JourneyFlowConfig = {
+        useShowConditions: true,
+        stepOrder: ['s1', 's2'],
+        sections: [{ id: 'a', titleKey: 'a', steps: ['s1', 'foreign-section-step'] }],
+        steps: {},
+      };
+
+      await expect(getNextStep(mockReq, 's1', flowConfig, {})).resolves.toBe('s2');
+    });
   });
 
   describe('getNextStep without show conditions', () => {

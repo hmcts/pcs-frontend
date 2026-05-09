@@ -31,7 +31,7 @@ export async function getNextStep(
 }
 
 async function getNextStepByShowCondition(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
-  if (!flowConfig.sections) {
+  if (flowConfig.stepOrder?.length) {
     return getNextStepByShowConditionFlat(req, currentStepName, flowConfig);
   }
   return getNextStepBySectionTraversal(req, currentStepName, flowConfig);
@@ -150,7 +150,7 @@ async function getPreviousStepByShowConditions(req: Request, currentStepName: st
     return null;
   }
 
-  if (!flowConfig.sections) {
+  if (flowConfig.stepOrder?.length) {
     return getPreviousStepByShowConditionsFlat(req, currentStepName, flowConfig);
   }
   return getPreviousStepBySectionTraversal(req, currentStepName, flowConfig);
