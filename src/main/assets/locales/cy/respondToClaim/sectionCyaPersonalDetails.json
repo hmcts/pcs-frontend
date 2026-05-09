@@ -1,0 +1,19 @@
+{
+  "pageTitle": "cy Check your answers",
+  "back": "cy Back",
+  "change": "cy Change",
+  "buttons": {
+    "saveAndContinue": "cy Save and continue",
+    "saveForLater": "cy Save for later"
+  },
+  "rows": {
+    "defendantNameConfirmation": {
+      "label": "cy Is the name on the claim correct?",
+      "changeHidden": "cy whether the name on the claim is correct",
+      "options": {
+        "YES": "cy Yes",
+        "NO": "cy No"
+      }
+    }
+  }
+}

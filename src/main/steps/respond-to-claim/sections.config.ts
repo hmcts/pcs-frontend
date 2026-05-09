@@ -20,6 +20,7 @@ const sectionDefs = [
       'contact-preferences-email-or-post',
       'contact-preferences-telephone',
       'contact-preferences-text-message',
+      'section-cya-personal-details',
     ],
   },
   {

@@ -40,6 +40,7 @@ import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
+import { step as sectionCyaPersonalDetails } from './section-cya-personal-details';
 import { step as sectionCyaStartNowAndDetails } from './section-cya-start-now-and-details';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
@@ -68,6 +69,7 @@ export const stepRegistry = {
   'end-now': endNow,
   'task-list': taskList,
   'section-cya-start-now-and-details': sectionCyaStartNowAndDetails,
+  'section-cya-personal-details': sectionCyaPersonalDetails,
   'landlord-registered': landlordRegistered,
   'landlord-licensed': landlordLicensed,
   'written-terms': writtenTerms,

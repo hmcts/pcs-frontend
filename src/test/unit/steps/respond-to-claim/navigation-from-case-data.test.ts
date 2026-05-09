@@ -37,7 +37,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       'contact-preferences-text-message'
     );
     await expect(getNextStep(optedOutReq, 'contact-preferences-telephone', flowConfig, {})).resolves.toBe(
-      'tenancy-type-details'
+      'section-cya-personal-details'
     );
   });
 
@@ -84,7 +84,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
-      'contact-preferences-telephone'
+      'section-cya-personal-details'
     );
   });
 

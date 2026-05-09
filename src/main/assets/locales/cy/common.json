@@ -154,6 +154,7 @@
     }
   },
   "taskList": {
-    "startNowAndDetails": "cy Read information about responding and free legal advice"
+    "startNowAndDetails": "cy Read information about responding and free legal advice",
+    "personalDetails": "cy Confirm your details and contact preferences"
   }
 }
