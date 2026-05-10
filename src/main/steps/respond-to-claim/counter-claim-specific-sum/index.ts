@@ -1,12 +1,11 @@
 import type { Request } from 'express';
 
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CcdCounterClaim, PossessionClaimResponse } from '@services/ccdCase.interface';
 
 const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/;
 const MAX_AMOUNT = 1_000_000_000;
@@ -141,26 +140,36 @@ export const step: StepDefinition = createFormStep({
     return formData;
   },
   beforeRedirect: async (req: Request) => {
-    const isClaimAmountKnown = req.body?.isClaimAmountKnown as string;
-
-    const counterClaim: CcdCounterClaim = { isClaimAmountKnown: isClaimAmountKnown.toUpperCase() };
+    const isClaimAmountKnown = req.body?.isClaimAmountKnown as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
 
     if (isClaimAmountKnown === 'yes') {
+      response.defendantResponses.counterClaim.isClaimAmountKnown = 'YES';
       const amountRaw = req.body?.['isClaimAmountKnown.claimAmount'] as string | undefined;
-      if (amountRaw) {
-        counterClaim.claimAmount = poundsToPence(amountRaw);
+      const amountInPence = amountRaw ? poundsToPence(amountRaw) : undefined;
+      if (amountInPence !== undefined) {
+        response.defendantResponses.counterClaim.claimAmount = amountInPence;
+      } else {
+        delete response.defendantResponses.counterClaim.claimAmount;
       }
+      delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
     } else if (isClaimAmountKnown === 'no') {
+      response.defendantResponses.counterClaim.isClaimAmountKnown = 'NO';
       const amountRaw = req.body?.['isClaimAmountKnown.estimatedMaxClaimAmount'] as string | undefined;
-      if (amountRaw) {
-        counterClaim.estimatedMaxClaimAmount = poundsToPence(amountRaw);
+      const amountInPence = amountRaw ? poundsToPence(amountRaw) : undefined;
+      if (amountInPence !== undefined) {
+        response.defendantResponses.counterClaim.estimatedMaxClaimAmount = amountInPence;
+      } else {
+        delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
       }
+      delete response.defendantResponses.counterClaim.claimAmount;
+    } else {
+      delete response.defendantResponses.counterClaim.isClaimAmountKnown;
+      delete response.defendantResponses.counterClaim.claimAmount;
+      delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: { counterClaim: { ...counterClaim } },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });
