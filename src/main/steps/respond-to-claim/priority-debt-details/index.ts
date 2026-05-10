@@ -1,6 +1,6 @@
 import { AMOUNT_FORMAT_REGEX } from '../../../constants/validation';
 import type { FrequencyValue } from '../../../services/ccdCase.interface';
-import { getValidatedCaseHouseholdCircumstances, penceToPounds, poundsToPence } from '../../utils';
+import { ccdPenceToPoundsString, getValidatedCaseHouseholdCircumstances, poundsStringToPence } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
@@ -57,9 +57,9 @@ export const step: StepDefinition = createFormStep({
     const hc = response.defendantResponses.householdCircumstances;
 
     if (typeof total === 'string' && total.trim()) {
-      const pence = poundsToPence(total);
+      const pence = poundsStringToPence(total);
       if (pence !== undefined) {
-        hc.debtTotal = pence;
+        hc.debtTotal = String(pence);
       } else {
         delete hc.debtTotal;
       }
@@ -68,9 +68,9 @@ export const step: StepDefinition = createFormStep({
     }
 
     if (typeof contribution === 'string' && contribution.trim()) {
-      const pence = poundsToPence(contribution);
+      const pence = poundsStringToPence(contribution);
       if (pence !== undefined) {
-        hc.debtContribution = pence;
+        hc.debtContribution = String(pence);
       } else {
         delete hc.debtContribution;
       }
@@ -95,10 +95,8 @@ export const step: StepDefinition = createFormStep({
         }
       | undefined;
 
-    const priorityDebtTotal = penceToPounds(householdCircumstances?.debtTotal as string | number | undefined);
-    const priorityDebtContribution = penceToPounds(
-      householdCircumstances?.debtContribution as string | number | undefined
-    );
+    const priorityDebtTotal = ccdPenceToPoundsString(householdCircumstances?.debtTotal);
+    const priorityDebtContribution = ccdPenceToPoundsString(householdCircumstances?.debtContribution);
     const priorityDebtContributionFrequencyRaw = householdCircumstances?.debtContributionFrequency;
     const normalizedFrequency = priorityDebtContributionFrequencyRaw?.toUpperCase();
     const priorityDebtContributionFrequency =

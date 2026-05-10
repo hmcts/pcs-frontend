@@ -10,7 +10,20 @@ export { isFinanceDetailsProvided } from './isFinanceDetailsProvided';
 export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
+export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
+export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';
 export { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
+export {
+  shouldRouteToPriorityDebts,
+  shouldRouteToUniversalCreditQuestion,
+  shouldRouteToPriorityDebtDetails,
+  shouldRouteToOtherRegularExpenses,
+} from './respondToClaimRouteConditions';
+export {
+  poundsStringToPence,
+  ccdPenceToPoundsString,
+  additionalRentContributionToPoundsString,
+} from './moneyAmountTransforms';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export {
   LEGAL_REPRESENTATIVE_USER_ROLES,

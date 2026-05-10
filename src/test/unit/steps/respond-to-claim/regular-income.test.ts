@@ -30,13 +30,9 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-const mockSaveDraftDefendantResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
-  buildDraftDefendantResponse: jest.fn(() => ({
-    defendantResponses: {},
-    defendantContactDetails: { party: {} },
-  })),
-  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
+const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
+jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
+  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
 }));
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
@@ -69,11 +65,11 @@ describe('respond-to-claim regular-income step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
+    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: caseReference, data: {} });
   });
 
   const lastPayload = (): Record<string, unknown> => {
-    const call = mockSaveDraftDefendantResponse.mock.calls[0];
+    const call = mockBuildCcdCaseForPossessionClaimResponse.mock.calls[0];
     return call[1] as Record<string, unknown>;
   };
 
@@ -128,11 +124,10 @@ describe('respond-to-claim regular-income step', () => {
     await step.postController.post(req, res, next);
 
     const hc = getHouseholdCircumstances();
-    // Holistic-save pattern: unticked options are deleted from the slice (clears stale data on full-replace).
-    expect(hc).not.toHaveProperty('universalCredit');
-    expect(hc).not.toHaveProperty('universalCreditAmount');
-    expect(hc).not.toHaveProperty('universalCreditFrequency');
-    // Must NOT touch hasAppliedForUniversalCredit or ucApplicationDate — owned by the applied-for-UC screen
+    expect(hc.universalCredit).toBe('NO');
+    expect(hc.universalCreditAmount).toBeNull();
+    expect(hc.universalCreditFrequency).toBeNull();
+    // Must NOT touch hasAppliedForUniversalCredit or ucApplicationDate
     expect(hc).not.toHaveProperty('hasAppliedForUniversalCredit');
     expect(hc).not.toHaveProperty('ucApplicationDate');
   });
