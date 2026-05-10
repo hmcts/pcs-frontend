@@ -38,11 +38,11 @@ const sectionDefs = [
       'confirmation-of-notice-date-when-not-provided',
       'rent-arrears-dispute',
       'non-rent-arrears-dispute',
-      'section-cya-dispute-and-tenancy',
       'counter-claim',
       'counter-claim-what-are-you-claiming-for',
       'counter-claim-specific-sum',
       'counter-claim-fee',
+      'section-cya-dispute-and-tenancy',
     ],
   },
   {

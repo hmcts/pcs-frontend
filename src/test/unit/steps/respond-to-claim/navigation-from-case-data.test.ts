@@ -119,7 +119,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'your-household-and-circumstances'
+      'section-cya-dispute-and-tenancy'
     );
   });
 
@@ -131,7 +131,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'payment-interstitial'
+      'section-cya-dispute-and-tenancy'
     );
   });
 
