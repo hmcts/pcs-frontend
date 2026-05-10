@@ -1,9 +1,8 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CcdCounterClaim, PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim-what-are-you-claiming-for',
@@ -43,12 +42,16 @@ export const step: StepDefinition = createFormStep({
     return { claimType };
   },
   beforeRedirect: async req => {
-    const claimType = req.body?.claimType as string;
+    const claimType = req.body?.claimType as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
 
-    const counterClaim: CcdCounterClaim = { claimType };
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: { counterClaim: { ...counterClaim } },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    if (claimType) {
+      response.defendantResponses.counterClaim.claimType = claimType;
+    } else {
+      delete response.defendantResponses.counterClaim.claimType;
+    }
+
+    await saveDraftDefendantResponse(req, response);
   },
 });
