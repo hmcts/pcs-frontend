@@ -1,0 +1,56 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Dispute and tenancy",
+  "back": "Back",
+  "change": "Change",
+  "buttons": {
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  },
+  "options": {
+    "YES": "Yes",
+    "NO": "No",
+    "NOT_SURE": "Not sure",
+    "yes": "Yes",
+    "no": "No",
+    "imNotSure": "I'm not sure"
+  },
+  "rows": {
+    "landlordRegistered": {
+      "label": "Is your landlord registered with Rent Smart Wales?",
+      "changeHidden": "whether your landlord is registered with Rent Smart Wales"
+    },
+    "landlordLicensed": {
+      "label": "Does your landlord have a Rent Smart Wales licence?",
+      "changeHidden": "whether your landlord has a Rent Smart Wales licence"
+    },
+    "writtenTerms": {
+      "label": "Did you have a written tenancy agreement?",
+      "changeHidden": "whether you had a written tenancy agreement"
+    },
+    "tenancyTypeCorrect": {
+      "label": "Is the tenancy type on the claim correct?",
+      "changeHidden": "whether the tenancy type on the claim is correct"
+    },
+    "tenancyStartDate": {
+      "label": "When did your tenancy start?",
+      "changeHidden": "your tenancy start date"
+    },
+    "possessionNoticeReceived": {
+      "label": "Did you receive a possession notice?",
+      "changeHidden": "whether you received a possession notice"
+    },
+    "noticeReceivedDate": {
+      "label": "When did you receive the notice?",
+      "changeHidden": "the date you received the notice"
+    },
+    "rentArrearsAmountConfirmation": {
+      "label": "Do you agree with the rent arrears amount?",
+      "changeHidden": "whether you agree with the rent arrears amount"
+    },
+    "disputeClaim": {
+      "label": "Why are you disputing this claim?",
+      "changeHidden": "why you are disputing this claim"
+    }
+  }
+}
