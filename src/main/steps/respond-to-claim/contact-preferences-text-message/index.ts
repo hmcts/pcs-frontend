@@ -1,13 +1,15 @@
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { createRespondToClaimFormStep } from '../formStep';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { flowConfig } from '../flow.config';
 
+import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createRespondToClaimFormStep({
+export const step: StepDefinition = createFormStep({
   stepName: 'contact-preferences-text-message',
+  journeyFolder: 'respondToClaim',
   showCancelButton: false,
   stepDir: __dirname,
+  flowConfig,
 
   translationKeys: {
     caption: 'caption',
@@ -37,33 +39,34 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
+
   getInitialFormData: req => {
-    const contactByText = req.res?.locals?.validatedCase?.defendantResponsesContactByText;
+    const caseData = req.res?.locals?.validatedCase?.possessionClaimResponse;
+    const contactByText = caseData?.defendantResponses?.contactByText as string | undefined;
+
+    const result: Record<string, unknown> = {};
 
     if (contactByText === 'YES') {
-      return { contactByTextMessage: 'yes' };
+      result.contactByTextMessage = 'yes';
+    } else if (contactByText === 'NO') {
+      result.contactByTextMessage = 'no';
     }
 
-    if (contactByText === 'NO') {
-      return { contactByTextMessage: 'no' };
-    }
-
-    return {};
+    return result;
   },
-  beforeRedirect: async req => {
-    const textForm = req.body as Record<string, unknown>;
-    const contactByTextMessage = textForm.contactByTextMessage as string | undefined;
 
-    if (!contactByTextMessage) {
-      return;
+  beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    const contactByTextMessage = req.body?.contactByTextMessage as 'yes' | 'no' | undefined;
+
+    if (contactByTextMessage === 'yes') {
+      response.defendantResponses.contactByText = 'YES';
+    } else if (contactByTextMessage === 'no') {
+      response.defendantResponses.contactByText = 'NO';
+    } else {
+      delete response.defendantResponses.contactByText;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        contactByText: contactByTextMessage === 'yes' ? 'YES' : 'NO',
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });

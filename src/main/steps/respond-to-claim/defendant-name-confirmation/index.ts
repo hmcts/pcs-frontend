@@ -1,59 +1,45 @@
 import type { Request } from 'express';
 
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { createRespondToClaimFormStep } from '../formStep';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { flowConfig } from '../flow.config';
 
+import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createRespondToClaimFormStep({
+export const step: StepDefinition = createFormStep({
   stepName: 'defendant-name-confirmation',
+  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
+  basePath: '/respond-to-claim',
+  flowConfig,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const nameConfirmation = req.body?.nameConfirmation as string | undefined;
 
-    if (!nameConfirmation || (nameConfirmation !== 'yes' && nameConfirmation !== 'no')) {
-      return;
-    }
+    if (nameConfirmation === 'yes' || nameConfirmation === 'no') {
+      response.defendantResponses.defendantNameConfirmation = nameConfirmation === 'yes' ? 'YES' : 'NO';
 
-    // Map to CCD enum (same logic as yesNoEnum)
-    const defendantNameConfirmation = nameConfirmation === 'yes' ? 'YES' : 'NO';
-
-    const party: Record<string, string> = {};
-
-    if (nameConfirmation === 'no') {
-      // User corrects name - read from subFields with dot-notation
-      const firstName = req.body?.['nameConfirmation.firstName'] as string | undefined;
-      const lastName = req.body?.['nameConfirmation.lastName'] as string | undefined;
-
-      if (firstName && firstName.trim()) {
-        party.firstName = firstName;
+      if (nameConfirmation === 'no') {
+        const firstName = req.body?.['nameConfirmation.firstName'] as string | undefined;
+        const lastName = req.body?.['nameConfirmation.lastName'] as string | undefined;
+        if (firstName?.trim()) {
+          response.defendantContactDetails.party.firstName = firstName;
+        }
+        if (lastName?.trim()) {
+          response.defendantContactDetails.party.lastName = lastName;
+        }
+      } else {
+        delete response.defendantContactDetails.party.firstName;
+        delete response.defendantContactDetails.party.lastName;
       }
-      if (lastName && lastName.trim()) {
-        party.lastName = lastName;
-      }
+    } else {
+      delete response.defendantResponses.defendantNameConfirmation;
+      delete response.defendantContactDetails.party.firstName;
+      delete response.defendantContactDetails.party.lastName;
     }
 
-    if (nameConfirmation === 'yes') {
-      // User confirms name - clear any previously corrected names by sending empty strings
-      party.firstName = '';
-      party.lastName = '';
-    }
-
-    // Build payload with dual paths
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        defendantNameConfirmation,
-      },
-      ...(Object.keys(party).length > 0 && {
-        defendantContactDetails: {
-          party,
-        },
-      }),
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -61,12 +47,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     contactUs: 'contactUs',
   },
   getInitialFormData: (req: Request) => {
-    const { defendantResponsesDefendantNameConfirmation: existingAnswer, defendantContactDetailsParty: party } = req.res
-      ?.locals?.validatedCase ?? {
-      defendantResponsesDefendantNameConfirmation: undefined,
-      defendantContactDetailsParty: undefined,
-    };
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const defendantResponses = caseData?.possessionClaimResponse?.defendantResponses;
+    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
 
+    const existingAnswer = defendantResponses?.defendantNameConfirmation;
     const formValue = existingAnswer === 'YES' ? 'yes' : existingAnswer === 'NO' ? 'no' : undefined;
 
     if (!formValue) {
@@ -88,15 +73,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return initial;
   },
   extendGetContent: (req: Request) => {
-    const { claimantEnteredDefendantDetailsName, defendantContactDetailsPartyName, claimantName } = req.res?.locals
-      ?.validatedCase ?? {
-      claimantEnteredDefendantDetailsName: '',
-      defendantContactDetailsPartyName: '',
-      claimantName: '',
-    };
+    // Provides dynamic values for the template (defendant name and organization name)
+    // These get interpolated into the question text and hint translations
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
+    const defendantName =
+      claimantEntry?.firstName && claimantEntry?.lastName ? `${claimantEntry.firstName} ${claimantEntry.lastName}` : '';
 
-    const defendantName = claimantEnteredDefendantDetailsName || defendantContactDetailsPartyName;
-    const organisationName = claimantName || 'Treetops Housing';
+    const organisationName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
 
     return {
       defendantName,
@@ -111,7 +95,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       translationKey: {
         label: 'nameConfirmationLabel',
       },
-      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
       options: [
         {
