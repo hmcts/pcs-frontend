@@ -1,6 +1,8 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
+import type { CcdCaseModel } from '@services/ccdCaseData.model';
+
 const SECTION_ID = 'startNowAndDetails';
 
 export type SummaryListRow = {
@@ -10,11 +12,12 @@ export type SummaryListRow = {
 };
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const caseRef = req.res?.locals.validatedCase?.id;
-  const validatedCase = req.res?.locals.validatedCase as
-    | { defendantResponses?: { freeLegalAdvice?: string } }
-    | undefined;
-  const value = validatedCase?.defendantResponses?.freeLegalAdvice;
+  const validatedCase = req.res?.locals.validatedCase as CcdCaseModel | undefined;
+  const caseRef = validatedCase?.id;
+  if (!validatedCase || !caseRef) {
+    return [];
+  }
+  const value = validatedCase.defendantResponsesFreeLegalAdvice;
 
   const rows: SummaryListRow[] = [];
 
