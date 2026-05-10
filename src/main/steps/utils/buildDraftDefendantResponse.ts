@@ -47,21 +47,27 @@ export const saveDraftDefendantResponse = async (req: Request, response: Possess
     possessionClaimResponse: normalised,
   });
 
-  // Refresh validatedCase with the merged response from the backend.
-  // updatedCase.data only carries the defendant slice (defendantContactDetails +
-  // defendantResponses). Deep-merge possessionClaimResponse so that claimant-side
-  // fields (claimantOrganisations, claimantEnteredDefendantDetails) survive — they
-  // are not echoed back by the BE mid-event by design.
+  // Refresh validatedCase locally with what we just wrote. We can't rely on
+  // updatedCase.data — CCD's /validate?pageId= endpoint may return an empty or
+  // diff-shaped body, so trusting it for downstream showCondition reads
+  // (e.g. shouldShowPriorityDebtDetailsStep reads priorityDebts immediately after
+  // priority-debts saves) leaves the request with stale defendant data and the
+  // framework routes past the step that depends on the just-saved field.
+  //
+  // Instead: take the normalised payload we KNOW was persisted (defendantResponses
+  // + defendantContactDetails — the whole defendant slice from buildDraftDefendantResponse)
+  // and overlay it on top of claimant-side fields from existingPCR.
   if (req.res?.locals) {
     const mergedId = updatedCase.id || caseId;
     const existingData = req.res.locals.validatedCase?.data ?? {};
     const existingPCR = existingData.possessionClaimResponse ?? {};
-    const updatedPCR = updatedCase.data?.possessionClaimResponse ?? {};
 
     const mergedData = {
       ...existingData,
-      ...updatedCase.data,
-      possessionClaimResponse: { ...existingPCR, ...updatedPCR },
+      possessionClaimResponse: {
+        ...existingPCR,
+        ...normalised,
+      },
     };
 
     req.res.locals.validatedCase = new CcdCaseModel({ id: mergedId, data: mergedData });
