@@ -11,11 +11,6 @@ export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
-export {
-  poundsStringToPence,
-  ccdPenceToPoundsString,
-  additionalRentContributionToPoundsString,
-} from './moneyAmountTransforms';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export {
   LEGAL_REPRESENTATIVE_USER_ROLES,
