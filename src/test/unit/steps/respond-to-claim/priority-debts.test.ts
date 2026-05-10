@@ -30,9 +30,13 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+const mockSaveDraftDefendantResponse = jest.fn();
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
@@ -59,7 +63,7 @@ describe('respond-to-claim priority-debts step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
+    mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
   });
 
   it('maps yes selection', async () => {
@@ -75,13 +79,14 @@ describe('respond-to-claim priority-debts step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        householdCircumstances: {
-          priorityDebts: 'YES',
-        },
-      },
-    });
+    expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: expect.objectContaining({
+          householdCircumstances: expect.objectContaining({ priorityDebts: 'YES' }),
+        }),
+      })
+    );
   });
 
   it('throws when priority debts selection is missing', async () => {
@@ -97,7 +102,7 @@ describe('respond-to-claim priority-debts step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledTimes(1);
     expect(next.mock.calls[0][0]).toBeInstanceOf(Error);
     expect((next.mock.calls[0][0] as Error).message).toBe('Missing or invalid priority debts selection submitted');

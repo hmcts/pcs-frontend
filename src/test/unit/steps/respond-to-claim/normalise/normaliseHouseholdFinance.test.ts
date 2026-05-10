@@ -103,13 +103,14 @@ describe('normaliseHouseholdFinance', () => {
     });
   });
 
-  it('keeps the full finance branch when shareIncomeExpenseDetails is YES and universalCredit is YES', () => {
+  it('drops hasAppliedForUniversalCredit and ucApplicationDate when universalCredit is YES (have-you-applied page is skipped)', () => {
     const response: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances: {
           shareIncomeExpenseDetails: 'YES',
           universalCredit: 'YES',
           universalCreditAmount: '1000',
+          hasAppliedForUniversalCredit: 'YES',
           ucApplicationDate: '2024-01-01',
         },
       },
@@ -121,7 +122,51 @@ describe('normaliseHouseholdFinance', () => {
       shareIncomeExpenseDetails: 'YES',
       universalCredit: 'YES',
       universalCreditAmount: '1000',
-      ucApplicationDate: '2024-01-01',
+    });
+  });
+
+  it('drops debt detail fields when priorityDebts is NO (priority-debt-details page is skipped)', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        householdCircumstances: {
+          shareIncomeExpenseDetails: 'YES',
+          priorityDebts: 'NO',
+          debtTotal: '50000',
+          debtContribution: '2000',
+          debtContributionFrequency: 'WEEKLY',
+        },
+      },
+    };
+
+    normaliseHouseholdFinance(response);
+
+    expect(response.defendantResponses?.householdCircumstances).toEqual({
+      shareIncomeExpenseDetails: 'YES',
+      priorityDebts: 'NO',
+    });
+  });
+
+  it('keeps debt detail fields when priorityDebts is YES', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        householdCircumstances: {
+          shareIncomeExpenseDetails: 'YES',
+          priorityDebts: 'YES',
+          debtTotal: '50000',
+          debtContribution: '2000',
+          debtContributionFrequency: 'WEEKLY',
+        },
+      },
+    };
+
+    normaliseHouseholdFinance(response);
+
+    expect(response.defendantResponses?.householdCircumstances).toEqual({
+      shareIncomeExpenseDetails: 'YES',
+      priorityDebts: 'YES',
+      debtTotal: '50000',
+      debtContribution: '2000',
+      debtContributionFrequency: 'WEEKLY',
     });
   });
 

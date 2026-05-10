@@ -1,13 +1,12 @@
 import { DateTime } from 'luxon';
 
-import type { PossessionClaimResponse } from '../../../services/ccdCase.interface';
 import {
   formatDatePartsToISODate,
   fromYesNoEnum,
   getValidatedCaseHouseholdCircumstances,
   toYesNoEnum,
 } from '../../utils';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -20,56 +19,38 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   beforeRedirect: async req => {
     const selection = req.body?.haveAppliedForUniversalCredit as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    const hc = response.defendantResponses.householdCircumstances;
+
     if (selection === 'no') {
-      const possessionClaimResponse: PossessionClaimResponse = {
-        defendantResponses: {
-          householdCircumstances: {
-            hasAppliedForUniversalCredit: toYesNoEnum('no'),
-            ucApplicationDate: null,
-          },
-        },
-      };
-      await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
-      return;
-    }
-
-    const day = (
-      (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-day'] as string | undefined) ?? ''
-    ).trim();
-    const month = (
-      (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-month'] as string | undefined) ?? ''
-    ).trim();
-    const year = (
-      (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-year'] as string | undefined) ?? ''
-    ).trim();
-
-    const hasAppliedForUniversalCredit = selection === 'yes' ? toYesNoEnum(selection) : undefined;
-
-    let isoDate: string | undefined;
-    if (selection === 'yes') {
+      hc.hasAppliedForUniversalCredit = toYesNoEnum('no');
+      delete hc.ucApplicationDate;
+    } else if (selection === 'yes') {
+      const day = (
+        (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-day'] as string | undefined) ?? ''
+      ).trim();
+      const month = (
+        (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-month'] as string | undefined) ?? ''
+      ).trim();
+      const year = (
+        (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-year'] as string | undefined) ?? ''
+      ).trim();
       if (!day || !month || !year) {
         throw new Error('Missing universal credit application date submitted');
       }
-      const parsedIsoDate = formatDatePartsToISODate(day, month, year);
-      if (!parsedIsoDate) {
+      const isoDate = formatDatePartsToISODate(day, month, year);
+      if (!isoDate) {
         throw new Error('Invalid universal credit application date submitted');
       }
-      isoDate = parsedIsoDate;
+      hc.hasAppliedForUniversalCredit = toYesNoEnum('yes');
+      hc.ucApplicationDate = isoDate;
+    } else {
+      delete hc.hasAppliedForUniversalCredit;
+      delete hc.ucApplicationDate;
     }
 
-    if (!hasAppliedForUniversalCredit) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          hasAppliedForUniversalCredit,
-          ucApplicationDate: isoDate,
-        },
-      },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as

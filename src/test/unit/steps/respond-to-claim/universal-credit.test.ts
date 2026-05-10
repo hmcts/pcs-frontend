@@ -31,9 +31,13 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+const mockSaveDraftDefendantResponse = jest.fn();
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
 import type { SupportedLang } from '../../../../main/modules/steps';
@@ -62,7 +66,7 @@ describe('respond-to-claim universal-credit step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
+    mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
   });
 
   it('maps yes selection with application date', async () => {
@@ -86,14 +90,17 @@ describe('respond-to-claim universal-credit step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        householdCircumstances: {
-          hasAppliedForUniversalCredit: 'YES',
-          ucApplicationDate: '2024-02-10',
-        },
-      },
-    });
+    expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: expect.objectContaining({
+          householdCircumstances: expect.objectContaining({
+            hasAppliedForUniversalCredit: 'YES',
+            ucApplicationDate: '2024-02-10',
+          }),
+        }),
+      })
+    );
   });
 
   it('maps no selection without date', async () => {
@@ -114,14 +121,9 @@ describe('respond-to-claim universal-credit step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        householdCircumstances: {
-          hasAppliedForUniversalCredit: 'NO',
-          ucApplicationDate: null,
-        },
-      },
-    });
+    const call = mockSaveDraftDefendantResponse.mock.calls[0][1];
+    expect(call.defendantResponses.householdCircumstances.hasAppliedForUniversalCredit).toBe('NO');
+    expect(call.defendantResponses.householdCircumstances).not.toHaveProperty('ucApplicationDate');
   });
 
   it('ignores date fields when selection is no', async () => {
@@ -145,14 +147,9 @@ describe('respond-to-claim universal-credit step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        householdCircumstances: {
-          hasAppliedForUniversalCredit: 'NO',
-          ucApplicationDate: null,
-        },
-      },
-    });
+    const call = mockSaveDraftDefendantResponse.mock.calls[0][1];
+    expect(call.defendantResponses.householdCircumstances.hasAppliedForUniversalCredit).toBe('NO');
+    expect(call.defendantResponses.householdCircumstances).not.toHaveProperty('ucApplicationDate');
   });
 
   describe('pre-population via getController', () => {
@@ -237,6 +234,6 @@ describe('respond-to-claim universal-credit step', () => {
     await step.postController.post(req, res, next);
 
     expect(next).toHaveBeenCalledWith(expect.any(Error));
-    expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+    expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,5 @@
-import type { PossessionClaimResponse } from '../../../services/ccdCase.interface';
 import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -17,14 +16,11 @@ export const step: StepDefinition = createFormStep({
       throw new Error('Missing or invalid priority debts selection submitted');
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          priorityDebts: toYesNoEnum(selection),
-        },
-      },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances.priorityDebts = toYesNoEnum(selection);
+
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const priorityDebts = getValidatedCaseHouseholdCircumstances(req)?.priorityDebts;

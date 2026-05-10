@@ -1,7 +1,7 @@
 import { AMOUNT_FORMAT_REGEX } from '../../../constants/validation';
-import type { FrequencyValue, PossessionClaimResponse } from '../../../services/ccdCase.interface';
+import type { FrequencyValue } from '../../../services/ccdCase.interface';
 import { ccdPenceToPoundsString, getValidatedCaseHouseholdCircumstances, poundsStringToPence } from '../../utils';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
@@ -52,34 +52,39 @@ export const step: StepDefinition = createFormStep({
     const contribution = req.body?.priorityDebtContribution as string | undefined;
     const frequency = req.body?.priorityDebtContributionFrequency as FrequencyFormValue | undefined;
 
-    const householdCircumstances: Record<string, unknown> = {};
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    const hc = response.defendantResponses.householdCircumstances;
 
     if (typeof total === 'string' && total.trim()) {
       const pence = poundsStringToPence(total);
       if (pence !== undefined) {
-        householdCircumstances.debtTotal = String(pence);
+        hc.debtTotal = String(pence);
+      } else {
+        delete hc.debtTotal;
       }
+    } else {
+      delete hc.debtTotal;
     }
+
     if (typeof contribution === 'string' && contribution.trim()) {
       const pence = poundsStringToPence(contribution);
       if (pence !== undefined) {
-        householdCircumstances.debtContribution = String(pence);
+        hc.debtContribution = String(pence);
+      } else {
+        delete hc.debtContribution;
       }
+    } else {
+      delete hc.debtContribution;
     }
+
     if (frequency === 'weekly' || frequency === 'monthly') {
-      householdCircumstances.debtContributionFrequency = frequency.toUpperCase() as FrequencyValue;
+      hc.debtContributionFrequency = frequency.toUpperCase() as FrequencyValue;
+    } else {
+      delete hc.debtContributionFrequency;
     }
 
-    if (Object.keys(householdCircumstances).length === 0) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances,
-      },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as

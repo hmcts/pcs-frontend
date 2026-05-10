@@ -30,9 +30,13 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+const mockSaveDraftDefendantResponse = jest.fn();
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
@@ -59,7 +63,7 @@ describe('respond-to-claim priority-debt-details step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
+    mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
   });
 
   it('maps amounts to pence and normalizes frequency', async () => {
@@ -82,14 +86,17 @@ describe('respond-to-claim priority-debt-details step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        householdCircumstances: {
-          debtTotal: '14850',
-          debtContribution: '2000',
-          debtContributionFrequency: 'WEEKLY',
-        },
-      },
-    });
+    expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: expect.objectContaining({
+          householdCircumstances: expect.objectContaining({
+            debtTotal: '14850',
+            debtContribution: '2000',
+            debtContributionFrequency: 'WEEKLY',
+          }),
+        }),
+      })
+    );
   });
 });
