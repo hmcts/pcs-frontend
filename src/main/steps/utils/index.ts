@@ -6,14 +6,10 @@ export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
 export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
-export { isFromIncomeAndExpenditure } from './isFromIncomeAndExpenditure';
 export { isFinanceDetailsProvided } from './isFinanceDetailsProvided';
 export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
-export { getPreviousPageForArrears } from './journeyHelpers';
-export { getStepBeforeDisputePages } from './journeyHelpers';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
-export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
 export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
 export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';
 export { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
@@ -37,6 +33,6 @@ export {
   isLegalRepresentativeUser,
 } from './userRole';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
-export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
+export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
