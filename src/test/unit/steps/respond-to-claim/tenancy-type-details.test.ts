@@ -23,13 +23,17 @@ jest.mock('../../../../main/steps/utils/isWalesProperty', () => ({
   isWalesProperty: jest.fn(),
 }));
 
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: jest.fn(),
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+  saveDraftDefendantResponse: jest.fn(),
 }));
 
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
 import type { YesNoNotSureValue } from '@services/ccdCaseData.model';
 
@@ -130,20 +134,38 @@ describe('respond-to-claim tenancy-type-details step', () => {
       ['yes', 'YES'],
       ['no', 'NO'],
       ['notSure', 'NOT_SURE'],
-      ['maybe', undefined],
-      [undefined, undefined],
     ])(
       'maps tenancyTypeConfirm=%s to tenancyTypeConfirmation=%s',
       async (tenancyTypeConfirm, tenancyTypeConfirmation) => {
+        const req = { body: { tenancyTypeConfirm } };
+
+        await testedStep.beforeRedirect(req);
+
+        expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+          expect.anything(), // req
+          expect.objectContaining({
+            defendantResponses: expect.objectContaining({
+              tenancyTypeConfirmation,
+            }),
+          })
+        );
+      }
+    );
+
+    it.each([['maybe'], [undefined]])(
+      'saves with fields deleted when tenancyTypeConfirm=%s',
+      async tenancyTypeConfirm => {
         const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
 
         await testedStep.beforeRedirect(req);
 
-        expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-          defendantResponses: {
-            tenancyTypeConfirmation,
-          },
-        });
+        expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+          expect.anything(), // req
+          {
+            defendantResponses: {},
+            defendantContactDetails: { party: {} },
+          }
+        );
       }
     );
   });
