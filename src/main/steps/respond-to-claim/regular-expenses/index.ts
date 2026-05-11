@@ -3,12 +3,12 @@ import type { Request } from 'express';
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { FrequencyValue, HouseholdCircumstances, IncomeExpenseDetails } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 const createAmountValidator =
   (largeAmountErrorKey: string, negativeErrorKey: string) =>
