@@ -352,5 +352,3 @@ export interface CitizenGenAppRequest {
   sotFullName?: string;
   clientReference?: string;
 }
-
-

@@ -39,8 +39,17 @@ import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { CaseState } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
-import type { DashboardNotification, DashboardTaskGroup, DashboardRelatedApplication } from '@services/dashboard.interface';
-import { formatAddress, unwrapNotifications, unwrapRelatedApplications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
+import type {
+  DashboardNotification,
+  DashboardRelatedApplication,
+  DashboardTaskGroup,
+} from '@services/dashboard.interface';
+import {
+  formatAddress,
+  unwrapNotifications,
+  unwrapRelatedApplications,
+  unwrapTaskGroups,
+} from '@utils/ccdDashboardUtils';
 
 const logger = Logger.getLogger('ccdCaseService');
 

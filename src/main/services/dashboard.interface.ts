@@ -1,4 +1,4 @@
-import { GenAppType } from "./ccdCase.interface";
+import { GenAppType } from './ccdCase.interface';
 
 export interface DashboardNotification {
   templateId: string;
