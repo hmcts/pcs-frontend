@@ -157,7 +157,7 @@
     "postcss": "8.5.14",
     "prettier": "3.8.3",
     "sass": "1.99.0",
-    "sass-loader": "16.0.7",
+    "sass-loader": "16.0.8",
     "saucectl": "^0.205.0",
     "style-loader": "4.0.0",
     "stylelint": "17.9.1",
