@@ -1,8 +1,7 @@
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../draftEvent';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import { createCcdDraftStorage, toDisplayDocuments } from '@modules/documents/storage';
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
@@ -12,12 +11,10 @@ const storage = createCcdDraftStorage({
   setDocs: docs => ({ possessionClaimResponse: { defendantResponses: { defendantDocuments: docs } } }),
 });
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'upload-document',
-  journeyFolder: 'respondToClaim',
   documentStorage: storage,
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/uploadDocument.njk`,
   fields: [
     {
