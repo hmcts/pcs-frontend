@@ -112,7 +112,7 @@
     "@types/config": "4.4.0",
     "@types/connect-redis": "0.0.23",
     "@types/cookie-parser": "1.4.10",
-    "@types/escape-html": "1.0.3",
+    "@types/escape-html": "1.0.4",
     "@types/express": "5.0.6",
     "@types/express-session": "1.19.0",
     "@types/git-rev-sync": "2.0.2",
