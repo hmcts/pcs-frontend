@@ -76,27 +76,25 @@ function getStepTranslationPaths(req: Request, stepName: string, folder: string)
 }
 
 /**
- * Loads and registers a step's translations under a journey-scoped i18next
- * namespace. The early-return cache check is safe because the namespace is
- * unique per (journey, step), so the first request warms it and subsequent
- * requests skip the disk read.
+ * Loads and registers the current step's translations under a journey-scoped
+ * i18next namespace. The step is read from `res.locals.step` (set by
+ * `withStepContext` middleware); outside a step request the call is a no-op.
  *
- * `stepName` and `folder` are optional — when omitted they're read from
- * `res.locals.step` (set by `withStepContext` middleware in registerSteps).
+ * The resource-bundle cache check is safe because the namespace is unique per
+ * (journey, step), so the first request warms it and subsequent requests skip
+ * the disk read.
  */
-export async function loadStepNamespace(req: Request, stepName?: string, folder?: string): Promise<void> {
+export async function loadStepNamespace(req: Request): Promise<void> {
   if (!req.i18n) {
     return;
   }
 
-  const resolvedStepName = stepName ?? req.res?.locals.step?.name;
-  const resolvedFolder = folder ?? req.res?.locals.step?.journey;
-
-  if (!resolvedStepName || !resolvedFolder) {
+  const step = req.res?.locals.step;
+  if (!step) {
     return;
   }
 
-  const stepNamespace = getStepTranslationPath(resolvedStepName, resolvedFolder);
+  const stepNamespace = getStepTranslationPath(step.name, step.journey);
   const lang = getMainRequestLanguage(req);
 
   if (req.i18n.getResourceBundle(lang, stepNamespace)) {
@@ -106,7 +104,7 @@ export async function loadStepNamespace(req: Request, stepName?: string, folder?
   const localesDir = await findLocalesDir();
   if (!localesDir) {
     if (isDevelopment) {
-      logger.warn(`Locales directory not found. Translation file for ${resolvedStepName} will not be loaded.`);
+      logger.warn(`Locales directory not found. Translation file for ${step.name} will not be loaded.`);
     }
     return;
   }
@@ -114,7 +112,7 @@ export async function loadStepNamespace(req: Request, stepName?: string, folder?
   try {
     let translations: Record<string, unknown> = {};
 
-    for (const translationPath of getStepTranslationPaths(req, resolvedStepName, resolvedFolder)) {
+    for (const translationPath of getStepTranslationPaths(req, step.name, step.journey)) {
       const filePath = path.join(localesDir, lang, `${translationPath}.json`);
       const resolvedPath = path.resolve(filePath);
       const resolvedLocalesDir = path.resolve(localesDir);
@@ -151,55 +149,41 @@ export async function loadStepNamespace(req: Request, stepName?: string, folder?
     if (isDevelopment) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       if (!errorMessage.includes('ENOENT')) {
-        logger.error(`Failed to load translation file for ${resolvedStepName}:`, error);
+        logger.error(`Failed to load translation file for ${step.name}:`, error);
       }
     }
   }
 }
 
-/**
- * Reads a step's translation bundle. `stepName` and `journeyFolder` are
- * optional — when omitted they're read from `res.locals.step`.
- */
-export function getStepTranslations(req: Request, stepName?: string, journeyFolder?: string): TranslationContent {
+/** Reads the current step's translation bundle (empty when outside a step request). */
+export function getStepTranslations(req: Request): TranslationContent {
   if (!req.i18n) {
     return {};
   }
 
-  const resolvedStepName = stepName ?? req.res?.locals.step?.name;
-  const resolvedFolder = journeyFolder ?? req.res?.locals.step?.journey;
-  if (!resolvedStepName || !resolvedFolder) {
+  const step = req.res?.locals.step;
+  if (!step) {
     return {};
   }
 
   const lang = getMainRequestLanguage(req);
-  const resources = req.i18n.getResourceBundle(lang, getStepTranslationPath(resolvedStepName, resolvedFolder));
+  const resources = req.i18n.getResourceBundle(lang, getStepTranslationPath(step.name, step.journey));
   return (resources as TranslationContent) || {};
 }
 
 /**
- * Translation function for a request. When `stepName` is omitted it's read
- * from `res.locals.step`; the journey folder is always read from
- * `res.locals.step` (which `withStepContext` populates per request).
+ * Translation function for a request. When a step context is set on
+ * `res.locals.step` the step's namespace is prepended to `namespaces`;
+ * otherwise this falls back to the common-only main translation function.
  */
-export function getTranslationFunction(
-  req: Request,
-  stepName?: string,
-  namespaces: string[] = ['common'],
-  journeyFolder?: string
-): TFunction {
+export function getTranslationFunction(req: Request, namespaces: string[] = ['common']): TFunction {
   if (!req.i18n) {
     return getMainTranslationFunction(req, namespaces);
   }
 
-  const resolvedStepName = stepName ?? req.res?.locals.step?.name;
-  const resolvedFolder = journeyFolder ?? req.res?.locals.step?.journey;
-
+  const step = req.res?.locals.step;
   const lang = getMainRequestLanguage(req);
-  const allNamespaces =
-    resolvedStepName && resolvedFolder
-      ? [getStepTranslationPath(resolvedStepName, resolvedFolder), ...namespaces]
-      : namespaces;
+  const allNamespaces = step ? [getStepTranslationPath(step.name, step.journey), ...namespaces] : namespaces;
   const fixedT = req.i18n.getFixedT(lang, allNamespaces);
   return fixedT || getMainTranslationFunction(req, namespaces);
 }

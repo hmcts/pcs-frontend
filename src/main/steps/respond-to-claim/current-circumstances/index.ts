@@ -49,7 +49,7 @@ export const step: StepDefinition = createFormStep({
   ],
   customTemplate: `${__dirname}/currentCircumstances.njk`,
   extendGetContent: req => {
-    const t = getTranslationFunction(req, 'your-circumstances', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       introParagraph: t('introParagraph'),

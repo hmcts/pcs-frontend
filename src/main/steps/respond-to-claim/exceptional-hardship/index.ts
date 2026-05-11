@@ -49,7 +49,7 @@ export const step: StepDefinition = createFormStep({
   ],
   customTemplate: `${__dirname}/exceptionalHardship.njk`,
   extendGetContent: req => {
-    const t = getTranslationFunction(req, 'exceptional-hardship', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       introParagraph1: t('introParagraph1'),

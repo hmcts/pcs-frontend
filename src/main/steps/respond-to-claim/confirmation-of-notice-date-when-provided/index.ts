@@ -105,7 +105,7 @@ export const step: StepDefinition = createFormStep({
       ? DateTime.fromISO(noticeDateRaw).setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y')
       : '';
 
-    const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-provided', ['common']);
+    const t = getTranslationFunction(req);
 
     const bulletPointLabel = t('bulletPointLabel', { returnObjects: true, claimantName });
     const hintText = t('hintText', { returnObjects: true, claimantName });

@@ -76,9 +76,9 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     documentStorage,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
-        await loadStepNamespace(req, stepName, journeyFolder);
+        await loadStepNamespace(req);
 
-        const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+        const t: TFunction = getTranslationFunction(req);
 
         const nunjucksEnv = req.app.locals.nunjucksEnv;
         if (!nunjucksEnv) {

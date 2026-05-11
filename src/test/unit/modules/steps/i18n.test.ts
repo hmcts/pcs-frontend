@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -34,6 +33,20 @@ jest.mock('../../../../main/steps/utils', () => ({
   getUserType: (...args: unknown[]) => mockGetUserType(...args),
 }));
 
+interface ReqOverrides {
+  i18n?: Record<string, unknown>;
+  step?: { name: string; journey: string };
+}
+
+function buildReq({ i18n, step }: ReqOverrides = {}): Request {
+  return {
+    ...(i18n !== undefined ? { i18n } : {}),
+    res: step ? { locals: { step } } : { locals: {} },
+  } as unknown as Request;
+}
+
+const stepContext = { name: 'test-step', journey: 'testFolder' };
+
 describe('steps/i18n', () => {
   const originalEnv = process.env.NODE_ENV;
 
@@ -67,13 +80,18 @@ describe('steps/i18n', () => {
 
   describe('loadStepNamespace', () => {
     it('should return early if req.i18n is missing', async () => {
-      const req = {} as Request;
-      await loadStepNamespace(req, 'test-step', 'folder');
+      await loadStepNamespace(buildReq({ step: stepContext }));
       expect(mockLogger.warn).not.toHaveBeenCalled();
     });
 
+    it('should return without loading when res.locals.step is not set', async () => {
+      const access = jest.spyOn(fs, 'access');
+      await loadStepNamespace(buildReq({ i18n: { getResourceBundle: jest.fn() } }));
+      expect(access).not.toHaveBeenCalled();
+    });
+
     it('should skip loading when a journey-scoped namespace bundle is already cached', async () => {
-      // Namespaces are now scoped by journey, so once a (journey, step) bundle
+      // Namespaces are scoped by journey, so once a (journey, step) bundle
       // is loaded the next request for the same pair short-circuits — no disk
       // I/O, no shared mutable state, no race.
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
@@ -82,11 +100,12 @@ describe('steps/i18n', () => {
       const addResourceBundle = jest.fn();
       const getResourceBundle = jest.fn().mockReturnValue({ already: 'loaded' });
       const access = jest.spyOn(fs, 'access');
-      const req = {
+      const req = buildReq({
         i18n: { getResourceBundle, addResourceBundle, loadNamespaces: jest.fn() },
-      } as any;
+        step: { name: 'test-step', journey: 'folder' },
+      });
 
-      await loadStepNamespace(req, 'test-step', 'folder');
+      await loadStepNamespace(req);
 
       expect(getResourceBundle).toHaveBeenCalledWith('en', 'folder/testStep');
       expect(access).not.toHaveBeenCalled();
@@ -102,9 +121,7 @@ describe('steps/i18n', () => {
       const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
       const addResourceBundle = jest.fn();
       const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: { getResourceBundle, addResourceBundle, loadNamespaces },
-      } as any;
+      const i18n = { getResourceBundle, addResourceBundle, loadNamespaces };
 
       jest.spyOn(fs, 'access').mockResolvedValue(undefined);
       jest
@@ -112,8 +129,8 @@ describe('steps/i18n', () => {
         .mockResolvedValueOnce(JSON.stringify({ title: 'Journey A' }))
         .mockResolvedValueOnce(JSON.stringify({ title: 'Journey B' }));
 
-      await loadStepNamespace(req, 'start-now', 'journeyA');
-      await loadStepNamespace(req, 'start-now', 'journeyB');
+      await loadStepNamespace(buildReq({ i18n, step: { name: 'start-now', journey: 'journeyA' } }));
+      await loadStepNamespace(buildReq({ i18n, step: { name: 'start-now', journey: 'journeyB' } }));
 
       expect(addResourceBundle).toHaveBeenNthCalledWith(
         1,
@@ -133,54 +150,14 @@ describe('steps/i18n', () => {
       );
     });
 
-    it('should derive step name and journey from res.locals.step when args are omitted', async () => {
-      // withStepContext middleware sets res.locals.step on every step request
-      // so callers can use the helpers without threading stepName/journey through.
-      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
-      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
-
-      const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
-      const addResourceBundle = jest.fn();
-      const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: { getResourceBundle, addResourceBundle, loadNamespaces },
-        res: { locals: { step: { name: 'start-now', journey: 'uploadAdditionalDocuments' } } },
-      } as any;
-
-      jest.spyOn(fs, 'access').mockResolvedValue(undefined);
-      jest.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify({ title: 'From context' }));
-
-      await loadStepNamespace(req);
-
-      expect(addResourceBundle).toHaveBeenCalledWith(
-        'en',
-        'uploadAdditionalDocuments/startNow',
-        { title: 'From context' },
-        true,
-        true
-      );
-    });
-
-    it('should return without loading when no step name or journey is resolvable', async () => {
-      const req = { i18n: { getResourceBundle: jest.fn() } } as any;
-      const access = jest.spyOn(fs, 'access');
-
-      await loadStepNamespace(req);
-
-      expect(access).not.toHaveBeenCalled();
-    });
-
     it('should return early if locales directory not found', async () => {
       process.env.NODE_ENV = 'development';
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(null);
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: { getResourceBundle },
-      } as any;
+      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
 
-      await loadStepNamespace(req, 'test-step', 'folder');
+      await loadStepNamespace(req);
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
         'Locales directory not found. Translation file for test-step will not be loaded.'
@@ -188,49 +165,39 @@ describe('steps/i18n', () => {
     });
 
     it('should load translation file successfully', async () => {
-      const mockLocalesDir = '/test/locales';
       const mockTranslations = { title: 'Test Title' };
       const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
 
-      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
       const addResourceBundle = jest.fn();
-      const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: {
-          getResourceBundle,
-          addResourceBundle,
-          loadNamespaces,
-        },
-      } as any;
+      const req = buildReq({
+        i18n: { getResourceBundle: jest.fn().mockReturnValue(null), addResourceBundle, loadNamespaces },
+        step: stepContext,
+      });
 
       jest.spyOn(fs, 'access').mockResolvedValue(undefined);
       jest.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify(mockTranslations));
 
-      await loadStepNamespace(req, 'test-step', 'testFolder');
+      await loadStepNamespace(req);
 
       expect(addResourceBundle).toHaveBeenCalledWith('en', 'testFolder/testStep', mockTranslations, true, true);
       expect(loadNamespaces).toHaveBeenCalledWith('testFolder/testStep', expect.any(Function));
     });
 
     it('should merge legalrep translations over default translations', async () => {
-      const mockLocalesDir = '/test/locales';
       const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
 
-      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
       mockGetUserType.mockReturnValue('legalrep');
 
       const addResourceBundle = jest.fn();
-      const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: {
-          getResourceBundle,
-          addResourceBundle,
-          loadNamespaces,
-        },
-      } as any;
+      const req = buildReq({
+        i18n: { getResourceBundle: jest.fn().mockReturnValue(null), addResourceBundle, loadNamespaces },
+        step: stepContext,
+      });
 
       jest.spyOn(fs, 'access').mockResolvedValue(undefined);
       jest
@@ -238,7 +205,7 @@ describe('steps/i18n', () => {
         .mockResolvedValueOnce(JSON.stringify({ title: 'Citizen title', nested: { keep: 'citizen', swap: 'base' } }))
         .mockResolvedValueOnce(JSON.stringify({ title: 'Professional title', nested: { swap: 'professional' } }));
 
-      await loadStepNamespace(req, 'test-step', 'testFolder');
+      await loadStepNamespace(req);
 
       expect(addResourceBundle).toHaveBeenCalledWith(
         'en',
@@ -261,12 +228,11 @@ describe('steps/i18n', () => {
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: { getResourceBundle },
-      } as any;
+      const req = buildReq({
+        i18n: { getResourceBundle: jest.fn().mockReturnValue(null) },
+        step: { name: '../../../etc/passwd', journey: 'folder' },
+      });
 
-      // Mock path.resolve to simulate path traversal
       const originalResolve = path.resolve;
       jest.spyOn(path, 'resolve').mockImplementation((...args: string[]) => {
         if (args.some(arg => arg.includes('..'))) {
@@ -275,7 +241,7 @@ describe('steps/i18n', () => {
         return originalResolve(...args);
       });
 
-      await loadStepNamespace(req, '../../../etc/passwd', 'folder');
+      await loadStepNamespace(req);
 
       expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Invalid translation path detected'));
 
@@ -284,19 +250,14 @@ describe('steps/i18n', () => {
 
     it('should handle file not found error silently', async () => {
       process.env.NODE_ENV = 'development';
-      const mockLocalesDir = '/test/locales';
-      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: { getResourceBundle },
-      } as any;
+      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
 
-      const error = new Error('ENOENT: no such file');
-      jest.spyOn(fs, 'access').mockRejectedValue(error);
+      jest.spyOn(fs, 'access').mockRejectedValue(new Error('ENOENT: no such file'));
 
-      await loadStepNamespace(req, 'test-step', 'folder');
+      await loadStepNamespace(req);
 
       // File not found errors should be handled silently (no warning)
       expect(mockLogger.warn).not.toHaveBeenCalled();
@@ -305,58 +266,53 @@ describe('steps/i18n', () => {
 
     it('should handle other errors', async () => {
       process.env.NODE_ENV = 'development';
-      const mockLocalesDir = '/test/locales';
-      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: { getResourceBundle },
-      } as any;
+      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
 
       const error = new Error('Parse error');
       jest.spyOn(fs, 'access').mockResolvedValue(undefined);
       jest.spyOn(fs, 'readFile').mockRejectedValue(error);
 
-      await loadStepNamespace(req, 'test-step', 'folder');
+      await loadStepNamespace(req);
 
       expect(mockLogger.error).toHaveBeenCalledWith('Failed to load translation file for test-step:', error);
     });
 
     it('should handle errors silently when not in development', async () => {
-      const mockLocalesDir = '/test/locales';
-      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: { getResourceBundle },
-      } as any;
+      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
 
-      const error = new Error('ENOENT: no such file');
-      jest.spyOn(fs, 'access').mockRejectedValue(error);
+      jest.spyOn(fs, 'access').mockRejectedValue(new Error('ENOENT: no such file'));
 
-      await expect(loadStepNamespace(req, 'test-step', 'folder')).resolves.not.toThrow();
+      await expect(loadStepNamespace(req)).resolves.not.toThrow();
     });
   });
 
   describe('getStepTranslations', () => {
     it('should return empty object if req.i18n is missing', () => {
-      const req = {} as Request;
-      const result = getStepTranslations(req, 'test-step');
+      expect(getStepTranslations(buildReq({ step: stepContext }))).toEqual({});
+    });
+
+    it('should return empty object when no step context is set', () => {
+      const getResourceBundle = jest.fn();
+      const result = getStepTranslations(buildReq({ i18n: { getResourceBundle } }));
+
+      expect(getResourceBundle).not.toHaveBeenCalled();
       expect(result).toEqual({});
     });
 
-    it('should return translations from resource bundle', () => {
+    it('should return translations from the journey-scoped resource bundle', () => {
       const mockTranslations = { title: 'Test Title', description: 'Test Description' };
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
       const getResourceBundle = jest.fn().mockReturnValue(mockTranslations);
-      const req = {
-        i18n: { getResourceBundle },
-      } as any;
+      const req = buildReq({ i18n: { getResourceBundle }, step: stepContext });
 
-      const result = getStepTranslations(req, 'test-step', 'testFolder');
+      const result = getStepTranslations(req);
 
       expect(getResourceBundle).toHaveBeenCalledWith('en', 'testFolder/testStep');
       expect(result).toEqual(mockTranslations);
@@ -365,42 +321,9 @@ describe('steps/i18n', () => {
     it('should return empty object if resource bundle is missing', () => {
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const getResourceBundle = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: { getResourceBundle },
-      } as any;
+      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
 
-      const result = getStepTranslations(req, 'test-step', 'testFolder');
-
-      expect(result).toEqual({});
-    });
-
-    it('should return empty object when no journey context is available', () => {
-      const getResourceBundle = jest.fn();
-      const req = {
-        i18n: { getResourceBundle },
-      } as any;
-
-      const result = getStepTranslations(req, 'test-step');
-
-      expect(getResourceBundle).not.toHaveBeenCalled();
-      expect(result).toEqual({});
-    });
-
-    it('should read the journey-scoped namespace when journey context is set', () => {
-      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
-
-      const bundle = { title: 'Hello' };
-      const getResourceBundle = jest.fn().mockReturnValue(bundle);
-      const req = {
-        i18n: { getResourceBundle },
-        res: { locals: { step: { name: 'start-now', journey: 'uploadAdditionalDocuments' } } },
-      } as any;
-
-      const result = getStepTranslations(req);
-
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'uploadAdditionalDocuments/startNow');
-      expect(result).toBe(bundle);
+      expect(getStepTranslations(req)).toEqual({});
     });
   });
 
@@ -409,26 +332,48 @@ describe('steps/i18n', () => {
       const mockT = jest.fn();
       (mainI18n.getTranslationFunction as jest.Mock).mockReturnValue(mockT);
 
-      const req = {} as Request;
+      const req = buildReq({ step: stepContext });
       const result = getTranslationFunction(req);
 
       expect(mainI18n.getTranslationFunction).toHaveBeenCalledWith(req, ['common']);
       expect(result).toBe(mockT);
     });
 
-    it('should return fixedT with step namespace when stepName and journey provided', () => {
+    it('should use the journey-scoped namespace when context is set', () => {
       const mockFixedT = jest.fn();
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
       const getFixedT = jest.fn().mockReturnValue(mockFixedT);
-      const req = {
+      const req = buildReq({
         i18n: { getFixedT },
-      } as any;
+        step: { name: 'start-now', journey: 'uploadAdditionalDocuments' },
+      });
 
-      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
+      const result = getTranslationFunction(req);
 
-      expect(getFixedT).toHaveBeenCalledWith('en', ['testFolder/testStep', 'common']);
+      expect(getFixedT).toHaveBeenCalledWith('en', ['uploadAdditionalDocuments/startNow', 'common']);
       expect(result).toBe(mockFixedT);
+    });
+
+    it('should fall through to the common-only namespaces when no step context is set', () => {
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const getFixedT = jest.fn().mockReturnValue(jest.fn());
+      getTranslationFunction(buildReq({ i18n: { getFixedT } }));
+
+      expect(getFixedT).toHaveBeenCalledWith('en', ['common']);
+    });
+
+    it('should pass through additional namespaces alongside the step namespace', () => {
+      const mockFixedT = jest.fn();
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
+      const req = buildReq({ i18n: { getFixedT }, step: stepContext });
+
+      getTranslationFunction(req, ['common', 'dashboard']);
+
+      expect(getFixedT).toHaveBeenCalledWith('en', ['testFolder/testStep', 'common', 'dashboard']);
     });
 
     it('should fallback to main translation function if fixedT is null', () => {
@@ -437,59 +382,12 @@ describe('steps/i18n', () => {
       (mainI18n.getTranslationFunction as jest.Mock).mockReturnValue(mockT);
 
       const getFixedT = jest.fn().mockReturnValue(null);
-      const req = {
-        i18n: { getFixedT },
-      } as any;
-
-      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
-
-      expect(mainI18n.getTranslationFunction).toHaveBeenCalledWith(req, ['common']);
-      expect(result).toBe(mockT);
-    });
-
-    it('should fall through to the common namespaces when no journey context is available', () => {
-      const mockFixedT = jest.fn();
-      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
-
-      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
-      const req = {
-        i18n: { getFixedT },
-      } as any;
-
-      getTranslationFunction(req, 'test-step');
-
-      expect(getFixedT).toHaveBeenCalledWith('en', ['common']);
-    });
-
-    it('should use the journey-scoped namespace when context is set on res.locals', () => {
-      const mockFixedT = jest.fn();
-      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
-
-      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
-      const req = {
-        i18n: { getFixedT },
-        res: { locals: { step: { name: 'start-now', journey: 'uploadAdditionalDocuments' } } },
-      } as any;
+      const req = buildReq({ i18n: { getFixedT }, step: stepContext });
 
       const result = getTranslationFunction(req);
 
-      expect(getFixedT).toHaveBeenCalledWith('en', ['uploadAdditionalDocuments/startNow', 'common']);
-      expect(result).toBe(mockFixedT);
-    });
-
-    it('should prefer explicit args over res.locals step context', () => {
-      const mockFixedT = jest.fn();
-      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
-
-      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
-      const req = {
-        i18n: { getFixedT },
-        res: { locals: { step: { name: 'start-now', journey: 'journeyA' } } },
-      } as any;
-
-      getTranslationFunction(req, 'other-step', ['common'], 'journeyB');
-
-      expect(getFixedT).toHaveBeenCalledWith('en', ['journeyB/otherStep', 'common']);
+      expect(mainI18n.getTranslationFunction).toHaveBeenCalledWith(req, ['common']);
+      expect(result).toBe(mockT);
     });
   });
 
@@ -528,9 +426,7 @@ describe('steps/i18n', () => {
 
       validateTranslationKey(mockT, 'missing.key', 'test context');
 
-      // Note: This test depends on NODE_ENV at module load time
-      // If running in production, logger.warn won't be called
-      // If running in development/test, logger.warn will be called
+      // Depends on NODE_ENV at module load time
       expect(mockT).toHaveBeenCalledWith('missing.key');
     });
 

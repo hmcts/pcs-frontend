@@ -84,7 +84,7 @@ export const step: StepDefinition = createFormStep({
     const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops Housing';
 
-    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+    const t = getTranslationFunction(req);
     const paragraph = t('paragraph', { claimantName });
 
     return {

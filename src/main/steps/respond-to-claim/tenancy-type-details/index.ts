@@ -151,7 +151,7 @@ export const step: StepDefinition = createFormStep({
         ? `${formContent.detailsHeading}${orgName}${':'}`
         : formContent.detailsHeading;
 
-    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+    const t = getTranslationFunction(req);
     let tenancyType: unknown;
     if (walesProperty) {
       if (occupationLicenceTypeWales === 'OTHER') {

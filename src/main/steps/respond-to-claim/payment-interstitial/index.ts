@@ -23,7 +23,7 @@ export const step: StepDefinition = createFormStep({
   fields: [],
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
-    const t = getTranslationFunction(req, 'payment-interstitial', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       paragraph1: t('paragraph1', { claimantName }),

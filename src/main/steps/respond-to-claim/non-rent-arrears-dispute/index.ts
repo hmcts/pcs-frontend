@@ -80,7 +80,7 @@ export const step: StepDefinition = createFormStep({
     const caseReference = req.params.caseReference;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
 
-    const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
+    const t = getTranslationFunction(req);
 
     // Pre-translate content with interpolation (following rent-arrears pattern)
     return {
