@@ -5,6 +5,7 @@ import { uploadAdditionalDocuments } from '../data/page-data/documents-page-data
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
+import { contactUs } from '../data/section-data/contactUs.section.data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
@@ -26,7 +27,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
 });
-
 test.describe('Dashboard - e2e Journey @nightly', async () => {
   test('Validate address, case number and links on the dashboard @regression', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
@@ -64,5 +64,14 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       dashboard.viewOrdersAndNoticesLink,
       viewOrdersAndNotices.mainHeader
     );
+    await performAction('clickLink', dashboard.contactUsForHelpLink);
+    await performValidation('text', { elementType: 'subHeader', text: contactUs.emailSubHeader });
+    await performValidation('text', { elementType: 'paragraph', text: contactUs.localCourtEmailAddrParagraph });
+    await performValidation('text', { elementType: 'paragraph', text: contactUs.ifYouDoNotKnowParagraph });
+    await performValidation('text', { elementType: 'link', text: contactUs.findACourtLink });
+    await performValidation('text', { elementType: 'subHeader', text: contactUs.telephoneSubHeader });
+    await performValidation('text', { elementType: 'paragraph', text: contactUs.telephoneNumberParagraph });
+    await performValidation('text', { elementType: 'paragraph', text: contactUs.telephoneAvailabilityParagraph });
+    await performValidation('text', { elementType: 'link', text: contactUs.callChargesLink });
   });
 });
