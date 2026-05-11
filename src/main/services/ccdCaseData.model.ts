@@ -79,6 +79,18 @@ export class CcdCaseModel {
     return this.data.notice_NoticeOtherElectronicDateTime;
   }
 
+  get notice_NoticeDeliveredDate(): string | undefined {
+    return this.data.notice_NoticeDeliveredDate;
+  }
+
+  get notice_NoticeEmailSentDateTime(): string | undefined {
+    return this.data.notice_NoticeEmailSentDateTime;
+  }
+
+  get notice_NoticeOtherDateTime(): string | undefined {
+    return this.data.notice_NoticeOtherDateTime;
+  }
+
   get tenancy_TypeOfTenancyLicence(): string | undefined {
     return this.data.tenancy_TypeOfTenancyLicence;
   }
@@ -230,10 +242,6 @@ export class CcdCaseModel {
     return this.defendantResponses?.contactByPost ?? undefined;
   }
 
-  get defendantResponsesPreferenceType(): string | undefined {
-    return this.defendantResponses?.preferenceType ?? undefined;
-  }
-
   get defendantResponsesLandlordLicensed(): string | undefined {
     return this.defendantResponses?.landlordLicensed ?? undefined;
   }
@@ -282,20 +290,16 @@ export class CcdCaseModel {
     return String(raw).trim();
   }
 
-  /**
-   * First provided notice date from CCD case data, regardless of channel.
-   *
-   * Order of precedence:
-   * - notice_NoticeHandedOverDateTime (hand delivered)
-   * - notice_NoticePostedDate (posted)
-   * - notice_NoticeOtherElectronicDateTime (electronic)
-   */
   get noticeDate(): string | undefined {
-    return (
-      this.notice_NoticeHandedOverDateTime ||
-      this.notice_NoticePostedDate ||
-      this.notice_NoticeOtherElectronicDateTime ||
-      undefined
-    );
+    const populatedNoticeField = [
+      this.notice_NoticePostedDate,
+      this.notice_NoticeDeliveredDate,
+      this.notice_NoticeHandedOverDateTime,
+      this.notice_NoticeEmailSentDateTime,
+      this.notice_NoticeOtherElectronicDateTime,
+      this.notice_NoticeOtherDateTime,
+    ].find(Boolean);
+
+    return populatedNoticeField?.slice(0, 10);
   }
 }
