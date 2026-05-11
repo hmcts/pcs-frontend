@@ -1,3 +1,5 @@
+import { deepNormaliseYesNoCasing } from './ccdResponseNormaliser';
+
 import {
   CcdCase,
   CcdCaseAddress,
@@ -16,7 +18,15 @@ export class CcdCaseModel {
   protected readonly validatedCase: CcdCase;
 
   constructor(validatedCase: CcdCase) {
-    this.validatedCase = validatedCase;
+    // pcs-api echoes CCD SDK's YesOrNo enum as PascalCase ("Yes"/"No") on the @Primary
+    // ObjectMapper (since pcs-api PR #1678 / HDPI-6064). FE code throughout the
+    // codebase strict-compares against UPPERCASE "YES"/"NO". Canonicalise at the
+    // boundary so downstream comparisons stay correct regardless of which mapper the
+    // BE used.
+    this.validatedCase = {
+      ...validatedCase,
+      data: deepNormaliseYesNoCasing(validatedCase.data),
+    };
   }
 
   get data(): CcdCaseData {
