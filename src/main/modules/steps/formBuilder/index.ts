@@ -7,7 +7,7 @@ import { createGetController } from '../controller';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
-import { getStaticBasePath, resolveFormBuilderFlowConfig } from './flowConfig';
+import { getStaticBasePath, getStaticEntryStepId, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
@@ -66,9 +66,9 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
 
   const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath = customTemplate || 'formBuilder.njk';
-  const basePath = flowConfig?.basePath || `/steps/${journeyPath}`;
+  const basePath = getStaticBasePath(flowConfig, configuredBasePath || `/steps/${journeyPath}`);
   const stepNavigation = createStepNavigation(flowConfig);
-  const stepUrl = flowConfig.entryStepIdAtBasePath === stepName ? basePath : path.join(basePath, stepName);
+  const stepUrl = getStaticEntryStepId(flowConfig) === stepName ? basePath : path.join(basePath, stepName);
 
   return {
     url: stepUrl,
