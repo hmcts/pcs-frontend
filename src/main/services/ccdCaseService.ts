@@ -182,9 +182,9 @@ export const ccdCaseService = {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
-      logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
+      logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
       const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
-      logger.info(`[ccdCaseService] Case access validated successfully for caseId: ${caseId}`);
+      logger.info(`Case access validated successfully for caseId: ${caseId}`);
 
       const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
       return {
@@ -206,9 +206,9 @@ export const ccdCaseService = {
     const caseUrl = `${getBaseUrl()}/cases/${caseId}`;
 
     try {
-      logger.debug(`[ccdCaseService] Fetching case by id forread view: ${caseId}`);
+      logger.debug(`Fetching case by id for read view: ${caseId}`);
       const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
-      logger.debug(`[ccdCaseService]read case response for ${caseId}: ${JSON.stringify(response.data, null, 2)}`);
+      logger.debug(`Read case response for ${caseId}: ${JSON.stringify(response.data, null, 2)}`);
       const caseData = response.data.data ?? {};
 
       return {
