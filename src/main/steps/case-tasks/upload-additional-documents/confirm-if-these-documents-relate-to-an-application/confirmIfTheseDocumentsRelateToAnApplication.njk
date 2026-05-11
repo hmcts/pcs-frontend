@@ -1,8 +1,23 @@
 {% extends "stepsTemplate.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 
 {% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
 
 {% block mainContent %}
-  <h1 class="govuk-heading-l">{{ t('heading') }}</h1>
-  <p class="govuk-body">{{ t('body') }}</p>
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  <p class="govuk-body">{{ body }}</p>
+
+  {{ govukRadios({
+    idPrefix: "relatedApplicationId",
+    name: "relatedApplicationId",
+    fieldset: {
+      legend: {
+        text: question,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    items: applications
+  }) }}
+  
 {% endblock %}
