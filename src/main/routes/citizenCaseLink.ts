@@ -38,8 +38,8 @@ const API_ERROR_MESSAGES: Record<AccessCodeValidationError, { field: 'claimNumbe
     text: 'Access code does not match claim number',
   },
   unknown: {
-    field: 'accessCode',
-    text: 'Access code does not match claim number',
+    field: 'claimNumber',
+    text: 'We cannot find that claim number. Enter the claim number that you received from the court',
   },
 };
 
@@ -121,7 +121,9 @@ export default function citizenCaseLinkRoutes(app: Application): void {
       return renderForm(res, errors, claimNumber, accessCode);
     } catch (err) {
       logger.error(`Failed to validate access code for case ${caseId}:`, err);
-      errors.accessCode = { text: 'Access code does not match claim number' };
+      errors.claimNumber = {
+        text: 'We cannot find that claim number. Enter the claim number that you received from the court',
+      };
       return renderForm(res, errors, claimNumber, accessCode);
     }
   });
