@@ -1,4 +1,5 @@
 import { PassThrough } from 'stream';
+import config from 'config';
 
 import { HTTPError } from '../../../main/HttpError';
 
@@ -32,7 +33,7 @@ describe('documentService', () => {
             id: 'doc-1',
             value: {
               document_filename: 'claim-form.pdf',
-              document_binary_url: 'http://doc-store/claim-form/binary',
+              document_binary_url: 'http://dm-store/documents/69a31b98-9de1-49ae-a79c-97d8c521d0f5/binary',
             },
           },
         ],
@@ -49,10 +50,14 @@ describe('documentService', () => {
 
     const result = await documentService.getDocumentStream('token', '1777570813792018', 'doc-1');
 
-    expect(http.get).toHaveBeenCalledWith('http://doc-store/claim-form/binary', {
+    const cdamBaseUrl = config.get<string>('cdam.url').replace(/\/+$/, '');
+    expect(http.get).toHaveBeenCalledWith(
+      `${cdamBaseUrl}/cases/documents/69a31b98-9de1-49ae-a79c-97d8c521d0f5/binary`,
+      {
       headers: { Authorization: 'Bearer token' },
       responseType: 'stream',
-    });
+      }
+    );
     expect(result.filename).toBe('claim-form.pdf');
     expect(result.contentType).toBe('application/pdf');
     expect(result.contentLength).toBe('1234');
@@ -74,5 +79,27 @@ describe('documentService', () => {
       })
     );
   });
-});
 
+  it('throws 404 when document binary URL is missing', async () => {
+    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+      id: '1777570813792018',
+      data: {
+        allDocuments: [
+          {
+            id: 'doc-1',
+            value: {
+              document_filename: 'claim-form.pdf',
+            },
+          },
+        ],
+      },
+    });
+
+    await expect(documentService.getDocumentStream('token', '1777570813792018', 'doc-1')).rejects.toEqual(
+      expect.objectContaining<Partial<HTTPError>>({
+        message: 'Document not found',
+        status: 404,
+      })
+    );
+  });
+});

@@ -12,9 +12,7 @@ type DocumentFolderKey = keyof typeof DOCUMENT_FOLDER_TITLES;
 type CaseData = {
   allDocuments?: {
     id?: string;
-    value: CcdCaseDocument & {
-      category_id?: string;
-    };
+    value: CcdCaseDocument;
   }[];
 };
 

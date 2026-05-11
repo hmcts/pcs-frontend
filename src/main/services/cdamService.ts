@@ -67,7 +67,12 @@ export async function deleteDocument(documentUrl: string, userToken: string): Pr
 export async function getDocumentBinary(
   binaryUrl: string,
   userToken: string
-): Promise<{ stream: NodeJS.ReadableStream; contentType: string }> {
+): Promise<{
+  stream: NodeJS.ReadableStream;
+  contentType: string;
+  contentLength?: string;
+  contentDisposition?: string;
+}> {
   const cdamUrl = getCdamUrl();
   const documentsIndex = binaryUrl.lastIndexOf('/documents');
   const cdamPath = documentsIndex >= 0 ? `/cases${binaryUrl.slice(documentsIndex)}` : binaryUrl;
@@ -79,6 +84,13 @@ export async function getDocumentBinary(
   });
 
   const contentType = (response.headers?.['content-type'] as string) || 'application/octet-stream';
+  const contentLength = response.headers?.['content-length'] as string | undefined;
+  const contentDisposition = response.headers?.['content-disposition'] as string | undefined;
 
-  return { stream: response.data as NodeJS.ReadableStream, contentType };
+  return {
+    stream: response.data as NodeJS.ReadableStream,
+    contentType,
+    contentLength,
+    contentDisposition,
+  };
 }

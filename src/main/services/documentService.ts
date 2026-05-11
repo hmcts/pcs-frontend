@@ -2,8 +2,8 @@ import type { Readable } from 'stream';
 
 import { HTTPError } from '../HttpError';
 
-import { http } from '@modules/http';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { getDocumentBinary } from '@services/cdamService';
 
 export interface DocumentStreamResult {
   stream: Readable;
@@ -31,23 +31,23 @@ export const documentService = {
   async getDocumentStream(accessToken: string, caseReference: string, documentId: string): Promise<DocumentStreamResult> {
     const caseData = await ccdCaseService.getCaseById(accessToken, caseReference);
     const document = caseData.data?.allDocuments?.find(item => item.id === documentId)?.value;
-    const documentBinaryUrl = document?.document_binary_url?.trim();
     const filename = document?.document_filename?.trim() || 'document';
 
-    if (!documentBinaryUrl) {
+    if (!document) {
+      throw new HTTPError('Document not found', 404);
+    }
+    const binaryUrl = document.document_binary_url?.trim();
+    if (!binaryUrl) {
       throw new HTTPError('Document not found', 404);
     }
 
-    const binaryResponse = await http.get<Readable>(documentBinaryUrl, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      responseType: 'stream',
-    });
+    const binaryResponse = await getDocumentBinary(binaryUrl, accessToken);
 
     return {
-      stream: binaryResponse.data,
-      contentType: asHeaderString(binaryResponse.headers['content-type']),
-      contentLength: asHeaderString(binaryResponse.headers['content-length']),
-      contentDisposition: asHeaderString(binaryResponse.headers['content-disposition']),
+      stream: binaryResponse.stream as Readable,
+      contentType: asHeaderString(binaryResponse.contentType),
+      contentLength: asHeaderString(binaryResponse.contentLength),
+      contentDisposition: asHeaderString(binaryResponse.contentDisposition),
       filename,
     };
   },
