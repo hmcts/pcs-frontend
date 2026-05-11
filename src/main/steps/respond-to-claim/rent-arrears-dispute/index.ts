@@ -1,11 +1,11 @@
 import type { Request } from 'express';
 
 import { currency } from '../../../modules/nunjucks/filters/currency';
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
@@ -13,11 +13,9 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
 const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 decimal places
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'rent-arrears-dispute',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',

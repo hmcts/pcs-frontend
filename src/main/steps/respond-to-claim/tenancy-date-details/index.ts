@@ -1,11 +1,11 @@
 import { format, parseISO } from 'date-fns';
 import type { Request } from 'express';
 
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate, fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCaseData } from '@services/ccdCase.interface';
@@ -14,11 +14,9 @@ function getTenancyStartDate(caseData: CcdCaseData | undefined): string | undefi
   return caseData?.tenancy_TenancyLicenceDate ?? caseData?.licenceStartDate;
 }
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'tenancy-date-details',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/tenancyDateDetails.njk`,
   translationKeys: {
     caption: 'caption',

@@ -5,19 +5,17 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../u
 import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import { Logger } from '@modules/logger';
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData } from '@services/ccdCase.interface';
 const logger = Logger.getLogger('confirmation-of-notice-date-when-not-provided');
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-date-when-not-provided',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/confirmationOfNoticeDateWhenNotProvided.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
