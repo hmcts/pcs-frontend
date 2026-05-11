@@ -1,9 +1,7 @@
 import type { Request, Response } from 'express';
 
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-do-you-want-to-upload-files';
-import * as populateModule from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
-
-import type { CcdCase } from '@services/ccdCase.interface';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),
@@ -13,11 +11,15 @@ jest.mock('../../../../main/modules/i18n', () => ({
   getStepTranslations: jest.fn(() => ({})),
 }));
 
-describe('counter-claim-do-you-want-to-upload-files submit-time CCD payloads', () => {
-  const buildCcdSpy = jest
-    .spyOn(populateModule, 'buildCcdCaseForPossessionClaimResponse')
-    .mockResolvedValue({} as CcdCase);
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+  saveDraftDefendantResponse: jest.fn(),
+}));
 
+describe('counter-claim-do-you-want-to-upload-files submit-time CCD payloads', () => {
   const createBaseReqRes = () => {
     const req = {
       body: {},
@@ -50,7 +52,7 @@ describe('counter-claim-do-you-want-to-upload-files submit-time CCD payloads', (
     jest.clearAllMocks();
   });
 
-  it('builds CCD payload with YES when user wants to upload files', async () => {
+  it('persists YES when user wants to upload files', async () => {
     const { req, res, next } = createBaseReqRes();
     req.body = { counterClaimWantToUploadFiles: 'YES' };
 
@@ -59,17 +61,17 @@ describe('counter-claim-do-you-want-to-upload-files submit-time CCD payloads', (
 
     await post!(req, res, next);
 
-    expect(buildCcdSpy).toHaveBeenCalledWith(
+    expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
       req,
       expect.objectContaining({
-        defendantResponses: {
+        defendantResponses: expect.objectContaining({
           counterClaimWantToUploadFiles: 'YES',
-        },
+        }),
       })
     );
   });
 
-  it('builds CCD payload with NO when user does not want to upload files', async () => {
+  it('persists NO when user does not want to upload files', async () => {
     const { req, res, next } = createBaseReqRes();
     req.body = { counterClaimWantToUploadFiles: 'NO' };
 
@@ -78,17 +80,17 @@ describe('counter-claim-do-you-want-to-upload-files submit-time CCD payloads', (
 
     await post!(req, res, next);
 
-    expect(buildCcdSpy).toHaveBeenCalledWith(
+    expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
       req,
       expect.objectContaining({
-        defendantResponses: {
+        defendantResponses: expect.objectContaining({
           counterClaimWantToUploadFiles: 'NO',
-        },
+        }),
       })
     );
   });
 
-  it('does not call buildCcdCaseForPossessionClaimResponse when body has no value', async () => {
+  it('still calls saveDraftDefendantResponse when body has no value', async () => {
     const { req, res, next } = createBaseReqRes();
     req.body = {};
 
@@ -97,6 +99,6 @@ describe('counter-claim-do-you-want-to-upload-files submit-time CCD payloads', (
 
     await post!(req, res, next);
 
-    expect(buildCcdSpy).not.toHaveBeenCalled();
+    expect(saveDraftDefendantResponse).toHaveBeenCalled();
   });
 });

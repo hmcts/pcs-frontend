@@ -1,9 +1,9 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CaseData, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { CaseData, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim-do-you-want-to-upload-files',
@@ -35,19 +35,16 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
-    const counterClaimWantToUploadFiles: YesNoValue | undefined = req.body?.counterClaimWantToUploadFiles;
+    const counterClaimWantToUploadFiles = req.body?.counterClaimWantToUploadFiles as YesNoValue | undefined;
+    const response = buildDraftDefendantResponse(req);
 
-    if (!counterClaimWantToUploadFiles) {
-      return;
+    if (counterClaimWantToUploadFiles) {
+      response.defendantResponses.counterClaimWantToUploadFiles = counterClaimWantToUploadFiles;
+    } else {
+      delete response.defendantResponses.counterClaimWantToUploadFiles;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        counterClaimWantToUploadFiles,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
