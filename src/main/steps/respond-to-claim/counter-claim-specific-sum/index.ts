@@ -2,9 +2,8 @@ import type { Request } from 'express';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/;
@@ -51,11 +50,9 @@ const validateEstimatedMaxClaimAmount = createAmountValidator(
   'errors.estimatedMaxClaimAmount.invalidFormat'
 );
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-specific-sum',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/counterClaimSpecificSum.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
