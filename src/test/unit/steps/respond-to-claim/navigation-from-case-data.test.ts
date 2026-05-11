@@ -100,7 +100,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('uses valid static previous step for household interstitial path', async () => {
+  it('routes back from your-household-and-circumstances to repayments-agreed when no payment steps visible', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
       'counter-claim'

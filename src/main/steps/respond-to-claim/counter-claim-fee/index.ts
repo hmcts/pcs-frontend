@@ -1,16 +1,13 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CcdCounterClaim, PossessionClaimResponse, VerticalYesNoValue } from '@services/ccdCase.interface';
+import type { YesNoValue } from '@services/ccdCase.interface';
 import { DIRECT_LOOKUP_FEE_CODES, getCounterClaimFeeType, getFee, getFeeDirect } from '@services/feeLookupService';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-fee',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/counterClaimFee.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -39,23 +36,23 @@ export const step: StepDefinition = createFormStep({
   ],
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const counterClaimNeedHelpWithFees: VerticalYesNoValue | undefined =
+    const counterClaimNeedHelpWithFees: YesNoValue | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.counterClaim?.needHelpWithFees;
 
     return counterClaimNeedHelpWithFees ? { counterClaimNeedHelpWithFees } : {};
   },
   beforeRedirect: async req => {
-    const counterClaimNeedHelpWithFees: VerticalYesNoValue = req.body?.counterClaimNeedHelpWithFees;
+    const counterClaimNeedHelpWithFees: YesNoValue = req.body?.counterClaimNeedHelpWithFees;
 
     if (!counterClaimNeedHelpWithFees) {
       return;
     }
 
-    const counterClaim: CcdCounterClaim = { needHelpWithFees: counterClaimNeedHelpWithFees };
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: { counterClaim: { ...counterClaim } },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
+    response.defendantResponses.counterClaim.needHelpWithFees = counterClaimNeedHelpWithFees;
+
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async req => {
     const counterClaim =

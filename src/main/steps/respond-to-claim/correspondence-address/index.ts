@@ -1,21 +1,14 @@
 import type { Request } from 'express';
 import isPostalCode from 'validator/lib/isPostalCode';
 
+import { getTranslationFunction } from '../../../modules/steps';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { buildCcdAddressFromFormParts, formatCcdAddress } from '../../utils/ccdAddress';
 import { getClaimantName } from '../../utils/getClaimantName';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep, getFormData, getTranslationFunction, setFormData } from '@modules/steps';
-import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { FormFieldConfig, RadioFormField } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CcdCaseAddress } from '@services/ccdCase.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
-import { arrayToString } from '@utils/arrayToString';
-
-const STEP_NAME = 'correspondence-address';
-
-// Required is dynamic: when address is shown (__isAddressKnown from session), the radio is required
-// Session is set in extendGetContent; validation reads it via allData on POST.
 
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
@@ -92,9 +85,9 @@ const fieldsConfig: FormFieldConfig[] = [
             attributes: {
               autocomplete: 'postal-code',
             },
-            validator: (value): boolean => {
-              if (typeof value === 'string' && value.trim()) {
-                return isPostalCode(value.trim(), 'GB');
+            validator: (value): boolean | string => {
+              if (typeof value === 'string' && value.trim() && !isPostalCode(value.trim(), 'GB')) {
+                return 'errors.correspondenceAddressConfirm.postcode';
               }
               return true;
             },
@@ -105,108 +98,68 @@ const fieldsConfig: FormFieldConfig[] = [
   },
 ];
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'correspondence-address',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: 'respond-to-claim/correspondence-address/correspondenceAddress.njk',
   beforeRedirect: async req => {
-    const stepData = getFormData(req, STEP_NAME) || {};
+    const response = buildDraftDefendantResponse(req);
+    const addressConfirm = req.body?.['correspondenceAddressConfirm'] as string | undefined;
 
-    const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
-      req,
-      stepData
-    );
+    if (addressConfirm === 'yes') {
+      response.defendantResponses.correspondenceAddressConfirmation = 'YES';
+      delete response.defendantContactDetails.party.address;
+    } else if (addressConfirm === 'no') {
+      response.defendantResponses.correspondenceAddressConfirmation = 'NO';
+      response.defendantContactDetails.party.address = buildCcdAddressFromFormParts({
+        addressLine1: req.body?.['correspondenceAddressConfirm.addressLine1'] ?? '',
+        addressLine2: req.body?.['correspondenceAddressConfirm.addressLine2'],
+        townOrCity: req.body?.['correspondenceAddressConfirm.townOrCity'] ?? '',
+        county: req.body?.['correspondenceAddressConfirm.county'],
+        postcode: req.body?.['correspondenceAddressConfirm.postcode'] ?? '',
+      });
+    } else {
+      delete response.defendantResponses.correspondenceAddressConfirmation;
+      delete response.defendantContactDetails.party.address;
+    }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        correspondenceAddressConfirmation: addressConfirmedRadioSelection
-          ? addressConfirmedRadioSelection.toUpperCase()
-          : '',
-      },
-      ...(addressConfirmedRadioSelection === 'no' && {
-        defendantContactDetails: {
-          party: {
-            address: {
-              AddressLine1: addressLine1,
-              ...(addressLine2 && { AddressLine2: addressLine2 }),
-              PostTown: townOrCity,
-              ...(county && { County: county }),
-              PostCode: postcode,
-            },
-          },
-        },
-      }),
-    };
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: (req: Request) => {
-    const stepData = getFormData(req, STEP_NAME);
-    const possessionClaimResponse = req.res?.locals.validatedCase?.data?.possessionClaimResponse;
-    const correspondenceAddressConfirmed =
-      possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
+    const possessionClaimResponse = req.res?.locals?.validatedCase?.possessionClaimResponse;
+    const confirmed = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
 
-    const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
-      req,
-      stepData,
-      partyAddress,
-      correspondenceAddressConfirmed ?? undefined
-    );
+    const selection = confirmed === 'YES' ? 'yes' : confirmed === 'NO' ? 'no' : undefined;
+    if (!selection) {
+      return {};
+    }
 
-    const result: Record<string, unknown> = {};
-    if (addressConfirmedRadioSelection) {
-      result['correspondenceAddressConfirm'] = addressConfirmedRadioSelection;
-      if (addressConfirmedRadioSelection === 'no') {
-        result['correspondenceAddressConfirm.addressLine1'] = addressLine1;
-        result['correspondenceAddressConfirm.addressLine2'] = addressLine2;
-        result['correspondenceAddressConfirm.townOrCity'] = townOrCity;
-        result['correspondenceAddressConfirm.county'] = county;
-        result['correspondenceAddressConfirm.postcode'] = postcode;
-      }
+    const result: Record<string, unknown> = { correspondenceAddressConfirm: selection };
+    if (selection === 'no') {
+      result['correspondenceAddressConfirm.addressLine1'] = partyAddress?.AddressLine1 || '';
+      result['correspondenceAddressConfirm.addressLine2'] = partyAddress?.AddressLine2 || '';
+      result['correspondenceAddressConfirm.townOrCity'] = partyAddress?.PostTown || '';
+      result['correspondenceAddressConfirm.county'] = partyAddress?.County || '';
+      result['correspondenceAddressConfirm.postcode'] = partyAddress?.PostCode || '';
     }
     return result;
   },
-
   extendGetContent: async (req, formContent) => {
-    const stepData = getFormData(req, STEP_NAME);
     const t = getTranslationFunction(req, 'correspondence-address', ['common']);
-    const possessionClaimResponse = req.res?.locals.validatedCase?.data?.possessionClaimResponse;
+    const possessionClaimResponse = req.res?.locals?.validatedCase?.possessionClaimResponse;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
+
     const isAddressKnown = formattedAddressStr !== '?';
 
-    setFormData(req, STEP_NAME, { ...stepData, __isAddressKnown: isAddressKnown });
-
-    const correspondenceAddressConfirmed =
-      possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
-
-    const { addressConfirmedRadioSelection, addressLine1, addressLine2, townOrCity, county, postcode } = getAddressData(
-      req,
-      stepData,
-      partyAddress,
-      correspondenceAddressConfirmed ?? undefined
-    );
-
-    const radioField = formContent.fields.find(f => f.name === 'correspondenceAddressConfirm');
-
-    if (radioField) {
-      radioField.value = addressConfirmedRadioSelection;
+    const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioFormField | undefined;
+    if (!radio || !radio.component) {
+      return {};
     }
 
-    const claimantName = getClaimantName(req);
-    const radio = formContent.fields.find(f => f.componentType === 'radios') as
-      | {
-          component: {
-            label: { text: string };
-            fieldset: { legend: { text: string; isPageHeading?: boolean } };
-            hint: { text: string };
-          };
-        }
-      | undefined;
-
-    if (radio?.component && isAddressKnown) {
+    if (isAddressKnown) {
+      const claimantName = getClaimantName(req);
       const prepopulateHeading = t('legend', { formattedAddressStr });
       radio.component.label.text = prepopulateHeading;
       radio.component.fieldset.legend.text = prepopulateHeading;
@@ -216,21 +169,15 @@ export const step: StepDefinition = createFormStep({
       }
     }
 
-    // TODO: Refactor to avoid mutating module-scoped `fieldsConfig` per request.
-    // Use the same pattern as `rent-arrears-dispute` (static validator returning a translation key).
-    // Dynamically inject validator with translation function
-    const postcodeField = fieldsConfig[0].options?.[1]?.subFields?.postcode;
-    if (postcodeField) {
-      postcodeField.validator = (value: unknown): boolean | string => {
-        if (typeof value === 'string' && value.trim()) {
-          const isValid = isPostalCode(value.trim(), 'GB');
-          if (!isValid) {
-            return t('errors.correspondenceAddressConfirm.postcode');
-          }
-        }
-        return true;
-      };
-    }
+    const confirmed = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
+    const addressConfirmedRadioSelection =
+      req.body?.correspondenceAddressConfirm !== undefined
+        ? req.body.correspondenceAddressConfirm
+        : confirmed === 'YES'
+          ? 'yes'
+          : confirmed === 'NO'
+            ? 'no'
+            : undefined;
 
     return {
       ...formContent,
@@ -268,11 +215,13 @@ export const step: StepDefinition = createFormStep({
         selectAddress: t('errors.selectAddress'),
       },
       // Extract nested field values for easy template access (only on POST with errors)
-      correspondenceAddressLine1: addressLine1,
-      correspondenceAddressLine2: addressLine2,
-      correspondenceTownOrCity: townOrCity,
-      correspondenceCounty: county,
-      correspondencePostcode: postcode,
+      correspondenceAddressLine1:
+        req.body?.['correspondenceAddressConfirm.addressLine1'] || partyAddress?.AddressLine1 || '',
+      correspondenceAddressLine2:
+        req.body?.['correspondenceAddressConfirm.addressLine2'] || partyAddress?.AddressLine2 || '',
+      correspondenceTownOrCity: req.body?.['correspondenceAddressConfirm.townOrCity'] || partyAddress?.PostTown || '',
+      correspondenceCounty: req.body?.['correspondenceAddressConfirm.county'] || partyAddress?.County || '',
+      correspondencePostcode: req.body?.['correspondenceAddressConfirm.postcode'] || partyAddress?.PostCode || '',
     };
   },
 
@@ -280,73 +229,12 @@ export const step: StepDefinition = createFormStep({
   fields: fieldsConfig,
 });
 
-function getAddressData(
-  req: Request,
-  stepData: Record<string, unknown>,
-  partyAddress?: CcdCaseAddress,
-  correspondenceAddressConfirmed?: string
-) {
-  const addressConfirmedRadioSelection =
-    req.body?.correspondenceAddressConfirm !== undefined
-      ? req.body.correspondenceAddressConfirm
-      : stepData?.correspondenceAddressConfirm !== undefined
-        ? stepData.correspondenceAddressConfirm
-        : correspondenceAddressConfirmed === 'YES'
-          ? 'yes'
-          : correspondenceAddressConfirmed === 'NO'
-            ? 'no'
-            : undefined;
-
-  const fieldMap: Record<string, keyof CcdCaseAddress> = {
-    addressLine1: 'AddressLine1',
-    addressLine2: 'AddressLine2',
-    townOrCity: 'PostTown',
-    county: 'County',
-    postcode: 'PostCode',
-  };
-
-  const getField = (field: keyof typeof fieldMap) => {
-    if (addressConfirmedRadioSelection && addressConfirmedRadioSelection !== 'no') {
-      return '';
-    }
-
-    const key = fieldMap[field];
-
-    return (
-      req.body?.[`correspondenceAddressConfirm.${field}`] ||
-      stepData?.[`correspondenceAddressConfirm.${field}`] ||
-      partyAddress?.[key] ||
-      ''
-    );
-  };
-
-  return {
-    addressConfirmedRadioSelection,
-    addressLine1: getField('addressLine1'),
-    addressLine2: getField('addressLine2'),
-    townOrCity: getField('townOrCity'),
-    county: getField('county'),
-    postcode: getField('postcode'),
-  };
-}
-
 function getExistingAddress(req: Request): { formattedAddress: string } {
-  const caseData = req.res?.locals.validatedCase?.data;
-  const defendantDetails = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
-  const originalAddress = defendantDetails?.address;
+  const caseData = req.res?.locals?.validatedCase?.data;
+  const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address;
 
-  if (originalAddress?.AddressLine1) {
-    const formattedAddress =
-      arrayToString([
-        originalAddress.AddressLine1,
-        originalAddress.AddressLine2,
-        originalAddress.AddressLine3,
-        originalAddress.PostTown,
-        originalAddress.County,
-        originalAddress.PostCode,
-        originalAddress.Country,
-      ]) + '?';
-    return { formattedAddress };
+  if (originalAddress && 'AddressLine1' in originalAddress && originalAddress.AddressLine1) {
+    return { formattedAddress: formatCcdAddress(originalAddress) + '?' };
   }
   return { formattedAddress: '?' };
 }
