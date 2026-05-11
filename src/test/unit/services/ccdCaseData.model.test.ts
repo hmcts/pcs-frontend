@@ -1,4 +1,4 @@
-import { CcdCase, CcdCaseAddress, YesNoEnum } from '@services/ccdCase.interface';
+import { CcdCase, CcdCaseAddress, YesNoEnum, YesNoNotSureValue } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 const buildModel = (overrides: Partial<CcdCase> = {}): CcdCaseModel => {
@@ -246,12 +246,12 @@ describe('CcdCaseModel', () => {
       expect(model.isDefendantContactByText).toBe(false);
     });
 
-    it('normalizes confirm notice given answers from CCD values', () => {
+    it('normalizes possessionNoticeReceived answers from CCD values', () => {
       const yesModel = buildModel({
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: ' YES ',
+              possessionNoticeReceived: ' YES ' as unknown as YesNoNotSureValue,
             },
           },
         },
@@ -260,7 +260,7 @@ describe('CcdCaseModel', () => {
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: 'no',
+              possessionNoticeReceived: 'no' as unknown as YesNoNotSureValue,
             },
           },
         },
@@ -269,7 +269,7 @@ describe('CcdCaseModel', () => {
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: 'IM_NOT_SURE',
+              possessionNoticeReceived: 'IM_NOT_SURE' as unknown as YesNoNotSureValue,
             },
           },
         },
@@ -278,45 +278,32 @@ describe('CcdCaseModel', () => {
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: '  maybe-later  ',
+              possessionNoticeReceived: '  maybe-later  ' as unknown as YesNoNotSureValue,
             },
           },
         },
       });
       const missingValueModel = buildModel();
 
-      expect(yesModel.defendantResponsesConfirmNoticeGiven).toBe('yes');
-      expect(noModel.defendantResponsesConfirmNoticeGiven).toBe('no');
-      expect(notSureModel.defendantResponsesConfirmNoticeGiven).toBe('imNotSure');
-      expect(customValueModel.defendantResponsesConfirmNoticeGiven).toBe('maybe-later');
-      expect(missingValueModel.defendantResponsesConfirmNoticeGiven).toBeUndefined();
+      expect(yesModel.defendantResponsesPossessionNoticeReceived).toBe('yes');
+      expect(noModel.defendantResponsesPossessionNoticeReceived).toBe('no');
+      expect(notSureModel.defendantResponsesPossessionNoticeReceived).toBe('imNotSure');
+      expect(customValueModel.defendantResponsesPossessionNoticeReceived).toBe('maybe-later');
+      expect(missingValueModel.defendantResponsesPossessionNoticeReceived).toBeUndefined();
     });
   });
 
   describe('notice date', () => {
-    it('uses the first available notice date in precedence order', () => {
-      const handedOverModel = buildModel({
-        data: {
-          notice_NoticeHandedOverDateTime: '2024-05-01T09:30:00',
-          notice_NoticePostedDate: '2024-05-02',
-          notice_NoticeOtherElectronicDateTime: '2024-05-03T10:00:00',
-        },
-      });
-      const postedModel = buildModel({
-        data: {
-          notice_NoticePostedDate: '2024-05-02',
-          notice_NoticeOtherElectronicDateTime: '2024-05-03T10:00:00',
-        },
-      });
-      const electronicModel = buildModel({
-        data: {
-          notice_NoticeOtherElectronicDateTime: '2024-05-03T10:00:00',
-        },
-      });
-
-      expect(handedOverModel.noticeDate).toBe('2024-05-01T09:30:00');
-      expect(postedModel.noticeDate).toBe('2024-05-02');
-      expect(electronicModel.noticeDate).toBe('2024-05-03T10:00:00');
+    it.each([
+      ['notice_NoticePostedDate', '2024-05-02', '2024-05-02'],
+      ['notice_NoticeDeliveredDate', '2024-05-02', '2024-05-02'],
+      ['notice_NoticeHandedOverDateTime', '2024-05-02T14:30:00', '2024-05-02'],
+      ['notice_NoticeEmailSentDateTime', '2024-05-02T00:30:00', '2024-05-02'],
+      ['notice_NoticeOtherElectronicDateTime', '2024-05-02T23:45:00', '2024-05-02'],
+      ['notice_NoticeOtherDateTime', '2024-05-02T12:00:00', '2024-05-02'],
+    ])('returns %s truncated to YYYY-MM-DD', (field, raw, expected) => {
+      const model = buildModel({ data: { [field]: raw } });
+      expect(model.noticeDate).toBe(expected);
     });
 
     it('returns undefined when no notice date exists', () => {

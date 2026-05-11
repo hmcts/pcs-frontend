@@ -8,6 +8,9 @@ import {
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
   correspondenceAddress,
+  counterClaim,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -34,6 +37,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -70,6 +74,7 @@ export class RespondToClaimAction implements IAction {
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
       ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
+      ['selectCounterClaim', () => this.selectCounterClaim(fieldName as actionRecord)],
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
@@ -96,6 +101,9 @@ export class RespondToClaimAction implements IAction {
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
+      ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
+      ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
+      ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -315,6 +323,14 @@ export class RespondToClaimAction implements IAction {
       option: howMuchToPayData.radioOption,
     });
     await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
+  }
+
+  private async selectCounterClaim(counterClaimOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterClaim.doYouWantToMakeACounterclaim,
+      option: counterClaimOption.option,
+    });
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
   }
 
   private async selectIncomeAndExpenses(incomeAndExpenseData: actionRecord): Promise<void> {
@@ -667,6 +683,43 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  }
+
+  private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
+    if (uploadDocs?.files) {
+      await performAction('uploadFile', uploadDocs.files);
+    }
+    await performAction('clickButton', uploadFiles.saveAndContinueButton);
+  }
+
+  private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: claim.question,
+      option: claim.option,
+    });
+    await performAction('clickButton', counterClaimWhatAreYouClaimingFor.saveAndContinueButton);
+  }
+
+  private async counterClaimSpecificSumOfMoney(sumOfMoney: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: sumOfMoney.question,
+      option: sumOfMoney.option,
+    });
+
+    if (sumOfMoney.option === counterClaimSpecificSumOfMoney.yesRadioOption) {
+      await performAction(
+        'inputText',
+        counterClaimSpecificSumOfMoney.howMuchAreYouClaimingHiddenQuestion,
+        sumOfMoney.amount
+      );
+    } else {
+      await performAction(
+        'inputText',
+        counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,
+        sumOfMoney.amount
+      );
+    }
+    await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

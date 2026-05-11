@@ -8,7 +8,7 @@
   },
   "rentArrearsAmountCorrection": {
     "label": "How much does the defendant believe they owe in rent arrears?",
-     "hint": ""
+    "hint": ""
   },
   "errors": {
     "rentArrears": {
