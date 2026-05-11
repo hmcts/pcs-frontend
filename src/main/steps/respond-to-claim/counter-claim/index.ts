@@ -1,11 +1,11 @@
 import type { Request } from 'express';
 
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { YesNoValue } from '@services/ccdCase.interface';
 import { FeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createFormStep({
@@ -54,18 +54,16 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
-    const makeCounterClaim: YesNoValue = req.body?.makeCounterClaim;
-    if (!makeCounterClaim) {
-      return;
+    const makeCounterClaim = req.body?.makeCounterClaim as YesNoValue | undefined;
+    const response = buildDraftDefendantResponse(req);
+
+    if (makeCounterClaim) {
+      response.defendantResponses.makeCounterClaim = makeCounterClaim;
+    } else {
+      delete response.defendantResponses.makeCounterClaim;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        makeCounterClaim,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
