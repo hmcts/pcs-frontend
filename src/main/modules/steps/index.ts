@@ -45,7 +45,7 @@ export {
 } from './i18n';
 
 // Export step request-context helpers
-export { getStepContext, withStepContext } from './stepContext';
+export { withStepContext } from './stepContext';
 export type { StepContext } from './stepContext';
 
 // Re-export language utilities from main i18n module for convenience

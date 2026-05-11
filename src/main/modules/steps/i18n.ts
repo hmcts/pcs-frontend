@@ -12,8 +12,6 @@ import {
   getTranslationFunction as getMainTranslationFunction,
 } from '../i18n';
 
-import { getStepContext } from './stepContext';
-
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('i18n');
@@ -77,14 +75,6 @@ function getStepTranslationPaths(req: Request, stepName: string, folder: string)
   return [defaultPath, getStepTranslationPath(stepName, `${folder}/${userType}`)];
 }
 
-function resolveStepName(req: Request, explicit?: string): string | undefined {
-  return explicit ?? getStepContext(req)?.name;
-}
-
-function resolveJourneyFolder(req: Request, explicit?: string): string | undefined {
-  return explicit ?? getStepContext(req)?.journey;
-}
-
 /**
  * Loads and registers a step's translations under a journey-scoped i18next
  * namespace. The early-return cache check is safe because the namespace is
@@ -99,8 +89,8 @@ export async function loadStepNamespace(req: Request, stepName?: string, folder?
     return;
   }
 
-  const resolvedStepName = resolveStepName(req, stepName);
-  const resolvedFolder = resolveJourneyFolder(req, folder);
+  const resolvedStepName = stepName ?? req.res?.locals.step?.name;
+  const resolvedFolder = folder ?? req.res?.locals.step?.journey;
 
   if (!resolvedStepName || !resolvedFolder) {
     return;
@@ -176,8 +166,8 @@ export function getStepTranslations(req: Request, stepName?: string, journeyFold
     return {};
   }
 
-  const resolvedStepName = resolveStepName(req, stepName);
-  const resolvedFolder = resolveJourneyFolder(req, journeyFolder);
+  const resolvedStepName = stepName ?? req.res?.locals.step?.name;
+  const resolvedFolder = journeyFolder ?? req.res?.locals.step?.journey;
   if (!resolvedStepName || !resolvedFolder) {
     return {};
   }
@@ -202,8 +192,8 @@ export function getTranslationFunction(
     return getMainTranslationFunction(req, namespaces);
   }
 
-  const resolvedStepName = resolveStepName(req, stepName);
-  const resolvedFolder = resolveJourneyFolder(req, journeyFolder);
+  const resolvedStepName = stepName ?? req.res?.locals.step?.name;
+  const resolvedFolder = journeyFolder ?? req.res?.locals.step?.journey;
 
   const lang = getMainRequestLanguage(req);
   const allNamespaces =

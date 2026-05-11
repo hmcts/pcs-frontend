@@ -1,12 +1,8 @@
-import type { Request, RequestHandler } from 'express';
+import type { RequestHandler } from 'express';
 
 export interface StepContext {
   name: string;
   journey: string;
-}
-
-export function getStepContext(req: Request): StepContext | undefined {
-  return req.res?.locals.step;
 }
 
 export const withStepContext =
