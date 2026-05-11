@@ -8,7 +8,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-date-of-birth',
   stepDir: __dirname,
-  basePath: '/respond-to-claim',
   showCancelButton: false,
   beforeRedirect: async req => {
     const dateOfBirth = req.body?.dateOfBirth;

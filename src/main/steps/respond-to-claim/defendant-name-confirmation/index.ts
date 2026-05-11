@@ -8,7 +8,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-name-confirmation',
   stepDir: __dirname,
-  basePath: '/respond-to-claim',
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
