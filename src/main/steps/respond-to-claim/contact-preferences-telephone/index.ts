@@ -1,15 +1,12 @@
-import { createFormStep } from '../../../modules/steps';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'contact-preferences-telephone',
-  journeyFolder: 'respondToClaim',
   showCancelButton: false,
   stepDir: __dirname,
-  flowConfig,
 
   translationKeys: {
     caption: 'caption',
