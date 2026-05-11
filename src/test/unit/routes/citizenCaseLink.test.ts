@@ -201,7 +201,7 @@ describe('citizenCaseLink routes', () => {
 
       expect(res.render).toHaveBeenCalledWith(
         'accessCode',
-        expect.objectContaining({ errors: expect.objectContaining({ accessCode: expect.any(Object) }) })
+        expect.objectContaining({ errors: expect.objectContaining({ claimNumber: expect.any(Object) }) })
       );
     });
   });
