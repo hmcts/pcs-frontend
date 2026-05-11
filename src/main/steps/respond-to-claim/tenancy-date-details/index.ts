@@ -71,9 +71,12 @@ export const step: StepDefinition = createFormStep({
 
     const result: Record<string, unknown> = { confirmTenancyDate: formValue };
 
-    if (existingDateIsCorrect === 'NO' && existingTenancyStartDate) {
+    // Case-insensitive compare via the already-computed formValue (CCD echoes 'No' Pascal
+    // since pcs-api PR #1678 — strict `=== 'NO'` would miss it). Dotted key so the form-
+    // builder matches this against the subField inputs.
+    if (formValue === 'no' && existingTenancyStartDate) {
       const parsed = parseISO(existingTenancyStartDate);
-      result.tenancyStartDate = {
+      result['confirmTenancyDate.tenancyStartDate'] = {
         day: format(parsed, 'd'),
         month: format(parsed, 'M'),
         year: format(parsed, 'yyyy'),
