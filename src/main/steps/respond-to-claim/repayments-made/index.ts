@@ -1,16 +1,13 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { getClaimantName } from '../../utils/getClaimantName';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PaymentAgreement, YesNoValue } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-made',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
