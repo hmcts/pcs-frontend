@@ -1,6 +1,6 @@
 {
   "pageTitle": "Access your case",
-  "description": "Access and manage your case using your claim number and access code. These will be in a letter, email or pack sent by the court.",
+  "description": "Access and manage your case using your claim number and access code. These will be in the letter, email or pack sent by the court.",
   "claimNumber": {
     "label": "Enter your claim number",
     "hint": "This is a 16-digit number"
