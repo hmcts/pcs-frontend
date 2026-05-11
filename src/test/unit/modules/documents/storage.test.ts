@@ -1,6 +1,6 @@
 jest.mock('../../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
-    getCaseById: jest.fn(),
+    getCaseByIdForEvent: jest.fn(),
     updateDraft: jest.fn(),
   },
 }));
@@ -12,7 +12,7 @@ import { createCcdDraftStorage, sessionDocs, toDisplayDocuments } from '../../..
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
-const mockGetCaseById = ccdCaseService.getCaseById as jest.Mock;
+const mockGetCaseByIdForEvent = ccdCaseService.getCaseByIdForEvent as jest.Mock;
 const mockUpdateDraft = ccdCaseService.updateDraft as jest.Mock;
 
 const doc1: CcdCollectionItem<CcdUploadedDocument> = {
@@ -85,7 +85,7 @@ describe('createCcdDraftStorage', () => {
       const result = await storage.read(req);
 
       expect(result).toEqual([doc1]);
-      expect(mockGetCaseById).not.toHaveBeenCalled();
+      expect(mockGetCaseByIdForEvent).not.toHaveBeenCalled();
     });
 
     it('returns empty array when path does not exist in validatedCase', async () => {
@@ -107,7 +107,7 @@ describe('createCcdDraftStorage', () => {
 
   describe('readFresh', () => {
     it('calls getCaseById with configured event id and returns docs at path', async () => {
-      mockGetCaseById.mockResolvedValue({
+      mockGetCaseByIdForEvent.mockResolvedValue({
         id: VALID_CASE_REF,
         data: {
           possessionClaimResponse: {
@@ -119,12 +119,12 @@ describe('createCcdDraftStorage', () => {
       const req = makeReq();
       const result = await storage.readFresh(req);
 
-      expect(mockGetCaseById).toHaveBeenCalledWith('test-token', VALID_CASE_REF, EVENT.id);
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith('test-token', VALID_CASE_REF, EVENT.id);
       expect(result).toEqual([doc1, doc2]);
     });
 
     it('returns empty array when path not present in fresh response', async () => {
-      mockGetCaseById.mockResolvedValue({ id: VALID_CASE_REF, data: {} });
+      mockGetCaseByIdForEvent.mockResolvedValue({ id: VALID_CASE_REF, data: {} });
 
       const result = await storage.readFresh(makeReq());
 
@@ -141,7 +141,7 @@ describe('createCcdDraftStorage', () => {
       const req = makeReq({ params: { caseReference: 'not-a-case-id' } });
 
       await expect(storage.readFresh(req)).rejects.toThrow('Invalid case reference format');
-      expect(mockGetCaseById).not.toHaveBeenCalled();
+      expect(mockGetCaseByIdForEvent).not.toHaveBeenCalled();
     });
   });
 

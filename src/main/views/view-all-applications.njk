@@ -1,0 +1,80 @@
+{% extends "template.njk" %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% macro partyGenAppCard(title, genApps, noGenAppsMessage) %}
+  <div class="govuk-summary-card">
+    <div class="govuk-summary-card__title-wrapper">
+      <h2 class="govuk-summary-card__title">{{ title }}</h2>
+    </div>
+
+    <div class="govuk-summary-card__content">
+      <dl class="govuk-summary-list">
+       {% if genApps.length > 0 %}
+         {% for genApp in genApps %}
+          <div class="govuk-summary-list__row">
+            <dd class="govuk-summary-list__value">
+              <p class="govuk-body govuk-!-margin-bottom-1">
+                {% set submissionDocument = genApp.submissionDocument %}
+                {% if submissionDocument.documentId %}
+                  <a href="/documents/{{ submissionDocument.documentId }}/download" rel="noreferrer noopener" target="_blank">{{ submissionDocument.filename }}</a>
+                {% else %}
+                  {{ submissionDocument.filename }}
+                {% endif %}
+              </p>
+              <p class="govuk-body-s">{{ t('viewAllApplications:submittedOn') }} {{ genApp.submittedOn | date}}</p>
+            </dd>
+          </div>
+         {% endfor %}
+       {% elif noGenAppsMessage != null %}
+         <div class="govuk-summary-list__row">
+           <dd class="govuk-summary-list__value">
+             <p class="govuk-body">
+              {{ noGenAppsMessage }}
+             </p>
+           </dd>
+         </div>
+       {% endif %}
+      </dl>
+    </div>
+  </div>
+{% endmacro %}
+
+{% block serviceNavigation %}
+  {{ govukServiceNavigation({
+    serviceName: t('dashboard:serviceName'),
+    serviceUrl: dashboardUrl if dashboardUrl else "/dashboard",
+    navigation: [
+      {
+        text: t('logout', 'Log out'),
+        href: "/logout"
+      }
+    ],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}
+
+{% set backUrl = dashboardUrl %}
+
+{% block pageTitle %}
+{{ t('viewAllApplications:title') }}
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">{{ t('viewAllApplications:heading') }}</h1>
+
+  <p class="govuk-body">
+    {{ t('viewAllApplications:caseReferenceLabel') }} {{ formattedCaseReference }}
+  </p>
+
+  {{ partyGenAppCard(t('viewAllApplications:yourApplications'), userGenApps, t('viewAllApplications:youDoNotHaveAnyApplicationsYet')) }}
+
+  {% for partyId, partyGenApps in otherPartyGenAppsMap %}
+    {% set partyName = partyGenApps.party.firstName + ' ' + partyGenApps.party.lastName %}
+    {% set cardTitle = t('viewAllApplications:applicationsMadeBy') + ' ' + partyName %}
+    {{ partyGenAppCard(cardTitle, partyGenApps.genApps) }}
+  {% endfor %}
+
+
+{% endblock %}
