@@ -1,5 +1,16 @@
 export const counterClaimFee = {
   mainHeader: `Counterclaim fee`,
+  stopOrDelayAnEvictionParagraph: `Stop or delay an eviction`,
+  basedOnInformationParagraph: () => `Based on the information provided, it will cost ${process.env.COUNTERCLAIM_FEES} to make your counterclaim.`,
+  helpWithCourtFeesHeader: `Help with court fees`,
+  youMayBeAbleParagraph: `You may be able to get help with paying the fee if you (one or more of the following):`,
+  areOnBenefitList: `are on certain benefits`,
+  haveLittleList: `have little or no savings`,
+  haveLowIncomeList: `have low income`,
+  doYouNeedHelpPayingCounterClaimQuestion: `Do you need help paying the counterclaim fee?`,
+  backLink: `Back`,
+  iNeedHelpRadioOption: `I need help paying the fee`,
+  iDoNotNeedHelpRadioOption: `I do not need help paying the fee`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
 };
