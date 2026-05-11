@@ -321,6 +321,13 @@ export interface CcdDashboardData {
   propertyAddress?: CcdCaseAddress;
   notifications?: CcdCollectionItem<CcdDashboardNotification>[];
   taskGroups?: CcdCollectionItem<CcdDashboardTaskGroup>[];
+  relatedApplications?: CcdCollectionItem<CcdRelatedApplication>[];
+}
+
+export interface CcdRelatedApplication {
+  id?: string;
+  type?: GenAppType;
+  applicationSubmittedDate?: string;
 }
 
 export enum GenAppType {
@@ -345,3 +352,5 @@ export interface CitizenGenAppRequest {
   sotFullName?: string;
   clientReference?: string;
 }
+
+

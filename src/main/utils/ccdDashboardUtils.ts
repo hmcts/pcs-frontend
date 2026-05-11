@@ -3,9 +3,10 @@ import type {
   CcdCollectionItem,
   CcdDashboardNotification,
   CcdDashboardTaskGroup,
+  CcdRelatedApplication,
   CcdTemplateKeyValue,
 } from '@services/ccdCase.interface';
-import type { DashboardNotification, DashboardTask, DashboardTaskGroup } from '@services/dashboard.interface';
+import type { DashboardNotification, DashboardTask, DashboardTaskGroup, DashboardRelatedApplication } from '@services/dashboard.interface';
 
 export function formatAddress(addr: CcdCaseAddress | undefined): string | undefined {
   if (!addr) {
@@ -49,4 +50,17 @@ export function unwrapTaskGroups(raw: CcdCollectionItem<CcdDashboardTaskGroup>[]
       })
     ),
   }));
+}
+
+export function unwrapRelatedApplications(raw: CcdCollectionItem<CcdRelatedApplication>[] | undefined): DashboardRelatedApplication[] {
+  return unwrapCollection(raw)
+    .filter(
+      (app): app is CcdRelatedApplication & { id: string; type: DashboardRelatedApplication['type'] } =>
+        !!app.id && !!app.type
+    )
+    .map(app => ({
+      id: app.id,
+      type: app.type,
+      applicationSubmittedDate: app.applicationSubmittedDate,
+    }));
 }
