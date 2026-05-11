@@ -64,6 +64,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
   },
   uploadAdditionalDocuments: {
     name: 'uploadAdditionalDocuments',
+    slug: 'upload-additional-documents',
     default: {
       flowConfig: uploadAdditionalDocumentsFlowConfig,
       stepRegistry: uploadAdditionalDocumentsStepRegistry,
