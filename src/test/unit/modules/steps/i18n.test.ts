@@ -51,10 +51,18 @@ describe('steps/i18n', () => {
   });
 
   describe('getStepNamespace', () => {
-    it('should convert step name to namespace', () => {
+    it('should convert step name to namespace when no journey folder is provided', () => {
       expect(getStepNamespace('enter-dob')).toBe('enterDob');
       expect(getStepNamespace('respond-to-claim-summary')).toBe('respondToClaimSummary');
       expect(getStepNamespace('single-word')).toBe('singleWord');
+    });
+
+    it('should produce distinct namespaces for the same step in different journeys', () => {
+      expect(getStepNamespace('start-now', 'respondToClaim')).toBe('respondToClaim__startNow');
+      expect(getStepNamespace('start-now', 'uploadAdditionalDocuments')).toBe('uploadAdditionalDocuments__startNow');
+      expect(getStepNamespace('start-now', 'respondToClaim')).not.toBe(
+        getStepNamespace('start-now', 'uploadAdditionalDocuments')
+      );
     });
   });
 
@@ -72,30 +80,102 @@ describe('steps/i18n', () => {
       expect(mockLogger.warn).not.toHaveBeenCalled();
     });
 
-    it('should reload the bundle even when one is already loaded for the namespace', async () => {
-      // Different journeys can share a step name (e.g. "start-now"), which means
-      // they share an i18next namespace. We must not skip loading just because a
-      // bundle already exists, otherwise the previous journey's translations win.
-      const mockLocalesDir = '/test/locales';
-      const mockTranslations = { title: 'Reloaded Title' };
-      const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
-
-      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(mockLocalesDir);
+    it('should skip loading when a journey-scoped namespace bundle is already cached', async () => {
+      // Namespaces are now scoped by journey, so once a (journey, step) bundle
+      // is loaded the next request for the same pair short-circuits — no disk
+      // I/O, no shared mutable state, no race.
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
       const addResourceBundle = jest.fn();
-      // Simulate that a bundle for this namespace already exists (loaded by another journey).
-      const getResourceBundle = jest.fn().mockReturnValue({ stale: 'value' });
+      const getResourceBundle = jest.fn().mockReturnValue({ already: 'loaded' });
+      const access = jest.spyOn(fs, 'access');
+      const req = {
+        i18n: { getResourceBundle, addResourceBundle, loadNamespaces: jest.fn() },
+      } as any;
+
+      await loadStepNamespace(req, 'test-step', 'folder');
+
+      expect(getResourceBundle).toHaveBeenCalledWith('en', 'folder__testStep');
+      expect(access).not.toHaveBeenCalled();
+      expect(addResourceBundle).not.toHaveBeenCalled();
+    });
+
+    it('should isolate the same step name across journeys into distinct namespaces', async () => {
+      // Two journeys with a "start-now" step must NOT share a bundle —
+      // the bug the journey-scoped namespace fixes.
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
+      const addResourceBundle = jest.fn();
+      const getResourceBundle = jest.fn().mockReturnValue(null);
       const req = {
         i18n: { getResourceBundle, addResourceBundle, loadNamespaces },
       } as any;
 
       jest.spyOn(fs, 'access').mockResolvedValue(undefined);
-      jest.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify(mockTranslations));
+      jest
+        .spyOn(fs, 'readFile')
+        .mockResolvedValueOnce(JSON.stringify({ title: 'Journey A' }))
+        .mockResolvedValueOnce(JSON.stringify({ title: 'Journey B' }));
 
-      await loadStepNamespace(req, 'test-step', 'folder');
+      await loadStepNamespace(req, 'start-now', 'journeyA');
+      await loadStepNamespace(req, 'start-now', 'journeyB');
 
-      expect(addResourceBundle).toHaveBeenCalledWith('en', 'testStep', mockTranslations, true, true);
+      expect(addResourceBundle).toHaveBeenNthCalledWith(
+        1,
+        'en',
+        'journeyA__startNow',
+        { title: 'Journey A' },
+        true,
+        true
+      );
+      expect(addResourceBundle).toHaveBeenNthCalledWith(
+        2,
+        'en',
+        'journeyB__startNow',
+        { title: 'Journey B' },
+        true,
+        true
+      );
+    });
+
+    it('should derive step name and journey from res.locals.step when args are omitted', async () => {
+      // withStepContext middleware sets res.locals.step on every step request
+      // so callers can use the helpers without threading stepName/journey through.
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
+      const addResourceBundle = jest.fn();
+      const getResourceBundle = jest.fn().mockReturnValue(null);
+      const req = {
+        i18n: { getResourceBundle, addResourceBundle, loadNamespaces },
+        res: { locals: { step: { name: 'start-now', journey: 'uploadAdditionalDocuments' } } },
+      } as any;
+
+      jest.spyOn(fs, 'access').mockResolvedValue(undefined);
+      jest.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify({ title: 'From context' }));
+
+      await loadStepNamespace(req);
+
+      expect(addResourceBundle).toHaveBeenCalledWith(
+        'en',
+        'uploadAdditionalDocuments__startNow',
+        { title: 'From context' },
+        true,
+        true
+      );
+    });
+
+    it('should return without loading when no step name or journey is resolvable', async () => {
+      const req = { i18n: { getResourceBundle: jest.fn() } } as any;
+      const access = jest.spyOn(fs, 'access');
+
+      await loadStepNamespace(req);
+
+      expect(access).not.toHaveBeenCalled();
     });
 
     it('should return early if locales directory not found', async () => {
@@ -138,8 +218,8 @@ describe('steps/i18n', () => {
 
       await loadStepNamespace(req, 'test-step', 'testFolder');
 
-      expect(addResourceBundle).toHaveBeenCalledWith('en', 'testStep', mockTranslations, true, true);
-      expect(loadNamespaces).toHaveBeenCalledWith('testStep', expect.any(Function));
+      expect(addResourceBundle).toHaveBeenCalledWith('en', 'testFolder__testStep', mockTranslations, true, true);
+      expect(loadNamespaces).toHaveBeenCalledWith('testFolder__testStep', expect.any(Function));
     });
 
     it('should merge legalrep translations over default translations', async () => {
@@ -170,7 +250,7 @@ describe('steps/i18n', () => {
 
       expect(addResourceBundle).toHaveBeenCalledWith(
         'en',
-        'testStep',
+        'testFolder__testStep',
         {
           title: 'Professional title',
           nested: {
@@ -302,6 +382,22 @@ describe('steps/i18n', () => {
 
       expect(result).toEqual({});
     });
+
+    it('should read the journey-scoped namespace when journey context is set', () => {
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const bundle = { title: 'Hello' };
+      const getResourceBundle = jest.fn().mockReturnValue(bundle);
+      const req = {
+        i18n: { getResourceBundle },
+        res: { locals: { step: { name: 'start-now', journey: 'uploadAdditionalDocuments' } } },
+      } as any;
+
+      const result = getStepTranslations(req);
+
+      expect(getResourceBundle).toHaveBeenCalledWith('en', 'uploadAdditionalDocuments__startNow');
+      expect(result).toBe(bundle);
+    });
   });
 
   describe('getTranslationFunction', () => {
@@ -345,6 +441,37 @@ describe('steps/i18n', () => {
 
       expect(mainI18n.getTranslationFunction).toHaveBeenCalledWith(req, ['common']);
       expect(result).toBe(mockT);
+    });
+
+    it('should use the journey-scoped namespace when context is set on res.locals', () => {
+      const mockFixedT = jest.fn();
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
+      const req = {
+        i18n: { getFixedT },
+        res: { locals: { step: { name: 'start-now', journey: 'uploadAdditionalDocuments' } } },
+      } as any;
+
+      const result = getTranslationFunction(req);
+
+      expect(getFixedT).toHaveBeenCalledWith('en', ['uploadAdditionalDocuments__startNow', 'common']);
+      expect(result).toBe(mockFixedT);
+    });
+
+    it('should prefer explicit args over res.locals step context', () => {
+      const mockFixedT = jest.fn();
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
+      const req = {
+        i18n: { getFixedT },
+        res: { locals: { step: { name: 'start-now', journey: 'journeyA' } } },
+      } as any;
+
+      getTranslationFunction(req, 'other-step', ['common'], 'journeyB');
+
+      expect(getFixedT).toHaveBeenCalledWith('en', ['journeyB__otherStep', 'common']);
     });
   });
 

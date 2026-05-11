@@ -12,6 +12,8 @@ import {
   getTranslationFunction as getMainTranslationFunction,
 } from '../i18n';
 
+import { getStepContext } from './stepContext';
+
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('i18n');
@@ -46,15 +48,26 @@ function mergeTranslations(
   return merged;
 }
 
-export function getStepNamespace(stepName: string): string {
+function camelizeStepName(stepName: string): string {
   return stepName
     .split('-')
     .map((part, index) => (index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)))
     .join('');
 }
 
+/**
+ * i18next namespace for a step. Scoped by the journey folder so that two
+ * journeys with the same step name (e.g. two `start-now` steps) get distinct
+ * namespaces and don't share a single mutable bundle.
+ */
+export function getStepNamespace(stepName: string, journeyFolder?: string): string {
+  const camel = camelizeStepName(stepName);
+  return journeyFolder ? `${journeyFolder}__${camel}` : camel;
+}
+
+/** Filesystem path (without extension) for a step's translation file under locales/<lang>/. */
 export function getStepTranslationPath(stepName: string, folder: string): string {
-  return `${folder}/${getStepNamespace(stepName)}`;
+  return `${folder}/${camelizeStepName(stepName)}`;
 }
 
 function getStepTranslationPaths(req: Request, stepName: string, folder: string): string[] {
@@ -65,21 +78,49 @@ function getStepTranslationPaths(req: Request, stepName: string, folder: string)
     return [defaultPath];
   }
 
-  return [defaultPath, `${folder}/${userType}/${getStepNamespace(stepName)}`];
+  return [defaultPath, `${folder}/${userType}/${camelizeStepName(stepName)}`];
 }
 
-export async function loadStepNamespace(req: Request, stepName: string, folder: string): Promise<void> {
+function resolveStepName(req: Request, explicit?: string): string | undefined {
+  return explicit ?? getStepContext(req)?.name;
+}
+
+function resolveJourneyFolder(req: Request, explicit?: string): string | undefined {
+  return explicit ?? getStepContext(req)?.journey;
+}
+
+/**
+ * Loads and registers a step's translations under a journey-scoped i18next
+ * namespace. The early-return cache check is safe because the namespace is
+ * unique per (journey, step), so the first request warms it and subsequent
+ * requests skip the disk read.
+ *
+ * `stepName` and `folder` are optional — when omitted they're read from
+ * `res.locals.step` (set by `withStepContext` middleware in registerSteps).
+ */
+export async function loadStepNamespace(req: Request, stepName?: string, folder?: string): Promise<void> {
   if (!req.i18n) {
     return;
   }
 
-  const stepNamespace = getStepNamespace(stepName);
+  const resolvedStepName = resolveStepName(req, stepName);
+  const resolvedFolder = resolveJourneyFolder(req, folder);
+
+  if (!resolvedStepName || !resolvedFolder) {
+    return;
+  }
+
+  const stepNamespace = getStepNamespace(resolvedStepName, resolvedFolder);
   const lang = getMainRequestLanguage(req);
+
+  if (req.i18n.getResourceBundle(lang, stepNamespace)) {
+    return;
+  }
 
   const localesDir = await findLocalesDir();
   if (!localesDir) {
     if (isDevelopment) {
-      logger.warn(`Locales directory not found. Translation file for ${stepName} will not be loaded.`);
+      logger.warn(`Locales directory not found. Translation file for ${resolvedStepName} will not be loaded.`);
     }
     return;
   }
@@ -87,7 +128,7 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
   try {
     let translations: Record<string, unknown> = {};
 
-    for (const translationPath of getStepTranslationPaths(req, stepName, folder)) {
+    for (const translationPath of getStepTranslationPaths(req, resolvedStepName, resolvedFolder)) {
       const filePath = path.join(localesDir, lang, `${translationPath}.json`);
       const resolvedPath = path.resolve(filePath);
       const resolvedLocalesDir = path.resolve(localesDir);
@@ -124,30 +165,54 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
     if (isDevelopment) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       if (!errorMessage.includes('ENOENT')) {
-        logger.error(`Failed to load translation file for ${stepName}:`, error);
+        logger.error(`Failed to load translation file for ${resolvedStepName}:`, error);
       }
     }
   }
 }
 
-export function getStepTranslations(req: Request, stepName: string): TranslationContent {
+/**
+ * Reads a step's translation bundle. `stepName` and `journeyFolder` are
+ * optional — when omitted they're read from `res.locals.step`.
+ */
+export function getStepTranslations(req: Request, stepName?: string, journeyFolder?: string): TranslationContent {
   if (!req.i18n) {
     return {};
   }
 
+  const resolvedStepName = resolveStepName(req, stepName);
+  if (!resolvedStepName) {
+    return {};
+  }
+
+  const resolvedFolder = resolveJourneyFolder(req, journeyFolder);
   const lang = getMainRequestLanguage(req);
-  const resources = req.i18n.getResourceBundle(lang, getStepNamespace(stepName));
+  const resources = req.i18n.getResourceBundle(lang, getStepNamespace(resolvedStepName, resolvedFolder));
   return (resources as TranslationContent) || {};
 }
 
-/** Gets the translation function for a request with step namespace support. */
-export function getTranslationFunction(req: Request, stepName?: string, namespaces: string[] = ['common']): TFunction {
+/**
+ * Translation function for a request. When `stepName` is omitted it's read
+ * from `res.locals.step`; the journey folder is always read from
+ * `res.locals.step` (which `withStepContext` populates per request).
+ */
+export function getTranslationFunction(
+  req: Request,
+  stepName?: string,
+  namespaces: string[] = ['common'],
+  journeyFolder?: string
+): TFunction {
   if (!req.i18n) {
     return getMainTranslationFunction(req, namespaces);
   }
 
+  const resolvedStepName = resolveStepName(req, stepName);
+  const resolvedFolder = resolveJourneyFolder(req, journeyFolder);
+
   const lang = getMainRequestLanguage(req);
-  const allNamespaces = stepName ? [getStepNamespace(stepName), ...namespaces] : namespaces;
+  const allNamespaces = resolvedStepName
+    ? [getStepNamespace(resolvedStepName, resolvedFolder), ...namespaces]
+    : namespaces;
   const fixedT = req.i18n.getFixedT(lang, allNamespaces);
   return fixedT || getMainTranslationFunction(req, namespaces);
 }
