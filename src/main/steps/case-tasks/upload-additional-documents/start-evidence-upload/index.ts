@@ -9,12 +9,12 @@ import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
 
 const journeyName = 'uploadAdditionalDocuments';
-const stepName = 'start-now';
-const templatePath = 'case-tasks/upload-additional-documents/start-now/startNow.njk';
+const stepName = 'start-evidence-upload';
+const templatePath = 'case-tasks/upload-additional-documents/start-evidence-upload/startEvidenceUpload.njk';
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
 export const step: StepDefinition = {
-  url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/start-now`,
+  url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
   name: stepName,
   view: templatePath,
   stepDir: __dirname,

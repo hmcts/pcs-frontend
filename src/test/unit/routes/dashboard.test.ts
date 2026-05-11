@@ -258,7 +258,9 @@ describe('Dashboard Routes', () => {
       };
       const [configuredTask] = renderArgs.taskGroups[0].tasks;
 
-      expect(configuredTask.href).toBe('/case/1234567890123456/upload-additional-documents/start-now');
+      expect(configuredTask.href).toBe(
+        '/case/1234567890123456/upload-additional-documents/upload-additional-documents/start-evidence-upload'
+      );
     });
 
     it('should fall back to dashboard URL for unmapped task templateId', async () => {
