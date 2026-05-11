@@ -24,6 +24,7 @@ export const step: StepDefinition = {
     createGetController(templatePath, stepName, stepNavigation, (req: Request) => ({
       backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/dashboard',
         dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+        url: req.originalUrl || '',
         applications: [
           {
             value: 'gen-app-1',
