@@ -5,6 +5,8 @@ import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config'
 import { getPreviousStep } from '@modules/steps/flow';
 
 describe('respond-to-claim what-other-regular-expenses-do-you-have back navigation (showCondition paradigm)', () => {
+  // hasSelectedPriorityDebts checks debtTotal/debtContribution/debtContributionFrequency presence,
+  // not the priorityDebts flag — include a realistic debt amount alongside the YES flag.
   const reqWithPriorityDebts = (priorityDebts: 'YES' | 'NO'): Request =>
     ({
       res: {
@@ -16,6 +18,7 @@ describe('respond-to-claim what-other-regular-expenses-do-you-have back navigati
                   householdCircumstances: {
                     shareIncomeExpenseDetails: 'YES',
                     priorityDebts,
+                    ...(priorityDebts === 'YES' ? { debtTotal: '50000' } : {}),
                   },
                 },
               },

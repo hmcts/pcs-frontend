@@ -6,6 +6,9 @@ import { shouldShowUniversalCreditStep } from '../../../../main/steps/respond-to
 import { getNextStep } from '@modules/steps/flow';
 
 describe('respond-to-claim regular-income flow routing (showCondition paradigm)', () => {
+  // hasSelectedUniversalCredit (src/main/steps/utils/hasSelectedUniversalCredit.ts) checks for
+  // universalCreditAmount/universalCreditFrequency presence, not the universalCredit flag —
+  // so realistic fixtures must include amount/frequency when simulating "UC selected".
   const createReq = (universalCredit: 'YES' | 'NO' | undefined): Request =>
     ({
       res: {
@@ -16,7 +19,11 @@ describe('respond-to-claim regular-income flow routing (showCondition paradigm)'
                 defendantResponses: {
                   householdCircumstances: {
                     shareIncomeExpenseDetails: 'YES',
-                    ...(universalCredit !== undefined ? { universalCredit } : {}),
+                    ...(universalCredit === 'YES'
+                      ? { universalCredit, universalCreditAmount: '20000', universalCreditFrequency: 'MONTHLY' }
+                      : universalCredit === 'NO'
+                        ? { universalCredit }
+                        : {}),
                   },
                 },
               },

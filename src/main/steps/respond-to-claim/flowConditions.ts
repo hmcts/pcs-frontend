@@ -1,11 +1,13 @@
 import { Request } from 'express';
 
 import {
-  fromYesNoEnum,
-  getValidatedCaseHouseholdCircumstances,
   hasAnyRentArrearsGround,
+  hasSelectedPriorityDebts,
+  hasSelectedUniversalCredit,
   isFinanceDetailsProvided,
   isNoticeDateProvided,
+  isPriorityDebtsSelected,
+  isUniversalCreditSelected,
   normalizeYesNoValue,
 } from '../utils';
 
@@ -52,19 +54,7 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
     return false;
   }
 
-  // Fast path: when user just submitted what-regular-income-do-you-receive, the body
-  // tells us whether UC was ticked — don't wait for the CCD-backed validatedCase refresh,
-  // which only happens after the save round-trip and isn't guaranteed for nested fields.
-  const regularIncome = req.body?.regularIncome;
-  if (regularIncome !== undefined) {
-    const incomeArray = Array.isArray(regularIncome) ? regularIncome : [regularIncome];
-    if (incomeArray.includes('universalCredit')) {
-      return false;
-    }
-  }
-
-  const hc = getValidatedCaseHouseholdCircumstances(req);
-  return fromYesNoEnum(hc?.universalCredit) !== 'yes';
+  return !isUniversalCreditSelected(req) && !hasSelectedUniversalCredit(req);
 }
 
 export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
@@ -72,18 +62,5 @@ export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
     return false;
   }
 
-  // Fast path: when user just submitted priority-debts, the body tells us the answer
-  // immediately. Mirrors the req.body-first pattern in hasProvidedFinanceDetails so
-  // the next-step routing doesn't depend on validatedCase being fully refreshed for
-  // nested defendantResponses.householdCircumstances fields.
-  const havePriorityDebts = req.body?.havePriorityDebts;
-  if (havePriorityDebts === 'yes') {
-    return true;
-  }
-  if (havePriorityDebts === 'no') {
-    return false;
-  }
-
-  const hc = getValidatedCaseHouseholdCircumstances(req);
-  return fromYesNoEnum(hc?.priorityDebts) === 'yes';
+  return isPriorityDebtsSelected(req) || hasSelectedPriorityDebts(req);
 }

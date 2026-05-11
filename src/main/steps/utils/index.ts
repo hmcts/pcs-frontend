@@ -9,6 +9,8 @@ export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
 export { isFinanceDetailsProvided } from './isFinanceDetailsProvided';
 export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
+export { isPriorityDebtsSelected } from './isPriorityDebtsSelected';
+export { hasSelectedPriorityDebts } from './hasSelectedPriorityDebts';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
 export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';

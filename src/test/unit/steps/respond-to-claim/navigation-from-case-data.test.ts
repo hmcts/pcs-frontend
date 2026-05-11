@@ -276,6 +276,8 @@ describe('respond-to-claim navigation from CCD case data', () => {
             householdCircumstances: {
               shareIncomeExpenseDetails: 'YES',
               universalCredit: 'YES',
+              universalCreditAmount: '20000',
+              universalCreditFrequency: 'MONTHLY',
             },
           },
         },
@@ -322,6 +324,8 @@ describe('respond-to-claim navigation from CCD case data', () => {
             householdCircumstances: {
               shareIncomeExpenseDetails: 'YES',
               universalCredit: 'YES',
+              universalCreditAmount: '20000',
+              universalCreditFrequency: 'MONTHLY',
             },
           },
         },

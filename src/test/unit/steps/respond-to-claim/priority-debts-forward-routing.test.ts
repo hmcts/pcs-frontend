@@ -5,6 +5,9 @@ import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config'
 import { getNextStep } from '@modules/steps/flow';
 
 describe('respond-to-claim priority-debts forward routing (showCondition paradigm)', () => {
+  // hasSelectedPriorityDebts checks debtTotal/debtContribution/debtContributionFrequency presence,
+  // not the priorityDebts flag — so the YES fixture includes a debt amount the normaliser
+  // would have persisted alongside the flag.
   const createReq = (priorityDebts: 'YES' | 'NO' | undefined): Request =>
     ({
       res: {
@@ -15,7 +18,11 @@ describe('respond-to-claim priority-debts forward routing (showCondition paradig
                 defendantResponses: {
                   householdCircumstances: {
                     shareIncomeExpenseDetails: 'YES',
-                    ...(priorityDebts !== undefined ? { priorityDebts } : {}),
+                    ...(priorityDebts === 'YES'
+                      ? { priorityDebts, debtTotal: '50000' }
+                      : priorityDebts === 'NO'
+                        ? { priorityDebts }
+                        : {}),
                   },
                 },
               },
