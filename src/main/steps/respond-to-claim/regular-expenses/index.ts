@@ -2,17 +2,12 @@ import type { Request } from 'express';
 
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type {
-  FrequencyValue,
-  HouseholdCircumstances,
-  IncomeExpenseDetails,
-  PossessionClaimResponse,
-} from '@services/ccdCase.interface';
+import type { FrequencyValue, HouseholdCircumstances, IncomeExpenseDetails } from '@services/ccdCase.interface';
 import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 const createAmountValidator =
@@ -493,34 +488,30 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async (req: Request) => {
     const selectedRaw = req.body?.regularExpenses as string | string[] | undefined;
     const selected = Array.isArray(selectedRaw) ? selectedRaw : selectedRaw ? [selectedRaw] : [];
-    const householdCircumstances: Record<string, unknown> = {};
     const body = req.body as Record<string, unknown> | undefined;
 
-    for (const key of regularExpenseKeys) {
-      const isYes = selected.includes(key);
-      const amountRaw = body?.[`regularExpenses.${key}Amount`] as string | undefined;
-      const frequency = body?.[`regularExpenses.${key}Frequency`] as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    const hc = response.defendantResponses.householdCircumstances;
 
-      const details: IncomeExpenseDetails = {
-        applies: toYesNoEnum(isYes ? 'yes' : 'no'),
-      };
-      if (isYes) {
+    for (const key of regularExpenseKeys) {
+      if (selected.includes(key)) {
+        const details: IncomeExpenseDetails = { applies: toYesNoEnum('yes') };
+        const amountRaw = body?.[`regularExpenses.${key}Amount`] as string | undefined;
+        const frequency = body?.[`regularExpenses.${key}Frequency`] as string | undefined;
         if (amountRaw) {
           details.amount = poundsToPence(amountRaw);
         }
         if (frequency) {
           details.frequency = frequency as FrequencyValue;
         }
+        hc[key] = details;
+      } else {
+        delete hc[key];
       }
-      householdCircumstances[key] = details;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances,
-      },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: req => {
     const t = getTranslationFunction(req, 'what-other-regular-expenses-do-you-have', ['common']);

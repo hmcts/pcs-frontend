@@ -1,10 +1,10 @@
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CaseData, LanguageUsed, PossessionClaimResponse } from '@services/ccdCase.interface';
+import type { CaseData, LanguageUsed } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'language-used',
@@ -45,18 +45,13 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const languageUsed: LanguageUsed | undefined = req.body?.languageUsed;
+    const response = buildDraftDefendantResponse(req);
 
-    if (!languageUsed) {
-      return;
+    if (languageUsed) {
+      response.defendantResponses = { ...response.defendantResponses, languageUsed };
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        languageUsed,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: req => {
     const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);

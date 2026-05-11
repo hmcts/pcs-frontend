@@ -1,37 +1,12 @@
 import type { Request } from 'express';
 
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
-
-function mapRepaymentsAgreedToCcdValue(repaymentsAgreed: string | undefined): 'YES' | 'NO' | 'NOT_SURE' {
-  if (repaymentsAgreed === 'yes') {
-    return 'YES';
-  }
-  if (repaymentsAgreed === 'no') {
-    return 'NO';
-  }
-  return 'NOT_SURE';
-}
-
-function mapCcdRepaymentPlanToFormValue(
-  repaymentPlanAgreed: 'YES' | 'NO' | 'NOT_SURE' | null | undefined
-): 'yes' | 'no' | 'imNotSure' | undefined {
-  if (repaymentPlanAgreed === 'YES') {
-    return 'yes';
-  }
-  if (repaymentPlanAgreed === 'NO') {
-    return 'no';
-  }
-  if (repaymentPlanAgreed === 'NOT_SURE') {
-    return 'imNotSure';
-  }
-  return undefined;
-}
 
 export const step: StepDefinition = createFormStep({
   stepName: 'repayments-agreed',
@@ -41,33 +16,31 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/repaymentsAgreed.njk`,
   beforeRedirect: async req => {
-    const repaymentsForm = req.body as Record<string, unknown>;
-    const repaymentsAgreed = repaymentsForm.repaymentsAgreed as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
+    const repaymentsAgreed = req.body?.repaymentsAgreed as string | undefined;
+    const enumValue = toYesNoNotSureEnum(repaymentsAgreed);
 
-    if (!repaymentsForm) {
-      return;
+    if (enumValue) {
+      response.defendantResponses.paymentAgreement.repaymentPlanAgreed = enumValue;
+
+      if (repaymentsAgreed === 'yes') {
+        response.defendantResponses.paymentAgreement.repaymentAgreedDetails = req.body?.[
+          'repaymentsAgreed.repaymentsAgreedDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.paymentAgreement.repaymentAgreedDetails;
+      }
+    } else {
+      delete response.defendantResponses.paymentAgreement.repaymentPlanAgreed;
+      delete response.defendantResponses.paymentAgreement.repaymentAgreedDetails;
     }
-    const existingRepaymentDetails =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
-        ?.repaymentAgreedDetails;
 
-    let repaymentAgreedDetails: string | undefined;
-    if (repaymentsAgreed === 'yes') {
-      repaymentAgreedDetails = repaymentsForm['repaymentsAgreed.repaymentsAgreedDetails'] as string | undefined;
-    } else if (existingRepaymentDetails) {
-      repaymentAgreedDetails = '';
-    }
+    await saveDraftDefendantResponse(
+      req,
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        paymentAgreement: {
-          repaymentPlanAgreed: mapRepaymentsAgreedToCcdValue(repaymentsAgreed),
-          repaymentAgreedDetails,
-        },
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -77,29 +50,28 @@ export const step: StepDefinition = createFormStep({
     question: 'question',
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data as
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const pcr = caseData?.possessionClaimResponse as
       | {
-          possessionClaimResponse?: {
-            defendantResponses?: {
-              paymentAgreement?: {
-                repaymentPlanAgreed?: 'YES' | 'NO' | 'NOT_SURE' | null;
-                repaymentAgreedDetails?: string;
-              };
-            };
+          defendantResponses?: {
             paymentAgreement?: {
               repaymentPlanAgreed?: 'YES' | 'NO' | 'NOT_SURE' | null;
               repaymentAgreedDetails?: string;
             };
           };
+          paymentAgreement?: {
+            repaymentPlanAgreed?: 'YES' | 'NO' | 'NOT_SURE' | null;
+            repaymentAgreedDetails?: string;
+          };
         }
       | undefined;
-
-    const pcr = caseData?.possessionClaimResponse;
+    // Defensive read: prefer nested defendantResponses.paymentAgreement (current shape),
+    // fall back to flat pcr.paymentAgreement for legacy cases that may pre-date the move.
     const paymentAgreement = pcr?.defendantResponses?.paymentAgreement ?? pcr?.paymentAgreement;
     const repaymentPlanAgreed = paymentAgreement?.repaymentPlanAgreed;
     const repaymentAgreedDetails = paymentAgreement?.repaymentAgreedDetails;
 
-    const formValue = mapCcdRepaymentPlanToFormValue(repaymentPlanAgreed);
+    const formValue = fromYesNoNotSureEnum(repaymentPlanAgreed);
 
     if (formValue === undefined) {
       return {};
@@ -132,8 +104,9 @@ export const step: StepDefinition = createFormStep({
       name: 'repaymentsAgreed',
       type: 'radio',
       required: true,
+      isPageHeading: true,
       translationKey: { label: 'question' },
-      legendClasses: 'govuk-fieldset__legend--m',
+      legendClasses: 'govuk-fieldset__legend--l',
       options: [
         {
           value: 'yes',
@@ -153,7 +126,7 @@ export const step: StepDefinition = createFormStep({
         },
         { value: 'no', translationKey: 'options.no' },
         { divider: 'options.or' },
-        { value: 'imNotSure', translationKey: 'options.imNotSure' },
+        { value: 'notSure', translationKey: 'options.imNotSure' },
       ],
     },
   ],

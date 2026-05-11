@@ -1,11 +1,10 @@
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils/yesNoEnum';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'income-and-expenses',
@@ -23,19 +22,22 @@ export const step: StepDefinition = createFormStep({
   },
 
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+
     const provideFinanceDetails = req.body?.provideFinanceDetails as 'yes' | 'no' | undefined;
-    if (!provideFinanceDetails) {
-      return;
+
+    if (provideFinanceDetails === 'yes' || provideFinanceDetails === 'no') {
+      response.defendantResponses.householdCircumstances.shareIncomeExpenseDetails = toYesNoEnum(provideFinanceDetails);
+    } else {
+      delete response.defendantResponses.householdCircumstances.shareIncomeExpenseDetails;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          shareIncomeExpenseDetails: toYesNoEnum(provideFinanceDetails),
-        },
-      },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(
+      req,
+
+      response
+    );
   },
 
   translationKeys: {

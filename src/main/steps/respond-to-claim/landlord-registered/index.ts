@@ -1,10 +1,12 @@
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import type { Request } from 'express';
+
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
+import type { YesNoNotSureValue } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'landlord-registered';
 
@@ -20,7 +22,7 @@ export const step: StepDefinition = createFormStep({
     question: 'question',
     publicRegisterLinkText: 'publicRegisterLinkText',
     introText: 'introText',
-    heading: 'heading'
+    heading: 'heading',
   },
   fields: [
     {
@@ -39,30 +41,23 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
-  getInitialFormData: req => {
-    const landlordRegistered = req.res?.locals?.validatedCase?.defendantResponses?.landlordRegistered;
-    if (landlordRegistered === 'YES' || landlordRegistered === 'NO' || landlordRegistered === 'NOT_SURE') {
-      return { landlordRegistered };
-    }
-
-    return {};
-  },
-  beforeRedirect: async req => {
+  beforeRedirect: async (req: Request) => {
+    const response = buildDraftDefendantResponse(req);
     const landlordRegistered: YesNoNotSureValue | undefined = req.body?.landlordRegistered;
 
-    if (!landlordRegistered) {
-      return;
+    if (landlordRegistered) {
+      response.defendantResponses.landlordRegistered = landlordRegistered;
+    } else {
+      delete response.defendantResponses.landlordRegistered;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        landlordRegistered,
-      },
-    };
+    await saveDraftDefendantResponse(
+      req,
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
-    extendGetContent: req => {
+  extendGetContent: req => {
     const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
     const t = getTranslationFunction(req, 'landlord-registered', ['common']);
 

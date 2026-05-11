@@ -2,30 +2,16 @@ import type { Request } from 'express';
 
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 // Validation constants
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
 const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 decimal places
-
-// Backend enum mappings
-const BACKEND_CONFIRMATION = {
-  YES: 'YES',
-  NO: 'NO',
-  NOT_SURE: 'NOT_SURE',
-} as const;
-
-// Frontend form values
-const FORM_VALUES = {
-  YES: 'yes',
-  NO: 'no',
-  NOT_SURE: 'notSure',
-} as const;
 
 export const step: StepDefinition = createFormStep({
   stepName: 'rent-arrears-dispute',
@@ -39,73 +25,51 @@ export const step: StepDefinition = createFormStep({
     caption: 'captionHeading',
   },
   beforeRedirect: async req => {
-    const rentArrears = req.body?.rentArrears as 'yes' | 'no' | 'notSure' | undefined;
-    const amountRaw = req.body?.['rentArrears.rentArrearsAmountCorrection'] as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    const rentArrears = req.body?.rentArrears as string | undefined;
+    const enumValue = toYesNoNotSureEnum(rentArrears);
 
-    if (!rentArrears) {
-      return;
-    }
+    if (enumValue) {
+      response.defendantResponses.rentArrearsAmountConfirmation = enumValue;
 
-    const result: Record<string, unknown> = {};
-
-    // Map frontend radio value to backend enum
-    if (rentArrears === FORM_VALUES.YES) {
-      result.rentArrearsAmountConfirmation = BACKEND_CONFIRMATION.YES;
-    } else if (rentArrears === FORM_VALUES.NO) {
-      result.rentArrearsAmountConfirmation = BACKEND_CONFIRMATION.NO;
-      // Convert pounds to pence (backend stores as pence string via MoneyGBP serializer)
-      if (amountRaw) {
-        const normalized = amountRaw.replace(/,/g, ''); // Remove comma separators
-        const amountInPounds = parseFloat(normalized);
-        if (!Number.isNaN(amountInPounds)) {
-          result.rentArrearsAmount = String(Math.round(amountInPounds * 100));
+      if (rentArrears === 'no') {
+        const amountInPence = poundsToPence(
+          req.body?.['rentArrears.rentArrearsAmountCorrection'] as string | undefined
+        );
+        if (amountInPence !== undefined) {
+          response.defendantResponses.rentArrearsAmount = amountInPence;
         }
+      } else {
+        delete response.defendantResponses.rentArrearsAmount;
       }
-    } else if (rentArrears === FORM_VALUES.NOT_SURE) {
-      result.rentArrearsAmountConfirmation = BACKEND_CONFIRMATION.NOT_SURE;
+    } else {
+      delete response.defendantResponses.rentArrearsAmountConfirmation;
+      delete response.defendantResponses.rentArrearsAmount;
     }
 
-    if (Object.keys(result).length === 0) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: result,
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const response = caseData?.possessionClaimResponse?.defendantResponses;
+    const formValue = fromYesNoNotSureEnum(response?.rentArrearsAmountConfirmation);
 
-    if (!response?.rentArrearsAmountConfirmation) {
+    if (!formValue) {
       return {};
     }
 
-    const formData: Record<string, unknown> = {};
+    const formData: Record<string, unknown> = { rentArrears: formValue };
 
-    // Map backend enum to frontend radio value
-    if (response.rentArrearsAmountConfirmation === BACKEND_CONFIRMATION.YES) {
-      formData.rentArrears = FORM_VALUES.YES;
-    } else if (response.rentArrearsAmountConfirmation === BACKEND_CONFIRMATION.NO) {
-      formData.rentArrears = FORM_VALUES.NO;
-      // Prepopulate the amount if it exists (convert pence to pounds)
-      // Use dotted notation for subField, matching defendant-name-confirmation pattern
-      if (response.rentArrearsAmount) {
-        const amountInPence = parseFloat(response.rentArrearsAmount as string);
-        const amountInPounds = amountInPence / 100;
-        formData['rentArrears.rentArrearsAmountCorrection'] = amountInPounds.toFixed(2);
-      }
-    } else if (response.rentArrearsAmountConfirmation === BACKEND_CONFIRMATION.NOT_SURE) {
-      formData.rentArrears = FORM_VALUES.NOT_SURE;
+    if (formValue === 'no' && response?.rentArrearsAmount) {
+      // dotted notation matches subField rendering pattern
+      formData['rentArrears.rentArrearsAmountCorrection'] = penceToPounds(response.rentArrearsAmount as string);
     }
 
     return formData;
   },
   extendGetContent: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
-    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
+    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
     const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
     const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
     const rentArrearsAmount = currency(amountInPounds);

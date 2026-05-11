@@ -39,11 +39,19 @@ import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { CaseState } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
+import type { DashboardNotification, DashboardTaskGroup } from '@services/dashboard.interface';
+import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
 
 const logger = Logger.getLogger('ccdCaseService');
 
 interface EventTokenResponse {
   token: string;
+}
+
+export interface TransformedDashboardData {
+  notifications: DashboardNotification[];
+  taskGroups: DashboardTaskGroup[];
+  propertyAddress: string | undefined;
 }
 
 function getBaseUrl(): string {
@@ -315,7 +323,8 @@ export const ccdCaseService = {
     }
   },
 
-  async updateDraftRespondToClaim(
+  async updateDraft(
+    draftEvent: { id: string; pageId: string },
     accessToken: string | undefined,
     caseId: string,
     data: Record<string, unknown>
@@ -324,16 +333,14 @@ export const ccdCaseService = {
       throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
     }
 
-    const eventId = 'respondPossessionClaim';
-    const pageId = 'respondToPossessionDraftSavePage';
-    const ccdPageId = `${eventId}${pageId}`;
+    const ccdPageId = `${draftEvent.id}${draftEvent.pageId}`;
     const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/validate?pageId=${ccdPageId}`;
 
     const payload = {
       event: {
-        id: eventId,
-        summary: `Citizen ${eventId} draft save summary`,
-        description: `Citizen ${eventId} draft save description`,
+        id: draftEvent.id,
+        summary: `Citizen ${draftEvent.id} draft save summary`,
+        description: `Citizen ${draftEvent.id} draft save description`,
       },
       case_reference: caseId,
       event_data: data,
@@ -347,7 +354,26 @@ export const ccdCaseService = {
         data: response.data?.data ?? {},
       };
     } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'save draft response to claim');
+      throw convertAxiosErrorToHttpError(error, `save draft ${draftEvent.id}`);
+    }
+  },
+
+  async getDashboardView(accessToken: string, caseId: string): Promise<TransformedDashboardData> {
+    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/dashboardView?ignore-warning=false`;
+    try {
+      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
+      const raw = response.data.case_details?.case_data?.dashboardData ?? {};
+
+      const notifications = unwrapNotifications(raw.notifications);
+      const taskGroups = unwrapTaskGroups(raw.taskGroups);
+
+      return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress) };
+    } catch (error) {
+      const httpError = convertAxiosErrorToHttpError(error, 'getDashboardView');
+      if (httpError.status === 400 || httpError.status === 404) {
+        throw new HTTPError('Case not found', 404);
+      }
+      throw httpError;
     }
   },
 };

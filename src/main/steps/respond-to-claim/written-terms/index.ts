@@ -1,12 +1,12 @@
 import type { Request } from 'express';
 
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
+import type { YesNoNotSureValue } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'written-terms';
 
@@ -21,7 +21,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     introText: 'introText',
     heading: 'heading',
-    termsQuestion: 'termsQuestion'
+    termsQuestion: 'termsQuestion',
   },
   fields: [
     {
@@ -46,19 +46,20 @@ export const step: StepDefinition = createFormStep({
     return { writtenTerms };
   },
   beforeRedirect: async (req: Request) => {
+    const response = buildDraftDefendantResponse(req);
     const writtenTerms: YesNoNotSureValue | undefined = req.body?.writtenTerms;
 
-    if (!writtenTerms) {
-      return;
+    if (writtenTerms) {
+      response.defendantResponses.writtenTerms = writtenTerms;
+    } else {
+      delete response.defendantResponses.writtenTerms;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        writtenTerms,
-      },
-    };
+    await saveDraftDefendantResponse(
+      req,
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
   extendGetContent: req => {
     const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
