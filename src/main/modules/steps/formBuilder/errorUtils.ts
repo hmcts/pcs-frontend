@@ -142,7 +142,7 @@ export async function renderWithErrors(
   showCancelButton?: boolean
 ): Promise<void> {
   const lang = getRequestLanguage(req);
-  const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+  const t: TFunction = getTranslationFunction(req);
 
   const navigationBackUrl = await navigation.getBackUrl(req, stepName);
   const backUrl = typeof formContent.backUrl === 'string' ? formContent.backUrl : navigationBackUrl;

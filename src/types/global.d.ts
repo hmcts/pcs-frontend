@@ -7,6 +7,7 @@ import { S2S } from '../main/modules/s2s';
 import { OIDCModule } from '../main/modules/oidc';
 import { type TFunction } from 'i18next';
 import { type CcdCaseModel } from '@services/ccdCaseData.model';
+import { type StepContext } from '../main/modules/steps/stepContext';
 
 export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
@@ -44,6 +45,7 @@ declare module 'express' {
       validatedCase?: CcdCaseModel;
       t?: TFunction;
       lang?: string;
+      step?: StepContext;
     } & Record<string, unknown>;
     csrfToken?: () => string;
   }

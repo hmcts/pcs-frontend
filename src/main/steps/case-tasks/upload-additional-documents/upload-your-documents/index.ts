@@ -19,13 +19,7 @@ export const step: StepDefinition = {
   view: templatePath,
   stepDir: __dirname,
   getController: () =>
-    createGetController(
-      templatePath,
-      stepName,
-      stepNavigation,
-      (req: Request) => ({
-        dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-      }),
-      'uploadAdditionalDocuments'
-    ),
+    createGetController(templatePath, stepName, stepNavigation, (req: Request) => ({
+      dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+    })),
 };

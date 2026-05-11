@@ -19,17 +19,11 @@ export const step: StepDefinition = {
   view: templatePath,
   stepDir: __dirname,
   getController: () =>
-    createGetController(
-      templatePath,
-      stepName,
-      stepNavigation,
-      (req: Request) => ({
-        backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/dashboard',
-        dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-        url: req.originalUrl || '',
-      }),
-      journeyName
-    ),
+    createGetController(templatePath, stepName, stepNavigation, (req: Request) => ({
+      backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/dashboard',
+      dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+      url: req.originalUrl || '',
+    })),
   postController: {
     post: async (req: Request, res: Response) => {
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
