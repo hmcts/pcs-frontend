@@ -1,18 +1,15 @@
 import type { Request } from 'express';
 
-import { createFormStep } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-agreed',
-  journeyFolder: 'respondToClaim',
   showCancelButton: false,
   stepDir: __dirname,
-  flowConfig,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};

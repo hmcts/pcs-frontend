@@ -2,9 +2,8 @@ import { AMOUNT_FORMAT_REGEX } from '../../../constants/validation';
 import type { FrequencyValue } from '../../../services/ccdCase.interface';
 import { ccdPenceToPoundsString, getValidatedCaseHouseholdCircumstances, poundsStringToPence } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const MAX_AMOUNT = 1_000_000_000;
@@ -42,11 +41,9 @@ const validateMoney =
     return true;
   };
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'priority-debt-details',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   beforeRedirect: async req => {
     const total = req.body?.priorityDebtTotal as string | undefined;
     const contribution = req.body?.priorityDebtContribution as string | undefined;

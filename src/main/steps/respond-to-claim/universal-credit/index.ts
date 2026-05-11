@@ -7,16 +7,13 @@ import {
   toYesNoEnum,
 } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'have-you-applied-for-universal-credit',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   beforeRedirect: async req => {
     const selection = req.body?.haveAppliedForUniversalCredit as string | undefined;
     const response = buildDraftDefendantResponse(req);

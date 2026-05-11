@@ -1,15 +1,12 @@
 import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'priority-debts',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   beforeRedirect: async req => {
     const selection = req.body?.havePriorityDebts as string | undefined;
     if (selection !== 'yes' && selection !== 'no') {

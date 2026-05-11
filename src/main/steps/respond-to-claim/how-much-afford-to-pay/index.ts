@@ -1,15 +1,12 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'how-much-afford-to-pay',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};

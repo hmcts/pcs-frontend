@@ -4,10 +4,9 @@ import { HTTPError } from '../../../HttpError';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { getUserToken } from '../../utils/userRole';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../draftEvent';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/storage';
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -44,12 +43,10 @@ const storage: DocumentStorage = {
   },
 };
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'upload-document',
-  journeyFolder: 'respondToClaim',
   documentStorage: storage,
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/uploadDocument.njk`,
   fields: [
     {
