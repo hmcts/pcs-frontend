@@ -9,6 +9,9 @@ import { step as contactPreferencesTelephone } from './contact-preferences-telep
 import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
+import { step as counterClaimFee } from './counter-claim-fee';
+import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
+import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
 import { step as yourCircumstances } from './current-circumstances';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
@@ -40,11 +43,12 @@ import { step as repaymentsMade } from './repayments-made';
 import { step as selectDefendant } from './select-defendant';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
+import { step as supportNeeds } from './support-needs';
 import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
 import { step as haveYouAppliedForUniversalCredit } from './universal-credit';
-import { step as uploadDocs } from './upload-docs';
+import { step as uploadDocument } from './upload-document';
 import { step as writtenTerms } from './written-terms';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -73,7 +77,12 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'confirmation-of-notice-date-when-not-provided': confirmationOfNoticeDateNotProvided,
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
+  'upload-document': uploadDocument,
+  'support-needs': supportNeeds,
   'counter-claim': counterClaim,
+  'counter-claim-what-are-you-claiming-for': counterClaimWhatAreYouClaimingFor,
+  'counter-claim-specific-sum': counterClaimSpecificSum,
+  'counter-claim-fee': counterClaimFee,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
@@ -94,7 +103,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'priority-debt-details': priorityDebtDetails,
   'what-other-regular-expenses-do-you-have': regularExpenses,
   'other-considerations': otherConsiderations,
-  'upload-docs': uploadDocs,
   'equality-and-diversity-start': equalityAndDiversityStart,
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,

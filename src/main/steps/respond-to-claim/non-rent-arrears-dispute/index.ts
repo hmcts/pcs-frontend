@@ -2,11 +2,10 @@ import type { Request } from 'express';
 
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'non-rent-arrears-dispute',
@@ -18,32 +17,31 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     caption: 'caption',
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const disputeOtherParts = req.body?.disputeOtherParts as 'yes' | 'no' | undefined;
-    const disputeDetailsRaw = req.body?.['disputeOtherParts.disputeDetails'] as string | undefined;
 
-    if (!disputeOtherParts) {
-      return;
-    }
+    if (disputeOtherParts === 'yes' || disputeOtherParts === 'no') {
+      response.defendantResponses.disputeClaim = toYesNoEnum(disputeOtherParts);
 
-    const result: Record<string, unknown> = {
-      disputeClaim: toYesNoEnum(disputeOtherParts),
-    };
-
-    // Add dispute details if user selected 'yes' and provided details
-    if (disputeOtherParts === 'yes' && disputeDetailsRaw) {
-      const trimmed = disputeDetailsRaw.trim();
-      if (trimmed) {
-        result.disputeClaimDetails = trimmed;
+      if (disputeOtherParts === 'yes') {
+        const disputeDetailsRaw = req.body?.['disputeOtherParts.disputeDetails'] as string | undefined;
+        const trimmed = disputeDetailsRaw?.trim();
+        if (trimmed) {
+          response.defendantResponses.disputeClaimDetails = trimmed;
+        }
+      } else {
+        delete response.defendantResponses.disputeClaimDetails;
       }
-    } else if (disputeOtherParts === 'no') {
-      result.disputeClaimDetails = '';
+    } else {
+      delete response.defendantResponses.disputeClaim;
+      delete response.defendantResponses.disputeClaimDetails;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: result,
-    };
+    await saveDraftDefendantResponse(
+      req,
 
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;

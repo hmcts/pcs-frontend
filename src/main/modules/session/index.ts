@@ -47,7 +47,7 @@ export class Session {
       saveUninitialized: false,
       rolling: true,
       cookie: {
-        sameSite: secure ? 'strict' : 'lax',
+        sameSite: 'lax',
         secure,
         maxAge: sessionTimeoutMinutes * 60 * 1000,
       },

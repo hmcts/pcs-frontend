@@ -473,7 +473,7 @@ export const submitCaseApiData = {
       tenancy_TenancyLicenceDate: null,
       tenancy_TenancyLicenceDocuments: [],
       secureOrFlexibleDiscretionaryGrounds: ['DOMESTIC_VIOLENCE'],
-      secureOrFlexibleMandatoryGrounds: [],
+      secureAntisocialAdditionalGrounds: [],
       secureOrFlexibleMandatoryGroundsAlt: [],
       secureOrFlexibleDiscretionaryGroundsAlt: [],
       domesticViolenceGround: 'Domestic violence test',
@@ -644,10 +644,31 @@ export const submitCaseApiData = {
       isCorrectClaimantContactAddress: 'YES',
       claimantProvidePhoneNumber: 'NO',
       defendant1: {
-        nameKnown: 'NO',
-        addressKnown: 'NO',
+        nameKnown: 'YES',
+        addressKnown: 'YES',
+        addressSameAsPossession: 'YES',
+        firstName: 'John',
+        lastName: 'Doe',
       },
-      addAnotherDefendant: 'NO',
+      addAnotherDefendant: 'YES',
+      additionalDefendants: [
+        {
+          value: {
+            nameKnown: 'NO',
+            addressKnown: 'NO',
+            addressSameAsPossession: 'NO',
+          },
+          id: null,
+        },
+        {
+          value: {
+            nameKnown: 'NO',
+            addressKnown: 'NO',
+            addressSameAsPossession: 'NO',
+          },
+          id: null,
+        },
+      ],
       tenancy_TypeOfTenancyLicence: 'OTHER',
       tenancy_DetailsOfOtherTypeOfTenancyLicence: 'Other tenancy - short term',
       tenancy_TenancyLicenceDate: null,

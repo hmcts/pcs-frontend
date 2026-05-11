@@ -240,10 +240,12 @@ describe('ccdCaseService', () => {
   });
 
   describe('updateCase', () => {
-    it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
+    const draftEvent = { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' };
 
-      await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(
+    it('throws HTTPError if case id is missing', async () => {
+      await expect(ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
+
+      await expect(ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })).rejects.toThrow(
         'Cannot UPDATE draft, Case Id not specified'
       );
     });
@@ -451,13 +453,15 @@ describe('ccdCaseService', () => {
 });
 
 describe('updateCase', () => {
+  const draftEvent = { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' };
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should throw HTTPError if case id is missing', async () => {
-    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
-    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, '', { data: {} })).rejects.toThrow(
+    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
+    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })).rejects.toThrow(
       'Cannot UPDATE draft, Case Id not specified'
     );
   });
@@ -470,7 +474,7 @@ describe('updateCase', () => {
       data: { data: mockData, _links: { self: { href: 'self' } } },
     });
 
-    const result = await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, mockData);
+    const result = await ccdCaseService.updateDraft(draftEvent, accessToken, caseId, mockData);
 
     expect(mockPost).toHaveBeenCalledWith(
       `${mockUrl}/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,
@@ -503,11 +507,11 @@ describe('updateCase', () => {
       message: 'Server exploded',
     });
 
-    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
+    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
       HTTPError
     );
 
-    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
+    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
       'CCD case service error'
     );
   });
@@ -523,7 +527,7 @@ describe('updateCase', () => {
       message: 'Unprocessable Entity',
     });
 
-    await expect(ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
+    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
       'CCD callback rejected request: Invalid submission: immutable field nameKnown'
     );
   });
@@ -540,7 +544,7 @@ describe('updateCase', () => {
       selectedPartyId: 'abc',
     };
 
-    const result = await ccdCaseService.updateDraftRespondToClaim(accessToken, caseId, mockData, clientContextHeaders);
+    const result = await ccdCaseService.updateDraft(draftEvent, accessToken, caseId, mockData, clientContextHeaders);
 
     expect(mockPost).toHaveBeenCalledWith(
       `${mockUrl}/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,

@@ -1,8 +1,7 @@
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'contact-preferences-telephone',
@@ -71,56 +70,46 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
+
   getInitialFormData: req => {
-    const validatedCase = req.res?.locals?.validatedCase;
-    const contactByPhone = validatedCase?.defendantResponsesContactByPhone;
-    const phoneNumber = validatedCase?.defendantContactDetailsPartyPhoneNumber;
+    const caseData = req.res?.locals?.validatedCase?.possessionClaimResponse;
+    const contactByPhone = caseData?.defendantResponses?.contactByPhone as string | undefined;
+    const phoneNumber = caseData?.defendantContactDetails?.party?.phoneNumber as string | undefined;
+
+    const result: Record<string, unknown> = {};
 
     if (contactByPhone === 'YES') {
-      return {
-        contactByTelephone: 'yes',
-        ...(phoneNumber ? { 'contactByTelephone.phoneNumber': phoneNumber } : {}),
-      };
+      result.contactByTelephone = 'yes';
+      if (phoneNumber) {
+        result['contactByTelephone.phoneNumber'] = phoneNumber;
+      }
+    } else if (contactByPhone === 'NO') {
+      result.contactByTelephone = 'no';
     }
 
-    if (contactByPhone === 'NO') {
-      return {
-        contactByTelephone: 'no',
-      };
-    }
-
-    return {};
+    return result;
   },
 
   beforeRedirect: async req => {
-    const telephoneForm = req.body as Record<string, unknown>;
-    const contactByTelephone = telephoneForm.contactByTelephone as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    const contactByTelephone = req.body?.contactByTelephone as 'yes' | 'no' | undefined;
 
-    if (!contactByTelephone) {
-      return;
+    if (contactByTelephone === 'yes') {
+      response.defendantResponses.contactByPhone = 'YES';
+      const phoneNumber = (req.body?.['contactByTelephone.phoneNumber'] as string | undefined)?.trim();
+      if (phoneNumber) {
+        response.defendantContactDetails.party.phoneNumber = phoneNumber;
+      } else {
+        delete response.defendantContactDetails.party.phoneNumber;
+      }
+    } else if (contactByTelephone === 'no') {
+      response.defendantResponses.contactByPhone = 'NO';
+      delete response.defendantContactDetails.party.phoneNumber;
+    } else {
+      delete response.defendantResponses.contactByPhone;
+      delete response.defendantContactDetails.party.phoneNumber;
     }
 
-    const existingPhoneNumber = req.res?.locals?.validatedCase?.defendantContactDetailsPartyPhoneNumber as
-      | string
-      | undefined;
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantContactDetails: {
-        party: {
-          phoneNumberProvided: contactByTelephone === 'yes' ? 'YES' : 'NO',
-          phoneNumber:
-            contactByTelephone === 'yes'
-              ? (telephoneForm['contactByTelephone.phoneNumber'] as string | undefined)
-              : existingPhoneNumber
-                ? ''
-                : undefined,
-        },
-      },
-      defendantResponses: {
-        contactByPhone: contactByTelephone === 'yes' ? 'YES' : 'NO',
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });

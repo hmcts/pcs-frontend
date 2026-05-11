@@ -1,13 +1,8 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type {
-  CaseData,
-  HouseholdCircumstances,
-  PossessionClaimResponse,
-  YesNoValue,
-} from '@services/ccdCase.interface';
+import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-you-have-any-dependant-children',
@@ -20,34 +15,32 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     paragraph: 'dependantChildrenParagraph',
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const dependantChildren: string = req.body?.dependantChildren;
-
-    if (!dependantChildren) {
-      return;
-    }
-
-    const enumMapping: Record<string, YesNoValue> = {
-      yes: 'YES',
-      no: 'NO',
-    };
-
+    const enumMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
     const dependantChildrenCcd = enumMapping[dependantChildren];
-    if (!dependantChildrenCcd) {
-      return;
+
+    if (dependantChildrenCcd) {
+      response.defendantResponses.householdCircumstances.dependantChildren = dependantChildrenCcd;
+
+      if (dependantChildren === 'yes') {
+        response.defendantResponses.householdCircumstances.dependantChildrenDetails = req.body?.[
+          'dependantChildren.dependantChildrenDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.householdCircumstances.dependantChildrenDetails;
+      }
+    } else {
+      delete response.defendantResponses.householdCircumstances.dependantChildren;
+      delete response.defendantResponses.householdCircumstances.dependantChildrenDetails;
     }
 
-    const dependantChildrenDetails: string | undefined =
-      dependantChildrenCcd === 'YES' ? req.body?.['dependantChildren.dependantChildrenDetails'] : undefined;
+    await saveDraftDefendantResponse(
+      req,
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          dependantChildren: dependantChildrenCcd,
-          dependantChildrenDetails: dependantChildrenDetails ?? '',
-        },
-      },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
   getInitialFormData: req => {
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;

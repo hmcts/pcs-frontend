@@ -6,18 +6,20 @@ export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
 export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
-export { isFromIncomeAndExpenditure } from './isFromIncomeAndExpenditure';
 export { isFinanceDetailsProvided } from './isFinanceDetailsProvided';
 export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
-export { getPreviousPageForArrears } from './journeyHelpers';
-export { getStepBeforeDisputePages } from './journeyHelpers';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
-export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
-export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
-export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
+export {
+  LEGAL_REPRESENTATIVE_USER_ROLES,
+  getUserRoles,
+  getUserToken,
+  getUserType,
+  isLegalRepresentativeUser,
+} from './userRole';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
-export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
+export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
+export { hasMadeCounterClaim } from './hasMadeCounterClaim';
 export { isSingleLinkedDefendant } from './isSingleLinkedDefendant';

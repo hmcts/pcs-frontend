@@ -25,8 +25,11 @@ interface CustomSessionData extends SessionData {
   returnTo?: string;
   formData?: Record<string, any>;
   ccdCase?: CcdCase;
+  genApp?: {
+    applicationId?: string;
+    showDuplicateSubmissionPage?: boolean;
+  };
   destroy(callback: (err?: Error) => void): void;
-  returnTo?: string;
   clientContext?: ClientContextHeaders;
 }
 
