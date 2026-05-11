@@ -30,5 +30,5 @@ export const dashboard = {
   viewHearingDocumentsLink: `View hearing documents`,
   ordersNoticesFromCourtSubHeader: `Orders and notices from the court`,
   viewOrdersAndNoticesLink: `View orders and notices`,
-  contactUsForHelpLink: 'Contact us for help',
+  contactUsForHelpLink: `Contact us for help`,
 };
