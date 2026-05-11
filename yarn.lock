@@ -4064,12 +4064,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.19.17":
-  version: 22.19.17
-  resolution: "@types/node@npm:22.19.17"
+"@types/node@npm:22.19.18":
+  version: 22.19.18
+  resolution: "@types/node@npm:22.19.18"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/8adcf9c2e9e7c524196efdd5ee60ebeda980b4ec9b5b8650e2341a2cabe46d368f3a4e4c0050b3bf26eb9cf383453ea2193ec5604079cdf9493a11a742f62018
+  checksum: 10/464dbc4fb223f7b9d031e377e1207462c57271702e5ca73e3333cdabdbdc73b20ec5d07331ddd7c736ad69c83028c9d7ec6493eda8f7543b36bfe749a68849bf
   languageName: node
   linkType: hard
 
@@ -11953,7 +11953,7 @@ __metadata:
     "@types/lodash": "npm:4.17.24"
     "@types/luxon": "npm:3.7.1"
     "@types/multer": "npm:^2.1.0"
-    "@types/node": "npm:22.19.17"
+    "@types/node": "npm:22.19.18"
     "@types/nunjucks": "npm:3.2.6"
     "@types/serve-favicon": "npm:2.5.7"
     "@types/totp-generator": "npm:0.0.8"
