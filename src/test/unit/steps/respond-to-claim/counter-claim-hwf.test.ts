@@ -3,8 +3,10 @@ jest.mock('../../../../main/modules/steps', () => ({
 }));
 
 const mockSaveDraftDefendantResponse = jest.fn();
+const mockBuildDraftDefendantResponse = jest.fn(() => ({ defendantResponses: { makeCounterClaim: 'YES' } }));
 jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
+  buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
 }));
 
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-have-you-already-applied-for-help-with-your-fees';
@@ -52,6 +54,7 @@ describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-
 
       expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(req, {
         defendantResponses: {
+          makeCounterClaim: 'YES',
           counterClaim: {
             appliedForHwf: 'YES',
             hwfReferenceNumber: 'HWF-A1B-23C',
@@ -60,7 +63,7 @@ describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-
       });
     });
 
-    it('saves NO with empty HWF reference number', async () => {
+    it('saves NO without HWF reference number', async () => {
       const req = {
         body: {
           alreadyAppliedForHelp: 'no',
@@ -71,9 +74,9 @@ describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-
 
       expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(req, {
         defendantResponses: {
+          makeCounterClaim: 'YES',
           counterClaim: {
             appliedForHwf: 'NO',
-            hwfReferenceNumber: '',
           },
         },
       });

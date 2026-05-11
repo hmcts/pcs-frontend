@@ -17,6 +17,11 @@ export function normaliseCounterClaim(response: PossessionClaimResponse): void {
     return;
   }
 
+  // HWF not applied for → reference number is stale
+  if (cc.appliedForHwf !== 'YES') {
+    delete cc.hwfReferenceNumber;
+  }
+
   // Counterclaim isn't a money/payment claim → counter-claim-specific-sum is skipped
   if (cc.claimType !== 'PAYMENT_OR_COMPENSATION' && cc.claimType !== 'BOTH') {
     delete cc.isClaimAmountKnown;
