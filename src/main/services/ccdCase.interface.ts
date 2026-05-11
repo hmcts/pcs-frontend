@@ -3,10 +3,8 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
-export type ContactPreference = 'EMAIL' | 'POST' | null;
 export enum YesNoEnum {
   YES = 'YES',
   NO = 'NO',
@@ -75,7 +73,7 @@ export type PaymentAgreement = {
   repaymentPlanAgreed?: YesNoNotSureValue;
   repaymentAgreedDetails?: string;
   repayArrearsInstalments?: YesNoValue;
-  additionalRentContribution?: unknown;
+  additionalRentContribution?: PenceAmount;
   additionalContributionFrequency?: string;
 };
 
@@ -141,11 +139,31 @@ export interface CcdDefendantParty {
   address?: CcdCaseAddress | Record<string, never>;
   addressKnown?: string;
   addressSameAsProperty?: string;
-  phoneNumberProvided?: VerticalYesNoValue;
+  phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
 }
 
-/** Defendant responses (e.g. receivedFreeLegalAdvice). */
+/** CCD SDK Document type -- flat reference with URLs. */
+export interface CcdDocumentReference {
+  document_url: string;
+  document_binary_url: string;
+  document_filename: string;
+  document_hash?: string;
+  category_id?: string;
+}
+
+/** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
+export interface CcdUploadedDocument {
+  document: CcdDocumentReference;
+  contentType?: string;
+  sizeInBytes?: number;
+}
+
+export interface CcdCollectionItem<T> {
+  id?: string;
+  value: T;
+}
+
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
   tenancyTypeCorrect?: YesNoNotSureValue;
@@ -155,11 +173,10 @@ export interface CcdDefendantResponses {
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;
-  contactByPhone?: VerticalYesNoValue;
-  contactByEmail?: VerticalYesNoValue;
-  contactByPost?: VerticalYesNoValue;
-  contactByText?: VerticalYesNoValue;
-  preferenceType?: ContactPreference;
+  contactByPhone?: YesNoValue;
+  contactByEmail?: YesNoValue;
+  contactByPost?: YesNoValue;
+  contactByText?: YesNoValue;
   rentArrearsAmountConfirmation?: string;
   rentArrearsAmount?: string;
   landlordRegistered?: YesNoNotSureValue;
@@ -172,6 +189,8 @@ export interface CcdDefendantResponses {
   counterClaim?: CcdCounterClaim;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
+  defendantDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
+  counterClaimDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   languageUsed?: LanguageUsed;
   equalityAndDiversityQuestionsChoice?: EqualityAndDiversityQuestionsChoice;
   otherConsiderations?: YesNoValue;
@@ -212,12 +231,16 @@ export interface CcdCaseData {
   noticeServed?: string;
   propertyAddress?: CcdCaseAddress;
   claimGroundSummaries?: CcdClaimGroundSummaryItem[];
+  userPcqId?: string;
   userPcqIdSet?: string;
   tenancy_TenancyLicenceDate?: string;
   legislativeCountry?: string;
   notice_NoticeHandedOverDateTime?: string;
   notice_NoticePostedDate?: string;
+  notice_NoticeDeliveredDate?: string;
+  notice_NoticeEmailSentDateTime?: string;
   notice_NoticeOtherElectronicDateTime?: string;
+  notice_NoticeOtherDateTime?: string;
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
@@ -226,6 +249,9 @@ export interface CcdCaseData {
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
   citizenGenAppRequest?: CitizenGenAppRequest;
+  // Gen-apps applicant fields written at create-case time
+  applicantForename?: string;
+  applicantSurname?: string;
   dashboardData?: CcdDashboardData;
 }
 
@@ -268,11 +294,6 @@ export interface StartCallbackData {
   _links: CcdStartCallbackLinks;
   case_details: CcdCaseDetails;
   event_id: string;
-}
-
-export interface CcdCollectionItem<T> {
-  value: T;
-  id: string;
 }
 
 export interface CcdTemplateKeyValue {

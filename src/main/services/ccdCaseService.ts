@@ -174,7 +174,7 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseById(accessToken: string, caseId: string, eventId: string): Promise<CcdCase> {
+  async getCaseById(accessToken: string, caseId: string, eventId: string = 'respondPossessionClaim'): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
@@ -323,7 +323,8 @@ export const ccdCaseService = {
     }
   },
 
-  async updateDraftRespondToClaim(
+  async updateDraft(
+    draftEvent: { id: string; pageId: string },
     accessToken: string | undefined,
     caseId: string,
     data: Record<string, unknown>
@@ -332,16 +333,14 @@ export const ccdCaseService = {
       throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
     }
 
-    const eventId = 'respondPossessionClaim';
-    const pageId = 'respondToPossessionDraftSavePage';
-    const ccdPageId = `${eventId}${pageId}`;
+    const ccdPageId = `${draftEvent.id}${draftEvent.pageId}`;
     const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/validate?pageId=${ccdPageId}`;
 
     const payload = {
       event: {
-        id: eventId,
-        summary: `Citizen ${eventId} draft save summary`,
-        description: `Citizen ${eventId} draft save description`,
+        id: draftEvent.id,
+        summary: `Citizen ${draftEvent.id} draft save summary`,
+        description: `Citizen ${draftEvent.id} draft save description`,
       },
       case_reference: caseId,
       event_data: data,
@@ -355,7 +354,7 @@ export const ccdCaseService = {
         data: response.data?.data ?? {},
       };
     } catch (error) {
-      throw convertAxiosErrorToHttpError(error, 'save draft response to claim');
+      throw convertAxiosErrorToHttpError(error, `save draft ${draftEvent.id}`);
     }
   },
 
