@@ -26,7 +26,6 @@ export const step: StepDefinition = createFormStep({
       name: 'counterClaimNeedHelpWithFees',
       type: 'radio',
       required: true,
-      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--m',
       translationKey: {
         label: 'counterClaimFeeHeading2',

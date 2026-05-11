@@ -1,19 +1,19 @@
 {
   "pageTitle": "cyCounterclaim fee",
-  "counterClaimFeeCostParagraph":"cyBased on the information provided, it will cost {{counterClaimFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to make your counterclaim.",
+  "counterClaimFeeCostParagraph":"cyBased on the information provided, it will cost the defendant {{counterClaimFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to make their counterclaim.",
   "counterClaimFeeHeading": "cyHelp with court fees",
-  "counterClaimFeeHelpParagraph":"cyYou may be able to get help paying the fee if you (one or more of the following):",
+  "counterClaimFeeHelpParagraph":"cyThe defendant may be able to get help with paying the fee if they (one or more of the following):",
   "counterClaimFeeBulletBenefits":"cyare on certain benefits",
   "counterClaimFeeBulletLowSavings":"cyhave little or no savings",
   "counterClaimFeeBulletLowIncome":"cyhave low income",
-  "counterClaimFeeHeading2": "cyDo you need help paying the counterclaim fee?",
+  "counterClaimFeeHeading2": "cyDoes the defendant need help paying the counterclaim fee?",
   "counterClaimFeeOptions": {
-    "iNeedHelpWithPayingFee": "cyI need help paying the fee",
-    "iDoNotNeedHelpWithPayingFee": "cyI do not need help paying the fee"
+    "iNeedHelpWithPayingFee": "cyThe defendant needs help paying the fee",
+    "iDoNotNeedHelpWithPayingFee": "cyThe defendant does not need help paying the fee"
   },
   "errors": {
     "counterClaimFee": {
-      "required": "cySelect if you need help paying the counterclaim fee"
+      "required": "cySelect if the defendant needs help paying the counterclaim fee"
     }
   }
 }

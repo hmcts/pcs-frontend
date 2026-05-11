@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 
-import { FeeLookupParams, FeeType, getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+import { FeeLookupParams, FeeType, getCounterClaimFeeType, getFee, getFeeDirect } from '@services/feeLookupService';
 
 jest.mock('axios');
 jest.mock('config');
@@ -17,6 +17,15 @@ const STANDARD_FEE_LOOKUP_PARAMS: FeeLookupParams = {
   service: 'test service',
 };
 
+const COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS: FeeLookupParams = {
+  channel: 'default',
+  event: 'issue',
+  jurisdiction1: 'civil',
+  jurisdiction2: 'civil',
+  service: 'other',
+  keyword: 'AnyOtherRemedy',
+};
+
 (config.get as jest.Mock).mockImplementation(key => {
   if (key === 'feeService.url') {
     return FEE_SERVICE_URL;
@@ -24,10 +33,16 @@ const STANDARD_FEE_LOOKUP_PARAMS: FeeLookupParams = {
   if (key === 'feeService.lookup.genAppStandardFee') {
     return STANDARD_FEE_LOOKUP_PARAMS;
   }
+  if (key === 'feeService.lookup.counterClaimFlatFeeFEE0450') {
+    return COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS;
+  }
 });
 
 (config.has as jest.Mock).mockImplementation(key => {
   if (key === 'feeService.lookup.genAppStandardFee') {
+    return true;
+  }
+  if (key === 'feeService.lookup.counterClaimFlatFeeFEE0450') {
     return true;
   }
 });
@@ -69,6 +84,23 @@ describe('feeLookupService', () => {
 
       expect(getFee(FeeType.genAppStandardFee)).rejects.toThrow('Error fetching fee');
     });
+
+    it('should include lookup params for FEE0450 counterclaim flat fee', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          fee_amount: 332,
+        },
+      });
+
+      await getFee(FeeType.counterClaimFlatFeeFEE0450);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${FEE_SERVICE_URL}/fees-register/fees/lookup`,
+        expect.objectContaining({
+          params: COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS,
+        })
+      );
+    });
   });
 
   describe('getCounterClaimFeeType', () => {
@@ -95,6 +127,53 @@ describe('feeLookupService', () => {
 
     it('falls back to FEE0506 when amount is missing for money claim types', () => {
       expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION')).toEqual(FeeType.counterClaimFee0506);
+    });
+  });
+
+  describe('getFeeDirect', () => {
+    it('returns flat amount when fee service responds with flat_amount', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          current_version: {
+            flat_amount: { amount: 123 },
+          },
+        },
+      });
+
+      const actualFee = await getFeeDirect('FEE0508');
+
+      expect(mockGet).toHaveBeenCalledWith(`${FEE_SERVICE_URL}/fees-register/fees/FEE0508`);
+      expect(actualFee).toBe(123);
+    });
+
+    it('returns calculated fee when fee service responds with percentage_amount', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          current_version: {
+            percentage_amount: { percentage: 5 },
+          },
+        },
+      });
+
+      const actualFee = await getFeeDirect('FEE0506', '20000');
+
+      expect(actualFee).toBe(10);
+    });
+
+    it('throws when response has neither flat nor percentage amounts', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          current_version: {},
+        },
+      });
+
+      await expect(getFeeDirect('FEE0506', '20000')).rejects.toThrow('Error fetching fee');
+    });
+
+    it('throws when fee service request fails', async () => {
+      mockGet.mockRejectedValue(new Error('Fee service unavailable'));
+
+      await expect(getFeeDirect('FEE0508')).rejects.toThrow('Error fetching fee');
     });
   });
 });

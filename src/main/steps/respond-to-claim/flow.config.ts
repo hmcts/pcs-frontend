@@ -2,6 +2,7 @@ import { type Request } from 'express';
 
 import {
   hasAnyRentArrearsGround,
+  hasMadeCounterClaim,
   hasOnlyRentArrearsGrounds,
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
@@ -133,6 +134,12 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-specific-sum': {
       showCondition: (req: Request) => isMoneyCounterClaim(req),
     },
+    'counter-claim-what-are-you-claiming-for': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-fee': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
     'counter-claim-have-you-applied-for-help': {
       showCondition: (req: Request) => shouldShowCounterClaimHelpWithFeesStep(req),
     },
@@ -144,6 +151,15 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counter-claim-order-other-than-sum': {
       showCondition: (req: Request) => isSomethingElseCounterClaim(req),
+    },
+    'payment-interstitial': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
+    },
+    'repayments-made': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
+    },
+    'repayments-agreed': {
+      showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
     'installment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
