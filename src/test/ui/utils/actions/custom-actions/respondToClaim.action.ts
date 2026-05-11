@@ -38,6 +38,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -103,6 +104,7 @@ export class RespondToClaimAction implements IAction {
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
       ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
+      ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
     ]);
@@ -686,6 +688,7 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', otherConsiderations.saveAndContinueButton);
   }
 
+<<<<<<< HDPI-3508-QA
   private async accessYourCase(accessCode: actionRecord): Promise<void> {
     const pin = pins[0];
     if (!pin) {
@@ -695,6 +698,13 @@ export class RespondToClaimAction implements IAction {
 
     await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
     await performAction('clickButton', accessYourCase.continueButton);
+=======
+  private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
+    if (uploadDocs?.files) {
+      await performAction('uploadFile', uploadDocs.files);
+    }
+    await performAction('clickButton', uploadFiles.saveAndContinueButton);
+>>>>>>> HDPI-3508-pin-and-post-screen
   }
 
   private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {

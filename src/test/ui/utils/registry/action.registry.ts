@@ -34,7 +34,7 @@ export class ActionRegistry {
     ['clickTab', new ClickTabAction()],
     ['inputText', new InputTextAction()],
     ['select', new SelectAction()],
-    ['UploadFile', new UploadFileAction()],
+    ['uploadFile', new UploadFileAction()],
     ['login', new LoginAction()],
     ['createUser', new LoginAction()],
     ['navigateToUrl', new NavigateToUrlAction()],
@@ -104,6 +104,7 @@ export class ActionRegistry {
     ['reviewAndUpdateCYA', new GenAppsAction()],
     ['otherConsiderations', new RespondToClaimAction()],
     ['accessYourCase', new RespondToClaimAction()],
+    ['uploadFiles', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
   ]);

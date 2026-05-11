@@ -23,7 +23,7 @@ export const validateAccessCode = async (
   const pcsApiURL = getBaseUrl();
   const normalizedCaseId = caseId.trim().replace(/-/g, '');
   if (!/^\d{16,20}$/.test(normalizedCaseId)) {
-    return { valid: false, error: 'mismatch' };
+    return { valid: false, error: 'not_found' };
   }
   const encodedCaseId = encodeURIComponent(normalizedCaseId);
   try {
