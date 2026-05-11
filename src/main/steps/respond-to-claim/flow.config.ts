@@ -76,7 +76,6 @@ export const flowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have',
     'other-considerations',
     'upload-document',
-    'support-needs',
     'reasonable-adjustments-triage',
     'equality-and-diversity-start',
     'equality-and-diversity-end',
