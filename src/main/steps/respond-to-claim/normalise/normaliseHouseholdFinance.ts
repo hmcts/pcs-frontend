@@ -1,3 +1,5 @@
+import { normalizeYesNoValue } from '../../utils';
+
 import type { HouseholdCircumstances, PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export function normaliseHouseholdFinance(response: PossessionClaimResponse): void {
@@ -7,24 +9,24 @@ export function normaliseHouseholdFinance(response: PossessionClaimResponse): vo
   }
 
   // Defendant declined to share finance details → entire finance branch is skipped
-  if (hc.shareIncomeExpenseDetails !== 'YES') {
+  if (normalizeYesNoValue(hc.shareIncomeExpenseDetails) !== 'YES') {
     dropEntireFinanceBranch(hc);
     return;
   }
 
   // Already on Universal Credit → "have-you-applied-for-universal-credit" page is skipped
-  if (hc.universalCredit === 'YES') {
+  if (normalizeYesNoValue(hc.universalCredit) === 'YES') {
     delete hc.hasAppliedForUniversalCredit;
     delete hc.ucApplicationDate;
   }
 
   // Defendant didn't apply for Universal Credit → application date isn't asked
-  if (hc.hasAppliedForUniversalCredit !== 'YES') {
+  if (normalizeYesNoValue(hc.hasAppliedForUniversalCredit) !== 'YES') {
     delete hc.ucApplicationDate;
   }
 
   // No priority debts → priority-debt-details page is skipped
-  if (hc.priorityDebts !== 'YES') {
+  if (normalizeYesNoValue(hc.priorityDebts) !== 'YES') {
     delete hc.debtTotal;
     delete hc.debtContribution;
     delete hc.debtContributionFrequency;

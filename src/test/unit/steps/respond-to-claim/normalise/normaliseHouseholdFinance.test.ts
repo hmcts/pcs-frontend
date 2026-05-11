@@ -198,4 +198,30 @@ describe('normaliseHouseholdFinance', () => {
     normaliseHouseholdFinance(response);
     expect(JSON.stringify(response)).toBe(afterOnce);
   });
+
+  // CCD's @Primary ObjectMapper echoes YesOrNo PascalCase ("Yes"/"No") since pcs-api
+  // PR #1678. validatedCase is hydrated from that response and re-sent on the next save,
+  // so the normaliser must treat casing variants as equivalent — otherwise the strict
+  // compare would silently wipe persisted finance fields.
+  it('treats PascalCase "Yes" on shareIncomeExpenseDetails the same as "YES"', () => {
+    const response = {
+      defendantResponses: {
+        householdCircumstances: {
+          // Cast simulates BE returning out-of-type casing — the static type is 'YES'/'NO'.
+          shareIncomeExpenseDetails: 'Yes' as 'YES',
+          incomeFromJobs: 'YES',
+          incomeFromJobsAmount: '5000',
+          incomeFromJobsFrequency: 'WEEKLY',
+        },
+      },
+    } as PossessionClaimResponse;
+
+    normaliseHouseholdFinance(response);
+
+    expect(response.defendantResponses?.householdCircumstances).toMatchObject({
+      incomeFromJobs: 'YES',
+      incomeFromJobsAmount: '5000',
+      incomeFromJobsFrequency: 'WEEKLY',
+    });
+  });
 });
