@@ -174,7 +174,6 @@ export interface CcdCollectionItem<T> {
   value: T;
 }
 
-
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
   tenancyTypeCorrect?: YesNoNotSureValue;

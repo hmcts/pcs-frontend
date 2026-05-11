@@ -2,9 +2,9 @@ jest.mock('../../../../main/modules/steps', () => ({
   createFormStep: jest.fn(config => config),
 }));
 
-const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+const mockSaveDraftDefendantResponse = jest.fn();
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-have-you-already-applied-for-help-with-your-fees';
@@ -50,7 +50,7 @@ describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-
 
       await testedStep.beforeRedirect(req);
 
-      expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(req, {
         defendantResponses: {
           counterClaim: {
             appliedForHwf: 'YES',
@@ -69,7 +69,7 @@ describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-
 
       await testedStep.beforeRedirect(req);
 
-      expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(req, {
         defendantResponses: {
           counterClaim: {
             appliedForHwf: 'NO',
@@ -84,7 +84,7 @@ describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-
 
       await testedStep.beforeRedirect(req);
 
-      expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+      expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
     });
 
     it('does not persist when body is undefined', async () => {
@@ -92,7 +92,7 @@ describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-
 
       await testedStep.beforeRedirect(req);
 
-      expect(mockBuildCcdCaseForPossessionClaimResponse).not.toHaveBeenCalled();
+      expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
     });
   });
 
