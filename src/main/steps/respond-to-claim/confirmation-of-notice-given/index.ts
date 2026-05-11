@@ -3,19 +3,17 @@ import type { Request } from 'express';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { getClaimantName } from '../../utils/getClaimantName';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, YesNoNotSureValue } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'confirmation-of-notice-given';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-given',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/confirmationOfNoticeGiven.njk`,
   translationKeys: {
     caption: 'caption',

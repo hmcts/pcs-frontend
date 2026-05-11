@@ -1,17 +1,13 @@
 import type { Request } from 'express';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-name-confirmation',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  basePath: '/respond-to-claim',
-  flowConfig,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);

@@ -1,18 +1,15 @@
 import type { Request } from 'express';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
 import { FeeType, getFee } from '@services/feeLookupService';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/counterClaim.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',

@@ -1,18 +1,15 @@
 import { HTTPError } from '../../../HttpError';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import { Logger } from '@modules/logger';
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const logger = Logger.getLogger('equalityAndDiversityStart');
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'equality-and-diversity-start',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   fields: [],
   customTemplate: `${__dirname}/equalityAndDiversityStart.njk`,
   beforeRedirect: async req => {
