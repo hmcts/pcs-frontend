@@ -1,6 +1,5 @@
 export const doYouHaveAnyOtherDependants = {
   mainHeader: `Do you have any other dependants?`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   dependantArePeopleParagraph: `Dependants are people you look after financially, like elderly relatives.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

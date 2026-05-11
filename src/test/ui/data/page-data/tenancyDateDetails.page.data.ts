@@ -3,7 +3,6 @@ import { submitCaseApiDataWales } from '../api-data/submitCaseWales.api.data';
 
 export const tenancyDateDetails = {
   mainHeader: `Tenancy, occupation contract or licence start date`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   getDetailsGivenByParagraph: (claimantName: string): string => {
     return `Details given by ${claimantName}:`;
   },
