@@ -37,7 +37,6 @@ export {
 
 // Export step-specific i18n utilities
 export {
-  getStepNamespace,
   getStepTranslationPath,
   loadStepNamespace,
   getStepTranslations,

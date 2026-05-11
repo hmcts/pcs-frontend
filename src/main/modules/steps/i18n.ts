@@ -56,16 +56,12 @@ function camelizeStepName(stepName: string): string {
 }
 
 /**
- * i18next namespace for a step. Scoped by the journey folder so that two
- * journeys with the same step name (e.g. two `start-now` steps) get distinct
- * namespaces and don't share a single mutable bundle.
+ * Identity for a step's translations. Used as both the locales filesystem path
+ * (under `locales/<lang>/`) and the i18next namespace — one identity, one
+ * function. The journey folder is required so that two journeys with the same
+ * step name (e.g. two `start-now` steps) get distinct namespaces and don't
+ * share a single mutable bundle.
  */
-export function getStepNamespace(stepName: string, journeyFolder?: string): string {
-  const camel = camelizeStepName(stepName);
-  return journeyFolder ? `${journeyFolder}__${camel}` : camel;
-}
-
-/** Filesystem path (without extension) for a step's translation file under locales/<lang>/. */
 export function getStepTranslationPath(stepName: string, folder: string): string {
   return `${folder}/${camelizeStepName(stepName)}`;
 }
@@ -78,7 +74,7 @@ function getStepTranslationPaths(req: Request, stepName: string, folder: string)
     return [defaultPath];
   }
 
-  return [defaultPath, `${folder}/${userType}/${camelizeStepName(stepName)}`];
+  return [defaultPath, getStepTranslationPath(stepName, `${folder}/${userType}`)];
 }
 
 function resolveStepName(req: Request, explicit?: string): string | undefined {
@@ -110,7 +106,7 @@ export async function loadStepNamespace(req: Request, stepName?: string, folder?
     return;
   }
 
-  const stepNamespace = getStepNamespace(resolvedStepName, resolvedFolder);
+  const stepNamespace = getStepTranslationPath(resolvedStepName, resolvedFolder);
   const lang = getMainRequestLanguage(req);
 
   if (req.i18n.getResourceBundle(lang, stepNamespace)) {
@@ -181,13 +177,13 @@ export function getStepTranslations(req: Request, stepName?: string, journeyFold
   }
 
   const resolvedStepName = resolveStepName(req, stepName);
-  if (!resolvedStepName) {
+  const resolvedFolder = resolveJourneyFolder(req, journeyFolder);
+  if (!resolvedStepName || !resolvedFolder) {
     return {};
   }
 
-  const resolvedFolder = resolveJourneyFolder(req, journeyFolder);
   const lang = getMainRequestLanguage(req);
-  const resources = req.i18n.getResourceBundle(lang, getStepNamespace(resolvedStepName, resolvedFolder));
+  const resources = req.i18n.getResourceBundle(lang, getStepTranslationPath(resolvedStepName, resolvedFolder));
   return (resources as TranslationContent) || {};
 }
 
@@ -210,9 +206,10 @@ export function getTranslationFunction(
   const resolvedFolder = resolveJourneyFolder(req, journeyFolder);
 
   const lang = getMainRequestLanguage(req);
-  const allNamespaces = resolvedStepName
-    ? [getStepNamespace(resolvedStepName, resolvedFolder), ...namespaces]
-    : namespaces;
+  const allNamespaces =
+    resolvedStepName && resolvedFolder
+      ? [getStepTranslationPath(resolvedStepName, resolvedFolder), ...namespaces]
+      : namespaces;
   const fixedT = req.i18n.getFixedT(lang, allNamespaces);
   return fixedT || getMainTranslationFunction(req, namespaces);
 }

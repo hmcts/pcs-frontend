@@ -15,7 +15,6 @@ jest.mock('@modules/logger', () => ({
 
 import * as mainI18n from '@modules/i18n';
 import {
-  getStepNamespace,
   getStepTranslationPath,
   getStepTranslations,
   getTranslationFunction,
@@ -50,26 +49,19 @@ describe('steps/i18n', () => {
     process.env.NODE_ENV = originalEnv;
   });
 
-  describe('getStepNamespace', () => {
-    it('should convert step name to namespace when no journey folder is provided', () => {
-      expect(getStepNamespace('enter-dob')).toBe('enterDob');
-      expect(getStepNamespace('respond-to-claim-summary')).toBe('respondToClaimSummary');
-      expect(getStepNamespace('single-word')).toBe('singleWord');
-    });
-
-    it('should produce distinct namespaces for the same step in different journeys', () => {
-      expect(getStepNamespace('start-now', 'respondToClaim')).toBe('respondToClaim__startNow');
-      expect(getStepNamespace('start-now', 'uploadAdditionalDocuments')).toBe('uploadAdditionalDocuments__startNow');
-      expect(getStepNamespace('start-now', 'respondToClaim')).not.toBe(
-        getStepNamespace('start-now', 'uploadAdditionalDocuments')
-      );
-    });
-  });
-
   describe('getStepTranslationPath', () => {
     it('should return correct translation path', () => {
       expect(getStepTranslationPath('start-now', 'respondToClaim')).toBe('respondToClaim/startNow');
       expect(getStepTranslationPath('summary', 'common')).toBe('common/summary');
+      expect(getStepTranslationPath('respond-to-claim-summary', 'respondToClaim')).toBe(
+        'respondToClaim/respondToClaimSummary'
+      );
+    });
+
+    it('should produce distinct identifiers for the same step in different journeys', () => {
+      expect(getStepTranslationPath('start-now', 'respondToClaim')).not.toBe(
+        getStepTranslationPath('start-now', 'uploadAdditionalDocuments')
+      );
     });
   });
 
@@ -96,7 +88,7 @@ describe('steps/i18n', () => {
 
       await loadStepNamespace(req, 'test-step', 'folder');
 
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'folder__testStep');
+      expect(getResourceBundle).toHaveBeenCalledWith('en', 'folder/testStep');
       expect(access).not.toHaveBeenCalled();
       expect(addResourceBundle).not.toHaveBeenCalled();
     });
@@ -126,7 +118,7 @@ describe('steps/i18n', () => {
       expect(addResourceBundle).toHaveBeenNthCalledWith(
         1,
         'en',
-        'journeyA__startNow',
+        'journeyA/startNow',
         { title: 'Journey A' },
         true,
         true
@@ -134,7 +126,7 @@ describe('steps/i18n', () => {
       expect(addResourceBundle).toHaveBeenNthCalledWith(
         2,
         'en',
-        'journeyB__startNow',
+        'journeyB/startNow',
         { title: 'Journey B' },
         true,
         true
@@ -162,7 +154,7 @@ describe('steps/i18n', () => {
 
       expect(addResourceBundle).toHaveBeenCalledWith(
         'en',
-        'uploadAdditionalDocuments__startNow',
+        'uploadAdditionalDocuments/startNow',
         { title: 'From context' },
         true,
         true
@@ -218,8 +210,8 @@ describe('steps/i18n', () => {
 
       await loadStepNamespace(req, 'test-step', 'testFolder');
 
-      expect(addResourceBundle).toHaveBeenCalledWith('en', 'testFolder__testStep', mockTranslations, true, true);
-      expect(loadNamespaces).toHaveBeenCalledWith('testFolder__testStep', expect.any(Function));
+      expect(addResourceBundle).toHaveBeenCalledWith('en', 'testFolder/testStep', mockTranslations, true, true);
+      expect(loadNamespaces).toHaveBeenCalledWith('testFolder/testStep', expect.any(Function));
     });
 
     it('should merge legalrep translations over default translations', async () => {
@@ -250,7 +242,7 @@ describe('steps/i18n', () => {
 
       expect(addResourceBundle).toHaveBeenCalledWith(
         'en',
-        'testFolder__testStep',
+        'testFolder/testStep',
         {
           title: 'Professional title',
           nested: {
@@ -364,9 +356,9 @@ describe('steps/i18n', () => {
         i18n: { getResourceBundle },
       } as any;
 
-      const result = getStepTranslations(req, 'test-step');
+      const result = getStepTranslations(req, 'test-step', 'testFolder');
 
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'testStep');
+      expect(getResourceBundle).toHaveBeenCalledWith('en', 'testFolder/testStep');
       expect(result).toEqual(mockTranslations);
     });
 
@@ -378,8 +370,20 @@ describe('steps/i18n', () => {
         i18n: { getResourceBundle },
       } as any;
 
+      const result = getStepTranslations(req, 'test-step', 'testFolder');
+
+      expect(result).toEqual({});
+    });
+
+    it('should return empty object when no journey context is available', () => {
+      const getResourceBundle = jest.fn();
+      const req = {
+        i18n: { getResourceBundle },
+      } as any;
+
       const result = getStepTranslations(req, 'test-step');
 
+      expect(getResourceBundle).not.toHaveBeenCalled();
       expect(result).toEqual({});
     });
 
@@ -395,7 +399,7 @@ describe('steps/i18n', () => {
 
       const result = getStepTranslations(req);
 
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'uploadAdditionalDocuments__startNow');
+      expect(getResourceBundle).toHaveBeenCalledWith('en', 'uploadAdditionalDocuments/startNow');
       expect(result).toBe(bundle);
     });
   });
@@ -412,7 +416,7 @@ describe('steps/i18n', () => {
       expect(result).toBe(mockT);
     });
 
-    it('should return fixedT with step namespace when stepName provided', () => {
+    it('should return fixedT with step namespace when stepName and journey provided', () => {
       const mockFixedT = jest.fn();
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
@@ -421,9 +425,9 @@ describe('steps/i18n', () => {
         i18n: { getFixedT },
       } as any;
 
-      const result = getTranslationFunction(req, 'test-step');
+      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
 
-      expect(getFixedT).toHaveBeenCalledWith('en', ['testStep', 'common']);
+      expect(getFixedT).toHaveBeenCalledWith('en', ['testFolder/testStep', 'common']);
       expect(result).toBe(mockFixedT);
     });
 
@@ -437,10 +441,24 @@ describe('steps/i18n', () => {
         i18n: { getFixedT },
       } as any;
 
-      const result = getTranslationFunction(req, 'test-step');
+      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
 
       expect(mainI18n.getTranslationFunction).toHaveBeenCalledWith(req, ['common']);
       expect(result).toBe(mockT);
+    });
+
+    it('should fall through to the common namespaces when no journey context is available', () => {
+      const mockFixedT = jest.fn();
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
+      const req = {
+        i18n: { getFixedT },
+      } as any;
+
+      getTranslationFunction(req, 'test-step');
+
+      expect(getFixedT).toHaveBeenCalledWith('en', ['common']);
     });
 
     it('should use the journey-scoped namespace when context is set on res.locals', () => {
@@ -455,7 +473,7 @@ describe('steps/i18n', () => {
 
       const result = getTranslationFunction(req);
 
-      expect(getFixedT).toHaveBeenCalledWith('en', ['uploadAdditionalDocuments__startNow', 'common']);
+      expect(getFixedT).toHaveBeenCalledWith('en', ['uploadAdditionalDocuments/startNow', 'common']);
       expect(result).toBe(mockFixedT);
     });
 
@@ -471,7 +489,7 @@ describe('steps/i18n', () => {
 
       getTranslationFunction(req, 'other-step', ['common'], 'journeyB');
 
-      expect(getFixedT).toHaveBeenCalledWith('en', ['journeyB__otherStep', 'common']);
+      expect(getFixedT).toHaveBeenCalledWith('en', ['journeyB/otherStep', 'common']);
     });
   });
 
