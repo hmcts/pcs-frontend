@@ -1,0 +1,16 @@
+export const counterClaimAbout = {
+  mainHeader: `About your counterclaim`,
+  youWillBeParagraph: `You will be able to upload any evidence you have on the next page.`,
+  theClaimantWillBeParagraph: `The claimant will be able to see your answers.`,
+  whatIsYourCounterClaimLabelText: `What is your counterclaim for?`,
+  youCanEnterUpToHintText: `You can enter up to 6,800 characters`,
+  whatAreYourReasonsLabelText: `What are your reasons for making the counterclaim?`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  backLink: `Back`,
+  enterWhatYourCounterClaimErrorMessage: `Enter what your counterclaim is for`,
+  enterWhatYourReasonsAreForErrorMessage: `Enter what your reasons are for making the counterclaim`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  counterClaimForInput: `services not provided`,
+  reasonsForCounterClaimInput: `electricity and windows not repaired`,
+};

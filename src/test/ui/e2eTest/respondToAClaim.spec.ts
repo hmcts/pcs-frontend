@@ -6,7 +6,9 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimAbout,
   counterClaimFee,
+  counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -40,6 +42,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { firstName, lastName } from '../utils/actions/custom-actions';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -1170,7 +1173,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
     await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
+      option: counterClaim.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    //counter claim fee i dont need help step need to include
+    await performAction('selectClaimAgainstWhom', claimantName, firstName + ' ' + lastName);
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('counterClaimOrderOtherThanSum', {
+      ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
+      factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
     });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {

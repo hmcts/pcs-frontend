@@ -105,6 +105,9 @@ export class ActionRegistry {
     ['otherConsiderations', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['selectClaimAgainstWhom', new RespondToClaimAction()],
+    ['counterClaimAbout', new RespondToClaimAction()],
+    ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
   ]);
 
   static getAction(actionName: string): IAction {

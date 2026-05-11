@@ -9,6 +9,8 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimAbout,
+  counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -102,6 +104,9 @@ export class RespondToClaimAction implements IAction {
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
+      ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
+      ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
+      ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -711,6 +716,43 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
+  }
+
+  private async selectClaimAgainstWhom(claimAgainstWhom: actionRecord): Promise<void> {
+    if (Array.isArray(claimAgainstWhom.options)) {
+      for (const option of claimAgainstWhom.options) {
+        await performAction('check', {
+          question: claimAgainstWhom.question,
+          option,
+        });
+      }
+    } else if (claimAgainstWhom.radioOption) {
+      await performAction('check', {
+        question: claimAgainstWhom.question,
+        option: claimAgainstWhom.radioOption,
+      });
+    }
+    await performAction('clickButton', claimAgainstWhom.saveAndContinueButton);
+  }
+
+  private async counterClaimAbout(claimAbout: actionRecord): Promise<void> {
+    await performAction('inputText', counterClaimAbout.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
+    await performAction('inputText', counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
+    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+  }
+
+  private async counterClaimOrderOtherThanSum(cliamOtherThanSum: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      counterClaimOrderOtherThanSum.whatOrdersAreYouAskingLabelText,
+      cliamOtherThanSum.ordersInput
+    );
+    await performAction(
+      'inputText',
+      counterClaimOrderOtherThanSum.whatFactsWouldYouLikeLabelText,
+      cliamOtherThanSum.factsInput
+    );
+    await performAction('clickButton', counterClaimOrderOtherThanSum.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

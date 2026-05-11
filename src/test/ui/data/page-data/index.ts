@@ -51,3 +51,6 @@ export * from './uploadFiles.page.data';
 export * from './counterClaimFee.page.data';
 export * from './counterClaimSpecificSumOfMoney.page.data';
 export * from './counterClaimWhatAreYouClaimingFor.page.data';
+export * from './counterClaimAbout.page.data';
+export * from './counterClaimAgainstWhom.page.data';
+export * from './counterClaimOrderOtherThanSum.page.data';
