@@ -8,7 +8,7 @@ import { flowConfig } from '../flow.config';
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { FrequencyValue, HouseholdCircumstances, IncomeExpenseDetails } from '@services/ccdCase.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 
 const createAmountValidator =
   (largeAmountErrorKey: string, negativeErrorKey: string) =>
