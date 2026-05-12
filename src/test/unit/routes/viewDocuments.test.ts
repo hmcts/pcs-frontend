@@ -1,5 +1,6 @@
-import type { Application, Request, Response } from 'express';
 import { PassThrough } from 'stream';
+
+import type { Application, Request, Response } from 'express';
 
 import viewDocumentsRoute from '@routes/viewDocuments';
 import { getDocumentBinary } from '@services/cdamService';

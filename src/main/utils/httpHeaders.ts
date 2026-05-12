@@ -1,7 +1,7 @@
 export function asHeaderString(value: unknown): string | undefined {
   if (typeof value === 'string') {
     const trimmed = value.trim();
-    return trimmed ? trimmed : undefined;
+    return trimmed || undefined;
   }
   if (typeof value === 'number') {
     return String(value);
