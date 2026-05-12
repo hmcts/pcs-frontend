@@ -1,0 +1,29 @@
+{
+  "pageTitle": "cyUpload additional documents",
+  "title": "cyUpload additional documents",
+  "leadParagraph": "cyYou can upload a document to support an application, or to show proof that you have done something.",
+  "paragraphShare": "cyWe usually share anything you upload with the other party, for example your landlord, housing association or mortgage provider.",
+  "paragraphWithoutNotice": "cyIf your application is 'without notice' (where you have asked us to consider your application without telling the other party) we will not share anything with them.",
+  "whatYouCanUploadHeading": "cyWhat you can upload",
+  "exampleIntro": "cyFor example, you can share:",
+  "exampleBullet1": "cyevidence that a judge has asked for, like bank statements showing your rent payments",
+  "exampleBullet2": "cyphotographs of the property in a state of disrepair, like damp in the bathroom",
+  "exampleBullet3": "cya report from an electrician or a plumber, showing evidence of a repair that needs to be done",
+  "exampleBullet4": "cyemails or letters from the claimant (your landlord, housing association, or mortgage lender)",
+  "fileTypesIntro": "cyYou can upload the following file types:",
+  "fileTypeDoc": "cyDOC/DOCX (Word)",
+  "fileTypeXls": "cyXLS/XLSM (Excel)",
+  "fileTypePpt": "cyPPT/PPTX (PowerPoint)",
+  "fileTypePdf": "cyPDF",
+  "fileTypeRtf": "cyRTF",
+  "fileTypeTxt": "cyTXT",
+  "fileTypeCsv": "cyCSV",
+  "fileTypeJpg": "cyJPG/JPEG",
+  "fileTypePng": "cyPNG",
+  "fileTypeBmp": "cyBMP",
+  "fileTypeTif": "cyTIF/TIFF",
+  "restrictions": "cyYou cannot upload video or audio files.",
+  "buttons": {
+    "startNow": "cyStart now"
+  }
+}
