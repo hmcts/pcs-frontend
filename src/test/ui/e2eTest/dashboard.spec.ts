@@ -8,7 +8,13 @@ import { viewTheClaim } from '../data/page-data/theClaim-page-data';
 import { contactUs } from '../data/section-data/contactUs.section.data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
+import {
+  initializeExecutor,
+  performAction,
+  performActions,
+  performValidation,
+  performValidations,
+} from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
 
@@ -65,13 +71,16 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       viewOrdersAndNotices.mainHeader
     );
     await performAction('clickLink', dashboard.contactUsForHelpLink);
-    await performValidation('text', { elementType: 'subHeader', text: contactUs.emailSubHeader });
-    await performValidation('text', { elementType: 'paragraph', text: contactUs.localCourtEmailAddrParagraph });
-    await performValidation('text', { elementType: 'paragraph', text: contactUs.ifYouDoNotKnowParagraph });
-    await performValidation('text', { elementType: 'link', text: contactUs.findACourtLink });
-    await performValidation('text', { elementType: 'subHeader', text: contactUs.telephoneSubHeader });
-    await performValidation('text', { elementType: 'paragraph', text: contactUs.telephoneNumberParagraph });
-    await performValidation('text', { elementType: 'paragraph', text: contactUs.telephoneAvailabilityParagraph });
-    await performValidation('text', { elementType: 'link', text: contactUs.callChargesLink });
+    await performValidations(
+      'Validate contact us section',
+      ['text', { elementType: 'subSectionHeader', text: contactUs.emailSubHeader }],
+      ['text', { elementType: 'paragraph', text: contactUs.localCourtEmailAddrParagraph }],
+      ['text', { elementType: 'link', text: contactUs.findACourtLink }],
+      ['text', { elementType: 'paragraph', text: contactUs.ifYouDoNotKnowParagraph }],
+      ['text', { elementType: 'subSectionHeader', text: contactUs.telephoneSubHeader }],
+      ['text', { elementType: 'paragraph', text: contactUs.telephoneNumberParagraph }],
+      ['text', { elementType: 'paragraph', text: contactUs.telephoneAvailabilityParagraph }],
+      ['text', { elementType: 'link', text: contactUs.callChargesLink }]
+    );
   });
 });
