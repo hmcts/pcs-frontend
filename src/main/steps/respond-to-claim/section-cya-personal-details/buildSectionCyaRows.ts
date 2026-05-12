@@ -2,6 +2,8 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
+import { formatIsoDate } from '../../utils';
+
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
 const SECTION_ID = 'personalDetails';
@@ -29,17 +31,6 @@ function formatAddress(addr?: Address): string {
   return [addr.AddressLine1, addr.AddressLine2, addr.AddressLine3, addr.PostTown, addr.County, addr.PostCode]
     .filter((s): s is string => Boolean(s && s.trim()))
     .join(', ');
-}
-
-function formatDob(iso?: string): string {
-  if (!iso) {
-    return '';
-  }
-  const [year, month, day] = iso.split('-');
-  if (!year || !month || !day) {
-    return iso;
-  }
-  return `${parseInt(day, 10)} ${parseInt(month, 10)} ${year}`;
 }
 
 // GDS pattern: single value as text, multiple values as a bullet-less list
@@ -115,7 +106,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   if (dateOfBirth) {
     rows.push({
       key: { text: t('rows.dateOfBirth.label') },
-      value: { text: formatDob(dateOfBirth) },
+      value: { text: formatIsoDate(dateOfBirth) },
       actions: { items: [change('defendant-date-of-birth', 'rows.dateOfBirth.changeHidden')] },
     });
   }

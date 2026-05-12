@@ -12,6 +12,14 @@ export function parseISOToDateParts(isoDate: string): { day: string; month: stri
   };
 }
 
+export function formatIsoDate(iso?: string): string {
+  if (!iso) {
+    return '';
+  }
+  const dt = DateTime.fromISO(iso).setLocale('en-gb');
+  return dt.isValid ? dt.toFormat('d LLLL yyyy') : iso;
+}
+
 export function formatDatePartsToISODate(day: string, month: string, year: string): string | undefined {
   const d = day?.trim();
   const m = month?.trim();

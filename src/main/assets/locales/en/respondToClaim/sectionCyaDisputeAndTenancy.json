@@ -49,8 +49,30 @@
       "changeHidden": "whether you agree with the rent arrears amount"
     },
     "disputeClaim": {
+      "label": "Are you disputing other parts of the claim?",
+      "changeHidden": "whether you are disputing other parts of the claim"
+    },
+    "disputeClaimDetails": {
       "label": "Why are you disputing this claim?",
       "changeHidden": "why you are disputing this claim"
+    },
+    "makeCounterClaim": {
+      "label": "Do you want to make a counterclaim?",
+      "changeHidden": "whether you want to make a counterclaim"
+    },
+    "counterClaimType": {
+      "label": "What are you counterclaiming for?",
+      "changeHidden": "what you are counterclaiming for",
+      "options": {
+        "PAYMENT_OR_COMPENSATION": "A sum of money or compensation",
+        "SOMETHING_ELSE": "Something else",
+        "BOTH": "Both"
+      }
+    },
+    "counterClaimAmount": {
+      "label": "How much are you counterclaiming?",
+      "changeHidden": "how much you are counterclaiming",
+      "estimatedMaxPrefix": "Estimated maximum:"
     }
   }
 }

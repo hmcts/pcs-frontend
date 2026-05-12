@@ -1,0 +1,47 @@
+{
+  "pageTitle": "cy Check your answers",
+  "cardTitle": "cy Payments and agreements",
+  "back": "cy Back",
+  "change": "cy Change",
+  "buttons": {
+    "saveAndContinue": "cy Save and continue",
+    "saveForLater": "cy Save for later"
+  },
+  "options": {
+    "YES": "cy Yes",
+    "NO": "cy No",
+    "NOT_SURE": "cy Not sure"
+  },
+  "rows": {
+    "anyPaymentsMade": {
+      "label": "cy Have you made any repayments to your landlord?",
+      "changeHidden": "cy whether you have made any repayments"
+    },
+    "paymentDetails": {
+      "label": "cy What repayments have you made?",
+      "changeHidden": "cy the repayments you have made"
+    },
+    "repaymentPlanAgreed": {
+      "label": "cy Have you agreed a repayment plan?",
+      "changeHidden": "cy whether you have agreed a repayment plan"
+    },
+    "repaymentAgreedDetails": {
+      "label": "cy What repayment plan have you agreed?",
+      "changeHidden": "cy the repayment plan you have agreed"
+    },
+    "repayArrearsInstalments": {
+      "label": "cy Can you pay your rent and contribute to the arrears?",
+      "changeHidden": "cy whether you can pay rent and contribute to arrears"
+    },
+    "affordToPay": {
+      "label": "cy How much can you afford to pay towards arrears?",
+      "changeHidden": "cy how much you can afford to pay",
+      "frequencies": {
+        "weekly": "cy weekly",
+        "every2Weeks": "cy every 2 weeks",
+        "every4Weeks": "cy every 4 weeks",
+        "monthly": "cy monthly"
+      }
+    }
+  }
+}

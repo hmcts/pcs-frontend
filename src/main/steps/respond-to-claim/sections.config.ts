@@ -54,6 +54,7 @@ const sectionDefs = [
       'repayments-agreed',
       'installment-payments',
       'how-much-afford-to-pay',
+      'section-cya-payments',
     ],
     isApplicable: async (req: Request) => hasAnyRentArrearsGround(req),
   },

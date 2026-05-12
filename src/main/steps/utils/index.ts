@@ -25,7 +25,7 @@ export {
   getUserType,
   isLegalRepresentativeUser,
 } from './userRole';
-export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
+export { formatDatePartsToISODate, formatIsoDate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';

@@ -2,6 +2,8 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
+import { formatIsoDate, penceToPounds } from '../../utils';
+
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
 const SECTION_ID = 'disputeAndTenancy';
@@ -12,15 +14,10 @@ export type SummaryListRow = {
   actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
 };
 
-function formatIsoDate(iso?: string): string {
-  if (!iso) {
-    return '';
-  }
-  const [year, month, day] = iso.split('-');
-  if (!year || !month || !day) {
-    return iso;
-  }
-  return `${parseInt(day, 10)} ${parseInt(month, 10)} ${year}`;
+// GDS pattern (matches make-an-application/check-your-answers): preserve newlines
+// in user-entered free text by converting \n to <br> after HTML-escaping.
+function escapeWithLineBreaks(value: string): string {
+  return escapeHtml(value).replace(/\n/g, '<br>');
 }
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
@@ -132,16 +129,67 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     });
   }
 
-  // Non-rent-arrears dispute
+  // Non-rent-arrears dispute — radio Y/N on its own row; YES adds a second row with the details
   if (responses.disputeClaim) {
-    const value = responses.disputeClaimDetails
-      ? { html: escapeHtml(String(responses.disputeClaimDetails).trim()) }
-      : { text: t(`options.${responses.disputeClaim}`) };
     rows.push({
       key: { text: t('rows.disputeClaim.label') },
-      value,
+      value: { text: t(`options.${responses.disputeClaim}`) },
       actions: { items: [change('non-rent-arrears-dispute', 'rows.disputeClaim.changeHidden')] },
     });
+    if (responses.disputeClaim === 'YES' && responses.disputeClaimDetails?.trim()) {
+      rows.push({
+        key: { text: t('rows.disputeClaimDetails.label') },
+        value: { html: escapeWithLineBreaks(String(responses.disputeClaimDetails).trim()) },
+        actions: { items: [change('non-rent-arrears-dispute', 'rows.disputeClaimDetails.changeHidden')] },
+      });
+    }
+  }
+
+  // Counterclaim — Yes/No
+  if (responses.makeCounterClaim) {
+    rows.push({
+      key: { text: t('rows.makeCounterClaim.label') },
+      value: { text: yesNoNotSure(responses.makeCounterClaim) },
+      actions: { items: [change('counter-claim', 'rows.makeCounterClaim.changeHidden')] },
+    });
+  }
+
+  // Counterclaim details — only when YES
+  if (responses.makeCounterClaim === 'YES' && responses.counterClaim) {
+    const cc = responses.counterClaim;
+
+    // What are you counterclaiming for?
+    if (cc.claimType) {
+      rows.push({
+        key: { text: t('rows.counterClaimType.label') },
+        value: { text: t(`rows.counterClaimType.options.${cc.claimType}`) },
+        actions: {
+          items: [change('counter-claim-what-are-you-claiming-for', 'rows.counterClaimType.changeHidden')],
+        },
+      });
+    }
+
+    // Specific sum — only when claiming for money (PAYMENT_OR_COMPENSATION or BOTH)
+    const claimsMoney = cc.claimType === 'PAYMENT_OR_COMPENSATION' || cc.claimType === 'BOTH';
+    if (claimsMoney && cc.isClaimAmountKnown) {
+      let amountText: string;
+      if (cc.isClaimAmountKnown === 'YES' && cc.claimAmount !== undefined) {
+        const pounds = penceToPounds(cc.claimAmount);
+        amountText = pounds ? `£${pounds}` : yesNoNotSure(cc.isClaimAmountKnown);
+      } else if (cc.isClaimAmountKnown === 'NO' && cc.estimatedMaxClaimAmount !== undefined) {
+        const pounds = penceToPounds(cc.estimatedMaxClaimAmount);
+        amountText = pounds
+          ? `${t('rows.counterClaimAmount.estimatedMaxPrefix')} £${pounds}`
+          : yesNoNotSure(cc.isClaimAmountKnown);
+      } else {
+        amountText = yesNoNotSure(cc.isClaimAmountKnown);
+      }
+      rows.push({
+        key: { text: t('rows.counterClaimAmount.label') },
+        value: { text: amountText },
+        actions: { items: [change('counter-claim-specific-sum', 'rows.counterClaimAmount.changeHidden')] },
+      });
+    }
   }
 
   return rows;
