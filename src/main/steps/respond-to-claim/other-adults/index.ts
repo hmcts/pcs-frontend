@@ -1,4 +1,5 @@
 import { getTranslationFunction } from '../../../modules/steps';
+import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -53,13 +54,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: req => {
     const hc = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const otherTenants = hc?.otherTenants as string | undefined;
+    // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
+    // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and the
+    // otherTenantsDetails textarea pre-fill below would never run.
+    const otherTenantsForm = fromYesNoEnum(hc?.otherTenants);
 
-    if (!otherTenants) {
+    if (!otherTenantsForm) {
       return {};
     }
 
-    if (otherTenants === 'YES') {
+    if (otherTenantsForm === 'yes') {
       return {
         confirmOtherAdults: 'yes',
         'confirmOtherAdults.otherAdultsDetails': hc?.otherTenantsDetails ?? '',
