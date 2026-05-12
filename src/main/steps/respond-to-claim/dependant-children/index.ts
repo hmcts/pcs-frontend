@@ -1,15 +1,13 @@
+import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-you-have-any-dependant-children',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/dependantChildren.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -49,13 +47,16 @@ export const step: StepDefinition = createFormStep({
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
     const householdCircumstances: HouseholdCircumstances | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const dependantChildrenCcd: YesNoValue | undefined = householdCircumstances?.dependantChildren;
+    // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
+    // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and
+    // silently overwrite the stored YES on resubmit. fromYesNoEnum handles either casing.
+    const dependantChildrenForm = fromYesNoEnum(householdCircumstances?.dependantChildren);
 
-    if (!dependantChildrenCcd) {
+    if (!dependantChildrenForm) {
       return {};
     }
 
-    if (dependantChildrenCcd === 'YES') {
+    if (dependantChildrenForm === 'yes') {
       const dependantChildrenDetails: string | undefined = householdCircumstances?.dependantChildrenDetails;
       return {
         dependantChildren: 'yes',
