@@ -16,6 +16,9 @@ import {
   hasProvidedFinanceDetails,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
+  shouldShowCounterClaimAboutStep,
+  shouldShowCounterClaimAgainstWhoStep,
+  shouldShowCounterClaimHelpWithFeesStep,
   shouldShowInstallmentPaymentsStep,
   shouldShowUniversalCreditStep,
 } from './flowConditions';
@@ -56,6 +59,9 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-what-are-you-claiming-for',
     'counter-claim-specific-sum',
     'counter-claim-fee',
+    'counter-claim-have-you-applied-for-help',
+    'counter-claim-against-whom',
+    'counter-claim-about',
     'payment-interstitial',
     'repayments-made',
     'repayments-agreed',
@@ -111,7 +117,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       showCondition: (req: Request) => isNoticeServed(req),
     },
-
     'confirmation-of-notice-date-when-provided': {
       showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
@@ -132,6 +137,15 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counter-claim-fee': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-have-you-applied-for-help': {
+      showCondition: (req: Request) => shouldShowCounterClaimHelpWithFeesStep(req),
+    },
+    'counter-claim-against-whom': {
+      showCondition: (req: Request) => shouldShowCounterClaimAgainstWhoStep(req),
+    },
+    'counter-claim-about': {
+      showCondition: (req: Request) => shouldShowCounterClaimAboutStep(req),
     },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
