@@ -1,25 +1,45 @@
-import type { Request } from 'express';
-
-import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
 import { flowConfig } from '../flow.config';
 
-import { createGetController, createStepNavigation } from '@modules/steps';
+import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
+import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { getDashboardUrl } from '@routes/dashboard';
-import { getFlowConfigForJourney } from '@steps';
+import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
-const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'upload-your-documents';
-const templatePath = 'case-tasks/upload-additional-documents/upload-your-documents/uploadYourDocuments.njk';
-const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
-export const step: StepDefinition = {
-  url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
-  name: stepName,
-  view: templatePath,
+const storage = sessionDocs({ stepName, fieldName: 'documents' });
+
+export const step: StepDefinition = createFormStep({
+  stepName,
+  journeyFolder: 'uploadAdditionalDocuments',
+  documentStorage: storage,
   stepDir: __dirname,
-  getController: () =>
-    createGetController(templatePath, stepName, stepNavigation, (req: Request) => ({
-      dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-    })),
-};
+  flowConfig,
+  customTemplate: `${__dirname}/uploadYourDocuments.njk`,
+  fields: [
+    {
+      name: 'documents',
+      type: 'file',
+      required: false,
+      accept: ACCEPT_ATTRIBUTE_EXTENSIONS,
+      maxFileSize: UPLOAD_MAX_FILE_SIZE_MB,
+      labelClasses: 'govuk-label--s',
+      translationKey: { label: 'uploadLabel', hint: 'uploadHint' },
+    },
+  ],
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    heading: 'heading',
+    guidanceText: 'guidanceText',
+    beforeUploadText: 'beforeUploadText',
+    fileTypesText: 'fileTypesText',
+    uploadLabel: 'uploadLabel',
+    uploadHint: 'uploadHint',
+    filesAddedHeading: 'filesAddedHeading',
+    uploadButton: 'uploadButton',
+    deleteButton: 'deleteButton',
+  },
+  getInitialFormData: async req => ({
+    documents: toDisplayDocuments(await storage.read(req)),
+  }),
+});
