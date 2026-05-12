@@ -3,7 +3,7 @@ import { PassThrough } from 'stream';
 
 import viewDocumentsRoute from '@routes/viewDocuments';
 import { ccdCaseService } from '@services/ccdCaseService';
-import { documentService } from '@services/documentService';
+import { getDocumentStream } from '@services/cdamService';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void>;
 
@@ -17,10 +17,8 @@ jest.mock('../../../main/services/ccdCaseService', () => ({
   },
 }));
 
-jest.mock('@services/documentService', () => ({
-  documentService: {
-    getDocumentStream: jest.fn(),
-  },
+jest.mock('@services/cdamService', () => ({
+  getDocumentStream: jest.fn(),
 }));
 
 describe('viewDocuments route', () => {
@@ -119,7 +117,7 @@ describe('viewDocuments route', () => {
 
     const stream = new PassThrough();
     const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
-    (documentService.getDocumentStream as jest.Mock).mockResolvedValue({
+    (getDocumentStream as jest.Mock).mockResolvedValue({
       stream,
       contentType: 'application/pdf',
       contentLength: '1234',
@@ -146,7 +144,7 @@ describe('viewDocuments route', () => {
       next
     );
 
-    expect(documentService.getDocumentStream).toHaveBeenCalledWith(
+    expect(getDocumentStream).toHaveBeenCalledWith(
       'token',
       '1777570813792018',
       '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa'

@@ -5,7 +5,7 @@ import { oidcMiddleware } from '../middleware';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
-import { documentService } from '@services/documentService';
+import { getDocumentStream } from '@services/cdamService';
 import { extractViewDocumentFolders } from '@utils/documentUtils';
 
 function toSafeFilename(value: string): string {
@@ -59,7 +59,7 @@ export default function viewDocumentsRoutes(app: Application): void {
 
       try {
         const { stream, contentType, contentLength, contentDisposition, filename } =
-          await documentService.getDocumentStream(accessToken, caseReference, documentId);
+          await getDocumentStream(accessToken, caseReference, documentId);
 
         res.setHeader('Content-Type', contentType || 'application/octet-stream');
         if (contentLength) {
