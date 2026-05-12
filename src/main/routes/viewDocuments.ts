@@ -4,31 +4,59 @@ import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware';
 
 import { getDashboardUrl } from '@routes/dashboard';
-import { ccdCaseService } from '@services/ccdCaseService';
-import { getDocumentStream } from '@services/cdamService';
+import { getDocumentBinary } from '@services/cdamService';
 import { extractViewDocumentFolders } from '@utils/documentUtils';
 
 function toSafeFilename(value: string): string {
   return value.replace(/"/g, '');
 }
 
+function sanitiseDocumentIdParam(documentId: unknown): string {
+  if (typeof documentId !== 'string') {
+    return '';
+  }
+  const trimmed = documentId.trim();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed)
+    ? trimmed
+    : '';
+}
+
+function asHeaderString(value: unknown): string | undefined {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed ? trimmed : undefined;
+  }
+  if (typeof value === 'number') {
+    return String(value);
+  }
+  if (Array.isArray(value) && value.length > 0) {
+    return String(value[0]);
+  }
+  return undefined;
+}
+
 export default function viewDocumentsRoutes(app: Application): void {
-  app.get('/case/:caseId/view-documents', oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
-    const caseReference = typeof req.params.caseId === 'string' ? req.params.caseId : '';
+  app.get(
+    '/case/:caseReference/view-documents',
+    oidcMiddleware,
+    async (req: Request, res: Response, next: NextFunction) => {
+    const validatedCase = res.locals.validatedCase as { id: string; data: any } | undefined;
+    const caseReference = validatedCase?.id || '';
     const accessToken = req.session.user?.accessToken;
 
+    if (!caseReference) {
+      return next(new HTTPError('Invalid case reference format', 404));
+    }
     if (!accessToken) {
       return next(new HTTPError('Authentication required', 401));
     }
 
     try {
-      const caseData = await ccdCaseService.getCaseById(accessToken, caseReference);
-
       res.render('view-documents', {
         dashboardUrl: getDashboardUrl(caseReference),
         backUrl: getDashboardUrl(caseReference),
         caseReference,
-        documentFolders: extractViewDocumentFolders(caseData.data, {
+        documentFolders: extractViewDocumentFolders((validatedCase?.data ?? {}) as Record<string, unknown>, {
           folderTitles: {
             statementsOfCase: req.t('dashboard:viewDocuments.folders.statementsOfCase'),
             propertyDocuments: req.t('dashboard:viewDocuments.folders.propertyDocuments'),
@@ -40,16 +68,21 @@ export default function viewDocumentsRoutes(app: Application): void {
     } catch (error) {
       next(error);
     }
-  });
+    }
+  );
 
   app.get(
-    '/case/:caseId/view-documents/:documentId',
+    '/case/:caseReference/view-documents/:documentId',
     oidcMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
-      const caseReference = typeof req.params.caseId === 'string' ? req.params.caseId : '';
-      const documentId = typeof req.params.documentId === 'string' ? req.params.documentId.trim() : '';
+      const validatedCase = res.locals.validatedCase as { id: string; data: any } | undefined;
+      const caseReference = validatedCase?.id || '';
+      const documentId = sanitiseDocumentIdParam(req.params.documentId);
       const accessToken = req.session.user?.accessToken;
 
+      if (!caseReference) {
+        return next(new HTTPError('Invalid case reference format', 404));
+      }
       if (!accessToken) {
         return next(new HTTPError('Authentication required', 401));
       }
@@ -58,8 +91,22 @@ export default function viewDocumentsRoutes(app: Application): void {
       }
 
       try {
-        const { stream, contentType, contentLength, contentDisposition, filename } =
-          await getDocumentStream(accessToken, caseReference, documentId);
+        const allDocuments = (validatedCase?.data?.allDocuments ?? []) as Array<{
+          id?: string;
+          value?: { document_filename?: string; document_binary_url?: string };
+        }>;
+        const document = allDocuments.find(item => item.id === documentId)?.value;
+        const filename = document?.document_filename?.trim() || 'document';
+        const binaryUrl = document?.document_binary_url?.trim();
+        if (!binaryUrl) {
+          return next(new HTTPError('Document not found', 404));
+        }
+
+        const binaryResponse = await getDocumentBinary(binaryUrl, accessToken);
+        const stream = binaryResponse.stream;
+        const contentType = asHeaderString(binaryResponse.contentType);
+        const contentLength = asHeaderString(binaryResponse.contentLength);
+        const contentDisposition = asHeaderString(binaryResponse.contentDisposition);
 
         res.setHeader('Content-Type', contentType || 'application/octet-stream');
         if (contentLength) {
