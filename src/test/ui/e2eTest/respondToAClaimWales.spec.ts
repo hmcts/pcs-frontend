@@ -35,9 +35,9 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
+  supportNeeds,
   tenancyDateDetails,
   tenancyTypeDetails,
-  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   writtenTerms,
@@ -71,6 +71,12 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else {
     process.env.RENT_ARREARS = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentOtherTenancy });
+  }
+  //other considrations back link navigation
+  if (testInfo.title.includes('Income - no')) {
+    process.env.INCOME_AND_EXPENSES = 'NO';
+  } else {
+    process.env.INCOME_AND_EXPENSES = 'YES';
   }
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
@@ -220,7 +226,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);

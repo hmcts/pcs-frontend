@@ -1,9 +1,9 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CaseData, CcdCounterClaim, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { CaseData, CcdCounterClaim, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim-have-you-already-applied-for-help-with-your-fees',
@@ -72,16 +72,14 @@ export const step: StepDefinition = createFormStep({
         ? (req.body?.['alreadyAppliedForHelp.hwfReference'] as string | undefined)
         : undefined;
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        counterClaim: {
-          appliedForHwf,
-          hwfReferenceNumber: appliedForHwf === 'YES' ? (hwfReference ?? '') : '',
-        },
-      },
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.counterClaim = {
+      ...response.defendantResponses.counterClaim,
+      appliedForHwf,
+      ...(appliedForHwf === 'YES' && { hwfReferenceNumber: hwfReference ?? '' }),
     };
 
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;

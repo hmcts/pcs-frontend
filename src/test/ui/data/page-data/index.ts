@@ -51,6 +51,7 @@ export * from './otherConsiderations.page.data';
 export * from './uploadFiles.page.data';
 export * from './counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.page.data';
 export * from './counterclaimYouNeedToApplyForHelpWithYourFees.page.data';
+export * from './supportNeeds.page.data';
 export * from './counterClaimFee.page.data';
 export * from './counterClaimSpecificSumOfMoney.page.data';
 export * from './counterClaimWhatAreYouClaimingFor.page.data';
