@@ -42,6 +42,8 @@ export interface JourneyFlowConfig {
   journeyName?: string;
   useShowConditions?: boolean;
   useSessionFormData?: boolean;
+  // CCD event ID started/resumed by this journey. Required at journey registration time.
+  eventId?: string;
   stepOrder: string[];
   steps: Record<string, StepConfig>;
 }

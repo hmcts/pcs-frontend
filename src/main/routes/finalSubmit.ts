@@ -15,6 +15,7 @@ import { Router as createRouter } from 'express';
 
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
+import { requireEventAccess } from '../middleware/requireEventAccess';
 import { http } from '../modules/http';
 
 import { Logger } from '@modules/logger';
@@ -41,9 +42,12 @@ export default function finalSubmitRoutes(app: Application): void {
   // Create dedicated router for final submit routes
   const finalSubmitRouter: Router = createRouter({ mergeParams: true });
 
-  // Apply param middleware - validates format AND user access
-  // This ensures res.locals.validatedCase is set for routes with :caseReference
+  // Apply param middleware - validates the case reference format
   finalSubmitRouter.param('caseReference', caseReferenceParamMiddleware);
+
+  // Check user has access to the case via the respondPossessionClaim event and
+  // hydrate res.locals.validatedCase for downstream handlers
+  finalSubmitRouter.use(requireEventAccess('respondPossessionClaim'));
 
   // GET: Display final submit page
   finalSubmitRouter.get('/:caseReference/final-submit', oidcMiddleware, (req: Request, res: Response) => {

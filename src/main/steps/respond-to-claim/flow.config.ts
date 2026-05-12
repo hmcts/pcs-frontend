@@ -30,6 +30,7 @@ export const flowConfig: JourneyFlowConfig = {
   journeyName: 'respondToClaim',
   useShowConditions: true,
   useSessionFormData: false,
+  eventId: 'respondPossessionClaim',
   stepOrder: [
     'start-now',
     'free-legal-advice',
