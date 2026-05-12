@@ -115,11 +115,6 @@ export interface CcdClaimGroundSummaryItem {
   id: string;
 }
 
-export interface CcdDefendantItem {
-  value: CcdDefendantParty;
-  id: string;
-}
-
 /** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
 export interface CcdClaimantOrganisation {
   value: string;
