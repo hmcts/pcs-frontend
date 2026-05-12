@@ -1,7 +1,8 @@
+import { RadioItems } from '../../../utils/fieldComponentTypes.interface';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { CcdDefendantItem, RadioItems } from '@services/ccdCase.interface';
+import { CcdCollectionItem, CcdDefendantParty } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'select-defendant',
@@ -25,11 +26,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     detailsHeading: 'detailsHeading',
   },
   extendGetContent: async (req, formContent) => {
-    const allDefendants: CcdDefendantItem[] | undefined = req.res?.locals?.validatedCase?.allDefendants;
+    const allLinkedDefendants: CcdCollectionItem<CcdDefendantParty>[] | undefined = req.res?.locals?.validatedCase?.allLinkedDefendants;
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioItems | undefined;
 
-    addRadioButtonForAllDefendants(allDefendants, radio);
+    addRadioButtonForAllLinkedDefendants(allLinkedDefendants, radio);
 
     return {
       ...formContent,
@@ -50,9 +51,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
 });
 
-function addRadioButtonForAllDefendants(allDefendants: CcdDefendantItem[] | undefined, radio: RadioItems | undefined) {
+function addRadioButtonForAllLinkedDefendants(
+  allLinkedDefendants: CcdCollectionItem<CcdDefendantParty>[] | undefined,
+  radio: RadioItems | undefined
+) {
   if (radio?.component) {
-    allDefendants?.forEach(defendant => {
+    allLinkedDefendants?.forEach(defendant => {
       radio.component.items.push({
         value: defendant.id,
         text: defendant.value.firstName + ' ' + defendant.value.lastName,

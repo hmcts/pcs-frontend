@@ -12,7 +12,7 @@ describe('isSingleLinkedDefendant', () => {
           validatedCase: new CcdCaseModel({
             id: '',
             data: {
-              allDefendants: [
+              allLinkedDefendants: [
                 {
                   id: '',
                   value: {},
@@ -36,7 +36,7 @@ describe('isSingleLinkedDefendant', () => {
           validatedCase: new CcdCaseModel({
             id: '',
             data: {
-              allDefendants: [
+              allLinkedDefendants: [
                 {
                   id: '',
                   value: {},
