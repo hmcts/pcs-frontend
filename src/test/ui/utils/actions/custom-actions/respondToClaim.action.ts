@@ -37,6 +37,7 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -100,6 +101,7 @@ export class RespondToClaimAction implements IAction {
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
+      ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
     ]);
@@ -681,6 +683,13 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  }
+
+  private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
+    if (uploadDocs?.files) {
+      await performAction('uploadFile', uploadDocs.files);
+    }
+    await performAction('clickButton', uploadFiles.saveAndContinueButton);
   }
 
   private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {
