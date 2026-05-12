@@ -258,6 +258,14 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+}
+
+export interface CcdCaseDocument {
+  document_binary_url?: string;
+  document_filename?: string;
+  upload_timestamp?: string;
+  category_id?: string;
 }
 
 /** Case representation used by services: id + case_data. */

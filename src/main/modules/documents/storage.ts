@@ -53,7 +53,7 @@ export function createCcdDraftStorage(opts: {
       if (!caseId) {
         throw new HTTPError('Invalid case reference format', 404);
       }
-      const fresh = await ccdCaseService.getCaseById(token, caseId, opts.event.id);
+      const fresh = await ccdCaseService.getCaseByIdForEvent(token, caseId, opts.event.id);
       return opts.getDocs((fresh.data ?? {}) as CcdCaseData) ?? [];
     },
 

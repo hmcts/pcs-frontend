@@ -19,11 +19,11 @@ jest.mock('@utils/caseReference', () => ({
   }),
 }));
 
-const mockGetCaseById = jest.fn();
+const mockGetCaseByIdForEvent = jest.fn();
 
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
-    getCaseById: (...args: unknown[]) => mockGetCaseById(...args),
+    getCaseByIdForEvent: (...args: unknown[]) => mockGetCaseByIdForEvent(...args),
   },
 }));
 
@@ -68,11 +68,11 @@ describe('caseReferenceParamMiddleware', () => {
       const mockAccessToken = 'mock-access-token';
 
       mockReq.session = { user: { accessToken: mockAccessToken } } as MockSession as Request['session'];
-      mockGetCaseById.mockResolvedValue(mockCase);
+      mockGetCaseByIdForEvent.mockResolvedValue(mockCase);
 
       await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
-      expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef);
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef);
       expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
       expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
       expect(next).toHaveBeenCalledWith();
@@ -84,7 +84,7 @@ describe('caseReferenceParamMiddleware', () => {
       const mockAccessToken = 'mock-access-token';
 
       mockReq.session = { user: { accessToken: mockAccessToken } } as MockSession as Request['session'];
-      mockGetCaseById.mockResolvedValue(mockCase);
+      mockGetCaseByIdForEvent.mockResolvedValue(mockCase);
 
       await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
@@ -113,7 +113,7 @@ describe('caseReferenceParamMiddleware', () => {
       const mockAccessToken = 'mock-access-token';
 
       mockReq.session = { user: { accessToken: mockAccessToken } } as MockSession as Request['session'];
-      mockGetCaseById.mockRejectedValue(new Error('Case not found'));
+      mockGetCaseByIdForEvent.mockRejectedValue(new Error('Case not found'));
 
       await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 

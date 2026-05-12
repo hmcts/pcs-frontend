@@ -1,4 +1,5 @@
 {
+  "serviceName": "Possession Claims",
   "caseReferenceLabel": "Case number:",
   "iWantToHeading": "I want to...",
   "askCourtToMakeOrder": "Ask the court to make an order (make a general application)",
@@ -19,18 +20,19 @@
     "JUDGEMENT": "Judgement from the court",
     "NOTICE": "Orders and notices from the court",
     "RESPONSE": "The response",
-    "APPLICATIONS": "Applications"
+    "APPLICATIONS": "Applications",
+    "DOCUMENTS": "Documents"
   },
 
   "notifications": {
     "Defendant": {
       "CaseIssued": {
         "title": "Case issued",
-        "body": "Your case has been issued. <a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/claim/Defendant.ViewClaim\">View the claim</a>. Respond by {{responseEndDate}}."
+        "body": "Your case has been issued. <a class=\"govuk-link\" href=\"/case/{{caseReference}}/view-the-claim\">View the claim</a>. Respond by {{responseEndDate}}."
       },
       "ResponseToClaim": {
         "title": "Response to claim",
-        "body": "<a class=\"govuk-link\" href=\"/dashboard/{{caseReference}}/response/Defendant.RespondToClaim\">{{ctaLabel}}</a>"
+        "body": "<a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">{{ctaLabel}}</a>"
       }
     }
   },
@@ -42,14 +44,26 @@
       "COMPLETED": "Completed",
       "NOT_STARTED": "Not started"
     },
-    "Defendant": {
-      "ViewClaim": { "title": "View the claim" },
-      "RespondToClaim": { "title": "Respond to the claim" },
-      "ViewDocuments": { "title": "View documents" },
-      "ViewHearingDocuments": { "title": "View hearing documents" },
-      "ViewOrdersAndNotices": { "title": "View orders and notices" },
-      "ReviewResponse": { "title": "Review the response" },
-      "SubmitResponse": { "title": "Submit the response" }
+    "ViewClaim": { "title": "View the claim" },
+    "UploadDocuments": { "title": "Upload additional documents" },
+    "ViewDocuments": { "title": "View documents" },
+    "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
+    "ViewAllApplications": { "title": "View all applications" },
+    "RespondToClaim": { "title": "Respond to the claim" },
+    "ViewHearingDocuments": { "title": "View hearing documents" },
+    "ViewOrdersAndNotices": { "title": "View orders and notices" },
+    "ReviewResponse": { "title": "Review the response" },
+    "SubmitResponse": { "title": "Submit the response" }
+  },
+  "viewDocuments": {
+    "pageTitle": "View documents",
+    "noDocuments": "There are no documents to display.",
+    "submittedOn": "Submitted on",
+    "folders": {
+      "statementsOfCase": "Statements of case",
+      "propertyDocuments": "Property documents",
+      "evidence": "Evidence",
+      "correspondence": "Correspondence"
     }
   }
 }
