@@ -1,0 +1,46 @@
+import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../draftEvent';
+import { createRespondToClaimFormStep } from '../formStep';
+
+import { createCcdDraftStorage, toDisplayDocuments } from '@modules/documents/storage';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
+
+const storage = createCcdDraftStorage({
+  event: RESPOND_TO_CLAIM_DRAFT_EVENT,
+  getDocs: data => data.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [],
+  setDocs: docs => ({ possessionClaimResponse: { defendantResponses: { defendantDocuments: docs } } }),
+});
+
+export const step: StepDefinition = createRespondToClaimFormStep({
+  stepName: 'upload-document',
+  documentStorage: storage,
+  stepDir: __dirname,
+  customTemplate: `${__dirname}/uploadDocument.njk`,
+  fields: [
+    {
+      name: 'documents',
+      type: 'file',
+      required: false,
+      accept: ACCEPT_ATTRIBUTE_EXTENSIONS,
+      maxFileSize: UPLOAD_MAX_FILE_SIZE_MB,
+      labelClasses: 'govuk-label--s',
+      translationKey: {
+        label: 'uploadLabel',
+      },
+    },
+  ],
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    heading: 'heading',
+    guidanceText: 'guidanceText',
+    beforeUploadHeading: 'beforeUploadHeading',
+    beforeUploadText: 'beforeUploadText',
+    uploadLabel: 'uploadLabel',
+    filesAddedHeading: 'filesAddedHeading',
+    uploadButton: 'uploadButton',
+    deleteButton: 'deleteButton',
+  },
+  getInitialFormData: async req => ({ documents: toDisplayDocuments(await storage.read(req)) }),
+  // No extendGetContent — formBuilder auto-wires uploadUrl/deleteUrl when documentStorage is set.
+  // No beforeRedirect — documents are saved to CCD on upload/delete via documentProxy.
+});

@@ -153,6 +153,12 @@
   "xui": {
     "uri": "https://manage-case.aat.platform.hmcts.net"
   },
+  "cdam": {
+    "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+  },
+  "documentUpload": {
+    "maxFileSizeMB": 1024
+  },
   "dashboard": {
     "taskRoutes": {
       "Defendant.ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
