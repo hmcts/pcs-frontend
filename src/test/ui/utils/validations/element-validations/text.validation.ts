@@ -37,7 +37,8 @@ export class TextValidation implements IValidation {
         data.elementType = 'div';
         break;
     }
-    const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
-    await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(String(data.text))}\\s*$`));
+    const locator = page.locator(`${data.elementType}:has-text("${data.text}")`).filter({ visible: true }).first();
+    const normalizedText = escapeForRegex(String(data.text)).replace(/\s+/g, '\\s+');
+    await expect(locator).toHaveText(new RegExp(`^\\s*${normalizedText}\\s*$`));
   }
 }
