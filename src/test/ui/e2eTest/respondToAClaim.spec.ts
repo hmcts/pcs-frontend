@@ -7,9 +7,11 @@ import {
   correspondenceAddress,
   counterClaim,
   counterClaimAbout,
+  counterClaimAgainstWhom,
   counterClaimFee,
   counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
+  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
@@ -42,7 +44,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-import { claimantsName, firstName, lastName } from '../utils/actions/custom-actions';
+//import { firstName, lastName, pins } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -261,6 +263,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimFee.mainHeader);
     await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    //Need help steps need to be added
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -1132,7 +1140,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
-    /*await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
@@ -1180,8 +1188,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     //counter claim fee i dont need help step need to include*/
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/counter-claim-against-whom`);
-    await performAction('selectClaimAgainstWhom', claimantsName,firstName+' '+lastName);
+    await performAction('selectClaimAgainstWhom', {
+      question: counterClaimAgainstWhom.mainHeader,
+      radioOption: claimantName,
+    });
     await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
@@ -1190,6 +1200,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
       factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
     });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),

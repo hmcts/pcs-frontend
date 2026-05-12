@@ -10,6 +10,7 @@ import {
   correspondenceAddress,
   counterClaim,
   counterClaimAbout,
+  counterClaimAgainstWhom,
   counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
@@ -732,7 +733,7 @@ export class RespondToClaimAction implements IAction {
         option: claimAgainstWhom.radioOption,
       });
     }
-    await performAction('clickButton', claimAgainstWhom.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAgainstWhom.saveAndContinueButton);
   }
 
   private async counterClaimAbout(claimAbout: actionRecord): Promise<void> {
