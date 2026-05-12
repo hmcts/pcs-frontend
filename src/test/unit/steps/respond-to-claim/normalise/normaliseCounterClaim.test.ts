@@ -134,4 +134,20 @@ describe('normaliseCounterClaim', () => {
 
     expect(response.defendantResponses).toEqual({ makeCounterClaim: 'YES' });
   });
+
+  // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — keep counterClaim alive when
+  // makeCounterClaim comes back as "Yes" instead of "YES".
+  it('treats PascalCase "Yes" on makeCounterClaim the same as "YES"', () => {
+    const response = {
+      defendantResponses: {
+        // Cast simulates BE returning out-of-type casing — the static type is 'YES'/'NO'.
+        makeCounterClaim: 'Yes' as 'YES',
+        counterClaim: { claimType: 'OTHER' },
+      },
+    } as PossessionClaimResponse;
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaim).toEqual({ claimType: 'OTHER' });
+  });
 });
