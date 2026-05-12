@@ -46,10 +46,6 @@
         "title": "Your response",
         "body": "You have responded to the claim."
       },
-      "ResponseUnknown": {
-        "title": "Your response",
-        "body": "Your response status is unavailable right now."
-      },
       "NoHearingArranged": {
         "title": "A property possession claim has been made against you",
         "body": "The court will arrange the hearing and contact you with details."
