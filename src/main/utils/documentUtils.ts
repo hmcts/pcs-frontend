@@ -1,4 +1,4 @@
-import type { CcdCaseDocument } from '@services/ccdCase.interface';
+import type { CcdDocumentReference } from '@services/ccdCase.interface';
 
 const DOCUMENT_FOLDER_TITLES = {
   statementsOfCase: 'Statements of case',
@@ -12,7 +12,7 @@ type DocumentFolderKey = keyof typeof DOCUMENT_FOLDER_TITLES;
 type CaseData = {
   allDocuments?: {
     id?: string;
-    value: CcdCaseDocument;
+    value: Partial<CcdDocumentReference>;
   }[];
 };
 

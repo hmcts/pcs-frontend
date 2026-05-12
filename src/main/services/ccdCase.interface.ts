@@ -254,10 +254,8 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
-  allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+  allDocuments?: CcdCollectionItem<Partial<CcdDocumentReference>>[];
 }
-
-export type CcdCaseDocument = Partial<CcdDocumentReference>;
 
 /** Case representation used by services: id + case_data. */
 export interface CcdCase {
