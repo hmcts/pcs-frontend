@@ -64,5 +64,10 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       dashboard.viewOrdersAndNoticesLink,
       viewOrdersAndNotices.mainHeader
     );
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.uploadAdditionalDocumentsLink,
+      header: uploadAdditionalDocuments.mainHeader,
+    });
   });
 });
