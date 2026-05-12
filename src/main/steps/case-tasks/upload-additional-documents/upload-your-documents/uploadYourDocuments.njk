@@ -18,9 +18,8 @@
   {% endif %}
 
   <p class="govuk-body">{{ guidanceText }}</p>
-
-  <h2 class="govuk-heading-s">{{ beforeUploadHeading }}</h2>
   <p class="govuk-body">{{ beforeUploadText }}</p>
+  <p class="govuk-body">{{ fileTypesText }}</p>
 
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
