@@ -3,10 +3,8 @@ export enum CaseState {
   SUBMITTED = 'Submitted',
 }
 
-export type VerticalYesNoValue = 'YES' | 'NO' | null;
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
-export type ContactPreference = 'EMAIL' | 'POST' | null;
 export enum YesNoEnum {
   YES = 'YES',
   NO = 'NO',
@@ -75,7 +73,7 @@ export type PaymentAgreement = {
   repaymentPlanAgreed?: YesNoNotSureValue;
   repaymentAgreedDetails?: string;
   repayArrearsInstalments?: YesNoValue;
-  additionalRentContribution?: unknown;
+  additionalRentContribution?: PenceAmount;
   additionalContributionFrequency?: string;
 };
 
@@ -141,7 +139,7 @@ export interface CcdDefendantParty {
   address?: CcdCaseAddress | Record<string, never>;
   addressKnown?: string;
   addressSameAsProperty?: string;
-  phoneNumberProvided?: VerticalYesNoValue;
+  phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
 }
 
@@ -175,11 +173,10 @@ export interface CcdDefendantResponses {
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;
-  contactByPhone?: VerticalYesNoValue;
-  contactByEmail?: VerticalYesNoValue;
-  contactByPost?: VerticalYesNoValue;
-  contactByText?: VerticalYesNoValue;
-  preferenceType?: ContactPreference;
+  contactByPhone?: YesNoValue;
+  contactByEmail?: YesNoValue;
+  contactByPost?: YesNoValue;
+  contactByText?: YesNoValue;
   rentArrearsAmountConfirmation?: string;
   rentArrearsAmount?: string;
   landlordRegistered?: YesNoNotSureValue;
@@ -234,12 +231,16 @@ export interface CcdCaseData {
   noticeServed?: string;
   propertyAddress?: CcdCaseAddress;
   claimGroundSummaries?: CcdClaimGroundSummaryItem[];
+  userPcqId?: string;
   userPcqIdSet?: string;
   tenancy_TenancyLicenceDate?: string;
   legislativeCountry?: string;
   notice_NoticeHandedOverDateTime?: string;
   notice_NoticePostedDate?: string;
+  notice_NoticeDeliveredDate?: string;
+  notice_NoticeEmailSentDateTime?: string;
   notice_NoticeOtherElectronicDateTime?: string;
+  notice_NoticeOtherDateTime?: string;
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
@@ -248,6 +249,9 @@ export interface CcdCaseData {
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
   citizenGenAppRequest?: CitizenGenAppRequest;
+  // Gen-apps applicant fields written at create-case time
+  applicantForename?: string;
+  applicantSurname?: string;
   dashboardData?: CcdDashboardData;
 }
 
