@@ -1,8 +1,8 @@
-import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { uploadAdditionalDocuments } from '../data/page-data/documents-page-data';
-import { chooseAnApplication } from '../data/page-data/genApps-page-data';
+import { chooseAnApplication, viewAllApplications } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
@@ -48,21 +48,30 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       ['clickLinkAndVerifySameTabTitle', dashboard.findInfoAboutMyCourtLink, dashboard.findACourtOrTribunalHeader]
     );
     await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.theClaimSubHeader,
       fieldName: dashboard.viewTheClaimLink,
       header: viewTheClaim.mainHeader,
-      sectionHeader: dashboard.theClaimSubHeader,
     });
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.courtHearingSubHeader });
-    await performAction(
-      'clickLinkAndVerifySameTabTitle',
-      dashboard.viewHearingDocumentsLink,
-      viewHearingDocuments.mainHeader
-    );
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.ordersNoticesFromCourtSubHeader });
-    await performAction(
-      'clickLinkAndVerifySameTabTitle',
-      dashboard.viewOrdersAndNoticesLink,
-      viewOrdersAndNotices.mainHeader
-    );
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.courtHearingSubHeader,
+      fieldName: dashboard.viewHearingDocumentsLink,
+      header: viewHearingDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.ordersNoticesFromCourtSubHeader,
+      fieldName: dashboard.viewOrdersAndNoticesLink,
+      header: viewOrdersAndNotices.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.applicationSubHeader,
+      fieldName: dashboard.askTheCourtToMakeAnOrderLink,
+      header: chooseAnApplication.mainHeader,
+    });
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.applicationSubHeader,
+      fieldName: dashboard.viewAllApplicationsLink,
+      header: viewAllApplications.mainHeader,
+    });
   });
 });

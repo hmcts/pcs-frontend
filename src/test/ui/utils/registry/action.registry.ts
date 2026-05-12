@@ -1,4 +1,5 @@
 import {
+  CitizenCreateGenAppAPIAction,
   CreateCaseAPIAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
@@ -40,6 +41,7 @@ export class ActionRegistry {
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
