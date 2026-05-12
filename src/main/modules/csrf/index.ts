@@ -14,7 +14,13 @@ export class Csrf {
        * @param {Request} req - The incoming request object.
        * @returns {string|undefined} The CSRF token if present, otherwise undefined.
        */
-      getTokenFromRequest: (req: Request) => req.body._csrf || req.get('x-csrf-token'),
+      getTokenFromRequest: (req: Request) => {
+        const tokenFromBody =
+          req.body && typeof req.body === 'object' && '_csrf' in req.body
+            ? (req.body._csrf as string | undefined)
+            : undefined;
+        return tokenFromBody || req.get('x-csrf-token');
+      },
     });
 
     /**

@@ -10,7 +10,7 @@ export const test = base;
 
 test.afterEach(async () => {
   if (process.env.CASE_NUMBER) {
-    await performAction('deleteCaseRole', '[CREATOR]');
+    await performAction('deleteCaseRole', '[CLAIMANTSOLICITOR]');
   }
 });
 

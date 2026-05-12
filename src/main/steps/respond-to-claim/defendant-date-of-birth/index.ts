@@ -1,59 +1,53 @@
 import { DateTime } from 'luxon';
 
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-date-of-birth',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  basePath: '/respond-to-claim',
-  flowConfig,
   showCancelButton: false,
   beforeRedirect: async req => {
     const dateOfBirth = req.body?.dateOfBirth;
 
-    if (!dateOfBirth || typeof dateOfBirth !== 'object') {
-      return;
+    const response = buildDraftDefendantResponse(req);
+    let dateSet = false;
+    if (dateOfBirth && typeof dateOfBirth === 'object') {
+      const { day, month, year } = dateOfBirth;
+
+      if (day && month && year) {
+        const dateTime = DateTime.fromObject({
+          year: Number(year),
+          month: Number(month),
+          day: Number(day),
+        });
+
+        if (dateTime.isValid) {
+          response.defendantResponses.dateOfBirth = dateTime.toISODate();
+          dateSet = true;
+        }
+      }
     }
 
-    const { day, month, year } = dateOfBirth;
-
-    if (!day || !month || !year) {
-      return;
+    if (!dateSet) {
+      delete response.defendantResponses.dateOfBirth;
     }
 
-    // Validate and convert to ISO date (same logic as dateToISO)
-    const dateTime = DateTime.fromObject({
-      year: Number(year),
-      month: Number(month),
-      day: Number(day),
-    });
+    await saveDraftDefendantResponse(
+      req,
 
-    if (!dateTime.isValid) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        dateOfBirth: dateTime.toISODate(),
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
   },
   getInitialFormData: req => {
-    const { defendantResponsesDateOfBirth: dateOfBirth } = req.res?.locals.validatedCase ?? {
-      defendantResponsesDateOfBirth: undefined,
-    };
+    const caseData = req.res?.locals.validatedCase?.data;
+    const dateOfBirth = caseData?.possessionClaimResponse?.defendantResponses?.dateOfBirth;
 
     if (!dateOfBirth || typeof dateOfBirth !== 'string') {
       return {};
@@ -74,7 +68,6 @@ export const step: StepDefinition = createFormStep({
   },
   fields: [
     {
-      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l govuk-!-margin-bottom-9',
       name: 'dateOfBirth',
       type: 'date',
