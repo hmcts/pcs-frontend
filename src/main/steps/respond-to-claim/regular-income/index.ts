@@ -105,7 +105,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     // Universal Credit
-    if (fromYesNoEnum(hc.universalCredit) === 'yes') {
+    const appliedForUniversalCredit = fromYesNoEnum(hc.universalCredit);
+    if ((hc.universalCreditAmount || hc.universalCreditFrequency) && appliedForUniversalCredit !== 'no') {
       selectedIncome.push('universalCredit');
       if (hc.universalCreditAmount) {
         formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);
@@ -171,7 +172,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
           delete hc[amountKey];
         }
         if (frequency) {
-          hc[frequencyKey] = frequency as (typeof hc)[typeof frequencyKey];
+          hc[frequencyKey] = frequency as 'WEEKLY' | 'MONTHLY';
         } else {
           delete hc[frequencyKey];
         }
