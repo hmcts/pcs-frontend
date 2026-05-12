@@ -37,6 +37,8 @@ export const step: StepDefinition = createFormStep({
     askingForSomethingElseListItem1: 'askingForSomethingElseListItem1',
     askingForSomethingElseListItem2: 'askingForSomethingElseListItem2',
     askingForSomethingElseListItem3: 'askingForSomethingElseListItem3',
+    raQuestionsButton: 'raQuestionsButton',
+    progressButton: 'progressButton',
   },
   fields: [],
 });

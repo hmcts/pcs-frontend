@@ -4,7 +4,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% block pageTitle %}
-  {{ pageTitle | safe }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
 {% block mainContent %}
   {% if errorSummary %}
@@ -62,11 +62,11 @@
   <form method="post" action="{{ url }}">
     <div class="govuk-button-group govuk-!-padding-top-6">
       {{ govukButton({
-          text: 'Continue to the questions',
+          text: raQuestionsButton,
           type: "button"
       }) }}
         {{ govukButton({
-              text: 'I do not need support at this time',
+              text: progressButton,
               classes: 'govuk-button--secondary',
               name: 'reasonableAdjustmentsChoice',
               value: 'skip'

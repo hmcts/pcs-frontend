@@ -25,5 +25,8 @@
   "contactByPhoneHeading": "Contact the court by telephone",
   "contactByPhoneParagraph1": "0300 123 7050",
   "contactByPhoneParagraph2": "Monday to Friday, 8.30am to 5pm. ",
-  "contactByPhoneParagraph3": "Find out about call charges (opens in new tab)."
+  "contactByPhoneParagraph3": "Find out about call charges (opens in new tab).",
+  "raQuestionsButton": "Continue to the questions",
+  "progressButton": "I do not need support at this time"
+
 }
