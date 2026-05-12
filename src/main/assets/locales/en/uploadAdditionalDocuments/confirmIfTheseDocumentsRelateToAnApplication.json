@@ -1,5 +1,7 @@
 {
-  "pageTitle": "Confirm the application",
-  "heading": "Confirm the application",
-  "body": "Placeholder content: confirm which application these documents relate to. This step will be expanded when requirements are finalised."
+  "pageTitle": "Confirm if these documents relate to an existing application",
+  "heading": "Confirm if these documents relate to an existing application",
+  "paragraph1": "We usually share anything you upload with the other party, for example your landlord, housing association or mortgage provider.",
+  "paragraph2": "If your application is 'without notice' (where you have asked us to consider your application without telling the other party) we will not share anything with them.",
+  "question": "Do these documents relate to an existing application?"
 }

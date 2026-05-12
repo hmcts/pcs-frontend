@@ -48,7 +48,7 @@ export const step: StepDefinition = {
 
       const noOption = {
         value: 'claim-or-counterclaim',
-        text: "No, the documents I'm uploading relate to the claim or counterclaim",
+        text: "No, the documents I'm uploading relate to the main claim or counterclaim",
         checked: selectedApplicationId === 'claim-or-counterclaim',
       };
 
