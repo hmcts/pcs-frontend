@@ -72,14 +72,12 @@ export const submitCaseApiDataWales = {
     walesLicensedAgentAppointed: 'NO',
     walesRegistered: 'NO',
 
-    
     showReasonsForGroundsPageWales: 'YES',
 
     rentDetails_Frequency: 'WEEKLY',
-    
+
     rentDetails_CurrentRent: '80000',
     rentDetails_CalculatedDailyCharge: '11429',
-    
 
     rentArrears_Total: '8000',
     rentArrears_RecoveryAttempted: 'YES',
