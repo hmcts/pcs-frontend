@@ -1,7 +1,8 @@
 import type { Request } from 'express';
 
+import type { FormBuilderFlowConfig } from './flowConfig';
+
 import type { DocumentStorage } from '@modules/documents/storage';
-import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export type FormFieldType =
   | 'radio'
@@ -32,6 +33,17 @@ export interface FormFieldOption {
   conditionalText?: string | ((translations: Record<string, string>) => string);
   // SubFields appear conditionally when this option is selected (e.g., text inputs under "No" radio button)
   subFields?: Record<string, FormFieldConfig>;
+}
+
+// Shape of the built `component` config that the radio macro consumes. Steps reach into this
+// via `formContent.fields.find(f => f.componentType === 'radios')` to mutate heading/legend/hint
+// at render time. Narrowed from FormFieldConfig['component'] which is Record<string, unknown>.
+export interface RadioFormField {
+  component: {
+    label: { text: string };
+    fieldset: { legend: { text: string; isPageHeading?: boolean } };
+    hint?: { text: string };
+  };
 }
 
 export interface FormFieldConfig {
@@ -130,7 +142,7 @@ export interface FormBuilderConfig {
   translationKeys?: TranslationKeys;
   customTemplate?: string;
   basePath?: string;
-  flowConfig?: JourneyFlowConfig;
+  flowConfig?: FormBuilderFlowConfig;
   showCancelButton?: boolean;
   // Storage adapter for upload steps. When set, formBuilder auto-wires uploadUrl/deleteUrl
   // onto the fileUpload field component from req.originalUrl.

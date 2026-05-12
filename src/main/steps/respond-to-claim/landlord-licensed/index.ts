@@ -1,15 +1,12 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'landlord-licensed',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/landlordLicensed.njk`,
   translationKeys: {
     caption: 'caption',
@@ -28,42 +25,28 @@ export const step: StepDefinition = createFormStep({
         { value: 'yes', translationKey: 'options.yes' },
         { value: 'no', translationKey: 'options.no' },
         { divider: 'options.or' },
-        { value: 'imNotSure', translationKey: 'options.imNotSure' },
+        { value: 'notSure', translationKey: 'options.imNotSure' },
       ],
     },
   ],
   beforeRedirect: async req => {
-    const confirmValue = req.body?.confirmLandlordLicensed as string | undefined;
+    const response = buildDraftDefendantResponse(req);
+    const enumValue = toYesNoNotSureEnum(req.body?.confirmLandlordLicensed);
 
-    const defendantResponses: Record<string, unknown> = {};
-
-    if (confirmValue === 'yes') {
-      defendantResponses.landlordLicensed = 'YES';
-    } else if (confirmValue === 'no') {
-      defendantResponses.landlordLicensed = 'NO';
-    } else if (confirmValue === 'imNotSure') {
-      defendantResponses.landlordLicensed = 'NOT_SURE';
+    if (enumValue) {
+      response.defendantResponses.landlordLicensed = enumValue;
+    } else {
+      delete response.defendantResponses.landlordLicensed;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        ...defendantResponses,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: async req => {
-    const landlordLicensed = req.res?.locals?.validatedCase?.defendantResponsesLandlordLicensed as string | undefined;
-
-    const mapping: Record<string, string> = {
-      YES: 'yes',
-      NO: 'no',
-      NOT_SURE: 'imNotSure',
-    };
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const landlordLicensed = caseData?.possessionClaimResponse?.defendantResponses?.landlordLicensed;
 
     return {
-      confirmLandlordLicensed: landlordLicensed ? mapping[landlordLicensed] : undefined,
+      confirmLandlordLicensed: fromYesNoNotSureEnum(landlordLicensed),
     };
   },
 });
