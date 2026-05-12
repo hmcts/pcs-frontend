@@ -12,7 +12,6 @@ import {
   getCommonTranslations,
   getTranslationFunction,
   populateCommonTranslations,
-  setupNunjucksGlobals,
 } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 
@@ -106,7 +105,7 @@ describe('i18n module', () => {
     // Error was logged
     expect(mockLogger.error).toHaveBeenCalledWith('[i18n] init error', err);
   });
-  it('middleware clamps language, calls changeLanguage, exposes t and sets nunjucks globals (valid lang)', async () => {
+  it('middleware clamps language, calls changeLanguage and exposes lang+t on res.locals (valid lang)', async () => {
     // Make init succeed
     mockInit.mockImplementation((_opts: unknown, cb: (err: unknown) => void) => cb(null));
 
@@ -118,13 +117,11 @@ describe('i18n module', () => {
     const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => void;
 
     const changeLanguage = jest.fn();
-    const addGlobal = jest.fn();
 
     const req = {
       language: 'cy',
       i18n: { changeLanguage },
       t: (key: string | string[], def?: string) => (Array.isArray(key) ? (def ?? key[0]) : (def ?? key)),
-      app: { locals: { nunjucksEnv: { addGlobal } } },
       session: { user: { name: 'Alice' } },
     } as unknown as Parameters<typeof langMw>[0];
 
@@ -136,15 +133,11 @@ describe('i18n module', () => {
     // changeLanguage called with clamped 'cy'
     expect(changeLanguage).toHaveBeenCalledWith('cy');
 
-    // res.locals populated
+    // res.locals populated (request-scoped, not shared nunjucks globals)
     expect(res.locals.lang).toBe('cy');
     expect(typeof res.locals.t).toBe('function');
 
     expect(res.locals.t('serviceName', 'Default Service')).toBe('Default Service');
-
-    // nunjucks globals set
-    expect(addGlobal).toHaveBeenCalledWith('lang', 'cy');
-    expect(addGlobal).toHaveBeenCalledWith('t', expect.any(Function));
 
     // next called
     expect(next).toHaveBeenCalled();
@@ -161,13 +154,11 @@ describe('i18n module', () => {
     const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => void;
 
     const changeLanguage = jest.fn();
-    const addGlobal = jest.fn();
 
     const req = {
       language: 'fr', // invalid -> should clamp to 'en'
       i18n: { changeLanguage },
       // no req.t -> middleware must provide fallback TFunction
-      app: { locals: { nunjucksEnv: { addGlobal } } },
       session: {}, // no user
     } as unknown as Parameters<typeof langMw>[0];
 
@@ -187,11 +178,8 @@ describe('i18n module', () => {
     // @ts-expect-error runtime call for test
     expect(res.locals.t(['k1', 'k2'], undefined)).toBe('k1'); // returns first key when no default
 
-    // nunjucks globals set (lang & t); no user global when absent
-    expect(addGlobal).toHaveBeenCalledWith('lang', 'en');
-    expect(addGlobal).toHaveBeenCalledWith('t', expect.any(Function));
-    // ensure we did NOT push a user global
-    expect(addGlobal).not.toHaveBeenCalledWith('user', expect.anything());
+    // user is exposed to templates by oidcMiddleware, not the i18n middleware
+    expect(res.locals.user).toBeUndefined();
 
     expect(next).toHaveBeenCalled();
   });
@@ -328,25 +316,6 @@ describe('i18n module', () => {
       populateCommonTranslations(req, res, mockT);
 
       expect(res.locals.serviceName).toBe('Existing Service');
-    });
-  });
-
-  describe('setupNunjucksGlobals', () => {
-    it('should add globals to nunjucks environment', () => {
-      const addGlobal = jest.fn();
-      const env = { addGlobal } as any;
-      const globals = { lang: 'en', t: jest.fn() };
-
-      setupNunjucksGlobals(env, globals);
-
-      expect(addGlobal).toHaveBeenCalledWith('lang', 'en');
-      expect(addGlobal).toHaveBeenCalledWith('t', globals.t);
-    });
-
-    it('should return early if env is undefined', () => {
-      const globals = { lang: 'en', t: jest.fn() };
-
-      expect(() => setupNunjucksGlobals(undefined, globals)).not.toThrow();
     });
   });
 

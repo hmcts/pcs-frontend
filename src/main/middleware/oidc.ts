@@ -108,8 +108,8 @@ export const oidcMiddleware: RequestHandler = async (
         if (!req.session?.user) {
           return setReturnToAndRedirectToLogin();
         }
-        // Update nunjucks global and continue
-        req.app.locals.nunjucksEnv.addGlobal('user', req.session.user);
+        // Expose user to templates via per-request res.locals (not a shared nunjucks global)
+        res.locals.user = req.session.user;
         return next();
       }
 
@@ -186,8 +186,8 @@ export const oidcMiddleware: RequestHandler = async (
       }
     }
 
-    // Token is valid, update nunjucks global and continue
-    req.app.locals.nunjucksEnv.addGlobal('user', req.session.user);
+    // Token is valid; expose user to templates via per-request res.locals
+    res.locals.user = req.session.user;
     next();
   } catch (error) {
     logger.error('Unexpected error in oidcMiddleware', {
