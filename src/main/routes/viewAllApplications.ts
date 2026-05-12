@@ -30,6 +30,39 @@ type PartyGenApps = {
   genApps: GenAppSummary[];
 };
 
+export default function viewAllApplicationsRoutes(app: Application): void {
+  app.get('/case/:caseReference/view-all-applications', oidcMiddleware, async (req: Request, res: Response) => {
+    const accessToken = req.session.user?.accessToken;
+    if (!accessToken) {
+      logger.warn('User not authenticated - no access token');
+      throw new HTTPError('Authentication required', 401);
+    }
+
+    const rawCaseReference = req.params.caseReference as string;
+    const caseReference = sanitiseCaseReference(rawCaseReference);
+    if (!caseReference) {
+      return null;
+    }
+
+    const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
+
+    // Gen apps are ordered in the CCD data by submission date descending
+    const allGenApps = ccdCase?.data.genApps || [];
+    const currentUserIdamId = req.session.user?.uid as string;
+
+    const userGenApps = buildUserGenAppSummaries(allGenApps, currentUserIdamId);
+    const otherPartyGenAppsMap = buildOtherPartyGenAppsMap(allGenApps, currentUserIdamId);
+    const formattedCaseReference = caseReference.replace(/(\d{4})(?=\d)/g, '$1 ');
+
+    res.render('view-all-applications', {
+      formattedCaseReference,
+      dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+      userGenApps,
+      otherPartyGenAppsMap,
+    });
+  });
+}
+
 function toGenAppSummary(genApp: GenApp): GenAppSummary {
   return {
     applicationType: genApp.applicationType,
@@ -80,37 +113,4 @@ function buildOtherPartyGenAppsMap(allGenApps: CcdCollectionItem<GenApp>[], curr
 
       return partyGenAppsMap;
     }, initialMap);
-}
-
-export default function viewAllApplicationsRoutes(app: Application): void {
-  app.get('/case/:caseReference/view-all-applications', oidcMiddleware, async (req: Request, res: Response) => {
-    const accessToken = req.session.user?.accessToken;
-    if (!accessToken) {
-      logger.warn('User not authenticated - no access token');
-      throw new HTTPError('Authentication required', 401);
-    }
-
-    const rawCaseReference = req.params.caseReference as string;
-    const caseReference = sanitiseCaseReference(rawCaseReference);
-    if (!caseReference) {
-      return null;
-    }
-
-    const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
-
-    // Gen apps are ordered in the CCD data by submission date descending
-    const allGenApps = ccdCase?.data.genApps || [];
-    const currentUserIdamId = req.session.user?.uid as string;
-
-    const userGenApps = buildUserGenAppSummaries(allGenApps, currentUserIdamId);
-    const otherPartyGenAppsMap = buildOtherPartyGenAppsMap(allGenApps, currentUserIdamId);
-    const formattedCaseReference = caseReference.replace(/(\d{4})(?=\d)/g, '$1 ');
-
-    res.render('view-all-applications', {
-      formattedCaseReference,
-      dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-      userGenApps,
-      otherPartyGenAppsMap,
-    });
-  });
 }
