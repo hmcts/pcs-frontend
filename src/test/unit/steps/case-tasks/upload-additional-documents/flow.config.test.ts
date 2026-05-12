@@ -6,20 +6,20 @@ import {
 import { isViewAllApplicationsAvailable } from '../../../../../main/steps/case-tasks/upload-additional-documents/flowConditions';
 
 describe('upload-additional-documents flow.config', () => {
-  describe('start-now branching', () => {
-    const startNow = flowConfig.steps['start-now'];
+  describe('start-evidence-upload branching', () => {
+    const startEvidenceUpload = flowConfig.steps['start-evidence-upload'];
 
     it('should not use defaultNext (branching is via routes)', () => {
-      expect(startNow.defaultNext).toBeUndefined();
+      expect(startEvidenceUpload.defaultNext).toBeUndefined();
     });
 
     it('should define routes in the correct branching order', () => {
-      expect(startNow.routes).toBeDefined();
-      expect(startNow.routes).toHaveLength(2);
+      expect(startEvidenceUpload.routes).toBeDefined();
+      expect(startEvidenceUpload.routes).toHaveLength(2);
     });
 
     it('routes the user to confirm-if-these-documents-relate-to-an-application when isViewAllApplicationsAvailable is true', () => {
-      const conditionalRoute = startNow.routes?.[0];
+      const conditionalRoute = startEvidenceUpload.routes?.[0];
 
       expect(conditionalRoute?.condition).toBe(isViewAllApplicationsAvailable);
       expect(conditionalRoute?.nextStep).toBe(confirmIfTheseDocumentsRelateToAnApplicationStep);
@@ -27,7 +27,7 @@ describe('upload-additional-documents flow.config', () => {
     });
 
     it('falls through to upload-your-documents as the default branch', () => {
-      const fallbackRoute = startNow.routes?.[1];
+      const fallbackRoute = startEvidenceUpload.routes?.[1];
 
       expect(fallbackRoute?.condition).toBeUndefined();
       expect(fallbackRoute?.nextStep).toBe(uploadYourDocumentsStep);

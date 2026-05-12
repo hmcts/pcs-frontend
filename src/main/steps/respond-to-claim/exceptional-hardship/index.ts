@@ -1,15 +1,13 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { YesNoValue } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'exceptional-hardship',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
@@ -49,7 +47,7 @@ export const step: StepDefinition = createFormStep({
   ],
   customTemplate: `${__dirname}/exceptionalHardship.njk`,
   extendGetContent: req => {
-    const t = getTranslationFunction(req, 'exceptional-hardship', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       introParagraph1: t('introParagraph1'),
@@ -63,36 +61,38 @@ export const step: StepDefinition = createFormStep({
     };
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const exceptionalHardshipValue = req.body?.exceptionalHardship as string | undefined;
+    const ccdMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
 
-    if (!exceptionalHardshipValue || (exceptionalHardshipValue !== 'yes' && exceptionalHardshipValue !== 'no')) {
-      return;
+    if (exceptionalHardshipValue && ccdMapping[exceptionalHardshipValue]) {
+      response.defendantResponses.householdCircumstances.exceptionalHardship = ccdMapping[exceptionalHardshipValue];
+
+      if (exceptionalHardshipValue === 'yes') {
+        response.defendantResponses.householdCircumstances.exceptionalHardshipDetails = req.body?.[
+          'exceptionalHardship.exceptionalHardshipDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.householdCircumstances.exceptionalHardshipDetails;
+      }
+    } else {
+      delete response.defendantResponses.householdCircumstances.exceptionalHardship;
+      delete response.defendantResponses.householdCircumstances.exceptionalHardshipDetails;
     }
 
-    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
-    const exceptionalHardship = ccdMapping[exceptionalHardshipValue];
-    const exceptionalHardshipDetails =
-      exceptionalHardshipValue === 'yes'
-        ? (req.body?.['exceptionalHardship.exceptionalHardshipDetails'] as string | undefined)
-        : undefined;
+    await saveDraftDefendantResponse(
+      req,
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          exceptionalHardship,
-          exceptionalHardshipDetails,
-        },
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const householdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     const existingAnswer = householdCircumstances?.exceptionalHardship as string | undefined;
 
-    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
+    const mapping: Record<string, string> = { YES: 'yes', NO: 'no' };
     const exceptionalHardshipValue = existingAnswer ? mapping[existingAnswer] : undefined;
 
     if (!exceptionalHardshipValue) {

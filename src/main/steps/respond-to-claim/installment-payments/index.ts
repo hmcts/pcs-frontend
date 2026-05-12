@@ -1,11 +1,11 @@
 import { normalizeYesNoValue } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { getClaimantName } from '../../utils/getClaimantName';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { YesNoValue } from '@services/ccdCase.interface';
 
 function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): YesNoValue | undefined {
   if (value === 'yes') {
@@ -17,38 +17,29 @@ function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): Yes
   return undefined;
 }
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'installment-payments',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/instalmentOffer.njk`,
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
     const repayArrearsInstalments = repayArrearsInstalmentsFromConfirmOffer(
       req.body?.confirmInstallmentOffer as string | undefined
     );
-    if (repayArrearsInstalments === undefined) {
-      return;
+
+    if (repayArrearsInstalments) {
+      response.defendantResponses.paymentAgreement.repayArrearsInstalments = repayArrearsInstalments;
+    } else {
+      delete response.defendantResponses.paymentAgreement.repayArrearsInstalments;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        paymentAgreement: { repayArrearsInstalments },
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data as
-      | {
-          possessionClaimResponse?: {
-            defendantResponses?: { paymentAgreement?: { repayArrearsInstalments?: YesNoValue } };
-          };
-        }
-      | undefined;
-
-    const stored = caseData?.possessionClaimResponse?.defendantResponses?.paymentAgreement?.repayArrearsInstalments;
+    const stored =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
+        ?.repayArrearsInstalments;
     const normalizedStored = normalizeYesNoValue(stored);
 
     if (normalizedStored === 'YES') {
@@ -84,7 +75,7 @@ export const step: StepDefinition = createFormStep({
   ],
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
-    const t = getTranslationFunction(req, 'installment-payments', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       paragraph1: t('paragraph1', { claimantName }),

@@ -11,9 +11,9 @@ export const flowConfig: JourneyFlowConfig = {
   basePath: UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE,
   journeyName: 'uploadAdditionalDocuments',
   useSessionFormData: false,
-  stepOrder: ['start-now', confirmIfTheseDocumentsRelateToAnApplicationStep, uploadYourDocumentsStep],
+  stepOrder: ['start-evidence-upload', confirmIfTheseDocumentsRelateToAnApplicationStep, uploadYourDocumentsStep],
   steps: {
-    'start-now': {
+    'start-evidence-upload': {
       routes: [
         {
           condition: isViewAllApplicationsAvailable,

@@ -35,13 +35,12 @@ export const createGetController = (
   view: string,
   stepName: string,
   stepNavigation: StepNavigation,
-  extendContent?: (req: Request) => StepFormData | Promise<StepFormData>,
-  journeyFolder?: string
+  extendContent?: (req: Request) => StepFormData | Promise<StepFormData>
 ): GetController => {
   return new GetController(view, async (req: Request) => {
-    if (journeyFolder && req.i18n) {
+    if (req.i18n) {
       try {
-        await loadStepNamespace(req, stepName, journeyFolder);
+        await loadStepNamespace(req);
       } catch (error) {
         logger.warn(`Failed to load namespace for step ${stepName}:`, error);
       }
@@ -51,15 +50,13 @@ export const createGetController = (
     const postData = req.body || {};
     const lang = getRequestLanguage(req);
 
-    const t: TFunction = journeyFolder
-      ? getTranslationFunction(req, stepName, ['common'])
-      : getTranslationFunction(req);
+    const t: TFunction = getTranslationFunction(req);
 
     req.t = t;
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
 
-    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName) : {};
+    const stepTranslations = getStepTranslations(req);
     const commonTranslations = req.i18n?.getResourceBundle(lang, 'common') || {};
     const commonContent: Record<string, unknown> = {};
     for (const key of ['change', 'buttons']) {
@@ -107,23 +104,20 @@ export const createPostController = (
   stepNavigation: StepNavigation,
   getFields: (t: TFunction) => FormFieldConfig[],
   view: string,
-  beforeRedirect?: PostControllerCallback,
-  journeyFolder?: string
+  beforeRedirect?: PostControllerCallback
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } => {
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
-      if (journeyFolder && req.i18n) {
+      if (req.i18n) {
         try {
-          await loadStepNamespace(req, stepName, journeyFolder);
+          await loadStepNamespace(req);
         } catch (error) {
           logger.warn(`Failed to load namespace for step ${stepName}:`, error);
         }
       }
 
       const reqLang = getRequestLanguage(req);
-      const t: TFunction = journeyFolder
-        ? getTranslationFunction(req, stepName, ['common'])
-        : getTranslationFunction(req);
+      const t: TFunction = getTranslationFunction(req);
 
       const fields = getFields(t);
       const errors = validateForm(req, fields);

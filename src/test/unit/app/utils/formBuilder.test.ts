@@ -52,7 +52,6 @@ jest.mock('@modules/steps/i18n', () => ({
   getValidatedLanguage: (...args: unknown[]) => mockGetValidatedLanguage(...args),
   getRequestLanguage: (...args: unknown[]) => mockGetRequestLanguage(...args),
   getTranslationFunction: (...args: unknown[]) => mockGetTranslationFunction(...args),
-  getStepNamespace: jest.fn((stepName: string) => stepName),
   loadStepNamespace: jest.fn(),
   getStepTranslations: jest.fn(() => ({})),
 }));
@@ -191,6 +190,52 @@ describe('formBuilder', () => {
       };
       const step = createFormStep(config);
       expect(step.url).toBe('/steps/test-journey/test-step');
+    });
+
+    it('should use configured basePath when flowConfig is resolved from the request', () => {
+      const config: FormBuilderConfig = {
+        ...baseConfig,
+        basePath: '/case/:caseReference/respond-to-claim',
+        flowConfig: () => flowConfig,
+      };
+
+      const step = createFormStep(config);
+
+      expect(step.url).toBe('/case/:caseReference/respond-to-claim/test-step');
+    });
+
+    it('should use request-resolved flow config when loading persisted form data', async () => {
+      const step = createFormStep({
+        ...baseConfig,
+        flowConfig: () => ({
+          ...flowConfig,
+          useSessionFormData: false,
+        }),
+      });
+      const res = {
+        render: jest.fn(),
+        locals: {},
+      } as unknown as Response;
+      const req = createMockRequest({
+        session: {
+          formData: {
+            'test-step': { testField: 'saved value' },
+          },
+        },
+        res,
+      } as unknown as Request);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const controller = (step.getController as any)();
+      await controller.get(req, res);
+
+      expect(mockGetFormData).not.toHaveBeenCalled();
+      expect(res.render).toHaveBeenCalledWith(
+        'formBuilder.njk',
+        expect.objectContaining({
+          fieldValues: { testField: '' },
+        })
+      );
     });
 
     it('should create getController that renders with form content', async () => {
