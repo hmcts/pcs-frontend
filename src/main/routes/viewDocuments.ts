@@ -6,33 +6,11 @@ import { oidcMiddleware } from '../middleware';
 import { getDashboardUrl } from '@routes/dashboard';
 import { getDocumentBinary } from '@services/cdamService';
 import { extractViewDocumentFolders } from '@utils/documentUtils';
+import { asHeaderString } from '@utils/httpHeaders';
+import { sanitiseUUID } from '@utils/uuid';
 
 function toSafeFilename(value: string): string {
   return value.replace(/"/g, '');
-}
-
-function sanitiseDocumentIdParam(documentId: unknown): string {
-  if (typeof documentId !== 'string') {
-    return '';
-  }
-  const trimmed = documentId.trim();
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(trimmed)
-    ? trimmed
-    : '';
-}
-
-function asHeaderString(value: unknown): string | undefined {
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-    return trimmed ? trimmed : undefined;
-  }
-  if (typeof value === 'number') {
-    return String(value);
-  }
-  if (Array.isArray(value) && value.length > 0) {
-    return String(value[0]);
-  }
-  return undefined;
 }
 
 export default function viewDocumentsRoutes(app: Application): void {
@@ -77,7 +55,7 @@ export default function viewDocumentsRoutes(app: Application): void {
     async (req: Request, res: Response, next: NextFunction) => {
       const validatedCase = res.locals.validatedCase as { id: string; data: any } | undefined;
       const caseReference = validatedCase?.id || '';
-      const documentId = sanitiseDocumentIdParam(req.params.documentId);
+      const documentId = sanitiseUUID(req.params.documentId);
       const accessToken = req.session.user?.accessToken;
 
       if (!caseReference) {
