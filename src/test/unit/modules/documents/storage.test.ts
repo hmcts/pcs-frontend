@@ -106,7 +106,7 @@ describe('createCcdDraftStorage', () => {
   });
 
   describe('readFresh', () => {
-    it('calls getCaseById with configured event id and returns docs at path', async () => {
+    it('calls getCaseByIdForEvent with configured event id and returns docs at path', async () => {
       mockGetCaseByIdForEvent.mockResolvedValue({
         id: VALID_CASE_REF,
         data: {
