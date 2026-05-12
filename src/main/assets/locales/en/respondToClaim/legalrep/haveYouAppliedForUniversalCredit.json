@@ -1,0 +1,15 @@
+{
+  "caseNumber": "Case number: {{caseNumber}}",
+  "question": "Have the defendant applied for Universal Credit?",
+  "dateLabel": "When did the defendant apply?",
+  "errors": {
+    "haveAppliedForUniversalCredit": "Select if the defendant has applied for Universal Credit",
+    "date": {
+      "required": "Enter the date the defendant applied for Universal Credit",
+      "missingOne": "The date the defendant applied for Universal Credit must include a {{missingField}}",
+      "missingTwo": "The date the defendant applied for Universal Credit must include a {{first}} and {{second}}",
+      "notRealDate": "The date the defendant applied for Universal Credit must be a real date",
+      "futureDate": "The date the defendant applied for Universal Credit must must either be today’s date or in the past"
+    }
+  }
+}

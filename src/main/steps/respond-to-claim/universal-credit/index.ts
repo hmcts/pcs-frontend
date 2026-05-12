@@ -10,9 +10,13 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../u
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { getTranslationFunction } from '@modules/steps/i18n';
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
+
+const STEP_NAME = 'have-you-applied-for-universal-credit';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
-  stepName: 'have-you-applied-for-universal-credit',
+  stepName: STEP_NAME,
   stepDir: __dirname,
   beforeRedirect: async req => {
     const selection = req.body?.haveAppliedForUniversalCredit as string | undefined;
@@ -79,6 +83,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     heading: 'heading',
     caption: 'caption',
+    question: 'question',
+    caseNumber: 'caseNumber',
   },
   fields: [
     {
@@ -112,4 +118,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   customTemplate: `${__dirname}/universalCredit.njk`,
+  extendGetContent: async (req, formContent) => {
+    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    return {
+      ...formContent,
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
+  },
 });

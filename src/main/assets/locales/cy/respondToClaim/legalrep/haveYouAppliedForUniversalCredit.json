@@ -1,0 +1,15 @@
+{
+  "caseNumber": "cyCase number: {{caseNumber}}",
+  "question": "cyHave the defendant applied for Universal Credit?",
+  "dateLabel": "cyWhen did the defendant apply?",
+  "errors": {
+    "haveAppliedForUniversalCredit": "cySelect if the defendant has applied for Universal Credit",
+    "date": {
+      "required": "cyEnter the date the defendant applied for Universal Credit",
+      "missingOne": "cyThe date the defendant applied for Universal Credit must include a {{missingField}}",
+      "missingTwo": "cyThe date the defendant applied for Universal Credit must include a {{first}} and {{second}}",
+      "notRealDate": "cyThe date the defendant applied for Universal Credit must be a real date",
+      "futureDate": "cyThe date the defendant applied for Universal Credit must must either be today’s date or in the past"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "caseNumber": "cyCase number: {{caseNumber}}",
+  "paragraph1": "cyPriority debts are debts which could lead to serious consequences if the defendant do not pay them.",
+  "question": "cyDoes the defendant have any priority debts?",
+  "errors": {
+    "havePriorityDebts": "cySelect if the defendant has any priority debts"
+  }
+}
