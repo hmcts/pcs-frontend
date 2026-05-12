@@ -21,7 +21,6 @@ export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
-
 export interface IncomeExpenseDetails {
   applies?: YesNoValue;
   amount?: PenceAmount;

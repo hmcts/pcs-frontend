@@ -26,7 +26,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     detailsHeading: 'detailsHeading',
   },
   extendGetContent: async (req, formContent) => {
-    const allLinkedDefendants: CcdCollectionItem<CcdDefendantParty>[] | undefined = req.res?.locals?.validatedCase?.allLinkedDefendants;
+    const allLinkedDefendants: CcdCollectionItem<CcdDefendantParty>[] | undefined =
+      req.res?.locals?.validatedCase?.allLinkedDefendants;
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioItems | undefined;
 
