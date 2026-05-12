@@ -6,6 +6,7 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimAbout,
   counterClaimFee,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
@@ -40,6 +41,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -256,8 +258,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.yesRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.defendantDoesNotNeedHelpRadioOption,
+      typeOfClaim: 'Sum of money or compensation',
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performValidation('maninHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -386,8 +393,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.noRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.defendantDoesNotNeedHelpRadioOption,
+      typeOfClaim: 'Both',
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -480,8 +492,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.defendantNeedHelpRadioOption,
+      typeOfClaim: counterClaimFee.typeOfClaimSomethingElseHidden,
+    });
+    await performAction('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
