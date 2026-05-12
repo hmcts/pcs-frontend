@@ -46,6 +46,28 @@ jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((_req: unknown, _res: unknown, next: () => void) => next()),
 }));
 
+// Replace the production Redis-backed lock with an in-process per-key serialiser.
+// The concurrency-safety tests below run several uploads/deletes in parallel
+// against `Promise.all`; we need real serialisation in tests for those assertions
+// to mean anything, but we can't (and shouldn't) stand up a real Redis here.
+jest.mock('../../../main/modules/redisLock', () => {
+  const tails = new Map<string, Promise<unknown>>();
+  return {
+    withRedisLock: jest.fn(async (_redis: unknown, key: string, _opts: unknown, fn: () => Promise<unknown>) => {
+      const previous = tails.get(key) ?? Promise.resolve();
+      const settled = previous.then(() => fn());
+      // Chain the next caller on us; swallow errors so one failing holder
+      // doesn't poison the queue.
+      tails.set(
+        key,
+        settled.catch(() => undefined)
+      );
+      return settled;
+    }),
+    RedisLockTimeoutError: class extends Error {},
+  };
+});
+
 import type { Application, Request, Response } from 'express';
 import multer from 'multer';
 
@@ -79,6 +101,7 @@ function makeReqWithDocs(overrides: Record<string, unknown>, docs: unknown[] = [
   return {
     session: { user: { accessToken: 'token' } },
     params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
+    app: { locals: { redisClient: {} } },
     t: mockT,
     res: {
       locals: {
@@ -652,6 +675,7 @@ describe('documentProxyRoutes', () => {
       const req = {
         session: { user: { accessToken: 'token' } },
         params: { caseReference: '123', journey: 'respond-to-claim', step: 'upload-document' },
+        app: { locals: { redisClient: {} } },
         t: mockT,
         res: { locals: {} },
         body: { delete: 'unknown-id' },
@@ -712,6 +736,7 @@ describe('documentProxyRoutes', () => {
       const baseReq = {
         session: { user: { accessToken: 'token' } },
         params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
+        app: { locals: { redisClient: {} } },
         t: mockT,
         res: { locals: {} },
       };
@@ -753,6 +778,7 @@ describe('documentProxyRoutes', () => {
       const baseReq = {
         session: { user: { accessToken: 'token' } },
         params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
+        app: { locals: { redisClient: {} } },
         t: mockT,
         res: { locals: {} },
       };
@@ -790,6 +816,7 @@ describe('documentProxyRoutes', () => {
       const req = {
         session: { user: { accessToken: 'token' } },
         params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
+        app: { locals: { redisClient: {} } },
         t: mockT,
         res: { locals: { validatedCase: {} } },
         file: makeFile('new.pdf', 99),
