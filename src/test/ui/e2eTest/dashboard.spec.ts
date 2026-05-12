@@ -31,21 +31,75 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
   test('Validate address, case number and links on the dashboard @regression', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.iWantToHeader });
     await performActions(
       'Validate I want to... links',
-      ['clickLinkAndVerifySameTabTitle', dashboard.askTheCourtToMakeAnOrderLink, chooseAnApplication.mainHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.uploadAdditionalDocumentsLink, uploadAdditionalDocuments.mainHeader]
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.iWantToHeader,
+          fieldName: dashboard.askTheCourtToMakeAnOrderLink,
+          header: chooseAnApplication.mainHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.iWantToHeader,
+          fieldName: dashboard.uploadAdditionalDocumentsLink,
+          header: uploadAdditionalDocuments.mainHeader,
+        },
+      ]
     );
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.helpAndSupportHeader });
     await performActions(
       'Validate Help and Support links',
-      ['clickLinkAndVerifySameTabTitle', dashboard.helpWithFeesLink, dashboard.getHelpPayingCourtFeesHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.whatToExpectAtHearingLink, dashboard.whatToExpectComingCourtHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.representMyselfAtHearingLink, dashboard.representYourselfHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.findLegalAdviceLink, dashboard.findLegalAdviceHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.getDebtRespiteLink, dashboard.breathingSpaceHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.findInfoAboutMyCourtLink, dashboard.findACourtOrTribunalHeader]
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.helpWithFeesLink,
+          header: dashboard.getHelpPayingCourtFeesHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.whatToExpectAtHearingLink,
+          header: dashboard.whatToExpectComingCourtHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.representMyselfAtHearingLink,
+          header: dashboard.representYourselfHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.findLegalAdviceLink,
+          header: dashboard.findLegalAdviceHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.getDebtRespiteLink,
+          header: dashboard.breathingSpaceHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.findInfoAboutMyCourtLink,
+          header: dashboard.findACourtOrTribunalHeader,
+        },
+      ]
     );
     await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.theClaimSubHeader,
