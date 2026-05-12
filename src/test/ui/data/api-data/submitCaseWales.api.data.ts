@@ -72,19 +72,18 @@ export const submitCaseApiDataWales = {
     walesLicensedAgentAppointed: 'NO',
     walesRegistered: 'NO',
 
-    showRentArrearsPage: 'YES',
+    
     showReasonsForGroundsPageWales: 'YES',
 
     rentDetails_Frequency: 'WEEKLY',
-    rentSectionPaymentFrequency: 'WEEKLY',
+    
     rentDetails_CurrentRent: '80000',
     rentDetails_CalculatedDailyCharge: '11429',
-    rentDetails_FormattedCalculatedDailyCharge: '£114.29',
-    rentDetails_PerDayCorrect: 'YES',
+    
 
     rentArrears_Total: '8000',
-    rentArrears_ThirdPartyPayments: 'YES',
-    rentArrears_ThirdPartyPaymentSources: ['UNIVERSAL_CREDIT'],
+    rentArrears_RecoveryAttempted: 'YES',
+    rentArrears_RecoveryAttemptDetails: 'Rent recovery attempts test data',
     arrearsJudgmentWanted: 'YES',
 
     rentArrears_StatementDocuments: [
@@ -216,12 +215,8 @@ export const submitCaseApiDataWales = {
     rentDetails_CurrentRent: '100000',
     rentDetails_Frequency: 'MONTHLY',
     rentDetails_CalculatedDailyCharge: '3285',
-    rentSectionPaymentFrequency: 'MONTHLY',
-    rentDetails_FormattedCalculatedDailyCharge: '£32.85',
-    rentDetails_PerDayCorrect: 'YES',
-    showRentArrearsPage: 'Yes',
     rentArrears_Total: '150000',
-    rentArrears_ThirdPartyPayments: 'NO',
+    rentArrears_RecoveryAttempted: 'NO',
     arrearsJudgmentWanted: 'NO',
     claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
     claimantCircumstancesSelect: 'NO',
