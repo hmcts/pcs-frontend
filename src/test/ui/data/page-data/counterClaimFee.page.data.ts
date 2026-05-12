@@ -12,5 +12,4 @@ export const counterClaimFee = {
   iDoNotNeedHelpRadioOption: `I do not need help paying the fee`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  typeOfClaimSomethingElseHidden: 'Something else',
 };
