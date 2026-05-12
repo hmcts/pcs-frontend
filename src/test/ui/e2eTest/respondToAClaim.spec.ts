@@ -499,7 +499,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles', { files: ['rentArrears.pdf'] });
+    await performAction('clickButton', supportNeeds.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
