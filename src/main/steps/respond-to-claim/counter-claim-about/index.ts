@@ -1,17 +1,13 @@
 import type { Request } from 'express';
 
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CcdCounterClaim, PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-about',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/counterClaimAbout.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -58,13 +54,21 @@ export const step: StepDefinition = createFormStep({
     const counterClaimFor = (req.body?.counterClaimFor as string | undefined)?.trim();
     const counterClaimReasons = (req.body?.counterClaimReasons as string | undefined)?.trim();
 
-    const counterClaim: CcdCounterClaim = {
-      ...(counterClaimFor ? { counterClaimFor } : {}),
-      ...(counterClaimReasons ? { counterClaimReasons } : {}),
-    };
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: { counterClaim: { ...counterClaim } },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
+
+    if (counterClaimFor) {
+      response.defendantResponses.counterClaim.counterClaimFor = counterClaimFor;
+    } else {
+      delete response.defendantResponses.counterClaim.counterClaimFor;
+    }
+
+    if (counterClaimReasons) {
+      response.defendantResponses.counterClaim.counterClaimReasons = counterClaimReasons;
+    } else {
+      delete response.defendantResponses.counterClaim.counterClaimReasons;
+    }
+
+    await saveDraftDefendantResponse(req, response);
   },
 });

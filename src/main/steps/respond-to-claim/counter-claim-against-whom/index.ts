@@ -1,17 +1,13 @@
 import type { Request } from 'express';
 
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CcdCounterClaim, PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-against-whom',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/counterClaimAgainstWhom.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -34,7 +30,7 @@ export const step: StepDefinition = createFormStep({
     const data = req.res?.locals?.validatedCase?.data;
     const alreadySaved = data?.possessionClaimResponse?.defendantResponses?.counterClaim?.counterClaimAgainst ?? [];
     const submitted = req.body?.counterClaimAgainst;
-    const checkedIds: string[] = submitted
+    const checkedIds: (string | undefined)[] = submitted
       ? Array.isArray(submitted)
         ? submitted
         : [submitted]
@@ -42,7 +38,7 @@ export const step: StepDefinition = createFormStep({
     const defendants = (data?.allDefendants ?? []).filter(
       p => p.id !== data?.possessionClaimResponse?.currentDefendantPartyId
     );
-    const orderedParties = [...(data?.allClaimants ?? []), ...defendants];
+    const orderedParties = [...(data?.allClaimants ?? []), ...defendants].filter(p => p.id);
 
     const checkboxItems = orderedParties
       .filter(p => p.value?.orgName || p.value?.firstName || p.value?.lastName)
@@ -68,10 +64,15 @@ export const step: StepDefinition = createFormStep({
       return party ? [party] : [];
     });
 
-    const counterClaim: CcdCounterClaim = { counterClaimAgainst };
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: { counterClaim: { ...counterClaim } },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
+
+    if (counterClaimAgainst.length > 0) {
+      response.defendantResponses.counterClaim.counterClaimAgainst = counterClaimAgainst;
+    } else {
+      delete response.defendantResponses.counterClaim.counterClaimAgainst;
+    }
+
+    await saveDraftDefendantResponse(req, response);
   },
 });
