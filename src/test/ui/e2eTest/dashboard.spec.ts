@@ -63,13 +63,14 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       header: viewOrdersAndNotices.mainHeader,
     });
     await performAction('clickLinkAndVerifySameTabTitle', {
-      sectionHeader: dashboard.applicationSubHeader,
+      sectionHeader: dashboard.applicationsSubHeader,
       fieldName: dashboard.askTheCourtToMakeAnOrderLink,
       header: chooseAnApplication.mainHeader,
     });
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
+    await performAction('reloadPage');
     await performAction('clickLinkAndVerifySameTabTitle', {
-      sectionHeader: dashboard.applicationSubHeader,
+      sectionHeader: dashboard.applicationsSubHeader,
       fieldName: dashboard.viewAllApplicationsLink,
       header: viewAllApplications.mainHeader,
     });
