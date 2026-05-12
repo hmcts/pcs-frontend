@@ -618,11 +618,11 @@ export class RespondToClaimAction implements IAction {
         counterClaimFeeValue = 10000; // FEE0506
       }
     }
-    const basedOnInformationParagraph = `Based on the information provided, it will cost the defendant £${counterClaimFeeValue} to make their counterclaim.`;
+    const basedOnInformationParagraph = `Based on the information provided, it will cost £${counterClaimFeeValue} to make your counterclaim.`;
     await performValidation('text', { elementType: 'paragraph', text: basedOnInformationParagraph });
 
     await performAction('clickRadioButton', {
-      question: counterClaimFee.doesTheDefendantNeedHelpPayingCounterClaimQuestion,
+      question: counterClaimFee.doYouNeedHelpPayingCounterClaimQuestion,
       option: counterClaimFeeOption.radioOption,
     });
     await performAction('clickButton', counterClaimFee.saveAndContinueButton);

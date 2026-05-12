@@ -259,7 +259,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performAction('selectCounterClaimFee', {
-      radioOption: counterClaimFee.defendantDoesNotNeedHelpRadioOption,
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
       typeOfClaim: 'Sum of money or compensation',
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
@@ -394,7 +394,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('selectCounterClaimFee', {
-      radioOption: counterClaimFee.defendantDoesNotNeedHelpRadioOption,
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
       typeOfClaim: 'Both',
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
@@ -493,7 +493,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performAction('selectCounterClaimFee', {
-      radioOption: counterClaimFee.defendantNeedHelpRadioOption,
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
       typeOfClaim: counterClaimFee.typeOfClaimSomethingElseHidden,
     });
     await performAction('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
