@@ -86,7 +86,9 @@ export const flowConfig: JourneyFlowConfig = {
     'equality-and-diversity-end',
     'language-used',
     'check-your-answers',
-    'end-now',
+    'response-submitted',
+    'response-submitted-counterclaim-fee-payment-needed',
+    'response-and-counterclaim-submitted',
   ],
   steps: {
     'defendant-name-confirmation': {

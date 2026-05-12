@@ -8,7 +8,10 @@
   {% endif %}
   <h1 class="govuk-heading-l">Check your answers (placeholder)</h1>
   <p class="govuk-body">This is a placeholder for Check your answers step.</p>
-  <form method="post" action="{{ url }}">
+  <form id="submitResponse" method="POST" action="/case/{{ ccdId }}/final-submit" novalidate>
+    <button type="submit" class="govuk-button" data-module="govuk-button">
+      Submit
+    </button>
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
