@@ -6,12 +6,18 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export const confirmIfTheseDocumentsRelateToAnApplicationStep = 'confirm-if-these-documents-relate-to-an-application';
 export const uploadYourDocumentsStep = 'upload-your-documents';
+export const checkYourAnswersStep = 'check-your-answers';
 
 export const flowConfig: JourneyFlowConfig = {
   basePath: UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE,
   journeyName: 'uploadAdditionalDocuments',
   useSessionFormData: false,
-  stepOrder: ['start-evidence-upload', confirmIfTheseDocumentsRelateToAnApplicationStep, uploadYourDocumentsStep],
+  stepOrder: [
+    'start-evidence-upload',
+    confirmIfTheseDocumentsRelateToAnApplicationStep,
+    uploadYourDocumentsStep,
+    checkYourAnswersStep,
+  ],
   steps: {
     'start-evidence-upload': {
       routes: [
@@ -23,6 +29,7 @@ export const flowConfig: JourneyFlowConfig = {
       ],
     },
     [confirmIfTheseDocumentsRelateToAnApplicationStep]: {},
-    [uploadYourDocumentsStep]: {},
+    [uploadYourDocumentsStep]: { routes: [{ nextStep: checkYourAnswersStep }] },
+    [checkYourAnswersStep]: {},
   },
 };
