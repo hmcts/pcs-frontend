@@ -1,3 +1,4 @@
+import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -90,10 +91,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   getInitialFormData: req => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const householdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const existingAnswer = householdCircumstances?.exceptionalHardship as string | undefined;
-
-    const mapping: Record<string, string> = { YES: 'yes', NO: 'no' };
-    const exceptionalHardshipValue = existingAnswer ? mapping[existingAnswer] : undefined;
+    // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — fromYesNoEnum handles either casing.
+    const exceptionalHardshipValue = fromYesNoEnum(householdCircumstances?.exceptionalHardship);
 
     if (!exceptionalHardshipValue) {
       return {};
