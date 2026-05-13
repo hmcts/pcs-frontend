@@ -153,7 +153,6 @@ export class GenAppsAction implements IAction {
     if (uploadDocs.files) {
       await performAction('uploadFile', uploadDocs.files);
       const file = Array.isArray(uploadDocs.files) ? uploadDocs.files[0] : uploadDocs.files;
-
       FieldsStore.set('Upload documents', String(file));
     }
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
