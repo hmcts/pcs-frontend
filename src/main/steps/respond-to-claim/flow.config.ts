@@ -9,6 +9,9 @@ import {
   isNoticeServed,
   isTenancyStartDateKnown,
   isWalesProperty,
+  shouldShowCounterclaimFeePaymentNeededConfirmationStep,
+  shouldShowResponseAndCounterclaimSubmittedConfirmationStep,
+  shouldShowResponseSubmittedConfirmationStep,
 } from '../utils';
 
 import {
@@ -178,6 +181,18 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
+    },
+    'response-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-submitted-counterclaim-fee-payment-needed': {
+      showCondition: (req: Request) =>
+        shouldShowCounterclaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-and-counterclaim-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseAndCounterclaimSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
     },
   },
 };
