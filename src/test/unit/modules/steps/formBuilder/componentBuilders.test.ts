@@ -244,6 +244,43 @@ describe('componentBuilders', () => {
       });
     });
 
+    it('passes hintClasses onto the GOV.UK hint object for text inputs', () => {
+      const field: FormFieldConfig = {
+        name: 'amount',
+        type: 'text',
+        translationKey: { label: 'amount' },
+        hintClasses: 'govuk-!-margin-bottom-1',
+      };
+
+      const result = buildComponentConfig(
+        buildArgs(field, {
+          hint: 'Enter a number',
+        })
+      );
+
+      expect(result.component.hint).toEqual({
+        text: 'Enter a number',
+        classes: 'govuk-!-margin-bottom-1',
+      });
+    });
+
+    it('falls back to input component type for unknown field types', () => {
+      const field = {
+        name: 'legacy',
+        type: 'postcodeLookup',
+        translationKey: { label: 'legacy' },
+      } as unknown as FormFieldConfig;
+
+      const result = buildComponentConfig(buildArgs(field, { label: 'Legacy input', fieldValue: 'AB1 2CD' }));
+
+      expect(result.componentType).toBe('input');
+      expect(result.component.value).toBeUndefined();
+      expect(result.component.label).toEqual({
+        text: 'Legacy input',
+        classes: undefined,
+      });
+    });
+
     describe('character-count field', () => {
       it('should build character count component with maxlength', () => {
         const field: FormFieldConfig = {
