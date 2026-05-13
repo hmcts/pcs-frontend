@@ -2,8 +2,8 @@ import { Request } from 'express';
 
 import {
   hasAnyRentArrearsGround,
-  hasSelectedPriorityDebts,
   hasMultipleParties,
+  hasSelectedPriorityDebts,
   hasSelectedUniversalCredit,
   isFinanceDetailsProvided,
   isNoticeDateProvided,
