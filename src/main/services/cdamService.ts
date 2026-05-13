@@ -79,7 +79,7 @@ export async function getDocumentBinary(
   const cdamPath = documentsIndex >= 0 ? `/cases${binaryUrl.slice(documentsIndex)}` : binaryUrl;
   const requestUrl = `${cdamUrl}${cdamPath}`;
 
-  logger.info('Fetching document binary from CDAM', {
+  logger.debug('Fetching document binary from CDAM', {
     requestUrl,
     cdamPath,
     sourceBinaryUrl: binaryUrl,
