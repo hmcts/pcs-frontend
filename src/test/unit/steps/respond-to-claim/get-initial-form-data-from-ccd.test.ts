@@ -153,8 +153,8 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ confirmLandlordLicensed: 'imNotSure' }));
-    expect(renderData.confirmLandlordLicensed).toBe('imNotSure');
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ confirmLandlordLicensed: 'notSure' }));
+    expect(renderData.confirmLandlordLicensed).toBe('notSure');
   });
 
   it('populates page heading from CCD without pre-selecting yes or filling address form', async () => {

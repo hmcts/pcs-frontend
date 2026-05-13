@@ -160,6 +160,11 @@ async function removeDraftDocument(req: Request, docId: string): Promise<'remove
   });
 }
 
+// Generate the collection-item id on the frontend. CCD treats collection items
+// with stable ids as "existing" (preserved across draft round-trips); items
+// without ids are treated as new each round-trip and can be lost/duplicated by
+// the backend's merge logic. This matches the original fileUpload.ts behaviour
+// that was dropped during the BFF proxy refactor.
 function cdamToCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocument> {
   return {
     id: randomUUID(),
@@ -310,6 +315,8 @@ export default function documentProxyRoutes(app: Application): void {
         return res.status(404).json({ error: { message: errors.documentNotFound } });
       }
 
+      // Delete is idempotent: a missing doc means it's already gone (concurrent
+      // delete from another tab/click). Treat as success so the client converges.
       await removeDraftDocument(req, docId);
       return res.json({ success: true });
     } catch (error) {
