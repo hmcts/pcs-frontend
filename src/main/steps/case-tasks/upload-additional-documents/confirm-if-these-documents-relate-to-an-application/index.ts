@@ -1,10 +1,17 @@
 import type { Request } from 'express';
+import type { TFunction } from 'i18next';
 
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
 import { formatISOToLongDate } from '../../../utils/dateUtils';
 import { flowConfig } from '../flow.config';
 
-import { createGetController, createStepNavigation, getFormData, setFormData } from '@modules/steps';
+import {
+  createGetController,
+  createStepNavigation,
+  getFormData,
+  getTranslationFunction,
+  setFormData,
+} from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { GenAppType } from '@services/ccdCase.interface';
@@ -18,19 +25,19 @@ const templatePath =
 
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
-function buildApplicationText(type: GenAppType, submittedDate?: string): string {
-  const formattedDate = formatISOToLongDate(submittedDate);
+function buildApplicationText(t: TFunction, type: GenAppType | undefined, submittedDate?: string): string {
+  const date = formatISOToLongDate(submittedDate);
 
   switch (type) {
     case GenAppType.ADJOURN:
-      return `Yes, the documents I'm uploading relate to the application to adjourn the hearing - submitted on ${formattedDate}`;
+      return t('applicationOptionAdjourn', { date });
     case GenAppType.SET_ASIDE:
-      return `Yes, the documents I'm uploading relate to the application to set aside the order - submitted on ${formattedDate}`;
+      return t('applicationOptionSetAside', { date });
     case GenAppType.SUSPEND:
-      return `Yes, the documents I'm uploading relate to the application to suspend the eviction - submitted on ${formattedDate}`;
+      return t('applicationOptionSuspend', { date });
     case GenAppType.SOMETHING_ELSE:
     default:
-      return `Yes, the documents I'm uploading relate to the application submitted on ${formattedDate}`;
+      return t('applicationOptionGeneric', { date });
   }
 }
 
@@ -41,6 +48,7 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   getController: () =>
     createGetController(templatePath, stepName, stepNavigation, async (req: Request) => {
+      const t = getTranslationFunction(req);
       const caseId = req.res?.locals.validatedCase?.id;
       const accessToken = req.session?.user?.accessToken;
       const savedFormData = getFormData(req, stepName);
@@ -48,7 +56,7 @@ export const step: StepDefinition = {
 
       const noOption = {
         value: 'claim-or-counterclaim',
-        text: "No, the documents I'm uploading relate to the main claim or counterclaim",
+        text: t('optionClaimOrCounterclaim'),
         checked: selectedApplicationId === 'claim-or-counterclaim',
       };
 
@@ -58,7 +66,7 @@ export const step: StepDefinition = {
         applications = [
           ...dashboardView.relatedApplications.map(application => ({
             value: application.id,
-            text: buildApplicationText(application.type, application.applicationSubmittedDate),
+            text: buildApplicationText(t, application.type, application.applicationSubmittedDate),
             checked: selectedApplicationId === application.id,
           })),
           noOption,
