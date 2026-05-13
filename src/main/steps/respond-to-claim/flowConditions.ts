@@ -2,9 +2,11 @@ import { Request } from 'express';
 
 import {
   hasAnyRentArrearsGround,
+  hasSelectedPriorityDebts,
   hasSelectedUniversalCredit,
   isFinanceDetailsProvided,
   isNoticeDateProvided,
+  isPriorityDebtsSelected,
   isSingleLinkedDefendant,
   isUniversalCreditSelected,
   normalizeYesNoValue,
@@ -54,6 +56,14 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
   }
 
   return !isUniversalCreditSelected(req) && !hasSelectedUniversalCredit(req);
+}
+
+export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
+  if (!hasProvidedFinanceDetails(req)) {
+    return false;
+  }
+
+  return isPriorityDebtsSelected(req) || hasSelectedPriorityDebts(req);
 }
 
 export function hasSingleLinkedDefendant(req: Request): boolean {
