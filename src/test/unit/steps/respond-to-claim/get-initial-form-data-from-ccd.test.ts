@@ -113,7 +113,7 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            tenancyStartDateCorrect: 'NO',
+            tenancyStartDateConfirmation: 'NO',
             tenancyStartDate: '2025-12-01',
           },
         },
