@@ -41,7 +41,6 @@ export default {
   'counter-claim-you-need-to-apply-for-help-with-your-fees': 'counterclaimYouNeedToApplyForHelpWithYourFees',
   'counter-claim-have-you-already-applied-for-help-with-your-fees':
     'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
-  'check-your-answers': 'checkYourAnswersGenApps',
   'language-used': 'languageUsed',
   'other-considerations': 'otherConsiderations',
   'ask-to-adjourn-the-court-hearing': 'askToAdjournTheCourtHearing',
