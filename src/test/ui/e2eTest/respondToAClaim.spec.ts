@@ -36,9 +36,9 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
+  supportNeeds,
   tenancyDateDetails,
   tenancyTypeDetails,
-  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -156,6 +156,22 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.INCOME_AND_EXPENSES = 'NO';
   } else {
     process.env.INCOME_AND_EXPENSES = 'YES';
+  }
+
+  //other considrations back link navigation
+  if (testInfo.title.includes('Income - no')) {
+    process.env.INCOME_AND_EXPENSES = 'NO';
+  } else {
+    process.env.INCOME_AND_EXPENSES = 'YES';
+  }
+
+  //Check if Yes is selected on Priority debts page - for back link navigation of Priority debt details page
+  if (testInfo.title.includes('PriorityDebts - Yes')) {
+    process.env.PRIORITY_DEBTS = 'YES';
+  }
+  //Check if Universal Credit is selected on Regular income page - for back link navigation of Priority Debts page
+  if (testInfo.title.includes('RegularIncome - Universal Credit')) {
+    process.env.REGULAR_INCOME = 'UNIVERSAL_CREDIT';
   }
 
   if (testInfo.title.includes('@noDefendants')) {
@@ -306,10 +322,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.monthRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave', {
       regularIncomeOptions: [
         [
@@ -324,13 +346,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -341,7 +363,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression', async () => {
+  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown -  Income - no @assured @regression', async () => {
     //incomeAndExpenses - no - Upload docs
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -430,7 +452,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles', { files: ['rentArrears.pdf'] });
+    await performAction('clickButton', supportNeeds.continueButton);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
@@ -519,18 +542,27 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -540,7 +572,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
-
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
@@ -647,12 +678,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
+      ...getRelativeDate(-5),
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave', {
       regularIncomeOptions: [
         [
@@ -666,7 +700,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -757,12 +792,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.monthRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave', {
       regularIncomeOptions: [
         [
@@ -781,7 +824,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -792,8 +836,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
-    //universal credit with all other options - priority debts
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit @regression', async () => {
+    //universal credit with all other options - priority debts - No
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -899,16 +943,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -919,7 +964,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No - PriorityDebts - Yes @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -1002,18 +1047,28 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
+      ...getRelativeDate(-3),
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1117,18 +1172,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1237,18 +1295,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('clickButton', uploadFiles.continueButton);
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);

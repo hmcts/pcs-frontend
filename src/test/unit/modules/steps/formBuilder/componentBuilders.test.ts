@@ -244,6 +244,43 @@ describe('componentBuilders', () => {
       });
     });
 
+    it('passes hintClasses onto the GOV.UK hint object for text inputs', () => {
+      const field: FormFieldConfig = {
+        name: 'amount',
+        type: 'text',
+        translationKey: { label: 'amount' },
+        hintClasses: 'govuk-!-margin-bottom-1',
+      };
+
+      const result = buildComponentConfig(
+        buildArgs(field, {
+          hint: 'Enter a number',
+        })
+      );
+
+      expect(result.component.hint).toEqual({
+        text: 'Enter a number',
+        classes: 'govuk-!-margin-bottom-1',
+      });
+    });
+
+    it('falls back to input component type for unknown field types', () => {
+      const field = {
+        name: 'legacy',
+        type: 'postcodeLookup',
+        translationKey: { label: 'legacy' },
+      } as unknown as FormFieldConfig;
+
+      const result = buildComponentConfig(buildArgs(field, { label: 'Legacy input', fieldValue: 'AB1 2CD' }));
+
+      expect(result.componentType).toBe('input');
+      expect(result.component.value).toBeUndefined();
+      expect(result.component.label).toEqual({
+        text: 'Legacy input',
+        classes: undefined,
+      });
+    });
+
     describe('character-count field', () => {
       it('should build character count component with maxlength', () => {
         const field: FormFieldConfig = {
@@ -765,6 +802,85 @@ describe('componentBuilders', () => {
           },
         });
       });
+    });
+  });
+
+  describe('file type', () => {
+    it('builds fileUpload component with correct properties', () => {
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+        accept: '.pdf,.doc',
+        maxFileSize: 50,
+      };
+
+      const result = buildComponentConfig(buildArgs(field, { fieldValue: [] }));
+
+      expect(result.componentType).toBe('fileUpload');
+      expect(result.component.accept).toBe('.pdf,.doc');
+      expect(result.component.maxFileSize).toBe(50);
+      expect(result.component.value).toEqual([]);
+      expect(result.component.classes).toBe('govuk-file-upload');
+    });
+
+    it('uses default accept and maxFileSize when not provided', () => {
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+      };
+
+      const result = buildComponentConfig(buildArgs(field));
+
+      expect(result.componentType).toBe('fileUpload');
+      expect(result.component.accept).toBeTruthy();
+      expect(result.component.maxFileSize).toBe(1024);
+    });
+
+    it('sets translated error messages and button text', () => {
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+      };
+
+      const result = buildComponentConfig(buildArgs(field));
+
+      expect(result.component.errorWrongType).toBe('common:errors.documentUpload.wrongFileTypeDocStore');
+      expect(result.component.errorFileTooLarge).toBeTruthy();
+      expect(result.component.errorDelete).toBe('common:errors.documentUpload.fileDeleteFailed');
+      expect(result.component.uploadButtonText).toBe('uploadButton');
+      expect(result.component.filesAddedHeading).toBe('filesAddedHeading');
+      expect(result.component.deleteButtonText).toBe('deleteButton');
+    });
+
+    it('sets empty uploadUrl and deleteUrl as defaults', () => {
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+      };
+
+      const result = buildComponentConfig(buildArgs(field));
+
+      expect(result.component.uploadUrl).toBe('');
+      expect(result.component.deleteUrl).toBe('');
+    });
+
+    it('preserves existing documents as field value', () => {
+      const existingDocs = [
+        { document_url: 'http://dm/doc/1', document_binary_url: 'http://dm/doc/1/binary', document_filename: 'a.pdf' },
+      ];
+      const field: FormFieldConfig = {
+        name: 'documents',
+        type: 'file',
+        required: false,
+      };
+
+      const result = buildComponentConfig(buildArgs(field, { fieldValue: existingDocs }));
+
+      expect(result.component.value).toEqual(existingDocs);
     });
   });
 });

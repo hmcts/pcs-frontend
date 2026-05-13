@@ -7,6 +7,7 @@ import { Logger } from '@modules/logger';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { createToken } from '@services/pcq/createToken';
+import { journeyRegistry } from '@steps';
 
 const logger = Logger.getLogger('pcqRedirectMiddleware');
 
@@ -73,8 +74,14 @@ export function pcqRedirectMiddleware() {
       token,
     };
 
+    const { draftEvent } = journeyRegistry.respondToClaim;
+    if (!draftEvent) {
+      logger.warn('draftEvent not configured for respondToClaim journey, skipping PCQ update');
+      return next();
+    }
+
     try {
-      const updatedCase = await ccdCaseService.updateDraftRespondToClaim(user.accessToken, ccdCase.id, {
+      const updatedCase = await ccdCaseService.updateDraft(draftEvent, user.accessToken, ccdCase.id, {
         ...ccdCase.data,
         userPcqId: pcqId,
       });
