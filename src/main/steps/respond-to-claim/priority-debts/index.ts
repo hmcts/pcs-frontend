@@ -1,10 +1,10 @@
 import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps/i18n';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 const STEP_NAME = 'priority-debts';
 
