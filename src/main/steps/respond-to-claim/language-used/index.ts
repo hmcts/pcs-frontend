@@ -1,15 +1,12 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CaseData, LanguageUsed, PossessionClaimResponse } from '@services/ccdCase.interface';
+import type { CaseData, LanguageUsed } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'language-used',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/languageUsed.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -42,17 +39,12 @@ export const step: StepDefinition = createFormStep({
   },
   beforeRedirect: async req => {
     const languageUsed: LanguageUsed | undefined = req.body?.languageUsed;
+    const response = buildDraftDefendantResponse(req);
 
-    if (!languageUsed) {
-      return;
+    if (languageUsed) {
+      response.defendantResponses = { ...response.defendantResponses, languageUsed };
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        languageUsed,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });
