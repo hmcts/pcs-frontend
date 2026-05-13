@@ -6,7 +6,7 @@
   "askingForReasonableAdjustmentParagraph2": "cySome examples of reasonable adjustments are:",
   "askingForReasonableAdjustmentListItem1": "cystep-free access to the court",
   "askingForReasonableAdjustmentListItem2": "cybringing support with you to the hearing, like an assistance dog",
-  "askingForReasonableAdjustmentlistItem3": "cydocuments in an alternative format, like large print",
+  "askingForReasonableAdjustmentListItem3": "cydocuments in an alternative format, like large print",
   "askingForReasonableAdjustmentListItem4": "cyregular breaks during a hearing to make you feel more comfortable",
   "askingForReasonableAdjustmentParagraph3": "cyYou can ask for a reasonable adjustment now by selecting ‘Continue to the questions’, or at any time during your case by selecting ‘Your support’ from your case overview. ",
   "askingForReasonableAdjustmentParagraph4": "cyOnce you’ve submitted your request for support, it’ll be reviewed by the court or a judge. We’ll keep you updated on the status of the request in your account. If we need more information we’ll contact you by the preferred method you’ve already chosen.",
@@ -25,7 +25,7 @@
   "contactByPhoneHeading": "cyContact the court by telephone",
   "contactByPhoneParagraph1": "cy0300 123 7050",
   "contactByPhoneParagraph2": "cyMonday to Friday, 8.30am to 5pm. ",
-  "contactByPhoneParagraph3": "cyFind out about call charges (opens in new tab).",
+  "contactByPhoneParagraph3": "cyFind out about call charges (opens in new tab)",
   "raQuestionsButton": "cyContinue to the questions",
   "progressButton": "cyI do not need support at this time"
 }
