@@ -1,8 +1,26 @@
 import fs from 'fs';
 import path from 'path';
 
-import { accessTokenApiData, s2STokenApiData } from '../data/api-data';
 import { user } from '../data/user-data';
+
+/** CNP environment names where IdAM/S2S URLs follow the standard `*.platform.hmcts.net` pattern (matches Jenkins `E2E_TARGET_ENV`). */
+const KNOWN_CNP_ENVIRONMENT_NAMES = new Set(['aat', 'demo', 'perftest', 'ithc']);
+
+/** Derives IdAM / S2S URLs from `ENVIRONMENT` when unset (CNP nightly or local). */
+export function applyPlaywrightServiceUrls(): void {
+  const normalizedCnpEnvironment = (process.env.ENVIRONMENT || '').toLowerCase();
+
+  if (KNOWN_CNP_ENVIRONMENT_NAMES.has(normalizedCnpEnvironment)) {
+    process.env.IDAM_WEB_URL ||= `https://idam-api.${normalizedCnpEnvironment}.platform.hmcts.net`;
+    process.env.IDAM_TESTING_SUPPORT_URL ||= `https://idam-testing-support-api.${normalizedCnpEnvironment}.platform.hmcts.net`;
+    process.env.S2S_URL ||= `http://rpe-service-auth-provider-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal/testing-support/lease`;
+  } else {
+    process.env.IDAM_WEB_URL ||= 'https://idam-api.aat.platform.hmcts.net';
+    process.env.IDAM_TESTING_SUPPORT_URL ||= 'https://idam-testing-support-api.aat.platform.hmcts.net';
+    process.env.S2S_URL ||=
+      'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease';
+  }
+}
 
 /** Clears PFT lock dir on local runs only (skipped when CI is set). */
 export function clearEmvLocksIfLocal(): void {
@@ -15,13 +33,18 @@ export function clearEmvLocksIfLocal(): void {
 
 export const getS2SToken = async (): Promise<void> => {
   const { ServiceAuthUtils } = await import('@hmcts/playwright-common');
-  process.env.S2S_URL = process.env.S2S_URL || s2STokenApiData.s2sUrl;
+  applyPlaywrightServiceUrls();
+  if (!process.env.S2S_URL) {
+    throw new Error(
+      'S2S_URL is not set (set ENVIRONMENT to aat|demo|perftest|ithc, or export S2S_URL; otherwise AAT defaults apply via applyPlaywrightServiceUrls)'
+    );
+  }
 
   let lastError: unknown;
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
       process.env.SERVICE_AUTH_TOKEN = await new ServiceAuthUtils().retrieveToken({
-        microservice: s2STokenApiData.microservice,
+        microservice: 'pcs_api',
       });
       return;
     } catch (error) {
@@ -37,8 +60,12 @@ export const getS2SToken = async (): Promise<void> => {
 
 export const getAccessToken = async (): Promise<void> => {
   const { IdamUtils } = await import('@hmcts/playwright-common');
-  process.env.IDAM_WEB_URL = accessTokenApiData.idamUrl;
-  process.env.IDAM_TESTING_SUPPORT_URL = accessTokenApiData.idamTestingSupportUrl;
+  applyPlaywrightServiceUrls();
+  if (!process.env.IDAM_WEB_URL || !process.env.IDAM_TESTING_SUPPORT_URL) {
+    throw new Error(
+      'IDAM_WEB_URL and IDAM_TESTING_SUPPORT_URL are not set (set ENVIRONMENT to aat|demo|perftest|ithc, or export both URLs)'
+    );
+  }
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
     username: user.claimantSolicitor.email,
     password: user.claimantSolicitor.password,
