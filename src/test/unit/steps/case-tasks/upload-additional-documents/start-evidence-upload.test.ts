@@ -14,9 +14,7 @@ type NavMocks = { getBackUrl: jest.Mock; getNextStepUrl: jest.Mock };
 jest.mock('../../../../../main/modules/steps/flow', () => {
   const navigation: NavMocks = {
     getBackUrl: jest.fn(async () => '/back-from-flow'),
-    getNextStepUrl: jest.fn(
-      async () => '/case/123/upload-additional-documents/upload-additional-documents/upload-your-documents'
-    ),
+    getNextStepUrl: jest.fn(async () => '/case/123/upload-additional-documents/upload-your-documents'),
   };
 
   const globalCtx = globalThis as typeof globalThis & { __startEvidenceUploadNavMocks?: NavMocks };
@@ -58,7 +56,7 @@ function createReq(overrides: CreateReqOverrides = {}): Request {
 
   return {
     body: {},
-    originalUrl: '/case/1234567890123456/upload-additional-documents/upload-additional-documents/start-evidence-upload',
+    originalUrl: '/case/1234567890123456/upload-additional-documents/start-evidence-upload',
     query: { lang: 'en' },
     params: { caseReference: '1234567890123456' },
     session: { formData: {}, ccdCase: { id: '1234567890123456' } },
@@ -97,17 +95,13 @@ describe('start-evidence-upload step', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     const nav = navigationMocks();
-    nav.getNextStepUrl.mockResolvedValue(
-      '/case/123/upload-additional-documents/upload-additional-documents/upload-your-documents'
-    );
+    nav.getNextStepUrl.mockResolvedValue('/case/123/upload-additional-documents/upload-your-documents');
     nav.getBackUrl.mockResolvedValue('/back-from-flow');
   });
 
   it('exposes correct step name, url, and view', () => {
     expect(step.name).toBe('start-evidence-upload');
-    expect(step.url).toBe(
-      '/case/:caseReference/upload-additional-documents/upload-additional-documents/start-evidence-upload'
-    );
+    expect(step.url).toBe('/case/:caseReference/upload-additional-documents/start-evidence-upload');
     expect(step.view).toContain('startEvidenceUpload.njk');
   });
 
@@ -129,10 +123,10 @@ describe('start-evidence-upload step', () => {
     expect(res.render).toHaveBeenCalledWith(
       step.view,
       expect.objectContaining({
-        pageUrl: '/case/1234567890123456/upload-additional-documents/upload-additional-documents/start-evidence-upload',
+        pageUrl: '/case/1234567890123456/upload-additional-documents/start-evidence-upload',
         backUrl: '/dashboard/1234567890123456',
         dashboardUrl: '/dashboard/1234567890123456',
-        url: '/case/1234567890123456/upload-additional-documents/upload-additional-documents/start-evidence-upload',
+        url: '/case/1234567890123456/upload-additional-documents/start-evidence-upload',
       })
     );
   });
@@ -170,10 +164,7 @@ describe('start-evidence-upload step', () => {
     await step.postController.post(req, res, next);
 
     expect(navigationMocks().getNextStepUrl).toHaveBeenCalledWith(req, 'start-evidence-upload');
-    expect(res.redirect).toHaveBeenCalledWith(
-      303,
-      '/case/123/upload-additional-documents/upload-additional-documents/upload-your-documents'
-    );
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/upload-additional-documents/upload-your-documents');
   });
 
   it('POST renders not-found when navigation returns no url', async () => {
