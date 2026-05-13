@@ -54,7 +54,7 @@
     "@router": "dist/main/router"
   },
   "dependencies": {
-    "@azure/monitor-opentelemetry": "1.17.0",
+    "@azure/monitor-opentelemetry": "1.18.0",
     "@hmcts-cft/cft-ui-component-lib": "0.1.0-alpha.4",
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
@@ -78,7 +78,7 @@
     "govuk-frontend": "6.1.0",
     "helmet": "8.1.0",
     "http-terminator": "3.2.0",
-    "i18next": "26.0.8",
+    "i18next": "26.1.0",
     "i18next-fs-backend": "2.6.5",
     "i18next-http-middleware": "3.9.6",
     "ioredis": "5.10.1",
@@ -132,7 +132,7 @@
     "@typescript-eslint/parser": "8.59.3",
     "allure-commandline": "2.40.0",
     "allure-js-commons": "3.8.0",
-    "allure-playwright": "3.7.2",
+    "allure-playwright": "3.8.0",
     "chokidar": "5.0.0",
     "copy-webpack-plugin": "13.0.1",
     "css-loader": "7.1.4",

@@ -83,16 +83,17 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   fields: fieldsConfig,
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const existingTenancyTypeCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeCorrect;
+    const existingTenancyTypeConfirmation =
+      caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeConfirmation;
     const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses?.tenancyType;
 
-    const formValue = fromYesNoNotSureEnum(existingTenancyTypeCorrect);
+    const formValue = fromYesNoNotSureEnum(existingTenancyTypeConfirmation);
     if (!formValue) {
       return {};
     }
 
     const initial: Record<string, unknown> = { tenancyTypeConfirm: formValue };
-    if (existingTenancyTypeCorrect === 'NO' && existingCorrectedTenancyType) {
+    if (existingTenancyTypeConfirmation === 'NO' && existingCorrectedTenancyType) {
       initial['tenancyTypeConfirm.correctType'] = existingCorrectedTenancyType;
     }
     return initial;
@@ -103,7 +104,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const enumValue = toYesNoNotSureEnum(tenancyTypeConfirm);
 
     if (enumValue) {
-      response.defendantResponses.tenancyTypeCorrect = enumValue;
+      response.defendantResponses.tenancyTypeConfirmation = enumValue;
 
       if (tenancyTypeConfirm === 'no') {
         const correctedType = (
@@ -112,24 +113,26 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         )?.trim();
         if (correctedType) {
           response.defendantResponses.tenancyType = correctedType;
+        } else {
+          delete response.defendantResponses.tenancyType;
         }
       } else {
         delete response.defendantResponses.tenancyType;
       }
     } else {
-      delete response.defendantResponses.tenancyTypeCorrect;
+      delete response.defendantResponses.tenancyTypeConfirmation;
       delete response.defendantResponses.tenancyType;
     }
 
     await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async (req, formContent) => {
-    const existingTenancyTypeCorrect =
-      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.tenancyTypeCorrect;
+    const existingTenancyTypeConfirmation =
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.tenancyTypeConfirmation;
     const existingCorrectedTenancyType = req.res?.locals.validatedCase?.data?.possessionClaimResponse
       ?.defendantResponses?.tenancyType as string;
     const tenancyTypeConfirm =
-      (req.body?.tenancyTypeConfirm as string) || fromYesNoNotSureEnum(existingTenancyTypeCorrect) || '';
+      (req.body?.tenancyTypeConfirm as string) || fromYesNoNotSureEnum(existingTenancyTypeConfirmation) || '';
     const correctType =
       (req.body?.['tenancyTypeConfirm.correctType'] as string) ||
       (req.body?.correctType as string) ||
