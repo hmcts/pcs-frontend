@@ -19,6 +19,7 @@ import {
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
   shouldShowInstallmentPaymentsStep,
+  shouldShowPriorityDebtDetailsStep,
   shouldShowUniversalCreditStep,
 } from './flowConditions';
 import { isMoneyCounterClaim } from './utils';
@@ -169,7 +170,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'priority-debt-details': {
-      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
+      showCondition: (req: Request) => shouldShowPriorityDebtDetailsStep(req),
     },
     'what-other-regular-expenses-do-you-have': {
       showCondition: (req: Request) => hasProvidedFinanceDetails(req),

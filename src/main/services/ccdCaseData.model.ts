@@ -190,8 +190,8 @@ export class CcdCaseModel {
     return this.data.possessionClaimResponse?.defendantResponses ?? undefined;
   }
 
-  get defendantResponsesTenancyStartDateCorrect(): string | undefined {
-    return this.defendantResponses?.tenancyStartDateCorrect ?? undefined;
+  get defendantResponsesTenancyStartDateConfirmation(): string | undefined {
+    return this.defendantResponses?.tenancyStartDateConfirmation ?? undefined;
   }
 
   get defendantResponsesTenancyStartDate(): string | undefined {
