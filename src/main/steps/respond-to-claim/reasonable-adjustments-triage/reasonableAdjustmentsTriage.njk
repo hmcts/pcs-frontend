@@ -4,7 +4,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% block pageTitle %}
-  {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
 {% block mainContent %}
   {% if errorSummary %}
@@ -16,15 +16,15 @@
 
   <p class="govuk-body">{{ askingForReasonableAdjustmentParagraph1 }}</p>
   <p class="govuk-body">{{ askingForReasonableAdjustmentParagraph2 }}</p>
-  <p class="govuk-body">{{ askingForReasonableAdjustmentParagraph3 }}</p>
   <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
     <li>{{ askingForReasonableAdjustmentListItem1 }}</li>
     <li>{{ askingForReasonableAdjustmentListItem2 }}</li>
     <li>{{ askingForReasonableAdjustmentListItem3 }}</li>
     <li>{{ askingForReasonableAdjustmentListItem4 }}</li>
   </ul>
+  <p class="govuk-body">{{ askingForReasonableAdjustmentParagraph3 }}</p>
   <p class="govuk-body">{{ askingForReasonableAdjustmentParagraph4 }}</p>
-  <p class="govuk-body govuk-!-margin-bottom-6 govuk-!-font-weight-bold">{{ askingForSomethingElseHeading }}</p>
+  <h2 class="govuk-heading-s">{{ askingForSomethingElseHeading }}</h2>
   <p class="govuk-body">{{ askingForSomethingElseParagraph1 }}</p>
   <p class="govuk-body">{{ askingForSomethingElseParagraph2 }}</p>
   <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
@@ -33,7 +33,7 @@
     <li>{{ askingForSomethingElseListItem3 }}</li>
   </ul>
   <p class="govuk-body">{{ askingForSomethingElseParagraph3 }}</p>
-  <p class="govuk-body govuk-!-font-weight-bold">{{ contactByEmailHeading }}</p>
+  <h2 class="govuk-heading-s">{{ contactByEmailHeading }}</h2>
   <p class="govuk-body">
      {{ contactByEmailParagraph1Prefix }}
      <a
@@ -41,13 +41,12 @@
        href="https://www.gov.uk/find-court-tribunal "
        target="_blank"
        rel="noopener noreferrer">
-       {{ contactByEmailParagraph1LinkText }}
-     </a>
+       {{ contactByEmailParagraph1LinkText }}</a>
      {{ contactByEmailParagraph1Suffix }}
   </p>
   <p class="govuk-body">{{  contactByEmailParagraph2 }}</p>
-  <p class="govuk-body govuk-!-font-weight-bold">{{  contactByPhoneHeading }}</p>
-  <p class="govuk-body">{{ contactByPhoneParagraph1 }}</p>
+  <h2 class="govuk-heading-s">{{  contactByPhoneHeading }}</h2>
+  <p class="govuk-body govuk-!-margin-bottom-0">{{ contactByPhoneParagraph1 }}</p>
   <p class="govuk-body">{{ contactByPhoneParagraph2 }}</p>
   <p class="govuk-body">
      <a
@@ -55,8 +54,7 @@
       href="https://www.gov.uk/call-charges"
       target="_blank"
       rel="noopener noreferrer">
-      {{ contactByPhoneParagraph3 }}
-     </a>
+      {{ contactByPhoneParagraph3 }}</a>
   </p>
 
   <form method="post" action="{{ url }}">
