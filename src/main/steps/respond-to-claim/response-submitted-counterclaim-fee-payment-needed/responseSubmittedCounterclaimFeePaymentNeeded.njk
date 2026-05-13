@@ -2,12 +2,15 @@
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% block pageTitle %}Universal Credit &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
-
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% block pageTitle %}Response Submitted Counterclaim Fee Payment Needed &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Response Submitted Counterclaim Fee Payment Needed (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for Response Submitted Counterclaim Fee Payment Needed step.</p>
+  {{ govukPanel({
+  titleText: "Response Submitted Counterclaim Fee Payment Needed ",
+  html: "Your reference number<br><strong>" + caseReference + "</strong>"
+}) }}
+  <p class="govuk-body">We’ve sent you a confirmation email.</p>
 {% endblock %}

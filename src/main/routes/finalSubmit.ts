@@ -9,33 +9,34 @@
  * Note: pcs-api SubmitEventHandler requires possessionClaimResponse to be non-null
  * to pass validation, then it loads actual data from draft database.
  */
-import config from 'config';
+// import config from 'config';
 import type { Application, Request, Response, Router } from 'express';
 import { Router as createRouter } from 'express';
 
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
-import { http } from '../modules/http';
+// import { http } from '../modules/http';
+import { getRespondToClaimConfirmationPath } from '../steps/utils/postSubmissionRouting';
 
 import { Logger } from '@modules/logger';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('finalSubmit');
 
-function getBaseUrl(): string {
-  return config.get('ccd.url');
-}
+// function getBaseUrl(): string {
+//   return config.get('ccd.url');
+// }
 
-function getCaseHeaders(token: string) {
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      experimental: true,
-      Accept: '*/*',
-      'Content-Type': 'application/json',
-    },
-  };
-}
+// function getCaseHeaders(token: string) {
+//   return {
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//       experimental: true,
+//       Accept: '*/*',
+//       'Content-Type': 'application/json',
+//     },
+//   };
+// }
 
 export default function finalSubmitRoutes(app: Application): void {
   // Create dedicated router for final submit routes
@@ -86,7 +87,7 @@ export default function finalSubmitRoutes(app: Application): void {
 
     try {
       logger.info(`Submitting response to claim for case ${caseId}`);
-
+      /*
       // Phase 1: START - Get event token from CCD
       const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/respondPossessionClaim`;
       logger.info(`Calling START callback: ${eventUrl}`);
@@ -119,9 +120,8 @@ export default function finalSubmitRoutes(app: Application): void {
       await http.post(submitUrl, payload, getCaseHeaders(userAccessToken));
 
       logger.info(`Response submitted successfully for case ${caseId}`);
-
-      // Use safeRedirect303 to prevent open redirect vulnerabilities
-      return safeRedirect303(res, `/case/${caseId}/confirmation`, '/', ['/case']);
+*/
+      return safeRedirect303(res, getRespondToClaimConfirmationPath(caseId, validatedCase.data), '/', ['/case']);
     } catch (error) {
       logger.error(`Failed to submit response for case ${caseId}:`, error);
       // Use safeRedirect303 to prevent open redirect vulnerabilities

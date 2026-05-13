@@ -25,3 +25,16 @@ export function shouldShowCounterclaimFeePaymentNeededConfirmationStep(caseData:
   }
   return !defendantResponses.counterClaim?.hwfReferenceNumber?.trim();
 }
+
+// Final submit route handler function used to determine which confirmation page to show after response submission
+export function getRespondToClaimConfirmationPath(caseId: string, caseData: CcdCaseData | undefined): string {
+  const base = `/case/${caseId}/respond-to-claim`;
+
+  if (shouldShowResponseSubmittedConfirmationStep(caseData)) {
+    return `${base}/response-submitted`;
+  }
+  if (shouldShowResponseAndCounterclaimSubmittedConfirmationStep(caseData)) {
+    return `${base}/response-and-counterclaim-submitted`;
+  }
+  return `${base}/response-submitted-counterclaim-fee-payment-needed`;
+}
