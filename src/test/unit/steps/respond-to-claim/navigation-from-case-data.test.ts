@@ -102,35 +102,41 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes back from your-household-and-circumstances to repayments-agreed when no payment steps visible', async () => {
+  it('routes back from your-household-and-circumstances to counter-claim when no counter-claim data in CCD', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'counter-claim-have-you-already-applied-for-help-with-your-fees'
+      'counter-claim'
     );
   });
 
-  it('routes counter-claim forward to HWF step when what-are-you-claiming-for is skipped (non-rent-arrears-only)', async () => {
+  it('routes counter-claim forward to your-household-and-circumstances when makeCounterClaim is NO (non-rent-arrears-only)', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+        possessionClaimResponse: {
+          defendantResponses: {
+            makeCounterClaim: 'NO',
+          },
+        },
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'counter-claim-have-you-already-applied-for-help-with-your-fees'
-    );
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('your-household-and-circumstances');
   });
 
-  it('routes counter-claim forward to HWF step when what-are-you-claiming-for is skipped (rent-arrears)', async () => {
+  it('routes counter-claim forward to payment-interstitial when makeCounterClaim is NO (rent-arrears)', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }, { value: { isRentArrears: 'NO' } }],
+        possessionClaimResponse: {
+          defendantResponses: {
+            makeCounterClaim: 'NO',
+          },
+        },
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'counter-claim-have-you-already-applied-for-help-with-your-fees'
-    );
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('payment-interstitial');
   });
 
   it('routes counter-claim YES to what-are-you-claiming-for', async () => {
