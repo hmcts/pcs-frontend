@@ -57,7 +57,9 @@ export class ClickLinkAction implements IAction {
     }
     let link;
     if (sectionHeader) {
-      const section = page.locator(`h2:text-is("${sectionHeader}") + ul`);
+      const section = page
+        .locator(`h2:text-is("${sectionHeader}")`)
+        .locator('xpath=following-sibling::ul | following-sibling::nav//ul');
       link = section.locator(`a:text-is("${name}")`);
     } else {
       link = page.locator(`a:text-is("${name}")`).first();

@@ -6,3 +6,4 @@ export * from './respondToClaim.action';
 export * from './triggerPageFunctionalTests.action';
 export * from './genApps.action';
 export * from './recordAnsweredFields.action';
+export * from './citizenCreateGenAppAPI.action';
