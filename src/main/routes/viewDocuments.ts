@@ -10,8 +10,19 @@ import { extractViewDocumentFolders } from '@utils/documentUtils';
 import { asHeaderString } from '@utils/httpHeaders';
 import { sanitiseUUID } from '@utils/uuid';
 
-function toSafeFilename(value: string): string {
-  return value.replace(/"/g, '');
+function toFilename(value: string): string {
+  const filename = value.trim();
+  return filename || 'document';
+}
+
+function encodeRFC5987ValueChars(value: string): string {
+  return encodeURIComponent(value).replace(/['()*]/g, ch => `%${ch.charCodeAt(0).toString(16).toUpperCase()}`);
+}
+
+function buildInlineContentDisposition(filename: string): string {
+  const fallback = toFilename(filename);
+  const utf8Filename = encodeRFC5987ValueChars(filename);
+  return `inline; filename="${fallback}"; filename*=UTF-8''${utf8Filename}`;
 }
 
 interface ValidatedCaseView {
@@ -96,7 +107,7 @@ export default function viewDocumentsRoutes(app: Application): void {
         if (contentLength) {
           res.setHeader('Content-Length', contentLength);
         }
-        res.setHeader('Content-Disposition', contentDisposition || `inline; filename="${toSafeFilename(filename)}"`);
+        res.setHeader('Content-Disposition', contentDisposition || buildInlineContentDisposition(filename));
 
         stream.on('error', () => {
           if (!res.headersSent) {

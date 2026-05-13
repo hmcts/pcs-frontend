@@ -157,7 +157,10 @@ describe('viewDocuments route', () => {
     expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/abc-123/binary', 'token');
     expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
     expect(res.setHeader).toHaveBeenCalledWith('Content-Length', '1234');
-    expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', 'inline; filename="claim-form.pdf"');
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Content-Disposition',
+      "inline; filename=\"claim-form.pdf\"; filename*=UTF-8''claim-form.pdf"
+    );
     expect(pipeSpy).toHaveBeenCalledWith(res);
     expect(next).not.toHaveBeenCalled();
   });
