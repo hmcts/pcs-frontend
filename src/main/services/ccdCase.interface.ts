@@ -258,6 +258,7 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  allLinkedDefendants?: CcdCollectionItem<CcdDefendantParty>[];
 }
 
 /** Case representation used by services: id + case_data. */
