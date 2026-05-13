@@ -5,6 +5,7 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
+export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export enum LanguageUsed {
   ENGLISH = 'ENGLISH',
   WELSH = 'WELSH',
@@ -13,7 +14,6 @@ export enum LanguageUsed {
 
 export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
-export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
 export interface IncomeExpenseDetails {
@@ -43,14 +43,19 @@ export interface HouseholdCircumstances {
   pensionAmount?: PenceAmount;
   pensionFrequency?: FrequencyValue;
   universalCredit?: YesNoValue;
-  universalCreditAmount?: PenceAmount;
-  universalCreditFrequency?: FrequencyValue;
-  ucApplicationDate?: string;
+  hasAppliedForUniversalCredit?: YesNoValue;
+  universalCreditAmount?: PenceAmount | null;
+  universalCreditFrequency?: FrequencyValue | null;
+  ucApplicationDate?: string | null;
   otherBenefits?: YesNoValue;
   otherBenefitsAmount?: PenceAmount;
   otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
+  priorityDebts?: YesNoValue;
+  debtTotal?: string;
+  debtContribution?: string;
+  debtContributionFrequency?: FrequencyValue;
   householdBills?: IncomeExpenseDetails;
   loanPayments?: IncomeExpenseDetails;
   childSpousalMaintenance?: IncomeExpenseDetails;
@@ -167,10 +172,10 @@ export interface CcdCollectionItem<T> {
 
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
-  tenancyTypeCorrect?: YesNoNotSureValue;
+  tenancyTypeConfirmation?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
-  tenancyStartDateCorrect?: string;
+  tenancyStartDateConfirmation?: YesNoNotSureValue;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;
