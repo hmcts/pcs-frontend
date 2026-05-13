@@ -1,5 +1,6 @@
 import config from 'config';
 import FormData from 'form-data';
+import { AxiosError } from 'axios';
 
 import { CASE_TYPE, CLASSIFICATION, JURISDICTION } from '../constants';
 
@@ -76,12 +77,34 @@ export async function getDocumentBinary(
   const cdamUrl = getCdamUrl();
   const documentsIndex = binaryUrl.lastIndexOf('/documents');
   const cdamPath = documentsIndex >= 0 ? `/cases${binaryUrl.slice(documentsIndex)}` : binaryUrl;
-  const response = await http.get(`${cdamUrl}${cdamPath}`, {
-    headers: {
-      Authorization: `Bearer ${userToken}`,
-    },
-    responseType: 'stream',
+  const requestUrl = `${cdamUrl}${cdamPath}`;
+
+  logger.info('Fetching document binary from CDAM', {
+    requestUrl,
+    cdamPath,
+    sourceBinaryUrl: binaryUrl,
   });
+
+  let response;
+  try {
+    response = await http.get(requestUrl, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+      responseType: 'stream',
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    logger.error('CDAM document binary fetch failed', {
+      requestUrl,
+      cdamPath,
+      sourceBinaryUrl: binaryUrl,
+      status: axiosError.response?.status,
+      statusText: axiosError.response?.statusText,
+      errorMessage: axiosError.message,
+    });
+    throw error;
+  }
 
   const contentType = (response.headers?.['content-type'] as string) || 'application/octet-stream';
   const contentLength = response.headers?.['content-length'] as string | undefined;
