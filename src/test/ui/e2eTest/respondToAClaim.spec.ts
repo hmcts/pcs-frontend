@@ -168,6 +168,8 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.SOMETHING_ELSE = 'YES';
   } else {
     process.env.SOMETHING_ELSE = 'NO';
+  }
+
   //Check if Yes is selected on Priority debts page - for back link navigation of Priority debt details page
   if (testInfo.title.includes('PriorityDebts - Yes')) {
     process.env.PRIORITY_DEBTS = 'YES';
