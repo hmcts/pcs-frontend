@@ -22,7 +22,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       required: true,
       maxLength: 6800,
       errorMessage: 'errors.counterClaimForRequired',
-      labelClasses: 'govuk-label--s',
+      labelClasses: 'govuk-label--m',
       translationKey: {
         label: 'counterClaimForLabel',
       },
@@ -33,7 +33,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       required: true,
       maxLength: 6800,
       errorMessage: 'errors.counterClaimReasonsRequired',
-      labelClasses: 'govuk-label--s',
+      labelClasses: 'govuk-label--m',
       translationKey: {
         label: 'counterClaimReasonsLabel',
       },
