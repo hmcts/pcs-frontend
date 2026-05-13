@@ -62,11 +62,11 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (process.env.OCCUPATION_LICENCE_TYPE === 'SECURE_CONTRACT') {
     process.env.RENT_NON_RENT = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
-  } else if (testInfo.title.includes('NonRentArrears')) {
-    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseNonRentStandard });
-  } else if (testInfo.title.includes('Standard contract - Rent and Non-Rent Arrears')) {
+  } else if (testInfo.title.includes('Standard contract - RentArrears and NonRentArrears')) {
     process.env.RENT_NON_RENT = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentNonRentStandard });
+  } else if (testInfo.title.includes('NonRentArrears')) {
+    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseNonRentStandard });
   } else {
     process.env.RENT_ARREARS = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentOtherTenancy });
@@ -113,7 +113,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - CounterClaimFee - INeedHelp @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Secure contract - Rent and NonRentArrears - CounterClaimFee - INeedHelp @noDefendants @regression', async () => {
     //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
