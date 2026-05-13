@@ -67,6 +67,8 @@ export function hasNotAppliedForCounterClaimHwf(req: Request): boolean {
   const caseData = req.res?.locals?.validatedCase?.data;
   const counterClaim = caseData?.possessionClaimResponse?.defendantResponses?.counterClaim;
   return counterClaim?.appliedForHwf === 'NO';
+}
+
 export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
   if (!hasProvidedFinanceDetails(req)) {
     return false;

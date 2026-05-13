@@ -117,7 +117,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       showCondition: (req: Request) => isNoticeServed(req),
     },
-
     'confirmation-of-notice-date-when-provided': {
       showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
@@ -137,6 +136,9 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'counter-claim-fee': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-have-you-already-applied-for-help-with-your-fees': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'counter-claim-you-need-to-apply-for-help-with-your-fees': {

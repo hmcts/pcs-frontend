@@ -250,4 +250,38 @@ describe('respond-to-claim counter-claim HWF show conditions', () => {
       expect(showCondition?.(makeReq(undefined))).toBe(false);
     });
   });
+
+  describe('counter-claim-have-you-already-applied-for-help-with-your-fees showCondition', () => {
+    const showCondition =
+      flowConfig.steps['counter-claim-have-you-already-applied-for-help-with-your-fees']?.showCondition;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const makeCounterClaimReq = (makeCounterClaim: string | undefined): any => ({
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  makeCounterClaim,
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    it('is visible when makeCounterClaim is YES', () => {
+      expect(showCondition?.(makeCounterClaimReq('YES'))).toBe(true);
+    });
+
+    it('is not visible when makeCounterClaim is NO', () => {
+      expect(showCondition?.(makeCounterClaimReq('NO'))).toBe(false);
+    });
+
+    it('is not visible when makeCounterClaim is absent', () => {
+      expect(showCondition?.(makeCounterClaimReq(undefined))).toBe(false);
+    });
+  });
 });

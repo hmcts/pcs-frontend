@@ -102,10 +102,9 @@ export function buildComponentConfig({
     id: field.name,
     name: field.name,
     label: { text: label, classes: field.labelClasses },
-    // hint: hint ? (hint.includes('<') ? { html: hint } : { text: hint }) : null,
     hint: hint
       ? {
-          text: hint,
+          ...(hint.includes('<') ? { html: hint } : { text: hint }),
           ...(field.hintClasses ? { classes: field.hintClasses } : {}),
         }
       : null,
