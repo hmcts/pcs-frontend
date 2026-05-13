@@ -28,7 +28,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
-  test('Validate address, case number and links on the dashboard @regression', async () => {
+  test('Validate address, case number and links on the dashboard @smoke @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
     await performActions(
