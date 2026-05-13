@@ -10,7 +10,7 @@
   "whatToExpectAtTheHearing": "cyWhat to expect at a hearing",
   "representMyselfAtTheHearing": "cyRepresent myself at a hearing",
   "findLegalAdvice": "cyFind legal advice",
-  "getDebtRespite": "cyGet debt respite (Breathing Space)",
+  "getDebtRespite": "cyGet debt respite (Breathing Space)",
   "findInformation": "cyFind information about my court",
 
   "taskGroups": {
@@ -53,5 +53,10 @@
     "SubmitResponse": { "title": "cySubmit the response" },
     "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
     "ViewAllApplications": { "title": "cyView all applications" }
+  },
+
+  "viewDocuments": {
+    "pageTitle": "cyView documents",
+    "noDocuments": "cyThere are no documents to display."
   }
 }

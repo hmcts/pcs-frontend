@@ -1,5 +1,3 @@
-export * from '../../data/api-data/accessToken.api.data';
-export * from '../../data/api-data/s2SToken.api.data';
 export * from '../../data/api-data/createCaseEventToken.api.data';
 export * from '../../data/api-data/createCase.api.data';
 export * from '../../data/api-data/submitCase.api.data';
@@ -7,3 +5,5 @@ export * from '../../data/api-data/submitCaseEventToken.api.data';
 export * from '../../data/api-data/fetchPINs.api.data';
 export * from '../../data/api-data/validateAccessCode.api.data';
 export * from '../../data/api-data/caseUserRoleDeletion.api.data';
+export * from '../../data/api-data/citizenCreateGenAppEventToken.api.data';
+export * from '../../data/api-data/citizenCreateGenApp.api.data';
