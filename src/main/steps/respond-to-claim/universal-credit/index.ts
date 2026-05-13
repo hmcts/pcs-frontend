@@ -9,8 +9,8 @@ import {
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getTranslationFunction } from '@modules/steps/i18n';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 
 const STEP_NAME = 'have-you-applied-for-universal-credit';
