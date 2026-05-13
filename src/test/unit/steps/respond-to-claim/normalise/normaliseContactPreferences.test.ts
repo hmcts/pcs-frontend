@@ -71,4 +71,17 @@ describe('normaliseContactPreferences', () => {
     normaliseContactPreferences(response);
     expect(JSON.stringify(response)).toBe(afterOnce);
   });
+
+  // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — keep contactByText when
+  // contactByPhone comes back as "Yes" instead of "YES".
+  it('treats PascalCase "Yes" on contactByPhone the same as "YES"', () => {
+    const response = {
+      // Cast simulates BE returning out-of-type casing — the static type is 'YES'/'NO'.
+      defendantResponses: { contactByPhone: 'Yes' as 'YES', contactByText: 'YES' },
+    } as PossessionClaimResponse;
+
+    normaliseContactPreferences(response);
+
+    expect(response.defendantResponses?.contactByText).toBe('YES');
+  });
 });
