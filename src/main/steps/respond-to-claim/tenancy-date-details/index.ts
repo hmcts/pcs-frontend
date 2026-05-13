@@ -1,10 +1,10 @@
 import { format, parseISO } from 'date-fns';
 import type { Request } from 'express';
 
-import { createFormStep, getTranslationFunction } from '../../../modules/steps';
+import { getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate, fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCaseData } from '@services/ccdCase.interface';
@@ -13,11 +13,9 @@ function getTenancyStartDate(caseData: CcdCaseData | undefined): string | undefi
   return caseData?.tenancy_TenancyLicenceDate ?? caseData?.licenceStartDate;
 }
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'tenancy-date-details',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/tenancyDateDetails.njk`,
   translationKeys: {
     caption: 'caption',
@@ -61,7 +59,7 @@ export const step: StepDefinition = createFormStep({
   ],
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
-    const existingDateIsCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateCorrect;
+    const existingDateIsCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateConfirmation;
     const existingTenancyStartDate = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDate;
 
     const formValue = fromYesNoNotSureEnum(existingDateIsCorrect);
@@ -71,9 +69,12 @@ export const step: StepDefinition = createFormStep({
 
     const result: Record<string, unknown> = { confirmTenancyDate: formValue };
 
-    if (existingDateIsCorrect === 'NO' && existingTenancyStartDate) {
+    // Case-insensitive compare via the already-computed formValue (CCD echoes 'No' Pascal
+    // since pcs-api PR #1678 — strict `=== 'NO'` would miss it). Dotted key so the form-
+    // builder matches this against the subField inputs.
+    if (formValue === 'no' && existingTenancyStartDate) {
       const parsed = parseISO(existingTenancyStartDate);
-      result.tenancyStartDate = {
+      result['confirmTenancyDate.tenancyStartDate'] = {
         day: format(parsed, 'd'),
         month: format(parsed, 'M'),
         year: format(parsed, 'yyyy'),
@@ -89,7 +90,7 @@ export const step: StepDefinition = createFormStep({
     const enumValue = toYesNoNotSureEnum(confirmValue);
 
     if (enumValue) {
-      response.defendantResponses.tenancyStartDateCorrect = enumValue;
+      response.defendantResponses.tenancyStartDateConfirmation = enumValue;
 
       if (confirmValue === 'no') {
         const day = (req.body?.['confirmTenancyDate.tenancyStartDate-day'] as string | undefined) ?? '';
@@ -105,15 +106,11 @@ export const step: StepDefinition = createFormStep({
         delete response.defendantResponses.tenancyStartDate;
       }
     } else {
-      delete response.defendantResponses.tenancyStartDateCorrect;
+      delete response.defendantResponses.tenancyStartDateConfirmation;
       delete response.defendantResponses.tenancyStartDate;
     }
 
-    await saveDraftDefendantResponse(
-      req,
-
-      response
-    );
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: req => {
     const caseData = req.res?.locals?.validatedCase?.data;

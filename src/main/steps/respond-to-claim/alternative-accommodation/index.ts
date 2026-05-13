@@ -1,15 +1,12 @@
-import { createFormStep } from '../../../modules/steps';
 import { formatDatePartsToISODate, fromYesNoNotSureEnum, parseISOToDateParts, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/alternativeAccommodation.njk`,
   translationKeys: {
     caption: 'caption',
@@ -59,7 +56,9 @@ export const step: StepDefinition = createFormStep({
     const result: Record<string, unknown> = { confirmAlternativeAccommodation: formValue };
 
     if (existingDate) {
-      result.alternativeAccommodationDate = parseISOToDateParts(existingDate);
+      // Dotted key so the form-builder matches this against the subField inputs
+      // (named confirmAlternativeAccommodation.alternativeAccommodationDate-{day,month,year}).
+      result['confirmAlternativeAccommodation.alternativeAccommodationDate'] = parseISOToDateParts(existingDate);
     }
 
     return result;

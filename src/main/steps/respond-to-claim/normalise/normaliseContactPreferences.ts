@@ -1,3 +1,5 @@
+import { normalizeYesNoValue } from '../../utils';
+
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export function normaliseContactPreferences(response: PossessionClaimResponse): void {
@@ -8,7 +10,7 @@ export function normaliseContactPreferences(response: PossessionClaimResponse): 
 
   // Text message step is only reachable when a phone number was collected (contactByPhone === 'YES').
   // If the user changes their telephone answer to NO, contactByText becomes stale.
-  if (dr.contactByPhone !== 'YES') {
+  if (normalizeYesNoValue(dr.contactByPhone) !== 'YES') {
     delete dr.contactByText;
   }
 }

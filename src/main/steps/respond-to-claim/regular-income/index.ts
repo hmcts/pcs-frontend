@@ -3,9 +3,8 @@ import type { Request } from 'express';
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const createAmountValidator =
@@ -67,11 +66,9 @@ const validateOtherBenefitsAmount = createAmountValidator(
   'errors.otherBenefitsAmount.largeAmount'
 );
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-regular-income-do-you-receive',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   showCancelButton: false,
 
   getInitialFormData: (req: Request) => {
@@ -108,7 +105,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Universal Credit
-    if (fromYesNoEnum(hc.universalCredit) === 'yes') {
+    const appliedForUniversalCredit = fromYesNoEnum(hc.universalCredit);
+    if ((hc.universalCreditAmount || hc.universalCreditFrequency) && appliedForUniversalCredit !== 'no') {
       selectedIncome.push('universalCredit');
       if (hc.universalCreditAmount) {
         formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);
@@ -174,7 +172,7 @@ export const step: StepDefinition = createFormStep({
           delete hc[amountKey];
         }
         if (frequency) {
-          hc[frequencyKey] = frequency as (typeof hc)[typeof frequencyKey];
+          hc[frequencyKey] = frequency as 'WEEKLY' | 'MONTHLY';
         } else {
           delete hc[frequencyKey];
         }

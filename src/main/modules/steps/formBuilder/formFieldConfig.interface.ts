@@ -1,7 +1,8 @@
 import type { Request } from 'express';
 
+import type { FormBuilderFlowConfig } from './flowConfig';
+
 import type { DocumentStorage } from '@modules/documents/storage';
-import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export type FormFieldType =
   | 'radio'
@@ -55,6 +56,8 @@ export interface FormFieldConfig {
   errorMessage?: string;
   label?: string | ((translations: Record<string, string>) => string);
   labelClasses?: string;
+  formGroupClasses?: string;
+  hintClasses?: string;
   hint?: string;
   translationKey?: {
     label?: string;
@@ -141,7 +144,7 @@ export interface FormBuilderConfig {
   translationKeys?: TranslationKeys;
   customTemplate?: string;
   basePath?: string;
-  flowConfig?: JourneyFlowConfig;
+  flowConfig?: FormBuilderFlowConfig;
   showCancelButton?: boolean;
   // Storage adapter for upload steps. When set, formBuilder auto-wires uploadUrl/deleteUrl
   // onto the fileUpload field component from req.originalUrl.
