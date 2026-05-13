@@ -88,6 +88,7 @@ export class ActionRegistry {
     ['selectCounterClaim', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
+    ['readReasonableAdjustmentsTriage', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
