@@ -22,3 +22,8 @@ export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } 
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
+export {
+  shouldShowCounterclaimFeePaymentNeededConfirmationStep,
+  shouldShowResponseAndCounterclaimSubmittedConfirmationStep,
+  shouldShowResponseSubmittedConfirmationStep,
+} from './postSubmissionRouting';
