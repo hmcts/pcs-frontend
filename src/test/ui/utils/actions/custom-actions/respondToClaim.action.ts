@@ -593,7 +593,7 @@ export class RespondToClaimAction implements IAction {
     if (counterClaimFeeOption.typeOfClaim === 'Something else') {
       counterClaimFeeValue = 377;
     } else if (
-      counterClaimFeeOption.typeOfClaim === 'Sum of money or compensation' ||
+      counterClaimFeeOption.typeOfClaim === 'A sum of money or compensation' ||
       counterClaimFeeOption.typeOfClaim === 'Both'
     ) {
       if (counterClaimFeeOption.amount === null) {

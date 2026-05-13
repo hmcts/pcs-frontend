@@ -160,7 +160,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iNeedHelpRadioOption,
-      typeOfClaim: 'Sum of money or compensation',
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
@@ -306,10 +306,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
-      typeOfClaim: 'Sum of money or compensation',
-      amount: counterClaimSpecificSumOfMoney.claimInput,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    await performValidation('maninHeader', counterClaimAbout.mainHeader);
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
@@ -488,9 +488,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
-      typeOfClaim: 'Something else',
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    await performValidation('maninHeader', counterClaimAbout.mainHeader);
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
   });
 });

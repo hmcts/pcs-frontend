@@ -268,7 +268,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
-      typeOfClaim: 'Sum of money or compensation',
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performValidation('maninHeader', counterClaimAbout.mainHeader);
@@ -403,7 +403,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
-      typeOfClaim: 'Both',
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
@@ -503,7 +503,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iNeedHelpRadioOption,
-      typeOfClaim: 'Something else',
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
@@ -611,7 +611,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iNeedHelpRadioOption,
-      typeOfClaim: 'Sum of money or compensation',
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
@@ -747,8 +747,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.noRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -868,7 +873,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iNeedHelpRadioOption,
-      typeOfClaim: 'Sum of money or compensation',
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueFEE0508Input,
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
@@ -1014,7 +1019,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
-      typeOfClaim: 'Sum of money or compensation',
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performValidation('maninHeader', counterClaimAbout.mainHeader);
@@ -1129,7 +1134,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
-      typeOfClaim: 'Something else',
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performValidation('mainHeader', counterClaimAgainstWhom.mainHeader);
     await performAction('clickButton', counterClaimAgainstWhom.continueButton);
