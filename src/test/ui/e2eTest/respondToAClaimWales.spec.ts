@@ -489,9 +489,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
     await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
-    });
-    await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingFor', {
