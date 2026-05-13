@@ -1,6 +1,6 @@
+import { AxiosError } from 'axios';
 import config from 'config';
 import FormData from 'form-data';
-import { AxiosError } from 'axios';
 
 import { CASE_TYPE, CLASSIFICATION, JURISDICTION } from '../constants';
 
