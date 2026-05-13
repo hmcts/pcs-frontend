@@ -10,14 +10,9 @@ properties([
       description: 'Why this build was triggered. For manual runs, enter a short note (e.g. verify a fix, extra browser coverage). Scheduled runs keep the default.'
     ),
     choice(
-      name: 'ENVIRONMENT',
-      choices: ['aat', 'preview'],
-      description: 'Environment to run the test.'
-    ),
-    string(
-      name: 'PR_NUMBER',
-      defaultValue: '',
-      description: 'PR number (REQUIRED if environment is preview, leave blank otherwise).'
+      name: 'E2E_TARGET_ENV',
+      choices: ['aat', 'demo', 'perftest', 'ithc'],
+      description: 'CNP env for vault pcs-<name>, backend URLs, and Playwright ENVIRONMENT (derives IdAM/S2S). Scheduled runs default to aat.'
     ),
     string(
       name: 'PLAYWRIGHT_SPEC',
@@ -123,20 +118,18 @@ static Map secret(String secretName, String envVariable) {
   ]
 }
 
-def secrets = [
-  'pcs-${env}': [
-    secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
-    secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
-    secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64'),
-    secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID')
-  ]
+def pcsE2eVaultSecrets = [
+  secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
+  secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
+  secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64'),
+  secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID'),
 ]
 
 withNightlyPipeline(type, product, component) {
   validateInputs()
   enableSlackNotifications('#pcs-tech')
-  loadVaultSecrets(secrets)
   handleEnvironmentSetting()
+  loadVaultSecrets(["pcs-${env.ENVIRONMENT}": pcsE2eVaultSecrets])
   setFunctionalTestEnvVars()
   enableFortifyScan()
   def sauceSuites = selectedSauceSuites()
@@ -162,27 +155,22 @@ def selectedSauceSuites() {
 }
 
 def validateInputs() {
-  if (params.ENVIRONMENT == 'preview' && (!params.PR_NUMBER?.trim())) {
-    error("Validation Failed: PR number is required when environment is 'preview'")
-  }
-  if (params.ENVIRONMENT == 'preview' && !params.PR_NUMBER.trim().matches("^\\d+\$")) {
-    error("Validation Failed: PR number must contain only numerical values")
+  if (!browserToggleParamNames().any { params[it] }) {
+    error('E2E matrix: enable at least one browser/device option (e.g. CHROME_TESTS).')
   }
 }
 
 def handleEnvironmentSetting() {
-  env.TEST_URL = (params.ENVIRONMENT == 'preview')
-    ? "https://pcs-frontend-pr-${params.PR_NUMBER}.preview.platform.hmcts.net"
-    : "https://pcs.${params.ENVIRONMENT}.platform.hmcts.net/"
+  env.ENVIRONMENT = (params.E2E_TARGET_ENV?.trim() ?: 'aat').toLowerCase()
+  env.TEST_URL = "https://pcs.${env.ENVIRONMENT}.platform.hmcts.net/"
+  env.E2E_TEST_SCOPE = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@nightly'
+  env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
 }
 
 def setFunctionalTestEnvVars() {
-  env.PCS_API_URL = 'http://pcs-api-aat.service.core-compute-aat.internal'
-  env.DATA_STORE_URL_BASE = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+  env.PCS_API_URL = "http://pcs-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
+  env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
   env.SAUCE_GREP = (params.SAUCE_GREP?.trim()) ?: '@crossbrowser'
-  def tag = params.PLAYWRIGHT_GREP_TAG?.trim() ?: '@nightly'
-  env.E2E_TEST_SCOPE = tag
-  env.E2E_SPEC = params.PLAYWRIGHT_SPEC?.trim() ?: ''
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
   env.ENABLE_AXE_AUDIT = params.ENABLE_AXE_AUDIT
 }
@@ -204,8 +192,21 @@ def runE2ETests(yarnBuilder) {
   }
 }
 
+/** Names of boolean pipeline params that select browser/device E2E stages (must stay in sync with `runE2ETests`). */
+def browserToggleParamNames() {
+  [
+    'CHROME_TESTS',
+    'FIREFOX_TESTS',
+    'WEBKIT_TESTS',
+    'EDGE_TESTS',
+    'MOBILE_ANDROID_TESTS',
+    'MOBILE_IOS_TESTS',
+    'MOBILE_IPAD_TESTS',
+  ]
+}
+
 def runE2eStage(yarnBuilder, String playwrightProject, String browser, String stageLabel) {
-  stage("E2E - ${stageLabel}") {
+  stage("E2E - ${stageLabel} [${env.ENVIRONMENT}]") {
     node {
       checkout scm
       sh 'rm -rf allure-results allure-report'

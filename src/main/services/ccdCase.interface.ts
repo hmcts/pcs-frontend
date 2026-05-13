@@ -171,10 +171,10 @@ export interface CcdCollectionItem<T> {
 
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
-  tenancyTypeCorrect?: YesNoNotSureValue;
+  tenancyTypeConfirmation?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
-  tenancyStartDateCorrect?: string;
+  tenancyStartDateConfirmation?: YesNoNotSureValue;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;
