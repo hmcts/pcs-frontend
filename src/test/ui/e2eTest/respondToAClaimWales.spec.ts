@@ -85,6 +85,13 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.SOMETHING_ELSE = 'NO';
   }
 
+  //paymentInterstitial back navigation
+  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
+    process.env.I_NEED_HELP = 'YES';
+  } else {
+    process.env.I_NEED_HELP = 'NO';
+  }
+
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
@@ -100,7 +107,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - Rent and Non-Rent Arrears @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Secure contract - Rent and Non-Rent Arrears - CounterClaimFee - INeedHelp @PR @noDefendants @regression', async () => {
     //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -358,7 +365,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Other contract - @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Other contract - @noDefendants @regression @PR', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -441,7 +448,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //   await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - Yes - SomethingElse @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - Yes - SomethingElse @noDefendants @regression @PR', async () => {
     //Single named party - Something else - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {

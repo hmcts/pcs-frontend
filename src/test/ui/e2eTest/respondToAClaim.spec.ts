@@ -179,6 +179,13 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.REGULAR_INCOME = 'UNIVERSAL_CREDIT';
   }
 
+  //paymentInterstitial back navigation
+  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
+    process.env.I_NEED_HELP = 'YES';
+  } else {
+    process.env.I_NEED_HELP = 'NO';
+  }
+
   if (testInfo.title.includes('@noDefendants')) {
     claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     process.env.CLAIMANT_NAME = claimantName;
@@ -367,7 +374,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown -  Income - no @assured @regression', async () => {
+  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown -  Income - no @assured @regression @PR', async () => {
     //incomeAndExpenses - no - Upload docs - Single named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -585,6 +592,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
   });
+
   test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
@@ -859,8 +867,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit @regression', async () => {
-    //universal credit with all other options - priority debts - No
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp  @regression @PR', async () => {
+    //universal credit with all other options - priority debts - No - Multiple namedParties - iNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -1262,7 +1270,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression @PR', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
