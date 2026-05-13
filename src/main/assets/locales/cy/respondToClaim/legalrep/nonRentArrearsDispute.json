@@ -1,5 +1,5 @@
 {
-  "heading": "cy{{claimantName}} claim",
+  "heading": "cy{{claimantName}}'s claim",
   "disputeOtherPartsQuestion": "cyDoes the defendant dispute any other parts of the claim?",
   "caseNumber": "cyCase number: {{caseNumber}}",
   "disputeDetails": {
