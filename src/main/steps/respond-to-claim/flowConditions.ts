@@ -7,6 +7,7 @@ import {
   isFinanceDetailsProvided,
   isNoticeDateProvided,
   isPriorityDebtsSelected,
+  isSingleLinkedDefendant,
   isUniversalCreditSelected,
   normalizeYesNoValue,
 } from '../utils';
@@ -63,4 +64,8 @@ export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
   }
 
   return isPriorityDebtsSelected(req) || hasSelectedPriorityDebts(req);
+}
+
+export function hasSingleLinkedDefendant(req: Request): boolean {
+  return isSingleLinkedDefendant(req);
 }

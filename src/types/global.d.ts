@@ -14,6 +14,10 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   refreshToken: string;
 }
 
+export interface ClientContextHeaders {
+  selectedPartyId: string;
+}
+
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
@@ -26,6 +30,7 @@ interface CustomSessionData extends SessionData {
     showDuplicateSubmissionPage?: boolean;
   };
   destroy(callback: (err?: Error) => void): void;
+  clientContext?: ClientContextHeaders;
 }
 
 declare module 'express-session' {

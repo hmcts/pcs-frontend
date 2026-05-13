@@ -1,11 +1,14 @@
+import type { Request } from 'express';
+
 import { flowConfig as citizenFlowConfig } from './flow.config';
+import { hasSingleLinkedDefendant } from './flowConditions';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'start-now',
+  'select-defendant',
   'defendant-name-confirmation',
-  'defendant-name-capture',
   'defendant-date-of-birth',
   'correspondence-address',
   'contact-preferences-email-or-post',
@@ -50,4 +53,12 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
   ...citizenFlowConfig,
   journeyName: 'respondToClaimLegalrep',
   stepOrder: legalrepStepOrder,
+  steps: {
+    'select-defendant': {
+      showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
+    },
+    'defendant-name-confirmation': {
+      showCondition: (req: Request) => hasSingleLinkedDefendant(req),
+    },
+  },
 };

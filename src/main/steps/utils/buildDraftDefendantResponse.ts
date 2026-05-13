@@ -43,9 +43,15 @@ export const saveDraftDefendantResponse = async (req: Request, response: Possess
   const accessToken = req.session?.user?.accessToken || '';
   const caseId = req.res?.locals.validatedCase?.id || '';
 
-  const updatedCase = await ccdCaseService.updateDraft(RESPOND_TO_CLAIM_DRAFT_EVENT, accessToken, caseId, {
-    possessionClaimResponse: normalised,
-  });
+  const updatedCase = await ccdCaseService.updateDraft(
+    RESPOND_TO_CLAIM_DRAFT_EVENT,
+    accessToken,
+    caseId,
+    {
+      possessionClaimResponse: normalised,
+    },
+    req.session?.clientContext
+  );
 
   // Refresh validatedCase with the merged response from the backend.
   // updatedCase.data only carries the defendant slice (defendantContactDetails +

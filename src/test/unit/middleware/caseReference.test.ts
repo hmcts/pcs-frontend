@@ -72,7 +72,7 @@ describe('caseReferenceParamMiddleware', () => {
 
       await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
 
-      expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef);
+      expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef, 'respondPossessionClaim', undefined);
       expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
       expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
       expect(next).toHaveBeenCalledWith();
@@ -128,6 +128,31 @@ describe('caseReferenceParamMiddleware', () => {
           error: 'Case not found',
         })
       );
+    });
+
+    it('should invoke with client context when present', async () => {
+      const validCaseRef = '1234567890123456';
+      const mockCase = { id: validCaseRef, state: 'Open' };
+      const mockAccessToken = 'mock-access-token';
+      const clientContext = { selectedPartyId: 'abc' };
+
+      mockReq.session = {
+        user: { accessToken: mockAccessToken },
+        clientContext,
+      } as MockSession as Request['session'];
+      mockGetCaseById.mockResolvedValue(mockCase);
+
+      await caseReferenceParamMiddleware(mockReq as Request, mockRes as Response, next, validCaseRef);
+
+      expect(mockGetCaseById).toHaveBeenCalledWith(
+        mockAccessToken,
+        validCaseRef,
+        'respondPossessionClaim',
+        clientContext
+      );
+      expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
+      expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
+      expect(next).toHaveBeenCalledWith();
     });
   });
 
