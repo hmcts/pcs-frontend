@@ -1,6 +1,8 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, LanguageUsed } from '@services/ccdCase.interface';
 
@@ -12,6 +14,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     heading: 'heading',
     caption: 'caption',
+    languageHeading: 'languageHeading',
+    question: 'question',
   },
   fields: [
     {
@@ -46,5 +50,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     await saveDraftDefendantResponse(req, response);
+  },
+  extendGetContent: req => {
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+    const t = getTranslationFunction(req, 'language-used', ['common']);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
   },
 });

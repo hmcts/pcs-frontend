@@ -4,6 +4,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
+{% from "macros/caseNumberDisplay.njk"import caseNumberDisplay%}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
@@ -19,7 +20,17 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
+  {{ caseNumberDisplay(isLegalRepresentative, caseNumber) }}
+
+  {% if isLegalRepresentative %}
+    <p class="govuk-heading-m">{{ heading }} </p>
+  {% endif %}
+
   <p class="govuk-body">{{ paragraph | safe }}</p>
+
+  {% if isLegalRepresentative %}
+     <p class="govuk-heading-m">{{ landlordQuestion }} </p>
+  {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}

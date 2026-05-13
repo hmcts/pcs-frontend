@@ -1,8 +1,10 @@
 import type { Request } from 'express';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoNotSureValue } from '@services/ccdCase.interface';
 
@@ -18,6 +20,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     question: 'question',
     publicRegisterLinkText: 'publicRegisterLinkText',
     introText: 'introText',
+    heading: 'heading',
   },
   fields: [
     {
@@ -51,5 +54,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
       response
     );
+  },
+  extendGetContent: req => {
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+    const t = getTranslationFunction(req, 'landlord-registered', ['common']);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
   },
 });

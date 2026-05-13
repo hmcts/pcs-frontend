@@ -10,6 +10,7 @@
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
+{% from "macros/caseNumberDisplay.njk"import caseNumberDisplay%}
 {% from "macros/fileUploadMoj.njk" import fileUploadMoj %}
 
 {% block pageTitle %}
@@ -29,6 +30,12 @@
     <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% elif title %}
     <h1 class="govuk-heading-l">{{ title }}</h1>
+  {% endif %}
+
+  {{ caseNumberDisplay(isLegalRepresentative, caseNumber) }}
+
+  {% if isLegalRepresentative %}
+    <p class="govuk-heading-m">{{ subheading}}</p>
   {% endif %}
 
   {% if content %}

@@ -1,11 +1,15 @@
+import { caseNumberFormatter } from 'steps/utils/caseNumberFormatter';
 import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { getTranslationFunction } from '@modules/steps/i18n';
+
+const STEP_NAME = 'priority-debts';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
-  stepName: 'priority-debts',
+  stepName: STEP_NAME,
   stepDir: __dirname,
   beforeRedirect: async req => {
     const selection = req.body?.havePriorityDebts as string | undefined;
@@ -45,6 +49,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     unpaidIncomeTaxNationalInsuranceOrVat: 'unpaidIncomeTaxNationalInsuranceOrVat',
     unpaidChildMaintenance: 'unpaidChildMaintenance',
     guidanceLinkText: 'guidanceLinkText',
+    caseNumber: 'caseNumber',
   },
   fields: [
     {
@@ -61,4 +66,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   customTemplate: `${__dirname}/priorityDebts.njk`,
+  extendGetContent: async (req, formContent) => {
+    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    return {
+      ...formContent,
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
+  },
 });

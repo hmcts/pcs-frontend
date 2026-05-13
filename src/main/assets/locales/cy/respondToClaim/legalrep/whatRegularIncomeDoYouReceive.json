@@ -1,0 +1,53 @@
+{
+  "caption": "cyRespond to a property possession claim",
+  "caseNumber": "cyCase number: {{caseNumber}}",
+  "heading": "cyIncome",
+  "subheading": "cyWhat regular income does the defendant receive?",
+  "groupName": "cyRegular income options",
+  "hintText": "cySelect all that apply. The information the defendant provides must be truthful and accurate.",
+  "options": {
+    "incomeFromJobs": "cyIncome from all jobs they do",
+    "moneyFromElsewhere": "cyMoney from somewhere else (for example, child maintenance payments or someone in the defendant's household gives them money)"
+  },
+  "subFields": {
+    "moneyFromElsewhereDetailsHint": "cyGive details about the other sources of income and how much the defendant usually receives a month"
+  },
+  "errors": {
+    "incomeFromJobsAmount": {
+      "required": "cyEnter the total amount the defendant receives from all jobs they do",
+      "negative": "cyThe total amount the defendant receive from all jobs they do each week or month must be £0.00 or above",
+      "largeAmount": "cyThe total amount the defendant receive from all jobs you do each week or month must be less than £1 billion"
+    },
+    "incomeFromJobsFrequency": {
+      "required": "cySelect how frequently the defendant receives income from all jobs they do"
+    },
+    "pensionAmount": {
+      "required": "cyEnter the total amount the defendant receives from a state or private pension",
+      "negative": "cyThe total amount the defendant receives from pension (state and private) each week or month must be £0.00 or above",
+      "largeAmount": "cyThe total amount the defendant receives from pension (state and private) each week or month must be less than £1 billion"
+    },
+    "pensionFrequency": {
+      "required": "cySelect how frequently the defendant receives income from a state or private pension"
+    },
+    "universalCreditAmount": {
+      "required": "cyEnter the total amount the defendant receives from Universal Credit",
+      "negative": "cyThe total amount the defendant receives from Universal Credit each week or month must be £0.00 or above",
+      "largeAmount": "cyThe total amount the defendsnt receives from Universal Credit each week or month must be less than £1 billion"
+    },
+    "universalCreditFrequency": {
+      "required": "cySelect how frequently the defendant receives Universal Credit"
+    },
+    "otherBenefitsAmount": {
+      "required": "cyEnter the total amount the defendant receives from other benefits and credits",
+      "negative": "cyThe total amount the defendant receives from other benefits and credit each week or month must be £0.00 or above",
+      "largeAmount": "cyThe total amount the defendant receives from other benefits and credit each week or month must be less than £1 billion"
+    },
+    "otherBenefitsFrequency": {
+      "required": "cySelect how frequently the defendant receives income from other benefits and credits"
+    },
+    "moneyFromElsewhereDetails": {
+      "required": "cyEnter details about the money the defendant received from somewhere else and how much the defendant usually receive",
+      "invalidCharacters": "cyGive details about the other sources of income and how much the defendant usually receives must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    }
+  }
+}

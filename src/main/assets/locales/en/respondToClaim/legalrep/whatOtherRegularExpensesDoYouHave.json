@@ -1,0 +1,102 @@
+{
+  "heading": "Expenses",
+  "subheading": "What regular income does the defendant receive? (Optional)",
+  "caseNumber": "Case number: {{caseNumber}}",
+  "hintText": "Select all that apply. The information the defendant provides must be truthful and accurate.",
+  "options": {
+    "householdBills": "Household bills (for example, council tax, gas, electricity, water, internet)",
+    "loanPayments": "Loan payments",
+    "childSpousalMaintenance": "Child or spousal maintenance",
+    "mobilePhone": "Mobile phone",
+    "groceryShopping": "Grocery shopping",
+    "fuelParkingTransport": "Fuel, parking and transport",
+    "schoolCosts": "School costs (for example, uniform and school dinners)",
+    "clothing": "Clothing",
+    "otherExpenses": "Other"
+  },
+  "subFields": {
+    "amount": "Amount paid",
+    "frequency": "Paid every:"
+  },
+  "frequency": {
+    "week": "Week",
+    "month": "Month"
+  },
+  "errors": {
+    "householdBillsAmount": {
+      "required": "Enter the amount the defendant pays for household bills",
+      "negative": "The amount the defendant pays for household bills each week or month must be £0.00 or above",
+      "largeAmount": "The amount the defendant pays for household bills each week or month must be less than £1 billion"
+    },
+    "householdBillsFrequency": {
+      "required": "Select how frequently the defendant pays household bills"
+    },
+    "loanPaymentsAmount": {
+      "required": "Enter the amount the defendant pays for loan payments",
+      "negative": "The amount the defendant pays for loan payments each week or month must be £0.00 or above",
+      "largeAmount": "The amount the defendant pays for loan payments each week or month must be less than £1 billion"
+    },
+    "loanPaymentsFrequency": {
+      "required": "Select how frequently the defendant makes loan payments"
+    },
+    "childSpousalMaintenanceAmount": {
+      "required": "Enter the amount the defendant pays for child or spousal maintenance",
+      "negative": "The amount the defendant pays for child or spousal maintenance each week or month must be £0.00 or above",
+      "largeAmount": "The amount the defendant pays for child or spousal maintenance each week or month must be less than £1 billion"
+    },
+    "childSpousalMaintenanceFrequency": {
+      "required": "Select how frequently the defendant pays child or spousal maintenance"
+    },
+    "mobilePhoneAmount": {
+      "required": "Enter the amount the defendant pays for a mobile phone",
+      "negative": "The amount the defendant pays for a mobile phone each week or month must be £0.00 or above",
+      "largeAmount": "The amount the defendant pays for a mobile phone each week or month must be less than £1 billion"
+    },
+    "mobilePhoneFrequency": {
+      "required": "Select how frequently the defendant pays for a mobile phone"
+    },
+    "groceryShoppingAmount": {
+      "required": "Enter the amount the defendant pays for grocery shopping",
+      "negative": "The amount the defendant pays for grocery shopping each week or month must be £0.00 or above",
+      "largeAmount": "The amount the defendant pays for grocery shopping each week or month must be less than £1 billion"
+    },
+    "groceryShoppingFrequency": {
+      "required": "Select how frequently the defendant pays for grocery shopping"
+    },
+    "fuelParkingTransportAmount": {
+      "required": "Enter the amount the defendant pays for fuel, parking and transport",
+      "negative": "The amount the defendant pays for fuel, parking and transport each week or month must be £0.00 or above",
+      "largeAmount": "The amount the defendant pays for fuel, parking and transport each week or month must be less than £1 billion"
+    },
+    "fuelParkingTransportFrequency": {
+      "required": "Select how frequently the defendant pays for fuel, parking and transport"
+    },
+    "schoolCostsAmount": {
+      "required": "Enter the amount the defendant pays for school costs",
+      "negative": "The amount the defendant pays for school costs each week or month must be £0.00 or above",
+      "largeAmount": "The amount the defendant pays for school costs each week or month must be less than £1 billion"
+    },
+    "schoolCostsFrequency": {
+      "required": "Select how frequently the defendant pays school costs"
+    },
+    "clothingAmount": {
+      "required": "Enter the amount the defendant pays for clothing",
+      "negative": "The amount the defendant pays for clothing each week or month must be £0.00 or above",
+      "largeAmount": "The amount the defendant pays for clothing each week or month must be less than £1 billion"
+    },
+    "clothingFrequency": {
+      "required": "Select how frequently the defendant pays for clothing"
+    },
+    "otherExpensesAmount": {
+      "required": "Enter the amount the defendant pays for other regular expenses",
+      "negative": "The amount the defendant pays for other expenses each week or month must be £0.00 or above",
+      "largeAmount": "The amount the defendant pays for other expenses each week or month must be less than £1 billion"
+    },
+    "otherExpensesFrequency": {
+      "required": "Select how frequently the defendant pays for other expenses"
+    },
+    "amount": {
+      "invalidFormat": "Enter an amount in the correct format, for example 148.00 or 148.50"
+    }
+  }
+}

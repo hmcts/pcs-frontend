@@ -1,0 +1,22 @@
+{
+  "caseNumber": "cyCase number: {{caseNumber}}",
+  "question": " ",
+  "heading": "cyThe defendant’s situation",
+  "accommodationHeading": "cyAlternative accommodation",
+  "accommodationQuestion": "cyWould the defendant have somewhere else to live if they had to leave their home?",
+  "dateLabel": "cyWhen would they be able to move in? (Optional)",
+  "options": {
+    "or": " ",
+    "notSure": "cyDefendant is not sure"
+  },
+  "errors": {
+    "date": {
+      "notRealDate": "cyThe date the defendant would be able to move in must be a real date ",
+      "pastDate": "cyThe date the defendant would be able to move in must be in the future",
+      "invalidValue": "cyThe date the defendant would be able to move in must be a real date ",
+      "missingOne": "cyThe date the defendant would be able to move in must include a {{missingField}}",
+      "missingTwo": "cyThe date the defendant would be able to move in must include a {{first}} and {{second}}"
+    },
+    "confirmAlternativeAccommodation": "cySelect if the defendant would have somewhere else to live if they had to leave their home"
+  }
+}

@@ -1,5 +1,7 @@
+import { getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate, fromYesNoNotSureEnum, parseISOToDateParts, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -12,6 +14,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     caption: 'caption',
     question: 'question',
     pageTitle: 'pageTitle',
+    heading: 'heading',
+    accommodationQuestion: 'accommodationQuestion',
+    accommodationHeading: 'accommodationHeading',
   },
   fields: [
     {
@@ -97,5 +102,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
       response
     );
+  },
+  extendGetContent: async req => {
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    const t = getTranslationFunction(req, 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home', [
+      'common',
+    ]);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
   },
 });

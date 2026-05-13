@@ -3,8 +3,10 @@ import type { Request } from 'express';
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { FrequencyValue, HouseholdCircumstances, IncomeExpenseDetails } from '@services/ccdCase.interface';
 
@@ -97,6 +99,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     pageTitle: 'pageTitle',
     hintText: 'hintText',
+    caseNumber: 'caseNumber',
+    subheading: 'subheading',
   },
 
   fields: [
@@ -506,5 +510,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     await saveDraftDefendantResponse(req, response);
+  },
+  extendGetContent: req => {
+    const t = getTranslationFunction(req, 'what-other-regular-expenses-do-you-have', ['common']);
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
   },
 });

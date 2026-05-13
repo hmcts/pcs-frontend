@@ -1,7 +1,9 @@
 import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccdCase.interface';
 
@@ -14,6 +16,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     caption: 'caption',
     paragraph: 'dependantChildrenParagraph',
+    caseNumber: 'caseNumber',
+    dependantHeading: 'dependantHeading',
+    dependantQuestion: 'dependantQuestion',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -99,4 +104,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
+  extendGetContent: async req => {
+    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
+
+    const t = getTranslationFunction(req, 'do-you-have-any-dependant-children', ['common']);
+
+    return {
+      caseNumber: t('caseNumber', { caseNumber }),
+    };
+  },
 });
