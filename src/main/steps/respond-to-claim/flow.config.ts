@@ -19,6 +19,7 @@ import {
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
   shouldShowInstallmentPaymentsStep,
+  shouldShowPriorityDebtDetailsStep,
   shouldShowUniversalCreditStep,
 } from './flowConditions';
 import { isMoneyCounterClaim } from './utils';
@@ -116,7 +117,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       showCondition: (req: Request) => isNoticeServed(req),
     },
-
     'confirmation-of-notice-date-when-provided': {
       showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
@@ -136,6 +136,9 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'counter-claim-fee': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-have-you-already-applied-for-help-with-your-fees': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'counter-claim-you-need-to-apply-for-help-with-your-fees': {
@@ -169,7 +172,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'priority-debt-details': {
-      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
+      showCondition: (req: Request) => shouldShowPriorityDebtDetailsStep(req),
     },
     'what-other-regular-expenses-do-you-have': {
       showCondition: (req: Request) => hasProvidedFinanceDetails(req),

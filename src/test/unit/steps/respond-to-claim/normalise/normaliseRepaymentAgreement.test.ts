@@ -110,4 +110,27 @@ describe('normaliseRepaymentAgreement', () => {
     normaliseRepaymentAgreement(response);
     expect(JSON.stringify(response)).toBe(afterOnce);
   });
+
+  // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — keep the contribution chain
+  // when repaymentPlanAgreed comes back as "No" and repayArrearsInstalments as "Yes".
+  it('treats PascalCase "No"/"Yes" the same as "NO"/"YES"', () => {
+    const response = {
+      defendantResponses: {
+        paymentAgreement: {
+          // Casts simulate BE returning out-of-type casing.
+          repaymentPlanAgreed: 'No' as 'NO',
+          repayArrearsInstalments: 'Yes' as 'YES',
+          additionalRentContribution: '10000',
+          additionalContributionFrequency: 'WEEKLY',
+        },
+      },
+    } as PossessionClaimResponse;
+
+    normaliseRepaymentAgreement(response);
+
+    expect(response.defendantResponses?.paymentAgreement).toMatchObject({
+      additionalRentContribution: '10000',
+      additionalContributionFrequency: 'WEEKLY',
+    });
+  });
 });
