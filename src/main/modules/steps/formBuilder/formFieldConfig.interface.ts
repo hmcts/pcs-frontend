@@ -56,6 +56,8 @@ export interface FormFieldConfig {
   errorMessage?: string;
   label?: string | ((translations: Record<string, string>) => string);
   labelClasses?: string;
+  formGroupClasses?: string;
+  hintClasses?: string;
   hint?: string;
   translationKey?: {
     label?: string;

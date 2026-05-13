@@ -1,3 +1,5 @@
+import { normalizeYesNoValue } from '../../utils';
+
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export function normaliseNoticeDetails(response: PossessionClaimResponse): void {
@@ -7,7 +9,7 @@ export function normaliseNoticeDetails(response: PossessionClaimResponse): void 
   }
 
   // Notice not received → notice-date pages are skipped
-  if (dr.possessionNoticeReceived !== 'YES') {
+  if (normalizeYesNoValue(dr.possessionNoticeReceived) !== 'YES') {
     delete dr.noticeReceivedDate;
   }
 }
