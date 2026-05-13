@@ -44,7 +44,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-//import { firstName, lastName, pins } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { pinUsers } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -1197,7 +1197,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - Counter-claim-multi-party @rentNonRent @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -1246,9 +1246,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     //counter claim fee i dont need help step need to include*/
+    const pin2User = pinUsers[1];
     await performAction('selectClaimAgainstWhom', {
       question: counterClaimAgainstWhom.mainHeader,
-      radioOption: claimantName,
+      options: [claimantName, `${pin2User.firstName} ${pin2User.lastName}`],
     });
     await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,

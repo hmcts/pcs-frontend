@@ -6,10 +6,19 @@ import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.
 import { fetchPINsApiData, validateAccessCodeApiData } from '../../../data/api-data';
 import { IAction } from '../../interfaces';
 
+export type PinUser = {
+  pin: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  [k: string]: any;
+};
+
 export let pins: string[] = [];
 export let firstName: string = '';
 export let lastName: string = '';
 export let address: string = '';
+export let pinUsers: PinUser[] = [];
 
 export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
   async execute(page: Page, action: string): Promise<void> {
@@ -33,6 +42,23 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
       const fetchedPins = Object.keys(response.data);
       if (fetchedPins.length > 0) {
         pins = fetchedPins;
+        pinUsers = pins.map(pin => {
+          const pinData = response.data[pin];
+          const addressObj = pinData.address;
+          let formattedAddress = '';
+          if (addressObj) {
+            const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country } = addressObj;
+            formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country]
+              .filter(value => value && typeof value === 'string' && value.trim() !== '')
+              .join(', ');
+          }
+          return {
+            pin,
+            firstName: pinData.firstName,
+            lastName: pinData.lastName,
+            address: formattedAddress,
+          };
+        });
         const pinData = response.data[pins[0]];
         firstName = pinData.firstName;
         lastName = pinData.lastName;
