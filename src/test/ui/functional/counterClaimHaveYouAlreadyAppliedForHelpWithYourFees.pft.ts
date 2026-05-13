@@ -1,5 +1,5 @@
 import {
-  counterClaim,
+  counterClaimFee,
   counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   dashboard,
   feedback,
@@ -36,7 +36,7 @@ export async function counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesNaviga
   await performValidation(
     'pageNavigation',
     counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.backLink,
-    counterClaim.mainHeader
+    counterClaimFee.mainHeader
   );
   await performAction('clickRadioButton', counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption);
   await performAction(
