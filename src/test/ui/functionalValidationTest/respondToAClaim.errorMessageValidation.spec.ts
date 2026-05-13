@@ -7,6 +7,7 @@ import {
   correspondenceAddress,
   counterClaim,
   counterClaimAbout,
+  counterClaimAgainstWhom,
   counterClaimFee,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
@@ -313,6 +314,9 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
+
+    await softErrorMessageValidation('counterClaimAgainstWhom', NO_EMV_READ_ONLY);
+    await performAction('clickButton', counterClaimAgainstWhom.continueButton);
 
     await softErrorMessageValidation('counterClaimAbout', NO_EMV_READ_ONLY);
     await performAction('clickButton', counterClaimAbout.continueButton);

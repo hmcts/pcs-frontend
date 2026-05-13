@@ -61,6 +61,26 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
 
+  //paymentInterstitial back navigation
+  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
+    process.env.I_NEED_HELP = 'YES';
+  } else {
+    process.env.I_NEED_HELP = 'NO';
+  }
+
+  if (testInfo.title.includes('@rentNonRent')) {
+    process.env.TENANCY_START_DATE_KNOWN = 'YES';
+    process.env.RENT_NON_RENT = 'YES';
+  } else {
+    process.env.RENT_NON_RENT = 'NO';
+  }
+
+  if (testInfo.title.includes('SelectCounterClaim - No')) {
+    process.env.SELECT_COUNTER_CLAIM = 'NO';
+  } else {
+    process.env.SELECT_COUNTER_CLAIM = 'YES';
+  }
+
   const isRentArrearsOnly =
     testInfo.title.includes('RentArrears') &&
     !testInfo.title.includes('NonRentArrears') &&
@@ -112,13 +132,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   // Tenancy start date logic for noDefendantTest and rentNonRent test
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('Respond to a claim') ? 'NO' : 'YES';
-    process.env.RENT_NON_RENT = 'NO';
-  }
-
-  if (testInfo.title.includes('@rentNonRent')) {
-    process.env.TENANCY_START_DATE_KNOWN = 'YES';
-    process.env.RENT_NON_RENT = 'YES';
-  } else {
     process.env.RENT_NON_RENT = 'NO';
   }
 
@@ -177,13 +190,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   //Check if Universal Credit is selected on Regular income page - for back link navigation of Priority Debts page
   if (testInfo.title.includes('RegularIncome - Universal Credit')) {
     process.env.REGULAR_INCOME = 'UNIVERSAL_CREDIT';
-  }
-
-  //paymentInterstitial back navigation
-  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
-    process.env.I_NEED_HELP = 'YES';
-  } else {
-    process.env.I_NEED_HELP = 'NO';
   }
 
   if (testInfo.title.includes('@noDefendants')) {
@@ -374,7 +380,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown -  Income - no @assured @regression', async () => {
+  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown -  Income - no @PR @assured @regression', async () => {
     //incomeAndExpenses - no - Upload docs - Single named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -479,7 +485,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - SomethingElse @secureFlexible @regression', async () => {
+  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - SomethingElse @PR @secureFlexible @regression', async () => {
     //Income and expenses - yes - no option On regular Income - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
@@ -593,7 +599,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
+  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
@@ -867,7 +873,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp  @regression', async () => {
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp @PR @regression', async () => {
     //universal credit with all other options - priority debts - No - Multiple namedParties - iNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
@@ -1270,7 +1276,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - No @rentNonRent @regression @PR', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
