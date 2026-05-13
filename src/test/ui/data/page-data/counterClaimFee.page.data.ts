@@ -10,6 +10,10 @@ export const counterClaimFee = {
   backLink: `Back`,
   iNeedHelpRadioOption: `I need help paying the fee`,
   iDoNotNeedHelpRadioOption: `I do not need help paying the fee`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfYouNeedHelpErrorMessage: `Select if you need help paying the counterclaim fee`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `counter-claim-fee`,
 };

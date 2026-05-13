@@ -77,6 +77,14 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else {
     process.env.INCOME_AND_EXPENSES = 'YES';
   }
+
+  //counterClaimFee back link navigation
+  if (testInfo.title.includes('SomethingElse')) {
+    process.env.SOMETHING_ELSE = 'YES';
+  } else {
+    process.env.SOMETHING_ELSE = 'NO';
+  }
+
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
@@ -425,7 +433,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //   await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - Yes @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - Yes - SomethingElse @noDefendants @regression', async () => {
     //Single named party - Something else - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
