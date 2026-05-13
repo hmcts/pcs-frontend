@@ -29,13 +29,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const allLinkedDefendants: CcdCollectionItem<CcdDefendantParty>[] | undefined =
       req.res?.locals?.validatedCase?.allLinkedDefendants;
 
-    const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioItems | undefined;
+    const radio = formContent.fields.find(f => f.name === 'selectDefendant') as RadioItems | undefined;
 
     addRadioButtonForAllLinkedDefendants(allLinkedDefendants, radio);
 
-    return {
-      ...formContent,
-    };
+    return formContent;
   },
   fields: [
     {
