@@ -36,7 +36,7 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
   'your-circumstances',
   'exceptional-hardship',
-  'income-and-expenditure',
+  'income-and-expenses',
   'what-regular-income-do-you-receive',
   'have-you-applied-for-universal-credit',
   'priority-debts',

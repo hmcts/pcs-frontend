@@ -1,5 +1,6 @@
 {
-  "question": "Have the defendant applied for Universal Credit?",
+  "question": "Has the defendant applied for Universal Credit?",
+  "heading": "Universal Credit?",
   "dateLabel": "When did the defendant apply?",
   "errors": {
     "haveAppliedForUniversalCredit": "Select if the defendant has applied for Universal Credit",
