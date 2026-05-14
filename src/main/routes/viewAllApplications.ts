@@ -7,7 +7,6 @@ import { Logger } from '@modules/logger';
 import { getDashboardUrl } from '@routes/dashboard';
 import { CcdCollectionItem, GenApp, GenAppType, Party } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
-import { extractDocumentId } from '@services/documentClient';
 import { sanitiseCaseReference } from '@utils/caseReference';
 
 const logger = Logger.getLogger('viewAllApplications');
@@ -55,6 +54,7 @@ export default function viewAllApplicationsRoutes(app: Application): void {
     const formattedCaseReference = caseReference.replace(/(\d{4})(?=\d)/g, '$1 ');
 
     res.render('view-all-applications', {
+      caseReference,
       formattedCaseReference,
       dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
       userGenApps,
@@ -69,8 +69,8 @@ function toGenAppSummary(genApp: GenApp): GenAppSummary {
     party: genApp.party,
     submittedOn: genApp.submittedOn,
     submissionDocument: {
-      filename: genApp.submissionDocument.document_filename,
-      documentId: extractDocumentId(genApp.submissionDocument.document_url),
+      filename: genApp.submissionDocument.document.document_filename,
+      documentId: genApp.submissionDocument.id,
     },
   };
 }

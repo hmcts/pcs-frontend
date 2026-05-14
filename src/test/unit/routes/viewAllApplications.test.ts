@@ -89,7 +89,7 @@ describe('View All Application Route', () => {
             lastName: 'Smith',
           },
           submissionDocument: {
-            documentId: 'bf112cdf-76d7-4d15-bb92-cd7c3483a300',
+            documentId: 'bf112cdf-76d7-4d15-bb92-cd7c34830001',
             filename: 'General Application GA1 - Defendant 1.pdf',
           },
           submittedOn: '2026-05-06T17:29:33.301528',
@@ -106,6 +106,7 @@ describe('View All Application Route', () => {
     expect(res.render).toHaveBeenCalledWith(
       'view-all-applications',
       expect.objectContaining({
+        caseReference: `${caseReference}`,
         dashboardUrl: `/dashboard/${caseReference}`,
         formattedCaseReference: '1234 5678 9012 3456',
         otherPartyGenAppsMap: expectedOtherPartyMap,
@@ -119,7 +120,7 @@ describe('View All Application Route', () => {
               lastName: 'Edwardson',
             },
             submissionDocument: {
-              documentId: 'bf112cdf-76d7-4d15-bb92-cd7c3483a7ef',
+              documentId: 'bf112cdf-76d7-4d15-bb92-cd7c34830001',
               filename: 'General Application GA1 - Defendant 3.pdf',
             },
             submittedOn: '2026-05-03T17:29:33.301528',
@@ -133,7 +134,7 @@ describe('View All Application Route', () => {
               lastName: 'Edwardson',
             },
             submissionDocument: {
-              documentId: 'bf112cdf-76d7-4d15-bb92-cd7c3483a200',
+              documentId: 'bf112cdf-76d7-4d15-bb92-cd7c34830002',
               filename: 'General Application GA2 - Defendant 3.pdf',
             },
             submittedOn: '2026-05-04T17:29:33.301528',
@@ -208,9 +209,12 @@ function getTestGenApps() {
         },
         submittedOn: '2026-05-03T17:29:33.301528',
         submissionDocument: {
-          document_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a7ef',
-          document_filename: 'General Application GA1 - Defendant 3.pdf',
-          document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a7ef/binary',
+          id: 'bf112cdf-76d7-4d15-bb92-cd7c34830001',
+          document: {
+            document_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a7ef',
+            document_filename: 'General Application GA1 - Defendant 3.pdf',
+            document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a7ef/binary',
+          },
         },
       },
     },
@@ -226,9 +230,12 @@ function getTestGenApps() {
         },
         submittedOn: '2026-05-04T17:29:33.301528',
         submissionDocument: {
-          document_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a200',
-          document_filename: 'General Application GA2 - Defendant 3.pdf',
-          document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a200/binary',
+          id: 'bf112cdf-76d7-4d15-bb92-cd7c34830002',
+          document: {
+            document_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a200',
+            document_filename: 'General Application GA2 - Defendant 3.pdf',
+            document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a200/binary',
+          },
         },
       },
     },
@@ -244,9 +251,12 @@ function getTestGenApps() {
         },
         submittedOn: '2026-05-06T17:29:33.301528',
         submissionDocument: {
-          document_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a300',
-          document_filename: 'General Application GA1 - Defendant 1.pdf',
-          document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a300/binary',
+          id: 'bf112cdf-76d7-4d15-bb92-cd7c34830001',
+          document: {
+            document_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a300',
+            document_filename: 'General Application GA1 - Defendant 1.pdf',
+            document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a300/binary',
+          },
         },
       },
     },

@@ -17,7 +17,7 @@
               <p class="govuk-body govuk-!-margin-bottom-1">
                 {% set submissionDocument = genApp.submissionDocument %}
                 {% if submissionDocument.documentId %}
-                  <a href="/documents/{{ submissionDocument.documentId }}/download" rel="noreferrer noopener" target="_blank">{{ submissionDocument.filename }}</a>
+                  <a href="/case/{{ caseReference }}/view-documents/{{ submissionDocument.documentId }}" rel="noreferrer noopener" target="_blank">{{ submissionDocument.filename }}</a>
                 {% else %}
                   {{ submissionDocument.filename }}
                 {% endif %}

@@ -114,13 +114,17 @@ export interface Document {
   document_binary_url: string;
 }
 
+export interface DocumentWithId {
+  id: string;
+  document: Document;
+}
+
 export interface GenApp {
   applicationType: GenAppType;
   party: Party;
   submittedOn: string;
-  submissionDocument: Document;
+  submissionDocument: DocumentWithId;
 }
-
 /** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
 export interface CcdClaimantOrganisation {
   value: string;
@@ -156,6 +160,7 @@ export interface CcdDocumentReference {
   document_filename: string;
   document_hash?: string;
   category_id?: string;
+  upload_timestamp?: string;
 }
 
 /** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
@@ -260,6 +265,7 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  allDocuments?: CcdCollectionItem<Partial<CcdDocumentReference>>[];
 }
 
 /** Case representation used by services: id + case_data. */
