@@ -20,6 +20,6 @@
     "disputeDetails": {
       "required": "cyEnter the parts of the claim you do not agree with"
     },
-    "disputeDetailsMaxLength": "cyYour explanation must be 6500 characters or fewer"
+    "disputeDetailsMaxLength": "cyExplanation must be 6500 characters or less"
   }
 }

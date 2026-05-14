@@ -44,7 +44,29 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
     message: defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
   });
+  //Test: Both first name and last name for emoji
+  await performAction(
+    'inputText',
+    defendantNameConfirmation.firstNameHiddenTextLabel,
+    defendantNameConfirmation.emojiTextInput
+  );
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.emojiFirstNameErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    defendantNameConfirmation.lastNameHiddenTextLabel,
+    defendantNameConfirmation.emojiTextInput
+  );
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.emojiLastNameErrorMessage,
+  });
 }
+
 export async function defendantNameConfirmationNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', defendantNameConfirmation.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,

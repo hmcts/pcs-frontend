@@ -20,7 +20,7 @@ export const yourCircumstances = {
   emojiTextInput: `👉 😄`,
   emojiGiveGiveDetailsAboutYourCircumstancesErrorMessage: `Give details about your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   selectCircumstancesErrorMessage: `Select if you’d like to share anything about your circumstances`,
-  mustBe500CharactersOrFewerErrorMessage: `Must be 500 characters or fewer`,
+  mustBe500CharactersOrFewerErrorMessage: `Circumstances details must be 500 characters or less`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `your-circumstances`,
 };

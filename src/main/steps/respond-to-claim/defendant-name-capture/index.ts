@@ -1,4 +1,5 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { noEmojiValidator } from '../../utils/fieldValidators';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -72,6 +73,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         autocomplete: 'given-name',
         spellcheck: false,
       },
+      validator: noEmojiValidator('errors.firstNameInvalidCharacters'),
     },
     {
       name: 'lastName',
@@ -86,6 +88,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         autocomplete: 'family-name',
         spellcheck: false,
       },
+      validator: noEmojiValidator('errors.lastNameInvalidCharacters'),
     },
   ],
 });
