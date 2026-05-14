@@ -18,6 +18,6 @@
     "tenancyTypeConfirm": "cySelect yes, no or I’m not sure",
     "tenancyDetails.correctType": "cyEnter the correct tenancy, occupation contract or licence type",
     "requiredText": "cyEnter the correct tenancy, licence or occupation contract details",
-    "defaultMaxLength": "cyThe correct tenancy, occupation contract or licence type must be {max} characters or fewer"
+    "defaultMaxLength": "cyTenancy, occupation contract or licence type must be 60 characters or less"
   }
 }
