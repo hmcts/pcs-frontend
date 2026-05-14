@@ -1,5 +1,4 @@
 {
-  "caseNumber": "Case number: {{caseNumber}}",
   "hintText": "",
   "question": "Did {{claimantName}} give the defendant notice of their intention to begin possession proceedings?",
   "options": {
