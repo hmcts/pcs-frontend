@@ -1,6 +1,5 @@
 export const doAnyOtherAdultsLiveInYourHome = {
   mainHeader: `Do any other adults live in your home?`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   giveDetailsAboutOtherAdultsHiddenTextLabel: `Give details about the other adults living in your home`,
   youShouldIncludeDetailsHiddenHintText: `You should include details about how many adults live in your home, their relationship to you, as well as anything else you think the court should know about them`,
@@ -13,7 +12,7 @@ export const doAnyOtherAdultsLiveInYourHome = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfAnyOtherAdultsErrorMessage: `Select if any other adults live in your home`,
   giveDetailsAboutOtherAdultsErrorMessage: 'Give details about the other adults living in your home',
-  mustBe500ErrorMessage: `Must be 500 characters or fewer`,
+  mustBe500ErrorMessage: `Details about other adults must be 500 characters or less`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `do-any-other-adults-live-in-your-home`,
   emojiTextInput: `👉 😄`,

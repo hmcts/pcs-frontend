@@ -1,5 +1,4 @@
 {
-  "caption": "Respond to a property possession claim",
   "pageTitle": "Regular income",
   "heading": "What regular income do you receive? (Optional)",
   "groupName": "Regular income options",
@@ -54,6 +53,7 @@
     "otherBenefitsFrequency": {
       "required": "Select how frequently you receive income from other benefits and credits"
     },
+    "moneyFromElsewhereDetailsMaxLength": "Details of money from somewhere else must be 500 characters or less",
     "moneyFromElsewhereDetails": {
       "required": "Enter details about the money you receive from somewhere else and how much you usually receive",
       "invalidCharacters": "Give details about the other sources of income and how much you usually receive must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
