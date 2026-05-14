@@ -1,16 +1,12 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils/yesNoEnum';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'income-and-expenses',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/incomeAndExpenditure.njk`,
 
   getInitialFormData: req => {
@@ -22,19 +18,22 @@ export const step: StepDefinition = createFormStep({
   },
 
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+
     const provideFinanceDetails = req.body?.provideFinanceDetails as 'yes' | 'no' | undefined;
-    if (!provideFinanceDetails) {
-      return;
+
+    if (provideFinanceDetails === 'yes' || provideFinanceDetails === 'no') {
+      response.defendantResponses.householdCircumstances.shareIncomeExpenseDetails = toYesNoEnum(provideFinanceDetails);
+    } else {
+      delete response.defendantResponses.householdCircumstances.shareIncomeExpenseDetails;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          shareIncomeExpenseDetails: toYesNoEnum(provideFinanceDetails),
-        },
-      },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(
+      req,
+
+      response
+    );
   },
 
   translationKeys: {

@@ -6,17 +6,43 @@ export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
 export { hasOnlyRentArrearsGrounds } from './hasOnlyRentArrearsGrounds';
 export { isNoticeServed } from './isNoticeServed';
 export { isTenancyStartDateKnown } from './isTenancyStartDateKnown';
-export { isFromIncomeAndExpenditure } from './isFromIncomeAndExpenditure';
 export { isFinanceDetailsProvided } from './isFinanceDetailsProvided';
 export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
-export { getPreviousPageForArrears } from './journeyHelpers';
-export { getStepBeforeDisputePages } from './journeyHelpers';
+export { isPriorityDebtsSelected } from './isPriorityDebtsSelected';
+export { hasSelectedPriorityDebts } from './hasSelectedPriorityDebts';
+export {
+  getFirstStepInSection,
+  getSectionCoverage,
+  getSectionForStep,
+  getStepsInSection,
+  isLastStepInSection,
+  isSectionApplicable,
+} from './sections';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
-export { getPreviousStepForYourHouseholdAndCircumstances } from './getPreviousStepForYourHouseholdAndCircumstances';
-export { poundsStringToPence, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
-export { LEGAL_REPRESENTATIVE_USER_ROLES, getUserRoles, getUserType, isLegalRepresentativeUser } from './userRole';
-export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
-export { toYesNoEnum, fromYesNoEnum, toVerticalYesNoEnum, fromVerticalYesNoEnum } from './yesNoEnum';
+export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
+export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';
+export { getValidatedCaseHouseholdCircumstances } from './getValidatedCaseHouseholdCircumstances';
+export {
+  shouldRouteToPriorityDebts,
+  shouldRouteToUniversalCreditQuestion,
+  shouldRouteToPriorityDebtDetails,
+  shouldRouteToOtherRegularExpenses,
+} from './respondToClaimRouteConditions';
+export {
+  poundsStringToPence,
+  ccdPenceToPoundsString,
+  additionalRentContributionToPoundsString,
+} from './moneyAmountTransforms';
 export { penceToPounds, poundsToPence } from './currencyConversion';
+export {
+  LEGAL_REPRESENTATIVE_USER_ROLES,
+  getUserRoles,
+  getUserToken,
+  getUserType,
+  isLegalRepresentativeUser,
+} from './userRole';
+export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
+export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
+export { hasMadeCounterClaim } from './hasMadeCounterClaim';

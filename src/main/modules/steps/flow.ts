@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { Logger } from '@modules/logger';
-import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '@modules/steps/stepFlow.interface';
+import type { JourneyFlowConfig, JourneyFlowConfigResolver, SectionConfig } from '@modules/steps/stepFlow.interface';
 
 const logger = Logger.getLogger('stepDependencyCheck');
 
@@ -31,24 +31,67 @@ export async function getNextStep(
 }
 
 async function getNextStepByShowCondition(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
-  const currentIndex = getStepIndex(flowConfig, currentStepName);
+  if (flowConfig.stepOrder?.length) {
+    return getNextStepByShowConditionFlat(req, currentStepName, flowConfig);
+  }
+  return getNextStepBySectionTraversal(req, currentStepName, flowConfig);
+}
 
-  for (let stepIndex = currentIndex + 1; stepIndex < flowConfig.stepOrder.length; stepIndex++) {
-    const candidateNextStepName = flowConfig.stepOrder[stepIndex];
-    const candidateNextStep = flowConfig.steps[candidateNextStepName];
+function getNextStepByShowConditionFlat(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+  const stepOrder = getStepOrder(flowConfig);
+  const currentIndex = getStepIndex(stepOrder, currentStepName);
 
-    if (!candidateNextStep || !candidateNextStep.showCondition) {
-      // No show condition defined
-      return candidateNextStepName;
-    }
-
-    if (candidateNextStep.showCondition(req)) {
-      // Show condition matches
+  for (let stepIndex = currentIndex + 1; stepIndex < stepOrder.length; stepIndex++) {
+    const candidateNextStepName = stepOrder[stepIndex];
+    if (isStepVisible(flowConfig, candidateNextStepName, req)) {
       return candidateNextStepName;
     }
   }
 
   return null;
+}
+
+async function getNextStepBySectionTraversal(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+  const sections = flowConfig.sections!;
+  const nonSectionSteps = flowConfig.nonSectionStepOrder ?? [];
+  const location = locateStep(currentStepName, sections, nonSectionSteps);
+
+  if (!location) {
+    throw new Error(`Step ${currentStepName} not found in stepOrder`);
+  }
+
+  if (location.kind === 'section') {
+    const { sectionIndex, stepIndex } = location;
+    const currentSection = sections[sectionIndex];
+
+    // Stay within current section if it remains applicable.
+    if (await isSectionApplicableAtRuntime(currentSection, req)) {
+      const remainingInSection = currentSection.steps.slice(stepIndex + 1);
+      const next = firstVisible(remainingInSection, flowConfig, req);
+      if (next) {
+        return next;
+      }
+    }
+
+    // Walk forward through subsequent applicable sections.
+    for (let i = sectionIndex + 1; i < sections.length; i++) {
+      const section = sections[i];
+      if (!(await isSectionApplicableAtRuntime(section, req))) {
+        continue;
+      }
+      const next = firstVisible(section.steps, flowConfig, req);
+      if (next) {
+        return next;
+      }
+    }
+
+    // Fall through to non-section steps.
+    return firstVisible(nonSectionSteps, flowConfig, req) ?? null;
+  }
+
+  // Current step is in nonSectionStepOrder — only walk forward within that list.
+  const remainingNonSection = nonSectionSteps.slice(location.stepIndex + 1);
+  return firstVisible(remainingNonSection, flowConfig, req) ?? null;
 }
 
 async function getNextStepByRouteConditions(
@@ -59,6 +102,7 @@ async function getNextStepByRouteConditions(
   currentStepData: Record<string, unknown>
 ) {
   const stepConfig = flowConfig.steps[currentStepName];
+  const stepOrder = getStepOrder(flowConfig);
 
   if (stepConfig?.routes) {
     for (const route of stepConfig.routes) {
@@ -76,9 +120,9 @@ async function getNextStepByRouteConditions(
     return stepConfig.defaultNext;
   }
 
-  const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
-  if (currentIndex >= 0 && currentIndex < flowConfig.stepOrder.length - 1) {
-    return flowConfig.stepOrder[currentIndex + 1];
+  const currentIndex = stepOrder.indexOf(currentStepName);
+  if (currentIndex >= 0 && currentIndex < stepOrder.length - 1) {
+    return stepOrder[currentIndex + 1];
   }
 
   return null;
@@ -106,20 +150,77 @@ async function getPreviousStepByShowConditions(req: Request, currentStepName: st
     return null;
   }
 
-  const currentIndex = getStepIndex(flowConfig, currentStepName);
+  if (flowConfig.stepOrder?.length) {
+    return getPreviousStepByShowConditionsFlat(req, currentStepName, flowConfig);
+  }
+  return getPreviousStepBySectionTraversal(req, currentStepName, flowConfig);
+}
+
+function getPreviousStepByShowConditionsFlat(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+  const stepOrder = getStepOrder(flowConfig);
+  const currentIndex = getStepIndex(stepOrder, currentStepName);
 
   for (let stepIndex = currentIndex - 1; stepIndex >= 0; stepIndex--) {
-    const candidatePreviousStepName = flowConfig.stepOrder[stepIndex];
-    const candidatePreviousStep = flowConfig.steps[candidatePreviousStepName];
-
-    if (!candidatePreviousStep || !candidatePreviousStep.showCondition) {
-      // No show condition defined
+    const candidatePreviousStepName = stepOrder[stepIndex];
+    if (isStepVisibleAndCanGoBack(flowConfig, candidatePreviousStepName, req)) {
       return candidatePreviousStepName;
     }
+  }
 
-    if (candidatePreviousStep.showCondition(req) && !candidatePreviousStep.preventBack) {
-      // Show condition matches
-      return candidatePreviousStepName;
+  return null;
+}
+
+async function getPreviousStepBySectionTraversal(req: Request, currentStepName: string, flowConfig: JourneyFlowConfig) {
+  const sections = flowConfig.sections!;
+  const nonSectionSteps = flowConfig.nonSectionStepOrder ?? [];
+  const location = locateStep(currentStepName, sections, nonSectionSteps);
+
+  if (!location) {
+    throw new Error(`Step ${currentStepName} not found in stepOrder`);
+  }
+
+  if (location.kind === 'nonSection') {
+    // Walk backward within nonSection list first.
+    for (let i = location.stepIndex - 1; i >= 0; i--) {
+      if (isStepVisibleAndCanGoBack(flowConfig, nonSectionSteps[i], req)) {
+        return nonSectionSteps[i];
+      }
+    }
+    // Fall back to walking sections in reverse.
+    for (let i = sections.length - 1; i >= 0; i--) {
+      const section = sections[i];
+      if (!(await isSectionApplicableAtRuntime(section, req))) {
+        continue;
+      }
+      const prev = lastVisibleAndCanGoBack(section.steps, flowConfig, req);
+      if (prev) {
+        return prev;
+      }
+    }
+    return null;
+  }
+
+  const { sectionIndex, stepIndex } = location;
+  const currentSection = sections[sectionIndex];
+
+  // Stay within current section if it remains applicable.
+  if (await isSectionApplicableAtRuntime(currentSection, req)) {
+    const earlierInSection = currentSection.steps.slice(0, stepIndex);
+    const prev = lastVisibleAndCanGoBack(earlierInSection, flowConfig, req);
+    if (prev) {
+      return prev;
+    }
+  }
+
+  // Walk previous applicable sections in reverse.
+  for (let i = sectionIndex - 1; i >= 0; i--) {
+    const section = sections[i];
+    if (!(await isSectionApplicableAtRuntime(section, req))) {
+      continue;
+    }
+    const prev = lastVisibleAndCanGoBack(section.steps, flowConfig, req);
+    if (prev) {
+      return prev;
     }
   }
 
@@ -133,6 +234,7 @@ async function getPreviousStepByRouteConditions(
   formData: Record<string, unknown>
 ) {
   const stepConfig = flowConfig.steps[currentStepName];
+  const stepOrder = getStepOrder(flowConfig);
 
   // If step has explicit previousStep configuration, use it
   if (stepConfig?.previousStep) {
@@ -166,9 +268,9 @@ async function getPreviousStepByRouteConditions(
   }
 
   // Fallback to stepOrder array index
-  const currentIndex = flowConfig.stepOrder.indexOf(currentStepName);
+  const currentIndex = stepOrder.indexOf(currentStepName);
   if (currentIndex > 0) {
-    return flowConfig.stepOrder[currentIndex - 1];
+    return stepOrder[currentIndex - 1];
   }
   return null;
 }
@@ -270,10 +372,78 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
   };
 }
 
-function getStepIndex(flowConfig: JourneyFlowConfig, stepName: string) {
-  const stepIndex = flowConfig.stepOrder.indexOf(stepName);
+function getStepIndex(stepOrder: string[], stepName: string) {
+  const stepIndex = stepOrder.indexOf(stepName);
   if (stepIndex === -1) {
     throw new Error(`Step ${stepName} not found in stepOrder`);
   }
   return stepIndex;
+}
+
+export function getStepOrder(flowConfig: JourneyFlowConfig): string[] {
+  if (flowConfig.stepOrder?.length) {
+    return flowConfig.stepOrder;
+  }
+
+  if (!flowConfig.sections) {
+    throw new Error('JourneyFlowConfig requires stepOrder when sections are not configured');
+  }
+
+  const sectionSteps = flowConfig.sections.flatMap(section => section.steps);
+  const nonSectionSteps = flowConfig.nonSectionStepOrder ?? [];
+  return [...sectionSteps, ...nonSectionSteps];
+}
+
+type StepLocation =
+  | { kind: 'section'; sectionIndex: number; stepIndex: number }
+  | { kind: 'nonSection'; stepIndex: number };
+
+function locateStep(stepName: string, sections: SectionConfig[], nonSectionSteps: string[]): StepLocation | null {
+  for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex++) {
+    const stepIndex = sections[sectionIndex].steps.indexOf(stepName);
+    if (stepIndex !== -1) {
+      return { kind: 'section', sectionIndex, stepIndex };
+    }
+  }
+  const nonSectionIndex = nonSectionSteps.indexOf(stepName);
+  if (nonSectionIndex !== -1) {
+    return { kind: 'nonSection', stepIndex: nonSectionIndex };
+  }
+  return null;
+}
+
+async function isSectionApplicableAtRuntime(section: SectionConfig, req: Request): Promise<boolean> {
+  if (!section.isApplicable) {
+    return true;
+  }
+  return section.isApplicable(req);
+}
+
+function isStepVisible(flowConfig: JourneyFlowConfig, stepName: string, req: Request): boolean {
+  const stepConfig = flowConfig.steps[stepName];
+  if (!stepConfig || !stepConfig.showCondition) {
+    return true;
+  }
+  return stepConfig.showCondition(req);
+}
+
+function isStepVisibleAndCanGoBack(flowConfig: JourneyFlowConfig, stepName: string, req: Request): boolean {
+  const stepConfig = flowConfig.steps[stepName];
+  if (!stepConfig || !stepConfig.showCondition) {
+    return true;
+  }
+  return stepConfig.showCondition(req) && !stepConfig.preventBack;
+}
+
+function firstVisible(stepNames: string[], flowConfig: JourneyFlowConfig, req: Request): string | undefined {
+  return stepNames.find(stepName => isStepVisible(flowConfig, stepName, req));
+}
+
+function lastVisibleAndCanGoBack(stepNames: string[], flowConfig: JourneyFlowConfig, req: Request): string | undefined {
+  for (let i = stepNames.length - 1; i >= 0; i--) {
+    if (isStepVisibleAndCanGoBack(flowConfig, stepNames[i], req)) {
+      return stepNames[i];
+    }
+  }
+  return undefined;
 }

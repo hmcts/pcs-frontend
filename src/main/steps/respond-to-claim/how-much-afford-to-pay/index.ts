@@ -1,71 +1,44 @@
-import { additionalRentContributionToPoundsString, poundsStringToPence } from '../../utils';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'how-much-afford-to-pay',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
     const installmentAmount = req.body?.installmentAmount as string | undefined;
     const installmentFrequency = req.body?.installmentFrequency as string | undefined;
 
-    const paymentAgreement: Record<string, unknown> = {};
-
     if (typeof installmentAmount === 'string' && installmentAmount.trim()) {
-      const amountInPence = poundsStringToPence(installmentAmount);
+      const amountInPence = poundsToPence(installmentAmount);
       if (amountInPence !== undefined) {
         // pcs-api MoneyGBP JSON is a pence string (see MoneyGBPDeserializer), not { amount: ... }.
-        paymentAgreement.additionalRentContribution = String(amountInPence);
+        response.defendantResponses.paymentAgreement.additionalRentContribution = amountInPence;
       }
+    } else {
+      delete response.defendantResponses.paymentAgreement.additionalRentContribution;
     }
 
     if (typeof installmentFrequency === 'string' && installmentFrequency.trim()) {
-      paymentAgreement.additionalContributionFrequency = installmentFrequency.trim();
+      response.defendantResponses.paymentAgreement.additionalContributionFrequency = installmentFrequency.trim();
+    } else {
+      delete response.defendantResponses.paymentAgreement.additionalContributionFrequency;
     }
 
-    if (Object.keys(paymentAgreement).length === 0) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        paymentAgreement,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data as
-      | {
-          possessionClaimResponse?: {
-            defendantResponses?: {
-              paymentAgreement?: {
-                additionalRentContribution?: unknown;
-                additionalContributionFrequency?: string;
-              };
-            };
-            paymentAgreement?: {
-              additionalRentContribution?: unknown;
-              additionalContributionFrequency?: string;
-            };
-          };
-        }
-      | undefined;
-
-    const pcr = caseData?.possessionClaimResponse;
-    const paymentAgreement = pcr?.defendantResponses?.paymentAgreement ?? pcr?.paymentAgreement;
-    const amountInPounds = additionalRentContributionToPoundsString(paymentAgreement?.additionalRentContribution);
+    const paymentAgreement =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+    const amountInPounds = penceToPounds(paymentAgreement?.additionalRentContribution as string | number | undefined);
     const installmentFrequency = paymentAgreement?.additionalContributionFrequency;
 
     if (amountInPounds || installmentFrequency) {

@@ -45,7 +45,7 @@ export const whatRegularIncomeDoYouReceive = {
   tooManyCharTextInput: generateRandomString(501),
   limitHiddenHintText: `You have 0 characters remaining`,
   oneCharTooManyHiddenHintText: `You have 1 character too many`,
-  tooManyCharErrorMessage: `Must be 500 characters or fewer`,
+  tooManyCharErrorMessage: `Details of money from somewhere else must be 500 characters or less`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,

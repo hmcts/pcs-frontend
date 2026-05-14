@@ -12,11 +12,11 @@ export const doYouHaveAnyDependantChildren = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouHaveAnyDependentChildrenErrorMessage: `Select if you have any dependent children`,
   giveDetailsAboutYourDependentChildrenErrorMessage: `Give details about your dependent children`,
-  mustBeUnderCharacterLimitErrorMessage: `Must be 500 characters or fewer`,
+  mustBeUnderCharacterLimitErrorMessage: `Dependent children details must be 500 characters or less`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
   emojiTextInput: `👉 😄`,
-  emojiExplainPartsOfClaimErrorMessage: `Give details about your dependent children must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
+  emojiErrorMessage: `Give details about your dependent children must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `do-you-have-any-dependant-children`,
 };

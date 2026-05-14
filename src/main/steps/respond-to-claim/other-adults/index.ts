@@ -1,15 +1,12 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { fromYesNoEnum } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-any-other-adults-live-in-your-home',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/otherAdults.njk`,
   translationKeys: {
     question: 'question',
@@ -49,39 +46,50 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   getInitialFormData: req => {
-    const caseData =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const existingRadioValue = caseData?.otherTenants as string | undefined;
-    const existingDetails = caseData?.otherTenantsDetails as string | undefined;
+    const hc = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
+    // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and the
+    // otherTenantsDetails textarea pre-fill below would never run.
+    const otherTenantsForm = fromYesNoEnum(hc?.otherTenants);
 
-    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
-    const formValue = existingRadioValue ? mapping[existingRadioValue] : undefined;
-
-    const result: Record<string, unknown> = { confirmOtherAdults: formValue };
-    if (existingDetails) {
-      result['confirmOtherAdults.otherAdultsDetails'] = existingDetails;
+    if (!otherTenantsForm) {
+      return {};
     }
 
-    return result;
+    if (otherTenantsForm === 'yes') {
+      return {
+        confirmOtherAdults: 'yes',
+        'confirmOtherAdults.otherAdultsDetails': hc?.otherTenantsDetails ?? '',
+      };
+    }
+
+    return { confirmOtherAdults: 'no' };
   },
   beforeRedirect: async req => {
     const confirmValue = req.body?.confirmOtherAdults as string | undefined;
-    const householdCircumstances: Record<string, unknown> = {};
-    const details = req.body?.['confirmOtherAdults.otherAdultsDetails'] as string | undefined;
 
-    if (confirmValue === 'yes') {
-      householdCircumstances.otherTenants = 'YES';
-      householdCircumstances.otherTenantsDetails = details;
-    } else if (confirmValue === 'no') {
-      householdCircumstances.otherTenants = 'NO';
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+
+    if (confirmValue === 'yes' || confirmValue === 'no') {
+      response.defendantResponses.householdCircumstances.otherTenants = confirmValue === 'yes' ? 'YES' : 'NO';
+
+      if (confirmValue === 'yes') {
+        response.defendantResponses.householdCircumstances.otherTenantsDetails = req.body?.[
+          'confirmOtherAdults.otherAdultsDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.householdCircumstances.otherTenantsDetails;
+      }
+    } else {
+      delete response.defendantResponses.householdCircumstances.otherTenants;
+      delete response.defendantResponses.householdCircumstances.otherTenantsDetails;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances,
-      },
-    };
+    await saveDraftDefendantResponse(
+      req,
 
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
 });

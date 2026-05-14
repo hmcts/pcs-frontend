@@ -1,0 +1,153 @@
+import type { PossessionClaimResponse } from '../../../../../main/services/ccdCase.interface';
+import { normaliseCounterClaim } from '../../../../../main/steps/respond-to-claim/normalise/normaliseCounterClaim';
+
+describe('normaliseCounterClaim', () => {
+  it('drops the entire counterClaim object when makeCounterClaim is NO', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'NO',
+        counterClaim: {
+          claimType: 'PAYMENT_OR_COMPENSATION',
+          isClaimAmountKnown: 'YES',
+          claimAmount: '50000',
+          estimatedMaxClaimAmount: '100000',
+        },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses).toEqual({ makeCounterClaim: 'NO' });
+  });
+
+  it('drops the entire counterClaim object when makeCounterClaim is undefined', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        counterClaim: {
+          claimType: 'SOMETHING_ELSE',
+        },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses).toEqual({});
+  });
+
+  it('drops the amount fields when claimType is SOMETHING_ELSE (specific-sum step is skipped)', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'YES',
+        counterClaim: {
+          claimType: 'SOMETHING_ELSE',
+          isClaimAmountKnown: 'YES',
+          claimAmount: '50000',
+          estimatedMaxClaimAmount: '100000',
+        },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaim).toEqual({ claimType: 'SOMETHING_ELSE' });
+  });
+
+  it('drops estimatedMaxClaimAmount when isClaimAmountKnown is YES', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'YES',
+        counterClaim: {
+          claimType: 'PAYMENT_OR_COMPENSATION',
+          isClaimAmountKnown: 'YES',
+          claimAmount: '50000',
+          estimatedMaxClaimAmount: '100000',
+        },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaim).toEqual({
+      claimType: 'PAYMENT_OR_COMPENSATION',
+      isClaimAmountKnown: 'YES',
+      claimAmount: '50000',
+    });
+  });
+
+  it('drops claimAmount when isClaimAmountKnown is NO', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'YES',
+        counterClaim: {
+          claimType: 'BOTH',
+          isClaimAmountKnown: 'NO',
+          claimAmount: '50000',
+          estimatedMaxClaimAmount: '100000',
+        },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaim).toEqual({
+      claimType: 'BOTH',
+      isClaimAmountKnown: 'NO',
+      estimatedMaxClaimAmount: '100000',
+    });
+  });
+
+  it('keeps the full chain when YES + PAYMENT_OR_COMPENSATION + isClaimAmountKnown YES', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'YES',
+        counterClaim: {
+          claimType: 'PAYMENT_OR_COMPENSATION',
+          isClaimAmountKnown: 'YES',
+          claimAmount: '50000',
+        },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaim).toEqual({
+      claimType: 'PAYMENT_OR_COMPENSATION',
+      isClaimAmountKnown: 'YES',
+      claimAmount: '50000',
+    });
+  });
+
+  it('does nothing when defendantResponses is undefined', () => {
+    const response: PossessionClaimResponse = {};
+
+    normaliseCounterClaim(response);
+
+    expect(response).toEqual({});
+  });
+
+  it('does nothing when counterClaim is undefined and makeCounterClaim is YES', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: { makeCounterClaim: 'YES' },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses).toEqual({ makeCounterClaim: 'YES' });
+  });
+
+  // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — keep counterClaim alive when
+  // makeCounterClaim comes back as "Yes" instead of "YES".
+  it('treats PascalCase "Yes" on makeCounterClaim the same as "YES"', () => {
+    const response = {
+      defendantResponses: {
+        // Cast simulates BE returning out-of-type casing — the static type is 'YES'/'NO'.
+        makeCounterClaim: 'Yes' as 'YES',
+        counterClaim: { claimType: 'OTHER' },
+      },
+    } as PossessionClaimResponse;
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaim).toEqual({ claimType: 'OTHER' });
+  });
+});

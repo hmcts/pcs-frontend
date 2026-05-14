@@ -45,17 +45,13 @@
     "month": "Month",
     "year": "Year"
   },
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
   "warningHiddenText": "Warning",
   "errors": {
     "title": "There is a problem",
     "required": "Enter a value",
     "defaultRequired": "This field is required",
     "defaultInvalid": "Invalid format",
-    "defaultMaxLength": "Must be {max} characters or fewer",
+    "defaultMaxLength": "Must be {max} characters or less",
     "defaultSpecialCharacter": "{fieldName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
     "chooseOption": "Choose an option",
     "email": {
@@ -77,6 +73,16 @@
       "yearMustBeSameOrAfter": "The year must be the same as or after {{minYear}}",
       "missingOne": "Date must include a {{missingField}}",
       "missingTwo": "Date must include a {{first}} and {{second}}"
+    },
+    "documentUpload": {
+      "wrongFileTypeDocStore": "The selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
+      "fileTooLargeDocStore": "The selected file must be smaller than 1GB",
+      "noFileSelected": "Select a file to upload",
+      "uploadFailed": "The file could not be uploaded – try again",
+      "fileDeleteFailed": "The file could not be removed – try again",
+      "documentUrlRequired": "Select a file to remove",
+      "uploadSuccess": "{{filename}} has been uploaded",
+      "errorSummaryTitle": "There is a problem"
     }
   },
   "months": {
@@ -140,6 +146,12 @@
     "500": {
       "title": "Sorry, we’re having technical problems",
       "paragraph": "Please try again in a few minutes."
+    }
+  },
+  "applicationErrors": {
+    "noApplicationIdInSession": {
+      "title": "Application not available",
+      "paragraph": "This application is not available. It may have already been submitted in a different window."
     }
   }
 }

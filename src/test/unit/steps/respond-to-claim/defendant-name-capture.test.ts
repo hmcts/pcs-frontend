@@ -25,25 +25,25 @@ const t = ((key: string) => {
   return translations[key] || key;
 }) as unknown as (key: string, options?: unknown) => string;
 
-jest.mock('@modules/steps/i18n', () => ({
+jest.mock('../../../../main/modules/steps/i18n', () => ({
   loadStepNamespace: jest.fn(),
   getStepTranslations: jest.fn(() => ({})),
   getTranslationFunction: jest.fn(() => t),
 }));
 
-jest.mock('@modules/i18n', () => ({
+jest.mock('../../../../main/modules/i18n', () => ({
   getRequestLanguage: jest.fn(() => 'en'),
   getCommonTranslations: jest.fn(() => ({})),
 }));
 
-jest.mock('@modules/steps/flow', () => ({
+jest.mock('../../../../main/modules/steps/flow', () => ({
   createStepNavigation: jest.fn(() => ({
     getBackUrl: jest.fn(async () => '/previous-step'),
     getNextStepUrl: jest.fn(async () => '/next-step'),
   })),
 }));
 
-jest.mock('@modules/steps/formBuilder/helpers', () => {
+jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   const actual = jest.requireActual('../../../../main/modules/steps/formBuilder/helpers');
   return {
     ...actual,
@@ -51,13 +51,17 @@ jest.mock('@modules/steps/formBuilder/helpers', () => {
   };
 });
 
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: jest.fn(),
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+  saveDraftDefendantResponse: jest.fn(),
 }));
-import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
 
-import { validateForm } from '@modules/steps/formBuilder/helpers';
+import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
+import { step } from '../../../../main/steps/respond-to-claim/defendant-name-capture';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 describe('respond-to-claim defendant-name-capture step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -148,7 +152,7 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
   it('POST saves data and redirects when validation passes', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
-    (buildCcdCaseForPossessionClaimResponse as jest.Mock).mockResolvedValue(undefined);
+    (saveDraftDefendantResponse as jest.Mock).mockResolvedValue(undefined);
 
     const req = createReq({
       body: { action: 'continue', firstName: 'Jane', lastName: 'Doe' },
@@ -160,14 +164,18 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
     await step.postController!.post(req, res, next);
 
-    expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-      defendantContactDetails: {
-        party: {
-          firstName: 'Jane',
-          lastName: 'Doe',
-        },
-      },
-    });
+    expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+      req,
+      expect.objectContaining({
+        defendantContactDetails: expect.objectContaining({
+          party: expect.objectContaining({
+            firstName: 'Jane',
+            lastName: 'Doe',
+          }),
+        }),
+      })
+    );
+    // useSessionFormData is false for respond-to-claim, so session formData is not updated
     expect(req.session.formData?.['defendant-name-capture']).toBeUndefined();
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });

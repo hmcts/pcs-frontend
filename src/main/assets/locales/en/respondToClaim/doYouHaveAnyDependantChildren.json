@@ -6,6 +6,7 @@
   "dependentChildrenDetailsHint": "You should include details about how many dependent children you have and how old they are",
   "errors": {
     "dependentChildren": "Select if you have any dependent children",
-    "dependentChildrenDetails": "Give details about your dependent children"
+    "dependentChildrenDetails": "Give details about your dependent children",
+    "dependantChildrenDetailsMaxLength": "Dependent children details must be 500 characters or less"
   }
 }

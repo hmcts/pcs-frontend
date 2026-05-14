@@ -23,13 +23,19 @@ jest.mock('../../../../main/steps/utils/isWalesProperty', () => ({
   isWalesProperty: jest.fn(),
 }));
 
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: jest.fn(),
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+  saveDraftDefendantResponse: jest.fn(),
 }));
 
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
-import { buildCcdCaseForPossessionClaimResponse } from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
+
+import type { YesNoNotSureValue } from '@services/ccdCaseData.model';
 
 type TenancyTypeDetailsStep = {
   getInitialFormData: (req: {
@@ -38,7 +44,7 @@ type TenancyTypeDetailsStep = {
         validatedCase?: {
           data?: {
             possessionClaimResponse?: {
-              defendantResponses?: { tenancyTypeCorrect?: string; tenancyType?: string };
+              defendantResponses?: { tenancyTypeConfirmation?: YesNoNotSureValue; tenancyType?: string };
             };
           };
         };
@@ -56,7 +62,7 @@ type TenancyTypeDetailsStep = {
             data?: {
               possessionClaimResponse?: {
                 claimantOrganisations?: { value?: string }[];
-                defendantResponses?: { tenancyTypeCorrect?: string; tenancyType?: string };
+                defendantResponses?: { tenancyTypeConfirmation?: YesNoNotSureValue; tenancyType?: string };
               };
               legislativeCountry?: string;
               tenancy_TypeOfTenancyLicence?: string;
@@ -81,13 +87,13 @@ describe('respond-to-claim tenancy-type-details step', () => {
   });
 
   describe('getInitialFormData', () => {
-    const makeReq = (tenancyTypeCorrect?: string, tenancyType?: string) => ({
+    const makeReq = (tenancyTypeConfirmation?: YesNoNotSureValue, tenancyType?: string) => ({
       res: {
         locals: {
           validatedCase: {
             data: {
               possessionClaimResponse: {
-                defendantResponses: { tenancyTypeCorrect, tenancyType },
+                defendantResponses: { tenancyTypeConfirmation, tenancyType },
               },
             },
           },
@@ -95,7 +101,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
       },
     });
 
-    it.each([
+    it.each<[YesNoNotSureValue, string]>([
       ['YES', 'yes'],
       ['NO', 'no'],
       ['NOT_SURE', 'notSure'],
@@ -112,13 +118,13 @@ describe('respond-to-claim tenancy-type-details step', () => {
       });
     });
 
-    it('returns empty object when CCD has no tenancyTypeCorrect', () => {
+    it('returns empty object when CCD has no tenancyTypeConfirmation', () => {
       const result = testedStep.getInitialFormData(makeReq(undefined));
       expect(result).toEqual({});
     });
 
-    it('returns empty object when tenancyTypeCorrect is an unrecognised value', () => {
-      const result = testedStep.getInitialFormData(makeReq('UNKNOWN'));
+    it('returns empty object when tenancyTypeConfirmation is an unrecognised value', () => {
+      const result = testedStep.getInitialFormData(makeReq('UNKNOWN' as YesNoNotSureValue));
       expect(result).toEqual({});
     });
   });
@@ -128,19 +134,40 @@ describe('respond-to-claim tenancy-type-details step', () => {
       ['yes', 'YES'],
       ['no', 'NO'],
       ['notSure', 'NOT_SURE'],
-      ['maybe', undefined],
-      [undefined, undefined],
-    ])('maps tenancyTypeConfirm=%s to tenancyTypeCorrect=%s', async (tenancyTypeConfirm, tenancyTypeCorrect) => {
-      const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
+    ])(
+      'maps tenancyTypeConfirm=%s to tenancyTypeConfirmation=%s',
+      async (tenancyTypeConfirm, tenancyTypeConfirmation) => {
+        const req = { body: { tenancyTypeConfirm } };
 
-      await testedStep.beforeRedirect(req);
+        await testedStep.beforeRedirect(req);
 
-      expect(buildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(req, {
-        defendantResponses: {
-          tenancyTypeCorrect,
-        },
-      });
-    });
+        expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+          expect.anything(), // req
+          expect.objectContaining({
+            defendantResponses: expect.objectContaining({
+              tenancyTypeConfirmation,
+            }),
+          })
+        );
+      }
+    );
+
+    it.each([['maybe'], [undefined]])(
+      'saves with fields deleted when tenancyTypeConfirm=%s',
+      async tenancyTypeConfirm => {
+        const req = tenancyTypeConfirm ? { body: { tenancyTypeConfirm } } : { body: {} };
+
+        await testedStep.beforeRedirect(req);
+
+        expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+          expect.anything(), // req
+          {
+            defendantResponses: {},
+            defendantContactDetails: { party: {} },
+          }
+        );
+      }
+    );
   });
 
   describe('extendGetContent', () => {

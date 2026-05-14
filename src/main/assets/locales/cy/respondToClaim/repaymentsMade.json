@@ -9,6 +9,7 @@
   "textAreaHint": "cyYou can enter up to 500 characters",
   "errors": {
     "repaymentsInfo": "cyGive details about how much you paid and when",
+    "repaymentsInfoMaxLength": "cyPayment details must be 500 characters or less",
     "confirmRepaymentsMade": "cySelect if you’ve paid any money to {{claimantName}} since {{claimIssueDate}}"
   }
 }

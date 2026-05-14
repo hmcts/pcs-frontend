@@ -8,6 +8,9 @@ import {
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
   correspondenceAddress,
+  counterClaim,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -17,6 +20,7 @@ import {
   doYouHaveAnyOtherDependants,
   exceptionalHardship,
   freeLegalAdvice,
+  haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
   incomeAndExpenses,
   installmentPayments,
@@ -28,12 +32,15 @@ import {
   noticeDateWhenProvided,
   otherConsiderations,
   paymentInterstitial,
+  priorityDebtDetails,
+  priorityDebts,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
+  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -70,6 +77,7 @@ export class RespondToClaimAction implements IAction {
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
       ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
+      ['selectCounterClaim', () => this.selectCounterClaim(fieldName as actionRecord)],
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
@@ -94,8 +102,14 @@ export class RespondToClaimAction implements IAction {
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
+      ['selectUniversalCredit', () => this.selectUniversalCredit(fieldName as actionRecord)],
+      ['selectPriorityDebts', () => this.selectPriorityDebts(fieldName as actionRecord)],
+      ['enterPriorityDebtDetails', () => this.enterPriorityDebtDetails(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
+      ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
+      ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
+      ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -313,6 +327,14 @@ export class RespondToClaimAction implements IAction {
       option: howMuchToPayData.radioOption,
     });
     await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
+  }
+
+  private async selectCounterClaim(counterClaimOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterClaim.doYouWantToMakeACounterclaim,
+      option: counterClaimOption.option,
+    });
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
   }
 
   private async selectIncomeAndExpenses(incomeAndExpenseData: actionRecord): Promise<void> {
@@ -619,6 +641,48 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
+  private async selectUniversalCredit(universalCreditDateData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      option: universalCreditDateData.creditRadioOption,
+    });
+    if (
+      universalCreditDateData.creditRadioOption === 'Yes' &&
+      universalCreditDateData?.day &&
+      universalCreditDateData?.month &&
+      universalCreditDateData?.year
+    ) {
+      await performActions(
+        'Enter Date',
+        ['inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, universalCreditDateData.day],
+        ['inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, universalCreditDateData.month],
+        ['inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, universalCreditDateData.year]
+      );
+    }
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  }
+
+  private async selectPriorityDebts(priorityDebtsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebtsData.option,
+    });
+    await performAction('clickButton', priorityDebts.saveAndContinueButton);
+  }
+
+  private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      priorityDebtDetails.whatIsTheTotalAmountQuestion,
+      priorityDebtDetailsData.totalAmount
+    );
+    await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetailsData.payAmount);
+    await performAction('clickRadioButton', {
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetailsData.option,
+    });
+    await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  }
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
       await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
@@ -665,6 +729,43 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  }
+
+  private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
+    if (uploadDocs?.files) {
+      await performAction('uploadFile', uploadDocs.files);
+    }
+    await performAction('clickButton', uploadFiles.saveAndContinueButton);
+  }
+
+  private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: claim.question,
+      option: claim.option,
+    });
+    await performAction('clickButton', counterClaimWhatAreYouClaimingFor.saveAndContinueButton);
+  }
+
+  private async counterClaimSpecificSumOfMoney(sumOfMoney: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: sumOfMoney.question,
+      option: sumOfMoney.option,
+    });
+
+    if (sumOfMoney.option === counterClaimSpecificSumOfMoney.yesRadioOption) {
+      await performAction(
+        'inputText',
+        counterClaimSpecificSumOfMoney.howMuchAreYouClaimingHiddenQuestion,
+        sumOfMoney.amount
+      );
+    } else {
+      await performAction(
+        'inputText',
+        counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,
+        sumOfMoney.amount
+      );
+    }
+    await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

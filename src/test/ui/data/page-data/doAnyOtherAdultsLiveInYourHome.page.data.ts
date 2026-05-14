@@ -12,7 +12,7 @@ export const doAnyOtherAdultsLiveInYourHome = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfAnyOtherAdultsErrorMessage: `Select if any other adults live in your home`,
   giveDetailsAboutOtherAdultsErrorMessage: 'Give details about the other adults living in your home',
-  mustBe500ErrorMessage: `Must be 500 characters or fewer`,
+  mustBe500ErrorMessage: `Details about other adults must be 500 characters or less`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `do-any-other-adults-live-in-your-home`,
   emojiTextInput: `👉 😄`,
