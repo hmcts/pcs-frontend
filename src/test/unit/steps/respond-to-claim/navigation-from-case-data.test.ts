@@ -102,10 +102,21 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
+  const rentArrearsData = {
+    claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+  };
+
   it('routes back from your-household-and-circumstances to counter-claim when no counter-claim data in CCD', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
       'counter-claim'
+    );
+  });
+
+  it('uses valid static previous step for household interstitial path', async () => {
+    const req = createReq({ data: rentArrearsData });
+    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
+      'repayments-agreed'
     );
   });
 
@@ -156,10 +167,6 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  const rentArrearsData = {
-    claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
-  };
-
   const noRentArrearsData = {
     claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
   };
@@ -198,6 +205,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('routes installment-payments forward from CCD state', async () => {
     const req = createReq({
       data: {
+        ...rentArrearsData,
         possessionClaimResponse: {
           defendantResponses: {
             paymentAgreement: { repayArrearsInstalments: 'YES' },
@@ -210,6 +218,28 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     await expect(getNextStep(createReq({}), 'installment-payments', flowConfig, {})).resolves.toBe(
       'your-household-and-circumstances'
+    );
+  });
+
+  it('routes installment-payments forward when repayArrearsInstalments is stored at possessionClaimResponse.paymentAgreement', async () => {
+    const req = createReq({
+      data: {
+        ...rentArrearsData,
+        possessionClaimResponse: {
+          paymentAgreement: { repayArrearsInstalments: 'YES' },
+        },
+      },
+    });
+
+    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
+  });
+
+  it('routes installment-payments forward from the submitted answer before CCD state is refreshed', async () => {
+    const req = createReq({ data: rentArrearsData });
+    req.body = { confirmInstallmentOffer: 'yes' };
+
+    await expect(getNextStep(req, 'installment-payments', flowConfig, {}, req.body)).resolves.toBe(
+      'how-much-afford-to-pay'
     );
   });
 
@@ -249,8 +279,18 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     expect(hasConfirmedInstallmentOffer(howMuchReq)).toBe(true);
+    const howMuchTopLevelReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          paymentAgreement: { repayArrearsInstalments: 'YES' },
+        },
+      },
+    });
+    expect(hasConfirmedInstallmentOffer(howMuchTopLevelReq)).toBe(true);
+    const howMuchSubmittedAnswerReq = createReq({});
+    howMuchSubmittedAnswerReq.body = { confirmInstallmentOffer: 'yes' };
+    expect(hasConfirmedInstallmentOffer(howMuchSubmittedAnswerReq)).toBe(true);
     expect(hasConfirmedInstallmentOffer(createReq({}))).toBe(false);
-
     const financeProvidedReq = createReq({
       data: {
         possessionClaimResponse: {
