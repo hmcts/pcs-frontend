@@ -116,7 +116,7 @@
       "ViewClaim": "/case/:caseReference/view-the-claim",
       "RespondToClaim": "/case/:caseReference/respond-to-claim/start-now",
       "MakeGeneralApplication": "/case/:caseReference/make-an-application/choose-an-application",
-      "UploadDocuments": "/case/:caseReference/upload-your-documents",
+      "UploadDocuments": "/case/:caseReference/upload-additional-documents",
       "ViewAllApplications": "/case/:caseReference/view-all-applications",
       "ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
       "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",

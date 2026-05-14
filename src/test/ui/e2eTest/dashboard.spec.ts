@@ -28,7 +28,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
-  test('Validate address, case number and links on the dashboard @smoke @crossbrowser', async () => {
+  test('Validate address, case number and links on the dashboard @smoke @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
     await performActions(
@@ -105,6 +105,11 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       sectionHeader: dashboard.theClaimSubHeader,
       fieldName: dashboard.viewTheClaimLink,
       header: viewTheClaim.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.uploadAdditionalDocumentsLink,
+      header: uploadAdditionalDocuments.mainHeader,
     });
     await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.courtHearingSubHeader,
