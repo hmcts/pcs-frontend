@@ -7,6 +7,7 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 export const confirmIfTheseDocumentsRelateToAnApplicationStep = 'confirm-if-these-documents-relate-to-an-application';
 export const uploadYourDocumentsStep = 'upload-your-documents';
 export const checkYourAnswersStep = 'check-your-answers';
+export const documentsSubmittedStep = 'documents-submitted';
 
 export const flowConfig: JourneyFlowConfig = {
   basePath: UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE,
@@ -17,6 +18,7 @@ export const flowConfig: JourneyFlowConfig = {
     confirmIfTheseDocumentsRelateToAnApplicationStep,
     uploadYourDocumentsStep,
     checkYourAnswersStep,
+    documentsSubmittedStep,
   ],
   steps: {
     'start-evidence-upload': {
@@ -28,8 +30,9 @@ export const flowConfig: JourneyFlowConfig = {
         { nextStep: uploadYourDocumentsStep },
       ],
     },
-    [confirmIfTheseDocumentsRelateToAnApplicationStep]: {},
+    [confirmIfTheseDocumentsRelateToAnApplicationStep]: { routes: [{ nextStep: uploadYourDocumentsStep }] },
     [uploadYourDocumentsStep]: { routes: [{ nextStep: checkYourAnswersStep }] },
-    [checkYourAnswersStep]: {},
+    [checkYourAnswersStep]: { routes: [{ nextStep: documentsSubmittedStep }] },
+    [documentsSubmittedStep]: {},
   },
 };

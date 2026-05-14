@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
 import { flowConfig } from '../flow.config';
@@ -9,8 +9,8 @@ import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
 
 const journeyName = 'uploadAdditionalDocuments';
-const stepName = 'check-your-answers';
-const templatePath = 'case-tasks/upload-additional-documents/check-your-answers/checkYourAnswers.njk';
+const stepName = 'documents-submitted';
+const templatePath = 'case-tasks/upload-additional-documents/documents-submitted/documentsSubmitted.njk';
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
 export const step: StepDefinition = {
@@ -19,19 +19,7 @@ export const step: StepDefinition = {
   view: templatePath,
   stepDir: __dirname,
   getController: () =>
-    createGetController(templatePath, stepName, stepNavigation, (req: Request) => {
-      return {
-        dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-        url: req.originalUrl || '',
-      };
-    }),
-  postController: {
-    post: async (req: Request, res: Response) => {
-      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
-      if (!redirectPath) {
-        return res.status(404).render('not-found');
-      }
-      res.redirect(303, redirectPath);
-    },
-  },
+    createGetController(templatePath, stepName, stepNavigation, (req: Request) => ({
+      dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+    })),
 };

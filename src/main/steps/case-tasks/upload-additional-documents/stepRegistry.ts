@@ -1,5 +1,6 @@
 import { step as checkYourAnswers } from './check-your-answers';
 import { step as confirmIfTheseDocumentsRelateToAnApplication } from './confirm-if-these-documents-relate-to-an-application';
+import { step as documentsSubmitted } from './documents-submitted';
 import { step as startEvidenceUpload } from './start-evidence-upload';
 import { step as uploadYourDocuments } from './upload-your-documents';
 
@@ -10,4 +11,5 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'confirm-if-these-documents-relate-to-an-application': confirmIfTheseDocumentsRelateToAnApplication,
   'upload-your-documents': uploadYourDocuments,
   'check-your-answers': checkYourAnswers,
+  'documents-submitted': documentsSubmitted,
 };
