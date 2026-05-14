@@ -63,7 +63,7 @@
     "@ministryofjustice/frontend": "^8.0.1",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/instrumentation-winston": "0.60.0",
-    "axios": "1.16.0",
+    "axios": "1.16.1",
     "body-parser": "2.2.2",
     "config": "4.4.1",
     "connect-redis": "7.1.1",
