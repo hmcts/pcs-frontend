@@ -62,4 +62,5 @@ export default {
   'what-are-you-claiming-for': 'counterClaimWhatAreYouClaimingFor',
   'counter-claim-specific-sum': 'counterClaimSpecificSumOfMoney',
   'counter-claim': 'counterClaim',
+  'counter-claim-fee': 'counterClaimFee',
 };
