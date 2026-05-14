@@ -4,9 +4,6 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'start-now',
-  'free-legal-advice',
-  'solicitor',
-  'ask-your-solicitor-to-respond-to-the-claim',
   'defendant-name-confirmation',
   'defendant-name-capture',
   'defendant-date-of-birth',
