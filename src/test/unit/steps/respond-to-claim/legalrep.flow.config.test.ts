@@ -5,15 +5,7 @@ import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegist
 
 import { getNextStep } from '@modules/steps/flow';
 
-const CITIZEN_ONLY_STEPS = [
-  'free-legal-advice',
-  'counter-claim-what-are-you-claiming-for',
-  'counter-claim-specific-sum',
-  'counter-claim-fee',
-  'other-considerations',
-  'upload-document',
-  'support-needs',
-];
+const CITIZEN_ONLY_STEPS = ['free-legal-advice', 'other-considerations', 'upload-document', 'support-needs'];
 
 describe('respond-to-claim legalrep flow config', () => {
   it('every stepOrder entry resolves to a registered step', () => {

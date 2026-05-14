@@ -69,10 +69,10 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   }
 
   // Tenancy type
-  if (responses.tenancyTypeCorrect) {
+  if (responses.tenancyTypeConfirmation) {
     rows.push({
       key: { text: t('rows.tenancyTypeCorrect.label') },
-      value: { text: yesNoNotSure(responses.tenancyTypeCorrect) },
+      value: { text: yesNoNotSure(responses.tenancyTypeConfirmation) },
       actions: { items: [change('tenancy-type-details', 'rows.tenancyTypeCorrect.changeHidden')] },
     });
   }
@@ -81,7 +81,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   // Change link points to whichever the user took (inferred from the data shape).
   const tenancyDate = validatedCase.defendantResponsesTenancyStartDate;
   if (tenancyDate) {
-    const dateKnown = !!validatedCase.defendantResponsesTenancyStartDateCorrect;
+    const dateKnown = !!validatedCase.defendantResponsesTenancyStartDateConfirmation;
     const editStep = dateKnown ? 'tenancy-date-details' : 'tenancy-date-unknown';
     rows.push({
       key: { text: t('rows.tenancyStartDate.label') },

@@ -1,0 +1,26 @@
+{% extends "template.njk" %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+
+{% block serviceNavigation %}
+  {{ govukServiceNavigation({
+    serviceName: t('dashboard:serviceName'),
+    serviceUrl: dashboardUrl if dashboardUrl else "/dashboard",
+    navigation: [
+      {
+        text: t('logout', 'Log out'),
+        href: "/logout"
+      }
+    ],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}
+
+{% block pageTitle %}
+{{ t('dashboard:tasks.ViewAllApplications.title') }}
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">{{ t('dashboard:tasks.ViewAllApplications.title') }}</h1>
+  <p class="govuk-body">Placeholder screen</p>
+{% endblock %}

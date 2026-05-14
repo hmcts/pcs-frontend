@@ -1,14 +1,12 @@
-import { createFormStep } from '../../../modules/steps';
+import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-any-other-adults-live-in-your-home',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/otherAdults.njk`,
   translationKeys: {
     question: 'question',
@@ -50,13 +48,16 @@ export const step: StepDefinition = createFormStep({
   ],
   getInitialFormData: req => {
     const hc = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const otherTenants = hc?.otherTenants as string | undefined;
+    // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
+    // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and the
+    // otherTenantsDetails textarea pre-fill below would never run.
+    const otherTenantsForm = fromYesNoEnum(hc?.otherTenants);
 
-    if (!otherTenants) {
+    if (!otherTenantsForm) {
       return {};
     }
 
-    if (otherTenants === 'YES') {
+    if (otherTenantsForm === 'yes') {
       return {
         confirmOtherAdults: 'yes',
         'confirmOtherAdults.otherAdultsDetails': hc?.otherTenantsDetails ?? '',

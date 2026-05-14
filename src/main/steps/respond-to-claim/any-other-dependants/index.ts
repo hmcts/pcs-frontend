@@ -1,15 +1,13 @@
+import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-you-have-any-other-dependants',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/anyOtherDependants.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -49,13 +47,16 @@ export const step: StepDefinition = createFormStep({
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
     const householdCircumstances: HouseholdCircumstances | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const otherDependantsCcd: YesNoValue | undefined = householdCircumstances?.otherDependants;
+    // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
+    // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and the
+    // textarea pre-fill below would never run. fromYesNoEnum handles either casing.
+    const otherDependantsForm = fromYesNoEnum(householdCircumstances?.otherDependants);
 
-    if (!otherDependantsCcd) {
+    if (!otherDependantsForm) {
       return {};
     }
 
-    if (otherDependantsCcd === 'YES') {
+    if (otherDependantsForm === 'yes') {
       const otherDependantDetails: string | undefined = householdCircumstances?.otherDependantDetails;
       return {
         otherDependants: 'yes',
