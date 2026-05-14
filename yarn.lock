@@ -5192,12 +5192,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-commandline@npm:2.40.0":
-  version: 2.40.0
-  resolution: "allure-commandline@npm:2.40.0"
+"allure-commandline@npm:2.41.0":
+  version: 2.41.0
+  resolution: "allure-commandline@npm:2.41.0"
   bin:
     allure: bin/allure
-  checksum: 10/84106ab891a86868c984b5c0d82a796c34f96657370cad07148e61f59b28ad2b87cd6b704dfbe50c54f7b67ac78b3baeac170bef8251d7200e1c862d69c3402b
+  checksum: 10/3dab2514ea760e8f457cf24e0ecdcd281d8f29062af0cc94999e660ffef58309cd6d81a05c7c32c43f5dd3335785c7b194f54e42de6dff5909037a60d29672b6
   languageName: node
   linkType: hard
 
@@ -11974,7 +11974,7 @@ __metadata:
     "@types/webpack-env": "npm:1.18.8"
     "@typescript-eslint/eslint-plugin": "npm:8.59.3"
     "@typescript-eslint/parser": "npm:8.59.3"
-    allure-commandline: "npm:2.40.0"
+    allure-commandline: "npm:2.41.0"
     allure-js-commons: "npm:3.8.0"
     allure-playwright: "npm:3.8.0"
     axios: "npm:1.16.1"
@@ -12487,12 +12487,11 @@ __metadata:
   linkType: hard
 
 "protobufjs@npm:^8.0.0":
-  version: 8.2.0
-  resolution: "protobufjs@npm:8.2.0"
+  version: 8.3.0
+  resolution: "protobufjs@npm:8.3.0"
   dependencies:
-    "@types/node": "npm:>=13.7.0"
     long: "npm:^5.0.0"
-  checksum: 10/45db2a0264f803ddd1fbf96de810669bfbc7a900941b76a2738fa39f5f5340766dc677101b6a9ea7da34c43a8e9385cef282204478ddf6c661e811d007fdb988
+  checksum: 10/22ab9f6c8d4ba95f129a569a857c3916940b128cc712916a31b3589eb62d8e23e01bb98b4d75f86617b05c0682d2aa68fd442972b8d95d2f3c88b3c15ae660b0
   languageName: node
   linkType: hard
 
