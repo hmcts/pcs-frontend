@@ -1,6 +1,5 @@
 import { normalizeYesNoValue } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -77,13 +76,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     const t = getTranslationFunction(req, 'installment-payments', ['common']);
 
     return {
       paragraph1: t('paragraph1', { claimantName }),
-      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
 });

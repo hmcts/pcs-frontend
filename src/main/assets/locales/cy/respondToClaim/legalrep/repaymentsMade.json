@@ -1,5 +1,4 @@
 {
-  "caseNumber": "cyCase number: {{caseNumber}}",
   "heading": "cyPrevious payments",
   "question": "cyHas the defendant paid any money to {{claimantName}} since {{claimIssueDate}}?",
   "textAreaLabel": "cyGive details about how much the defendant paid and when",

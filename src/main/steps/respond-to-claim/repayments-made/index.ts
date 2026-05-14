@@ -1,9 +1,7 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, PaymentAgreement, YesNoValue } from '@services/ccdCase.interface';
 
@@ -94,14 +92,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const claimantName = getClaimantName(req);
     const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
 
-    const t = getTranslationFunction(req, 'repayments-made', ['common']);
-
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-
     return {
       claimantName,
       claimIssueDate,
-      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
   customTemplate: `${__dirname}/repaymentsMade.njk`,

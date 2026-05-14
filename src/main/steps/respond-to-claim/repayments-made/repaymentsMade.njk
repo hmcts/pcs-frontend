@@ -1,6 +1,5 @@
 {% extends "stepsTemplate.njk" %}
 {% from "macros/stepButtons.njk" import stepButtons %}
-{% from "macros/caseNumberDisplay.njk" import caseNumberDisplay %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "macros/csrf.njk" import csrfProtection %}
@@ -22,9 +21,6 @@
   {% if isLegalRepresentative %}
     <h1 class="govuk-heading-xl">{{ heading }}</h1>
   {% endif %}
-
-  {{ caseNumberDisplay(isLegalRepresentative, caseNumber) }}
-
 
    <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}

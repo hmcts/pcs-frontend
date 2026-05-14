@@ -1,7 +1,6 @@
 {
   "heading": "Expenses",
   "subheading": "What regular income does the defendant receive? (Optional)",
-  "caseNumber": "Case number: {{caseNumber}}",
   "hintText": "Select all that apply. The information the defendant provides must be truthful and accurate.",
   "options": {
     "householdBills": "Household bills (for example, council tax, gas, electricity, water, internet)",

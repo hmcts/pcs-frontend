@@ -1,5 +1,4 @@
 {
-  "caseNumber": "Case number: {{caseNumber}}",
   "bulletPoint": "The tenancy, occupation contract or licence began on {{tenancyStartDate}}",
   "options": {
     "yes": "Yes",

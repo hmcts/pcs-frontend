@@ -19,8 +19,6 @@
 
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  {{ caseNumberDisplay(isLegalRepresentative, caseNumber) }}
-
   {% if not isLegalRepresentative %}
     <p class="govuk-body">{{ introParagraph | safe }}</p>
 

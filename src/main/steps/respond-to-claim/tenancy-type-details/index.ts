@@ -3,7 +3,6 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -70,7 +69,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
-    caseNumber: 'caseNumber',
     heading: 'heading',
     insetText: 'insetText',
     saveAndContinue: 'saveAndContinue',
@@ -168,11 +166,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-
     return {
       ...formContent,
-      caseNumber: t('caseNumber', { caseNumber }),
       receivedDetailsBy,
       tenancyType,
       organisationName: orgName,

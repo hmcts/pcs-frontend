@@ -1,5 +1,4 @@
 {
-  "caseNumber": "cyCase number: {{caseNumber}}",
   "question": "cyHave the defendant applied for Universal Credit?",
   "dateLabel": "cyWhen did the defendant apply?",
   "errors": {

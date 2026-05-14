@@ -3,7 +3,6 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -14,7 +13,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/nonRentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caseNumber: 'caseNumber',
     heading: 'heading',
     caption: 'caption',
   },
@@ -79,7 +77,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseData = req.res?.locals?.validatedCase?.data;
     const caseReference = req.params.caseReference;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
 
@@ -87,7 +84,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return {
       heading: t('heading', { claimantName }),
       introParagraph: t('introParagraph', { caseReference }),
-      caseNumber: t('caseNumber', { caseNumber }),
       includesHeading: t('includesHeading'),
       includesBullet1: t('includesBullet1', { claimantName }),
       includesBullet2: t('includesBullet2'),

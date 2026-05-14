@@ -7,10 +7,8 @@ import {
   toYesNoEnum,
 } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps/i18n';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const STEP_NAME = 'have-you-applied-for-universal-credit';
@@ -118,14 +116,4 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   customTemplate: `${__dirname}/universalCredit.njk`,
-  extendGetContent: async (req, formContent) => {
-    const t = getTranslationFunction(req, STEP_NAME, ['common']);
-
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-
-    return {
-      ...formContent,
-      caseNumber: t('caseNumber', { caseNumber }),
-    };
-  },
 });

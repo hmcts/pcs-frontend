@@ -4,7 +4,6 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate, fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -21,7 +20,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     caption: 'caption',
     pageTitle: 'pageTitle',
-    caseNumber: 'caseNumber',
     heading: 'heading',
     question: 'question',
     hintText: 'hintText',
@@ -127,11 +125,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const t = getTranslationFunction(req, 'tenancy-date-details', ['common']);
     const bulletPoint = t('bulletPoint', { returnObjects: true, tenancyStartDate });
     const subHeading = t('subHeading', { returnObjects: true, claimantName });
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     return {
       claimantName,
-      caseNumber: t('caseNumber', { caseNumber }),
       tenancyStartDate,
       bulletPoint,
       subHeading,
