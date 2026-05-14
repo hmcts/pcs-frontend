@@ -28,7 +28,7 @@ export const areThereAnyReasonsThatThisApplicationShouldNotBeShared = {
 
     errorTextField: [
       { type: 'empty', input: 'EMPTY', errMessage: 'Confirm why the other parties should not be informed' },
-      { type: 'moreThanMax', input: 6900, errMessage: 'Must be 6800 characters or fewer' },
+      { type: 'moreThanMax', input: 6900, errMessage: 'Must be 6800 characters or less' },
     ],
   },
 };
