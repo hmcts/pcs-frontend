@@ -22,7 +22,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       required: true,
       maxLength: 6800,
       errorMessage: 'errors.otherOrderRequestDetailsRequired',
-      labelClasses: 'govuk-label--s',
+      labelClasses: 'govuk-label--m',
       translationKey: {
         label: 'otherOrderRequestDetailsLabel',
         hint: 'characterCountHint',
@@ -34,7 +34,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       required: true,
       maxLength: 6800,
       errorMessage: 'errors.otherOrderRequestFactsRequired',
-      labelClasses: 'govuk-label--s',
+      labelClasses: 'govuk-label--m',
       translationKey: {
         label: 'otherOrderRequestFactsLabel',
       },
