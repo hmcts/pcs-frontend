@@ -17,15 +17,15 @@
   {% endif %}
   {% endif %}
 
-  {% if isLegalRepresentative %}
   {% if caption %}
     <span class="govuk-caption-xl">{{ caption }}</span>
   {% endif %}
+  {% if languageHeading %}
    <h1 class="govuk-heading-l">{{ languageHeading }}</h1>
   {% endif %} 
 
 
- {% if isLegalRepresentative %}
+ {% if question %}
      <p class="govuk-heading-s">{{ question }} </p>
   {% endif %}
 

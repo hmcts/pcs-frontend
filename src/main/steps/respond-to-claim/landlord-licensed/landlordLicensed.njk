@@ -19,13 +19,13 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {% if isLegalRepresentative %}
+  {% if heading %}
     <p class="govuk-heading-m">{{ heading }} </p>
   {% endif %}
 
   <p class="govuk-body">{{ paragraph | safe }}</p>
 
-  {% if isLegalRepresentative %}
+  {% if landlordQuestion %}
      <p class="govuk-heading-m">{{ landlordQuestion }} </p>
   {% endif %}
 

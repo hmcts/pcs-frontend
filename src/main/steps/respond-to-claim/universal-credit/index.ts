@@ -82,7 +82,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     caption: 'caption',
     question: 'question',
-    caseNumber: 'caseNumber',
   },
   fields: [
     {

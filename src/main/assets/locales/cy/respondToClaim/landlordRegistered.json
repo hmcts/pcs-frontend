@@ -3,6 +3,7 @@
   "pageTitle": "cyRegistered landlord",
   "introText": "cyYou can check if your landlord is registered by searching the",
   "publicRegisterLinkText": "cyPublic Register (opens in new tab)",
+  "heading": " ",
   "question": "cyIs your landlord registered?",
   "options": {
     "yes": "cyYes",

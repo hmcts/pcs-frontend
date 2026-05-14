@@ -1,6 +1,6 @@
 {
   "question": "cyHas the defendant applied for Universal Credit?",
-  "heading": "cyUniversal Credit?",
+  "heading": "cyUniversal Credit",
   "dateLabel": "cyWhen did the defendant apply?",
   "errors": {
     "haveAppliedForUniversalCredit": "cySelect if the defendant has applied for Universal Credit",

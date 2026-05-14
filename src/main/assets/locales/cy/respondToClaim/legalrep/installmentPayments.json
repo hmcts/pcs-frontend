@@ -2,6 +2,10 @@
   "pageTitle": "cyInstalment payments",
   "heading": "cyInstalment payments",
   "question": "cyWould the defendant like to offer to pay off their arrears in instalments?",
+  "paragraph1": " ",
+  "paragraph2": " ",
+  "paragraph3": " ",
+  "paragraph4": " ",
   "errors": {
     "confirmInstallmentOffer": "cySelect whether the defendant would like to offer to pay off their arrears in instalments"
   }
