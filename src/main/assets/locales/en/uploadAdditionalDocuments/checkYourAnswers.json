@@ -1,6 +1,6 @@
 {
   "pageTitle": "Check your answers",
   "heading": "Check your answers",
-  "placeholderHeading": "Placeholder page",
-  "placeholderBody": "This page is under construction. The review and submit step for additional documents will be added in a follow-up ticket."
+  "relatedApplicationLabel": "Related application",
+  "documentsLabel": "Uploaded documents" 
 }
