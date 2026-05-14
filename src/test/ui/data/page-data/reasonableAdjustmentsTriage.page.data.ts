@@ -28,4 +28,6 @@ export const reasonableAdjustmentsTriage = {
   telephoneAvailabilityParagraph: `Monday to Friday, 8.30am to 5pm.`,
   callChargesLink: `Find out about call charges (opens in new tab)`,
   findACourtLink: 'find a court or tribunal service (opens in new tab)',
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `reasonable-adjustments-triage`,
 };

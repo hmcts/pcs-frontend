@@ -4,7 +4,6 @@ export const counterClaimSpecificSumOfMoney = {
   noRadioOption: `No`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  cancelLink: `Cancel`,
   yourCounterClaimFeeHiddenParagraph: `Your counterclaim`,
   ifYouWantToCheckHiddenParagraph: `If you want to check how much your fee will be, you can estimate how much it will cost you to make your counterclaim (opens in new tab) `,
   howMuchAreYouClaimingHiddenQuestion: `How much are you claiming?`,
