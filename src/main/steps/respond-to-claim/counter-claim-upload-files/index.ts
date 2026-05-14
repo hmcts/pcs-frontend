@@ -1,27 +1,49 @@
-import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../draftEvent';
-import { flowConfig } from '../flow.config';
+import type { Request } from 'express';
 
-import { createCcdDraftStorage, toDisplayDocuments } from '@modules/documents/storage';
-import { createFormStep } from '@modules/steps';
+import { HTTPError } from '../../../HttpError';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { getUserToken } from '../../utils/userRole';
+import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../draftEvent';
+import { createRespondToClaimFormStep } from '../formStep';
+
+import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/storage';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
+import { toCaseReference16 } from '@utils/caseReference';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
-const storage = createCcdDraftStorage({
-  event: RESPOND_TO_CLAIM_DRAFT_EVENT,
-  getDocs: data => data.possessionClaimResponse?.defendantResponses?.counterClaimDocuments ?? [],
-  setDocs: docs => ({
-    possessionClaimResponse: {
-      defendantResponses: { counterClaimDocuments: docs },
-    },
-  }),
-});
+// Holistic save: each upload/delete sends the full defendant slice so CCD does not
+// replace defendantResponses with only counterClaimDocuments (wiping siblings).
+const storage: DocumentStorage = {
+  async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
+    const docs =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaimDocuments;
+    return Array.isArray(docs) ? docs : [];
+  },
 
-export const step: StepDefinition = createFormStep({
+  async readFresh(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
+    const token = getUserToken(req);
+    const caseId = toCaseReference16(req.params.caseReference);
+    if (!caseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+    const fresh = await ccdCaseService.getCaseById(token, caseId, RESPOND_TO_CLAIM_DRAFT_EVENT.id);
+    const docs = fresh.data?.possessionClaimResponse?.defendantResponses?.counterClaimDocuments;
+    return Array.isArray(docs) ? docs : [];
+  },
+
+  async save(req: Request, docs: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.counterClaimDocuments = docs;
+    await saveDraftDefendantResponse(req, response);
+  },
+};
+
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-upload-files',
-  journeyFolder: 'respondToClaim',
   documentStorage: storage,
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/counterClaimUploadFiles.njk`,
   fields: [
     {
@@ -32,6 +54,17 @@ export const step: StepDefinition = createFormStep({
       maxFileSize: UPLOAD_MAX_FILE_SIZE_MB,
       labelClasses: 'govuk-label--s',
       translationKey: { label: 'uploadLabel' },
+      validate: (_value, formData) => {
+        if (formData['action'] === 'saveForLater') {
+          return undefined;
+        }
+        const uploaded = formData['uploadedDocuments[]'];
+        const hasFiles =
+          uploaded !== undefined &&
+          uploaded !== null &&
+          !(Array.isArray(uploaded) && uploaded.length === 0);
+        return hasFiles ? undefined : 'Select a file to support your counterclaim';
+      },
     },
   ],
   translationKeys: {

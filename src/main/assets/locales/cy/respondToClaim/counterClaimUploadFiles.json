@@ -10,5 +10,8 @@
   "filesAddedHeading": "cyFiles added",
   "uploadButton": "cyUpload file",
   "deleteButton": "cyRemove",
-  "noFilesUploaded": "cyNo files uploaded"
+  "noFilesUploaded": "cyNo files uploaded",
+  "errors": {
+    "documents": "cySelect a file to support your counterclaim"
+  }
 }
