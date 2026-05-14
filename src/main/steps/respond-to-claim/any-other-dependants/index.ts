@@ -1,3 +1,4 @@
+import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -46,13 +47,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
     const householdCircumstances: HouseholdCircumstances | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const otherDependantsCcd: YesNoValue | undefined = householdCircumstances?.otherDependants;
+    // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
+    // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and the
+    // textarea pre-fill below would never run. fromYesNoEnum handles either casing.
+    const otherDependantsForm = fromYesNoEnum(householdCircumstances?.otherDependants);
 
-    if (!otherDependantsCcd) {
+    if (!otherDependantsForm) {
       return {};
     }
 
-    if (otherDependantsCcd === 'YES') {
+    if (otherDependantsForm === 'yes') {
       const otherDependantDetails: string | undefined = householdCircumstances?.otherDependantDetails;
       return {
         otherDependants: 'yes',
