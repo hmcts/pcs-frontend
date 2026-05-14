@@ -53,7 +53,7 @@ import { step as writtenTerms } from './written-terms';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const stepRegistry: Record<string, StepDefinition> = {
+export const stepRegistry = {
   'start-now': startNow,
   'select-defendant': selectDefendant,
   'correspondence-address': correspondenceAddress,
@@ -107,4 +107,4 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,
   'check-your-answers': checkYourAnswers,
-};
+} satisfies Record<string, StepDefinition>;

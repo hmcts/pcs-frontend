@@ -43,7 +43,6 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
 const t = ((key: string) => {
   const translations: Record<string, string> = {
     pageTitle: 'Instalment payments',
-    caption: 'Respond to a property possession claim',
     heading: 'Instalment offer',
     paragraph1: 'Paragraph one',
     paragraph2: 'Paragraph two',

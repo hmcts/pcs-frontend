@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { flowConfig as citizenFlowConfig } from './flow.config';
+import { RESPOND_TO_CLAIM_ROUTE, flowConfig as citizenFlowConfig } from './flow.config';
 import { hasSingleLinkedDefendant } from './flowConditions';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
@@ -42,7 +42,7 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
   'your-circumstances',
   'exceptional-hardship',
-  'income-and-expenditure',
+  'income-and-expenses',
   'what-regular-income-do-you-receive',
   'have-you-applied-for-universal-credit',
   'priority-debts',
@@ -55,14 +55,22 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'end-now',
 ];
 
+// Legal-rep journey is a flat, linear stepOrder. It is intentionally NOT sectionalised
+// (citizen is). Construct explicitly instead of spreading citizenFlowConfig so we don't
+// silently inherit `sections` / `nonSectionStepOrder` and have the engine pick
+// section-traversal over our linear stepOrder.
 export const legalrepFlowConfig: JourneyFlowConfig = {
-  ...citizenFlowConfig,
+  basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaimLegalrep',
+  useShowConditions: true,
+  useSessionFormData: false,
   stepOrder: legalrepStepOrder,
   steps: {
+    ...citizenFlowConfig.steps,
     'select-defendant': {
       showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
     },
+
     'defendant-name-confirmation': {
       showCondition: (req: Request) => hasSingleLinkedDefendant(req),
     },
