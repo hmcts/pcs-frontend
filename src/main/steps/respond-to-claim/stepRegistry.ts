@@ -1,5 +1,6 @@
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
+import { step as askYourSolicitorToRespondToTheClaim } from './ask-your-solicitor-to-respond-to-the-claim';
 import { step as checkYourAnswers } from './check-your-answers';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
@@ -41,6 +42,7 @@ import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
+import { step as solicitor } from './solicitor';
 import { step as startNow } from './start-now';
 import { step as supportNeeds } from './support-needs';
 import { step as tenancyDateDetails } from './tenancy-date-details';
@@ -56,6 +58,8 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'start-now': startNow,
   'correspondence-address': correspondenceAddress,
   'free-legal-advice': freeLegalAdvice,
+  solicitor,
+  'ask-your-solicitor-to-respond-to-the-claim': askYourSolicitorToRespondToTheClaim,
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,

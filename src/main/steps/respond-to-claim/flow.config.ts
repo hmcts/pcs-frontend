@@ -33,6 +33,8 @@ export const flowConfig: JourneyFlowConfig = {
   stepOrder: [
     'start-now',
     'free-legal-advice',
+    'solicitor',
+    'ask-your-solicitor-to-respond-to-the-claim',
     'defendant-name-confirmation',
     'defendant-name-capture',
     'defendant-date-of-birth',
@@ -84,6 +86,9 @@ export const flowConfig: JourneyFlowConfig = {
     'end-now',
   ],
   steps: {
+    'ask-your-solicitor-to-respond-to-the-claim': {
+      showCondition: () => false,
+    },
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
     },
