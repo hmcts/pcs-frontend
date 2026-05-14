@@ -1,6 +1,7 @@
 {
   "caseNumber": "cyCase number: {{caseNumber}}",
-  "question": "cyHave the defendant applied for Universal Credit?",
+  "question": "cyHas the defendant applied for Universal Credit?",
+  "heading": "cyUniversal Credit?",
   "dateLabel": "cyWhen did the defendant apply?",
   "errors": {
     "haveAppliedForUniversalCredit": "cySelect if the defendant has applied for Universal Credit",
