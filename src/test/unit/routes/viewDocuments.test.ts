@@ -159,7 +159,7 @@ describe('viewDocuments route', () => {
     expect(res.setHeader).toHaveBeenCalledWith('Content-Length', '1234');
     expect(res.setHeader).toHaveBeenCalledWith(
       'Content-Disposition',
-      "inline; filename=\"claim-form.pdf\"; filename*=UTF-8''claim-form.pdf"
+      'inline; filename="claim-form.pdf"; filename*=UTF-8\'\'claim-form.pdf'
     );
     expect(pipeSpy).toHaveBeenCalledWith(res);
     expect(next).not.toHaveBeenCalled();
