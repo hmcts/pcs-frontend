@@ -11,7 +11,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
   },
   fields: [
     {

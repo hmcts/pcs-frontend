@@ -254,9 +254,7 @@ export class RespondToClaimAction implements IAction {
       claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     }
     const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
-    const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
     await performValidation('text', { elementType: 'heading', text: mainHeader });
-    await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
@@ -509,7 +507,7 @@ export class RespondToClaimAction implements IAction {
     });
     await performValidation('text', {
       elementType: 'paragraph',
-      text: `When making their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
+      text: `When they made their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
     const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {
@@ -581,7 +579,7 @@ export class RespondToClaimAction implements IAction {
 
   private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: yourCircumstancesData.question,
+      question: yourCircumstancesData.wouldYouLikeToShareHeader,
       option: yourCircumstancesData.yourCircumstancesOption,
     });
     if (yourCircumstancesData.yourCircumstancesOption === yourCircumstances.yesRadioOption) {

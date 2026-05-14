@@ -1,6 +1,5 @@
 export const yourCircumstances = {
   mainHeader: `Your circumstances`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   youCanUseThisSectionParagraph: `You can use this section to give details about any events or circumstances that have impacted your case that you think a judge should know about.`,
