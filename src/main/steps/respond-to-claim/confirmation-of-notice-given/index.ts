@@ -1,15 +1,11 @@
 import type { Request } from 'express';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, YesNoNotSureValue } from '@services/ccdCase.interface';
-
-const STEP_NAME = 'confirmation-of-notice-given';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-given',
@@ -74,12 +70,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-    const t = getTranslationFunction(req, STEP_NAME, ['common']);
 
     return {
       claimantName,
-      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
 });

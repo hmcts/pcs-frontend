@@ -20,7 +20,7 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {% if isLegalRepresentative %}
+  {% if circumstanceHeading %}
     <h2 class="govuk-heading-m">{{ circumstanceHeading }}</h2>
   {% endif %}
 
@@ -34,7 +34,7 @@
     <li>{{ bullet3 }}</li>
   </ul>
 
-  {% if isLegalRepresentative %}
+  {% if circumstanceQuestion %}
     <h2 class="govuk-heading-s">{{ circumstanceQuestion }}</h2>
   {% endif %}
 

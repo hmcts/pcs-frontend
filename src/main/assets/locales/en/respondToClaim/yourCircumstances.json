@@ -1,6 +1,8 @@
 {
   "caption": "Respond to a property possession claim",
   "pageTitle": "Your circumstances",
+  "circumstanceHeading": " ",
+  "circumstanceQuestion": " ",
   "introParagraph": "You can use this section to give details about any events or circumstances that have impacted your case that you think a judge should know about.",
   "forExample": "For example:",
   "bullet1": "someone in your household has an illness or disability",

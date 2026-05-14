@@ -2,7 +2,6 @@ import type { Request } from 'express';
 import { DateTime } from 'luxon';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -93,12 +92,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const claimantName = getClaimantName(req);
 
     const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-not-provided', ['common']);
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     const paragraph = t('paragraph', { returnObjects: true, claimantName });
 
     return {
-      caseNumber: t('caseNumber', { caseNumber }),
       claimantName,
       paragraph,
     };

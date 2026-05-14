@@ -19,12 +19,12 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {% if isLegalRepresentative %}
+  {% if hardshipHeading %}
     <h2 class="govuk-heading-m">{{ hardshipHeading }}</h2>
   {% endif %}
 
   <p class="govuk-body">{{ introParagraph1 }}</p>
-  {% if not isLegalRepresentative %}
+  {% if not introParagraph2 %}
   <p class="govuk-body">{{ introParagraph2 }}</p>
   {% endif %}
   <p class="govuk-body">{{ introParagraph3 }}</p>

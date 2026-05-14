@@ -20,12 +20,15 @@
     <span class="govuk-caption-l">{{ caption }}</span>
   {% endif %}
 
-  {% if isLegalRepresentative %}
+  {% if heading %}
     <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% endif %}
 
-  {% if isLegalRepresentative %}
+  {% if accommodationHeading %}
     <h2 class="govuk-heading-m">{{ accommodationHeading }}</h1>
+  {% endif %}
+  
+  {% if accommodationQuestion %}
     <p class="govuk-heading-s">{{ accommodationQuestion }}</p>
   {% endif %}
 

@@ -2,6 +2,9 @@
   "caption": "cyRespond to a property possession claim",
   "pageTitle": "cySomewhere else to live",
   "question": "cyWould you have somewhere else to live if you had to leave your home?",
+  "heading": " ",
+  "accommodationHeading": " ",
+  "accommodationQuestion": " ",
   "dateLabel": "cyWhen would you be able to move in (optional)?",
   "options": {
     "yes": "cyYes",
