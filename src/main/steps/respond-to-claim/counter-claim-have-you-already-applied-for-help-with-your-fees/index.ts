@@ -13,7 +13,6 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
     heading: 'heading',
   },
   fields: [
