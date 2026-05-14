@@ -1,6 +1,5 @@
 import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
@@ -51,7 +50,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/exceptionalHardship.njk`,
   extendGetContent: req => {
     const t = getTranslationFunction(req, 'exceptional-hardship', ['common']);
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     return {
       introParagraph1: t('introParagraph1'),
@@ -62,7 +60,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       bullet2: t('bullet2'),
       bullet3: t('bullet3'),
       bullet4: t('bullet4'),
-      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
   beforeRedirect: async req => {

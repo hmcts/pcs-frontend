@@ -1,9 +1,7 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils/yesNoEnum';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
@@ -43,9 +41,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     infoParagraph1: 'infoParagraph1',
     infoParagraph2: 'infoParagraph2',
-    infoParagraph3: 'infoParagraph3',
     question: 'question',
-    caseNumber: 'caseNumber',
   },
 
   fields: [
@@ -61,12 +57,4 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
-  extendGetContent: req => {
-    const t = getTranslationFunction(req, 'income-and-expenses', ['common']);
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-
-    return {
-      caseNumber: t('caseNumber', { caseNumber }),
-    };
-  },
 });

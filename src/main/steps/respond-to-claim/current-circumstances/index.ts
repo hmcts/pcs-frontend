@@ -1,6 +1,5 @@
 import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
@@ -52,7 +51,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/currentCircumstances.njk`,
   extendGetContent: req => {
     const t = getTranslationFunction(req, 'your-circumstances', ['common']);
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
 
     return {
       introParagraph: t('introParagraph'),
@@ -60,7 +58,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       bullet1: t('bullet1'),
       bullet2: t('bullet2'),
       bullet3: t('bullet3'),
-      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
   beforeRedirect: async req => {

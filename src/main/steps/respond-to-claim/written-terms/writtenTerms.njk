@@ -3,7 +3,6 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% from "macros/caseNumberDisplay.njk"import caseNumberDisplay%}
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}{{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
@@ -19,8 +18,6 @@
   {% endif %}
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
-
-  {{ caseNumberDisplay(isLegalRepresentative, caseNumber) }}
 
   {% if isLegalRepresentative %}
      <p class="govuk-heading-m">{{ heading }} </p>

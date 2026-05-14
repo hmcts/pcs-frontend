@@ -1,6 +1,5 @@
 {
   "heading": "cyRepayment agreement",
-  "caseNumber": "cyCase number: {{caseNumber}}",
   "question": "cyHas the defendant come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
   "options": {
     "or": " ",

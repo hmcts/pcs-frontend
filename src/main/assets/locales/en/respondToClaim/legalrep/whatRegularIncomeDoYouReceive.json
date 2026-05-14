@@ -1,6 +1,5 @@
 {
   "caption": "Respond to a property possession claim",
-  "caseNumber": "Case number: {{caseNumber}}",
   "heading": "Income",
   "subheading": "What regular income does the defendant receive?",
   "groupName": "Regular income options",

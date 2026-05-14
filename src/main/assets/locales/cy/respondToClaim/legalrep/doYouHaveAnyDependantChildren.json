@@ -2,7 +2,6 @@
   "heading": "cyDependants and other adults",
   "dependantHeading": "cyDependant Children",
   "dependantQuestion": "cyDoes the defendant have any dependant children?",
-  "caseNumber": "cyCase number: {{caseNumber}}",
   "dependantChildrenDetailsLabel": "cyGive details about their dependant children",
   "dependantChildrenDetailsHint": "",
   "errors": {

@@ -2,7 +2,6 @@
   "heading": "Dependants and other adults",
   "dependantHeading": "Dependant Children",
   "dependantQuestion": "Does the defendant have any dependant children?",
-  "caseNumber": "Case number: {{caseNumber}}",
   "dependantChildrenDetailsLabel": "Give details about their dependant children",
   "dependantChildrenDetailsHint": "",
   "errors": {

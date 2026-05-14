@@ -1,6 +1,5 @@
 {
   "caption": "cyRespond to a property possession claim",
-  "caseNumber": "cyCase number: {{caseNumber}}",
   "heading": "cyIncome",
   "subheading": "cyWhat regular income does the defendant receive?",
   "groupName": "cyRegular income options",

@@ -1,7 +1,5 @@
-import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -17,7 +15,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     dependantHeading: 'dependantHeading',
     dependantQuestion: 'dependantQuestion',
     heading: 'heading',
-    caseNumber: 'caseNumber',
   },
   fields: [
     {
@@ -98,14 +95,5 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
       response
     );
-  },
-  extendGetContent: async req => {
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-
-    const t = getTranslationFunction(req, 'do-any-other-adults-live-in-your-home', ['common']);
-
-    return {
-      caseNumber: t('caseNumber', { caseNumber }),
-    };
   },
 });

@@ -1,9 +1,7 @@
 import { fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
@@ -51,14 +49,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       confirmLandlordLicensed: fromYesNoNotSureEnum(landlordLicensed),
-    };
-  },
-  extendGetContent: req => {
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
-    const t = getTranslationFunction(req, 'landlord-licensed', ['common']);
-
-    return {
-      caseNumber: t('caseNumber', { caseNumber }),
     };
   },
 });

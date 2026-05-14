@@ -2,7 +2,6 @@ import { DateTime } from 'luxon';
 
 import { getTranslationFunction } from '../../../modules/steps';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { caseNumberFormatter } from '../../utils/caseNumberFormatter';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -83,12 +82,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops Housing';
 
-    const caseNumber = caseNumberFormatter(req.res?.locals?.validatedCase?.id as string);
     const t = getTranslationFunction(req, STEP_NAME, ['common']);
     const paragraph = t('paragraph', { claimantName });
 
     return {
-      caseNumber: t('caseNumber', { caseNumber }),
       claimantName,
       paragraph,
     };
