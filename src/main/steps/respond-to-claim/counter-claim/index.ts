@@ -62,7 +62,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     await saveDraftDefendantResponse(req, response);
   },
-  getInitialFormData: req => {
+  getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
     const makeCounterClaim: YesNoValue | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.makeCounterClaim;
