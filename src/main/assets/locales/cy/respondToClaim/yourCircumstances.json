@@ -14,6 +14,8 @@
   "textAreaLabel": "cyGive details about your circumstances",
   "errors": {
     "shareCircumstances": "cySelect if you’d like to share anything about your circumstances",
-    "shareCircumstances.circumstancesDetails": "cyGive details about your circumstances"
+    "shareCircumstances.circumstancesDetails": "cyGive details about your circumstances",
+    "circumstancesDetailsMaxLength": "cyCircumstances details must be 500 characters or less",
+    "circumstancesDetailsInvalidCharacters": "cyThe details of your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }

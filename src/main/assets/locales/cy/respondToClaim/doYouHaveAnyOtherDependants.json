@@ -7,6 +7,7 @@
   "otherDependantDetailsHint": "cyYou should include details about how many other dependants you have, how old they are and anything else you think the court should know about them",
   "errors": {
     "otherDependants": "cySelect if you have any other dependants",
-    "otherDependantDetails": "cyGive details about your other dependants"
+    "otherDependantDetails": "cyGive details about your other dependants",
+    "otherDependantDetailsMaxLength": "cyOther dependants details must be 500 characters or less"
   }
 }
