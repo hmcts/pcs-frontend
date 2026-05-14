@@ -18,15 +18,15 @@
   {% endif %}
 
   {% if not isLegalRepresentative %}
-    {% if paragraph %}
-      <p class="govuk-body">{{ paragraph }}</p>
-    {% endif %}
+  {% if paragraph %}
+    <p class="govuk-body">{{ paragraph }}</p>
+  {% endif %}
   {% endif %}
 
-  {% if isLegalRepresentative %}
-      <h2 class="govuk-heading-m">{{ dependantHeading }}</h2>
-      <p class="govuk-heading-s">{{ dependantQuestion }} </p>
-  {% endif %}
+
+  <h2 class="govuk-heading-m">{{ dependantHeading }}</h2>
+  <p class="govuk-heading-s">{{ dependantQuestion }} </p>
+
 
   <form method="post" action="{{ url }}">
     {% for field in fields %}

@@ -2,6 +2,9 @@
   "caption": "Respond to a property possession claim",
   "pageTitle": "Other adults",
   "question": "Do any other adults live in your home?",
+  "heading": " ",
+  "dependantHeading": " ",
+  "dependantQuestion": " ",
   "options": {
     "yes": "Yes",
     "no": "No"

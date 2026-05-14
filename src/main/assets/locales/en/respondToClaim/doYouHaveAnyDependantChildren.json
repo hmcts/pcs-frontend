@@ -2,6 +2,8 @@
   "pageTitle": "Dependant children",
   "caption": "Respond to a property possession claim",
   "heading": "Do you have any dependant children?",
+  "dependantHeading": " ",
+  "dependantQuestion": " ",
   "dependantChildrenParagraph": "Dependant children are children you look after financially.",
   "dependantChildrenDetailsLabel": "Give details about your dependant children",
   "dependantChildrenDetailsHint": "You should include details about how many dependant children you have and how old they are",
