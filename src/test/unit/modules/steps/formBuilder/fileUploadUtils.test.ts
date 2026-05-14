@@ -55,7 +55,10 @@ describe('fileUploadUtils', () => {
     it('parses an array of JSON strings', () => {
       expect(
         parseUploadedDocumentsFromBody({
-          'uploadedDocuments[]': [JSON.stringify({ index: 0, document_filename: 'a.pdf' }), JSON.stringify({ index: 1, document_filename: 'b.pdf' })],
+          'uploadedDocuments[]': [
+            JSON.stringify({ index: 0, document_filename: 'a.pdf' }),
+            JSON.stringify({ index: 1, document_filename: 'b.pdf' }),
+          ],
         })
       ).toEqual([
         { index: 0, document_filename: 'a.pdf' },
@@ -66,7 +69,11 @@ describe('fileUploadUtils', () => {
     it('skips non-string and malformed entries', () => {
       expect(
         parseUploadedDocumentsFromBody({
-          'uploadedDocuments[]': ['not-json', JSON.stringify({ index: 1, document_filename: 'ok.pdf' }), 123 as unknown as string],
+          'uploadedDocuments[]': [
+            'not-json',
+            JSON.stringify({ index: 1, document_filename: 'ok.pdf' }),
+            123 as unknown as string,
+          ],
         })
       ).toEqual([{ index: 1, document_filename: 'ok.pdf' }]);
     });
