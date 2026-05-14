@@ -2,13 +2,11 @@ import type { Request } from 'express';
 
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { noEmojiValidator } from '../../utils/fieldValidators';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 const createAmountValidator =
   (negativeErrorKey: string, largeAmountErrorKey: string) =>
@@ -60,11 +58,9 @@ const validateOtherBenefitsAmount = createAmountValidator(
   'errors.otherBenefitsAmount.largeAmount'
 );
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-regular-income-do-you-receive',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   showCancelButton: false,
 
   getInitialFormData: (req: Request) => {
@@ -101,7 +97,8 @@ export const step: StepDefinition = createFormStep({
     }
 
     // Universal Credit
-    if (fromYesNoEnum(hc.universalCredit) === 'yes') {
+    const appliedForUniversalCredit = fromYesNoEnum(hc.universalCredit);
+    if ((hc.universalCreditAmount || hc.universalCreditFrequency) && appliedForUniversalCredit !== 'no') {
       selectedIncome.push('universalCredit');
       if (hc.universalCreditAmount) {
         formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);
@@ -138,82 +135,97 @@ export const step: StepDefinition = createFormStep({
   },
 
   beforeRedirect: async (req: Request) => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    const hc = response.defendantResponses.householdCircumstances;
+
     const selectedIncome = req.body?.regularIncome as string | string[] | undefined;
-
     const incomeArray = Array.isArray(selectedIncome) ? selectedIncome : selectedIncome ? [selectedIncome] : [];
-    const householdCircumstances: Record<string, unknown> = {};
 
-    // Income from jobs
-    householdCircumstances.incomeFromJobs = toYesNoEnum(incomeArray.includes('incomeFromJobs') ? 'yes' : 'no');
-    if (incomeArray.includes('incomeFromJobs')) {
-      const amountRaw = req.body?.['regularIncome.incomeFromJobsAmount'] as string | undefined;
-      const frequency = req.body?.['regularIncome.incomeFromJobsFrequency'] as string | undefined;
-
-      if (amountRaw) {
-        householdCircumstances.incomeFromJobsAmount = poundsToPence(amountRaw);
+    const applyAmountFrequency = (
+      checked: boolean,
+      flagKey: 'incomeFromJobs' | 'pension' | 'universalCredit' | 'otherBenefits',
+      amountKey: 'incomeFromJobsAmount' | 'pensionAmount' | 'universalCreditAmount' | 'otherBenefitsAmount',
+      frequencyKey:
+        | 'incomeFromJobsFrequency'
+        | 'pensionFrequency'
+        | 'universalCreditFrequency'
+        | 'otherBenefitsFrequency',
+      amountBodyKey: string,
+      frequencyBodyKey: string
+    ) => {
+      if (checked) {
+        hc[flagKey] = toYesNoEnum('yes');
+        const amountRaw = (req.body?.[amountBodyKey] as string | undefined)?.trim();
+        const frequency = (req.body?.[frequencyBodyKey] as string | undefined)?.trim();
+        if (amountRaw) {
+          hc[amountKey] = poundsToPence(amountRaw);
+        } else {
+          delete hc[amountKey];
+        }
+        if (frequency) {
+          hc[frequencyKey] = frequency as 'WEEKLY' | 'MONTHLY';
+        } else {
+          delete hc[frequencyKey];
+        }
+      } else {
+        delete hc[flagKey];
+        delete hc[amountKey];
+        delete hc[frequencyKey];
       }
-      if (frequency) {
-        householdCircumstances.incomeFromJobsFrequency = frequency;
-      }
-    }
-
-    // Pension
-    householdCircumstances.pension = toYesNoEnum(incomeArray.includes('pension') ? 'yes' : 'no');
-    if (incomeArray.includes('pension')) {
-      const amountRaw = req.body?.['regularIncome.pensionAmount'] as string | undefined;
-      const frequency = req.body?.['regularIncome.pensionFrequency'] as string | undefined;
-
-      if (amountRaw) {
-        householdCircumstances.pensionAmount = poundsToPence(amountRaw);
-      }
-      if (frequency) {
-        householdCircumstances.pensionFrequency = frequency;
-      }
-    }
-
-    // Universal Credit
-    householdCircumstances.universalCredit = toYesNoEnum(incomeArray.includes('universalCredit') ? 'yes' : 'no');
-    if (incomeArray.includes('universalCredit')) {
-      const amountRaw = req.body?.['regularIncome.universalCreditAmount'] as string | undefined;
-      const frequency = req.body?.['regularIncome.universalCreditFrequency'] as string | undefined;
-
-      if (amountRaw) {
-        householdCircumstances.universalCreditAmount = poundsToPence(amountRaw);
-      }
-      if (frequency) {
-        householdCircumstances.universalCreditFrequency = frequency;
-      }
-    }
-
-    // Other benefits
-    householdCircumstances.otherBenefits = toYesNoEnum(incomeArray.includes('otherBenefits') ? 'yes' : 'no');
-    if (incomeArray.includes('otherBenefits')) {
-      const amountRaw = req.body?.['regularIncome.otherBenefitsAmount'] as string | undefined;
-      const frequency = req.body?.['regularIncome.otherBenefitsFrequency'] as string | undefined;
-
-      if (amountRaw) {
-        householdCircumstances.otherBenefitsAmount = poundsToPence(amountRaw);
-      }
-      if (frequency) {
-        householdCircumstances.otherBenefitsFrequency = frequency;
-      }
-    }
-
-    // Money from elsewhere
-    householdCircumstances.moneyFromElsewhere = toYesNoEnum(incomeArray.includes('moneyFromElsewhere') ? 'yes' : 'no');
-    if (incomeArray.includes('moneyFromElsewhere')) {
-      const details = req.body?.['regularIncome.moneyFromElsewhereDetails'] as string | undefined;
-      if (details) {
-        householdCircumstances.moneyFromElsewhereDetails = details;
-      }
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances,
-      },
     };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+
+    applyAmountFrequency(
+      incomeArray.includes('incomeFromJobs'),
+      'incomeFromJobs',
+      'incomeFromJobsAmount',
+      'incomeFromJobsFrequency',
+      'regularIncome.incomeFromJobsAmount',
+      'regularIncome.incomeFromJobsFrequency'
+    );
+    applyAmountFrequency(
+      incomeArray.includes('pension'),
+      'pension',
+      'pensionAmount',
+      'pensionFrequency',
+      'regularIncome.pensionAmount',
+      'regularIncome.pensionFrequency'
+    );
+    applyAmountFrequency(
+      incomeArray.includes('universalCredit'),
+      'universalCredit',
+      'universalCreditAmount',
+      'universalCreditFrequency',
+      'regularIncome.universalCreditAmount',
+      'regularIncome.universalCreditFrequency'
+    );
+    applyAmountFrequency(
+      incomeArray.includes('otherBenefits'),
+      'otherBenefits',
+      'otherBenefitsAmount',
+      'otherBenefitsFrequency',
+      'regularIncome.otherBenefitsAmount',
+      'regularIncome.otherBenefitsFrequency'
+    );
+
+    if (incomeArray.includes('moneyFromElsewhere')) {
+      hc.moneyFromElsewhere = toYesNoEnum('yes');
+      const details = (req.body?.['regularIncome.moneyFromElsewhereDetails'] as string | undefined)?.trim();
+      if (details) {
+        hc.moneyFromElsewhereDetails = details;
+      } else {
+        delete hc.moneyFromElsewhereDetails;
+      }
+    } else {
+      delete hc.moneyFromElsewhere;
+      delete hc.moneyFromElsewhereDetails;
+    }
+
+    await saveDraftDefendantResponse(
+      req,
+
+      response
+    );
   },
 
   translationKeys: {

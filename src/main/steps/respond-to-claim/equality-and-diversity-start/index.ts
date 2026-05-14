@@ -1,19 +1,15 @@
 import { HTTPError } from '../../../HttpError';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import { Logger } from '@modules/logger';
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 const logger = Logger.getLogger('equalityAndDiversityStart');
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'equality-and-diversity-start',
-  journeyFolder: 'respondToClaim',
   stepDir: __dirname,
-  flowConfig,
   fields: [],
   customTemplate: `${__dirname}/equalityAndDiversityStart.njk`,
   beforeRedirect: async req => {
@@ -23,12 +19,12 @@ export const step: StepDefinition = createFormStep({
       throw new HTTPError('Invalid equality and diversity choice', 400);
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        equalityAndDiversityQuestionsChoice: choice === 'skip' ? 'SKIP' : 'CONTINUE',
-      },
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses = {
+      ...response.defendantResponses,
+      equalityAndDiversityQuestionsChoice: choice === 'skip' ? 'SKIP' : 'CONTINUE',
     };
 
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });

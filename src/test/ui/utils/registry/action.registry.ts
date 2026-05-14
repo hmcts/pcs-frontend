@@ -1,4 +1,5 @@
 import {
+  CitizenCreateGenAppAPIAction,
   CreateCaseAPIAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
@@ -34,12 +35,13 @@ export class ActionRegistry {
     ['clickTab', new ClickTabAction()],
     ['inputText', new InputTextAction()],
     ['select', new SelectAction()],
-    ['UploadFile', new UploadFileAction()],
+    ['uploadFile', new UploadFileAction()],
     ['login', new LoginAction()],
     ['createUser', new LoginAction()],
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
@@ -80,8 +82,10 @@ export class ActionRegistry {
     ['selectWhatRegularIncomeDoYouReceive', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],
     ['exceptionalHardship', new RespondToClaimAction()],
+    ['selectUniversalCredit', new RespondToClaimAction()],
+    ['selectPriorityDebts', new RespondToClaimAction()],
+    ['enterPriorityDebtDetails', new RespondToClaimAction()],
     ['selectCounterClaim', new RespondToClaimAction()],
-    ['languageUsed', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
@@ -103,6 +107,7 @@ export class ActionRegistry {
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
     ['otherConsiderations', new RespondToClaimAction()],
+    ['uploadFiles', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
   ]);
