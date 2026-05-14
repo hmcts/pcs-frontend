@@ -13,7 +13,6 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/counterClaimDoYouWantToUploadFiles.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
     heading: 'heading',
     paragraph1: 'paragraph1',
     paragraph2: 'paragraph2',

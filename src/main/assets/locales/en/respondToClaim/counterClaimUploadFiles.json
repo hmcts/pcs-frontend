@@ -1,11 +1,10 @@
 {
   "pageTitle": "Upload counterclaim files",
-  "caption": "Resolve a property dispute",
   "heading": "Upload files to support your counterclaim",
   "guidanceText": "You should only upload files that are relevant to your counterclaim.",
   "guidanceText2": "The claimant will be able to see any files you upload.",
   "beforeUploadText": "Before you upload the file give it a name that tells the court what it is, for example 'Job offer letter'.",
-  "fileTypesText": "Each file must be less than 100MB. You can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.",
+  "fileTypesText": "Each file must be less than 500MB. You can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.",
   "uploadLabel": "Upload a file",
   "filesAddedHeading": "Files added",
   "uploadButton": "Upload file",
