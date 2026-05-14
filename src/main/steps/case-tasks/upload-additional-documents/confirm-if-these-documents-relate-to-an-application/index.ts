@@ -2,9 +2,9 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
-import { formatISOToLongDate } from '../../../utils/dateUtils';
 import { flowConfig } from '../flow.config';
 
+import { date } from '@modules/nunjucks/filters/date';
 import {
   createGetController,
   createStepNavigation,
@@ -26,18 +26,21 @@ const templatePath =
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
 function buildApplicationText(t: TFunction, type: GenAppType | undefined, submittedDate?: string): string {
-  const date = formatISOToLongDate(submittedDate);
+  let formatted = '';
+  if (submittedDate) {
+    formatted = date(submittedDate, 'cccc d MMMM yyyy');
+  }
 
   switch (type) {
     case GenAppType.ADJOURN:
-      return t('applicationOptionAdjourn', { date });
+      return t('applicationOptionAdjourn', { date: formatted });
     case GenAppType.SET_ASIDE:
-      return t('applicationOptionSetAside', { date });
+      return t('applicationOptionSetAside', { date: formatted });
     case GenAppType.SUSPEND:
-      return t('applicationOptionSuspend', { date });
+      return t('applicationOptionSuspend', { date: formatted });
     case GenAppType.SOMETHING_ELSE:
     default:
-      return t('applicationOptionGeneric', { date });
+      return t('applicationOptionGeneric', { date: formatted });
   }
 }
 

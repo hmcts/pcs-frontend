@@ -33,14 +33,3 @@ export function formatDatePartsToISODate(day: string, month: string, year: strin
 
   return dt.toISODate() ?? undefined;
 }
-
-export function formatISOToLongDate(isoDate?: string): string {
-  if (!isoDate) {
-    return '';
-  }
-  const dt = DateTime.fromISO(isoDate);
-  if (!dt.isValid) {
-    return '';
-  }
-  return dt.toFormat('cccc d MMMM yyyy');
-}
