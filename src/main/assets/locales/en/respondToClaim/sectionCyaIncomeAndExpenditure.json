@@ -1,0 +1,69 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Income and expenses",
+  "back": "Back",
+  "change": "Change",
+  "noAnswerProvided": "No answer provided",
+  "buttons": {
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  },
+  "options": {
+    "YES": "Yes",
+    "NO": "No"
+  },
+  "frequencies": {
+    "WEEKLY": "a week",
+    "MONTHLY": "a month"
+  },
+  "rows": {
+    "shareIncomeExpenseDetails": {
+      "label": "Do you want to provide details about your income and expenses?",
+      "changeHidden": "whether you want to provide income and expense details"
+    },
+    "regularIncome": {
+      "label": "What regular income do you receive?",
+      "changeHidden": "the regular income you receive",
+      "options": {
+        "incomeFromJobs": "Income from jobs",
+        "pension": "Pension",
+        "universalCredit": "Universal Credit",
+        "otherBenefits": "Other benefits",
+        "moneyFromElsewhere": "Money from somewhere else"
+      }
+    },
+    "hasAppliedForUniversalCredit": {
+      "label": "Have you applied for Universal Credit?",
+      "changeHidden": "whether you have applied for Universal Credit"
+    },
+    "priorityDebts": {
+      "label": "Do you have any priority debts?",
+      "changeHidden": "whether you have any priority debts"
+    },
+    "priorityDebtDetails": {
+      "label": "Priority debt details",
+      "changeHidden": "your priority debt details",
+      "total": "Total amount owed",
+      "contribution": "Regular contribution"
+    },
+    "regularExpenses": {
+      "label": "What regular expenses do you have?",
+      "changeHidden": "the regular expenses you have",
+      "options": {
+        "householdBills": "Household bills",
+        "loanPayments": "Loan payments",
+        "childSpousalMaintenance": "Child or spousal maintenance",
+        "mobilePhone": "Mobile phone",
+        "groceryShopping": "Grocery shopping",
+        "fuelParkingTransport": "Fuel, parking and transport",
+        "schoolCosts": "School costs",
+        "clothing": "Clothing",
+        "otherExpenses": "Other expenses"
+      }
+    },
+    "otherConsiderations": {
+      "label": "Is there anything else you want the court to consider?",
+      "changeHidden": "whether there is anything else you want the court to consider"
+    }
+  }
+}

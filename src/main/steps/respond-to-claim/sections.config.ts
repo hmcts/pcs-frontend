@@ -69,6 +69,7 @@ const sectionDefs = [
       'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
       'your-circumstances',
       'exceptional-hardship',
+      'section-cya-situation-and-circumstances',
     ],
   },
   {
@@ -82,12 +83,13 @@ const sectionDefs = [
       'priority-debt-details',
       'what-other-regular-expenses-do-you-have',
       'other-considerations',
+      'section-cya-income-and-expenditure',
     ],
   },
   {
     id: 'uploadFiles',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document', 'support-needs'],
+    steps: ['upload-document', 'support-needs', 'section-cya-upload-files'],
   },
   {
     id: 'checkYourAnswersAndSubmit',

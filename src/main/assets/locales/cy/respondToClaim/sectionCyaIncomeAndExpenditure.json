@@ -1,0 +1,69 @@
+{
+  "pageTitle": "cy Check your answers",
+  "cardTitle": "cy Income and expenses",
+  "back": "cy Back",
+  "change": "cy Change",
+  "noAnswerProvided": "cy No answer provided",
+  "buttons": {
+    "saveAndContinue": "cy Save and continue",
+    "saveForLater": "cy Save for later"
+  },
+  "options": {
+    "YES": "cy Yes",
+    "NO": "cy No"
+  },
+  "frequencies": {
+    "WEEKLY": "cy a week",
+    "MONTHLY": "cy a month"
+  },
+  "rows": {
+    "shareIncomeExpenseDetails": {
+      "label": "cy Do you want to provide details about your income and expenses?",
+      "changeHidden": "cy whether you want to provide income and expense details"
+    },
+    "regularIncome": {
+      "label": "cy What regular income do you receive?",
+      "changeHidden": "cy the regular income you receive",
+      "options": {
+        "incomeFromJobs": "cy Income from jobs",
+        "pension": "cy Pension",
+        "universalCredit": "cy Universal Credit",
+        "otherBenefits": "cy Other benefits",
+        "moneyFromElsewhere": "cy Money from somewhere else"
+      }
+    },
+    "hasAppliedForUniversalCredit": {
+      "label": "cy Have you applied for Universal Credit?",
+      "changeHidden": "cy whether you have applied for Universal Credit"
+    },
+    "priorityDebts": {
+      "label": "cy Do you have any priority debts?",
+      "changeHidden": "cy whether you have any priority debts"
+    },
+    "priorityDebtDetails": {
+      "label": "cy Priority debt details",
+      "changeHidden": "cy your priority debt details",
+      "total": "cy Total amount owed",
+      "contribution": "cy Regular contribution"
+    },
+    "regularExpenses": {
+      "label": "cy What regular expenses do you have?",
+      "changeHidden": "cy the regular expenses you have",
+      "options": {
+        "householdBills": "cy Household bills",
+        "loanPayments": "cy Loan payments",
+        "childSpousalMaintenance": "cy Child or spousal maintenance",
+        "mobilePhone": "cy Mobile phone",
+        "groceryShopping": "cy Grocery shopping",
+        "fuelParkingTransport": "cy Fuel, parking and transport",
+        "schoolCosts": "cy School costs",
+        "clothing": "cy Clothing",
+        "otherExpenses": "cy Other expenses"
+      }
+    },
+    "otherConsiderations": {
+      "label": "cy Is there anything else you want the court to consider?",
+      "changeHidden": "cy whether there is anything else you want the court to consider"
+    }
+  }
+}

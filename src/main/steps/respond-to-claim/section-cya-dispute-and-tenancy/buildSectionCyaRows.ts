@@ -2,7 +2,7 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { formatIsoDate, penceToPounds } from '../../utils';
+import { formatIsoDate, normalizeYesNoValue, penceToPounds } from '../../utils';
 
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
@@ -37,7 +37,9 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     visuallyHiddenText: t(hiddenKey),
   });
 
-  const yesNoNotSure = (value: string): string => t(`options.${value}`);
+  // Normalise casing before building the options.{value} key — the backend can echo
+  // VerticalYesNo as 'Yes'/'No' but the translation keys are YES/NO/NOT_SURE.
+  const yesNoNotSure = (value: string): string => t(`options.${value.trim().toUpperCase()}`);
 
   const rows: SummaryListRow[] = [];
 
@@ -68,24 +70,32 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     });
   }
 
-  // Tenancy type
+  // Tenancy type — show the corrected type when the user says the claim's type is
+  // wrong (the "no" subfield), mirroring the rentArrearsAmountConfirmation row.
   if (responses.tenancyTypeConfirmation) {
+    const typeCorrect = normalizeYesNoValue(responses.tenancyTypeConfirmation) === 'YES';
+    const value =
+      !typeCorrect && responses.tenancyType?.trim()
+        ? { html: escapeHtml(`${t('options.NO')} (${responses.tenancyType.trim()})`) }
+        : { text: yesNoNotSure(responses.tenancyTypeConfirmation) };
     rows.push({
       key: { text: t('rows.tenancyTypeCorrect.label') },
-      value: { text: yesNoNotSure(responses.tenancyTypeConfirmation) },
+      value,
       actions: { items: [change('tenancy-type-details', 'rows.tenancyTypeCorrect.changeHidden')] },
     });
   }
 
   // Tenancy start date — ONE row covers both date-details and date-unknown branches.
-  // Change link points to whichever the user took (inferred from the data shape).
+  // tenancy-date-details always writes the confirmation answer (plus a date only
+  // when the user corrects it); tenancy-date-unknown writes only a date. Show the
+  // row when either is present; the change link and value adapt to the branch taken.
   const tenancyDate = validatedCase.defendantResponsesTenancyStartDate;
-  if (tenancyDate) {
-    const dateKnown = !!validatedCase.defendantResponsesTenancyStartDateConfirmation;
-    const editStep = dateKnown ? 'tenancy-date-details' : 'tenancy-date-unknown';
+  const tenancyDateConfirmation = validatedCase.defendantResponsesTenancyStartDateConfirmation;
+  if (tenancyDate || tenancyDateConfirmation) {
+    const editStep = tenancyDateConfirmation ? 'tenancy-date-details' : 'tenancy-date-unknown';
     rows.push({
       key: { text: t('rows.tenancyStartDate.label') },
-      value: { text: formatIsoDate(tenancyDate) },
+      value: { text: tenancyDate ? formatIsoDate(tenancyDate) : yesNoNotSure(tenancyDateConfirmation as string) },
       actions: { items: [change(editStep, 'rows.tenancyStartDate.changeHidden')] },
     });
   }
@@ -94,7 +104,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   const noticeReceived = validatedCase.defendantResponsesPossessionNoticeReceived;
   if (noticeReceived) {
     rows.push({
-      key: { text: t('rows.possessionNoticeReceived.label') },
+      key: { text: t('rows.possessionNoticeReceived.label', { claimantName: validatedCase.claimantName }) },
       value: { text: t(`options.${noticeReceived}`) },
       actions: {
         items: [change('confirmation-of-notice-given', 'rows.possessionNoticeReceived.changeHidden')],
@@ -103,25 +113,29 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   }
 
   // Notice received date — same field for both "provided" and "not-provided" branches.
-  // Change link defaults to the "provided" page (most common); the "not-provided"
-  // page reads the same field anyway.
+  // The change link routes to whichever step the user took, discriminated on the
+  // claim's notice date (the same signal isNoticeDateProvided uses in flow.config).
   if (responses.noticeReceivedDate) {
+    const noticeDateEditStep = validatedCase.noticeDate
+      ? 'confirmation-of-notice-date-when-provided'
+      : 'confirmation-of-notice-date-when-not-provided';
     rows.push({
-      key: { text: t('rows.noticeReceivedDate.label') },
+      key: { text: t('rows.noticeReceivedDate.label', { claimantName: validatedCase.claimantName }) },
       value: { text: formatIsoDate(responses.noticeReceivedDate) },
       actions: {
-        items: [change('confirmation-of-notice-date-when-provided', 'rows.noticeReceivedDate.changeHidden')],
+        items: [change(noticeDateEditStep, 'rows.noticeReceivedDate.changeHidden')],
       },
     });
   }
 
-  // Rent arrears amount confirmation (+ amount when disputing)
+  // Rent arrears amount confirmation (+ amount when disputing). rentArrearsAmount
+  // is stored in pence — convert for display, like the counterclaim rows.
   if (responses.rentArrearsAmountConfirmation) {
-    const confirmed = responses.rentArrearsAmountConfirmation === 'YES';
-    const value =
-      !confirmed && responses.rentArrearsAmount
-        ? { html: escapeHtml(`${t('options.NO')} (${responses.rentArrearsAmount})`) }
-        : { text: yesNoNotSure(responses.rentArrearsAmountConfirmation) };
+    const confirmed = normalizeYesNoValue(responses.rentArrearsAmountConfirmation) === 'YES';
+    const disputedAmount = !confirmed ? penceToPounds(responses.rentArrearsAmount) : undefined;
+    const value = disputedAmount
+      ? { html: escapeHtml(`${t('options.NO')} (£${disputedAmount})`) }
+      : { text: yesNoNotSure(responses.rentArrearsAmountConfirmation) };
     rows.push({
       key: { text: t('rows.rentArrearsAmountConfirmation.label') },
       value,
@@ -133,10 +147,10 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   if (responses.disputeClaim) {
     rows.push({
       key: { text: t('rows.disputeClaim.label') },
-      value: { text: t(`options.${responses.disputeClaim}`) },
+      value: { text: yesNoNotSure(responses.disputeClaim) },
       actions: { items: [change('non-rent-arrears-dispute', 'rows.disputeClaim.changeHidden')] },
     });
-    if (responses.disputeClaim === 'YES' && responses.disputeClaimDetails?.trim()) {
+    if (normalizeYesNoValue(responses.disputeClaim) === 'YES' && responses.disputeClaimDetails?.trim()) {
       rows.push({
         key: { text: t('rows.disputeClaimDetails.label') },
         value: { html: escapeWithLineBreaks(String(responses.disputeClaimDetails).trim()) },
@@ -155,7 +169,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   }
 
   // Counterclaim details — only when YES
-  if (responses.makeCounterClaim === 'YES' && responses.counterClaim) {
+  if (normalizeYesNoValue(responses.makeCounterClaim) === 'YES' && responses.counterClaim) {
     const cc = responses.counterClaim;
 
     // What are you counterclaiming for?
@@ -172,11 +186,12 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     // Specific sum — only when claiming for money (PAYMENT_OR_COMPENSATION or BOTH)
     const claimsMoney = cc.claimType === 'PAYMENT_OR_COMPENSATION' || cc.claimType === 'BOTH';
     if (claimsMoney && cc.isClaimAmountKnown) {
+      const isClaimAmountKnown = normalizeYesNoValue(cc.isClaimAmountKnown);
       let amountText: string;
-      if (cc.isClaimAmountKnown === 'YES' && cc.claimAmount !== undefined) {
+      if (isClaimAmountKnown === 'YES' && cc.claimAmount !== undefined) {
         const pounds = penceToPounds(cc.claimAmount);
         amountText = pounds ? `£${pounds}` : yesNoNotSure(cc.isClaimAmountKnown);
-      } else if (cc.isClaimAmountKnown === 'NO' && cc.estimatedMaxClaimAmount !== undefined) {
+      } else if (isClaimAmountKnown === 'NO' && cc.estimatedMaxClaimAmount !== undefined) {
         const pounds = penceToPounds(cc.estimatedMaxClaimAmount);
         amountText = pounds
           ? `${t('rows.counterClaimAmount.estimatedMaxPrefix')} £${pounds}`

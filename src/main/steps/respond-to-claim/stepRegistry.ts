@@ -41,9 +41,12 @@ import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
 import { step as sectionCyaDisputeAndTenancy } from './section-cya-dispute-and-tenancy';
+import { step as sectionCyaIncomeAndExpenditure } from './section-cya-income-and-expenditure';
 import { step as sectionCyaPayments } from './section-cya-payments';
 import { step as sectionCyaPersonalDetails } from './section-cya-personal-details';
+import { step as sectionCyaSituationAndCircumstances } from './section-cya-situation-and-circumstances';
 import { step as sectionCyaStartNowAndDetails } from './section-cya-start-now-and-details';
+import { step as sectionCyaUploadFiles } from './section-cya-upload-files';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
 import { step as supportNeeds } from './support-needs';
@@ -74,6 +77,9 @@ export const stepRegistry = {
   'section-cya-personal-details': sectionCyaPersonalDetails,
   'section-cya-dispute-and-tenancy': sectionCyaDisputeAndTenancy,
   'section-cya-payments': sectionCyaPayments,
+  'section-cya-situation-and-circumstances': sectionCyaSituationAndCircumstances,
+  'section-cya-income-and-expenditure': sectionCyaIncomeAndExpenditure,
+  'section-cya-upload-files': sectionCyaUploadFiles,
   'landlord-registered': landlordRegistered,
   'landlord-licensed': landlordLicensed,
   'written-terms': writtenTerms,

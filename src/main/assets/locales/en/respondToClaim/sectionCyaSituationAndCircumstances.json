@@ -1,0 +1,41 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Your situation and circumstances",
+  "back": "Back",
+  "change": "Change",
+  "buttons": {
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  },
+  "options": {
+    "YES": "Yes",
+    "NO": "No",
+    "NOT_SURE": "Not sure"
+  },
+  "rows": {
+    "dependantChildren": {
+      "label": "Do you have any dependant children?",
+      "changeHidden": "whether you have any dependant children"
+    },
+    "otherDependants": {
+      "label": "Do you have any other dependants?",
+      "changeHidden": "whether you have any other dependants"
+    },
+    "otherTenants": {
+      "label": "Do any other adults live in your home?",
+      "changeHidden": "whether any other adults live in your home"
+    },
+    "alternativeAccommodation": {
+      "label": "Would you have somewhere else to live if you had to leave your home?",
+      "changeHidden": "whether you would have somewhere else to live"
+    },
+    "shareAdditionalCircumstances": {
+      "label": "Do you want to share any other details about your circumstances?",
+      "changeHidden": "whether you want to share other details about your circumstances"
+    },
+    "exceptionalHardship": {
+      "label": "Would you experience exceptional hardship if you had to leave your home?",
+      "changeHidden": "whether you would experience exceptional hardship"
+    }
+  }
+}
