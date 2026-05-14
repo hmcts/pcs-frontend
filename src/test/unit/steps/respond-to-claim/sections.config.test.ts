@@ -50,6 +50,7 @@ describe('respond-to-claim sections config', () => {
 
   it('maps end-of-journey steps into final section', () => {
     expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
+      'reasonable-adjustments-triage',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',
