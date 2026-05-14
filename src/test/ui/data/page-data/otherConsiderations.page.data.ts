@@ -13,5 +13,7 @@ export const otherConsiderations = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfThereIsAnythingElseYouWantToTellTheCourtErrorMessage: `Select if there is anything else you want to tell the court`,
   giveDetailsAboutWhatYouWantToTellTheCourtErrorMessage: `Enter details about what you want to tell the court`,
-  mustBeUnderCharacterLimitErrorMessage: `Must be 500 characters or fewer`,
+  mustBeUnderCharacterLimitErrorMessage: `Details about what else you want to tell the court must be 6400 characters or less`,
+  emojiTextInput: `👉 😄`,
+  emojiExplainPartsOfClaimErrorMessage: `Give details about what else you want to tell the court must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
 };
