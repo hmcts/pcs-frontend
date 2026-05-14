@@ -23,6 +23,7 @@ export { penceToPounds, poundsToPence } from './currencyConversion';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
 export {
+  getRespondToClaimConfirmationPath,
   shouldShowCounterclaimFeePaymentNeededConfirmationStep,
   shouldShowResponseAndCounterclaimSubmittedConfirmationStep,
   shouldShowResponseSubmittedConfirmationStep,

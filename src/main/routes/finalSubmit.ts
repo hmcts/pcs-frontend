@@ -1,6 +1,6 @@
 /**
  * TEMPORARY TESTING ROUTE - WILL BE DELETED LATER
- * Simple page to test CCD final submit with minimal data payload
+ * Submit handler for respond-to-claim check-your-answers (POST only).
  *
  * Uses CCD's two-phase START to SUBMIT pattern:
  * 1. START: GET /event-triggers/respondPossessionClaim returns event_token
@@ -45,26 +45,6 @@ export default function finalSubmitRoutes(app: Application): void {
   // Apply param middleware - validates format AND user access
   // This ensures res.locals.validatedCase is set for routes with :caseReference
   finalSubmitRouter.param('caseReference', caseReferenceParamMiddleware);
-
-  // GET: Display final submit page
-  finalSubmitRouter.get('/:caseReference/final-submit', oidcMiddleware, (req: Request, res: Response) => {
-    const validatedCase = res.locals.validatedCase;
-
-    if (!validatedCase) {
-      logger.error('Final submit: validatedCase is undefined - middleware not executed');
-      return res.status(500).render('error', {
-        error: 'Internal server error',
-      });
-    }
-
-    const caseId = validatedCase.id;
-    const error = req.query.error as string | undefined;
-
-    return res.render('finalSubmit', {
-      caseId,
-      error: error === 'failed' ? 'Failed to submit response. Please try again.' : undefined,
-    });
-  });
 
   // POST: Submit to CCD with minimal data
   finalSubmitRouter.post('/:caseReference/final-submit', oidcMiddleware, async (req: Request, res: Response) => {
@@ -125,23 +105,10 @@ export default function finalSubmitRoutes(app: Application): void {
     } catch (error) {
       logger.error(`Failed to submit response for case ${caseId}:`, error);
       // Use safeRedirect303 to prevent open redirect vulnerabilities
-      return safeRedirect303(res, `/case/${caseId}/final-submit?error=failed`, '/', ['/case']);
+      return safeRedirect303(res, `/case/${caseId}/respond-to-claim/check-your-answers?submitError=failed`, '/', [
+        '/case',
+      ]);
     }
-  });
-
-  // GET: Confirmation page
-  finalSubmitRouter.get('/:caseReference/confirmation', oidcMiddleware, (req: Request, res: Response) => {
-    const validatedCase = res.locals.validatedCase;
-
-    if (!validatedCase) {
-      logger.error('Confirmation: validatedCase is undefined - middleware not executed');
-      return res.status(500).render('error', {
-        error: 'Internal server error',
-      });
-    }
-
-    const caseId = validatedCase.id;
-    return res.render('confirmation', { caseId });
   });
 
   // Mount router under /case

@@ -6,5 +6,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'response-submitted-counterclaim-fee-payment-needed',
   stepDir: __dirname,
   fields: [],
+  translationKeys: {
+    pageTitle: 'pageTitle',
+  },
   customTemplate: `${__dirname}/responseSubmittedCounterclaimFeePaymentNeeded.njk`,
 });
