@@ -18,7 +18,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   customTemplate: `${__dirname}/tenancyDateDetails.njk`,
   translationKeys: {
-    caption: 'caption',
     pageTitle: 'pageTitle',
     heading: 'heading',
     question: 'question',
