@@ -7,6 +7,7 @@
   "dependantChildrenDetailsHint": "cyYou should include details about how many dependant children you have and how old they are",
   "errors": {
     "dependantChildren": "cySelect if you have any dependant children",
-    "dependantChildrenDetails": "cyGive details about your dependant children"
+    "dependantChildrenDetails": "cyGive details about your dependant children",
+    "dependantChildrenDetailsMaxLength": "cyDependant children details must be 500 characters or less"
   }
 }
