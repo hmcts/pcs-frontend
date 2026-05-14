@@ -57,6 +57,14 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title.includes('Secure')) {
     process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
   }
+
+  //Page navigation for paymentInterstitial
+  if (testInfo.title.includes('SelectCounterClaim - Yes')) {
+    process.env.SELECT_COUNTER_CLAIM = 'YES';
+  } else {
+    process.env.SELECT_COUNTER_CLAIM = 'NO';
+  }
+
   submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
   claimantName = process.env.CLAIMANT_NAME;
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
@@ -93,7 +101,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - Rent and Non-Rent Arrears @noDefendants @regression @PR', async () => {
+  test('Respond to a claim - Wales - Secure contract - Rent and Non-Rent Arrears - SelectCounterClaim - Yes @noDefendants @regression @PR', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -246,7 +254,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Respond to a claim - Wales - Standard contract - Rent and Non-Rent Arrears @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Standard contract - Rent and Non-Rent Arrears - SelectCounterClaim - Yes @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,

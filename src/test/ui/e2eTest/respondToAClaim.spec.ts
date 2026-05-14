@@ -156,7 +156,11 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   //Page navigation for paymentInterstitial
-  process.env.SELECT_COUNTER_CLAIM = 'YES';
+  if (testInfo.title.includes('SelectCounterClaim - Yes')) {
+    process.env.SELECT_COUNTER_CLAIM = 'YES';
+  } else {
+    process.env.SELECT_COUNTER_CLAIM = 'NO';
+  }
   //other considrations back link navigation
   if (testInfo.title.includes('Income - no')) {
     process.env.INCOME_AND_EXPENSES = 'NO';
@@ -1340,7 +1344,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute - SelectCounterClaim - Yes @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,

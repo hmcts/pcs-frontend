@@ -1,6 +1,5 @@
 export const counterclaimYouNeedToApplyForHelpWithYourFees = {
   mainHeader: `You need to apply for help with your counterclaim fee`,
-  stoOrDelayAnEvictionParagraph: `Stop or delay an eviction`,
   backLink: `Back`,
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
