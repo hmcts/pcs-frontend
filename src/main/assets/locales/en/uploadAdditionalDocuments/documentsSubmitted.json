@@ -1,4 +1,10 @@
 {
   "pageTitle": "Documents uploaded",
-  "heading": "Documents uploaded"
+  "panelTitle": "Documents uploaded",
+  "confirmationBody": "We have received the documents you uploaded",
+  "whatHappensNext": {
+    "heading": "What happens next",
+    "body": "You do not need to do anything else. We will review the documents."
+  },
+  "closeLink": "Close and return to case overview"
 }
