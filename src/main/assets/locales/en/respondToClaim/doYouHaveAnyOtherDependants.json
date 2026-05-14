@@ -7,6 +7,7 @@
   "otherDependantDetailsHint": "You should include details about how many other dependants you have, how old they are and anything else you think the court should know about them",
   "errors": {
     "otherDependants": "Select if you have any other dependants",
-    "otherDependantDetails": "Give details about your other dependants"
+    "otherDependantDetails": "Give details about your other dependants",
+    "otherDependantDetailsMaxLength": "Other dependants details must be 500 characters or less"
   }
 }
