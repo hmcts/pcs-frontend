@@ -1,6 +1,5 @@
 export const priorityDebtDetails = {
   mainHeader: `Priority debt details`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   whatIsTheTotalAmountQuestion: `What is the total amount you owe for all your priority debts?`,
   howMuchDoYouPayQuestion: `How much do you pay towards your priority debts each week or month?`,
   enterTotalAmountHintText: `Enter total amount in pounds and pence, for example £148.00 or £148.50`,

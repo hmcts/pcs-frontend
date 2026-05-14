@@ -1,6 +1,5 @@
 {
   "pageTitle": "cyPayments made",
-  "caption": "cyRespond to a property possession claim",
   "question": "cyHave you paid any money to {{claimantName}} since {{claimIssueDate}}?",
   "options": {
     "yes": "cyYes",
