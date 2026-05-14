@@ -12,6 +12,7 @@ import { getUserType } from './utils';
 
 import type { CcdDraftEvent } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
+import { getStepOrder } from '@modules/steps/flow';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
@@ -120,9 +121,9 @@ function getJourneyConfigForRequest(journeyName: string, req?: Request): Resolve
 
 function getRegistrationStepNames(journey: JourneyConfig): string[] {
   const stepNames = new Set<string>([
-    ...journey.default.flowConfig.stepOrder,
+    ...getStepOrder(journey.default.flowConfig),
     ...Object.keys(journey.default.stepRegistry),
-    ...(journey.legalrep?.flowConfig.stepOrder ?? []),
+    ...(journey.legalrep ? getStepOrder(journey.legalrep.flowConfig) : []),
     ...Object.keys(journey.legalrep?.stepRegistry ?? {}),
   ]);
 
@@ -145,7 +146,7 @@ export function getStepsForJourney(journeyName: string, req?: Request): StepDefi
   }
 
   const activeJourney = getJourneyConfigForRequest(journeyName, req);
-  const stepNames = req && activeJourney ? activeJourney.flowConfig.stepOrder : getRegistrationStepNames(journey);
+  const stepNames = req && activeJourney ? getStepOrder(activeJourney.flowConfig) : getRegistrationStepNames(journey);
 
   return stepNames
     .map(stepName => {

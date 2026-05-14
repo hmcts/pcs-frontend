@@ -11,6 +11,14 @@ export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { isPriorityDebtsSelected } from './isPriorityDebtsSelected';
 export { hasSelectedPriorityDebts } from './hasSelectedPriorityDebts';
+export {
+  getFirstStepInSection,
+  getSectionCoverage,
+  getSectionForStep,
+  getStepsInSection,
+  isLastStepInSection,
+  isSectionApplicable,
+} from './sections';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
 export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';

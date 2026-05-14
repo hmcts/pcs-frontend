@@ -136,6 +136,13 @@ export async function performAction(
   value?: actionData | actionRecord
 ): Promise<void> {
   const executor = getExecutor();
+  if (action === 'reloadPage') {
+    await test.step('reloadPage', async () => {
+      await executor.page.reload({ waitUntil: 'networkidle' });
+    });
+
+    return;
+  }
   await validatePageIfNavigated(action);
   const actionInstance = ActionRegistry.getAction(action);
 
