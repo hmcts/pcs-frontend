@@ -47,7 +47,7 @@
     "required": "Enter a value",
     "defaultRequired": "This field is required",
     "defaultInvalid": "Invalid format",
-    "defaultMaxLength": "Must be {max} characters or fewer",
+    "defaultMaxLength": "Must be {max} characters or less",
     "defaultSpecialCharacter": "{fieldName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
     "chooseOption": "Choose an option",
     "email": {

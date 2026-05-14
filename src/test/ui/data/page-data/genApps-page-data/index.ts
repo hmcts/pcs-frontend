@@ -14,3 +14,4 @@ export * from './askTheCourtToSetAsideTheOrder.page.data';
 export * from './askTheCourtToMakeAnOrder.page.data';
 export * from './areThereAnyReasonsThatThisApplicationShouldNotBeShared.page.data';
 export * from './youNeedToApplyForHelpWithYourApplicationFee.page.data';
+export * from './viewAllApplications.page.data';
