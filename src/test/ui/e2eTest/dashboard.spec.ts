@@ -1,4 +1,5 @@
-import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
+//import { respondPossessionClaimApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { createCaseApiData, respondPossessionClaimApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { uploadAdditionalDocuments } from '../data/page-data/documents-page-data';
@@ -121,7 +122,26 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       fieldName: dashboard.askTheCourtToMakeAnOrderLink,
       header: chooseAnApplication.mainHeader,
     });
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
+    await performAction('respondPossessionClaimAPI', { data: respondPossessionClaimApiData.respondPossessionClaimPayload });
+    await performAction('reloadPage');
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.applicationsSubHeader,
+      fieldName: dashboard.viewAllApplicationsLink,
+      header: viewAllApplications.mainHeader,
+    });
+  });
+
+
+  test('check ', async () => {
+    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
+    
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.applicationsSubHeader,
+      fieldName: dashboard.askTheCourtToMakeAnOrderLink,
+      header: chooseAnApplication.mainHeader,
+    });
+    await performAction('respondPossessionClaimAPI', { data: respondPossessionClaimApiData.respondPossessionClaimPayload });
     await performAction('reloadPage');
     await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.applicationsSubHeader,

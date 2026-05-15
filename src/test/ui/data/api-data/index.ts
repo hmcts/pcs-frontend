@@ -7,3 +7,5 @@ export * from '../../data/api-data/validateAccessCode.api.data';
 export * from '../../data/api-data/caseUserRoleDeletion.api.data';
 export * from '../../data/api-data/citizenCreateGenAppEventToken.api.data';
 export * from '../../data/api-data/citizenCreateGenApp.api.data';
+export * from '../../data/api-data/respondPossessionClaimEventToken.api.data';
+export * from '../../data/api-data/respondPossessionClaim.api.data';

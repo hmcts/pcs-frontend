@@ -6,6 +6,7 @@ import {
   LoginAction,
   NavigateToUrlAction,
   RecordAnswers,
+  respondPossessionClaimAPIAction,
   RespondToClaimAction,
   TriggerPageFunctionalTestsAction,
 } from '../actions/custom-actions';
@@ -42,6 +43,7 @@ export class ActionRegistry {
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
+    ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()], 
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
