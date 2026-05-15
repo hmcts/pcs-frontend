@@ -20,15 +20,15 @@
     <span class="govuk-caption-l">{{ caption }}</span>
   {% endif %}
 
-  {% if heading %}
+  {% if heading != "heading" %}
     <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% endif %}
 
-  {% if accommodationHeading %}
-    <h2 class="govuk-heading-m">{{ accommodationHeading }}</h1>
+  {% if accommodationHeading != "accommodationHeading" %}
+    <h2 class="govuk-heading-m">{{ accommodationHeading }}</h2>
   {% endif %}
-  
-  {% if accommodationQuestion %}
+
+  {% if accommodationQuestion != "accommodationQuestion" %}
     <p class="govuk-heading-s">{{ accommodationQuestion }}</p>
   {% endif %}
 
