@@ -86,7 +86,6 @@ export class ActionRegistry {
     ['selectPriorityDebts', new RespondToClaimAction()],
     ['enterPriorityDebtDetails', new RespondToClaimAction()],
     ['selectCounterClaim', new RespondToClaimAction()],
-    ['languageUsed', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
