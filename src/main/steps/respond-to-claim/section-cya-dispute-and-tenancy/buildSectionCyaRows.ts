@@ -70,14 +70,13 @@ function addLandlordRegisteredRow({ rows, responses, t, change, yesNoNotSure }: 
   });
 }
 
-function addLandlordLicensedRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
-  const value = validatedCase.defendantResponsesLandlordLicensed;
-  if (!value) {
+function addLandlordLicensedRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
+  if (!responses.landlordLicensed) {
     return;
   }
   rows.push({
     key: { text: t('rows.landlordLicensed.label') },
-    value: { text: yesNoNotSure(value) },
+    value: { text: yesNoNotSure(responses.landlordLicensed) },
     actions: { items: [change('landlord-licensed', 'rows.landlordLicensed.changeHidden')] },
   });
 }
@@ -110,12 +109,12 @@ function addTenancyTypeRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   });
 }
 
-function addTenancyStartDateRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
+function addTenancyStartDateRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
   // tenancy-date-details always writes the confirmation answer (plus a date only when
   // the user corrects it); tenancy-date-unknown writes only a date. Confirmation presence
   // routes the change link back to whichever step the user took.
-  const date = validatedCase.defendantResponsesTenancyStartDate;
-  const confirmation = validatedCase.defendantResponsesTenancyStartDateConfirmation;
+  const date = responses.tenancyStartDate;
+  const confirmation = responses.tenancyStartDateConfirmation;
   if (!date && !confirmation) {
     return;
   }
