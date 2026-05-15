@@ -2,6 +2,7 @@ import { Request } from 'express';
 
 import {
   hasAnyRentArrearsGround,
+  hasMultipleParties,
   hasSelectedPriorityDebts,
   hasSelectedUniversalCredit,
   isFinanceDetailsProvided,
@@ -74,6 +75,23 @@ export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
   }
 
   return isPriorityDebtsSelected(req) || hasSelectedPriorityDebts(req);
+}
+
+function getCounterClaimNeedHelpWithFees(req: Request) {
+  return req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim
+    ?.needHelpWithFees;
+}
+
+export function shouldShowCounterClaimHelpWithFeesStep(req: Request): boolean {
+  return getCounterClaimNeedHelpWithFees(req) === 'YES';
+}
+
+export function shouldShowCounterClaimAgainstWhoStep(req: Request): boolean {
+  return getCounterClaimNeedHelpWithFees(req) === 'NO' && hasMultipleParties(req);
+}
+
+export function shouldShowCounterClaimAboutStep(req: Request): boolean {
+  return getCounterClaimNeedHelpWithFees(req) === 'NO';
 }
 
 export function hasSingleLinkedDefendant(req: Request): boolean {
