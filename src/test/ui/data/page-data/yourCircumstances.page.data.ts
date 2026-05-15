@@ -1,6 +1,5 @@
 export const yourCircumstances = {
   mainHeader: `Your circumstances`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   youCanUseThisSectionParagraph: `You can use this section to give details about any events or circumstances that have impacted your case that you think a judge should know about.`,
@@ -20,7 +19,7 @@ export const yourCircumstances = {
   emojiTextInput: `👉 😄`,
   emojiGiveGiveDetailsAboutYourCircumstancesErrorMessage: `Give details about your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   selectCircumstancesErrorMessage: `Select if you’d like to share anything about your circumstances`,
-  mustBe500CharactersOrFewerErrorMessage: `Must be 500 characters or fewer`,
+  mustBe500CharactersOrFewerErrorMessage: `Circumstances details must be 500 characters or less`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `your-circumstances`,
 };
