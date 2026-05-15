@@ -9,7 +9,7 @@ export function shouldShowResponseSubmittedConfirmationStep(caseData: CcdCaseDat
 }
 
 //  Response and counterclaim submitted (with Help With Fees reference).
-export function shouldShowResponseAndCounterclaimSubmittedConfirmationStep(caseData: CcdCaseData | undefined): boolean {
+export function shouldShowResponseAndCounterClaimSubmittedConfirmationStep(caseData: CcdCaseData | undefined): boolean {
   const defendantResponses = getDefendantResponses(caseData);
   if (defendantResponses?.makeCounterClaim !== 'YES') {
     return false;
@@ -18,7 +18,7 @@ export function shouldShowResponseAndCounterclaimSubmittedConfirmationStep(caseD
 }
 
 //  Response submitted with counterclaim, but fee payment needed (no Help With Fees reference).
-export function shouldShowCounterclaimFeePaymentNeededConfirmationStep(caseData: CcdCaseData | undefined): boolean {
+export function shouldShowCounterClaimFeePaymentNeededConfirmationStep(caseData: CcdCaseData | undefined): boolean {
   const defendantResponses = getDefendantResponses(caseData);
   if (defendantResponses?.makeCounterClaim !== 'YES') {
     return false;
@@ -33,8 +33,8 @@ export function getRespondToClaimConfirmationPath(caseId: string, caseData: CcdC
   if (shouldShowResponseSubmittedConfirmationStep(caseData)) {
     return `${base}/response-submitted`;
   }
-  if (shouldShowResponseAndCounterclaimSubmittedConfirmationStep(caseData)) {
-    return `${base}/response-and-counterclaim-submitted`;
+  if (shouldShowResponseAndCounterClaimSubmittedConfirmationStep(caseData)) {
+    return `${base}/response-and-counter-claim-submitted`;
   }
-  return `${base}/response-submitted-counterclaim-fee-payment-needed`;
+  return `${base}/response-submitted-counter-claim-fee-payment-needed`;
 }

@@ -43,9 +43,9 @@ import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
-import { step as responseAndCounterclaimSubmitted } from './response-and-counterclaim-submitted';
+import { step as responseAndCounterClaimSubmitted } from './response-and-counter-claim-submitted';
 import { step as responseSubmitted } from './response-submitted';
-import { step as responseSubmittedCounterclaimFeePaymentNeeded } from './response-submitted-counterclaim-fee-payment-needed';
+import { step as responseSubmittedCounterClaimFeePaymentNeeded } from './response-submitted-counter-claim-fee-payment-needed';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
 import { step as supportNeeds } from './support-needs';
@@ -116,6 +116,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'language-used': languageUsed,
   'check-your-answers': checkYourAnswers,
   'response-submitted': responseSubmitted,
-  'response-submitted-counterclaim-fee-payment-needed': responseSubmittedCounterclaimFeePaymentNeeded,
-  'response-and-counterclaim-submitted': responseAndCounterclaimSubmitted,
+  'response-submitted-counter-claim-fee-payment-needed': responseSubmittedCounterClaimFeePaymentNeeded,
+  'response-and-counter-claim-submitted': responseAndCounterClaimSubmitted,
 };

@@ -24,7 +24,7 @@ export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityF
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
 export {
   getRespondToClaimConfirmationPath,
-  shouldShowCounterclaimFeePaymentNeededConfirmationStep,
-  shouldShowResponseAndCounterclaimSubmittedConfirmationStep,
+  shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
   shouldShowResponseSubmittedConfirmationStep,
 } from './postSubmissionRouting';

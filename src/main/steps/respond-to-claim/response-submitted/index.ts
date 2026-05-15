@@ -8,6 +8,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   fields: [],
   translationKeys: {
     pageTitle: 'pageTitle',
+    responseSubmittedParagraph1: 'responseSubmittedParagraph1',
+    responseSubmittedHeading1: 'responseSubmittedHeading1',
+    responseSubmittedListItem1: 'responseSubmittedListItem1',
+    responseSubmittedListItem2: 'responseSubmittedListItem2',
+    responseSubmittedHeading2: 'responseSubmittedHeading2',
+    responseSubmittedParagraph2: 'responseSubmittedParagraph2',
   },
   customTemplate: `${__dirname}/responseSubmitted.njk`,
 });

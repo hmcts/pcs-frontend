@@ -9,8 +9,8 @@ import {
   isNoticeServed,
   isTenancyStartDateKnown,
   isWalesProperty,
-  shouldShowCounterclaimFeePaymentNeededConfirmationStep,
-  shouldShowResponseAndCounterclaimSubmittedConfirmationStep,
+  shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
   shouldShowResponseSubmittedConfirmationStep,
 } from '../utils';
 
@@ -90,8 +90,8 @@ export const flowConfig: JourneyFlowConfig = {
     'language-used',
     'check-your-answers',
     'response-submitted',
-    'response-submitted-counterclaim-fee-payment-needed',
-    'response-and-counterclaim-submitted',
+    'response-submitted-counter-claim-fee-payment-needed',
+    'response-and-counter-claim-submitted',
   ],
   steps: {
     'defendant-name-confirmation': {
@@ -186,13 +186,13 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) =>
         shouldShowResponseSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
     },
-    'response-submitted-counterclaim-fee-payment-needed': {
+    'response-submitted-counter-claim-fee-payment-needed': {
       showCondition: (req: Request) =>
-        shouldShowCounterclaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
     },
-    'response-and-counterclaim-submitted': {
+    'response-and-counter-claim-submitted': {
       showCondition: (req: Request) =>
-        shouldShowResponseAndCounterclaimSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
+        shouldShowResponseAndCounterClaimSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
     },
   },
 };
