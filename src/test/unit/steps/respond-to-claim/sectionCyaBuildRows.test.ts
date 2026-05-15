@@ -96,6 +96,72 @@ describe('section-CYA row builders — characterisation', () => {
       );
       expect(row?.value).toEqual({ text: 'options.YES' });
     });
+
+    it('correspondence-address: shows confirmation Q/A when claim has a defendant address and user said YES', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { correspondenceAddressConfirmation: 'YES' },
+            claimantEnteredDefendantDetails: {
+              addressKnown: 'YES',
+              address: { AddressLine1: '1 Claim Street', PostCode: 'AB1 2CD' },
+            },
+          },
+        },
+      });
+      const row = buildPersonalRows(reqWith(validatedCase), t).find(
+        r => r.key.text === 'rows.correspondenceAddressConfirmation.label'
+      );
+      expect(row?.value).toEqual({ text: 'options.YES' });
+    });
+
+    it('correspondence-address: shows alt address as value when claim has a defendant address and user said NO', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { correspondenceAddressConfirmation: 'NO' },
+            claimantEnteredDefendantDetails: {
+              addressKnown: 'YES',
+              address: { AddressLine1: '1 Claim Street', PostCode: 'AB1 2CD' },
+            },
+            defendantContactDetails: {
+              party: { address: { AddressLine1: '99 New Road', PostCode: 'XY1 9ZZ' } },
+            },
+          },
+        },
+      });
+      const row = buildPersonalRows(reqWith(validatedCase), t).find(
+        r => r.key.text === 'rows.correspondenceAddressConfirmation.label'
+      );
+      expect(row?.value).toMatchObject({ html: expect.stringContaining('99 New Road') });
+    });
+
+    it('correspondence-address: renders plain row (no fabricated Q/A) when claim recorded no defendant address', () => {
+      // Reproduces case 1777294706554860: claimant ticked "I don't know defendant's address" at
+      // filing, user typed their address on the NA page. The forged correspondenceAddressConfirmation
+      // value coming from the NA template's hidden field must NOT cause CYA to render a Y/N row
+      // anchored on propertyAddress.
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          propertyAddress: { AddressLine1: '1 Rse Way', PostCode: 'SW11 1PD' },
+          possessionClaimResponse: {
+            defendantResponses: { correspondenceAddressConfirmation: 'NO' },
+            claimantEnteredDefendantDetails: { addressKnown: 'NO' },
+            defendantContactDetails: {
+              party: { address: { AddressLine1: '3 Wiltshire Close', PostCode: 'WA1 4DA' } },
+            },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const row = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
+      expect(row?.value).toMatchObject({ html: expect.stringContaining('3 Wiltshire Close') });
+      // Crucially: the Y/N confirmation row must not be present.
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
+    });
   });
 
   describe('dispute-and-tenancy', () => {

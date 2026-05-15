@@ -102,25 +102,42 @@ function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void
 }
 
 function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowContext): void {
-  const confirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
-  if (!confirmation) {
+  // The page renders the Y/N confirmation template iff the claim recorded a defendant
+  // correspondence address (see correspondence-address/index.ts:getExistingAddress). Use the
+  // same signal here — `correspondenceAddressConfirmation` alone can't tell us which template
+  // the user actually saw, because the NA template submits a hidden `=no` purely to drive
+  // sub-field validation, not as a user answer.
+  const claimantAddress = formatCcdAddress(validatedCase.claimantEnteredDefendantDetails?.address);
+  const partyAddress = formatCcdAddress(validatedCase.defendantContactDetailsPartyAddress);
+
+  if (claimantAddress) {
+    // Y/N path — render the confirmation Q/A keyed off the claimant-provided anchor.
+    const confirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
+    if (!confirmation) {
+      return;
+    }
+    const value: SummaryListRow['value'] =
+      confirmation === 'NO' && partyAddress
+        ? { html: escapeHtml(partyAddress) }
+        : { text: t(`options.${confirmation}`) };
+    rows.push({
+      key: { text: t('rows.correspondenceAddressConfirmation.label', { address: claimantAddress }) },
+      value,
+      actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
+    });
     return;
   }
-  const propertyAddress = formatCcdAddress(validatedCase.propertyAddress);
-  const partyAddress = formatCcdAddress(validatedCase.defendantContactDetailsPartyAddress);
-  const addressInQuestion = propertyAddress || partyAddress;
-  const value: SummaryListRow['value'] =
-    confirmation === 'NO' && partyAddress ? { html: escapeHtml(partyAddress) } : { text: t(`options.${confirmation}`) };
+
+  // NA path — no confirmation question was asked. Render a plain row when the user has typed
+  // an address; ignore any storage-level `correspondenceAddressConfirmation` value (it's
+  // form-builder plumbing on this branch, not a user answer).
+  if (!partyAddress) {
+    return;
+  }
   rows.push({
-    key: {
-      text: addressInQuestion
-        ? t('rows.correspondenceAddressConfirmation.label', { address: addressInQuestion })
-        : t('rows.correspondenceAddressConfirmation.fallbackLabel'),
-    },
-    value,
-    actions: {
-      items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')],
-    },
+    key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
+    value: { html: escapeHtml(partyAddress) },
+    actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
   });
 }
 
