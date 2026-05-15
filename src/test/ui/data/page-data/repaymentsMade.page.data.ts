@@ -2,7 +2,6 @@ export const repaymentsMade = {
   getmainHeader: (claimantName: string): string => {
     return `Have you paid any money to ${claimantName} since 16th June 2025?`;
   },
-  respondToClaimParagraph: `Respond to a property possession claim`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   giveDetailsHiddenTextLabel: `Give details about how much you paid and when`,
@@ -15,7 +14,9 @@ export const repaymentsMade = {
   getSelectIfYouPaidAnyMoneyErrorMessage: (claimantName: string): string =>
     `Select if you’ve paid any money to ${claimantName} since 16th June 2025`,
   giveDetailsAboutHowMuchYouPaidErrorMessage: `Give details about how much you paid and when`,
-  mustBeUnderCharacterLimitErrorMessage: `Must be 500 characters or fewer`,
+  mustBeUnderCharacterLimitErrorMessage: `Payment details must be 500 characters or less`,
+  emojiTextInput: `👉 😄`,
+  emojiErrorMessage: `Give details about how much you paid and when must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
