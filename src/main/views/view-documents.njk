@@ -68,7 +68,7 @@
       <h1 class="govuk-heading-l">{{ t('dashboard:viewDocuments.pageTitle') }}</h1>
       <p class="govuk-body-m">
         {{ t('dashboard:caseReferenceLabel') }}
-        <span role="text" aria-label="{{ caseReference | speakDigits }}">{{ caseReference | caseReferenceDisplay }}</span>
+        {{ caseReference | caseReferenceDisplay }}
       </p>
     </div>
 
