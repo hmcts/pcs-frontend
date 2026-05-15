@@ -1,17 +1,6 @@
 {
   "pageTitle": "Check your answers",
   "cardTitle": "Payments and agreements",
-  "back": "Back",
-  "change": "Change",
-  "buttons": {
-    "saveAndContinue": "Save and continue",
-    "saveForLater": "Save for later"
-  },
-  "options": {
-    "YES": "Yes",
-    "NO": "No",
-    "NOT_SURE": "Not sure"
-  },
   "rows": {
     "anyPaymentsMade": {
       "label": "Have you made any repayments to your landlord?",

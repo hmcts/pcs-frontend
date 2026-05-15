@@ -1,17 +1,6 @@
 {
   "pageTitle": "Check your answers",
   "cardTitle": "Income and expenses",
-  "back": "Back",
-  "change": "Change",
-  "noAnswerProvided": "No answer provided",
-  "buttons": {
-    "saveAndContinue": "Save and continue",
-    "saveForLater": "Save for later"
-  },
-  "options": {
-    "YES": "Yes",
-    "NO": "No"
-  },
   "frequencies": {
     "WEEKLY": "a week",
     "MONTHLY": "a month"

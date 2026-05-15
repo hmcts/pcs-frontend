@@ -1,11 +1,5 @@
 {
   "pageTitle": "Check your answers",
-  "back": "Back",
-  "change": "Change",
-  "buttons": {
-    "saveAndContinue": "Save and continue",
-    "saveForLater": "Save for later"
-  },
   "rows": {
     "freeLegalAdvice": {
       "label": "Have you had free legal advice?",

@@ -1,17 +1,6 @@
 {
   "pageTitle": "Check your answers",
   "cardTitle": "Your situation and circumstances",
-  "back": "Back",
-  "change": "Change",
-  "buttons": {
-    "saveAndContinue": "Save and continue",
-    "saveForLater": "Save for later"
-  },
-  "options": {
-    "YES": "Yes",
-    "NO": "No",
-    "NOT_SURE": "Not sure"
-  },
   "rows": {
     "dependantChildren": {
       "label": "Do you have any dependant children?",

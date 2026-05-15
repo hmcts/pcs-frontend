@@ -1,12 +1,6 @@
 {
   "pageTitle": "cy Check your answers",
   "cardTitle": "cy Upload files",
-  "back": "cy Back",
-  "change": "cy Change",
-  "buttons": {
-    "saveAndContinue": "cy Save and continue",
-    "saveForLater": "cy Save for later"
-  },
   "rows": {
     "uploadedDocuments": {
       "label": "cy Documents you have uploaded",

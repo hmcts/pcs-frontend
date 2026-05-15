@@ -32,14 +32,14 @@
     "yes": "cyYes",
     "no": "cyNo",
     "or": "cyor",
-    "imNotSure": "cyI'm not sure"
+    "imNotSure": "cyI'm not sure",
+    "YES": "cyYes",
+    "NO": "cyNo",
+    "NOT_SURE": "cyNot sure"
   },
   "change": "cyChange",
   "back": "cyBack",
-  "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
-  },
+  "noAnswerProvided": "cyNo answer provided",
   "date": {
     "day": "cyDay",
     "month": "cyMonth",

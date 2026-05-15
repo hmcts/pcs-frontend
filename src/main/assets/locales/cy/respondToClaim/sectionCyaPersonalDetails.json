@@ -1,16 +1,6 @@
 {
   "pageTitle": "cy Check your answers",
   "cardTitle": "cy Personal details",
-  "back": "cy Back",
-  "change": "cy Change",
-  "buttons": {
-    "saveAndContinue": "cy Save and continue",
-    "saveForLater": "cy Save for later"
-  },
-  "options": {
-    "YES": "cy Yes",
-    "NO": "cy No"
-  },
   "rows": {
     "defendantNameConfirmation": {
       "label": "cy Is your name {{name}}?",

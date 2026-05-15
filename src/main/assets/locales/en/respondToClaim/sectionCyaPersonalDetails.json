@@ -1,16 +1,6 @@
 {
   "pageTitle": "Check your answers",
   "cardTitle": "Personal details",
-  "back": "Back",
-  "change": "Change",
-  "buttons": {
-    "saveAndContinue": "Save and continue",
-    "saveForLater": "Save for later"
-  },
-  "options": {
-    "YES": "Yes",
-    "NO": "No"
-  },
   "rows": {
     "defendantNameConfirmation": {
       "label": "Is your name {{name}}?",

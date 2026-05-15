@@ -1,17 +1,6 @@
 {
   "pageTitle": "cy Check your answers",
   "cardTitle": "cy Income and expenses",
-  "back": "cy Back",
-  "change": "cy Change",
-  "noAnswerProvided": "cy No answer provided",
-  "buttons": {
-    "saveAndContinue": "cy Save and continue",
-    "saveForLater": "cy Save for later"
-  },
-  "options": {
-    "YES": "cy Yes",
-    "NO": "cy No"
-  },
   "frequencies": {
     "WEEKLY": "cy a week",
     "MONTHLY": "cy a month"

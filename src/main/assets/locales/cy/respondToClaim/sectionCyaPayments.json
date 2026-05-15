@@ -1,17 +1,6 @@
 {
   "pageTitle": "cy Check your answers",
   "cardTitle": "cy Payments and agreements",
-  "back": "cy Back",
-  "change": "cy Change",
-  "buttons": {
-    "saveAndContinue": "cy Save and continue",
-    "saveForLater": "cy Save for later"
-  },
-  "options": {
-    "YES": "cy Yes",
-    "NO": "cy No",
-    "NOT_SURE": "cy Not sure"
-  },
   "rows": {
     "anyPaymentsMade": {
       "label": "cy Have you made any repayments to your landlord?",

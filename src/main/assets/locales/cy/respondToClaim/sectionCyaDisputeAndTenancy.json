@@ -1,16 +1,7 @@
 {
   "pageTitle": "cy Check your answers",
   "cardTitle": "cy Dispute and tenancy",
-  "back": "cy Back",
-  "change": "cy Change",
-  "buttons": {
-    "saveAndContinue": "cy Save and continue",
-    "saveForLater": "cy Save for later"
-  },
   "options": {
-    "YES": "cy Yes",
-    "NO": "cy No",
-    "NOT_SURE": "cy Not sure",
     "yes": "cy Yes",
     "no": "cy No",
     "imNotSure": "cy I'm not sure"

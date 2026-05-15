@@ -32,14 +32,14 @@
     "yes": "Yes",
     "no": "No",
     "or": "or",
-    "imNotSure": "I'm not sure"
+    "imNotSure": "I'm not sure",
+    "YES": "Yes",
+    "NO": "No",
+    "NOT_SURE": "Not sure"
   },
   "change": "Change",
   "back": "Back",
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
+  "noAnswerProvided": "No answer provided",
   "date": {
     "day": "Day",
     "month": "Month",

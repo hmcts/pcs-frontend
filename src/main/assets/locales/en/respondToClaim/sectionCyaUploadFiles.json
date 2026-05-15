@@ -1,12 +1,6 @@
 {
   "pageTitle": "Check your answers",
   "cardTitle": "Upload files",
-  "back": "Back",
-  "change": "Change",
-  "buttons": {
-    "saveAndContinue": "Save and continue",
-    "saveForLater": "Save for later"
-  },
   "rows": {
     "uploadedDocuments": {
       "label": "Documents you have uploaded",
