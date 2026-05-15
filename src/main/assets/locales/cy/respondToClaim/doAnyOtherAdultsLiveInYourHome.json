@@ -2,9 +2,6 @@
   "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyOther adults",
   "question": "cyDo any other adults live in your home?",
-  "heading": " ",
-  "dependantHeading": " ",
-  "dependantQuestion": " ",
   "options": {
     "yes": "cyYes",
     "no": "cyNo"

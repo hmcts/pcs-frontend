@@ -17,16 +17,15 @@
     <span class="govuk-caption-l">{{ caption }}</span>
   {% endif %}
 
-  
-  {% if heading %}
+  {% if heading != "heading"%}
     <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% endif %}
 
-  {% if dependantHeading %}
+  {% if dependantHeading != "dependantHeading" %}
     <h2 class="govuk-heading-m">{{ dependantHeading }}</h2>
   {% endif %}
 
-  {% if dependantQuestion %}
+  {% if dependantQuestion != "dependantQuestion" %}
     <p class="govuk-heading-s">{{ dependantQuestion }} </p>
   {% endif %}
  

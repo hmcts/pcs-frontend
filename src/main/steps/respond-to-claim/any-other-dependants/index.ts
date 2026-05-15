@@ -14,7 +14,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     caption: 'caption',
     paragraph: 'otherDependantsParagraph',
-    caseNumber: 'caseNumber',
     dependantHeading: 'dependantHeading',
     dependantQuestion: 'dependantQuestion',
   },
