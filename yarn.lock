@@ -2167,21 +2167,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:0.218.0":
+"@opentelemetry/api-logs@npm:0.218.0, @opentelemetry/api-logs@npm:^0.218.0":
   version: 0.218.0
   resolution: "@opentelemetry/api-logs@npm:0.218.0"
   dependencies:
     "@opentelemetry/api": "npm:^1.3.0"
   checksum: 10/201bd373978b894962992238359da8a63119ad516f94768902a2821af01a268660e4ed36ac6a853fb99c5a42196f6887e4aff8d8ed5096ae7dfb2f8158a24a85
-  languageName: node
-  linkType: hard
-
-"@opentelemetry/api-logs@npm:^0.216.0":
-  version: 0.216.0
-  resolution: "@opentelemetry/api-logs@npm:0.216.0"
-  dependencies:
-    "@opentelemetry/api": "npm:^1.3.0"
-  checksum: 10/9c88a320756e9ccde9fa82f4067eed1d73dab432851a678bfe337e7f035383f176a26a28bc1cd2fc25fc89279306d40c5a98e4419c760da8210572077e9f719b
   languageName: node
   linkType: hard
 
@@ -2736,16 +2727,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.64.0":
-  version: 0.64.0
-  resolution: "@opentelemetry/instrumentation-redis@npm:0.64.0"
+"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.66.0":
+  version: 0.66.0
+  resolution: "@opentelemetry/instrumentation-redis@npm:0.66.0"
   dependencies:
-    "@opentelemetry/instrumentation": "npm:^0.216.0"
+    "@opentelemetry/instrumentation": "npm:^0.218.0"
     "@opentelemetry/redis-common": "npm:^0.38.3"
     "@opentelemetry/semantic-conventions": "npm:^1.27.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/2a3a93db5c45cb2bad724b7ca8bc1caf5f4913226263e763d19817646e43d4f4f5c843c5dc5ff469acf4365c24d65b084ba46d7da90152d226a9463a8c632c07
+  checksum: 10/41365cd99b22d116be3fb3bf87bdfe72b1aa525705c6e61a6a83598c149cad4b7b7742de0d1db50b0dbd28ef357c671743a6b89360492dcdcaad742633c41966
   languageName: node
   linkType: hard
 
@@ -2787,15 +2778,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-winston@npm:0.60.0":
-  version: 0.60.0
-  resolution: "@opentelemetry/instrumentation-winston@npm:0.60.0"
+"@opentelemetry/instrumentation-winston@npm:0.62.0":
+  version: 0.62.0
+  resolution: "@opentelemetry/instrumentation-winston@npm:0.62.0"
   dependencies:
-    "@opentelemetry/api-logs": "npm:^0.216.0"
-    "@opentelemetry/instrumentation": "npm:^0.216.0"
+    "@opentelemetry/api-logs": "npm:^0.218.0"
+    "@opentelemetry/instrumentation": "npm:^0.218.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/836879fffa10a69b96348208b778b313ea5294a6022376485fa40102bc2d4a17143ee10a1ab40723f51d0514b48605b7a6df96619c71481643084a253833c712
+  checksum: 10/654b73ce2b78ec919d07a135ad77b8350955a839d68f6ec23369a2422c85ed3751620426309448fcb34e3b6c9c4acb7c2be9acd22d275b39b6baf6c261574f0f
   languageName: node
   linkType: hard
 
@@ -8973,15 +8964,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:26.1.0":
-  version: 26.1.0
-  resolution: "i18next@npm:26.1.0"
+"i18next@npm:26.2.0":
+  version: 26.2.0
+  resolution: "i18next@npm:26.2.0"
   peerDependencies:
     typescript: ^5 || ^6
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/ed33be2d5e5ce8a0b47734aa9f58d8473833cbd5cef1b2f1ff9b009d1f6471754083612d195273ce11df0cb5996989774fc25592f8a80f5216d9f5ee4ac78d42
+  checksum: 10/0c08971dd1791ebc6c9e7b6d3a2fe858f6bbfc237ad34ddb040e0bd67ce1d1a69eda38b8091661253e440d08b72bb595e13ef109398d24773dcd6c4a6d2f3a44
   languageName: node
   linkType: hard
 
@@ -11970,7 +11961,7 @@ __metadata:
     "@launchdarkly/node-server-sdk": "npm:9.10.14"
     "@ministryofjustice/frontend": "npm:^8.0.1"
     "@opentelemetry/api": "npm:1.9.1"
-    "@opentelemetry/instrumentation-winston": "npm:0.60.0"
+    "@opentelemetry/instrumentation-winston": "npm:0.62.0"
     "@pact-foundation/pact": "npm:15.0.1"
     "@pact-foundation/pact-cli": "npm:18.0.0"
     "@playwright/test": "npm:1.59.1"
@@ -12026,7 +12017,7 @@ __metadata:
     html-webpack-plugin: "npm:5.6.7"
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
-    i18next: "npm:26.1.0"
+    i18next: "npm:26.2.0"
     i18next-fs-backend: "npm:2.6.5"
     i18next-http-middleware: "npm:3.9.6"
     ioredis: "npm:5.10.1"
