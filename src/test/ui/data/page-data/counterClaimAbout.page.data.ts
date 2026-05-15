@@ -1,4 +1,4 @@
 export const counterClaimAbout = {
-  mainHeader: `Counter claim about (placeholder)`,
-  saveAndContinueButton: 'Save and continue',
+  mainHeader: `About your counter-claim (placeholder)`,
+  continueButton: 'Continue',
 };

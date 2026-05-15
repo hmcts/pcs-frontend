@@ -306,7 +306,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -451,7 +451,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -618,7 +618,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -739,7 +739,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -884,7 +884,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -1163,7 +1163,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', counterClaimAgainstWhom.mainHeader);
     await performAction('clickButton', counterClaimAgainstWhom.continueButton);
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1292,7 +1292,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', counterClaimAgainstWhom.mainHeader);
     await performAction('clickButton', counterClaimAgainstWhom.continueButton);
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),

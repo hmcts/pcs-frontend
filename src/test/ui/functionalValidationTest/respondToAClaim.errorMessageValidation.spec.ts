@@ -319,7 +319,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', counterClaimAgainstWhom.continueButton);
 
     await softErrorMessageValidation('counterClaimAbout', NO_EMV_READ_ONLY);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
 
     await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
@@ -331,7 +331,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
 
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
@@ -569,7 +569,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
 
