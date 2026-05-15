@@ -63,6 +63,39 @@ describe('section-CYA row builders — characterisation', () => {
       expect(keys).toContain('rows.dateOfBirth.label');
       expect(keys).toContain('rows.contactByPhone.label');
     });
+
+    it('name row: shows corrected name when user said "No" to claim-recorded name', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { defendantNameConfirmation: 'NO' },
+            defendantContactDetails: { party: { firstName: 'Jane', lastName: 'Doe' } },
+            claimantEnteredDefendantDetails: { firstName: 'John', lastName: 'Smith' },
+          },
+        },
+      });
+      const row = buildPersonalRows(reqWith(validatedCase), t).find(
+        r => r.key.text === 'rows.defendantNameConfirmation.label'
+      );
+      expect(row?.value).toEqual({ html: 'options.NO (Jane Doe)' });
+    });
+
+    it('name row: shows just "Yes" when user confirmed claim-recorded name', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { defendantNameConfirmation: 'YES' },
+            claimantEnteredDefendantDetails: { firstName: 'John', lastName: 'Smith' },
+          },
+        },
+      });
+      const row = buildPersonalRows(reqWith(validatedCase), t).find(
+        r => r.key.text === 'rows.defendantNameConfirmation.label'
+      );
+      expect(row?.value).toEqual({ text: 'options.YES' });
+    });
   });
 
   describe('dispute-and-tenancy', () => {

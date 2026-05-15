@@ -2,7 +2,7 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { formatIsoDate } from '../../utils';
+import { formatIsoDate, normalizeYesNoValue } from '../../utils';
 import { formatCcdAddress } from '../../utils/ccdAddress';
 import { type SummaryListRow, getValidatedCase, makeChange } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
@@ -62,9 +62,17 @@ function addNameRow({ rows, validatedCase, t, change }: RowContext): void {
   const claimDefendantName = validatedCase.claimantEnteredDefendantDetailsName;
   if (nameConfirmation && claimDefendantName) {
     // Branch 1: claim recorded the defendant name — user confirmed (Y/N).
+    // When "No", the corrected name lives on defendantContactDetails.party — append
+    // it so the CYA shows what the user actually entered (matches the
+    // tenancyType / rentArrears "No (correction)" pattern).
+    const correctedName = validatedCase.defendantContactDetailsPartyName?.trim();
+    const value =
+      normalizeYesNoValue(nameConfirmation) === 'NO' && correctedName
+        ? { html: escapeHtml(`${t('options.NO')} (${correctedName})`) }
+        : { text: t(`options.${nameConfirmation}`) };
     rows.push({
       key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
-      value: { text: t(`options.${nameConfirmation}`) },
+      value,
       actions: { items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')] },
     });
     return;
