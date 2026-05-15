@@ -39,8 +39,8 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-import { accessYourCaseErrorValidation } from '../functional/accessYourCase.pft';
 import { haveYouAlreadyAppliedForHelp } from '../data/page-data/genApps-page-data/haveYouAlreadyAppliedForHelp.page.data';
+import { accessYourCaseErrorValidation } from '../functional/accessYourCase.pft';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
