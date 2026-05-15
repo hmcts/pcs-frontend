@@ -6,6 +6,8 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimAbout,
+  counterClaimAgainstWhom,
   counterClaimFee,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
@@ -40,6 +42,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -56,6 +59,26 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'NO';
   } else {
     process.env.NOTICE_SERVED = 'YES';
+  }
+
+  //paymentInterstitial back navigation
+  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
+    process.env.I_NEED_HELP = 'YES';
+  } else {
+    process.env.I_NEED_HELP = 'NO';
+  }
+
+  if (testInfo.title.includes('@rentNonRent')) {
+    process.env.TENANCY_START_DATE_KNOWN = 'YES';
+    process.env.RENT_NON_RENT = 'YES';
+  } else {
+    process.env.RENT_NON_RENT = 'NO';
+  }
+
+  if (testInfo.title.includes('SelectCounterClaim - No')) {
+    process.env.SELECT_COUNTER_CLAIM = 'NO';
+  } else {
+    process.env.SELECT_COUNTER_CLAIM = 'YES';
   }
 
   const isRentArrearsOnly =
@@ -112,13 +135,6 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.RENT_NON_RENT = 'NO';
   }
 
-  if (testInfo.title.includes('@rentNonRent')) {
-    process.env.TENANCY_START_DATE_KNOWN = 'YES';
-    process.env.RENT_NON_RENT = 'YES';
-  } else {
-    process.env.RENT_NON_RENT = 'NO';
-  }
-
   // Check notice date provided for back link navigation
   if (testInfo.title.includes('NoticeDateProvided - No')) {
     process.env.NOTICE_DATE_PROVIDED = 'NO';
@@ -158,6 +174,22 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.INCOME_AND_EXPENSES = 'NO';
   } else {
     process.env.INCOME_AND_EXPENSES = 'YES';
+  }
+
+  //counterClaimFee back link navigation
+  if (testInfo.title.includes('SomethingElse')) {
+    process.env.SOMETHING_ELSE = 'YES';
+  } else {
+    process.env.SOMETHING_ELSE = 'NO';
+  }
+
+  //Check if Yes is selected on Priority debts page - for back link navigation of Priority debt details page
+  if (testInfo.title.includes('PriorityDebts - Yes')) {
+    process.env.PRIORITY_DEBTS = 'YES';
+  }
+  //Check if Universal Credit is selected on Regular income page - for back link navigation of Priority Debts page
+  if (testInfo.title.includes('RegularIncome - Universal Credit')) {
+    process.env.REGULAR_INCOME = 'UNIVERSAL_CREDIT';
   }
 
   if (testInfo.title.includes('@noDefendants')) {
@@ -263,8 +295,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.yesRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -302,10 +339,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.monthRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave', {
       regularIncomeOptions: [
         [
@@ -337,8 +380,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown -  Income - no @assured @regression', async () => {
-    //incomeAndExpenses - no - Upload docs
+  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown -  Income - no @assured @regression', async () => {
+    //incomeAndExpenses - no - Upload docs - Single named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -393,8 +436,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.noRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -437,7 +485,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
+  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - SomethingElse @secureFlexible @regression', async () => {
     //Income and expenses - yes - no option On regular Income - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
@@ -488,8 +536,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -516,12 +568,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
@@ -539,7 +599,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Non-RentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
+  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
@@ -592,8 +652,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.noRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -645,12 +710,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
+      ...getRelativeDate(-5),
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave', {
       regularIncomeOptions: [
         [
@@ -725,8 +793,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.noRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -756,12 +829,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.monthRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave', {
       regularIncomeOptions: [
         [
@@ -792,8 +873,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
-    //universal credit with all other options - priority debts
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp @regression', async () => {
+    //universal credit with all other options - priority debts - No - Multiple namedParties - iNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -833,8 +914,24 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: rentArrears.yesRadioOption,
     });
     await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
+      option: counterClaim.yesRadioOption,
     });
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueFEE0508Input,
+    });
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueFEE0508Input,
+    });
+    await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -899,10 +996,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
@@ -920,7 +1017,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No - PriorityDebts - Yes @regression', async () => {
+    //ASumOfMoneyOrComp - multiple named parties - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -962,8 +1060,26 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       rentAmount: rentArrears.rentAmountTextInput,
     });
     await performAction('selectCounterClaim', {
-      option: counterClaim.noRadioOption,
+      option: counterClaim.yesRadioOption,
     });
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performValidation('mainHeader', counterClaimAgainstWhom.mainHeader);
+    await performAction('clickButton', counterClaimAgainstWhom.continueButton);
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1003,12 +1119,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
+      ...getRelativeDate(-3),
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
@@ -1026,7 +1151,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute  @regression', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute - SomethingElse @regression', async () => {
+    //somethingElse - multiple named parties - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -1071,8 +1197,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    await performValidation('mainHeader', counterClaimAgainstWhom.mainHeader);
+    await performAction('clickButton', counterClaimAgainstWhom.continueButton);
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1119,12 +1251,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
@@ -1142,7 +1276,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute @rentNonRent @regression', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - No @rentNonRent @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -1222,12 +1356,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,

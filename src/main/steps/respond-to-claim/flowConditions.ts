@@ -3,9 +3,11 @@ import { Request } from 'express';
 import {
   hasAnyRentArrearsGround,
   hasMultipleParties,
+  hasSelectedPriorityDebts,
   hasSelectedUniversalCredit,
   isFinanceDetailsProvided,
   isNoticeDateProvided,
+  isPriorityDebtsSelected,
   isUniversalCreditSelected,
   normalizeYesNoValue,
 } from '../utils';
@@ -34,9 +36,19 @@ export function hasRejectedRepaymentAgreement(req: Request): boolean {
 }
 
 export function hasConfirmedInstallmentOffer(req: Request): boolean {
+  if (req.body?.confirmInstallmentOffer === 'yes') {
+    return true;
+  }
+
+  const possessionClaimResponse = req.res?.locals?.validatedCase?.data?.possessionClaimResponse as
+    | {
+        defendantResponses?: { paymentAgreement?: { repayArrearsInstalments?: string } };
+        paymentAgreement?: { repayArrearsInstalments?: string };
+      }
+    | undefined;
   const ccdAnswer =
-    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
-      ?.repayArrearsInstalments;
+    possessionClaimResponse?.defendantResponses?.paymentAgreement?.repayArrearsInstalments ??
+    possessionClaimResponse?.paymentAgreement?.repayArrearsInstalments;
   return normalizeYesNoValue(ccdAnswer) === 'YES';
 }
 
@@ -54,6 +66,14 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
   }
 
   return !isUniversalCreditSelected(req) && !hasSelectedUniversalCredit(req);
+}
+
+export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
+  if (!hasProvidedFinanceDetails(req)) {
+    return false;
+  }
+
+  return isPriorityDebtsSelected(req) || hasSelectedPriorityDebts(req);
 }
 
 function getCounterClaimNeedHelpWithFees(req: Request) {

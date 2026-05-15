@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { noEmojiValidator } from '../../utils/fieldValidators';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -38,16 +39,7 @@ const createAmountValidator =
     return true;
   };
 
-const EMOJI_PATTERN = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
-
-const validateMoneyFromElsewhereDetails = (value: unknown): boolean | string => {
-  if (typeof value === 'string' && value.trim()) {
-    if (EMOJI_PATTERN.test(value)) {
-      return 'errors.moneyFromElsewhereDetails.invalidCharacters';
-    }
-  }
-  return true;
-};
+const validateMoneyFromElsewhereDetails = noEmojiValidator('errors.moneyFromElsewhereDetails.invalidCharacters');
 
 const validateIncomeFromJobsAmount = createAmountValidator(
   'errors.incomeFromJobsAmount.negative',
@@ -105,7 +97,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     // Universal Credit
-    if (fromYesNoEnum(hc.universalCredit) === 'yes') {
+    const appliedForUniversalCredit = fromYesNoEnum(hc.universalCredit);
+    if ((hc.universalCreditAmount || hc.universalCreditFrequency) && appliedForUniversalCredit !== 'no') {
       selectedIncome.push('universalCredit');
       if (hc.universalCreditAmount) {
         formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);
@@ -171,7 +164,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
           delete hc[amountKey];
         }
         if (frequency) {
-          hc[frequencyKey] = frequency as (typeof hc)[typeof frequencyKey];
+          hc[frequencyKey] = frequency as 'WEEKLY' | 'MONTHLY';
         } else {
           delete hc[frequencyKey];
         }
@@ -236,7 +229,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
 
   translationKeys: {
-    caption: 'caption',
     heading: 'heading',
     pageTitle: 'pageTitle',
     hintText: 'hintText',
