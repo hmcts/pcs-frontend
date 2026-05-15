@@ -33,7 +33,7 @@ export const flowConfig: JourneyFlowConfig = {
   useShowConditions: true,
   useSessionFormData: false,
   sections: respondToClaimSections,
-  nonSectionStepOrder: ['end-now', 'task-list', 'dispute-claim-interstitial'],
+  nonSectionStepOrder: ['end-now', 'dispute-claim-interstitial'],
   steps: {
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),

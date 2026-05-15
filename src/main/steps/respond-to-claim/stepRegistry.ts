@@ -50,7 +50,6 @@ import { step as sectionCyaUploadFiles } from './section-cya-upload-files';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
 import { step as supportNeeds } from './support-needs';
-import { step as taskList } from './task-list';
 import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
@@ -72,7 +71,6 @@ export const stepRegistry = {
   'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'end-now': endNow,
-  'task-list': taskList,
   'section-cya-start-now-and-details': sectionCyaStartNowAndDetails,
   'section-cya-personal-details': sectionCyaPersonalDetails,
   'section-cya-dispute-and-tenancy': sectionCyaDisputeAndTenancy,
