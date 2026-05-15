@@ -156,6 +156,7 @@
   "taskList": {
     "startNowAndDetails": "cy Read information about responding and free legal advice",
     "personalDetails": "cy Confirm your details and contact preferences",
-    "disputeAndTenancy": "cy Response"
+    "disputeAndTenancy": "cy Response",
+    "situationAndCircumstances": "cy Your circumstances"
   }
 }

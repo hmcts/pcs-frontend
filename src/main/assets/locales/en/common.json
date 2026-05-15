@@ -157,6 +157,7 @@
   "taskList": {
     "startNowAndDetails": "Read information about responding and free legal advice",
     "personalDetails": "Confirm your details and contact preferences",
-    "disputeAndTenancy": "Response"
+    "disputeAndTenancy": "Response",
+    "situationAndCircumstances": "Your circumstances"
   }
 }
