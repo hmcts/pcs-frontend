@@ -3,38 +3,25 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { formatIsoDate } from '../../utils';
+import { formatCcdAddress } from '../../utils/ccdAddress';
 import { type SummaryListRow, getValidatedCase, makeChange } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
+import type { CcdCaseModel } from '@services/ccdCaseData.model';
+
 const SECTION_ID: RespondToClaimSectionId = 'personalDetails';
 
-type Address = {
-  AddressLine1?: string;
-  AddressLine2?: string;
-  AddressLine3?: string;
-  PostTown?: string;
-  County?: string;
-  PostCode?: string;
-  Country?: string;
-};
-
-function formatAddress(addr?: Address): string {
-  if (!addr) {
-    return '';
-  }
-  return [addr.AddressLine1, addr.AddressLine2, addr.AddressLine3, addr.PostTown, addr.County, addr.PostCode]
-    .filter((s): s is string => Boolean(s && s.trim()))
-    .join(', ');
+interface RowContext {
+  rows: SummaryListRow[];
+  validatedCase: CcdCaseModel;
+  t: TFunction;
+  change: ReturnType<typeof makeChange>;
 }
 
-// GDS pattern: single value as text, multiple values as a bullet-less list
-// rendered with class govuk-list (matches the existing make-an-application
-// CYA escape-then-render approach). Inputs that may carry user-supplied
-// content (email address, phone number) are escaped via escape-html.
-function multiSelectValue(
-  items: string[],
-  userSuppliedItems: Set<string> = new Set()
-): { text?: string; html?: string } {
+// GDS multi-select pattern: a single value renders as text; many values render as a
+// govuk-list. Items in `userSuppliedItems` are HTML-escaped (the rest are translation
+// strings that are safe to render verbatim).
+function multiSelectValue(items: string[], userSuppliedItems: Set<string> = new Set()): SummaryListRow['value'] {
   if (items.length === 0) {
     return { text: '' };
   }
@@ -53,130 +40,146 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     return [];
   }
 
-  // Use flattened getters from CcdCaseModel — single source of truth.
+  const ctx: RowContext = {
+    rows: [],
+    validatedCase,
+    t,
+    change: makeChange(caseRef, SECTION_ID, t),
+  };
+
+  addNameRow(ctx);
+  addDateOfBirthRow(ctx);
+  addCorrespondenceAddressRow(ctx);
+  addContactByEmailOrPostRow(ctx);
+  addContactByPhoneRow(ctx);
+  addContactByTextRow(ctx);
+
+  return ctx.rows;
+}
+
+function addNameRow({ rows, validatedCase, t, change }: RowContext): void {
   const nameConfirmation = validatedCase.defendantResponsesDefendantNameConfirmation;
-  const partyName = validatedCase.defendantContactDetailsPartyName;
   const claimDefendantName = validatedCase.claimantEnteredDefendantDetailsName;
-  const dateOfBirth = validatedCase.defendantResponsesDateOfBirth;
-
-  // correspondenceAddressConfirmation has no flattened getter — read from the deep path.
-  const correspondenceAddressConfirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
-  const propertyAddress = formatAddress(validatedCase.propertyAddress as Address | undefined);
-  const partyAddress = formatAddress(validatedCase.defendantContactDetailsPartyAddress as Address | undefined);
-
-  const contactByEmail = validatedCase.defendantResponsesContactByEmail;
-  const contactByPost = validatedCase.defendantResponsesContactByPost;
-  const contactByPhone = validatedCase.defendantResponsesContactByPhone;
-  const contactByText = validatedCase.defendantResponsesContactByText;
-  const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber;
-  const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress;
-
-  const change = makeChange(caseRef, SECTION_ID, t);
-
-  const rows: SummaryListRow[] = [];
-
-  // Branch 1: claim recorded the defendant name → user CONFIRMED it (yes/no).
   if (nameConfirmation && claimDefendantName) {
+    // Branch 1: claim recorded the defendant name — user confirmed (Y/N).
     rows.push({
       key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
       value: { text: t(`options.${nameConfirmation}`) },
-      actions: {
-        items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')],
-      },
+      actions: { items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')] },
     });
-  } else if (partyName?.trim()) {
-    // Branch 2: user CAPTURED their name via defendant-name-capture (showCondition: nameKnown !== 'YES').
-    rows.push({
-      key: { text: t('rows.defendantName.label') },
-      value: { html: escapeHtml(partyName.trim()) },
-      actions: { items: [change('defendant-name-capture', 'rows.defendantName.changeHidden')] },
-    });
+    return;
   }
-
-  if (dateOfBirth) {
-    rows.push({
-      key: { text: t('rows.dateOfBirth.label') },
-      value: { text: formatIsoDate(dateOfBirth) },
-      actions: { items: [change('defendant-date-of-birth', 'rows.dateOfBirth.changeHidden')] },
-    });
+  // Branch 2: name captured via defendant-name-capture (shown when nameKnown !== 'YES').
+  const partyName = validatedCase.defendantContactDetailsPartyName?.trim();
+  if (!partyName) {
+    return;
   }
+  rows.push({
+    key: { text: t('rows.defendantName.label') },
+    value: { html: escapeHtml(partyName) },
+    actions: { items: [change('defendant-name-capture', 'rows.defendantName.changeHidden')] },
+  });
+}
 
-  if (correspondenceAddressConfirmation) {
-    const addressInQuestion = propertyAddress || partyAddress;
-    const value: { text?: string; html?: string } =
-      correspondenceAddressConfirmation === 'NO' && partyAddress
-        ? { html: escapeHtml(partyAddress) }
-        : { text: t(`options.${correspondenceAddressConfirmation}`) };
-    rows.push({
-      key: {
-        text: addressInQuestion
-          ? t('rows.correspondenceAddressConfirmation.label', { address: addressInQuestion })
-          : t('rows.correspondenceAddressConfirmation.fallbackLabel'),
-      },
-      value,
-      actions: {
-        items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')],
-      },
-    });
+function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void {
+  const dateOfBirth = validatedCase.defendantResponsesDateOfBirth;
+  if (!dateOfBirth) {
+    return;
   }
+  rows.push({
+    key: { text: t('rows.dateOfBirth.label') },
+    value: { text: formatIsoDate(dateOfBirth) },
+    actions: { items: [change('defendant-date-of-birth', 'rows.dateOfBirth.changeHidden')] },
+  });
+}
 
-  // Email / Post — multi-select. Single selection renders as text;
-  // multiple selections render as a govuk-list (GDS multi-select CYA pattern).
-  if (contactByEmail || contactByPost) {
-    const items: string[] = [];
-    const userSupplied = new Set<string>();
-    if (contactByEmail === 'YES') {
-      const emailLabel = t('rows.contactByEmailOrPost.options.email');
-      if (emailAddress?.trim()) {
-        const item = `${emailLabel} (${emailAddress.trim()})`;
-        items.push(item);
-        userSupplied.add(item);
-      } else {
-        items.push(emailLabel);
-      }
+function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowContext): void {
+  const confirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
+  if (!confirmation) {
+    return;
+  }
+  const propertyAddress = formatCcdAddress(validatedCase.propertyAddress);
+  const partyAddress = formatCcdAddress(validatedCase.defendantContactDetailsPartyAddress);
+  const addressInQuestion = propertyAddress || partyAddress;
+  const value: SummaryListRow['value'] =
+    confirmation === 'NO' && partyAddress ? { html: escapeHtml(partyAddress) } : { text: t(`options.${confirmation}`) };
+  rows.push({
+    key: {
+      text: addressInQuestion
+        ? t('rows.correspondenceAddressConfirmation.label', { address: addressInQuestion })
+        : t('rows.correspondenceAddressConfirmation.fallbackLabel'),
+    },
+    value,
+    actions: {
+      items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')],
+    },
+  });
+}
+
+function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowContext): void {
+  const contactByEmail = validatedCase.defendantResponsesContactByEmail;
+  const contactByPost = validatedCase.defendantResponsesContactByPost;
+  if (!contactByEmail && !contactByPost) {
+    return;
+  }
+  const items: string[] = [];
+  const userSupplied = new Set<string>();
+
+  if (contactByEmail === 'YES') {
+    const emailLabel = t('rows.contactByEmailOrPost.options.email');
+    const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress?.trim();
+    if (emailAddress) {
+      const item = `${emailLabel} (${emailAddress})`;
+      items.push(item);
+      userSupplied.add(item);
+    } else {
+      items.push(emailLabel);
     }
-    if (contactByPost === 'YES') {
-      items.push(t('rows.contactByEmailOrPost.options.post'));
-    }
-    rows.push({
-      key: { text: t('rows.contactByEmailOrPost.label') },
-      value:
-        items.length === 0
-          ? { text: t('rows.contactByEmailOrPost.options.none') }
-          : multiSelectValue(items, userSupplied),
-      actions: {
-        items: [change('contact-preferences-email-or-post', 'rows.contactByEmailOrPost.changeHidden')],
-      },
-    });
+  }
+  if (contactByPost === 'YES') {
+    items.push(t('rows.contactByEmailOrPost.options.post'));
   }
 
-  // Phone — value is the phone number when YES, otherwise the No answer.
-  if (contactByPhone) {
-    const value: { text?: string; html?: string } =
-      contactByPhone === 'YES' && phoneNumber?.trim()
-        ? { html: escapeHtml(phoneNumber.trim()) }
-        : { text: t(`options.${contactByPhone}`) };
-    rows.push({
-      key: { text: t('rows.contactByPhone.label') },
-      value,
-      actions: {
-        items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')],
-      },
-    });
-  }
+  rows.push({
+    key: { text: t('rows.contactByEmailOrPost.label') },
+    value:
+      items.length === 0
+        ? { text: t('rows.contactByEmailOrPost.options.none') }
+        : multiSelectValue(items, userSupplied),
+    actions: { items: [change('contact-preferences-email-or-post', 'rows.contactByEmailOrPost.changeHidden')] },
+  });
+}
 
-  // Text — only when phone is YES (matches showCondition AND
-  // the contact-preferences normaliser that drops contactByText
-  // when contactByPhone !== 'YES').
-  if (contactByPhone === 'YES' && contactByText) {
-    rows.push({
-      key: { text: t('rows.contactByText.label') },
-      value: { text: t(`options.${contactByText}`) },
-      actions: {
-        items: [change('contact-preferences-text-message', 'rows.contactByText.changeHidden')],
-      },
-    });
+function addContactByPhoneRow({ rows, validatedCase, t, change }: RowContext): void {
+  const contactByPhone = validatedCase.defendantResponsesContactByPhone;
+  if (!contactByPhone) {
+    return;
   }
+  const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber?.trim();
+  const value: SummaryListRow['value'] =
+    contactByPhone === 'YES' && phoneNumber
+      ? { html: escapeHtml(phoneNumber) }
+      : { text: t(`options.${contactByPhone}`) };
+  rows.push({
+    key: { text: t('rows.contactByPhone.label') },
+    value,
+    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')] },
+  });
+}
 
-  return rows;
+function addContactByTextRow({ rows, validatedCase, t, change }: RowContext): void {
+  // Text only applies when phone is YES (matches showCondition AND the contact-preferences
+  // normaliser that drops contactByText when contactByPhone !== 'YES').
+  if (validatedCase.defendantResponsesContactByPhone !== 'YES') {
+    return;
+  }
+  const contactByText = validatedCase.defendantResponsesContactByText;
+  if (!contactByText) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.contactByText.label') },
+    value: { text: t(`options.${contactByText}`) },
+    actions: { items: [change('contact-preferences-text-message', 'rows.contactByText.changeHidden')] },
+  });
 }

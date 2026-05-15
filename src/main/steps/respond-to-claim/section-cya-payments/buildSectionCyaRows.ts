@@ -6,12 +6,23 @@ import {
   type SummaryListRow,
   escapeWithLineBreaks,
   getValidatedCase,
+  isYes,
   makeChange,
   makeYesNoNotSure,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
+import type { PaymentAgreement } from '@services/ccdCase.interface';
+
 const SECTION_ID: RespondToClaimSectionId = 'payments';
+
+interface RowContext {
+  rows: SummaryListRow[];
+  paymentAgreement: PaymentAgreement;
+  t: TFunction;
+  change: ReturnType<typeof makeChange>;
+  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
+}
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
   const validatedCase = getValidatedCase(req);
@@ -20,66 +31,86 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     return [];
   }
 
-  const paymentAgreement = validatedCase.defendantResponses?.paymentAgreement ?? {};
-  const change = makeChange(caseRef, SECTION_ID, t);
-  const yesNoNotSure = makeYesNoNotSure(t);
+  const ctx: RowContext = {
+    rows: [],
+    paymentAgreement: validatedCase.defendantResponses?.paymentAgreement ?? {},
+    t,
+    change: makeChange(caseRef, SECTION_ID, t),
+    yesNoNotSure: makeYesNoNotSure(t),
+  };
 
-  const rows: SummaryListRow[] = [];
+  addAnyPaymentsMadeRows(ctx);
+  addRepaymentPlanAgreedRows(ctx);
+  addRepayArrearsInstalmentsRow(ctx);
+  addAffordToPayRow(ctx);
 
-  // Repayments made — radio Y/N on its own row; YES adds a second row with the details
-  if (paymentAgreement.anyPaymentsMade) {
-    rows.push({
-      key: { text: t('rows.anyPaymentsMade.label') },
-      value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
-      actions: { items: [change('repayments-made', 'rows.anyPaymentsMade.changeHidden')] },
-    });
-    if (paymentAgreement.anyPaymentsMade === 'YES' && paymentAgreement.paymentDetails?.trim()) {
-      rows.push({
-        key: { text: t('rows.paymentDetails.label') },
-        value: { html: escapeWithLineBreaks(paymentAgreement.paymentDetails.trim()) },
-        actions: { items: [change('repayments-made', 'rows.paymentDetails.changeHidden')] },
-      });
-    }
+  return ctx.rows;
+}
+
+function addAnyPaymentsMadeRows({ rows, paymentAgreement, t, change, yesNoNotSure }: RowContext): void {
+  if (!paymentAgreement.anyPaymentsMade) {
+    return;
   }
+  rows.push({
+    key: { text: t('rows.anyPaymentsMade.label') },
+    value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
+    actions: { items: [change('repayments-made', 'rows.anyPaymentsMade.changeHidden')] },
+  });
 
-  // Repayments agreed — radio Y/N/NotSure on its own row; YES adds a second row with the details
-  if (paymentAgreement.repaymentPlanAgreed) {
-    rows.push({
-      key: { text: t('rows.repaymentPlanAgreed.label') },
-      value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
-      actions: { items: [change('repayments-agreed', 'rows.repaymentPlanAgreed.changeHidden')] },
-    });
-    if (paymentAgreement.repaymentPlanAgreed === 'YES' && paymentAgreement.repaymentAgreedDetails?.trim()) {
-      rows.push({
-        key: { text: t('rows.repaymentAgreedDetails.label') },
-        value: { html: escapeWithLineBreaks(paymentAgreement.repaymentAgreedDetails.trim()) },
-        actions: { items: [change('repayments-agreed', 'rows.repaymentAgreedDetails.changeHidden')] },
-      });
-    }
+  const details = paymentAgreement.paymentDetails?.trim();
+  if (!isYes(paymentAgreement.anyPaymentsMade) || !details) {
+    return;
   }
+  rows.push({
+    key: { text: t('rows.paymentDetails.label') },
+    value: { html: escapeWithLineBreaks(details) },
+    actions: { items: [change('repayments-made', 'rows.paymentDetails.changeHidden')] },
+  });
+}
 
-  // Instalment offer — Yes/No
-  if (paymentAgreement.repayArrearsInstalments) {
-    rows.push({
-      key: { text: t('rows.repayArrearsInstalments.label') },
-      value: { text: yesNoNotSure(paymentAgreement.repayArrearsInstalments) },
-      actions: { items: [change('installment-payments', 'rows.repayArrearsInstalments.changeHidden')] },
-    });
+function addRepaymentPlanAgreedRows({ rows, paymentAgreement, t, change, yesNoNotSure }: RowContext): void {
+  if (!paymentAgreement.repaymentPlanAgreed) {
+    return;
   }
+  rows.push({
+    key: { text: t('rows.repaymentPlanAgreed.label') },
+    value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
+    actions: { items: [change('repayments-agreed', 'rows.repaymentPlanAgreed.changeHidden')] },
+  });
 
-  // How much can you afford — only shown when instalment offer YES
-  if (paymentAgreement.repayArrearsInstalments === 'YES' && paymentAgreement.additionalRentContribution !== undefined) {
-    const pounds = penceToPounds(paymentAgreement.additionalRentContribution);
-    const frequency = paymentAgreement.additionalContributionFrequency;
-    const amountText = pounds ? `£${pounds}` : '';
-    const frequencyText = frequency ? t(`rows.affordToPay.frequencies.${frequency}`) : '';
-    const valueText = [amountText, frequencyText].filter(Boolean).join(' ');
-    rows.push({
-      key: { text: t('rows.affordToPay.label') },
-      value: { text: valueText },
-      actions: { items: [change('how-much-afford-to-pay', 'rows.affordToPay.changeHidden')] },
-    });
+  const details = paymentAgreement.repaymentAgreedDetails?.trim();
+  if (!isYes(paymentAgreement.repaymentPlanAgreed) || !details) {
+    return;
   }
+  rows.push({
+    key: { text: t('rows.repaymentAgreedDetails.label') },
+    value: { html: escapeWithLineBreaks(details) },
+    actions: { items: [change('repayments-agreed', 'rows.repaymentAgreedDetails.changeHidden')] },
+  });
+}
 
-  return rows;
+function addRepayArrearsInstalmentsRow({ rows, paymentAgreement, t, change, yesNoNotSure }: RowContext): void {
+  if (!paymentAgreement.repayArrearsInstalments) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.repayArrearsInstalments.label') },
+    value: { text: yesNoNotSure(paymentAgreement.repayArrearsInstalments) },
+    actions: { items: [change('installment-payments', 'rows.repayArrearsInstalments.changeHidden')] },
+  });
+}
+
+function addAffordToPayRow({ rows, paymentAgreement, t, change }: RowContext): void {
+  if (!isYes(paymentAgreement.repayArrearsInstalments) || paymentAgreement.additionalRentContribution === undefined) {
+    return;
+  }
+  const pounds = penceToPounds(paymentAgreement.additionalRentContribution);
+  const frequency = paymentAgreement.additionalContributionFrequency;
+  const amountText = pounds ? `£${pounds}` : '';
+  const frequencyText = frequency ? t(`rows.affordToPay.frequencies.${frequency}`) : '';
+  rows.push({
+    key: { text: t('rows.affordToPay.label') },
+    value: { text: [amountText, frequencyText].filter(Boolean).join(' ') },
+    actions: { items: [change('how-much-afford-to-pay', 'rows.affordToPay.changeHidden')] },
+  });
 }

@@ -57,3 +57,21 @@ export const makeChange =
     text: t('change'),
     visuallyHiddenText: t(hiddenKey),
   });
+
+/**
+ * "Yes/No (+ optional free-text detail beneath)" row value — the answer on one line,
+ * a blank line, then the escaped detail. When there's no detail, just the answer text.
+ * Used by every section-CYA row where a radio answer is captured alongside a free-text
+ * follow-up on the same page.
+ */
+export const answerWithDetail = (
+  answer: string,
+  detail: string | null | undefined,
+  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>
+): SummaryListRow['value'] => {
+  const trimmed = detail?.trim();
+  if (!trimmed) {
+    return { text: yesNoNotSure(answer) };
+  }
+  return { html: `${escapeHtml(yesNoNotSure(answer))}<br><br>${escapeWithLineBreaks(trimmed)}` };
+};

@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next';
 import { formatIsoDate, penceToPounds } from '../../utils';
 import {
   type SummaryListRow,
+  answerWithDetail,
   escapeWithLineBreaks,
   getValidatedCase,
   isYes,
@@ -14,7 +15,7 @@ import {
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
-import type { HouseholdCircumstances } from '@services/ccdCase.interface';
+import type { CcdDefendantResponses, HouseholdCircumstances } from '@services/ccdCase.interface';
 
 const SECTION_ID: RespondToClaimSectionId = 'incomeAndExpenditure';
 
@@ -41,6 +42,15 @@ const EXPENSE_KEYS = [
   'otherExpenses',
 ] as const;
 
+interface RowContext {
+  rows: SummaryListRow[];
+  responses: CcdDefendantResponses;
+  hc: HouseholdCircumstances;
+  t: TFunction;
+  change: ReturnType<typeof makeChange>;
+  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
+}
+
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
   const validatedCase = getValidatedCase(req);
   const caseRef = validatedCase?.id;
@@ -49,138 +59,168 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   }
 
   const responses = validatedCase.defendantResponses ?? {};
-  const hc: HouseholdCircumstances = responses.householdCircumstances ?? {};
-
-  const change = makeChange(caseRef, SECTION_ID, t);
-  const yesNo = makeYesNoNotSure(t);
-
-  // "£12.34 a week" — amount is stored in pence, frequency is WEEKLY/MONTHLY.
-  const amountWithFrequency = (amount?: string | null, frequency?: string | null): string => {
-    const pounds = penceToPounds(amount ?? undefined);
-    const money = pounds ? `£${pounds}` : '';
-    const freq = frequency ? t(`frequencies.${String(frequency).trim().toUpperCase()}`) : '';
-    return [money, freq].filter(Boolean).join(' ');
+  const ctx: RowContext = {
+    rows: [],
+    responses,
+    hc: responses.householdCircumstances ?? {},
+    t,
+    change: makeChange(caseRef, SECTION_ID, t),
+    yesNoNotSure: makeYesNoNotSure(t),
   };
 
-  const rows: SummaryListRow[] = [];
+  addShareIncomeExpenseDetailsRow(ctx);
+  addRegularIncomeRow(ctx);
+  addAppliedForUcRow(ctx);
+  addPriorityDebtsRow(ctx);
+  addPriorityDebtDetailsRow(ctx);
+  addRegularExpensesRow(ctx);
+  addOtherConsiderationsRow(ctx);
 
-  // Provide finance details — the gate for the rest of the section. The normaliser
-  // keeps this field even when the answer is "No" (it only drops the branch below).
-  if (hc.shareIncomeExpenseDetails) {
-    rows.push({
-      key: { text: t('rows.shareIncomeExpenseDetails.label') },
-      value: { text: yesNo(hc.shareIncomeExpenseDetails) },
-      actions: { items: [change('income-and-expenses', 'rows.shareIncomeExpenseDetails.changeHidden')] },
-    });
+  return ctx.rows;
+}
+
+// "£12.34 a week" — amount is stored in pence, frequency is WEEKLY/MONTHLY.
+function amountWithFrequency(
+  amount: string | null | undefined,
+  frequency: string | null | undefined,
+  t: TFunction
+): string {
+  const pounds = penceToPounds(amount ?? undefined);
+  const money = pounds ? `£${pounds}` : '';
+  const freq = frequency ? t(`frequencies.${String(frequency).trim().toUpperCase()}`) : '';
+  return [money, freq].filter(Boolean).join(' ');
+}
+
+function addShareIncomeExpenseDetailsRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
+  // The gate for the rest of the section. The normaliser keeps this field even
+  // when the answer is "No" (it only drops the branch below).
+  if (!hc.shareIncomeExpenseDetails) {
+    return;
   }
+  rows.push({
+    key: { text: t('rows.shareIncomeExpenseDetails.label') },
+    value: { text: yesNoNotSure(hc.shareIncomeExpenseDetails) },
+    actions: { items: [change('income-and-expenses', 'rows.shareIncomeExpenseDetails.changeHidden')] },
+  });
+}
 
-  // Regular income — shown whenever the user opted into finance details
-  // (shareIncomeExpenseDetails === YES is the showCondition for this step). The
-  // page is optional, so an empty selection is still an answer — render "No
-  // answer provided" rather than dropping the row, keeping the question and its
-  // Change link visible on the CYA.
-  if (isYes(hc.shareIncomeExpenseDetails)) {
-    const incomeItems: string[] = [];
-    for (const source of INCOME_SOURCES) {
-      if (isYes(hc[source.key])) {
-        const label = t(`rows.regularIncome.options.${source.key}`);
-        const detail = amountWithFrequency(hc[source.amount], hc[source.frequency]);
-        incomeItems.push(detail ? `${escapeHtml(label)}: ${escapeHtml(detail)}` : escapeHtml(label));
-      }
+function addRegularIncomeRow({ rows, hc, t, change }: RowContext): void {
+  // Shown whenever the user opted into finance details (shareIncomeExpenseDetails === YES
+  // is the showCondition for this step). The page is optional, so an empty selection is
+  // still an answer — render "No answer provided" rather than dropping the row, keeping
+  // the question and its Change link visible on the CYA.
+  if (!isYes(hc.shareIncomeExpenseDetails)) {
+    return;
+  }
+  const items: string[] = [];
+  for (const source of INCOME_SOURCES) {
+    if (!isYes(hc[source.key])) {
+      continue;
     }
-    if (isYes(hc.moneyFromElsewhere)) {
-      const label = t('rows.regularIncome.options.moneyFromElsewhere');
-      const detail = hc.moneyFromElsewhereDetails?.trim();
-      incomeItems.push(detail ? `${escapeHtml(label)}: ${escapeWithLineBreaks(detail)}` : escapeHtml(label));
+    const label = t(`rows.regularIncome.options.${source.key}`);
+    const detail = amountWithFrequency(hc[source.amount], hc[source.frequency], t);
+    items.push(detail ? `${escapeHtml(label)}: ${escapeHtml(detail)}` : escapeHtml(label));
+  }
+  if (isYes(hc.moneyFromElsewhere)) {
+    const label = t('rows.regularIncome.options.moneyFromElsewhere');
+    const detail = hc.moneyFromElsewhereDetails?.trim();
+    items.push(detail ? `${escapeHtml(label)}: ${escapeWithLineBreaks(detail)}` : escapeHtml(label));
+  }
+  rows.push({
+    key: { text: t('rows.regularIncome.label') },
+    value: items.length > 0 ? { html: listHtml(items) } : { text: t('noAnswerProvided') },
+    actions: { items: [change('what-regular-income-do-you-receive', 'rows.regularIncome.changeHidden')] },
+  });
+}
+
+function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
+  // The step is skipped (and the field absent) when the defendant is already on UC,
+  // so a presence check is correct.
+  if (!hc.hasAppliedForUniversalCredit) {
+    return;
+  }
+  const value =
+    isYes(hc.hasAppliedForUniversalCredit) && hc.ucApplicationDate
+      ? { text: `${yesNoNotSure(hc.hasAppliedForUniversalCredit)} (${formatIsoDate(hc.ucApplicationDate)})` }
+      : { text: yesNoNotSure(hc.hasAppliedForUniversalCredit) };
+  rows.push({
+    key: { text: t('rows.hasAppliedForUniversalCredit.label') },
+    value,
+    actions: {
+      items: [change('have-you-applied-for-universal-credit', 'rows.hasAppliedForUniversalCredit.changeHidden')],
+    },
+  });
+}
+
+function addPriorityDebtsRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
+  if (!hc.priorityDebts) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.priorityDebts.label') },
+    value: { text: yesNoNotSure(hc.priorityDebts) },
+    actions: { items: [change('priority-debts', 'rows.priorityDebts.changeHidden')] },
+  });
+}
+
+function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
+  // Only present when priorityDebts === YES (the normaliser drops these fields
+  // otherwise). Amounts are stored in pence.
+  if (!hc.debtTotal && !hc.debtContribution) {
+    return;
+  }
+  const items: string[] = [];
+  const totalPounds = penceToPounds(hc.debtTotal);
+  if (totalPounds) {
+    items.push(`${escapeHtml(t('rows.priorityDebtDetails.total'))}: £${totalPounds}`);
+  }
+  const contribution = amountWithFrequency(hc.debtContribution, hc.debtContributionFrequency, t);
+  if (contribution) {
+    items.push(`${escapeHtml(t('rows.priorityDebtDetails.contribution'))}: ${escapeHtml(contribution)}`);
+  }
+  if (items.length === 0) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.priorityDebtDetails.label') },
+    value: { html: listHtml(items) },
+    actions: { items: [change('priority-debt-details', 'rows.priorityDebtDetails.changeHidden')] },
+  });
+}
+
+function addRegularExpensesRow({ rows, hc, t, change }: RowContext): void {
+  // Same optional-multi-select handling as regular income: shown whenever finance
+  // details were opted into, "No answer provided" when the (optional) page was empty.
+  if (!isYes(hc.shareIncomeExpenseDetails)) {
+    return;
+  }
+  const items: string[] = [];
+  for (const key of EXPENSE_KEYS) {
+    const details = hc[key];
+    if (!details || !isYes(details.applies)) {
+      continue;
     }
-    rows.push({
-      key: { text: t('rows.regularIncome.label') },
-      value: incomeItems.length > 0 ? { html: listHtml(incomeItems) } : { text: t('noAnswerProvided') },
-      actions: { items: [change('what-regular-income-do-you-receive', 'rows.regularIncome.changeHidden')] },
-    });
+    const label = t(`rows.regularExpenses.options.${key}`);
+    const detail = amountWithFrequency(details.amount, details.frequency, t);
+    items.push(detail ? `${escapeHtml(label)}: ${escapeHtml(detail)}` : escapeHtml(label));
   }
+  rows.push({
+    key: { text: t('rows.regularExpenses.label') },
+    value: items.length > 0 ? { html: listHtml(items) } : { text: t('noAnswerProvided') },
+    actions: {
+      items: [change('what-other-regular-expenses-do-you-have', 'rows.regularExpenses.changeHidden')],
+    },
+  });
+}
 
-  // Applied for Universal Credit — the step is skipped (and the field absent) when
-  // the defendant is already on Universal Credit, so a presence check is correct.
-  if (hc.hasAppliedForUniversalCredit) {
-    const value =
-      isYes(hc.hasAppliedForUniversalCredit) && hc.ucApplicationDate
-        ? { text: `${yesNo(hc.hasAppliedForUniversalCredit)} (${formatIsoDate(hc.ucApplicationDate)})` }
-        : { text: yesNo(hc.hasAppliedForUniversalCredit) };
-    rows.push({
-      key: { text: t('rows.hasAppliedForUniversalCredit.label') },
-      value,
-      actions: {
-        items: [change('have-you-applied-for-universal-credit', 'rows.hasAppliedForUniversalCredit.changeHidden')],
-      },
-    });
+function addOtherConsiderationsRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
+  // Always shown; stored on defendantResponses, not householdCircumstances.
+  if (!responses.otherConsiderations) {
+    return;
   }
-
-  // Priority debts — Yes/No.
-  if (hc.priorityDebts) {
-    rows.push({
-      key: { text: t('rows.priorityDebts.label') },
-      value: { text: yesNo(hc.priorityDebts) },
-      actions: { items: [change('priority-debts', 'rows.priorityDebts.changeHidden')] },
-    });
-  }
-
-  // Priority debt details — only present when priorityDebts === YES (the normaliser
-  // drops these fields otherwise). Amounts are stored in pence.
-  if (hc.debtTotal || hc.debtContribution) {
-    const detailItems: string[] = [];
-    const totalPounds = penceToPounds(hc.debtTotal);
-    if (totalPounds) {
-      detailItems.push(`${escapeHtml(t('rows.priorityDebtDetails.total'))}: £${totalPounds}`);
-    }
-    const contribution = amountWithFrequency(hc.debtContribution, hc.debtContributionFrequency);
-    if (contribution) {
-      detailItems.push(`${escapeHtml(t('rows.priorityDebtDetails.contribution'))}: ${escapeHtml(contribution)}`);
-    }
-    if (detailItems.length > 0) {
-      rows.push({
-        key: { text: t('rows.priorityDebtDetails.label') },
-        value: { html: listHtml(detailItems) },
-        actions: { items: [change('priority-debt-details', 'rows.priorityDebtDetails.changeHidden')] },
-      });
-    }
-  }
-
-  // Other regular expenses — same optional-multi-select handling as regular
-  // income: shown whenever finance details were opted into, "No answer provided"
-  // when the (optional) page was left empty.
-  if (isYes(hc.shareIncomeExpenseDetails)) {
-    const expenseItems: string[] = [];
-    for (const key of EXPENSE_KEYS) {
-      const details = hc[key];
-      if (details && isYes(details.applies)) {
-        const label = t(`rows.regularExpenses.options.${key}`);
-        const detail = amountWithFrequency(details.amount, details.frequency);
-        expenseItems.push(detail ? `${escapeHtml(label)}: ${escapeHtml(detail)}` : escapeHtml(label));
-      }
-    }
-    rows.push({
-      key: { text: t('rows.regularExpenses.label') },
-      value: expenseItems.length > 0 ? { html: listHtml(expenseItems) } : { text: t('noAnswerProvided') },
-      actions: {
-        items: [change('what-other-regular-expenses-do-you-have', 'rows.regularExpenses.changeHidden')],
-      },
-    });
-  }
-
-  // Other considerations — always shown; stored on defendantResponses, not householdCircumstances.
-  if (responses.otherConsiderations) {
-    const detail = responses.otherConsiderationsDetails?.trim();
-    const value =
-      isYes(responses.otherConsiderations) && detail
-        ? { html: `${escapeHtml(yesNo(responses.otherConsiderations))}<br><br>${escapeWithLineBreaks(detail)}` }
-        : { text: yesNo(responses.otherConsiderations) };
-    rows.push({
-      key: { text: t('rows.otherConsiderations.label') },
-      value,
-      actions: { items: [change('other-considerations', 'rows.otherConsiderations.changeHidden')] },
-    });
-  }
-
-  return rows;
+  rows.push({
+    key: { text: t('rows.otherConsiderations.label') },
+    value: answerWithDetail(responses.otherConsiderations, responses.otherConsiderationsDetails, yesNoNotSure),
+    actions: { items: [change('other-considerations', 'rows.otherConsiderations.changeHidden')] },
+  });
 }
