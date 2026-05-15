@@ -148,12 +148,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   }
-  //other considrations back link navigation
-  if (testInfo.title.includes('income - no')) {
-    process.env.INCOME_AND_EXPENSES = 'NO';
-  } else {
-    process.env.INCOME_AND_EXPENSES = 'YES';
-  }
 
   //Page navigation for paymentInterstitial
   if (testInfo.title.includes('SelectCounterClaim - Yes')) {
@@ -434,7 +428,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
   });
 
-  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @assured @regression @PR', async () => {
+  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no @assured @regression @PR', async () => {
     //incomeAndExpenses - no - Upload docs
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
