@@ -2,6 +2,7 @@ import type { Request } from 'express';
 
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig as citizenFlowConfig } from './flow.config';
 import { hasSingleLinkedDefendant } from './flowConditions';
+import { legalRepRespondToClaimSections } from './legalrep.sections.config';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
@@ -65,6 +66,7 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
   useShowConditions: true,
   useSessionFormData: false,
   stepOrder: legalrepStepOrder,
+  sections: legalRepRespondToClaimSections,
   steps: {
     ...citizenFlowConfig.steps,
     'select-defendant': {

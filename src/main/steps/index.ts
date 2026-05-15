@@ -5,6 +5,7 @@ import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-applica
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from './respond-to-claim/draftEvent';
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
+import { legalRepStepRegistry as respondToClaimLegalRepStepRegistry } from './respond-to-claim/legalrep.stepRegistry';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
 import { getUserType } from './utils';
 
@@ -47,7 +48,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     },
     legalrep: {
       flowConfig: respondToClaimLegalrepFlowConfig,
-      stepRegistry: respondToClaimStepRegistry,
+      stepRegistry: respondToClaimLegalRepStepRegistry,
     },
   },
   makeAnApplication: {

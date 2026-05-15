@@ -40,7 +40,6 @@ import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
-import { step as selectDefendant } from './select-defendant';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
 import { step as supportNeeds } from './support-needs';
@@ -55,7 +54,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const stepRegistry = {
   'start-now': startNow,
-  'select-defendant': selectDefendant,
   'correspondence-address': correspondenceAddress,
   'free-legal-advice': freeLegalAdvice,
   'defendant-name-confirmation': defendantNameConfirmation,
