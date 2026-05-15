@@ -13,7 +13,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   customTemplate: `${__dirname}/writtenTerms.njk`,
   translationKeys: {
-    caption: 'caption',
     pageTitle: 'pageTitle',
     introText: 'introText',
   },
