@@ -7,6 +7,7 @@ import {
   correspondenceAddress,
   counterClaim,
   counterClaimAbout,
+  counterClaimAgainstWhom,
   counterClaimFee,
   counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
   counterClaimSpecificSumOfMoney,
@@ -39,12 +40,14 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { haveYouAlreadyAppliedForHelp } from '../data/page-data/genApps-page-data/haveYouAlreadyAppliedForHelp.page.data';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
 import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
 import { counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation } from '../functional/counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.pft';
+import { counterClaimFeeErrorValidation } from '../functional/counterClaimFee.pft';
 import { counterClaimSpecificSumErrorValidation } from '../functional/counterClaimSpecificSumOfMoney.pft';
 import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/counterClaimWhatAreYouClaimingFor.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
@@ -298,6 +301,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
+
     await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
     await performAction('counterClaimSpecificSumOfMoney', {
       question: counterClaimSpecificSumOfMoney.mainHeader,
@@ -305,10 +309,18 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
 
-    await softErrorMessageValidation('counterClaimFee', NO_EMV_READ_ONLY);
+    await softErrorMessageValidation('counterClaimFee', counterClaimFeeErrorValidation);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
 
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await softErrorMessageValidation('counterClaimAgainstWhom', NO_EMV_READ_ONLY);
+    await performAction('clickButton', counterClaimAgainstWhom.continueButton);
+
+    await softErrorMessageValidation('counterClaimAbout', NO_EMV_READ_ONLY);
+    await performAction('clickButton', counterClaimAbout.continueButton);
 
     await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
@@ -542,10 +554,12 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
 
-    await softErrorMessageValidation('counterClaimFee', NO_EMV_READ_ONLY);
-
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await softErrorMessageValidation('counterClaimFee', counterClaimFeeErrorValidation);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
 
     await softErrorMessageValidation(
       'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',

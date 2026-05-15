@@ -1,4 +1,5 @@
 import { counterClaim, counterClaimAbout, dashboard, feedback, paymentInterstitial } from '../data/page-data';
+import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
 import { performValidation } from '../utils/controller';
 
 export async function paymentInterstitialNavigationTests(): Promise<void> {

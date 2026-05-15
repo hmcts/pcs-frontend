@@ -78,6 +78,7 @@ export class ActionRegistry {
     ['installmentPayments', new RespondToClaimAction()],
     ['selectHowMuchAffordToPay', new RespondToClaimAction()],
     ['rentArrears', new RespondToClaimAction()],
+    ['selectCounterClaimFee', new RespondToClaimAction()],
     ['selectIncomeAndExpenses', new RespondToClaimAction()],
     ['selectWhatRegularIncomeDoYouReceive', new RespondToClaimAction()],
     ['yourCircumstances', new RespondToClaimAction()],

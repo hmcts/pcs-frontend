@@ -43,6 +43,7 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
+import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -71,11 +72,11 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (process.env.OCCUPATION_LICENCE_TYPE === 'SECURE_CONTRACT') {
     process.env.RENT_NON_RENT = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
-  } else if (testInfo.title.includes('NonRentArrears')) {
-    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseNonRentStandard });
-  } else if (testInfo.title.includes('Standard contract - Rent and Non-Rent Arrears')) {
+  } else if (testInfo.title.includes('Standard contract - RentArrears and NonRentArrears')) {
     process.env.RENT_NON_RENT = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentNonRentStandard });
+  } else if (testInfo.title.includes('NonRentArrears')) {
+    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseNonRentStandard });
   } else {
     process.env.RENT_ARREARS = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseRentOtherTenancy });
@@ -86,6 +87,27 @@ test.beforeEach(async ({ page }, testInfo) => {
   } else {
     process.env.INCOME_AND_EXPENSES = 'YES';
   }
+
+  //counterClaimFee back link navigation
+  if (testInfo.title.includes('SomethingElse')) {
+    process.env.SOMETHING_ELSE = 'YES';
+  } else {
+    process.env.SOMETHING_ELSE = 'NO';
+  }
+
+  //paymentInterstitial back navigation
+  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
+    process.env.I_NEED_HELP = 'YES';
+  } else {
+    process.env.I_NEED_HELP = 'NO';
+  }
+
+  if (testInfo.title.includes('SelectCounterClaim - No')) {
+    process.env.SELECT_COUNTER_CLAIM = 'NO';
+  } else {
+    process.env.SELECT_COUNTER_CLAIM = 'YES';
+  }
+
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
@@ -101,7 +123,8 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - Rent and Non-Rent Arrears - SelectCounterClaim - Yes @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Secure contract - Rent and Non-Rent Arrears - SelectCounterClaim - Yes - INeedHelp @noDefendants @regression', async () => {
+    //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -166,8 +189,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.yesRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
@@ -321,8 +347,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.noRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
       feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
@@ -443,7 +472,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //   await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - No @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Standard contract - NonRentArrears @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -533,8 +562,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
-
-  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - No - counterClaimHaveYouAppliedForHelpWithFee - No @noDefendants', async () => {
+  
+  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - Yes - SomethingElse @noDefendants @regression', async () => {
+    //Single named party - Something else - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,

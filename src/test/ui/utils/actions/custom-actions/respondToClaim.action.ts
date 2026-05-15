@@ -10,6 +10,7 @@ import {
   correspondenceAddress,
   counterClaim,
   counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
+  counterClaimFee,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -91,6 +92,7 @@ export class RespondToClaimAction implements IAction {
         'selectWhatRegularIncomeDoYouReceive',
         () => this.selectWhatRegularIncomeDoYouReceive(fieldName as actionRecord),
       ],
+      ['selectCounterClaimFee', () => this.selectCounterClaimFee(fieldName as actionRecord)],
       ['yourCircumstances', () => this.yourCircumstances(fieldName as actionRecord)],
       ['exceptionalHardship', () => this.exceptionalHardship(fieldName as actionRecord)],
       [
@@ -612,6 +614,48 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  }
+
+  private async selectCounterClaimFee(counterClaimFeeOption: actionRecord) {
+    let counterClaimFeeValue: number | string = 0;
+    if (counterClaimFeeOption.typeOfClaim === 'Something else') {
+      counterClaimFeeValue = 377;
+    } else if (
+      counterClaimFeeOption.typeOfClaim === 'A sum of money or compensation' ||
+      counterClaimFeeOption.typeOfClaim === 'Both'
+    ) {
+      if (counterClaimFeeOption.amount === null) {
+        throw new Error('Amount is required for this type of claim');
+      }
+      const amount = Number(counterClaimFeeOption.amount);
+      if (amount <= 300) {
+        counterClaimFeeValue = 35; // FEE0514
+      } else if (amount <= 500) {
+        counterClaimFeeValue = 50; // FEE0513
+      } else if (amount <= 1000) {
+        counterClaimFeeValue = 70; // FEE0512
+      } else if (amount <= 1500) {
+        counterClaimFeeValue = 80; // FEE0511
+      } else if (amount <= 3000) {
+        counterClaimFeeValue = 115; // FEE0510
+      } else if (amount <= 5000) {
+        counterClaimFeeValue = 205; // FEE0509
+      } else if (amount <= 10000) {
+        counterClaimFeeValue = 455; // FEE0508
+      } else if (amount <= 200000) {
+        counterClaimFeeValue = Number((amount * 0.05).toFixed(2)); // FEE0507
+      } else {
+        counterClaimFeeValue = 10000; // FEE0506
+      }
+    }
+    const basedOnInformationParagraph = `Based on the information provided, it will cost £${counterClaimFeeValue} to make your counterclaim.`;
+    await performValidation('text', { elementType: 'paragraph', text: basedOnInformationParagraph });
+
+    await performAction('clickRadioButton', {
+      question: counterClaimFee.doYouNeedHelpPayingCounterClaimQuestion,
+      option: counterClaimFeeOption.radioOption,
+    });
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   }
 
   private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {
