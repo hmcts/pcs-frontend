@@ -17,15 +17,15 @@
   {% endif %}
   {% endif %}
 
-  {% if caption %}
+  {% if caption != "caption" %}
     <span class="govuk-caption-xl">{{ caption }}</span>
   {% endif %}
-  {% if languageHeading %}
+  {% if languageHeading != "languageHeading" %}
    <h1 class="govuk-heading-l">{{ languageHeading }}</h1>
   {% endif %} 
 
 
- {% if question %}
+ {% if question != "question" %}
      <p class="govuk-heading-s">{{ question }} </p>
   {% endif %}
 
