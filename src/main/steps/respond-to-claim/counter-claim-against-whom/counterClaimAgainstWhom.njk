@@ -2,14 +2,14 @@
 {% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% block pageTitle %}About your counter-claim &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+{% block pageTitle %}Who is the counter-claim against? &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">About your counter-claim (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for About Your Counter-Claim step.</p>
+  <h1 class="govuk-heading-l">Who is the counter-claim against? (placeholder)</h1>
+  <p class="govuk-body">This is a placeholder for Who Is The Counter-Claim Against step.</p>
   <form method="post" action="{{ url }}">
     {{ stepButtons(continue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}

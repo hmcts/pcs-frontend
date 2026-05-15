@@ -9,7 +9,7 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
 }));
 
-import { step } from '../../../../main/steps/respond-to-claim/counter-claim-have-you-already-applied-for-help-with-your-fees';
+import { step } from '../../../../main/steps/respond-to-claim/counter-claim-have-you-applied-for-help';
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 
 type CounterClaimHwfStep = {
@@ -36,7 +36,7 @@ type CounterClaimHwfStep = {
 
 const testedStep = step as unknown as CounterClaimHwfStep;
 
-describe('respond-to-claim counter-claim-have-you-already-applied-for-help-with-your-fees', () => {
+describe('respond-to-claim counter-claim-have-you-applied-for-help', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -251,9 +251,8 @@ describe('respond-to-claim counter-claim HWF show conditions', () => {
     });
   });
 
-  describe('counter-claim-have-you-already-applied-for-help-with-your-fees showCondition', () => {
-    const showCondition =
-      flowConfig.steps['counter-claim-have-you-already-applied-for-help-with-your-fees']?.showCondition;
+  describe('counter-claim-have-you-applied-for-help showCondition', () => {
+    const showCondition = flowConfig.steps['counter-claim-have-you-applied-for-help']?.showCondition;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const makeCounterClaimReq = (makeCounterClaim: string | undefined): any => ({

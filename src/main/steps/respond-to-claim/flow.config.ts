@@ -18,6 +18,7 @@ import {
   hasProvidedFinanceDetails,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
+  shouldShowCounterClaimAgainstWhoStep,
   shouldShowInstallmentPaymentsStep,
   shouldShowPriorityDebtDetailsStep,
   shouldShowUniversalCreditStep,
@@ -85,11 +86,14 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-fee': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
-    'counter-claim-have-you-already-applied-for-help-with-your-fees': {
+    'counter-claim-have-you-applied-for-help': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'counter-claim-you-need-to-apply-for-help-with-your-fees': {
       showCondition: (req: Request) => hasNotAppliedForCounterClaimHwf(req),
+    },
+    'counter-claim-against-whom': {
+      showCondition: (req: Request) => shouldShowCounterClaimAgainstWhoStep(req),
     },
     'counter-claim-about': {
       showCondition: (req: Request) => hasAppliedForCounterClaimHwf(req),

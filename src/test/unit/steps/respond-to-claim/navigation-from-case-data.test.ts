@@ -415,9 +415,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(
-      getNextStep(req, 'counter-claim-have-you-already-applied-for-help-with-your-fees', flowConfig, {})
-    ).resolves.toBe('counter-claim-about');
+    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
+      'counter-claim-about'
+    );
   });
 
   it('routes counter-claim HWF step to you-need-to-apply when user has not applied for HWF (NO)', async () => {
@@ -431,9 +431,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(
-      getNextStep(req, 'counter-claim-have-you-already-applied-for-help-with-your-fees', flowConfig, {})
-    ).resolves.toBe('counter-claim-you-need-to-apply-for-help-with-your-fees');
+    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
+      'counter-claim-you-need-to-apply-for-help-with-your-fees'
+    );
   });
 
   it('HWF show condition helpers are derived from CCD counterClaim data', () => {

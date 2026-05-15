@@ -10,8 +10,9 @@ import { step as contactPreferencesTextMessage } from './contact-preferences-tex
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
 import { step as counterClaimAbout } from './counter-claim-about';
+import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
 import { step as counterClaimFee } from './counter-claim-fee';
-import { step as counterClaimHaveYouAlreadyAppliedForHelpWithYourFees } from './counter-claim-have-you-already-applied-for-help-with-your-fees';
+import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
 import { step as counterClaimYouNeedToApplyForHelpWithYourFees } from './counter-claim-you-need-to-apply-for-help-with-your-fees';
@@ -84,9 +85,9 @@ export const stepRegistry = {
   'counter-claim-what-are-you-claiming-for': counterClaimWhatAreYouClaimingFor,
   'counter-claim-specific-sum': counterClaimSpecificSum,
   'counter-claim-fee': counterClaimFee,
-  'counter-claim-have-you-already-applied-for-help-with-your-fees':
-    counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
+  'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
   'counter-claim-you-need-to-apply-for-help-with-your-fees': counterClaimYouNeedToApplyForHelpWithYourFees,
+  'counter-claim-against-whom': counterClaimAgainstWhom,
   'counter-claim-about': counterClaimAbout,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
