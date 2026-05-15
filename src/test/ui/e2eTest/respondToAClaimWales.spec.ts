@@ -43,7 +43,6 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
-import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -123,7 +122,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - Rent and Non-Rent Arrears - SelectCounterClaim - Yes - INeedHelp @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Secure contract - Rent and Non-Rent Arrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @noDefendants @regression', async () => {
     //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -562,7 +561,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
-  
+
   test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - Yes - SomethingElse @noDefendants @regression', async () => {
     //Single named party - Something else - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
