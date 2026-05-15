@@ -37,14 +37,29 @@ export const listHtml = (items: string[]): string =>
   `<ul class="govuk-list">\n${items.map(item => `<li>${item}</li>`).join('\n')}\n</ul>`;
 
 /**
- * options.{value} translation lookup, normalising casing first. The backend echoes
- * VerticalYesNo as Pascal 'Yes'/'No' since pcs-api #1678, but the translation keys
- * are YES/NO/NOT_SURE — normalising here keeps every section consistent.
+ * Map a CCD yes/no/not-sure value (any casing the backend echoes — 'YES', 'Yes',
+ * 'NO_SURE', etc.) to the lowercase translation key in `common.json` (`options.yes`,
+ * `options.no`, `options.imNotSure`). Unknown values fall through lowercased so
+ * mistakes surface as a missing-key, not as a silent miscast.
  */
+export const toOptionKey = (value: string): string => {
+  const upper = value.trim().toUpperCase();
+  if (upper === 'YES') {
+    return 'yes';
+  }
+  if (upper === 'NO') {
+    return 'no';
+  }
+  if (upper === 'NOT_SURE') {
+    return 'imNotSure';
+  }
+  return value.trim().toLowerCase();
+};
+
 export const makeYesNoNotSure =
   (t: TFunction) =>
   (value: string): string =>
-    t(`options.${value.trim().toUpperCase()}`);
+    t(`options.${toOptionKey(value)}`);
 
 /**
  * Section-scoped "Change" link factory. `stepSlug` is the edit-target step;

@@ -78,7 +78,23 @@ describe('section-CYA row builders — characterisation', () => {
       const row = buildPersonalRows(reqWith(validatedCase), t).find(
         r => r.key.text === 'rows.defendantNameConfirmation.label'
       );
-      expect(row?.value).toEqual({ html: 'options.NO (Jane Doe)' });
+      expect(row?.value).toEqual({ html: 'options.no (Jane Doe)' });
+    });
+
+    it('name row: tolerates Pascal-case "Yes" echo from pcs-api (no missing-key fallthrough)', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { defendantNameConfirmation: 'Yes' },
+            claimantEnteredDefendantDetails: { firstName: 'John', lastName: 'Smith' },
+          },
+        },
+      });
+      const row = buildPersonalRows(reqWith(validatedCase), t).find(
+        r => r.key.text === 'rows.defendantNameConfirmation.label'
+      );
+      expect(row?.value).toEqual({ text: 'options.yes' });
     });
 
     it('name row: shows just "Yes" when user confirmed claim-recorded name', () => {
@@ -94,7 +110,7 @@ describe('section-CYA row builders — characterisation', () => {
       const row = buildPersonalRows(reqWith(validatedCase), t).find(
         r => r.key.text === 'rows.defendantNameConfirmation.label'
       );
-      expect(row?.value).toEqual({ text: 'options.YES' });
+      expect(row?.value).toEqual({ text: 'options.yes' });
     });
 
     it('correspondence-address: shows confirmation Q/A when claim has a defendant address and user said YES', () => {
@@ -113,7 +129,7 @@ describe('section-CYA row builders — characterisation', () => {
       const row = buildPersonalRows(reqWith(validatedCase), t).find(
         r => r.key.text === 'rows.correspondenceAddressConfirmation.label'
       );
-      expect(row?.value).toEqual({ text: 'options.YES' });
+      expect(row?.value).toEqual({ text: 'options.yes' });
     });
 
     it('correspondence-address: shows alt address as value when claim has a defendant address and user said NO', () => {
@@ -194,7 +210,7 @@ describe('section-CYA row builders — characterisation', () => {
     it('tenancy-date row: shows the confirmation answer when no date entered', () => {
       const rows = buildDisputeRows(reqWith(model({ tenancyStartDateConfirmation: 'YES' })), t);
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
-      expect(row?.value).toEqual({ text: 'options.YES' });
+      expect(row?.value).toEqual({ text: 'options.yes' });
     });
 
     it('notice-date row: links to "not-provided" step when the claim has no notice date', () => {
@@ -239,7 +255,7 @@ describe('section-CYA row builders — characterisation', () => {
     it('normalises Pascal-case backend values (P1 casing fix)', () => {
       const rows = buildPaymentsRows(reqWith(model({ paymentAgreement: { anyPaymentsMade: 'Yes' } })), t);
       const row = rows.find(r => r.key.text === 'rows.anyPaymentsMade.label');
-      expect(row?.value).toEqual({ text: 'options.YES' });
+      expect(row?.value).toEqual({ text: 'options.yes' });
     });
   });
 

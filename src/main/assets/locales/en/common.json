@@ -32,10 +32,7 @@
     "yes": "Yes",
     "no": "No",
     "or": "or",
-    "imNotSure": "I'm not sure",
-    "YES": "Yes",
-    "NO": "No",
-    "NOT_SURE": "Not sure"
+    "imNotSure": "I'm not sure"
   },
   "change": "Change",
   "back": "Back",

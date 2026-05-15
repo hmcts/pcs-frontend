@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next';
 
 import { formatIsoDate, normalizeYesNoValue } from '../../utils';
 import { formatCcdAddress } from '../../utils/ccdAddress';
-import { type SummaryListRow, getValidatedCase, makeChange } from '../section-cya/cyaRow';
+import { type SummaryListRow, getValidatedCase, isYes, makeChange, makeYesNoNotSure } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -16,6 +16,7 @@ interface RowContext {
   validatedCase: CcdCaseModel;
   t: TFunction;
   change: ReturnType<typeof makeChange>;
+  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
 }
 
 // GDS multi-select pattern: a single value renders as text; many values render as a
@@ -45,6 +46,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     validatedCase,
     t,
     change: makeChange(caseRef, SECTION_ID, t),
+    yesNoNotSure: makeYesNoNotSure(t),
   };
 
   addNameRow(ctx);
@@ -57,7 +59,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
-function addNameRow({ rows, validatedCase, t, change }: RowContext): void {
+function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   const nameConfirmation = validatedCase.defendantResponsesDefendantNameConfirmation;
   const claimDefendantName = validatedCase.claimantEnteredDefendantDetailsName;
   if (nameConfirmation && claimDefendantName) {
@@ -68,8 +70,8 @@ function addNameRow({ rows, validatedCase, t, change }: RowContext): void {
     const correctedName = validatedCase.defendantContactDetailsPartyName?.trim();
     const value =
       normalizeYesNoValue(nameConfirmation) === 'NO' && correctedName
-        ? { html: escapeHtml(`${t('options.NO')} (${correctedName})`) }
-        : { text: t(`options.${nameConfirmation}`) };
+        ? { html: escapeHtml(`${t('options.no')} (${correctedName})`) }
+        : { text: yesNoNotSure(nameConfirmation) };
     rows.push({
       key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
       value,
@@ -101,7 +103,7 @@ function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void
   });
 }
 
-function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowContext): void {
+function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   // The page renders the Y/N confirmation template iff the claim recorded a defendant
   // correspondence address (see correspondence-address/index.ts:getExistingAddress). Use the
   // same signal here — `correspondenceAddressConfirmation` alone can't tell us which template
@@ -117,9 +119,9 @@ function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowCont
       return;
     }
     const value: SummaryListRow['value'] =
-      confirmation === 'NO' && partyAddress
+      normalizeYesNoValue(confirmation) === 'NO' && partyAddress
         ? { html: escapeHtml(partyAddress) }
-        : { text: t(`options.${confirmation}`) };
+        : { text: yesNoNotSure(confirmation) };
     rows.push({
       key: { text: t('rows.correspondenceAddressConfirmation.label', { address: claimantAddress }) },
       value,
@@ -150,7 +152,7 @@ function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowConte
   const items: string[] = [];
   const userSupplied = new Set<string>();
 
-  if (contactByEmail === 'YES') {
+  if (isYes(contactByEmail)) {
     const emailLabel = t('rows.contactByEmailOrPost.options.email');
     const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress?.trim();
     if (emailAddress) {
@@ -161,7 +163,7 @@ function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowConte
       items.push(emailLabel);
     }
   }
-  if (contactByPost === 'YES') {
+  if (isYes(contactByPost)) {
     items.push(t('rows.contactByEmailOrPost.options.post'));
   }
 
@@ -175,16 +177,14 @@ function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowConte
   });
 }
 
-function addContactByPhoneRow({ rows, validatedCase, t, change }: RowContext): void {
+function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   const contactByPhone = validatedCase.defendantResponsesContactByPhone;
   if (!contactByPhone) {
     return;
   }
   const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber?.trim();
   const value: SummaryListRow['value'] =
-    contactByPhone === 'YES' && phoneNumber
-      ? { html: escapeHtml(phoneNumber) }
-      : { text: t(`options.${contactByPhone}`) };
+    isYes(contactByPhone) && phoneNumber ? { html: escapeHtml(phoneNumber) } : { text: yesNoNotSure(contactByPhone) };
   rows.push({
     key: { text: t('rows.contactByPhone.label') },
     value,
@@ -192,10 +192,10 @@ function addContactByPhoneRow({ rows, validatedCase, t, change }: RowContext): v
   });
 }
 
-function addContactByTextRow({ rows, validatedCase, t, change }: RowContext): void {
+function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   // Text only applies when phone is YES (matches showCondition AND the contact-preferences
   // normaliser that drops contactByText when contactByPhone !== 'YES').
-  if (validatedCase.defendantResponsesContactByPhone !== 'YES') {
+  if (!isYes(validatedCase.defendantResponsesContactByPhone)) {
     return;
   }
   const contactByText = validatedCase.defendantResponsesContactByText;
@@ -204,7 +204,7 @@ function addContactByTextRow({ rows, validatedCase, t, change }: RowContext): vo
   }
   rows.push({
     key: { text: t('rows.contactByText.label') },
-    value: { text: t(`options.${contactByText}`) },
+    value: { text: yesNoNotSure(contactByText) },
     actions: { items: [change('contact-preferences-text-message', 'rows.contactByText.changeHidden')] },
   });
 }

@@ -32,10 +32,7 @@
     "yes": "cyYes",
     "no": "cyNo",
     "or": "cyor",
-    "imNotSure": "cyI'm not sure",
-    "YES": "cyYes",
-    "NO": "cyNo",
-    "NOT_SURE": "cyNot sure"
+    "imNotSure": "cyI'm not sure"
   },
   "change": "cyChange",
   "back": "cyBack",

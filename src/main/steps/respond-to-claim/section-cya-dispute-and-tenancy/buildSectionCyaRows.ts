@@ -100,7 +100,7 @@ function addTenancyTypeRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   const correctedType = responses.tenancyType?.trim();
   const value =
     !typeCorrect && correctedType
-      ? { html: escapeHtml(`${t('options.NO')} (${correctedType})`) }
+      ? { html: escapeHtml(`${t('options.no')} (${correctedType})`) }
       : { text: yesNoNotSure(responses.tenancyTypeConfirmation) };
   rows.push({
     key: { text: t('rows.tenancyTypeCorrect.label') },
@@ -164,7 +164,7 @@ function addRentArrearsRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   const confirmed = normalizeYesNoValue(responses.rentArrearsAmountConfirmation) === 'YES';
   const disputedAmount = !confirmed ? penceToPounds(responses.rentArrearsAmount) : undefined;
   const value = disputedAmount
-    ? { html: escapeHtml(`${t('options.NO')} (£${disputedAmount})`) }
+    ? { html: escapeHtml(`${t('options.no')} (£${disputedAmount})`) }
     : { text: yesNoNotSure(responses.rentArrearsAmountConfirmation) };
   rows.push({
     key: { text: t('rows.rentArrearsAmountConfirmation.label') },
