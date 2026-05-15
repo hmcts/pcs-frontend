@@ -1,9 +1,10 @@
 import type { Request, Response } from 'express';
 
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
-import { flowConfig } from '../flow.config';
+import { flowConfig, uploadYourDocumentsStep } from '../flow.config';
 
-import { createGetController, createStepNavigation } from '@modules/steps';
+import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
+import { createGetController, createStepNavigation, getFormData } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
@@ -12,6 +13,7 @@ const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'check-your-answers';
 const templatePath = 'case-tasks/upload-additional-documents/check-your-answers/checkYourAnswers.njk';
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
+const uploadStorage = sessionDocs({ stepName: uploadYourDocumentsStep, fieldName: 'documents' });
 
 export const step: StepDefinition = {
   url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
@@ -19,10 +21,16 @@ export const step: StepDefinition = {
   view: templatePath,
   stepDir: __dirname,
   getController: () =>
-    createGetController(templatePath, stepName, stepNavigation, (req: Request) => {
+    createGetController(templatePath, stepName, stepNavigation, async (req: Request) => {
+      const documents = toDisplayDocuments(await uploadStorage.read(req));
+      const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
+      const relatedApplicationText = (confirmData?.relatedApplicationText as string) ?? '';
+
       return {
         dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
         url: req.originalUrl || '',
+        documents,
+        relatedApplicationText,
       };
     }),
   postController: {

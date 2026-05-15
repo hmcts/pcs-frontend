@@ -9,8 +9,8 @@ import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
 
 const journeyName = 'uploadAdditionalDocuments';
-const stepName = 'documents-submitted';
-const templatePath = 'case-tasks/upload-additional-documents/documents-submitted/documentsSubmitted.njk';
+const stepName = 'documents-uploaded';
+const templatePath = 'case-tasks/upload-additional-documents/documents-uploaded/documentsUploaded.njk';
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
 export const step: StepDefinition = {

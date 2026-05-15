@@ -1,5 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
 
@@ -8,6 +9,44 @@
 {% block mainContent %}
   <h1 class="govuk-heading-xl">{{ t('heading') }}</h1>
 
+  {% set documentsHtml %}
+    {% if documents.length > 0 %}
+      <ul class="govuk-list">
+        {% for d in documents %}<li>{{ d.document_filename }}</li>{% endfor %}
+      </ul>
+    {% else %}
+      {{ t('documentsNone') }}
+    {% endif %}
+  {% endset %}
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: { text: t('relatedApplicationLabel') },
+        value: { text: relatedApplicationText },
+        actions: {
+          items: [
+            {
+              href: "./confirm-if-these-documents-relate-to-an-application",
+              text: t('change', { ns: 'common' })
+            }
+          ]
+        }
+      },
+      {
+        key: { text: t('documentsLabel') },
+        value: { html: documentsHtml },
+        actions: {
+          items: [
+            {
+              href: "./upload-your-documents",
+              text: t('change', { ns: 'common' })
+            }
+          ]
+        }
+      }
+    ]
+  }) }}
 
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">

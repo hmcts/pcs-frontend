@@ -2,5 +2,7 @@
   "pageTitle": "Check your answers",
   "heading": "Check your answers",
   "relatedApplicationLabel": "Related application",
-  "documentsLabel": "Uploaded documents"
+  "relatedApplicationValue": "No, the documents I'm uploading relate to the main claim or counterclaim",
+  "documentsLabel": "Uploaded documents",
+  "documentsNone": "No documents uploaded"
 }
