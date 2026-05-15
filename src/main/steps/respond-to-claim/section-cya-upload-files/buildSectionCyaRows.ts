@@ -2,30 +2,20 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import type { CcdCaseModel } from '@services/ccdCaseData.model';
+import { type SummaryListRow, getValidatedCase, listHtml, makeChange } from '../section-cya/cyaRow';
+import type { RespondToClaimSectionId } from '../sections.config';
 
-const SECTION_ID = 'uploadFiles';
-
-export type SummaryListRow = {
-  key: { text: string };
-  value: { text?: string; html?: string };
-  actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
-};
+const SECTION_ID: RespondToClaimSectionId = 'uploadFiles';
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = req.res?.locals.validatedCase as CcdCaseModel | undefined;
+  const validatedCase = getValidatedCase(req);
   const caseRef = validatedCase?.id;
   if (!validatedCase || !caseRef) {
     return [];
   }
 
   const responses = validatedCase.defendantResponses ?? {};
-
-  const change = (stepSlug: string, hiddenKey: string) => ({
-    href: `/case/${caseRef}/respond-to-claim/${stepSlug}?edit=${SECTION_ID}`,
-    text: t('change'),
-    visuallyHiddenText: t(hiddenKey),
-  });
+  const change = makeChange(caseRef, SECTION_ID, t);
 
   const rows: SummaryListRow[] = [];
 
@@ -40,11 +30,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     value:
       filenames.length === 0
         ? { text: t('rows.uploadedDocuments.none') }
-        : {
-            html: `<ul class="govuk-list">\n${filenames
-              .map(name => `<li>${escapeHtml(name.trim())}</li>`)
-              .join('\n')}\n</ul>`,
-          },
+        : { html: listHtml(filenames.map(name => escapeHtml(name.trim()))) },
     actions: { items: [change('upload-document', 'rows.uploadedDocuments.changeHidden')] },
   });
 

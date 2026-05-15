@@ -3,24 +3,20 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { formatIsoDate } from '../../utils';
+import {
+  type SummaryListRow,
+  escapeWithLineBreaks,
+  getValidatedCase,
+  isYes,
+  makeChange,
+  makeYesNoNotSure,
+} from '../section-cya/cyaRow';
+import type { RespondToClaimSectionId } from '../sections.config';
 
-import type { CcdCaseModel } from '@services/ccdCaseData.model';
-
-const SECTION_ID = 'situationAndCircumstances';
-
-export type SummaryListRow = {
-  key: { text: string };
-  value: { text?: string; html?: string };
-  actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
-};
-
-// Preserve newlines in user-entered free text by converting \n to <br> after escaping.
-function escapeWithLineBreaks(value: string): string {
-  return escapeHtml(value).replace(/\n/g, '<br>');
-}
+const SECTION_ID: RespondToClaimSectionId = 'situationAndCircumstances';
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = req.res?.locals.validatedCase as CcdCaseModel | undefined;
+  const validatedCase = getValidatedCase(req);
   const caseRef = validatedCase?.id;
   if (!validatedCase || !caseRef) {
     return [];
@@ -29,16 +25,8 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   // Every section-5 step writes to householdCircumstances and is unconditional, so
   // the CYA enumerates rows with a presence check only.
   const hc = validatedCase.defendantResponses?.householdCircumstances ?? {};
-
-  const change = (stepSlug: string, hiddenKey: string) => ({
-    href: `/case/${caseRef}/respond-to-claim/${stepSlug}?edit=${SECTION_ID}`,
-    text: t('change'),
-    visuallyHiddenText: t(hiddenKey),
-  });
-
-  // Backend echoes YesOrNo as 'Yes'/'No' since pcs-api #1678 — normalise before the
-  // options.{value} key lookup so YES/NO/NOT_SURE translation keys stay consistent.
-  const yesNoNotSure = (value: string): string => t(`options.${value.trim().toUpperCase()}`);
+  const change = makeChange(caseRef, SECTION_ID, t);
+  const yesNoNotSure = makeYesNoNotSure(t);
 
   // A radio answer plus an optional free-text detail captured on the same page:
   // one row, one change link — the answer, then the detail beneath it when present.
@@ -84,9 +72,8 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   // Somewhere else to live — Yes/No/Not sure, with a transfer date when Yes
   if (hc.alternativeAccommodation) {
     const date = hc.alternativeAccommodationTransferDate;
-    const isYes = hc.alternativeAccommodation.trim().toUpperCase() === 'YES';
     const value =
-      isYes && date
+      isYes(hc.alternativeAccommodation) && date
         ? { text: `${yesNoNotSure(hc.alternativeAccommodation)} (${formatIsoDate(date)})` }
         : { text: yesNoNotSure(hc.alternativeAccommodation) };
     rows.push({

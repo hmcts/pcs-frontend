@@ -1,41 +1,28 @@
-import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { penceToPounds } from '../../utils';
+import {
+  type SummaryListRow,
+  escapeWithLineBreaks,
+  getValidatedCase,
+  makeChange,
+  makeYesNoNotSure,
+} from '../section-cya/cyaRow';
+import type { RespondToClaimSectionId } from '../sections.config';
 
-import type { CcdCaseModel } from '@services/ccdCaseData.model';
-
-const SECTION_ID = 'payments';
-
-export type SummaryListRow = {
-  key: { text: string };
-  value: { text?: string; html?: string };
-  actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
-};
-
-// GDS pattern (matches make-an-application/check-your-answers): preserve newlines
-// in user-entered free text by converting \n to <br> after HTML-escaping.
-function escapeWithLineBreaks(value: string): string {
-  return escapeHtml(value).replace(/\n/g, '<br>');
-}
+const SECTION_ID: RespondToClaimSectionId = 'payments';
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = req.res?.locals.validatedCase as CcdCaseModel | undefined;
+  const validatedCase = getValidatedCase(req);
   const caseRef = validatedCase?.id;
   if (!validatedCase || !caseRef) {
     return [];
   }
 
   const paymentAgreement = validatedCase.defendantResponses?.paymentAgreement ?? {};
-
-  const change = (stepSlug: string, hiddenKey: string) => ({
-    href: `/case/${caseRef}/respond-to-claim/${stepSlug}?edit=${SECTION_ID}`,
-    text: t('change'),
-    visuallyHiddenText: t(hiddenKey),
-  });
-
-  const yesNoNotSure = (value: string): string => t(`options.${value}`);
+  const change = makeChange(caseRef, SECTION_ID, t);
+  const yesNoNotSure = makeYesNoNotSure(t);
 
   const rows: SummaryListRow[] = [];
 

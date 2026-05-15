@@ -43,7 +43,11 @@ export interface SectionConfig {
   id: string;
   titleKey: string;
   steps: string[];
+  // Does the section apply to this case at all (e.g. payments needs a rent-arrears ground)?
   isApplicable?: SectionApplicabilityCondition;
+  // Section ids that must be completed before this section becomes available.
+  // Consumed by the (future) section-status service — see docs/HDPI-5407/cya-refactor-plan.md.
+  dependsOn?: string[];
 }
 
 export interface JourneyFlowConfig {

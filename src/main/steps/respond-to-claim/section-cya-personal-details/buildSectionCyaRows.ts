@@ -3,16 +3,10 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { formatIsoDate } from '../../utils';
+import { type SummaryListRow, getValidatedCase, makeChange } from '../section-cya/cyaRow';
+import type { RespondToClaimSectionId } from '../sections.config';
 
-import type { CcdCaseModel } from '@services/ccdCaseData.model';
-
-const SECTION_ID = 'personalDetails';
-
-export type SummaryListRow = {
-  key: { text: string };
-  value: { text?: string; html?: string };
-  actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
-};
+const SECTION_ID: RespondToClaimSectionId = 'personalDetails';
 
 type Address = {
   AddressLine1?: string;
@@ -53,8 +47,8 @@ function multiSelectValue(
 }
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = req.res?.locals.validatedCase as CcdCaseModel | undefined;
-  const caseRef = (validatedCase as unknown as { id?: string })?.id;
+  const validatedCase = getValidatedCase(req);
+  const caseRef = validatedCase?.id;
   if (!validatedCase || !caseRef) {
     return [];
   }
@@ -77,11 +71,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber;
   const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress;
 
-  const change = (stepSlug: string, hiddenKey: string) => ({
-    href: `/case/${caseRef}/respond-to-claim/${stepSlug}?edit=${SECTION_ID}`,
-    text: t('change'),
-    visuallyHiddenText: t(hiddenKey),
-  });
+  const change = makeChange(caseRef, SECTION_ID, t);
 
   const rows: SummaryListRow[] = [];
 

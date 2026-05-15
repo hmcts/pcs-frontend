@@ -3,23 +3,20 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { formatIsoDate, penceToPounds } from '../../utils';
+import {
+  type SummaryListRow,
+  escapeWithLineBreaks,
+  getValidatedCase,
+  isYes,
+  listHtml,
+  makeChange,
+  makeYesNoNotSure,
+} from '../section-cya/cyaRow';
+import type { RespondToClaimSectionId } from '../sections.config';
 
 import type { HouseholdCircumstances } from '@services/ccdCase.interface';
-import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
-const SECTION_ID = 'incomeAndExpenditure';
-
-export type SummaryListRow = {
-  key: { text: string };
-  value: { text?: string; html?: string };
-  actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
-};
-
-function escapeWithLineBreaks(value: string): string {
-  return escapeHtml(value).replace(/\n/g, '<br>');
-}
-
-const isYes = (value?: string | null): boolean => (value ?? '').trim().toUpperCase() === 'YES';
+const SECTION_ID: RespondToClaimSectionId = 'incomeAndExpenditure';
 
 // Income sources captured on what-regular-income-do-you-receive. Each (bar
 // moneyFromElsewhere) carries an amount + frequency; moneyFromElsewhere carries
@@ -45,7 +42,7 @@ const EXPENSE_KEYS = [
 ] as const;
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = req.res?.locals.validatedCase as CcdCaseModel | undefined;
+  const validatedCase = getValidatedCase(req);
   const caseRef = validatedCase?.id;
   if (!validatedCase || !caseRef) {
     return [];
@@ -54,13 +51,8 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   const responses = validatedCase.defendantResponses ?? {};
   const hc: HouseholdCircumstances = responses.householdCircumstances ?? {};
 
-  const change = (stepSlug: string, hiddenKey: string) => ({
-    href: `/case/${caseRef}/respond-to-claim/${stepSlug}?edit=${SECTION_ID}`,
-    text: t('change'),
-    visuallyHiddenText: t(hiddenKey),
-  });
-
-  const yesNo = (value: string): string => t(`options.${value.trim().toUpperCase()}`);
+  const change = makeChange(caseRef, SECTION_ID, t);
+  const yesNo = makeYesNoNotSure(t);
 
   // "£12.34 a week" — amount is stored in pence, frequency is WEEKLY/MONTHLY.
   const amountWithFrequency = (amount?: string | null, frequency?: string | null): string => {
@@ -69,9 +61,6 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     const freq = frequency ? t(`frequencies.${String(frequency).trim().toUpperCase()}`) : '';
     return [money, freq].filter(Boolean).join(' ');
   };
-
-  const listHtml = (items: string[]): string =>
-    `<ul class="govuk-list">\n${items.map(item => `<li>${item}</li>`).join('\n')}\n</ul>`;
 
   const rows: SummaryListRow[] = [];
 
