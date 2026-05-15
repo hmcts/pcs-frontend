@@ -365,6 +365,7 @@ describe('ccdCaseService', () => {
           },
         ],
         propertyAddress: '1 Test Street, London, SW1A 1AA',
+        relatedApplications: [],
       });
     });
 
@@ -383,7 +384,45 @@ describe('ccdCaseService', () => {
         notifications: [],
         taskGroups: [],
         propertyAddress: undefined,
+        relatedApplications: [],
       });
+    });
+
+    it('maps relatedApplications from CCD into dashboard related applications', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: {
+              dashboardData: {
+                relatedApplications: [
+                  {
+                    id: 'a1',
+                    value: {
+                      id: 'a1',
+                      type: GenAppType.ADJOURN,
+                      applicationSubmittedDate: '2025-01-02T10:00:00.000',
+                    },
+                  },
+                  {
+                    id: 'a2',
+                    value: {
+                      id: 'a2',
+                      type: GenAppType.SET_ASIDE,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      });
+
+      const result = await ccdCaseService.getDashboardView(accessToken, caseId);
+
+      expect(result.relatedApplications).toEqual([
+        { id: 'a1', type: GenAppType.ADJOURN, applicationSubmittedDate: '2025-01-02T10:00:00.000' },
+        { id: 'a2', type: GenAppType.SET_ASIDE, applicationSubmittedDate: undefined },
+      ]);
     });
 
     it('maps 404 from CCD to Case not found HTTPError', async () => {
