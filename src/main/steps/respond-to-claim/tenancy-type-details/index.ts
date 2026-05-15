@@ -148,7 +148,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       : caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence;
     // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
-    const receivedDetailsBy = isLegalRepresentativeUser(req) ? claimantName : orgName;
+    const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
 
     const t = getTranslationFunction(req, STEP_NAME, ['common']);
     let tenancyType: unknown;
@@ -168,7 +168,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       ...formContent,
-      receivedDetailsBy,
+      senderName,
       tenancyType,
       organisationName: orgName,
       orgname: orgName,
