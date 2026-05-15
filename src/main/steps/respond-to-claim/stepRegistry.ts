@@ -9,7 +9,10 @@ import { step as contactPreferencesTelephone } from './contact-preferences-telep
 import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
+import { step as counterClaimAbout } from './counter-claim-about';
+import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
 import { step as counterClaimFee } from './counter-claim-fee';
+import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
 import { step as yourCircumstances } from './current-circumstances';
@@ -40,7 +43,6 @@ import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
-import { step as selectDefendant } from './select-defendant';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
 import { step as supportNeeds } from './support-needs';
@@ -53,9 +55,8 @@ import { step as writtenTerms } from './written-terms';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const stepRegistry: Record<string, StepDefinition> = {
+export const stepRegistry = {
   'start-now': startNow,
-  'select-defendant': selectDefendant,
   'correspondence-address': correspondenceAddress,
   'free-legal-advice': freeLegalAdvice,
   'defendant-name-confirmation': defendantNameConfirmation,
@@ -83,6 +84,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'counter-claim-what-are-you-claiming-for': counterClaimWhatAreYouClaimingFor,
   'counter-claim-specific-sum': counterClaimSpecificSum,
   'counter-claim-fee': counterClaimFee,
+  'counter-claim-about': counterClaimAbout,
+  'counter-claim-against-whom': counterClaimAgainstWhom,
+  'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
@@ -107,4 +111,4 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,
   'check-your-answers': checkYourAnswers,
-};
+} satisfies Record<string, StepDefinition>;

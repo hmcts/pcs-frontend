@@ -10,7 +10,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/otherAdults.njk`,
   translationKeys: {
     question: 'question',
-    caption: 'caption',
     pageTitle: 'pageTitle',
     dependantHeading: 'dependantHeading',
     dependantQuestion: 'dependantQuestion',

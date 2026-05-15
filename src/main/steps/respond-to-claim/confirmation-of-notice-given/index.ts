@@ -12,8 +12,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   customTemplate: `${__dirname}/confirmationOfNoticeGiven.njk`,
   translationKeys: {
-    caption: 'caption',
-    caseNumber: 'caseNumber',
     pageTitle: 'pageTitle',
     question: 'question',
     hintText: 'hintText',

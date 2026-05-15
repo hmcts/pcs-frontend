@@ -13,6 +13,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     caption: 'caption',
     paragraph2: 'paragraph2',
     paragraph3: 'paragraph3',
+    paragraph5: 'paragraph5',
     listItem1: 'listItem1',
     listItem2: 'listItem2',
     listItem3: 'listItem3',
@@ -25,6 +26,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return {
       heading: t('heading', { claimantName }),
       paragraph1: t('paragraph1', { claimantName }),
+      paragraph4: t('paragraph4', { claimantName }),
     };
   },
 });

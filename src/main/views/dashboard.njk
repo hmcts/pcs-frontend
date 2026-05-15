@@ -1,8 +1,24 @@
 {% extends "template.njk" %}
 {%- from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner -%}
 {%- from "components/taskGroup/macro.njk" import taskGroup -%}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
 {% set backUrl = '/' %}
+
+{% block serviceNavigation %}
+  {{ govukServiceNavigation({
+    serviceName: t('dashboard:serviceName'),
+    serviceUrl: dashboardUrl if dashboardUrl else "/dashboard",
+    navigation: [
+      {
+        text: t('logout', 'Log out'),
+        href: "/logout"
+      }
+    ],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}
 
 {% block content %}
 

@@ -11,6 +11,14 @@ export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { isPriorityDebtsSelected } from './isPriorityDebtsSelected';
 export { hasSelectedPriorityDebts } from './hasSelectedPriorityDebts';
+export {
+  getFirstStepInSection,
+  getSectionCoverage,
+  getSectionForStep,
+  getStepsInSection,
+  isLastStepInSection,
+  isSectionApplicable,
+} from './sections';
 export { normalizeYesNoValue } from './normalizeYesNoValue';
 export { getPreviousStepForWhatOtherRegularExpenses } from './getPreviousStepForWhatOtherRegularExpenses';
 export { getPreviousStepForPriorityDebts } from './getPreviousStepForPriorityDebts';
@@ -34,8 +42,10 @@ export {
   getUserType,
   isLegalRepresentativeUser,
 } from './userRole';
+export { getPreviousStepForCounterClaimAbout } from './getPreviousStepForCounterClaimAbout';
 export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
+export { hasMultipleParties } from './hasMultipleParties';
 export { isSingleLinkedDefendant } from './isSingleLinkedDefendant';

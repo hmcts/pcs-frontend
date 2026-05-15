@@ -13,10 +13,6 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if caption %}
-    <span class="govuk-caption-l">{{ caption }}</span>
-  {% endif %}
-
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
   {% if hardshipHeading != "hardshipHeading" %}
@@ -24,10 +20,12 @@
   {% endif %}
 
   <p class="govuk-body">{{ introParagraph1 }}</p>
-  {% if not introParagraph2 %}
   <p class="govuk-body">{{ introParagraph2 }}</p>
+  
+  {% if introParagraph3 != "introParagraph3" %}
+    <p class="govuk-body">{{ introParagraph3 }}</p>
   {% endif %}
-  <p class="govuk-body">{{ introParagraph3 }}</p>
+
   <p class="govuk-body">{{ forExample }}</p>
 
   <ul class="govuk-list govuk-list--bullet">
