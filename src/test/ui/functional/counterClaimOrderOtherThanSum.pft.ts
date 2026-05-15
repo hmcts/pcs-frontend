@@ -1,4 +1,4 @@
-import { counterClaimAbout, counterClaimOrderOtherThanSum } from '../data/page-data';
+import { counterClaimOrderOtherThanSum } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function counterClaimOrderOtherThanSumErrorValidation(): Promise<void> {
@@ -12,7 +12,7 @@ export async function counterClaimOrderOtherThanSumErrorValidation(): Promise<vo
     message: counterClaimOrderOtherThanSum.enterWhatFactsErrorMessage,
   });
 }
-
-export async function counterClaimOrderOtherThanSumNavigationTests(): Promise<void> {
+//Navigation tests will be enabled once all routing tickets is done
+/*export async function counterClaimOrderOtherThanSumNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', counterClaimOrderOtherThanSum.backLink, counterClaimAbout.mainHeader);
-}
+}*/

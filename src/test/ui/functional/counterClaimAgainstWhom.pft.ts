@@ -8,7 +8,7 @@ export async function counterClaimAgainstWhomErrorValidation(): Promise<void> {
     message: counterClaimAgainstWhom.selectWhoYouAreMakingErrorMessage,
   });
 }
-
+//Navigation tests will be enabled once all routing tickets is done
 /*export async function counterClaimAgainstWhomNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', counterClaimAgainstWhom.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,

@@ -8,7 +8,9 @@ import {
   counterClaim,
   counterClaimAbout,
   counterClaimFee,
+  counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
+  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
@@ -186,6 +188,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -338,8 +345,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.continueButton);
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -519,7 +529,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.continueButton);
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('counterClaimOrderOtherThanSum', {
+      ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
+      factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
   });
 });

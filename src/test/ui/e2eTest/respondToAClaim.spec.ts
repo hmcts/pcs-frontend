@@ -44,8 +44,8 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-import { pinUsers } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
+import { pinUsers } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -165,12 +165,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
   }
-  //other considrations back link navigation
-  if (testInfo.title.includes('income - no')) {
-    process.env.INCOME_AND_EXPENSES = 'NO';
-  } else {
-    process.env.INCOME_AND_EXPENSES = 'YES';
-  }
 
   //other considrations back link navigation
   if (testInfo.title.includes('Income - no')) {
@@ -241,6 +235,7 @@ test.afterEach(async () => {
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
   test('Respond to a claim @noDefendants @regression @crossbrowser', async () => {
+    //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -298,18 +293,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: counterClaimSpecificSumOfMoney.yesRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
-     await performAction('selectCounterClaimFee', {
+    await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
-    //Need help steps need to be added
     await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
-    // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -448,8 +441,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.continueButton);
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -493,7 +489,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - SomethingElse @secureFlexible @regression', async () => {
-    //Income and expenses - yes - no option On regular Income - universal credit
+    //Income and expenses - yes - no option On regular Income - universal credit Counterclaim - yes - SomethingElse -  I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -547,8 +543,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: counterClaimFee.iNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
+    //when user selects yes goes to multiparty screen steps can be added once HDPI-5193 is implemented.
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    await performAction('counterClaimOrderOtherThanSum', {
+      ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
+      factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -607,7 +609,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
-    //Income and expenses - yes - all options except Universal Credit - universal credit
+    //Income and expenses - yes - all options except Universal Credit - universal credit - What are you claiming for - sum of money - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -752,6 +754,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
+    //Counterclaim - both - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -881,7 +884,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp @regression', async () => {
-    //universal credit with all other options - priority debts - No - Multiple namedParties - iNeedHelp
+    //universal credit with all other options - priority debts - No - Multiple namedParties - sumofmoney - iNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -937,6 +940,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueFEE0508Input,
     });
+    //Need to add multiparty page and further pages once counterClaimHaveYouAppliedForHelp page is added as part of HDPI-5193
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
     await performAction('readPaymentInterstitial');
@@ -1083,10 +1087,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
-    await performValidation('mainHeader', counterClaimAgainstWhom.mainHeader);
-    await performAction('clickButton', counterClaimAgainstWhom.continueButton);
-    await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.continueButton);
+    const pin2User = pinUsers[1];
+    await performAction('selectClaimAgainstWhom', {
+      question: counterClaimAgainstWhom.mainHeader,
+      options: [claimantName, `${pin2User.firstName} ${pin2User.lastName}`],
+    });
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1208,10 +1218,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    await performValidation('mainHeader', counterClaimAgainstWhom.mainHeader);
-    await performAction('clickButton', counterClaimAgainstWhom.continueButton);
-    await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.continueButton);
+    await performAction('selectClaimAgainstWhom', {
+      question: counterClaimAgainstWhom.mainHeader,
+      options: [claimantName],
+    });
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('counterClaimOrderOtherThanSum', {
+      ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
+      factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1283,7 +1302,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - No - Counter-claim-multi-party @rentNonRent @regression', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - Counter-claim-multi-party @rentNonRent @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -1331,7 +1350,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    //counter claim fee i dont need help step need to include*/
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
     const pin2User = pinUsers[1];
     await performAction('selectClaimAgainstWhom', {
       question: counterClaimAgainstWhom.mainHeader,

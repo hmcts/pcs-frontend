@@ -12,7 +12,7 @@ export async function counterClaimAboutErrorValidation(): Promise<void> {
     message: counterClaimAbout.enterWhatYourReasonsAreForErrorMessage,
   });
 }
-
+//Navigation tests will be enabled once all routing tickets is done
 /*
 export async function counterClaimAboutNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', counterClaimAbout.feedbackLink, {
