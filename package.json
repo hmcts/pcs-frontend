@@ -149,7 +149,7 @@
     "jest-environment-jsdom": "30.4.1",
     "jest-html-reporter": "4.4.0",
     "jest-pact": "0.13.0",
-    "lint-staged": "16.4.0",
+    "lint-staged": "17.0.4",
     "mini-css-extract-plugin": "2.10.2",
     "nodemon": "3.1.14",
     "playwright": "1.60.0",
