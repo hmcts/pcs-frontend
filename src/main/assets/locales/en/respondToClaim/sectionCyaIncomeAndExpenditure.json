@@ -2,8 +2,8 @@
   "pageTitle": "Check your answers",
   "cardTitle": "Income and expenses",
   "frequencies": {
-    "WEEKLY": "a week",
-    "MONTHLY": "a month"
+    "WEEKLY": "weekly",
+    "MONTHLY": "monthly"
   },
   "rows": {
     "shareIncomeExpenseDetails": {

@@ -79,7 +79,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
-// "£12.34 a week" — amount is stored in pence, frequency is WEEKLY/MONTHLY.
+// "£12.34 weekly" — amount is stored in pence, frequency is WEEKLY/MONTHLY.
 function amountWithFrequency(
   amount: string | null | undefined,
   frequency: string | null | undefined,
