@@ -1,5 +1,5 @@
 {
-  "serviceName": "Respond to a property possession claim",
+  "serviceName": "Possession Claims",
   "phase": "ALPHA",
   "feedback": "This is a new service – your <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">feedback (opens in new tab)</a> will help us to improve it.",
   "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link language\">Cymraeg</a>",
@@ -47,7 +47,7 @@
     "required": "Enter a value",
     "defaultRequired": "This field is required",
     "defaultInvalid": "Invalid format",
-    "defaultMaxLength": "Must be {max} characters or fewer",
+    "defaultMaxLength": "Must be {max} characters or less",
     "defaultSpecialCharacter": "{fieldName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
     "chooseOption": "Choose an option",
     "email": {

@@ -187,7 +187,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       isManualOpen: addressConfirmedRadioSelection === 'no',
       legendNa: t('legendNa'),
       legendhintNa: t('legend.hintNa'),
-      caption: t('caption'),
       labels: {
         yes: t('labels.yes'),
         no: t('labels.no'),

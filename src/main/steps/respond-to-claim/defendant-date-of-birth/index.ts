@@ -43,7 +43,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals.validatedCase?.data;

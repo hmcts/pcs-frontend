@@ -12,8 +12,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
-    paragraph: 'dependantChildrenParagraph',
+    paragraph: 'dependentChildrenParagraph',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -75,7 +74,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       translationKey: {
         label: 'heading',
       },
-      errorMessage: 'errors.dependantChildren',
+      errorMessage: 'errors.dependentChildren',
       options: [
         {
           value: 'yes',
@@ -87,11 +86,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               required: true,
               maxLength: 500,
               translationKey: {
-                label: 'dependantChildrenDetailsLabel',
-                hint: 'dependantChildrenDetailsHint',
+                label: 'dependentChildrenDetailsLabel',
+                hint: 'dependentChildrenDetailsHint',
               },
               labelClasses: 'govuk-label--s',
-              errorMessage: 'errors.dependantChildrenDetails',
+              errorMessage: 'errors.dependentChildrenDetails',
             },
           },
         },
