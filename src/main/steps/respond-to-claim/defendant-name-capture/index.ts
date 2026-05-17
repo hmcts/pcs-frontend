@@ -6,7 +6,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-name-capture',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantContactDetailsParty?.firstName),
   stepDir: __dirname,
   showCancelButton: false,

@@ -9,7 +9,6 @@ import { FeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.makeCounterClaim),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaim.njk`,

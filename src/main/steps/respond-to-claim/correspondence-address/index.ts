@@ -100,7 +100,6 @@ const fieldsConfig: FormFieldConfig[] = [
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'correspondence-address',
-  kind: 'question',
   isAnswered: req =>
     Boolean(
       req.res?.locals?.validatedCase?.defendantResponses?.correspondenceAddressConfirmation ||

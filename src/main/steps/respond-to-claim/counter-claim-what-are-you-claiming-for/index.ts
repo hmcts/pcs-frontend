@@ -5,7 +5,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-what-are-you-claiming-for',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.counterClaim?.claimType),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimWhatAreYouClaimingFor.njk`,

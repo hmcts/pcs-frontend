@@ -60,7 +60,6 @@ const validateOtherBenefitsAmount = createAmountValidator(
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-regular-income-do-you-receive',
-  kind: 'question',
   isAnswered: () => true,
   stepDir: __dirname,
   showCancelButton: false,

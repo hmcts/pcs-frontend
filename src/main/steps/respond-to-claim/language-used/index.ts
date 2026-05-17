@@ -6,7 +6,6 @@ import type { CaseData, LanguageUsed } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'language-used',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.languageUsed),
   stepDir: __dirname,
   customTemplate: `${__dirname}/languageUsed.njk`,

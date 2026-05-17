@@ -7,7 +7,6 @@ import type { CaseData, PaymentAgreement, YesNoValue } from '@services/ccdCase.i
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-made',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.paymentAgreement?.anyPaymentsMade),
   stepDir: __dirname,
   translationKeys: {
