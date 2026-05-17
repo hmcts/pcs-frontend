@@ -15,7 +15,7 @@ import type { SectionConfig, SectionStatus } from '@modules/steps/stepFlow.inter
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
-import { getAllSectionStatuses, getFirstVisibleStep } from '@services/sectionStatus';
+import { getAllSectionStatuses, getFirstVisibleStep, getStatusTagClasses } from '@services/sectionStatus';
 import { getUserVariant } from '@steps';
 
 const stepName = 'task-list';
@@ -120,37 +120,23 @@ function buildItem(
   req: Request
 ): TaskListItem {
   const title = { text: t(section.titleKey) };
+  const statusText = t(`taskList.status.${status}`);
 
   if (status === 'NOT_AVAILABLE_YET') {
     return {
       title,
-      // No href → macro renders as non-link greyed text.
-      status: { text: t('taskList.status.notAvailableYet'), classes: 'govuk-task-list__status--cannot-start-yet' },
-      hint: { text: t('taskList.hint.notAvailableYet') },
+      // Omitting href makes the macro render as non-link greyed text.
+      status: { text: statusText, classes: 'govuk-task-list__status--cannot-start-yet' },
+      hint: { text: t(`taskList.hint.${status}`) },
     };
   }
 
   const firstStep = getFirstVisibleStep(section, flowConfig, req);
   const href = firstStep ? `/case/${caseRef}/respond-to-claim/${firstStep}` : undefined;
-
-  if (status === 'DONE') {
-    return {
-      title,
-      href,
-      status: { tag: { text: t('taskList.status.done'), classes: 'govuk-tag govuk-tag--green' } },
-    };
-  }
-  if (status === 'IN_PROGRESS') {
-    return {
-      title,
-      href,
-      status: { tag: { text: t('taskList.status.inProgress'), classes: 'govuk-tag govuk-tag--blue' } },
-    };
-  }
   return {
     title,
     href,
-    status: { tag: { text: t('taskList.status.available'), classes: 'govuk-tag govuk-tag--turquoise' } },
+    status: { tag: { text: statusText, classes: getStatusTagClasses(status) ?? '' } },
   };
 }
 

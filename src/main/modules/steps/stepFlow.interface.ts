@@ -34,7 +34,15 @@ export type SectionApplicabilityCondition = (req: Request) => Promise<boolean>;
 
 export type StepKind = 'question' | 'interstitial' | 'cya';
 
-export type SectionStatus = 'NOT_APPLICABLE' | 'NOT_AVAILABLE_YET' | 'AVAILABLE' | 'IN_PROGRESS' | 'DONE';
+export const SECTION_STATUS = {
+  NOT_APPLICABLE: 'NOT_APPLICABLE',
+  NOT_AVAILABLE_YET: 'NOT_AVAILABLE_YET',
+  AVAILABLE: 'AVAILABLE',
+  IN_PROGRESS: 'IN_PROGRESS',
+  DONE: 'DONE',
+} as const;
+
+export type SectionStatus = (typeof SECTION_STATUS)[keyof typeof SECTION_STATUS];
 
 export interface SectionAvailability {
   available: boolean;
