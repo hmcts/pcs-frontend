@@ -43,7 +43,6 @@ const validateMoney =
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'priority-debt-details',
-  kind: 'question',
   isAnswered: req =>
     Boolean(
       req.res?.locals?.validatedCase?.defendantResponses?.householdCircumstances?.debtTotal ||

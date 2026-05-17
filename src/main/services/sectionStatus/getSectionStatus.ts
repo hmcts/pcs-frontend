@@ -17,9 +17,6 @@ export async function getSectionStatus(
   if (hasUnsatisfiedDependencies(section, allStatuses)) {
     return 'NOT_AVAILABLE_YET';
   }
-  if (isExplicitlyUnavailable(section, req)) {
-    return 'NOT_AVAILABLE_YET';
-  }
 
   const questionSteps = visibleQuestionSteps(section, stepRegistry, flowConfig, req);
   if (questionSteps.length === 0) {
@@ -52,10 +49,6 @@ function hasUnsatisfiedDependencies(section: SectionConfig, allStatuses: Readonl
   });
 }
 
-function isExplicitlyUnavailable(section: SectionConfig, req: Request): boolean {
-  return Boolean(section.isAvailable && !section.isAvailable(req).available);
-}
-
 interface RegisteredStep {
   stepName: string;
   step: StepDefinition;
@@ -70,7 +63,7 @@ function visibleQuestionSteps(
   return section.steps
     .map(stepName => ({ stepName, step: stepRegistry[stepName] }))
     .filter((entry): entry is RegisteredStep => entry.step !== undefined)
-    .filter(({ step }) => (step.kind ?? 'question') === 'question')
+    .filter(({ step }) => step.isAnswered !== undefined)
     .filter(({ stepName }) => isStepVisible(stepName, flowConfig, req));
 }
 

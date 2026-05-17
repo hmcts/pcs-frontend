@@ -13,7 +13,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'have-you-applied-for-universal-credit',
-  kind: 'question',
   isAnswered: req =>
     Boolean(req.res?.locals?.validatedCase?.defendantResponses?.householdCircumstances?.hasAppliedForUniversalCredit),
   stepDir: __dirname,

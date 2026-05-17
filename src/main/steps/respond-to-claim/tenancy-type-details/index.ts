@@ -64,7 +64,6 @@ const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.tenancyTypeConfirmation),
   stepDir: __dirname,
   translationKeys: {

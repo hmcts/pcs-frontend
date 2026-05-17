@@ -14,7 +14,6 @@ const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 d
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'rent-arrears-dispute',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.rentArrearsAmountConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,

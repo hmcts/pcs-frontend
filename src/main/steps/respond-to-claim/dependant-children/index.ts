@@ -7,7 +7,6 @@ import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccd
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-you-have-any-dependant-children',
-  kind: 'question',
   isAnswered: req =>
     Boolean(req.res?.locals?.validatedCase?.defendantResponses?.householdCircumstances?.dependantChildren),
   stepDir: __dirname,

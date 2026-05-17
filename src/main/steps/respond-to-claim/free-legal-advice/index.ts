@@ -5,7 +5,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'free-legal-advice',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.freeLegalAdvice),
   stepDir: __dirname,
   customTemplate: `${__dirname}/freeLegalAdvice.njk`,

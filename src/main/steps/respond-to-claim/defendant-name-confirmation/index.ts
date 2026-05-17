@@ -7,7 +7,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-name-confirmation',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.defendantNameConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,

@@ -6,7 +6,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'income-and-expenses',
-  kind: 'question',
   isAnswered: req =>
     Boolean(req.res?.locals?.validatedCase?.defendantResponses?.householdCircumstances?.shareIncomeExpenseDetails),
   stepDir: __dirname,

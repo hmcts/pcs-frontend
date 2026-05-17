@@ -45,7 +45,6 @@ const storage: DocumentStorage = {
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'upload-document',
-  kind: 'question',
   isAnswered: req =>
     Boolean(
       req.res?.locals?.validatedCase?.defendantResponses?.defendantDocuments &&

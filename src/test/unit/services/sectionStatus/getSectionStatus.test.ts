@@ -14,7 +14,6 @@ const stub = (overrides: Partial<StepDefinition> = {}): StepDefinition =>
     view: 'stub.njk',
     stepDir: '/stub',
     getController: () => (() => undefined) as never,
-    kind: 'question',
     isAnswered: () => false,
     ...overrides,
   }) as StepDefinition;
@@ -59,11 +58,6 @@ describe('getSectionStatus', () => {
     expect(await getSectionStatus(sec, flow(), registry, reqStub, allStatuses)).toBe('AVAILABLE');
   });
 
-  it('returns NOT_AVAILABLE_YET when isAvailable predicate returns false', async () => {
-    const sec = section({ isAvailable: () => ({ available: false, reason: 'wait' }) });
-    expect(await getSectionStatus(sec, flow(), {}, reqStub, new Map())).toBe('NOT_AVAILABLE_YET');
-  });
-
   it('returns AVAILABLE when no question steps are answered', async () => {
     const sec = section({ steps: ['stepA', 'stepB'] });
     const registry = {
@@ -91,14 +85,14 @@ describe('getSectionStatus', () => {
     expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('DONE');
   });
 
-  it("ignores 'interstitial' and 'cya' steps when counting answers", async () => {
+  it('ignores steps without isAnswered (interstitials and CYAs) when counting answers', async () => {
     const sec = section({ steps: ['intro', 'stepA', 'cya'] });
     const registry = {
-      intro: stub({ kind: 'interstitial' }),
-      stepA: stub({ kind: 'question', isAnswered: () => true }),
-      cya: stub({ kind: 'cya' }),
+      intro: { ...stub(), isAnswered: undefined },
+      stepA: stub({ isAnswered: () => true }),
+      cya: { ...stub(), isAnswered: undefined },
     };
-    // Only stepA counts; it's answered → DONE.
+    // Only stepA has isAnswered → only stepA counts → DONE.
     expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('DONE');
   });
 
@@ -143,10 +137,10 @@ describe('getSectionStatus', () => {
     expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('IN_PROGRESS');
   });
 
-  it('treats missing isAnswered as "not answered"', async () => {
+  it('treats a section with no question steps (no isAnswered predicates) as NOT_APPLICABLE', async () => {
     const sec = section({ steps: ['stepA'] });
-    const registry = { stepA: stub({ isAnswered: undefined }) };
-    expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('AVAILABLE');
+    const registry = { stepA: { ...stub(), isAnswered: undefined } };
+    expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('NOT_APPLICABLE');
   });
 
   it('skips steps not present in the registry (graceful)', async () => {
