@@ -13,6 +13,7 @@ import { Logger } from '@modules/logger';
 import { getStepOrder } from '@modules/steps/flow';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { validateSectionConfig } from '@services/sectionStatus';
 
 const logger = Logger.getLogger('steps');
 
@@ -72,6 +73,13 @@ export function validateJourneyRegistry(registry: Record<string, JourneyConfig>)
       throw new Error(`Duplicate journey slug "${journey.slug}" in journeyRegistry`);
     }
     seenSlugs.add(journey.slug);
+
+    // Sectionalised flows must have an acyclic dependsOn graph with valid refs.
+    // No-op for flows without sections (legalrep, gen-app).
+    validateSectionConfig(journey.default.flowConfig);
+    if (journey.legalrep) {
+      validateSectionConfig(journey.legalrep.flowConfig);
+    }
   }
 }
 
