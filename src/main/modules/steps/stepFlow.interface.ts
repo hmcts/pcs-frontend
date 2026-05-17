@@ -62,9 +62,7 @@ export interface JourneyFlowConfig {
   nonSectionStepOrder?: string[];
   steps: Record<string, StepConfig>;
   sections?: SectionConfig[];
-  // Hub-and-spoke opt-in (HDPI-5350). When set, the back-link from the first
-  // visible step of any section returns to this hub step instead of walking
-  // back into the previous section. Must be a step name reachable via
-  // nonSectionStepOrder (or stepOrder for non-sectional journeys).
+  // When set, the back-link from the first visible step of any section returns
+  // here instead of walking back into the previous section.
   hubStepName?: string;
 }

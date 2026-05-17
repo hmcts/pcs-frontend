@@ -34,7 +34,9 @@ const section = (overrides: Partial<SectionConfig> = {}): SectionConfig => ({
 describe('getSectionStatus', () => {
   it('throws when called with a non-sectionalised flow config', async () => {
     const flowConfig: JourneyFlowConfig = { steps: {} }; // no sections — legalrep shape
-    await expect(getSectionStatus(section(), flowConfig, {}, reqStub, new Map())).rejects.toThrow(/no sections/);
+    await expect(getSectionStatus(section(), flowConfig, {}, reqStub, new Map())).rejects.toThrow(
+      /non-sectionalised flow/
+    );
   });
 
   it('returns NOT_APPLICABLE when isApplicable resolves false', async () => {

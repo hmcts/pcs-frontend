@@ -7,25 +7,7 @@ export class SectionConfigError extends Error {
   }
 }
 
-/**
- * Validates the static shape of a sectionalised flow's `sections` array at
- * server startup. Throws `SectionConfigError` on any of:
- *
- *   1. Duplicate section ids
- *   2. `dependsOn` referencing a non-existent section id (dangling)
- *   3. Self-reference (`section.dependsOn` contains its own id)
- *   4. Cycle in the `dependsOn` graph (A → B → A, A → B → C → A, etc.)
- *
- * Cycles are detected via DFS with grey/black colouring. The error message
- * names the cycle path so the dev sees exactly which sections are involved.
- *
- * Called once at bootstrap (Phase 1c wiring) — fast-fails the server on
- * misconfigured sections so the bug is impossible to deploy.
- */
 export function validateSectionConfig(flowConfig: JourneyFlowConfig): void {
-  // No-op for flows without sections (legalrep, journeys that opt out of the
-  // sectional model). Decision #44 in the plan: services are sections-only,
-  // but the validator itself is safe to call on any flow.
   if (!flowConfig.sections) {
     return;
   }
@@ -99,7 +81,6 @@ function visit(
   for (const next of adjacency.get(node) ?? []) {
     const nextColour = colour.get(next);
     if (nextColour === 'grey') {
-      // Cycle — slice the path from where `next` first appeared, then close it.
       const cycleStart = path.indexOf(next);
       return [...path.slice(cycleStart), next];
     }
