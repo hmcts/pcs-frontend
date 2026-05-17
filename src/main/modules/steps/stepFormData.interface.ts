@@ -1,7 +1,8 @@
-import { RequestHandler } from 'express';
+import { Request, RequestHandler } from 'express';
 
 import type { DocumentStorage } from '@modules/documents/storage';
 import { GetController, type SupportedLang } from '@modules/steps';
+import type { StepKind } from '@modules/steps/stepFlow.interface';
 
 export interface ErrorField {
   field: string;
@@ -29,4 +30,6 @@ export interface StepDefinition {
   // Absent on every non-upload step. The upload handler refuses requests targeting
   // a step that does not declare this.
   documentStorage?: DocumentStorage;
+  kind?: StepKind;
+  isAnswered?: (req: Request) => boolean;
 }
