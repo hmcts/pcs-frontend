@@ -100,6 +100,12 @@ const fieldsConfig: FormFieldConfig[] = [
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'correspondence-address',
+  kind: 'question',
+  isAnswered: req =>
+    Boolean(
+      req.res?.locals?.validatedCase?.defendantResponses?.correspondenceAddressConfirmation ||
+      req.res?.locals?.validatedCase?.defendantContactDetailsPartyAddress?.AddressLine1
+    ),
   stepDir: __dirname,
   customTemplate: 'respond-to-claim/correspondence-address/correspondenceAddress.njk',
   beforeRedirect: async req => {

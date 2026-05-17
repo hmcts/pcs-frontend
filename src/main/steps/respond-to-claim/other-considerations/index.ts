@@ -6,6 +6,8 @@ import type { CaseData, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'other-considerations',
+  kind: 'question',
+  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.otherConsiderations),
   stepDir: __dirname,
   customTemplate: `${__dirname}/otherConsiderations.njk`,
   translationKeys: {
