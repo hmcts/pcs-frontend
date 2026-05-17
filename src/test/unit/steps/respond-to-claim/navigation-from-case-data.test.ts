@@ -83,8 +83,12 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const englishReq = createReq({ legislativeCountry: 'England' });
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
+    // HDPI-5350 — dispute-claim-interstitial moved into disputeAndTenancy
+    // section as its first step (out of nonSectionStepOrder), so the English
+    // (non-Wales) back-walk from tenancy-type-details lands on it after the
+    // hidden landlord-* steps are skipped.
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
-      'check-your-answers-personal-details'
+      'dispute-claim-interstitial'
     );
   });
 
