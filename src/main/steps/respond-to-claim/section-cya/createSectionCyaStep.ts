@@ -77,9 +77,6 @@ export function createSectionCyaStep({
           return res.redirect(303, dashboardUrl ?? '/');
         }
 
-        // Hub-and-spoke (HDPI-5350): completing a section CYA returns the
-        // citizen to the task-list hub rather than walking forward into the
-        // next section linearly.
         const activeFlow = getFlowConfigForJourney(journeyName, req) || flowConfig;
         const hub = activeFlow.hubStepName;
         if (hub) {

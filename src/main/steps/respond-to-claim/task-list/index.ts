@@ -24,9 +24,6 @@ const VIEW = 'respond-to-claim/task-list/taskList.njk';
 
 const stepNavigation = createStepNavigation(() => flowConfig);
 
-// Decision #43 — legal reps who manually URL-nav to /respond-to-claim/task-list
-// must bounce out of the citizen-only hub into the dashboard. Runs before the
-// getController so the page is never rendered for legalrep variants.
 const redirectLegalrepToDashboard: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   if (getUserVariant(req) === 'legalrep') {
     return res.redirect(303, getDashboardUrl(req.res?.locals?.validatedCase?.id) ?? '/');
@@ -69,7 +66,7 @@ export const step: StepDefinition = {
 
         return {
           backUrl: getDashboardUrl(validatedCase?.id) ?? '/',
-          propertyAddress: formatPropertyAddress(validatedCase),
+          propertyAddress: formatCcdAddress(validatedCase?.propertyAddress),
           caseNumber: formatCaseNumber(validatedCase?.id),
           groups,
           iWantToLinks: [
@@ -157,12 +154,7 @@ function buildItem(
   };
 }
 
-// Per Figma decision #10 — full address (AddressLine1, PostTown, County if present, Postcode).
-function formatPropertyAddress(validatedCase: CcdCaseModel | undefined): string {
-  return formatCcdAddress(validatedCase?.propertyAddress);
-}
-
-// 4-digit groups (e.g. 1234567890123456 → "1234 5678 9012 3456")
+// 4-digit groups, e.g. 1234567890123456 -> "1234 5678 9012 3456".
 function formatCaseNumber(caseId: string | undefined): string {
   if (!caseId) {
     return '';

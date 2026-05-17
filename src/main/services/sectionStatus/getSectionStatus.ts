@@ -2,19 +2,6 @@ import type { Request } from 'express';
 
 import type { JourneyFlowConfig, SectionConfig, SectionStatus, StepDefinition } from './types';
 
-/**
- * Computes the status of one section from `validatedCase` and the user's request.
- * Pure function — no side effects, no persistence. Status is derived; the data IS
- * the state (per the design doc `cya.md`).
- *
- * Throws if the supplied flow config does not have `sections` — that's a sign the
- * caller is using the wrong flow (e.g., calling this on the linear legalrep
- * flow). Fail loud rather than silently produce wrong status.
- *
- * The `allStatuses` parameter is the partial map of statuses already computed
- * (used to resolve `dependsOn` gates). `getAllSectionStatuses` is the
- * orchestrator that computes them in topological order and feeds this in.
- */
 export async function getSectionStatus(
   section: SectionConfig,
   flowConfig: JourneyFlowConfig,
@@ -22,51 +9,73 @@ export async function getSectionStatus(
   req: Request,
   allStatuses: ReadonlyMap<string, SectionStatus>
 ): Promise<SectionStatus> {
-  if (!flowConfig.sections) {
-    throw new Error(
-      'getSectionStatus called with a flowConfig that has no sections. ' +
-        'Section status is only meaningful for sectionalised journeys. ' +
-        `Section id: ${section.id}, flow: ${flowConfig.journeyName ?? '(unnamed)'}.`
-    );
-  }
+  assertSectionalisedFlow(flowConfig, section.id);
 
-  // Gate 1 — applicability. Section vanishes entirely if not applicable.
-  if (section.isApplicable && !(await section.isApplicable(req))) {
+  if (await isSectionNotApplicable(section, req)) {
     return 'NOT_APPLICABLE';
   }
-
-  // Gate 2 — dependsOn. Section is locked until all listed deps are DONE
-  // (or NOT_APPLICABLE — non-applicable deps are treated as satisfied).
-  if (section.dependsOn?.length) {
-    const blocking = section.dependsOn.filter(depId => {
-      const depStatus = allStatuses.get(depId);
-      return depStatus !== 'DONE' && depStatus !== 'NOT_APPLICABLE';
-    });
-    if (blocking.length > 0) {
-      return 'NOT_AVAILABLE_YET';
-    }
+  if (hasUnsatisfiedDependencies(section, allStatuses)) {
+    return 'NOT_AVAILABLE_YET';
   }
-
-  // Gate 3 — escape-hatch predicate (rare).
-  if (section.isAvailable && !section.isAvailable(req).available) {
+  if (isExplicitlyUnavailable(section, req)) {
     return 'NOT_AVAILABLE_YET';
   }
 
-  // Count visible question steps and how many are answered.
-  const questionSteps = section.steps
-    .map(stepName => ({ stepName, step: stepRegistry[stepName] }))
-    .filter((entry): entry is { stepName: string; step: StepDefinition } => entry.step !== undefined)
-    .filter(({ step }) => (step.kind ?? 'question') === 'question')
-    .filter(({ stepName }) => isStepVisible(stepName, flowConfig, req));
-
-  // Section with no visible question steps (e.g., all hidden by showCondition,
-  // or only interstitials + CYA) → nothing for the user to do here.
+  const questionSteps = visibleQuestionSteps(section, stepRegistry, flowConfig, req);
   if (questionSteps.length === 0) {
     return 'NOT_APPLICABLE';
   }
 
-  const answeredCount = questionSteps.filter(({ step }) => safeIsAnswered(step, req)).length;
+  return scoreAnsweredness(questionSteps, req);
+}
 
+function assertSectionalisedFlow(flowConfig: JourneyFlowConfig, sectionId: string): void {
+  if (!flowConfig.sections) {
+    throw new Error(
+      `getSectionStatus called on non-sectionalised flow '${flowConfig.journeyName ?? '(unnamed)'}' ` +
+        `for section '${sectionId}'.`
+    );
+  }
+}
+
+async function isSectionNotApplicable(section: SectionConfig, req: Request): Promise<boolean> {
+  return Boolean(section.isApplicable && !(await section.isApplicable(req)));
+}
+
+function hasUnsatisfiedDependencies(section: SectionConfig, allStatuses: ReadonlyMap<string, SectionStatus>): boolean {
+  if (!section.dependsOn?.length) {
+    return false;
+  }
+  return section.dependsOn.some(depId => {
+    const depStatus = allStatuses.get(depId);
+    return depStatus !== 'DONE' && depStatus !== 'NOT_APPLICABLE';
+  });
+}
+
+function isExplicitlyUnavailable(section: SectionConfig, req: Request): boolean {
+  return Boolean(section.isAvailable && !section.isAvailable(req).available);
+}
+
+interface RegisteredStep {
+  stepName: string;
+  step: StepDefinition;
+}
+
+function visibleQuestionSteps(
+  section: SectionConfig,
+  stepRegistry: Record<string, StepDefinition>,
+  flowConfig: JourneyFlowConfig,
+  req: Request
+): RegisteredStep[] {
+  return section.steps
+    .map(stepName => ({ stepName, step: stepRegistry[stepName] }))
+    .filter((entry): entry is RegisteredStep => entry.step !== undefined)
+    .filter(({ step }) => (step.kind ?? 'question') === 'question')
+    .filter(({ stepName }) => isStepVisible(stepName, flowConfig, req));
+}
+
+function scoreAnsweredness(questionSteps: RegisteredStep[], req: Request): SectionStatus {
+  const answeredCount = questionSteps.filter(({ step }) => safeIsAnswered(step, req)).length;
   if (answeredCount === 0) {
     return 'AVAILABLE';
   }
@@ -84,11 +93,7 @@ function isStepVisible(stepName: string, flowConfig: JourneyFlowConfig, req: Req
   return stepConfig.showCondition(req);
 }
 
-/**
- * Defensive wrapper around `step.isAnswered` — a buggy predicate must not crash
- * the task-list page. On exception we fall through to "not answered" so the
- * section stays in a safe IN_PROGRESS / AVAILABLE state rather than DONE.
- */
+// A thrown isAnswered must not crash the task-list — treat as unanswered.
 function safeIsAnswered(step: StepDefinition, req: Request): boolean {
   if (!step.isAnswered) {
     return false;

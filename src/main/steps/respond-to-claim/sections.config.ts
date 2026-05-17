@@ -3,8 +3,7 @@ import type { Request } from 'express';
 import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 import { hasAnyRentArrearsGround } from '../utils';
 
-// Visual groups on the task-list page (Figma decision #4 + #6).
-// Section order within a group is the declaration order in sectionDefs below.
+// Visual groups on the task-list page. Section order within a group follows declaration order below.
 export const RESPOND_TO_CLAIM_SECTION_GROUPS = [
   { id: 'checkBeforeYouStart', titleKey: 'taskList.groups.checkBeforeYouStart' },
   { id: 'yourResponse', titleKey: 'taskList.groups.yourResponse' },

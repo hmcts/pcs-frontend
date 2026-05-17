@@ -212,9 +212,6 @@ async function getPreviousStepBySectionTraversal(req: Request, currentStepName: 
     }
   }
 
-  // Hub-and-spoke opt-in (HDPI-5350): if the journey declares a hub step,
-  // the first visible step of any section routes back to the hub instead of
-  // walking into the previous section.
   if (flowConfig.hubStepName && nonSectionSteps.includes(flowConfig.hubStepName)) {
     return flowConfig.hubStepName;
   }
