@@ -46,9 +46,9 @@ export interface SectionConfig {
   id: string;
   groupId?: string;
   titleKey: string;
-  steps: string[];
+  steps: readonly string[];
   isApplicable?: SectionApplicabilityCondition;
-  dependsOn?: string[];
+  dependsOn?: readonly string[];
 }
 
 export interface JourneyFlowConfig {
@@ -56,10 +56,10 @@ export interface JourneyFlowConfig {
   journeyName?: string;
   useShowConditions?: boolean;
   useSessionFormData?: boolean;
-  stepOrder?: string[];
-  nonSectionStepOrder?: string[];
+  stepOrder?: readonly string[];
+  nonSectionStepOrder?: readonly string[];
   steps: Record<string, StepConfig>;
-  sections?: SectionConfig[];
+  sections?: readonly SectionConfig[];
   // When set, the back-link from the first visible step of any section returns
   // here instead of walking back into the previous section.
   hubStepName?: string;

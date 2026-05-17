@@ -24,9 +24,10 @@ import {
   shouldShowUniversalCreditStep,
 } from './flowConditions';
 import { respondToClaimSections } from './sections.config';
+import type { RespondToClaimStepName } from './stepRegistry';
 import { isMoneyCounterClaim } from './utils';
 
-import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
+import type { JourneyFlowConfig, StepConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -130,5 +131,5 @@ export const flowConfig: JourneyFlowConfig = {
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
     },
-  },
+  } satisfies Partial<Record<RespondToClaimStepName, StepConfig>>,
 };

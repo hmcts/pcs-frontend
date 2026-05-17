@@ -39,7 +39,8 @@ export function createSectionCyaStep({
   stepDir,
   buildRows,
 }: SectionCyaStepConfig): StepDefinition {
-  const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
+  const resolveFlow = (req: Request) => getFlowConfigForJourney(journeyName, req) || flowConfig;
+  const stepNavigation = createStepNavigation(resolveFlow);
 
   return {
     url: `${RESPOND_TO_CLAIM_ROUTE}/${stepName}`,
@@ -76,7 +77,7 @@ export function createSectionCyaStep({
           return res.redirect(303, dashboardUrl ?? '/');
         }
 
-        const activeFlow = getFlowConfigForJourney(journeyName, req) || flowConfig;
+        const activeFlow = resolveFlow(req);
         const hub = activeFlow.hubStepName;
         if (hub) {
           return res.redirect(303, getStepUrl(hub, activeFlow, caseId));
