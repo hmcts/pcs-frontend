@@ -32,12 +32,25 @@ export interface StepConfig {
 
 export type SectionApplicabilityCondition = (req: Request) => Promise<boolean>;
 
+export type StepKind = 'question' | 'interstitial' | 'cya';
+
+export type SectionStatus = 'NOT_APPLICABLE' | 'NOT_AVAILABLE_YET' | 'AVAILABLE' | 'IN_PROGRESS' | 'DONE';
+
+export interface SectionAvailability {
+  available: boolean;
+  reason?: string;
+}
+
+export type SectionAvailabilityPredicate = (req: Request) => SectionAvailability;
+
 export interface SectionConfig {
   id: string;
+  groupId?: string;
   titleKey: string;
   steps: string[];
   isApplicable?: SectionApplicabilityCondition;
   dependsOn?: string[];
+  isAvailable?: SectionAvailabilityPredicate;
 }
 
 export interface JourneyFlowConfig {
