@@ -6,6 +6,7 @@ import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 import type { SummaryListRow } from './cyaRow';
 
 import { createGetController, createStepNavigation, getTranslationFunction } from '@modules/steps';
+import { getStepUrl } from '@modules/steps/flow';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
@@ -69,11 +70,20 @@ export function createSectionCyaStep({
     postController: {
       post: async (req: Request, res: Response) => {
         const action = req.body?.action;
+        const caseId = req.res?.locals.validatedCase?.id;
 
         if (action === 'saveForLater') {
-          const caseId = req.res?.locals.validatedCase?.id;
           const dashboardUrl = getDashboardUrl(caseId);
           return res.redirect(303, dashboardUrl ?? '/');
+        }
+
+        // Hub-and-spoke (HDPI-5350): completing a section CYA returns the
+        // citizen to the task-list hub rather than walking forward into the
+        // next section linearly.
+        const activeFlow = getFlowConfigForJourney(journeyName, req) || flowConfig;
+        const hub = activeFlow.hubStepName;
+        if (hub) {
+          return res.redirect(303, getStepUrl(hub, activeFlow, caseId));
         }
 
         const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
