@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { getFirstVisibleStep } from '../../../../main/services/sectionStatus/getFirstVisibleStep';
+import { getFirstVisibleStep } from '../../../../main/services/sectionStatus';
 
 import type { JourneyFlowConfig, SectionConfig } from '@modules/steps/stepFlow.interface';
 

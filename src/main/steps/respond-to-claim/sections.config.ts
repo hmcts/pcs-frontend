@@ -3,6 +3,8 @@ import type { Request } from 'express';
 import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 import { hasAnyRentArrearsGround } from '../utils';
 
+import type { RespondToClaimStepName } from './stepRegistry';
+
 // Visual groups on the task-list page. Section order within a group follows declaration order below.
 export const RESPOND_TO_CLAIM_SECTION_GROUPS = [
   { id: 'checkBeforeYouStart', titleKey: 'taskList.groups.checkBeforeYouStart' },
@@ -127,24 +129,17 @@ const sectionDefs = [
     ],
     steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used', 'check-your-answers'],
   },
-] as const;
+] as const satisfies readonly {
+  id: string;
+  groupId: string;
+  titleKey: string;
+  steps: readonly RespondToClaimStepName[];
+  isApplicable?: (req: Request) => Promise<boolean>;
+  dependsOn?: readonly string[];
+}[];
 
 export type RespondToClaimSectionId = (typeof sectionDefs)[number]['id'];
 
 export const RESPOND_TO_CLAIM_SECTION_IDS: readonly RespondToClaimSectionId[] = sectionDefs.map(s => s.id);
 
-export const respondToClaimSections: SectionConfig[] = sectionDefs.map(s => {
-  const out: SectionConfig = {
-    id: s.id,
-    groupId: s.groupId,
-    titleKey: s.titleKey,
-    steps: [...s.steps],
-  };
-  if ('isApplicable' in s) {
-    out.isApplicable = s.isApplicable;
-  }
-  if ('dependsOn' in s) {
-    out.dependsOn = [...s.dependsOn];
-  }
-  return out;
-});
+export const respondToClaimSections: readonly SectionConfig[] = sectionDefs;

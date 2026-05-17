@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { getSectionStatus } from '../../../../main/services/sectionStatus/getSectionStatus';
+import { getSectionStatus } from '../../../../main/services/sectionStatus';
 
 import type { JourneyFlowConfig, SectionConfig, SectionStatus } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
