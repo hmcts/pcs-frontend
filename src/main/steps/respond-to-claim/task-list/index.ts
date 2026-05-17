@@ -63,15 +63,22 @@ export const step: StepDefinition = {
         const allStatuses = await getAllSectionStatuses(flowConfig, stepRegistry, req);
         const groups = buildGroups(validatedCase, allStatuses, t, req);
 
+        const caseId = validatedCase?.id;
         return {
-          backUrl: getDashboardUrl(validatedCase?.id) ?? '/',
+          backUrl: getDashboardUrl(caseId) ?? '/',
           propertyAddress: formatCcdAddress(validatedCase?.propertyAddress),
-          caseNumber: formatCaseNumber(validatedCase?.id),
+          caseNumber: formatCaseNumber(caseId),
           groups,
           iWantToLinks: [
-            { key: 'iWantTo.makeApplication', href: '#' },
-            { key: 'iWantTo.breathingSpace', href: '#' },
-            { key: 'iWantTo.legalAdviser', href: '#' },
+            {
+              key: 'iWantTo.makeApplication',
+              href: caseId ? `/case/${caseId}/make-an-application/choose-an-application` : '#',
+            },
+            {
+              key: 'iWantTo.breathingSpace',
+              href: 'https://www.gov.uk/options-for-dealing-with-your-debts/breathing-space',
+            },
+            { key: 'iWantTo.legalAdviser', href: 'https://www.gov.uk/find-legal-advice' },
           ],
           helpSupportLinks: [
             { key: 'helpSupport.fees', href: 'https://www.gov.uk/get-help-with-court-fees' },
@@ -124,9 +131,9 @@ function buildItem(
   if (status === 'NOT_AVAILABLE_YET') {
     return {
       title,
-      // Omitting href makes the macro render as non-link greyed text.
+      // GOV.UK design system pattern for a locked task: plain secondary-text
+      // colour (no tag pill). See https://design-system.service.gov.uk/components/task-list/
       status: { text: statusText, classes: 'govuk-task-list__status--cannot-start-yet' },
-      hint: { text: t(`taskList.hint.${status}`) },
     };
   }
 
