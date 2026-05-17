@@ -10,9 +10,6 @@
       "DONE": "cyDone",
       "NOT_AVAILABLE_YET": "cyNot available yet"
     },
-    "hint": {
-      "NOT_AVAILABLE_YET": "cyYou can review and submit your response after completing all sections above."
-    },
     "groups": {
       "checkBeforeYouStart": "cyCheck before you start",
       "yourResponse": "cyYour response",
