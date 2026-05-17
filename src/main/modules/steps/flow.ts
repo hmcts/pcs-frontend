@@ -376,7 +376,7 @@ export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowC
   };
 }
 
-function getStepIndex(stepOrder: string[], stepName: string) {
+function getStepIndex(stepOrder: readonly string[], stepName: string) {
   const stepIndex = stepOrder.indexOf(stepName);
   if (stepIndex === -1) {
     throw new Error(`Step ${stepName} not found in stepOrder`);
@@ -384,7 +384,7 @@ function getStepIndex(stepOrder: string[], stepName: string) {
   return stepIndex;
 }
 
-export function getStepOrder(flowConfig: JourneyFlowConfig): string[] {
+export function getStepOrder(flowConfig: JourneyFlowConfig): readonly string[] {
   if (flowConfig.stepOrder?.length) {
     return flowConfig.stepOrder;
   }
@@ -402,7 +402,11 @@ type StepLocation =
   | { kind: 'section'; sectionIndex: number; stepIndex: number }
   | { kind: 'nonSection'; stepIndex: number };
 
-function locateStep(stepName: string, sections: SectionConfig[], nonSectionSteps: string[]): StepLocation | null {
+function locateStep(
+  stepName: string,
+  sections: readonly SectionConfig[],
+  nonSectionSteps: readonly string[]
+): StepLocation | null {
   for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex++) {
     const stepIndex = sections[sectionIndex].steps.indexOf(stepName);
     if (stepIndex !== -1) {
@@ -439,11 +443,15 @@ function isStepVisibleAndCanGoBack(flowConfig: JourneyFlowConfig, stepName: stri
   return stepConfig.showCondition(req) && !stepConfig.preventBack;
 }
 
-function firstVisible(stepNames: string[], flowConfig: JourneyFlowConfig, req: Request): string | undefined {
+function firstVisible(stepNames: readonly string[], flowConfig: JourneyFlowConfig, req: Request): string | undefined {
   return stepNames.find(stepName => isStepVisible(flowConfig, stepName, req));
 }
 
-function lastVisibleAndCanGoBack(stepNames: string[], flowConfig: JourneyFlowConfig, req: Request): string | undefined {
+function lastVisibleAndCanGoBack(
+  stepNames: readonly string[],
+  flowConfig: JourneyFlowConfig,
+  req: Request
+): string | undefined {
   for (let i = stepNames.length - 1; i >= 0; i--) {
     if (isStepVisibleAndCanGoBack(flowConfig, stepNames[i], req)) {
       return stepNames[i];
