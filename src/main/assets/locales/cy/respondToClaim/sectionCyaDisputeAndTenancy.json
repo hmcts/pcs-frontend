@@ -23,6 +23,10 @@
       "label": "cy Is the tenancy type on the claim correct?",
       "changeHidden": "cy whether the tenancy type on the claim is correct"
     },
+    "tenancyTypeDetails": {
+      "label": "cy Give the correct tenancy, occupation contract or licence type",
+      "changeHidden": "cy the correct tenancy, occupation contract or licence type"
+    },
     "tenancyStartDate": {
       "label": "cy When did your tenancy start?",
       "changeHidden": "cy your tenancy start date"
@@ -38,6 +42,10 @@
     "rentArrearsAmountConfirmation": {
       "label": "cy Do you agree with the rent arrears amount?",
       "changeHidden": "cy whether you agree with the rent arrears amount"
+    },
+    "rentArrearsAmountDetails": {
+      "label": "cy How much do you believe you owe in rent arrears?",
+      "changeHidden": "cy how much you believe you owe in rent arrears"
     },
     "disputeClaim": {
       "label": "cy Are you disputing other parts of the claim?",

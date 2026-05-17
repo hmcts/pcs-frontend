@@ -64,7 +64,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(keys).toContain('rows.contactByPhone.label');
     });
 
-    it('name row: shows corrected name when user said "No" to claim-recorded name', () => {
+    it('name row: emits separate Q/A and corrected-name rows when user said "No" to claim-recorded name', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -75,10 +75,11 @@ describe('section-CYA row builders — characterisation', () => {
           },
         },
       });
-      const row = buildPersonalRows(reqWith(validatedCase), t).find(
-        r => r.key.text === 'rows.defendantNameConfirmation.label'
-      );
-      expect(row?.value).toEqual({ html: 'options.no (Jane Doe)' });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const confirmation = rows.find(r => r.key.text === 'rows.defendantNameConfirmation.label');
+      const correction = rows.find(r => r.key.text === 'rows.defendantName.label');
+      expect(confirmation?.value).toEqual({ text: 'options.no' });
+      expect(correction?.value).toEqual({ html: 'Jane Doe' });
     });
 
     it('name row: tolerates Pascal-case "Yes" echo from pcs-api (no missing-key fallthrough)', () => {
@@ -132,7 +133,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(row?.value).toEqual({ text: 'options.yes' });
     });
 
-    it('correspondence-address: shows alt address as value when claim has a defendant address and user said NO', () => {
+    it('correspondence-address: emits separate Q/A and corrected-address rows when claim has a defendant address and user said NO', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -148,10 +149,11 @@ describe('section-CYA row builders — characterisation', () => {
           },
         },
       });
-      const row = buildPersonalRows(reqWith(validatedCase), t).find(
-        r => r.key.text === 'rows.correspondenceAddressConfirmation.label'
-      );
-      expect(row?.value).toMatchObject({ html: expect.stringContaining('99 New Road') });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const confirmation = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.label');
+      const correction = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
+      expect(confirmation?.value).toEqual({ text: 'options.no' });
+      expect(correction?.value).toMatchObject({ html: expect.stringContaining('99 New Road') });
     });
 
     it('correspondence-address: renders plain row (no fabricated Q/A) when claim recorded no defendant address', () => {

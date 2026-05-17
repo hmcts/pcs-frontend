@@ -1,4 +1,3 @@
-import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -96,16 +95,23 @@ function addTenancyTypeRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   if (!responses.tenancyTypeConfirmation) {
     return;
   }
-  const typeCorrect = normalizeYesNoValue(responses.tenancyTypeConfirmation) === 'YES';
-  const correctedType = responses.tenancyType?.trim();
-  const value =
-    !typeCorrect && correctedType
-      ? { html: escapeHtml(`${t('options.no')} (${correctedType})`) }
-      : { text: yesNoNotSure(responses.tenancyTypeConfirmation) };
   rows.push({
     key: { text: t('rows.tenancyTypeCorrect.label') },
-    value,
+    value: { text: yesNoNotSure(responses.tenancyTypeConfirmation) },
     actions: { items: [change('tenancy-type-details', 'rows.tenancyTypeCorrect.changeHidden')] },
+  });
+
+  if (normalizeYesNoValue(responses.tenancyTypeConfirmation) === 'YES') {
+    return;
+  }
+  const correctedType = responses.tenancyType?.trim();
+  if (!correctedType) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.tenancyTypeDetails.label') },
+    value: { text: correctedType },
+    actions: { items: [change('tenancy-type-details', 'rows.tenancyTypeDetails.changeHidden')] },
   });
 }
 
@@ -159,17 +165,24 @@ function addRentArrearsRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   if (!responses.rentArrearsAmountConfirmation) {
     return;
   }
-  // rentArrearsAmount is stored in pence — penceToPounds returning undefined for
-  // missing/invalid values also covers the "not disputing" branch.
-  const confirmed = normalizeYesNoValue(responses.rentArrearsAmountConfirmation) === 'YES';
-  const disputedAmount = !confirmed ? penceToPounds(responses.rentArrearsAmount) : undefined;
-  const value = disputedAmount
-    ? { html: escapeHtml(`${t('options.no')} (£${disputedAmount})`) }
-    : { text: yesNoNotSure(responses.rentArrearsAmountConfirmation) };
   rows.push({
     key: { text: t('rows.rentArrearsAmountConfirmation.label') },
-    value,
+    value: { text: yesNoNotSure(responses.rentArrearsAmountConfirmation) },
     actions: { items: [change('rent-arrears-dispute', 'rows.rentArrearsAmountConfirmation.changeHidden')] },
+  });
+
+  if (normalizeYesNoValue(responses.rentArrearsAmountConfirmation) === 'YES') {
+    return;
+  }
+  // rentArrearsAmount is stored in pence.
+  const disputedAmount = penceToPounds(responses.rentArrearsAmount);
+  if (!disputedAmount) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.rentArrearsAmountDetails.label') },
+    value: { text: `£${disputedAmount}` },
+    actions: { items: [change('rent-arrears-dispute', 'rows.rentArrearsAmountDetails.changeHidden')] },
   });
 }
 
