@@ -16,7 +16,7 @@
   "contactUsDetailsTelephoneHeading": "Telephone",
   "contactUsDetailsTelephoneNumber": "0300 123 7050",
   "contactUsDetailsTelephoneHours": "Monday to Friday, 8.30am to 5pm.",
-  "contactUsDetailsCallChargesLinkText": "Find out about call charges (opens in new tab)",
+  "contactUsDetailsCallChargesLinkText": "Find out about call charges",
   "buttons": {
     "saveAndContinue": "Save and continue",
     "continue": "Continue",
@@ -152,10 +152,10 @@
     }
   },
   "taskList": {
-    "startNowAndDetails": "Free Legal Advice",
+    "startNowAndDetails": "Read information about responding and free legal advice",
     "personalDetails": "Confirm your details and contact preferences",
-    "disputeAndTenancy": "Response",
-    "situationAndCircumstances": "Your circumstances",
+    "disputeAndTenancy": "Respond to specific parts of the claimant’s claim",
+    "situationAndCircumstances": "Give details about your household and circumstances",
     "payments": "Declare recent payments or agreements made",
     "incomeAndExpenditure": "Give details about your income and expenses",
     "uploadFiles": "Upload documents",
