@@ -108,11 +108,11 @@ describe('respond-to-claim navigation from CCD case data', () => {
     claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
   };
 
-  it('uses valid static previous step for household interstitial path', async () => {
+  it('routes back from the first step of situationAndCircumstances to the task-list hub', async () => {
+    // HDPI-5350 hub-and-spoke: the first visible step of any section
+    // back-links to the task-list hub, not the previous section's CYA.
     const req = createReq({ data: rentArrearsData });
-    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'section-cya-payments'
-    );
+    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe('task-list');
   });
 
   it('routes counter-claim NO to household interstitial for non-rent-arrears-only claims', async () => {
