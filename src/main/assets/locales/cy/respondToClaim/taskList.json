@@ -5,13 +5,13 @@
   "opensInNewTab": "cyopens in new tab",
   "taskList": {
     "status": {
-      "available": "cyAvailable",
-      "inProgress": "cyIn progress",
-      "done": "cyDone",
-      "notAvailableYet": "cyNot available yet"
+      "AVAILABLE": "cyAvailable",
+      "IN_PROGRESS": "cyIn progress",
+      "DONE": "cyDone",
+      "NOT_AVAILABLE_YET": "cyNot available yet"
     },
     "hint": {
-      "notAvailableYet": "cyYou can review and submit your response after completing all sections above."
+      "NOT_AVAILABLE_YET": "cyYou can review and submit your response after completing all sections above."
     },
     "groups": {
       "checkBeforeYouStart": "cyCheck before you start",
