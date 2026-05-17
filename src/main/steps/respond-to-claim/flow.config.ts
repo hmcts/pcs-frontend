@@ -37,6 +37,7 @@ export const flowConfig: JourneyFlowConfig = {
   useSessionFormData: false,
   sections: respondToClaimSections,
   nonSectionStepOrder: ['end-now', 'task-list'],
+  hubStepName: 'task-list',
   steps: {
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
