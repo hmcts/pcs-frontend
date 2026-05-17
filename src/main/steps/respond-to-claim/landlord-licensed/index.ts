@@ -6,6 +6,8 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'landlord-licensed',
+  kind: 'question',
+  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.landlordLicensed),
   stepDir: __dirname,
   customTemplate: `${__dirname}/landlordLicensed.njk`,
   translationKeys: {

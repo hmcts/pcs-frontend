@@ -11,6 +11,8 @@ const STEP_NAME = 'tenancy-date-unknown';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
+  kind: 'question',
+  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.tenancyStartDate),
   stepDir: __dirname,
   customTemplate: `${__dirname}/tenancyDateUnknown.njk`,
   translationKeys: {

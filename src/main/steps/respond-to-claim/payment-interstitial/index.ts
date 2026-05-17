@@ -6,6 +6,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'payment-interstitial',
+  kind: 'interstitial',
   stepDir: __dirname,
   customTemplate: `${__dirname}/paymentInterstitial.njk`,
   translationKeys: {

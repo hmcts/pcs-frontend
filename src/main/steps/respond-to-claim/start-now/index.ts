@@ -16,6 +16,7 @@ export const step: StepDefinition = {
   name: stepName,
   view: 'respond-to-claim/start-now/startNow.njk',
   stepDir: __dirname,
+  kind: 'interstitial',
   getController: () => {
     return createGetController(
       'respond-to-claim/start-now/startNow.njk',

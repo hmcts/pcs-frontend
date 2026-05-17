@@ -4,6 +4,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'your-household-and-circumstances',
+  kind: 'interstitial',
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',

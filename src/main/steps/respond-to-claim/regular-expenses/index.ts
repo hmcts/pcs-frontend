@@ -91,6 +91,8 @@ const regularExpenseKeys = [
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-other-regular-expenses-do-you-have',
+  kind: 'question',
+  isAnswered: () => true,
   stepDir: __dirname,
   showCancelButton: false,
   translationKeys: {

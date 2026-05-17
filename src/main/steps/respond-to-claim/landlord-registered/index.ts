@@ -10,6 +10,8 @@ const STEP_NAME = 'landlord-registered';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
+  kind: 'question',
+  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.landlordRegistered),
   stepDir: __dirname,
   customTemplate: `${__dirname}/landlordRegistered.njk`,
   translationKeys: {

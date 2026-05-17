@@ -8,6 +8,9 @@ import type { YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'exceptional-hardship',
+  kind: 'question',
+  isAnswered: req =>
+    Boolean(req.res?.locals?.validatedCase?.defendantResponses?.householdCircumstances?.exceptionalHardship),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',

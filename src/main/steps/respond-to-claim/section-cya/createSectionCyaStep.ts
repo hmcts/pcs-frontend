@@ -45,6 +45,7 @@ export function createSectionCyaStep({
     name: stepName,
     view: VIEW,
     stepDir,
+    kind: 'cya',
     getController: () =>
       createGetController(
         VIEW,
