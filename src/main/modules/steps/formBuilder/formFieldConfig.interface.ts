@@ -149,9 +149,7 @@ export interface FormBuilderConfig {
   // Storage adapter for upload steps. When set, formBuilder auto-wires uploadUrl/deleteUrl
   // onto the fileUpload field component from req.originalUrl.
   documentStorage?: DocumentStorage;
-  // Section-status-service inputs (HDPI-5350). `kind` defaults to 'question' if omitted.
-  // `isAnswered` is required for question steps in a sectionalised journey; the section
-  // status service uses it to compute Available / In progress / Done.
+  // Consumed by the section-status service. `kind` defaults to 'question'.
   kind?: import('../stepFlow.interface').StepKind;
   isAnswered?: (req: Request) => boolean;
 }

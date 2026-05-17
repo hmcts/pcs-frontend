@@ -83,10 +83,8 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const englishReq = createReq({ legislativeCountry: 'England' });
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
-    // HDPI-5350 — dispute-claim-interstitial moved into disputeAndTenancy
-    // section as its first step (out of nonSectionStepOrder), so the English
-    // (non-Wales) back-walk from tenancy-type-details lands on it after the
-    // hidden landlord-* steps are skipped.
+    // dispute-claim-interstitial is now the first step of disputeAndTenancy; the
+    // non-Wales back-walk lands on it after the hidden landlord-* steps are skipped.
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
       'dispute-claim-interstitial'
     );
@@ -109,8 +107,6 @@ describe('respond-to-claim navigation from CCD case data', () => {
   };
 
   it('routes back from the first step of situationAndCircumstances to the task-list hub', async () => {
-    // HDPI-5350 hub-and-spoke: the first visible step of any section
-    // back-links to the task-list hub, not the previous section's CYA.
     const req = createReq({ data: rentArrearsData });
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe('task-list');
   });

@@ -10,7 +10,7 @@ const CITIZEN_ONLY_STEPS = [
   'other-considerations',
   'upload-document',
   'support-needs',
-  // HDPI-5350 — task-list + 7 section CYAs are citizen-hub-only; must not leak into legalrep linear flow
+  // task-list + 7 section CYAs are citizen-hub-only; must not leak into legalrep linear flow
   'task-list',
   'section-cya-start-now-and-details',
   'section-cya-personal-details',
