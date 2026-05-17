@@ -4,6 +4,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'end-now',
+  kind: 'interstitial',
   stepDir: __dirname,
   fields: [],
   customTemplate: `${__dirname}/endNow.njk`,

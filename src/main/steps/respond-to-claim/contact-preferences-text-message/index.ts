@@ -5,6 +5,8 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'contact-preferences-text-message',
+  kind: 'question',
+  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.contactByText),
   showCancelButton: false,
   stepDir: __dirname,
 

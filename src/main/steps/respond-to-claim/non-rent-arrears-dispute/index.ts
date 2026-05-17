@@ -9,6 +9,8 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'non-rent-arrears-dispute',
+  kind: 'question',
+  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.disputeClaim),
   stepDir: __dirname,
   customTemplate: `${__dirname}/nonRentArrearsDispute.njk`,
   translationKeys: {
