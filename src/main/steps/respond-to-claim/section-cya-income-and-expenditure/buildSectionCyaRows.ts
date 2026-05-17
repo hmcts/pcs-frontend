@@ -5,7 +5,6 @@ import type { TFunction } from 'i18next';
 import { formatIsoDate, penceToPounds } from '../../utils';
 import {
   type SummaryListRow,
-  answerWithDetail,
   escapeWithLineBreaks,
   getValidatedCase,
   isYes,
@@ -138,15 +137,22 @@ function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
   if (!hc.hasAppliedForUniversalCredit) {
     return;
   }
-  const value =
-    isYes(hc.hasAppliedForUniversalCredit) && hc.ucApplicationDate
-      ? { text: `${yesNoNotSure(hc.hasAppliedForUniversalCredit)} (${formatIsoDate(hc.ucApplicationDate)})` }
-      : { text: yesNoNotSure(hc.hasAppliedForUniversalCredit) };
   rows.push({
     key: { text: t('rows.hasAppliedForUniversalCredit.label') },
-    value,
+    value: { text: yesNoNotSure(hc.hasAppliedForUniversalCredit) },
     actions: {
       items: [change('have-you-applied-for-universal-credit', 'rows.hasAppliedForUniversalCredit.changeHidden')],
+    },
+  });
+
+  if (!isYes(hc.hasAppliedForUniversalCredit) || !hc.ucApplicationDate) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.universalCreditApplicationDate.label') },
+    value: { text: formatIsoDate(hc.ucApplicationDate) },
+    actions: {
+      items: [change('have-you-applied-for-universal-credit', 'rows.universalCreditApplicationDate.changeHidden')],
     },
   });
 }
@@ -219,7 +225,17 @@ function addOtherConsiderationsRow({ rows, responses, t, change, yesNoNotSure }:
   }
   rows.push({
     key: { text: t('rows.otherConsiderations.label') },
-    value: answerWithDetail(responses.otherConsiderations, responses.otherConsiderationsDetails, yesNoNotSure),
+    value: { text: yesNoNotSure(responses.otherConsiderations) },
     actions: { items: [change('other-considerations', 'rows.otherConsiderations.changeHidden')] },
+  });
+
+  const detail = responses.otherConsiderationsDetails?.trim();
+  if (!isYes(responses.otherConsiderations) || !detail) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.otherConsiderationsDetails.label') },
+    value: { html: escapeWithLineBreaks(detail) },
+    actions: { items: [change('other-considerations', 'rows.otherConsiderationsDetails.changeHidden')] },
   });
 }
