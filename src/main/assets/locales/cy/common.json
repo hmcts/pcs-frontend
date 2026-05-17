@@ -154,6 +154,10 @@
     "startNowAndDetails": "cy Free Legal Advice",
     "personalDetails": "cy Confirm your details and contact preferences",
     "disputeAndTenancy": "cy Response",
-    "situationAndCircumstances": "cy Your circumstances"
+    "situationAndCircumstances": "cy Your circumstances",
+    "payments": "cyDeclare recent payments or agreements made",
+    "incomeAndExpenditure": "cyGive details about your income and expenses",
+    "uploadFiles": "cyUpload documents",
+    "checkYourAnswersAndSubmit": "cyCheck your answers and submit"
   }
 }

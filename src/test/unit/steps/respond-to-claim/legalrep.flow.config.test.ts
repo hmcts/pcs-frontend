@@ -10,8 +10,9 @@ const CITIZEN_ONLY_STEPS = [
   'other-considerations',
   'upload-document',
   'support-needs',
-  // Per-section CYAs are citizen-only — legal rep gets the single whole-claim CYA
-  // at check-your-answers, not these per-section summaries.
+  // task-list + per-section CYAs are citizen-hub-only — legal rep gets the single
+  // whole-claim CYA at check-your-answers, not these per-section summaries.
+  'task-list',
   'section-cya-start-now-and-details',
   'section-cya-personal-details',
   'section-cya-dispute-and-tenancy',
