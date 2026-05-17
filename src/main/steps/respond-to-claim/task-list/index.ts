@@ -1,6 +1,7 @@
-import type { Request } from 'express';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { formatCcdAddress } from '../../utils/ccdAddress';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 import {
   RESPOND_TO_CLAIM_SECTION_GROUPS,
@@ -16,13 +17,22 @@ import { getDashboardUrl } from '@routes/dashboard';
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
 import { getAllSectionStatuses, getFirstVisibleStep } from '@services/sectionStatus';
 import { getUserVariant } from '@steps';
-import { arrayToString } from '@utils/arrayToString';
 
 const stepName = 'task-list';
 const journeyName = 'respondToClaim';
 const VIEW = 'respond-to-claim/task-list/taskList.njk';
 
 const stepNavigation = createStepNavigation(() => flowConfig);
+
+// Decision #43 — legal reps who manually URL-nav to /respond-to-claim/task-list
+// must bounce out of the citizen-only hub into the dashboard. Runs before the
+// getController so the page is never rendered for legalrep variants.
+const redirectLegalrepToDashboard: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+  if (getUserVariant(req) === 'legalrep') {
+    return res.redirect(303, getDashboardUrl(req.res?.locals?.validatedCase?.id) ?? '/');
+  }
+  next();
+};
 
 interface TaskListItem {
   title: { text: string };
@@ -44,18 +54,13 @@ export const step: StepDefinition = {
   view: VIEW,
   stepDir: __dirname,
   kind: 'interstitial',
+  middleware: [redirectLegalrepToDashboard],
   getController: () =>
     createGetController(
       VIEW,
       stepName,
       stepNavigation,
       async (req: Request) => {
-        // Defensive: legalrep should never reach the task-list. If they do
-        // (manual URL nav), bounce them to the dashboard (decision #43).
-        if (getUserVariant(req) === 'legalrep') {
-          return { redirectTo: getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/' };
-        }
-
         const validatedCase = req.res?.locals.validatedCase;
         const t: TFunction = getTranslationFunction(req, stepName, ['common']);
 
@@ -154,11 +159,7 @@ function buildItem(
 
 // Per Figma decision #10 — full address (AddressLine1, PostTown, County if present, Postcode).
 function formatPropertyAddress(validatedCase: CcdCaseModel | undefined): string {
-  const a = validatedCase?.propertyAddress;
-  if (!a) {
-    return '';
-  }
-  return arrayToString([a.AddressLine1, a.AddressLine2, a.AddressLine3, a.PostTown, a.County, a.PostCode, a.Country]);
+  return formatCcdAddress(validatedCase?.propertyAddress);
 }
 
 // 4-digit groups (e.g. 1234567890123456 → "1234 5678 9012 3456")
