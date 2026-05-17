@@ -10,7 +10,6 @@ const STEP_NAME = 'written-terms';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.writtenTerms),
   stepDir: __dirname,
   customTemplate: `${__dirname}/writtenTerms.njk`,

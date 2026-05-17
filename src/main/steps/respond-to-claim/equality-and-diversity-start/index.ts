@@ -9,7 +9,6 @@ const logger = Logger.getLogger('equalityAndDiversityStart');
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'equality-and-diversity-start',
-  kind: 'interstitial',
   stepDir: __dirname,
   fields: [],
   customTemplate: `${__dirname}/equalityAndDiversityStart.njk`,

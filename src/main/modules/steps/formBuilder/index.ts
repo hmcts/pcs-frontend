@@ -58,7 +58,6 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     customTemplate,
     basePath: configuredBasePath,
     documentStorage,
-    kind,
     isAnswered,
   } = config;
 
@@ -78,7 +77,6 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     stepDir,
     showCancelButton,
     documentStorage,
-    kind,
     isAnswered,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {

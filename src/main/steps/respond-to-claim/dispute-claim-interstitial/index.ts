@@ -6,7 +6,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'dispute-claim-interstitial',
-  kind: 'interstitial',
   stepDir: __dirname,
   customTemplate: `${__dirname}/disputeClaimInterstitial.njk`,
   translationKeys: {

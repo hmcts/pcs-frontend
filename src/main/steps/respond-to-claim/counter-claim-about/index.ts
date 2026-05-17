@@ -5,7 +5,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'counter-claim-about',
-  kind: 'interstitial',
   journeyFolder: 'respondToClaim',
   stepDir: __dirname,
   flowConfig,

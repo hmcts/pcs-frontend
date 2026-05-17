@@ -6,7 +6,6 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-any-other-adults-live-in-your-home',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.householdCircumstances?.otherTenants),
   stepDir: __dirname,
   customTemplate: `${__dirname}/otherAdults.njk`,

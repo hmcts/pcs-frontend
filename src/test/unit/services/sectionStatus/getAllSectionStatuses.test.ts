@@ -14,7 +14,6 @@ const stub = (overrides: Partial<StepDefinition> = {}): StepDefinition =>
     view: 'stub.njk',
     stepDir: '/stub',
     getController: () => (() => undefined) as never,
-    kind: 'question',
     isAnswered: () => false,
     ...overrides,
   }) as StepDefinition;

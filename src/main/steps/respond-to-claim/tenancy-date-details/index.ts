@@ -15,7 +15,6 @@ function getTenancyStartDate(caseData: CcdCaseData | undefined): string | undefi
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'tenancy-date-details',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.tenancyStartDateConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/tenancyDateDetails.njk`,

@@ -52,7 +52,6 @@ const validateEstimatedMaxClaimAmount = createAmountValidator(
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-specific-sum',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.counterClaim?.isClaimAmountKnown),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimSpecificSum.njk`,

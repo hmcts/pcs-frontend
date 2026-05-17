@@ -7,7 +7,6 @@ import { DIRECT_LOOKUP_FEE_CODES, getCounterClaimFeeType, getFee, getFeeDirect }
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-fee',
-  kind: 'question',
   isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.counterClaim?.needHelpWithFees),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimFee.njk`,

@@ -50,7 +50,6 @@ export const step: StepDefinition = {
   name: stepName,
   view: VIEW,
   stepDir: __dirname,
-  kind: 'interstitial',
   middleware: [redirectLegalrepToDashboard],
   getController: () =>
     createGetController(
