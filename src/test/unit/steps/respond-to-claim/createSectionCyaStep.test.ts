@@ -7,7 +7,7 @@ jest.mock('@steps', () => ({
 }));
 
 const step = createSectionCyaStep({
-  stepName: 'section-cya-test',
+  stepName: 'check-your-answers-test',
   cardTitleKey: 'cardTitle',
   stepDir: __dirname,
   buildRows: () => [],
