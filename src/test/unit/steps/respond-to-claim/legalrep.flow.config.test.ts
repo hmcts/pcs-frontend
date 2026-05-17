@@ -5,7 +5,21 @@ import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegist
 
 import { getNextStep } from '@modules/steps/flow';
 
-const CITIZEN_ONLY_STEPS = ['free-legal-advice', 'other-considerations', 'upload-document', 'support-needs'];
+const CITIZEN_ONLY_STEPS = [
+  'free-legal-advice',
+  'other-considerations',
+  'upload-document',
+  'support-needs',
+  // HDPI-5350 — task-list + 7 section CYAs are citizen-hub-only; must not leak into legalrep linear flow
+  'task-list',
+  'section-cya-start-now-and-details',
+  'section-cya-personal-details',
+  'section-cya-dispute-and-tenancy',
+  'section-cya-payments',
+  'section-cya-situation-and-circumstances',
+  'section-cya-income-and-expenditure',
+  'section-cya-upload-files',
+];
 
 describe('respond-to-claim legalrep flow config', () => {
   it('every stepOrder entry resolves to a registered step', () => {
