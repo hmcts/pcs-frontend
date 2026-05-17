@@ -20,7 +20,7 @@ const sectionDefs = [
     id: 'startNowAndDetails',
     groupId: 'checkBeforeYouStart',
     titleKey: 'taskList.startNowAndDetails',
-    steps: ['start-now', 'free-legal-advice', 'section-cya-start-now-and-details'],
+    steps: ['start-now', 'free-legal-advice', 'check-your-answers-start-now-and-details'],
   },
   {
     id: 'personalDetails',
@@ -34,7 +34,7 @@ const sectionDefs = [
       'contact-preferences-email-or-post',
       'contact-preferences-telephone',
       'contact-preferences-text-message',
-      'section-cya-personal-details',
+      'check-your-answers-personal-details',
     ],
   },
   {
@@ -61,7 +61,7 @@ const sectionDefs = [
       'counter-claim-have-you-applied-for-help',
       'counter-claim-against-whom',
       'counter-claim-about',
-      'section-cya-dispute-and-tenancy',
+      'check-your-answers-your-response',
     ],
   },
   {
@@ -74,7 +74,7 @@ const sectionDefs = [
       'repayments-agreed',
       'installment-payments',
       'how-much-afford-to-pay',
-      'section-cya-payments',
+      'check-your-answers-payments-and-agreements',
     ],
     isApplicable: async (req: Request) => hasAnyRentArrearsGround(req),
   },
@@ -90,7 +90,7 @@ const sectionDefs = [
       'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
       'your-circumstances',
       'exceptional-hardship',
-      'section-cya-situation-and-circumstances',
+      'check-your-answers-your-circumstances',
     ],
   },
   {
@@ -105,14 +105,14 @@ const sectionDefs = [
       'priority-debt-details',
       'what-other-regular-expenses-do-you-have',
       'other-considerations',
-      'section-cya-income-and-expenditure',
+      'check-your-answers-income-and-expenses',
     ],
   },
   {
     id: 'uploadFiles',
     groupId: 'provideEvidence',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document', 'support-needs', 'section-cya-upload-files'],
+    steps: ['upload-document', 'support-needs', 'check-your-answers-documents'],
   },
   {
     id: 'checkYourAnswersAndSubmit',

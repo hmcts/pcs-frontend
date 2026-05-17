@@ -37,7 +37,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       'contact-preferences-text-message'
     );
     await expect(getNextStep(optedOutReq, 'contact-preferences-telephone', flowConfig, {})).resolves.toBe(
-      'section-cya-personal-details'
+      'check-your-answers-personal-details'
     );
   });
 
@@ -119,7 +119,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'section-cya-dispute-and-tenancy'
+      'check-your-answers-your-response'
     );
   });
 
@@ -131,7 +131,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'section-cya-dispute-and-tenancy'
+      'check-your-answers-your-response'
     );
   });
 

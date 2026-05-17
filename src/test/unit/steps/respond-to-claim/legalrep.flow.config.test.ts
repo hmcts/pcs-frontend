@@ -12,13 +12,13 @@ const CITIZEN_ONLY_STEPS = [
   'support-needs',
   // task-list + 7 section CYAs are citizen-hub-only; must not leak into legalrep linear flow
   'task-list',
-  'section-cya-start-now-and-details',
-  'section-cya-personal-details',
-  'section-cya-dispute-and-tenancy',
-  'section-cya-payments',
-  'section-cya-situation-and-circumstances',
-  'section-cya-income-and-expenditure',
-  'section-cya-upload-files',
+  'check-your-answers-start-now-and-details',
+  'check-your-answers-personal-details',
+  'check-your-answers-your-response',
+  'check-your-answers-payments-and-agreements',
+  'check-your-answers-your-circumstances',
+  'check-your-answers-income-and-expenses',
+  'check-your-answers-documents',
 ];
 
 describe('respond-to-claim legalrep flow config', () => {

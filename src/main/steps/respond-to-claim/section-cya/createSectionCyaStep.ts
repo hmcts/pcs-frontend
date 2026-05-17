@@ -18,7 +18,7 @@ const journeyName = 'respondToClaim';
 const VIEW = 'respond-to-claim/section-cya/sectionCya.njk';
 
 export interface SectionCyaStepConfig {
-  /** Journey step slug, e.g. 'section-cya-dispute-and-tenancy'. */
+  /** Journey step slug, e.g. 'check-your-answers-your-response'. */
   stepName: string;
   /** Translation key for the summary-card title (and the page <title>). */
   cardTitleKey: string;
