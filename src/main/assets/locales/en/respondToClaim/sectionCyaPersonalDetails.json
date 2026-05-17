@@ -29,8 +29,12 @@
       }
     },
     "contactByPhone": {
-      "label": "Phone number",
-      "changeHidden": "your phone preference"
+      "label": "Are you happy to be contacted by telephone?",
+      "changeHidden": "whether you are happy to be contacted by telephone"
+    },
+    "contactByPhoneNumber": {
+      "label": "UK phone number",
+      "changeHidden": "your UK phone number"
     },
     "contactByText": {
       "label": "Receive updates by text message",

@@ -64,18 +64,25 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
   const claimDefendantName = validatedCase.claimantEnteredDefendantDetailsName;
   if (nameConfirmation && claimDefendantName) {
     // Branch 1: claim recorded the defendant name — user confirmed (Y/N).
-    // When "No", the corrected name lives on defendantContactDetails.party — append
-    // it so the CYA shows what the user actually entered (matches the
-    // tenancyType / rentArrears "No (correction)" pattern).
-    const correctedName = validatedCase.defendantContactDetailsPartyName?.trim();
-    const value =
-      normalizeYesNoValue(nameConfirmation) === 'NO' && correctedName
-        ? { html: escapeHtml(`${t('options.no')} (${correctedName})`) }
-        : { text: yesNoNotSure(nameConfirmation) };
+    // When "No", the corrected name is rendered as a separate follow-up row so each
+    // answer keeps its own Change link (matches disputeClaim + disputeClaimDetails).
     rows.push({
       key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
-      value,
+      value: { text: yesNoNotSure(nameConfirmation) },
       actions: { items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')] },
+    });
+
+    if (normalizeYesNoValue(nameConfirmation) === 'YES') {
+      return;
+    }
+    const correctedName = validatedCase.defendantContactDetailsPartyName?.trim();
+    if (!correctedName) {
+      return;
+    }
+    rows.push({
+      key: { text: t('rows.defendantName.label') },
+      value: { html: escapeHtml(correctedName) },
+      actions: { items: [change('defendant-name-confirmation', 'rows.defendantName.changeHidden')] },
     });
     return;
   }
@@ -118,13 +125,18 @@ function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotS
     if (!confirmation) {
       return;
     }
-    const value: SummaryListRow['value'] =
-      normalizeYesNoValue(confirmation) === 'NO' && partyAddress
-        ? { html: escapeHtml(partyAddress) }
-        : { text: yesNoNotSure(confirmation) };
     rows.push({
       key: { text: t('rows.correspondenceAddressConfirmation.label', { address: claimantAddress }) },
-      value,
+      value: { text: yesNoNotSure(confirmation) },
+      actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
+    });
+
+    if (normalizeYesNoValue(confirmation) === 'YES' || !partyAddress) {
+      return;
+    }
+    rows.push({
+      key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
+      value: { html: escapeHtml(partyAddress) },
       actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
     });
     return;
@@ -182,13 +194,23 @@ function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: 
   if (!contactByPhone) {
     return;
   }
-  const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber?.trim();
-  const value: SummaryListRow['value'] =
-    isYes(contactByPhone) && phoneNumber ? { html: escapeHtml(phoneNumber) } : { text: yesNoNotSure(contactByPhone) };
   rows.push({
     key: { text: t('rows.contactByPhone.label') },
-    value,
+    value: { text: yesNoNotSure(contactByPhone) },
     actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')] },
+  });
+
+  if (!isYes(contactByPhone)) {
+    return;
+  }
+  const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber?.trim();
+  if (!phoneNumber) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.contactByPhoneNumber.label') },
+    value: { html: escapeHtml(phoneNumber) },
+    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhoneNumber.changeHidden')] },
   });
 }
 

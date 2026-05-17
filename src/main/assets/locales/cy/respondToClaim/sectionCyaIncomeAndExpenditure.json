@@ -25,6 +25,10 @@
       "label": "cy Have you applied for Universal Credit?",
       "changeHidden": "cy whether you have applied for Universal Credit"
     },
+    "universalCreditApplicationDate": {
+      "label": "cy When did you apply?",
+      "changeHidden": "cy when you applied for Universal Credit"
+    },
     "priorityDebts": {
       "label": "cy Do you have any priority debts?",
       "changeHidden": "cy whether you have any priority debts"
@@ -53,6 +57,10 @@
     "otherConsiderations": {
       "label": "cy Is there anything else you want the court to consider?",
       "changeHidden": "cy whether there is anything else you want the court to consider"
+    },
+    "otherConsiderationsDetails": {
+      "label": "cy Give details about what else you want the court to consider",
+      "changeHidden": "cy the details about what else you want the court to consider"
     }
   }
 }
