@@ -2,13 +2,13 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { CcdCaseModel } from '../../../../main/services/ccdCaseData.model';
-import { buildSectionCyaRows as buildDisputeRows } from '../../../../main/steps/respond-to-claim/section-cya-dispute-and-tenancy/buildSectionCyaRows';
-import { buildSectionCyaRows as buildIncomeRows } from '../../../../main/steps/respond-to-claim/section-cya-income-and-expenditure/buildSectionCyaRows';
-import { buildSectionCyaRows as buildPaymentsRows } from '../../../../main/steps/respond-to-claim/section-cya-payments/buildSectionCyaRows';
-import { buildSectionCyaRows as buildPersonalRows } from '../../../../main/steps/respond-to-claim/section-cya-personal-details/buildSectionCyaRows';
-import { buildSectionCyaRows as buildSituationRows } from '../../../../main/steps/respond-to-claim/section-cya-situation-and-circumstances/buildSectionCyaRows';
-import { buildSectionCyaRows as buildStartNowRows } from '../../../../main/steps/respond-to-claim/section-cya-start-now-and-details/buildSectionCyaRows';
-import { buildSectionCyaRows as buildUploadRows } from '../../../../main/steps/respond-to-claim/section-cya-upload-files/buildSectionCyaRows';
+import { buildSectionCyaRows as buildUploadRows } from '../../../../main/steps/respond-to-claim/check-your-answers-documents/buildSectionCyaRows';
+import { buildSectionCyaRows as buildIncomeRows } from '../../../../main/steps/respond-to-claim/check-your-answers-income-and-expenses/buildSectionCyaRows';
+import { buildSectionCyaRows as buildPaymentsRows } from '../../../../main/steps/respond-to-claim/check-your-answers-payments-and-agreements/buildSectionCyaRows';
+import { buildSectionCyaRows as buildPersonalRows } from '../../../../main/steps/respond-to-claim/check-your-answers-personal-details/buildSectionCyaRows';
+import { buildSectionCyaRows as buildStartNowRows } from '../../../../main/steps/respond-to-claim/check-your-answers-start-now-and-details/buildSectionCyaRows';
+import { buildSectionCyaRows as buildSituationRows } from '../../../../main/steps/respond-to-claim/check-your-answers-your-circumstances/buildSectionCyaRows';
+import { buildSectionCyaRows as buildDisputeRows } from '../../../../main/steps/respond-to-claim/check-your-answers-your-response/buildSectionCyaRows';
 
 // Characterisation tests — lock the current output of every section-CYA row builder
 // before the P1/P2 refactor. Identity `t` so assertions can match translation keys.

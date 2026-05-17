@@ -12,13 +12,13 @@ const CITIZEN_ONLY_STEPS = [
   'support-needs',
   // Per-section CYAs are citizen-only — legal rep gets the single whole-claim CYA
   // at check-your-answers, not these per-section summaries.
-  'section-cya-start-now-and-details',
-  'section-cya-personal-details',
-  'section-cya-dispute-and-tenancy',
-  'section-cya-payments',
-  'section-cya-situation-and-circumstances',
-  'section-cya-income-and-expenditure',
-  'section-cya-upload-files',
+  'check-your-answers-start-now-and-details',
+  'check-your-answers-personal-details',
+  'check-your-answers-your-response',
+  'check-your-answers-payments-and-agreements',
+  'check-your-answers-your-circumstances',
+  'check-your-answers-income-and-expenses',
+  'check-your-answers-documents',
 ];
 
 describe('respond-to-claim legalrep flow config', () => {

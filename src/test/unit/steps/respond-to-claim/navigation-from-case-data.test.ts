@@ -37,7 +37,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       'contact-preferences-text-message'
     );
     await expect(getNextStep(optedOutReq, 'contact-preferences-telephone', flowConfig, {})).resolves.toBe(
-      'section-cya-personal-details'
+      'check-your-answers-personal-details'
     );
   });
 
@@ -84,7 +84,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
-      'section-cya-personal-details'
+      'check-your-answers-personal-details'
     );
   });
 
@@ -107,7 +107,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('uses valid static previous step for household interstitial path', async () => {
     const req = createReq({ data: rentArrearsData });
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'section-cya-payments'
+      'check-your-answers-payments-and-agreements'
     );
   });
 
@@ -119,7 +119,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'section-cya-dispute-and-tenancy'
+      'check-your-answers-your-response'
     );
   });
 
@@ -131,7 +131,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'section-cya-dispute-and-tenancy'
+      'check-your-answers-your-response'
     );
   });
 
