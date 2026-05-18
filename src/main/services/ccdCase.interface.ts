@@ -206,6 +206,7 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  status?: 'SUBMITTED' | 'CREATED';
 }
 
 export interface PossessionClaimResponse {

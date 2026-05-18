@@ -19,8 +19,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   customTemplate: `${__dirname}/checkYourAnswers.njk`,
   extendGetContent: (req: Request) => {
+    const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
+    const submitDisabled = status === 'SUBMITTED';
+
     if (req.query.submitError !== 'failed') {
-      return {};
+      return { submitDisabled };
     }
 
     const t = getTranslationFunction(req, 'check-your-answers', ['common']);
@@ -32,6 +35,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const errorSummary = buildErrorSummary({ submitResponse: message }, submitResponseErrorFields, t);
 
-    return errorSummary ? { errorSummary } : {};
+    return { submitDisabled, ...(errorSummary ? { errorSummary } : {}) };
   },
 });

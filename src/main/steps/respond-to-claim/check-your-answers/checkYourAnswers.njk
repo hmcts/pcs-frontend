@@ -9,7 +9,7 @@
   <h1 class="govuk-heading-l">Check your answers (placeholder)</h1>
   <p class="govuk-body">This is a placeholder for Check your answers step.</p>
   <form id="submitResponse" method="POST" action="/case/{{ ccdId }}/final-submit" novalidate>
-    <button type="submit" class="govuk-button" data-module="govuk-button">
+    <button type="submit" class="govuk-button" data-module="govuk-button"{% if submitDisabled %} disabled aria-disabled="true"{% endif %}>
       Submit
     </button>
     {{ csrfProtection(csrfToken) }}
