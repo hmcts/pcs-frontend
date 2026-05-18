@@ -33,7 +33,7 @@
       {% endif %}
     {% endfor %}
 
-    {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ stepButtons(continue) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}

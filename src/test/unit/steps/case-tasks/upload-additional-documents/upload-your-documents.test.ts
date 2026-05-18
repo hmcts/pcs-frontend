@@ -104,7 +104,6 @@ describe('upload-your-documents step', () => {
           beforeUploadText: 'beforeUploadText',
           fileTypesText: 'fileTypesText',
           uploadLabel: 'uploadLabel',
-          uploadHint: 'uploadHint',
           uploadButton: 'uploadButton',
           filesAddedHeading: 'filesAddedHeading',
           deleteButton: 'deleteButton',
