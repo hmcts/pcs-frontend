@@ -4,7 +4,7 @@ import {
   checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
-  doYouWantToUploadDocumentToSupportYourApplication,
+  doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   uploadDocumentsToSupportYourApplication,
@@ -36,7 +36,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('Select an Application - Something else @regression', async () => {
+  test('Select an Application - Something else', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.somethingElseRadioOption,
@@ -59,17 +59,16 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
       option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
     });
-    await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('confirmOrderDoYouWant', {
       label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
       input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
     });
-    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
-    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performAction('confirmDocumentToUpload', {
+      question: doYouWantToUploadDocumentsToSupportYourApplication.doYouWantToUploadDocumentQuestion,
+      option: doYouWantToUploadDocumentsToSupportYourApplication.yesRadioOption,
+    });
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
-    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
+    await performAction('uploadFiles', { files: ['genApps.xlsx'] });
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,

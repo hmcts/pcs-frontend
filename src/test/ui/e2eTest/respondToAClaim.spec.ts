@@ -320,7 +320,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ...getRelativeDate(5),
     });
     await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.yesRadioOption,
     });
     await performAction('exceptionalHardship', {
@@ -463,7 +463,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ...getRelativeDate(5),
     });
     await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
     });
     await performAction('exceptionalHardship', {
@@ -564,9 +564,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
     });
     await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
     });
     await performAction('exceptionalHardship', {
@@ -686,7 +687,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ...getRelativeDate(5),
     });
     await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
     });
     await performAction('exceptionalHardship', {
@@ -828,7 +829,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ...getRelativeDate(5),
     });
     await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
     });
     await performAction('exceptionalHardship', {
@@ -969,7 +970,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
     });
     await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
     });
     await performAction('exceptionalHardship', {
@@ -1125,7 +1126,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     });
     await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
     });
     await performAction('exceptionalHardship', {
@@ -1266,7 +1267,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     });
     await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.yesRadioOption,
     });
     await performAction('exceptionalHardship', {
@@ -1393,7 +1394,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     });
     await performAction('yourCircumstances', {
-      question: yourCircumstances.mainHeader,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.noRadioOption,
     });
     await performAction('exceptionalHardship', {
