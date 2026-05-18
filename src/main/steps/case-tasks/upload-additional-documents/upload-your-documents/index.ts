@@ -20,11 +20,11 @@ export const step: StepDefinition = createFormStep({
     {
       name: 'documents',
       type: 'file',
-      required: false,
+      required: true,
       accept: ACCEPT_ATTRIBUTE_EXTENSIONS,
       maxFileSize: UPLOAD_MAX_FILE_SIZE_MB,
       labelClasses: 'govuk-label--s',
-      translationKey: { label: 'uploadLabel', hint: 'uploadHint' },
+      translationKey: { label: 'uploadLabel' },
     },
   ],
   translationKeys: {
@@ -34,7 +34,6 @@ export const step: StepDefinition = createFormStep({
     beforeUploadText: 'beforeUploadText',
     fileTypesText: 'fileTypesText',
     uploadLabel: 'uploadLabel',
-    uploadHint: 'uploadHint',
     filesAddedHeading: 'filesAddedHeading',
     uploadButton: 'uploadButton',
     deleteButton: 'deleteButton',
