@@ -16,15 +16,15 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if heading != "heading" %}
+  {% if heading %}
     <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% endif %}
 
-  {% if accommodationHeading != "accommodationHeading" %}
+  {% if accommodationHeading %}
     <h2 class="govuk-heading-m">{{ accommodationHeading }}</h2>
   {% endif %}
 
-  {% if accommodationQuestion != "accommodationQuestion" %}
+  {% if accommodationQuestion %}
     <p class="govuk-heading-s">{{ accommodationQuestion }}</p>
   {% endif %}
 

@@ -15,14 +15,14 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {% if hardshipHeading != "hardshipHeading" %}
+  {% if hardshipHeading %}
     <h2 class="govuk-heading-m">{{ hardshipHeading }}</h2>
   {% endif %}
 
   <p class="govuk-body">{{ introParagraph1 }}</p>
   <p class="govuk-body">{{ introParagraph2 }}</p>
   
-  {% if introParagraph3 != "introParagraph3" %}
+  {% if introParagraph3 %}
     <p class="govuk-body">{{ introParagraph3 }}</p>
   {% endif %}
 
