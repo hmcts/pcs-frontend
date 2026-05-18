@@ -1,6 +1,5 @@
 export const counterClaimFee = {
   mainHeader: `Counterclaim fee`,
-  stopOrDelayAnEvictionParagraph: `Stop or delay an eviction`,
   helpWithCourtFeesHeader: `Help with court fees`,
   youMayBeAbleParagraph: `You may be able to get help paying the fee if you (one or more of the following):`,
   areOnBenefitList: `are on certain benefits`,
