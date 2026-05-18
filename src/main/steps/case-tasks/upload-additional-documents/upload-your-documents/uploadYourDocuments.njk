@@ -1,6 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "macros/stepButtons.njk" import stepButtons %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% from "macros/fileUploadMoj.njk" import fileUploadMoj %}
 
@@ -9,6 +9,10 @@
 {% endblock %}
 
 {% block mainContent %}
+  <style>
+    .moj-multi-file-upload__button { display: none; }
+  </style>
+
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
@@ -33,7 +37,15 @@
       {% endif %}
     {% endfor %}
 
-    {{ stepButtons(continue) }}
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: continue,
+        attributes: { name: 'action', value: 'continue' }
+      }) }}
+      {% if showCancelButton is not defined or showCancelButton %}
+        <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+      {% endif %}
+    </div>
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
