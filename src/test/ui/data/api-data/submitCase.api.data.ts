@@ -694,7 +694,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
