@@ -111,7 +111,7 @@ export class ActionRegistry {
     ['reviewCYA', new GenAppsAction()],
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
-    ['uploadFiles', new GenAppsAction()],
+    ['uploadFilesGenApps', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {
