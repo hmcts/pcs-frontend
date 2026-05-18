@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash';
 
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../respond-to-claim/draftEvent';
 import { normaliseRespondToClaimDraft } from '../respond-to-claim/normalise';
-import { findSectionIdForStep, sectionIdToBackendEnum } from '../respond-to-claim/sections.config';
+import { CYA_STEP_PREFIX, findSectionIdForStep, sectionIdToBackendEnum } from '../respond-to-claim/sections.config';
 
 import { PossessionClaimResponse } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -33,17 +33,17 @@ export const buildDraftDefendantResponse = (req: Request): DraftDefendantRespons
     defendantOnly.defendantContactDetails = { party: {} };
   }
 
-  clearSectionConfirmationOnSaveForLater(req, defendantOnly);
+  clearSectionConfirmationOnEdit(req, defendantOnly);
 
   return defendantOnly as DraftDefendantResponse;
 };
 
-function clearSectionConfirmationOnSaveForLater(req: Request, draft: PossessionClaimResponse): void {
-  if (req.body?.action !== 'saveForLater') {
+function clearSectionConfirmationOnEdit(req: Request, draft: PossessionClaimResponse): void {
+  const stepName = req.path?.split('/').pop();
+  if (!stepName || stepName.startsWith(CYA_STEP_PREFIX)) {
     return;
   }
-  const stepName = req.path?.split('/').pop();
-  const sectionId = stepName ? findSectionIdForStep(stepName) : undefined;
+  const sectionId = findSectionIdForStep(stepName);
   if (!sectionId || !draft.defendantResponses) {
     return;
   }

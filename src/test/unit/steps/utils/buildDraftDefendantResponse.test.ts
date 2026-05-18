@@ -103,7 +103,7 @@ describe('saveDraftDefendantResponse wrapper', () => {
   });
 });
 
-describe('buildDraftDefendantResponse — Save for later auto-clears section confirmation', () => {
+describe('buildDraftDefendantResponse — any mid-section submission auto-clears section confirmation', () => {
   const reqFor = (path: string, action: string | undefined, confirmed: string[]): Request =>
     ({
       path,
@@ -130,18 +130,27 @@ describe('buildDraftDefendantResponse — Save for later auto-clears section con
     expect(draft.defendantResponses.confirmedSections).toEqual(['PAYMENTS']);
   });
 
-  it('leaves confirmedSections unchanged on Save and continue', () => {
+  it('removes the current step’s section from confirmedSections on Save and continue', () => {
     const req = reqFor('/case/123/respond-to-claim/defendant-name-confirmation', undefined, [
       'PERSONAL_DETAILS',
       'PAYMENTS',
     ]);
     const draft = buildDraftDefendantResponse(req);
-    expect(draft.defendantResponses.confirmedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
+    expect(draft.defendantResponses.confirmedSections).toEqual(['PAYMENTS']);
   });
 
   it('is a no-op when the step is not part of any section', () => {
     const req = reqFor('/case/123/respond-to-claim/task-list', 'saveForLater', ['PERSONAL_DETAILS']);
     const draft = buildDraftDefendantResponse(req);
     expect(draft.defendantResponses.confirmedSections).toEqual(['PERSONAL_DETAILS']);
+  });
+
+  it('is a no-op when the step is a section CYA — the CYA postController owns the flag', () => {
+    const req = reqFor('/case/123/respond-to-claim/check-your-answers-personal-details', 'saveForLater', [
+      'PERSONAL_DETAILS',
+      'PAYMENTS',
+    ]);
+    const draft = buildDraftDefendantResponse(req);
+    expect(draft.defendantResponses.confirmedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
   });
 });
