@@ -1,6 +1,7 @@
 {
   "pageTitle": "cyConfirm if these documents relate to an existing application",
   "heading": "cyConfirm if these documents relate to an existing application",
+<<<<<<< HDPI-6081-2
   "paragraph1": "cyWe usually share anything you upload with the other party, for example your landlord, housing association or mortgage provider.",
   "paragraph2": "cyIf your application is 'without notice' (where you have asked us to consider your application without telling the other party) we will not share anything with them.",
   "question": "cyDo these documents relate to an existing application?",
@@ -10,3 +11,7 @@
   "applicationOptionGeneric": "cyYes, the documents I'm uploading relate to the application submitted on {{date}}",
   "optionClaimOrCounterclaim": "cyNo, the documents I'm uploading relate to the main claim or counterclaim"
 }
+=======
+  "body": "Welsh placeholder: confirm which application these documents relate to."
+}
+>>>>>>> HDPI-6079-upload-your-documents

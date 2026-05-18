@@ -1,9 +1,7 @@
 {
-  "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyExceptional hardship",
   "introParagraph1": "cyExceptional hardship means experiencing serious difficulties that go beyond the normal difficulty of losing your home.",
-  "introParagraph2": "cyIf this applies to you, a judge might allow you to stay in your home for longer.",
-  "introParagraph3": "cyAny details you provide will be considered by a judge when making their decision, but it is up to them to decide if exceptional hardship applies in your case.",
+  "introParagraph2": "cyAny details you provide will be considered by a judge. If  they decide that exceptional hardship applies in your case, they might consider whether you can stay in your home for longer.",
   "forExample": "cyFor example, you might have:",
   "bullet1": "cygone through a divorce or separation",
   "bullet2": "cylost your job or been made redundant",
@@ -17,6 +15,8 @@
   "textAreaLabel": "cyGive details about the exceptional hardship you’d experience",
   "errors": {
     "exceptionalHardship": "cySelect if you’d experience exceptional hardship if you were asked to leave your home",
-    "exceptionalHardship.exceptionalHardshipDetails": "cyGive details about the exceptional hardship you’d experience"
+    "exceptionalHardship.exceptionalHardshipDetails": "cyGive details about the exceptional hardship you’d experience",
+    "exceptionalHardshipDetailsMaxLength": "cyExceptional hardship details must be 500 characters or less",
+    "exceptionalHardshipDetailsInvalidCharacters": "cyThe details of the exceptional hardship you’d experience must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }

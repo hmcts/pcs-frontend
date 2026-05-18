@@ -65,7 +65,7 @@ export const submitCaseApiDataWales = {
     // SECURE_CONTRACT = Wales (section 8 Housing (Wales) Act 2014)
     occupationLicenceTypeWales: process.env.OCCUPATION_LICENCE_TYPE,
 
-    licenceStartDate: '1990-11-10',
+    licenceStartDate: '2020-05-20',
     licenceDocuments: [],
 
     walesLicensed: 'NO',

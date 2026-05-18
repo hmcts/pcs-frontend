@@ -1,18 +1,38 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "macros/csrf.njk" import csrfProtection %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/stepButtons.njk" import stepButtons %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
 
-  <h1 class="govuk-heading-l">{{ heading }}</h1>
+<h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+  
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
 
-  <p class="govuk-body">Counter claim fee (Placeholder)</p>
+   <p class="govuk-body">{{ counterClaimFeeCostParagraph }}</p>
 
-  <form method="post" action="{{ url }}">
+  <h2 class="govuk-heading-s">{{ counterClaimFeeHeading }}</h2>
+  <p class="govuk-body">{{ counterClaimFeeHelpParagraph }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li class="govuk-body">{{ counterClaimFeeBulletBenefits }}</li>
+    <li class="govuk-body">{{ counterClaimFeeBulletLowSavings }}</li>
+    <li class="govuk-body">{{ counterClaimFeeBulletLowIncome }}</li>
+  </ul>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
+
     {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
+
 {% endblock %}
