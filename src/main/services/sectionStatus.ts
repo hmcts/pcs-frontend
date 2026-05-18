@@ -84,12 +84,12 @@ export async function getSectionStatus(
   if (raw !== 'DONE' || !sectionHasCya(section)) {
     return raw;
   }
-  // A section with a CYA is only DONE once the user has explicitly confirmed
-  // via Save & continue on that CYA. Without confirmation, fully-answered
-  // sections stay IN_PROGRESS so Save for later (which clears the flag) can
-  // round-trip the user back to IN_PROGRESS.
+  return userHasConfirmedSectionViaCya(section, req) ? 'DONE' : 'IN_PROGRESS';
+}
+
+function userHasConfirmedSectionViaCya(section: SectionConfig, req: Request): boolean {
   const confirmed = req.res?.locals?.validatedCase?.defendantResponses?.confirmedSections ?? [];
-  return confirmed.includes(sectionIdToBackendEnum(section.id as RespondToClaimSectionId)) ? 'DONE' : 'IN_PROGRESS';
+  return confirmed.includes(sectionIdToBackendEnum(section.id as RespondToClaimSectionId));
 }
 
 export class SectionConfigError extends Error {

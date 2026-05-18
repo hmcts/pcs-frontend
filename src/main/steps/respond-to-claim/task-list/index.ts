@@ -129,12 +129,7 @@ function buildItem(
   const statusText = t(`taskList.status.${status}`);
 
   if (status === 'NOT_AVAILABLE_YET') {
-    return {
-      title,
-      // GOV.UK design system pattern for a locked task: plain secondary-text
-      // colour (no tag pill). See https://design-system.service.gov.uk/components/task-list/
-      status: { text: statusText, classes: 'govuk-task-list__status--cannot-start-yet' },
-    };
+    return buildLockedTaskListItem(title, statusText);
   }
 
   const firstStep = getFirstVisibleStep(section, flowConfig, req);
@@ -143,6 +138,13 @@ function buildItem(
     title,
     href,
     status: { tag: { text: statusText, classes: getStatusTagClasses(status) ?? '' } },
+  };
+}
+
+function buildLockedTaskListItem(title: { text: string }, statusText: string): TaskListItem {
+  return {
+    title,
+    status: { text: statusText, classes: 'govuk-task-list__status--cannot-start-yet' },
   };
 }
 
