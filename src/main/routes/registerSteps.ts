@@ -172,7 +172,11 @@ export function registerAllJourneys(app: Application): void {
     // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
     journeyRouter.param('caseReference', caseReferenceParamMiddleware);
 
-    stackJourneyRouteMiddleware(journeyRouter, journey.routeMiddleware);
+    // Stacked onto the :caseReference param callback so handlers fire after
+    // validatedCase loads, before per-step middleware. Mounting via .use() would fire too early.
+    for (const handler of journey.routeMiddleware ?? []) {
+      journeyRouter.param('caseReference', (req, res, next) => handler(req, res, next));
+    }
 
     // Register all steps for this journey on the journey router
     registerSteps(journeyRouter, journeyName);
@@ -184,13 +188,4 @@ export function registerAllJourneys(app: Application): void {
   }
 
   logger.info('All journeys registered successfully');
-}
-
-// Adds each handler as another :caseReference param callback so it runs after
-// caseReferenceParamMiddleware has loaded validatedCase and before per-step middleware.
-// Mounting via router.use() would fire too early (before any param callback).
-function stackJourneyRouteMiddleware(router: IRouter, middleware?: RequestHandler[]): void {
-  for (const mw of middleware ?? []) {
-    router.param('caseReference', (req, res, next) => mw(req, res, next));
-  }
 }
