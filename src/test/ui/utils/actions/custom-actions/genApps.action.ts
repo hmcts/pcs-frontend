@@ -38,7 +38,7 @@ export class GenAppsAction implements IAction {
       ],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
       ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
-      ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
+      ['uploadFilesGenApps', () => this.uploadFilesGenApps(fieldName as actionRecord)],
       ['selectStatementOfTruth', () => this.selectStatementOfTruth(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
@@ -148,7 +148,7 @@ export class GenAppsAction implements IAction {
     await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
   }
 
-  private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
+  private async uploadFilesGenApps(uploadDocs: actionRecord): Promise<void> {
     await performAction('recordUserEntry', uploadDocs);
     if (uploadDocs.files) {
       await performAction('uploadFile', uploadDocs.files);
