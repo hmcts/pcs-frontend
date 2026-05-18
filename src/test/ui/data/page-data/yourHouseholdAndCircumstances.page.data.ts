@@ -1,6 +1,5 @@
 export const yourHouseholdAndCircumstances = {
   mainHeader: `Your household and circumstances`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   youMustNowAnswerParagraph: `You must now answer some questions about your household and personal circumstances. This will help a judge understand your situation.`,
   youWillBeParagraph: `You’ll be asked about:`,
   anyDependantsList: `any dependants you have (people you look after financially)`,
