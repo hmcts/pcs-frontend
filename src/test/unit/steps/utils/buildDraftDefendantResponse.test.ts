@@ -14,7 +14,10 @@ jest.mock('../../../../main/services/ccdCaseService', () => ({
 }));
 
 import { ccdCaseService } from '../../../../main/services/ccdCaseService';
-import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 const makeReq = (): Request =>
   ({
@@ -97,5 +100,48 @@ describe('saveDraftDefendantResponse wrapper', () => {
     await saveDraftDefendantResponse(req, response);
 
     expect(JSON.stringify(response)).toBe(snapshot);
+  });
+});
+
+describe('buildDraftDefendantResponse — Save for later auto-clears section confirmation', () => {
+  const reqFor = (path: string, action: string | undefined, confirmed: string[]): Request =>
+    ({
+      path,
+      body: action === undefined ? {} : { action },
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { confirmedSections: [...confirmed] },
+              },
+            },
+          },
+        },
+      },
+    }) as unknown as Request;
+
+  it('removes the current step’s section from confirmedSections on Save for later', () => {
+    const req = reqFor('/case/123/respond-to-claim/defendant-name-confirmation', 'saveForLater', [
+      'PERSONAL_DETAILS',
+      'PAYMENTS',
+    ]);
+    const draft = buildDraftDefendantResponse(req);
+    expect(draft.defendantResponses.confirmedSections).toEqual(['PAYMENTS']);
+  });
+
+  it('leaves confirmedSections unchanged on Save and continue', () => {
+    const req = reqFor('/case/123/respond-to-claim/defendant-name-confirmation', undefined, [
+      'PERSONAL_DETAILS',
+      'PAYMENTS',
+    ]);
+    const draft = buildDraftDefendantResponse(req);
+    expect(draft.defendantResponses.confirmedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
+  });
+
+  it('is a no-op when the step is not part of any section', () => {
+    const req = reqFor('/case/123/respond-to-claim/task-list', 'saveForLater', ['PERSONAL_DETAILS']);
+    const draft = buildDraftDefendantResponse(req);
+    expect(draft.defendantResponses.confirmedSections).toEqual(['PERSONAL_DETAILS']);
   });
 });

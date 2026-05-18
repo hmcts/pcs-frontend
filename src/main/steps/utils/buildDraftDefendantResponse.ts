@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash';
 
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../respond-to-claim/draftEvent';
 import { normaliseRespondToClaimDraft } from '../respond-to-claim/normalise';
+import { findSectionIdForStep, sectionIdToBackendEnum } from '../respond-to-claim/sections.config';
 
 import { PossessionClaimResponse } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -32,8 +33,25 @@ export const buildDraftDefendantResponse = (req: Request): DraftDefendantRespons
     defendantOnly.defendantContactDetails = { party: {} };
   }
 
+  clearSectionConfirmationOnSaveForLater(req, defendantOnly);
+
   return defendantOnly as DraftDefendantResponse;
 };
+
+function clearSectionConfirmationOnSaveForLater(req: Request, draft: PossessionClaimResponse): void {
+  if (req.body?.action !== 'saveForLater') {
+    return;
+  }
+  const stepName = req.path?.split('/').pop();
+  const sectionId = stepName ? findSectionIdForStep(stepName) : undefined;
+  if (!sectionId || !draft.defendantResponses) {
+    return;
+  }
+  const enumValue = sectionIdToBackendEnum(sectionId);
+  draft.defendantResponses.confirmedSections = (draft.defendantResponses.confirmedSections ?? []).filter(
+    s => s !== enumValue
+  );
+}
 
 // Convenience wrapper: normalises orphaned cross-page fields, saves the draft defendant response,
 // and refreshes validatedCase on the request.
