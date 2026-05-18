@@ -113,13 +113,11 @@ export class ActionRegistry {
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
     ['otherConsiderations', new RespondToClaimAction()],
-    ['uploadFiles', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
     ['selectClaimAgainstWhom', new RespondToClaimAction()],
     ['counterClaimAbout', new RespondToClaimAction()],
     ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
-    ['uploadFiles', new GenAppsAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
   ]);
 
