@@ -1,5 +1,47 @@
 {% extends "template.njk" %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{# GOV.UK summary list with card (Design System macro) — document list by folder. #}
+
+{% macro folderDocumentsCard(folder, caseReference, submittedOnLabel) %}
+  {% set rows = [] %}
+  {% for document in folder.documents %}
+    {% set valueHtml %}
+<a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ document.id }}" target="_blank" rel="noopener noreferrer">{{ document.filename }}</a>
+{% if document.submittedOn %}
+<div class="govuk-hint govuk-!-margin-bottom-2">{{ submittedOnLabel }} {{ document.submittedOn | date }}</div>
+{% endif %}
+{% endset %}
+    {% set rows = rows.concat([{
+      key: {
+        text: t('dashboard:viewDocuments.documentLabel', 'Document'),
+        classes: 'govuk-visually-hidden'
+      },
+      value: {
+        html: valueHtml,
+        classes: 'govuk-!-width-full'
+      },
+      actions: {
+        items: []
+      }
+    }]) %}
+  {% endfor %}
+  {{ govukSummaryList({
+    card: {
+      title: {
+        text: folder.title,
+        headingLevel: 2
+      },
+      actions: {
+        items: []
+      },
+      classes: 'govuk-!-margin-bottom-6'
+    },
+    rows: rows
+  }) }}
+{% endmacro %}
+
 {% block serviceNavigation %}
   {{ govukServiceNavigation({
     serviceName: t('dashboard:serviceName'),
@@ -20,35 +62,20 @@
 {% endblock %}
 
 {% block content %}
+  {% set submittedOnLabel = t('dashboard:viewDocuments.submittedOn') %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ t('dashboard:viewDocuments.pageTitle') }}</h1>
-      <p class="govuk-body-m">{{ t('dashboard:caseReferenceLabel') }} {{ caseReference | caseReferenceDisplay }}</p>
+      <p class="govuk-body-m">
+        {{ t('dashboard:caseReferenceLabel') }}
+        {{ caseReference | caseReferenceDisplay }}
+      </p>
     </div>
 
     <div class="govuk-grid-column-two-thirds">
       {% if documentFolders | length > 0 %}
         {% for folder in documentFolders %}
-          <div class="govuk-summary-card">
-            <div class="govuk-summary-card__title-wrapper">
-              <h2 class="govuk-summary-card__title">{{ folder.title }}</h2>
-            </div>
-
-            <div class="govuk-summary-card__content">
-              <dl class="govuk-summary-list">
-                {% for document in folder.documents %}
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__value govuk-!-width-two-thirds">
-                      <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ document.id }}" target="_blank" rel="noopener noreferrer">{{ document.filename }}</a>
-                      {% if document.submittedOn %}
-                        <div class="govuk-hint govuk-!-margin-bottom-2">{{ t('dashboard:viewDocuments.submittedOn') }} {{ document.submittedOn | date }}</div>
-                      {% endif %}
-                    </dt>
-                  </div>
-                {% endfor %}
-              </dl>
-            </div>
-          </div>
+          {{ folderDocumentsCard(folder, caseReference, submittedOnLabel) }}
         {% endfor %}
       {% else %}
         <p class="govuk-body">{{ t('dashboard:viewDocuments.noDocuments') }}</p>
