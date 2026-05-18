@@ -20,6 +20,18 @@ export let lastName: string = '';
 export let address: string = '';
 export let pinUsers: PinUser[] = [];
 
+export async function getPinUserAt(index: number, timeoutMs = 5000): Promise<PinUser> {
+  const pollInterval = 200;
+  const start = Date.now();
+  while (pinUsers.length <= index && Date.now() - start < timeoutMs) {
+    await new Promise(res => setTimeout(res, pollInterval));
+  }
+  if (pinUsers.length <= index) {
+    throw new Error(`Expected pinUsers[${index}] to be populated within ${timeoutMs}ms but found ${pinUsers.length}`);
+  }
+  return pinUsers[index] as PinUser;
+}
+
 export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
   async execute(page: Page, action: string): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -78,7 +90,22 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
 
   private async validateAccessCodeAPI(): Promise<void> {
     const validateApi = Axios.create(validateAccessCodeApiData.validateAccessCodeApiInstance());
-    const accessCode = pins?.[0];
+    const unknownPinUser = pinUsers.find((u: PinUser) => {
+      const missingName = !u.firstName || !u.lastName;
+      const missingAddress = !u.address || (typeof u.address === 'string' && u.address.trim() === '');
+      return missingName || missingAddress;
+    });
+
+    if (unknownPinUser && unknownPinUser.pin) {
+      process.env.VALIDATE_ACCESS_CODE = unknownPinUser.pin;
+      console.info(`Using unknown defendant PIN: ${unknownPinUser.pin}`);
+    }
+
+    const accessCode =
+      process.env.VALIDATE_ACCESS_CODE && process.env.VALIDATE_ACCESS_CODE !== ''
+        ? process.env.VALIDATE_ACCESS_CODE
+        : pins?.[0];
+
     if (!accessCode) {
       throw new Error('No access code available for validation');
     }

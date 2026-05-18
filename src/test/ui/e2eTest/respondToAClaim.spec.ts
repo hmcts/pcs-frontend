@@ -45,7 +45,7 @@ import {
   yourCircumstances,
 } from '../data/page-data';
 import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
-import { pinUsers } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -210,6 +210,10 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.TENANCY_START_DATE_KNOWN = 'YES';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
+  } else if (testInfo.title.includes('@multiParty')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
+    claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
@@ -811,6 +815,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -944,6 +949,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //Need to add multiparty page and further pages once counterClaimHaveYouAppliedForHelp page is added as part of HDPI-5193
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1088,7 +1094,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
-    const pin2User = pinUsers[1];
+    const pin2User = await getPinUserAt(1);
     await performAction('selectClaimAgainstWhom', {
       question: counterClaimAgainstWhom.mainHeader,
       options: [claimantName, `${pin2User.firstName} ${pin2User.lastName}`],
@@ -1303,7 +1309,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - Counter-claim-multi-party @rentNonRent @regression', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - No @rentNonRent @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -1355,7 +1361,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    const pin2User = pinUsers[1];
+    const pin2User = await getPinUserAt(1);
     await performAction('selectClaimAgainstWhom', {
       question: counterClaimAgainstWhom.mainHeader,
       options: [claimantName, `${pin2User.firstName} ${pin2User.lastName}`],
@@ -1414,6 +1420,131 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: priorityDebts.noRadioOption,
     });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('uploadFiles');
+    await performAction('clickButton', supportNeeds.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+  });
+
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - @multiParty', async () => {
+    // claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.noRadioOption,
+    });
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayloadDefault.isClaimantNameCorrect);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadDefault.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
+    });
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknown');
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption,
+    });
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('selectCounterClaim', {
+      option: counterClaim.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    const pin2User = await getPinUserAt(1);
+    let firstName, lastName;
+    if (pin2User.firstName === undefined) {
+      firstName = submitCaseApiData.submitCasePayloadDefault.defendant1.firstName;
+      lastName = submitCaseApiData.submitCasePayloadDefault.defendant1.lastName;
+    }
+    await performAction('selectClaimAgainstWhom', {
+      question: counterClaimAgainstWhom.mainHeader,
+      options: [claimantName, `${firstName} ${lastName}`],
+    });
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('counterClaimOrderOtherThanSum', {
+      ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
+      factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      question: repaymentsAgreed.getMainHeader(claimantName),
+      repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
+    });
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,

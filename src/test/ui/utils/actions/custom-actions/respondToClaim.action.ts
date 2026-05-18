@@ -509,11 +509,11 @@ export class RespondToClaimAction implements IAction {
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
     await performValidation('text', {
       elementType: 'subHeader',
-      text: `Amount you owe in rent arrears given by ${submitCaseApiData.submitCasePayload.claimantName}:`,
+      text: `Amount you owe in rent arrears given by ${claimantsName}:`,
     });
     await performValidation('text', {
       elementType: 'paragraph',
-      text: `When they made their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
+      text: `When they made their claim, ${claimantsName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
     const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {
