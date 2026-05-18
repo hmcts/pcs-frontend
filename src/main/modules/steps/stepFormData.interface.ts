@@ -29,5 +29,6 @@ export interface StepDefinition {
   // Absent on every non-upload step. The upload handler refuses requests targeting
   // a step that does not declare this.
   documentStorage?: DocumentStorage;
-  isAnswered?: (req: Request) => boolean;
+  // Truthy/falsy — consumers coerce. Lets `req => validatedCase?.foo` work without a Boolean(...) wrap.
+  isAnswered?: (req: Request) => unknown;
 }

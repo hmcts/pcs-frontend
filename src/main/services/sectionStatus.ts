@@ -189,7 +189,7 @@ export function safeIsAnswered(step: StepDefinition, req: Request): boolean {
     return false;
   }
   try {
-    return step.isAnswered(req);
+    return !!step.isAnswered(req);
   } catch {
     return false;
   }
