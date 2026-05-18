@@ -90,6 +90,7 @@ export class ActionRegistry {
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
+    ['languageUsed', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
 
@@ -117,6 +118,7 @@ export class ActionRegistry {
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
     ['uploadFiles', new GenAppsAction()],
+    ['uploadFilesGenApps', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {

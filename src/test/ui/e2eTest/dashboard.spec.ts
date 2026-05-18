@@ -1,7 +1,7 @@
 import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
-import { uploadAdditionalDocuments } from '../data/page-data/documents-page-data';
+import { startEvidenceUpload } from '../data/page-data/documents-page-data';
 import { chooseAnApplication, viewAllApplications } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
@@ -29,7 +29,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
-  test('Validate address, case number and links on the dashboard @smoke @crossbrowser', async () => {
+  test('Validate address, case number and links on the dashboard @smoke @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
     await performActions(
@@ -47,7 +47,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
         {
           sectionHeader: dashboard.iWantToHeader,
           fieldName: dashboard.uploadAdditionalDocumentsLink,
-          header: uploadAdditionalDocuments.mainHeader,
+          header: startEvidenceUpload.mainHeader,
         },
       ]
     );
