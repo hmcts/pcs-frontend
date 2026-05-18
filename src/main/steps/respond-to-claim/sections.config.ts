@@ -169,6 +169,10 @@ export function sectionHasCya(section: SectionConfig): boolean {
 
 const stepToSectionId = buildStepToSectionIdMap();
 
+export const sectionById: ReadonlyMap<RespondToClaimSectionId, SectionConfig> = new Map(
+  sectionDefs.map(section => [section.id, section as unknown as SectionConfig])
+);
+
 export function findSectionIdForStep(stepName: string): RespondToClaimSectionId | undefined {
   return stepToSectionId.get(stepName);
 }

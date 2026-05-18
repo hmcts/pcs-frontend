@@ -133,7 +133,7 @@ const mockStepsData = {
   allSteps,
 };
 
-import { Application } from 'express';
+import { Application, Request, Response } from 'express';
 
 import { legalRepresentativeHeaderMiddleware, oidcMiddleware } from '../../../main/middleware';
 import { registerSteps } from '../../../main/routes/registerSteps';
@@ -417,5 +417,91 @@ describe('registerAllJourneys', () => {
 
     // Verify that a router was created and mounted
     expect(mockUse).toHaveBeenCalled();
+  });
+
+  it('routeMiddleware fires AFTER caseReferenceParamMiddleware loads validatedCase, BEFORE per-step middleware', async () => {
+    const callOrder: string[] = [];
+
+    const caseRefMw = jest.fn((req, res, next, value) => {
+      res.locals.validatedCase = { id: value };
+      callOrder.push(`caseRef:${!!res.locals.validatedCase}`);
+      next();
+    });
+
+    const tracerMw = jest.fn((req, res, next) => {
+      callOrder.push(`tracer:${!!res.locals.validatedCase}`);
+      next();
+    });
+
+    const stepHandler = jest.fn((req, res) => {
+      callOrder.push(`handler:${!!res.locals.validatedCase}`);
+      res.end();
+    });
+
+    jest.resetModules();
+    jest.doMock('../../../main/middleware', () => ({
+      oidcMiddleware: jest.fn((req, res, next) => next()),
+      caseReferenceParamMiddleware: caseRefMw,
+      legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
+    }));
+
+    const testStep = {
+      url: '/case/:caseReference/wiring-test/step-a',
+      name: 'step-a',
+      getController: () => ({ get: stepHandler }),
+    };
+
+    jest.doMock('@steps', () => ({
+      journeyRegistry: {
+        wiringTest: {
+          name: 'wiringTest',
+          slug: 'wiring-test',
+          default: {
+            flowConfig: {
+              basePath: '/case/:caseReference/wiring-test',
+              stepOrder: ['step-a'],
+              steps: { 'step-a': { requiresAuth: false } },
+            },
+            stepRegistry: { 'step-a': testStep },
+          },
+          routeMiddleware: [tracerMw],
+        },
+      },
+      getFlowConfigForJourney: () => ({
+        basePath: '/case/:caseReference/wiring-test',
+        stepOrder: ['step-a'],
+        steps: { 'step-a': { requiresAuth: false } },
+      }),
+      getStepForJourney: () => testStep,
+      getStepsForJourney: () => [testStep],
+    }));
+
+    // Capture the journey router as it's mounted via app.use(journeyRouter).
+    let capturedRouter: unknown;
+    const captureApp = {
+      use: jest.fn((router: unknown) => {
+        capturedRouter = router;
+      }),
+      param: jest.fn(),
+    } as unknown as Application;
+
+    const { registerAllJourneys } = require('../../../main/routes/registerSteps');
+    registerAllJourneys(captureApp);
+
+    expect(capturedRouter).toBeDefined();
+
+    // Fire a request through the captured router by calling .handle() directly.
+    // No supertest needed — Express routers expose .handle(req, res, next).
+    const req = { url: '/case/abc-999/wiring-test/step-a', method: 'GET' } as unknown as Request;
+    const res = { locals: {}, end: jest.fn() } as unknown as Response;
+
+    await new Promise<void>((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (capturedRouter as any).handle(req, res, (err: unknown) => (err ? reject(err) : resolve()));
+      // step handler calls res.end() synchronously, so resolve immediately as a fallback
+      setImmediate(() => resolve());
+    });
+
+    expect(callOrder).toEqual(['caseRef:true', 'tracer:true', 'handler:true']);
   });
 });

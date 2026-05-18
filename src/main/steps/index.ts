@@ -1,7 +1,8 @@
-import type { Request } from 'express';
+import type { Request, RequestHandler } from 'express';
 
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
+import { respondToClaimAccessGuard } from './respond-to-claim/accessGuard';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from './respond-to-claim/draftEvent';
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
@@ -28,6 +29,9 @@ export interface JourneyConfig {
   draftEvent?: CcdDraftEvent;
   default: ResolvedJourneyConfig;
   legalrep?: ResolvedJourneyConfig;
+  // Stacked as additional `.param('caseReference', cb)` callbacks so they fire
+  // after validatedCase is loaded and before per-step middleware.
+  routeMiddleware?: RequestHandler[];
 }
 
 // JourneyVariant intentionally diverges from UserType ('citizen' | 'legalrep').
@@ -50,6 +54,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       flowConfig: respondToClaimLegalrepFlowConfig,
       stepRegistry: respondToClaimStepRegistry,
     },
+    routeMiddleware: [respondToClaimAccessGuard()],
   },
   makeAnApplication: {
     name: 'makeAnApplication',

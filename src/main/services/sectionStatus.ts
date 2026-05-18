@@ -215,7 +215,7 @@ function isStepVisible(stepName: string, flowConfig: JourneyFlowConfig, req: Req
 }
 
 // A thrown isAnswered must not crash the task-list — treat as unanswered.
-function safeIsAnswered(step: StepDefinition, req: Request): boolean {
+export function safeIsAnswered(step: StepDefinition, req: Request): boolean {
   if (!step.isAnswered) {
     return false;
   }
