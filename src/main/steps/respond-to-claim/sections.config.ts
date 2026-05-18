@@ -143,3 +143,57 @@ export type RespondToClaimSectionId = (typeof sectionDefs)[number]['id'];
 export const RESPOND_TO_CLAIM_SECTION_IDS: readonly RespondToClaimSectionId[] = sectionDefs.map(s => s.id);
 
 export const respondToClaimSections: readonly SectionConfig[] = sectionDefs;
+
+// URL prefix that identifies a section's check-your-answers page.
+export const CYA_STEP_PREFIX = 'check-your-answers-' as const;
+
+// Backend enum values for `defendantResponses.confirmedSections` — must match
+// pcs-api `RespondToClaimSection` Java enum exactly.
+export const RESPOND_TO_CLAIM_SECTION_ENUMS = [
+  'START_NOW_AND_DETAILS',
+  'PERSONAL_DETAILS',
+  'DISPUTE_AND_TENANCY',
+  'PAYMENTS',
+  'SITUATION_AND_CIRCUMSTANCES',
+  'INCOME_AND_EXPENDITURE',
+  'UPLOAD_FILES',
+  'CHECK_YOUR_ANSWERS_AND_SUBMIT',
+] as const;
+
+export type RespondToClaimSectionEnum = (typeof RESPOND_TO_CLAIM_SECTION_ENUMS)[number];
+
+export function sectionIdToBackendEnum(id: RespondToClaimSectionId): RespondToClaimSectionEnum {
+  return id.replace(/([A-Z])/g, '_$1').toUpperCase() as RespondToClaimSectionEnum;
+}
+
+export function sectionHasCya(section: SectionConfig): boolean {
+  return section.steps.some(stepName => stepName.startsWith(CYA_STEP_PREFIX));
+}
+
+// Reverse lookup built once at module load. Step is in exactly one section
+// (duplicates throw at boot — fail loud rather than silently confusing the
+// confirmation flag).
+const stepToSectionId = new Map<string, RespondToClaimSectionId>();
+for (const section of sectionDefs) {
+  for (const stepName of section.steps) {
+    if (stepToSectionId.has(stepName)) {
+      throw new Error(`Step "${stepName}" appears in more than one respond-to-claim section`);
+    }
+    stepToSectionId.set(stepName, section.id);
+  }
+}
+
+export function findSectionIdForStep(stepName: string): RespondToClaimSectionId | undefined {
+  return stepToSectionId.get(stepName);
+}
+
+// Startup invariant: every declared section maps to a recognised backend enum.
+// Fails loud at boot if FE and pcs-api `RespondToClaimSection` drift apart.
+for (const section of sectionDefs) {
+  const enumValue = sectionIdToBackendEnum(section.id);
+  if (!RESPOND_TO_CLAIM_SECTION_ENUMS.includes(enumValue)) {
+    throw new Error(
+      `Section id "${section.id}" derives backend enum "${enumValue}" which is not in RESPOND_TO_CLAIM_SECTION_ENUMS`
+    );
+  }
+}

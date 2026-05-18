@@ -1,7 +1,9 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+import { findSectionIdForStep, sectionIdToBackendEnum } from '../sections.config';
 
 import type { SummaryListRow } from './cyaRow';
 
@@ -68,11 +70,29 @@ export function createSectionCyaStep({
         journeyName
       ),
     postController: {
-      post: async (req: Request, res: Response) => {
+      post: async (req: Request, res: Response, next: NextFunction) => {
         const action = req.body?.action;
+        const isSaveForLater = action === 'saveForLater';
         const caseId = req.res?.locals.validatedCase?.id;
+        const sectionId = findSectionIdForStep(stepName);
 
-        if (action === 'saveForLater') {
+        if (sectionId) {
+          try {
+            const draft = buildDraftDefendantResponse(req);
+            const enumValue = sectionIdToBackendEnum(sectionId);
+            const current = draft.defendantResponses.confirmedSections ?? [];
+            draft.defendantResponses.confirmedSections = isSaveForLater
+              ? current.filter(s => s !== enumValue)
+              : current.includes(enumValue)
+                ? current
+                : [...current, enumValue];
+            await saveDraftDefendantResponse(req, draft);
+          } catch (error) {
+            return next(error);
+          }
+        }
+
+        if (isSaveForLater) {
           const dashboardUrl = getDashboardUrl(caseId);
           return res.redirect(303, dashboardUrl ?? '/');
         }

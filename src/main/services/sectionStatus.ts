@@ -2,6 +2,11 @@ import type { Request } from 'express';
 
 import type { JourneyFlowConfig, SectionConfig, SectionStatus } from '../modules/steps/stepFlow.interface';
 import type { StepDefinition } from '../modules/steps/stepFormData.interface';
+import {
+  type RespondToClaimSectionId,
+  sectionHasCya,
+  sectionIdToBackendEnum,
+} from '../steps/respond-to-claim/sections.config';
 
 export type { SectionStatus, SectionConfig, JourneyFlowConfig } from '../modules/steps/stepFlow.interface';
 export type { StepDefinition } from '../modules/steps/stepFormData.interface';
@@ -75,7 +80,16 @@ export async function getSectionStatus(
     return 'NOT_APPLICABLE';
   }
 
-  return scoreAnsweredness(questionSteps, req);
+  const raw = scoreAnsweredness(questionSteps, req);
+  if (raw !== 'DONE' || !sectionHasCya(section)) {
+    return raw;
+  }
+  // A section with a CYA is only DONE once the user has explicitly confirmed
+  // via Save & continue on that CYA. Without confirmation, fully-answered
+  // sections stay IN_PROGRESS so Save for later (which clears the flag) can
+  // round-trip the user back to IN_PROGRESS.
+  const confirmed = req.res?.locals?.validatedCase?.defendantResponses?.confirmedSections ?? [];
+  return confirmed.includes(sectionIdToBackendEnum(section.id as RespondToClaimSectionId)) ? 'DONE' : 'IN_PROGRESS';
 }
 
 export class SectionConfigError extends Error {

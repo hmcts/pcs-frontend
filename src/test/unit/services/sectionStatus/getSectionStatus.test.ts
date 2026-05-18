@@ -149,4 +149,73 @@ describe('getSectionStatus', () => {
     // ghost ignored, stepA answered → DONE.
     expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('DONE');
   });
+
+  // The override fires only for sections whose steps include a CYA — that is, a
+  // step whose name starts with `check-your-answers-`. A section without a CYA
+  // (e.g. `checkYourAnswersAndSubmit`, whose own CYA is the global one) passes
+  // raw status through unchanged.
+  describe('confirmedSections override', () => {
+    const reqWithConfirmed = (ids: string[]): Request =>
+      ({
+        res: {
+          locals: { validatedCase: { defendantResponses: { confirmedSections: ids } } },
+        },
+      }) as unknown as Request;
+
+    const sectionWithCya = (id: string, lastStepName: string) =>
+      section({
+        id,
+        steps: ['stepA', lastStepName],
+      });
+
+    it('flips DONE → IN_PROGRESS when section has CYA but is not in confirmedSections', async () => {
+      const sec = sectionWithCya('personalDetails', 'check-your-answers-personal-details');
+      const registry = {
+        stepA: stub({ isAnswered: () => true }),
+        'check-your-answers-personal-details': { ...stub(), isAnswered: undefined },
+      };
+      const status = await getSectionStatus(sec, flow(), registry, reqWithConfirmed([]), new Map());
+      expect(status).toBe('IN_PROGRESS');
+    });
+
+    it('keeps DONE when section is in confirmedSections', async () => {
+      const sec = sectionWithCya('personalDetails', 'check-your-answers-personal-details');
+      const registry = {
+        stepA: stub({ isAnswered: () => true }),
+        'check-your-answers-personal-details': { ...stub(), isAnswered: undefined },
+      };
+      const status = await getSectionStatus(sec, flow(), registry, reqWithConfirmed(['PERSONAL_DETAILS']), new Map());
+      expect(status).toBe('DONE');
+    });
+
+    it('passes IN_PROGRESS through unchanged regardless of confirmedSections (raw wins)', async () => {
+      const sec = section({
+        id: 'personalDetails',
+        steps: ['stepA', 'stepB', 'check-your-answers-personal-details'],
+      });
+      const registry = {
+        stepA: stub({ isAnswered: () => true }),
+        stepB: stub({ isAnswered: () => false }),
+        'check-your-answers-personal-details': { ...stub(), isAnswered: undefined },
+      };
+      // Stale flag present (somehow) — raw status says IN_PROGRESS → that wins.
+      const status = await getSectionStatus(sec, flow(), registry, reqWithConfirmed(['PERSONAL_DETAILS']), new Map());
+      expect(status).toBe('IN_PROGRESS');
+    });
+
+    it('does not apply the override for sections without a CYA (e.g. checkYourAnswersAndSubmit)', async () => {
+      // checkYourAnswersAndSubmit has steps like ['equality-and-diversity-start', …, 'check-your-answers']
+      // — none start with the CYA prefix, so sectionHasCya is false and raw status passes through.
+      const sec = section({
+        id: 'checkYourAnswersAndSubmit',
+        steps: ['equality-and-diversity-start', 'check-your-answers'],
+      });
+      const registry = {
+        'equality-and-diversity-start': stub({ isAnswered: () => true }),
+        'check-your-answers': { ...stub(), isAnswered: undefined },
+      };
+      const status = await getSectionStatus(sec, flow(), registry, reqWithConfirmed([]), new Map());
+      expect(status).toBe('DONE');
+    });
+  });
 });
