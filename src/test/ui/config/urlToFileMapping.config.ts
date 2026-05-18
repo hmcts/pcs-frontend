@@ -38,6 +38,8 @@ export default {
   'do-you-have-any-dependant-children': 'doYouHaveAnyDependantChildren',
   'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
   'choose-an-application': 'chooseAnApplication',
+  'make-an-application/check-your-answers': 'checkYourAnswersGenApps',
+  'respond-to-claim/check-your-answers': 'checkYourAnswers',
   'language-used': 'languageUsed',
   'other-considerations': 'otherConsiderations',
   'ask-to-adjourn-the-court-hearing': 'askToAdjournTheCourtHearing',
