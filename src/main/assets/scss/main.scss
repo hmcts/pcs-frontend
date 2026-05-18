@@ -91,3 +91,10 @@
 .pcs-task-list__divider {
   border-bottom: 3px solid govuk-colour('blue');
 }
+
+// GDS `cannot-start-yet` resolves to ~#484949 which reads as normal dark text
+// alongside the other rows. Lighten it so "Not available yet" reads as
+// visually muted/locked at a glance.
+.pcs-task-list .govuk-task-list__status--cannot-start-yet {
+  color: govuk-colour('black', $variant: 'tint-50');
+}
