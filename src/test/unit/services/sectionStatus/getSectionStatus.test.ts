@@ -158,7 +158,9 @@ describe('getSectionStatus', () => {
     const reqWithConfirmed = (ids: string[]): Request =>
       ({
         res: {
-          locals: { validatedCase: { defendantResponses: { confirmedSections: ids } } },
+          locals: {
+            validatedCase: { possessionClaimResponse: { defendantResponses: { confirmedSections: ids } } },
+          },
         },
       }) as unknown as Request;
 
