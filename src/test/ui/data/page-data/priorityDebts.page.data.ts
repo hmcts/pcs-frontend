@@ -1,6 +1,5 @@
 export const priorityDebts = {
   mainHeader: `Priority debts`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   priorityDebtsAreDebtsParagraph: `Priority debts are debts which could lead to serious consequences if you do not pay them.`,
   excludingRentParagraph: `Excluding rent or mortgage arrears, priority debts are:`,
   councilTaxList: `council tax arrears`,

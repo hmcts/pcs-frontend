@@ -1,5 +1,4 @@
 {
-  "caption": "cyRespond to a property possession claim",
   "pageTitle": "cyYour circumstances",
   "introParagraph": "cyYou can use this section to give details about any events or circumstances that have impacted your case that you think a judge should know about.",
   "forExample": "cyFor example:",
@@ -14,6 +13,8 @@
   "textAreaLabel": "cyGive details about your circumstances",
   "errors": {
     "shareCircumstances": "cySelect if you’d like to share anything about your circumstances",
-    "shareCircumstances.circumstancesDetails": "cyGive details about your circumstances"
+    "shareCircumstances.circumstancesDetails": "cyGive details about your circumstances",
+    "circumstancesDetailsMaxLength": "cyCircumstances details must be 500 characters or less",
+    "circumstancesDetailsInvalidCharacters": "cyThe details of your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }

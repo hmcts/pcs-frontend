@@ -1,6 +1,5 @@
 export const contactPreferencesTextMessage = {
   mainHeader: `Contact by text message`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   contactByTextMessageParagraph: `We might also send updates about your case by text message.`,
   contactByTextMessageQuestion: `Are you happy to be contacted by text message?`,
   yesRadioOption: `Yes`,
