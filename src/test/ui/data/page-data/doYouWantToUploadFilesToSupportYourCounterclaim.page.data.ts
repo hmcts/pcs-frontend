@@ -1,0 +1,11 @@
+export const doYouWantToUploadFilesToSupportYourCounterclaim = {
+  mainHeader: `Do you want to upload files to support your counterclaim?`,
+  witnessStatementsParagraph: `Witness statements do not need to be uploaded at this stage, directions for the exchange of witness statements will be given later.`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfYouWantToUploadErrorMessage: `Select if you want to upload files to support your counterclaim?`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `start-now`,
+  backLink: `Back`,
+};
