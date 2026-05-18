@@ -97,7 +97,7 @@ describe('respond-to-claim sections config', () => {
     await expect(findSection('payments')?.isApplicable?.(req)).resolves.toBe(false);
   });
 
-  describe('confirmedSections helpers', () => {
+  describe('completedSections helpers', () => {
     it('sectionIdToBackendEnum derives the correct pcs-api enum value for every section id', () => {
       const expected: Record<string, string> = {
         startNowAndDetails: 'START_NOW_AND_DETAILS',

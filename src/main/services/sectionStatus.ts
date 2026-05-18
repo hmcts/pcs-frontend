@@ -75,12 +75,12 @@ export async function getSectionStatus(
   if (raw !== 'DONE' || !sectionHasCya(section)) {
     return raw;
   }
-  return userHasConfirmedSectionViaCya(section, req) ? 'DONE' : 'IN_PROGRESS';
+  return userHasCompletedSectionViaCya(section, req) ? 'DONE' : 'IN_PROGRESS';
 }
 
-function userHasConfirmedSectionViaCya(section: SectionConfig, req: Request): boolean {
-  const confirmed = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.confirmedSections ?? [];
-  return confirmed.includes(sectionIdToBackendEnum(section.id as RespondToClaimSectionId));
+function userHasCompletedSectionViaCya(section: SectionConfig, req: Request): boolean {
+  const completed = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.completedSections ?? [];
+  return completed.includes(sectionIdToBackendEnum(section.id as RespondToClaimSectionId));
 }
 
 export class SectionConfigError extends Error {

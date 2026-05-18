@@ -154,12 +154,12 @@ describe('getSectionStatus', () => {
   // step whose name starts with `check-your-answers-`. A section without a CYA
   // (e.g. `checkYourAnswersAndSubmit`, whose own CYA is the global one) passes
   // raw status through unchanged.
-  describe('confirmedSections override', () => {
-    const reqWithConfirmed = (ids: string[]): Request =>
+  describe('completedSections override', () => {
+    const reqWithCompleted = (ids: string[]): Request =>
       ({
         res: {
           locals: {
-            validatedCase: { possessionClaimResponse: { defendantResponses: { confirmedSections: ids } } },
+            validatedCase: { possessionClaimResponse: { defendantResponses: { completedSections: ids } } },
           },
         },
       }) as unknown as Request;
@@ -170,27 +170,27 @@ describe('getSectionStatus', () => {
         steps: ['stepA', lastStepName],
       });
 
-    it('flips DONE → IN_PROGRESS when section has CYA but is not in confirmedSections', async () => {
+    it('flips DONE → IN_PROGRESS when section has CYA but is not in completedSections', async () => {
       const sec = sectionWithCya('personalDetails', 'check-your-answers-personal-details');
       const registry = {
         stepA: stub({ isAnswered: () => true }),
         'check-your-answers-personal-details': { ...stub(), isAnswered: undefined },
       };
-      const status = await getSectionStatus(sec, flow(), registry, reqWithConfirmed([]), new Map());
+      const status = await getSectionStatus(sec, flow(), registry, reqWithCompleted([]), new Map());
       expect(status).toBe('IN_PROGRESS');
     });
 
-    it('keeps DONE when section is in confirmedSections', async () => {
+    it('keeps DONE when section is in completedSections', async () => {
       const sec = sectionWithCya('personalDetails', 'check-your-answers-personal-details');
       const registry = {
         stepA: stub({ isAnswered: () => true }),
         'check-your-answers-personal-details': { ...stub(), isAnswered: undefined },
       };
-      const status = await getSectionStatus(sec, flow(), registry, reqWithConfirmed(['PERSONAL_DETAILS']), new Map());
+      const status = await getSectionStatus(sec, flow(), registry, reqWithCompleted(['PERSONAL_DETAILS']), new Map());
       expect(status).toBe('DONE');
     });
 
-    it('passes IN_PROGRESS through unchanged regardless of confirmedSections (raw wins)', async () => {
+    it('passes IN_PROGRESS through unchanged regardless of completedSections (raw wins)', async () => {
       const sec = section({
         id: 'personalDetails',
         steps: ['stepA', 'stepB', 'check-your-answers-personal-details'],
@@ -201,7 +201,7 @@ describe('getSectionStatus', () => {
         'check-your-answers-personal-details': { ...stub(), isAnswered: undefined },
       };
       // Stale flag present (somehow) — raw status says IN_PROGRESS → that wins.
-      const status = await getSectionStatus(sec, flow(), registry, reqWithConfirmed(['PERSONAL_DETAILS']), new Map());
+      const status = await getSectionStatus(sec, flow(), registry, reqWithCompleted(['PERSONAL_DETAILS']), new Map());
       expect(status).toBe('IN_PROGRESS');
     });
 
@@ -216,7 +216,7 @@ describe('getSectionStatus', () => {
         'equality-and-diversity-start': stub({ isAnswered: () => true }),
         'check-your-answers': { ...stub(), isAnswered: undefined },
       };
-      const status = await getSectionStatus(sec, flow(), registry, reqWithConfirmed([]), new Map());
+      const status = await getSectionStatus(sec, flow(), registry, reqWithCompleted([]), new Map());
       expect(status).toBe('DONE');
     });
   });

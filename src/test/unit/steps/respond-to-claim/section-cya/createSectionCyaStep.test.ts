@@ -46,34 +46,34 @@ const callPost = async (action: string | undefined, draftToReturn: object) => {
   return { req, res, next };
 };
 
-describe('createSectionCyaStep postController — confirmedSections producer', () => {
+describe('createSectionCyaStep postController — completedSections producer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('appends the section enum to confirmedSections on Save & continue', async () => {
-    const draft = { defendantResponses: { confirmedSections: [] } };
+  it('appends the section enum to completedSections on Save & continue', async () => {
+    const draft = { defendantResponses: { completedSections: [] } };
     await callPost(undefined, draft);
 
     expect(mockSaveDraft).toHaveBeenCalledTimes(1);
-    expect(draft.defendantResponses.confirmedSections).toEqual(['PERSONAL_DETAILS']);
+    expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS']);
   });
 
   it('is idempotent — Save & continue twice does not duplicate the section enum', async () => {
-    const draft = { defendantResponses: { confirmedSections: ['PERSONAL_DETAILS'] } };
+    const draft = { defendantResponses: { completedSections: ['PERSONAL_DETAILS'] } };
     await callPost(undefined, draft);
 
-    expect(draft.defendantResponses.confirmedSections).toEqual(['PERSONAL_DETAILS']);
+    expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS']);
   });
 
   it('removes the section enum on Save for later', async () => {
     const draft = {
-      defendantResponses: { confirmedSections: ['PERSONAL_DETAILS', 'PAYMENTS'] },
+      defendantResponses: { completedSections: ['PERSONAL_DETAILS', 'PAYMENTS'] },
     };
     await callPost('saveForLater', draft);
 
     expect(mockSaveDraft).toHaveBeenCalledTimes(1);
-    expect(draft.defendantResponses.confirmedSections).toEqual(['PAYMENTS']);
+    expect(draft.defendantResponses.completedSections).toEqual(['PAYMENTS']);
   });
 
   it('routes errors via next() when the draft save fails', async () => {

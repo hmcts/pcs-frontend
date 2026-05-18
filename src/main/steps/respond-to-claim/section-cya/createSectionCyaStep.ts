@@ -80,8 +80,8 @@ export function createSectionCyaStep({
           try {
             const draft = buildDraftDefendantResponse(req);
             const enumValue = sectionIdToBackendEnum(sectionId);
-            const current = draft.defendantResponses.confirmedSections ?? [];
-            draft.defendantResponses.confirmedSections = isSaveForLater
+            const current = draft.defendantResponses.completedSections ?? [];
+            draft.defendantResponses.completedSections = isSaveForLater
               ? current.filter(s => s !== enumValue)
               : current.includes(enumValue)
                 ? current

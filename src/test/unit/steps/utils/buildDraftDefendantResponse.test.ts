@@ -113,7 +113,7 @@ describe('buildDraftDefendantResponse — any mid-section submission auto-clears
           validatedCase: {
             data: {
               possessionClaimResponse: {
-                defendantResponses: { confirmedSections: [...confirmed] },
+                defendantResponses: { completedSections: [...confirmed] },
               },
             },
           },
@@ -121,28 +121,28 @@ describe('buildDraftDefendantResponse — any mid-section submission auto-clears
       },
     }) as unknown as Request;
 
-  it('removes the current step’s section from confirmedSections on Save for later', () => {
+  it('removes the current step’s section from completedSections on Save for later', () => {
     const req = reqFor('/case/123/respond-to-claim/defendant-name-confirmation', 'saveForLater', [
       'PERSONAL_DETAILS',
       'PAYMENTS',
     ]);
     const draft = buildDraftDefendantResponse(req);
-    expect(draft.defendantResponses.confirmedSections).toEqual(['PAYMENTS']);
+    expect(draft.defendantResponses.completedSections).toEqual(['PAYMENTS']);
   });
 
-  it('removes the current step’s section from confirmedSections on Save and continue', () => {
+  it('removes the current step’s section from completedSections on Save and continue', () => {
     const req = reqFor('/case/123/respond-to-claim/defendant-name-confirmation', undefined, [
       'PERSONAL_DETAILS',
       'PAYMENTS',
     ]);
     const draft = buildDraftDefendantResponse(req);
-    expect(draft.defendantResponses.confirmedSections).toEqual(['PAYMENTS']);
+    expect(draft.defendantResponses.completedSections).toEqual(['PAYMENTS']);
   });
 
   it('is a no-op when the step is not part of any section', () => {
     const req = reqFor('/case/123/respond-to-claim/task-list', 'saveForLater', ['PERSONAL_DETAILS']);
     const draft = buildDraftDefendantResponse(req);
-    expect(draft.defendantResponses.confirmedSections).toEqual(['PERSONAL_DETAILS']);
+    expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS']);
   });
 
   it('is a no-op when the step is a section CYA — the CYA postController owns the flag', () => {
@@ -151,6 +151,6 @@ describe('buildDraftDefendantResponse — any mid-section submission auto-clears
       'PAYMENTS',
     ]);
     const draft = buildDraftDefendantResponse(req);
-    expect(draft.defendantResponses.confirmedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
+    expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
   });
 });

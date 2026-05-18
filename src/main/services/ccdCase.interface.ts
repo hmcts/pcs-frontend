@@ -210,7 +210,7 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
-  confirmedSections?: RespondToClaimSectionEnum[];
+  completedSections?: RespondToClaimSectionEnum[];
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */

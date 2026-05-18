@@ -33,12 +33,12 @@ export const buildDraftDefendantResponse = (req: Request): DraftDefendantRespons
     defendantOnly.defendantContactDetails = { party: {} };
   }
 
-  clearSectionConfirmationOnEdit(req, defendantOnly);
+  clearSectionCompletionOnEdit(req, defendantOnly);
 
   return defendantOnly as DraftDefendantResponse;
 };
 
-function clearSectionConfirmationOnEdit(req: Request, draft: PossessionClaimResponse): void {
+function clearSectionCompletionOnEdit(req: Request, draft: PossessionClaimResponse): void {
   const stepName = req.path?.split('/').pop();
   if (!stepName || stepName.startsWith(CYA_STEP_PREFIX)) {
     return;
@@ -48,7 +48,7 @@ function clearSectionConfirmationOnEdit(req: Request, draft: PossessionClaimResp
     return;
   }
   const enumValue = sectionIdToBackendEnum(sectionId);
-  draft.defendantResponses.confirmedSections = (draft.defendantResponses.confirmedSections ?? []).filter(
+  draft.defendantResponses.completedSections = (draft.defendantResponses.completedSections ?? []).filter(
     s => s !== enumValue
   );
 }
