@@ -152,6 +152,8 @@ export async function renderWithErrors(
   res.status(400).render(viewPath, {
     ...formContent,
     errors,
+    /** Field-level validation only; avoid colliding with step i18n `errors` blobs spread on GET */
+    validationErrors: errors,
     // errorSummary,
     stepName,
     journeyFolder,

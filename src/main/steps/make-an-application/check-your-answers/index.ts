@@ -12,6 +12,7 @@ import VisibleFormDataView from './visibleFormDataView';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
+import { toCaseReference16 } from '@utils/caseReference';
 
 const STEP_NAME = 'check-your-answers';
 
@@ -92,6 +93,7 @@ export const step: StepDefinition = createFormStep({
     const statementOfTruthAccepted = (cyaFormData.statementOfTruthAccepted as string[])[0] as 'yes' | 'no';
 
     const visibleFormData = new VisibleFormDataView(req);
+    const uploadedDocs = visibleFormData.getUploadedDocuments();
 
     const citizenGenAppRequest: CitizenGenAppRequest = {
       applicationType: visibleFormData.getApplicationTypeField()?.fieldValue,
@@ -104,6 +106,8 @@ export const step: StepDefinition = createFormStep({
       withoutNoticeReason: visibleFormData.getReasonForNotSharingField()?.fieldValue,
       languageUsed: visibleFormData.getWhichLanguageField()?.fieldValue,
       whatOrderWanted: visibleFormData.getWhatOrderWantedField()?.fieldValue,
+      hasSupportingDocuments: toYesNoEnum(visibleFormData.getHasSupportingDocuments()?.fieldValue),
+      uploadedDocuments: uploadedDocs.length > 0 ? uploadedDocs : undefined,
       sotAccepted: toYesNoEnum(statementOfTruthAccepted),
       sotFullName: cyaFormData.fullName as string,
       clientReference: req.session.genApp.applicationId,
@@ -117,6 +121,10 @@ export const step: StepDefinition = createFormStep({
     });
 
     delete req.session.formData;
+    const caseRef = toCaseReference16(req.params?.caseReference);
+    if (caseRef && req.session.uploadedDocs?.[caseRef]) {
+      delete req.session.uploadedDocs[caseRef];
+    }
     delete req.session.genApp;
   },
 });

@@ -22,7 +22,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     subTitle: 'subTitle',
     hintText: 'hintText',
     listItem1: 'listItem1',
-    caption: 'caption',
     bulletPointLabel: 'bulletPointLabel',
     noticeDateHint: 'noticeDateHint',
     question: 'question',

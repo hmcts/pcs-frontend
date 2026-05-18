@@ -1,6 +1,5 @@
 export const whatOtherRegularExpensesDoYouHave = {
   mainHeader: `What other regular expenses do you have? (Optional)`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.`,
 
   // Household Bills
