@@ -10,8 +10,10 @@ import { step as contactPreferencesTextMessage } from './contact-preferences-tex
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
 import { step as counterClaimAbout } from './counter-claim-about';
+import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
 import { step as counterClaimDoYouWantToUploadFiles } from './counter-claim-do-you-want-to-upload-files';
 import { step as counterClaimFee } from './counter-claim-fee';
+import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
 import { step as counterClaimUploadFiles } from './counter-claim-upload-files';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
@@ -84,6 +86,8 @@ export const stepRegistry = {
   'counter-claim-what-are-you-claiming-for': counterClaimWhatAreYouClaimingFor,
   'counter-claim-specific-sum': counterClaimSpecificSum,
   'counter-claim-fee': counterClaimFee,
+  'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
+  'counter-claim-against-whom': counterClaimAgainstWhom,
   'counter-claim-about': counterClaimAbout,
   'counter-claim-do-you-want-to-upload-files': counterClaimDoYouWantToUploadFiles,
   'counter-claim-upload-files': counterClaimUploadFiles,

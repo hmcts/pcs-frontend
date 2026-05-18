@@ -19,7 +19,7 @@ export const submitCaseApiDataWales = {
     },
 
     claimAgainstTrespassers: 'NO',
-
+    isExemptLandlord: 'YES',
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
     claimantNamePossessiveForm: "Possession Claims Solicitor Org's",
@@ -65,12 +65,12 @@ export const submitCaseApiDataWales = {
     // SECURE_CONTRACT = Wales (section 8 Housing (Wales) Act 2014)
     occupationLicenceTypeWales: process.env.OCCUPATION_LICENCE_TYPE,
 
-    licenceStartDate: '1990-11-10',
+    licenceStartDate: '2020-05-20',
     licenceDocuments: [],
 
-    walesLicensed: 'NO',
-    walesLicensedAgentAppointed: 'NO',
-    walesRegistered: 'NO',
+    // walesLicensed: 'NO',
+    // walesLicensedAgentAppointed: 'NO',
+    // walesRegistered: 'NO',
 
     showReasonsForGroundsPageWales: 'YES',
 
@@ -125,7 +125,6 @@ export const submitCaseApiDataWales = {
 
     //  CORRECTED: Disable payments to avoid 422 error
     // If you need payments, add: paymentResponsibleParty, paymentAccountReference, etc.
-    claimingCostsWanted: 'NO',
     applicationWithClaim: 'NO',
 
     additionalReasonsForPossession: {
@@ -175,12 +174,13 @@ export const submitCaseApiDataWales = {
       valueCode: 'COMMUNITY_LANDLORD',
     },
     claimAgainstTrespassers: 'NO',
+    isExemptLandlord: 'YES',
     orgNameFound: 'Yes',
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
-    walesRegistered: 'NO',
-    walesLicensed: 'NO',
-    walesLicensedAgentAppointed: 'NO',
+    // walesRegistered: 'NO',
+    // walesLicensed: 'NO',
+    // walesLicensedAgentAppointed: 'NO',
     claimantContactEmail: 'pcs-solicitor-automation@test.com',
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'Yes',
@@ -220,7 +220,6 @@ export const submitCaseApiDataWales = {
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
     prohibitedConductWalesClaim: 'NO',
-    claimingCostsWanted: 'YES',
     hasUnderlesseeOrMortgagee: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
@@ -266,12 +265,13 @@ export const submitCaseApiDataWales = {
       valueCode: 'COMMUNITY_LANDLORD',
     },
     claimAgainstTrespassers: 'NO',
+    isExemptLandlord: 'YES',
     orgNameFound: 'YES',
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
-    walesRegistered: 'NOT_APPLICABLE',
-    walesLicensed: 'NOT_APPLICABLE',
-    walesLicensedAgentAppointed: 'NOT_APPLICABLE',
+    // walesRegistered: 'NOT_APPLICABLE',
+    // walesLicensed: 'NOT_APPLICABLE',
+    // walesLicensedAgentAppointed: 'NOT_APPLICABLE',
     claimantContactEmail: 'pcs-solicitor-automation@test.com',
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'YES',
@@ -314,7 +314,6 @@ export const submitCaseApiDataWales = {
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
     prohibitedConductWalesClaim: 'NO',
-    claimingCostsWanted: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
     },
@@ -353,12 +352,13 @@ export const submitCaseApiDataWales = {
       valueCode: 'COMMUNITY_LANDLORD',
     },
     claimAgainstTrespassers: 'NO',
+    isExemptLandlord: 'YES',
     orgNameFound: 'Yes',
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
-    walesRegistered: 'NO',
-    walesLicensed: 'NO',
-    walesLicensedAgentAppointed: 'NO',
+    // walesRegistered: 'NO',
+    // walesLicensed: 'NO',
+    // walesLicensedAgentAppointed: 'NO',
     claimantContactEmail: 'pcs-solicitor-automation@test.com',
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'Yes',
@@ -398,7 +398,6 @@ export const submitCaseApiDataWales = {
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
     prohibitedConductWalesClaim: 'NO',
-    claimingCostsWanted: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
     },
