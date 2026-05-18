@@ -140,6 +140,10 @@ export class CcdCaseModel {
       return this.data.claimantName.trim();
     }
 
+    return this.orgName;
+  }
+
+  get orgName(): string {
     return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
   }
 

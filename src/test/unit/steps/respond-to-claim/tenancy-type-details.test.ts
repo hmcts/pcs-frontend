@@ -42,6 +42,7 @@ type TenancyTypeDetailsStep = {
     res?: {
       locals?: {
         validatedCase?: {
+          orgName?: string;
           data?: {
             possessionClaimResponse?: {
               defendantResponses?: { tenancyTypeConfirmation?: YesNoNotSureValue; tenancyType?: string };
@@ -60,6 +61,7 @@ type TenancyTypeDetailsStep = {
         locals?: {
           validatedCase?: {
             id?: string;
+            orgName?: string;
             data?: {
               possessionClaimResponse?: {
                 claimantOrganisations?: { value?: string }[];
@@ -186,6 +188,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
             locals: {
               validatedCase: {
                 id: '12345',
+                orgName: 'Acme Housing',
                 data: {
                   possessionClaimResponse: {
                     claimantOrganisations: [{ value: 'Acme Housing' }],
@@ -225,6 +228,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
             locals: {
               validatedCase: {
                 id: '12345',
+                orgName: 'Acme Housing',
                 data: {
                   possessionClaimResponse: {
                     claimantOrganisations: [{ value: 'Acme Housing' }],
@@ -258,6 +262,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
             locals: {
               validatedCase: {
                 id: '12345',
+                orgName: 'Acme Housing',
                 data: {
                   possessionClaimResponse: {
                     claimantOrganisations: [{ value: 'Acme Housing' }],
@@ -282,6 +287,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
             locals: {
               validatedCase: {
                 id: '12345',
+                orgName: 'Acme Housing',
                 data: {
                   possessionClaimResponse: {
                     claimantOrganisations: [{ value: 'Acme Housing' }],

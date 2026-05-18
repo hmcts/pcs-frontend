@@ -3,8 +3,6 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { getClaimantName } from '../../utils/getClaimantName';
-import { getOrganisationName } from '../../utils/getOrgName';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -137,10 +135,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       (req.body?.correctType as string) ||
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
       '';
-    const claimantName = getClaimantName(req);
+    const claimantName = req.res?.locals.validatedCase?.claimantName;
     const caseData = req.res?.locals.validatedCase?.data;
     const walesProperty = isWalesProperty(caseData);
-    const orgName = getOrganisationName(req);
+    const orgName = req.res?.locals.validatedCase?.orgName;
     const tenancyTypeOfTenancyLicence = caseData?.tenancy_TypeOfTenancyLicence as string;
     const occupationLicenceTypeWales = caseData?.occupationLicenceTypeWales;
     // Wales: flat keys from OccupationLicenceDetailsWales.
