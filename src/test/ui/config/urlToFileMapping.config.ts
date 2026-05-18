@@ -68,4 +68,5 @@ export default {
   'counter-claim-about': 'counterClaimAbout',
   'counter-claim-other-than-sum': 'counterClaimOtherThanSum',
   'counter-claim-fee': 'counterClaimFee',
+  'start-evidence-upload': 'startEvidenceUpload',
 };

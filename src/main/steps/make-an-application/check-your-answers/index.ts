@@ -59,7 +59,7 @@ export const step: StepDefinition = createFormStep({
     understandProceedings: 'statementOfTruth.understandProceedings',
   },
   extendGetContent: async (req: Request) => {
-    const t: TFunction = getTranslationFunction(req, STEP_NAME, ['common']);
+    const t: TFunction = getTranslationFunction(req);
 
     const visibleFormData = new VisibleFormDataView(req);
 
