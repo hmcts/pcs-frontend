@@ -110,7 +110,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
@@ -186,7 +185,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
@@ -311,7 +309,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
@@ -400,7 +397,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'No',
       suspensionToBuyDemotionOfTenancyPages: 'No',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
@@ -483,7 +479,6 @@ export const submitCaseApiData = {
       suspensionOfRTB_ShowHousingActsPage: 'NO',
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
-      claimingCostsWanted: 'NO',
       hasUnderlesseeOrMortgagee: 'NO',
       wantToUploadDocuments: 'NO',
       applicationWithClaim: 'NO',
@@ -575,7 +570,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
@@ -682,7 +676,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },

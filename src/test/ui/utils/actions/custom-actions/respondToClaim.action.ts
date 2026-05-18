@@ -19,6 +19,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
@@ -108,6 +109,10 @@ export class RespondToClaimAction implements IAction {
       ['selectPriorityDebts', () => this.selectPriorityDebts(fieldName as actionRecord)],
       ['enterPriorityDebtDetails', () => this.enterPriorityDebtDetails(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
+      [
+        'selectDoYouWantToUploadDocFoCounterclaim',
+        () => this.selectDoYouWantToUploadDocFoCounterclaim(fieldName as actionRecord),
+      ],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
       ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
@@ -712,6 +717,14 @@ export class RespondToClaimAction implements IAction {
       option: priorityDebtsData.option,
     });
     await performAction('clickButton', priorityDebts.saveAndContinueButton);
+  }
+
+  private async selectDoYouWantToUploadDocFoCounterclaim(uploadOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader,
+      option: uploadOption.option,
+    });
+    await performAction('clickButton', doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   }
 
   private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
