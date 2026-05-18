@@ -125,7 +125,6 @@ export const submitCaseApiDataWales = {
 
     //  CORRECTED: Disable payments to avoid 422 error
     // If you need payments, add: paymentResponsibleParty, paymentAccountReference, etc.
-    claimingCostsWanted: 'NO',
     applicationWithClaim: 'NO',
 
     additionalReasonsForPossession: {
@@ -314,7 +313,6 @@ export const submitCaseApiDataWales = {
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
     prohibitedConductWalesClaim: 'NO',
-    claimingCostsWanted: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
     },
@@ -398,7 +396,6 @@ export const submitCaseApiDataWales = {
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
     prohibitedConductWalesClaim: 'NO',
-    claimingCostsWanted: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
     },
