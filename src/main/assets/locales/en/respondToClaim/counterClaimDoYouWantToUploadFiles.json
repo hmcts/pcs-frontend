@@ -3,10 +3,6 @@
   "heading": "Do you want to upload files to support your counterclaim?",
   "paragraph1": "Witness statements do not need to be uploaded at this stage, directions for the exchange of witness statements will be given later.",
   "paragraph2": "The claimant will be able to see these files.",
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
   "errors": {
     "counterClaimWantToUploadFiles": "Select if you want to upload files to support your counterclaim"
   }
