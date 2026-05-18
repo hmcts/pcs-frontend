@@ -583,7 +583,7 @@ export class RespondToClaimAction implements IAction {
 
   private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: yourCircumstancesData.wouldYouLikeToShareHeader,
+      question: yourCircumstancesData.question,
       option: yourCircumstancesData.yourCircumstancesOption,
     });
     if (yourCircumstancesData.yourCircumstancesOption === yourCircumstances.yesRadioOption) {
