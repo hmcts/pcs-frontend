@@ -36,7 +36,7 @@ export const flowConfig: JourneyFlowConfig = {
   nonSectionStepOrder: ['end-now'],
   steps: {
     'ask-your-solicitor-to-respond-to-the-claim': {
-      showCondition: () => false,
+      showCondition: (req: Request) => req.body?.hasSolicitor === 'YES',
     },
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
