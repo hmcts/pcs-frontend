@@ -145,7 +145,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       beforeRedirect,
       translationKeys,
       showCancelButton,
-      extendGetContent
+      extendGetContent,
+      documentStorage
     ),
   };
 }

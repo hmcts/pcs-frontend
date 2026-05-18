@@ -18,6 +18,7 @@ import {
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
 
+import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/storage';
 import type {
   BuiltFormContent,
   ExtendGetContent,
@@ -41,7 +42,8 @@ export function createPostHandler(
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
   showCancelButton?: boolean,
-  extendGetContent?: ExtendGetContent
+  extendGetContent?: ExtendGetContent,
+  documentStorage?: DocumentStorage
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -81,6 +83,20 @@ export function createPostHandler(
       // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
       normalizeCheckboxFields(req, fields);
 
+      // For file fields backed by documentStorage, the form body's `uploadedDocuments[]`
+      // hidden inputs are a UI mirror only — session is the source of truth. Hydrate
+      // req.body[field.name] from storage so required-validation and the error re-render
+      // both see actual upload state. Empty -> undefined so the standard isMissing check
+      // fires; non-empty -> display documents so the macro repopulates the file list.
+      if (documentStorage) {
+        for (const field of fields) {
+          if (field.type === 'file') {
+            const docs = await documentStorage.read(req);
+            req.body[field.name] = docs.length > 0 ? toDisplayDocuments(docs) : undefined;
+          }
+        }
+      }
+
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
       const emptyFormContent = { fields: [] } as BuiltFormContent;
       const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
@@ -116,6 +132,19 @@ export function createPostHandler(
           interpolationValues,
           showCancelButton
         );
+        // Mirror the GET controller's auto-wiring of upload/delete URLs onto the fileUpload
+        // component. Without this, the error re-render emits empty data-upload-url/data-delete-url,
+        // which causes multi-file-upload.ts:initContainer to bail before MOJ's JS upgrade runs —
+        // so the no-JS "Upload file" fallback button stays visible and async upload doesn't fire
+        // on file selection.
+        if (documentStorage) {
+          const urlBase = req.originalUrl.split('?')[0];
+          const fileField = formContent.fields?.find(f => f.componentType === 'fileUpload');
+          if (fileField?.component) {
+            fileField.component.uploadUrl = `${urlBase}/upload`;
+            fileField.component.deleteUrl = `${urlBase}/delete`;
+          }
+        }
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
