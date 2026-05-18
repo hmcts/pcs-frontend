@@ -69,7 +69,7 @@
     "connect-redis": "7.1.1",
     "cookie-parser": "1.4.7",
     "csrf-sync": "4.2.1",
-    "date-fns": "4.1.0",
+    "date-fns": "4.2.1",
     "dotenv": "17.4.2",
     "escape-html": "1.0.3",
     "express": "5.2.1",
