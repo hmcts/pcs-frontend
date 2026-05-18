@@ -1,7 +1,7 @@
 import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
-import { uploadAdditionalDocuments } from '../data/page-data/documents-page-data';
+import { uploadAdditionalDocuments, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication, viewAllApplications } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
@@ -110,6 +110,11 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       sectionHeader: dashboard.documentsSubHeader,
       fieldName: dashboard.uploadAdditionalDocumentsLink,
       header: uploadAdditionalDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.viewDocumentsLink,
+      header: viewDocuments.mainHeader,
     });
     await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.courtHearingSubHeader,
