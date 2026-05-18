@@ -7,25 +7,22 @@ jest.mock('@services/sectionStatus', () => ({
   safeIsAnswered: jest.fn(),
 }));
 
-jest.mock('../../../../main/steps/index', () => {
-  const actual = jest.requireActual('../../../../main/steps/index');
-  return {
-    ...actual,
-    shouldShowStep: jest.fn(),
-  };
-});
+jest.mock('@steps', () => ({
+  ...jest.requireActual('@steps'),
+  shouldShowStep: jest.fn(),
+}));
 
 jest.mock('../../../../main/steps/utils', () => ({
   ...jest.requireActual('../../../../main/steps/utils'),
   getUserType: jest.fn(),
 }));
 
-import { shouldShowStep } from '../../../../main/steps/index';
 import { respondToClaimAccessGuard } from '../../../../main/steps/respond-to-claim/accessGuard';
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import { getUserType } from '../../../../main/steps/utils';
 
 import { getAllSectionStatuses, getFirstVisibleStep, safeIsAnswered } from '@services/sectionStatus';
+import { shouldShowStep } from '@steps';
 
 const mockGetUserType = getUserType as jest.MockedFunction<typeof getUserType>;
 const mockShouldShowStep = shouldShowStep as jest.MockedFunction<typeof shouldShowStep>;

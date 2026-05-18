@@ -31,13 +31,13 @@ describe('getAllSectionStatuses', () => {
     await expect(getAllSectionStatuses(flow, {}, reqStub)).rejects.toThrow(/no sections/);
   });
 
-  it('resolves dependsOn in topological order (DONE deps unlock their dependents)', async () => {
+  it('resolves dependsOn in declaration order (DONE deps unlock their dependents)', async () => {
     const flow: JourneyFlowConfig = {
       steps: {},
       sections: [
-        section({ id: 'final', dependsOn: ['a', 'b'], steps: ['x'] }),
         section({ id: 'a', steps: ['x'] }),
         section({ id: 'b', steps: ['x'] }),
+        section({ id: 'final', dependsOn: ['a', 'b'], steps: ['x'] }),
       ],
     };
     const registry = { x: stub({ isAnswered: () => true }) };
@@ -50,7 +50,7 @@ describe('getAllSectionStatuses', () => {
   it('marks dependent NOT_AVAILABLE_YET when a dependency is still IN_PROGRESS', async () => {
     const flow: JourneyFlowConfig = {
       steps: {},
-      sections: [section({ id: 'final', dependsOn: ['a'], steps: ['x'] }), section({ id: 'a', steps: ['x', 'y'] })],
+      sections: [section({ id: 'a', steps: ['x', 'y'] }), section({ id: 'final', dependsOn: ['a'], steps: ['x'] })],
     };
     const registry = {
       x: stub({ isAnswered: () => true }),
@@ -65,9 +65,9 @@ describe('getAllSectionStatuses', () => {
     const flow: JourneyFlowConfig = {
       steps: {},
       sections: [
-        section({ id: 'final', dependsOn: ['a', 'b'], steps: ['x'] }),
         section({ id: 'a', steps: ['x'], isApplicable: async () => false }),
         section({ id: 'b', steps: ['x'] }),
+        section({ id: 'final', dependsOn: ['a', 'b'], steps: ['x'] }),
       ],
     };
     const registry = { x: stub({ isAnswered: () => true }) };

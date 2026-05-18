@@ -40,20 +40,13 @@ export async function getAllSectionStatuses(
     );
   }
 
-  const { ordered, cyclicIds } = analyseSectionGraph(flowConfig.sections);
-  // validateSectionConfig runs at startup and would have rejected a cyclic config, so cyclicIds is
-  // normally empty here. Defensive fallback: append cyclic ids in declaration order so the page renders.
-  const orderedIds = cyclicIds.length === 0 ? ordered : [...ordered, ...cyclicIds];
-  const sectionById = new Map(flowConfig.sections.map(s => [s.id, s]));
+  // Walk in declaration order — validateSectionConfig asserts at startup that the
+  // declaration order is topologically valid, so each section's dependsOn ids
+  // already have their statuses computed by the time we reach it.
   const statuses = new Map<string, SectionStatus>();
-
-  for (const sectionId of orderedIds) {
-    const section = sectionById.get(sectionId);
-    if (!section) {
-      continue;
-    }
+  for (const section of flowConfig.sections) {
     const status = await getSectionStatus(section, flowConfig, stepRegistry, req, statuses);
-    statuses.set(sectionId, status);
+    statuses.set(section.id, status);
   }
 
   return statuses;
@@ -109,49 +102,25 @@ export function validateSectionConfig(flowConfig: JourneyFlowConfig): void {
 
   assertUniqueIds(sections, journeyLabel);
   assertReferencesResolve(sections, journeyLabel);
-  const { cyclicIds } = analyseSectionGraph(sections);
-  if (cyclicIds.length > 0) {
-    throw new SectionConfigError(
-      `Journey '${journeyLabel}' has cyclic dependency among sections: ${cyclicIds.join(', ')}.`
-    );
-  }
+  assertDeclarationOrderIsTopological(sections, journeyLabel);
 }
 
-// Kahn's algorithm: returns the topologically sorted ids plus any ids that couldn't be ordered
-// (i.e. participate in a cycle). Used both for ordering renders and for cycle detection at startup.
-function analyseSectionGraph(sections: readonly SectionConfig[]): { ordered: string[]; cyclicIds: string[] } {
-  const ids = sections.map(s => s.id);
-  const idSet = new Set(ids);
-  const inDegree = new Map<string, number>(ids.map(id => [id, 0]));
-  const adjacency = new Map<string, string[]>(ids.map(id => [id, []]));
-
+// Declaration order must list each section after all of its dependsOn ids. This single
+// invariant subsumes cycle detection (any cycle would force a back-reference) and lets
+// getAllSectionStatuses skip a per-request topological sort.
+function assertDeclarationOrderIsTopological(sections: readonly SectionConfig[], journeyLabel: string): void {
+  const seen = new Set<string>();
   for (const section of sections) {
     for (const depId of section.dependsOn ?? []) {
-      if (!idSet.has(depId)) {
-        continue;
-      }
-      adjacency.get(depId)!.push(section.id);
-      inDegree.set(section.id, (inDegree.get(section.id) ?? 0) + 1);
-    }
-  }
-
-  const ordered: string[] = [];
-  const ready = ids.filter(id => inDegree.get(id) === 0);
-
-  while (ready.length > 0) {
-    const nextId = ready.shift()!;
-    ordered.push(nextId);
-    for (const dependentId of adjacency.get(nextId) ?? []) {
-      const newDegree = (inDegree.get(dependentId) ?? 0) - 1;
-      inDegree.set(dependentId, newDegree);
-      if (newDegree === 0) {
-        ready.push(dependentId);
+      if (!seen.has(depId)) {
+        throw new SectionConfigError(
+          `Journey '${journeyLabel}': section '${section.id}' depends on '${depId}' which is not declared earlier — ` +
+            'cyclic dependency or out-of-order declaration.'
+        );
       }
     }
+    seen.add(section.id);
   }
-
-  const cyclicIds = ids.filter(id => !ordered.includes(id));
-  return { ordered, cyclicIds };
 }
 
 function assertSectionalisedFlow(flowConfig: JourneyFlowConfig, sectionId: string): void {

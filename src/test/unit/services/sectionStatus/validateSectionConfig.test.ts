@@ -46,12 +46,17 @@ describe('validateSectionConfig', () => {
   it('throws on a 2-node cycle (A → B → A)', () => {
     const config = flow([section('a', ['b']), section('b', ['a'])]);
     expect(() => validateSectionConfig(config)).toThrow(SectionConfigError);
-    expect(() => validateSectionConfig(config)).toThrow(/cyclic dependency/);
+    expect(() => validateSectionConfig(config)).toThrow(/section 'a' depends on 'b' which is not declared earlier/);
   });
 
   it('throws on a 3-node cycle (A → B → C → A)', () => {
     const config = flow([section('a', ['b']), section('b', ['c']), section('c', ['a'])]);
-    expect(() => validateSectionConfig(config)).toThrow(/cyclic dependency/);
+    expect(() => validateSectionConfig(config)).toThrow(/cyclic dependency or out-of-order declaration/);
+  });
+
+  it('throws on a back-reference where the dependency is declared later', () => {
+    const config = flow([section('a', ['b']), section('b')]);
+    expect(() => validateSectionConfig(config)).toThrow(/section 'a' depends on 'b' which is not declared earlier/);
   });
 
   it('error includes the journey name for diagnostics', () => {
