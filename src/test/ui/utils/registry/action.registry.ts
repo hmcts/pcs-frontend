@@ -90,6 +90,7 @@ export class ActionRegistry {
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
+    ['languageUsed', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
 
