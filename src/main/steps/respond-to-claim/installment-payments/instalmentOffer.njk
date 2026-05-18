@@ -3,7 +3,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% from "macros/caseNumberDisplay.njk" import caseNumberDisplay %}
 
 {% block pageTitle %}
   {{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
@@ -33,7 +32,7 @@
   {% if paragraph4 %}
     <p class="govuk-body govuk-!-margin-bottom-6">{{ paragraph4 }}</p>
   {% endif %}
-  
+
   <form method="post" action="{{ url }}" novalidate>
     {{ csrfProtection(csrfToken) }}
     {% for field in fields %}

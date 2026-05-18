@@ -14,7 +14,7 @@
 
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  {% if not isLegalRepresentative %}
+  {% if introParagraph %}
     <p class="govuk-body">{{ introParagraph | safe }}</p>
 
     <p class="govuk-body">{{ includesHeading }}</p>

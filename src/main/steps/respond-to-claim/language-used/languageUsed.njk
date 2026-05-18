@@ -3,7 +3,6 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% from "macros/caseNumberDisplay.njk"import caseNumberDisplay%}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 {% block mainContent %}
@@ -11,10 +10,8 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if not islegalRepresentative %}
   {% if heading %}
     <h1 class="govuk-heading-l">{{ heading }}</h1>
-  {% endif %}
   {% endif %}
 
   {% if caption %}
@@ -22,7 +19,7 @@
   {% endif %}
   {% if languageHeading %}
    <h1 class="govuk-heading-l">{{ languageHeading }}</h1>
-  {% endif %} 
+  {% endif %}
 
 
  {% if question %}
