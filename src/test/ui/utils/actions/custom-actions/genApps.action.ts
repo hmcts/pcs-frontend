@@ -5,10 +5,11 @@ import {
   checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
-  doYouWantToUploadDocumentToSupportYourApplication,
+  doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
@@ -36,6 +37,8 @@ export class GenAppsAction implements IAction {
         () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord),
       ],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
+      ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
+      ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectStatementOfTruth', () => this.selectStatementOfTruth(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
@@ -134,6 +137,25 @@ export class GenAppsAction implements IAction {
     FieldsStore.rename(confirmOrder.label as string, 'What order do you want the court to make and why?');
     FieldsStore.update('What order do you want the court to make and why?', userInput);
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+  }
+
+  private async confirmDocumentToUpload(confirmUpload: actionRecord) {
+    await performAction('recordUserEntry', confirmUpload);
+    await performAction('clickRadioButton', {
+      question: confirmUpload.question,
+      option: confirmUpload.option,
+    });
+    await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
+  }
+
+  private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
+    await performAction('recordUserEntry', uploadDocs);
+    if (uploadDocs.files) {
+      await performAction('uploadFile', uploadDocs.files);
+      const file = Array.isArray(uploadDocs.files) ? uploadDocs.files[0] : uploadDocs.files;
+      FieldsStore.set('Upload documents', String(file));
+    }
+    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
   }
 
   private async selectLanguageUsedToComplete(selectLanguageData: actionRecord) {
@@ -385,7 +407,7 @@ export class GenAppsAction implements IAction {
           label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
           input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
         });
-        await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+        await performValidation('mainHeader', doYouWantToUploadDocumentsToSupportYourApplication.mainHeader);
         break;
       }
       case 'haveYouAlreadyAppliedForHelpWithYourApplicationFee': {
@@ -417,7 +439,7 @@ export class GenAppsAction implements IAction {
       const expectedPage = allowedPages[i];
       const onAllowedPage = currentUrl.includes(expectedPage);
 
-      expect(onAllowedPage, `Unexpected page. Expected: ${expectedPage}, Actual: ${currentUrl}`).toBeTruthy();
+      expect(onAllowedPage, `Expected: ${expectedPage}, Actual: ${currentUrl}`).toBeTruthy();
 
       const navButton = !currentUrl.includes('ask') ? 'Continue' : 'Start now';
       await performAction('clickButton', navButton);
