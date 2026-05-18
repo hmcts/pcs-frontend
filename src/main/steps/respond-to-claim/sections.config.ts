@@ -99,7 +99,7 @@ export const respondToClaimSections: SectionConfig[] = [
   {
     id: 'uploadFiles',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document', 'support-needs'],
+    steps: ['upload-document'],
   },
   {
     id: 'checkYourAnswersAndSubmit',

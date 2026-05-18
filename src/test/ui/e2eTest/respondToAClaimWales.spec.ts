@@ -29,11 +29,11 @@ import {
   otherConsiderations,
   priorityDebtDetails,
   priorityDebts,
+  reasonableAdjustmentsTriage,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
   startNow,
-  supportNeeds,
   tenancyDateDetails,
   tenancyTypeDetails,
   whatOtherRegularExpensesDoYouHave,
@@ -255,7 +255,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('uploadFiles');
-    await performAction('clickButton', supportNeeds.continueButton);
+    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
