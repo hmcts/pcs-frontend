@@ -114,10 +114,8 @@ export class ActionRegistry {
     ['reviewAndUpdateCYA', new GenAppsAction()],
     ['otherConsiderations', new RespondToClaimAction()],
     ['accessYourCase', new RespondToClaimAction()],
-    ['uploadFiles', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
-    ['uploadFiles', new GenAppsAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
   ]);
 
