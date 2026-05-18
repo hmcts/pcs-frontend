@@ -1,9 +1,8 @@
 export const reasonableAdjustmentsTriage = {
   mainHeader: `Tell us if you need support`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   continueToQuestionsButton: `Continue to the questions`,
-  iDoNotWantToAnswerButton: `I do not need support at this time`,
+  iDoNotWantToAnswerButton: `I do not need any support at this time`,
   askingForSubHeader: `Asking for a reasonable adjustment`,
   somePeopleNeedSupportParagraph: `Some people need support to access information and use our services. We call this a reasonable adjustment.`,
   someExamplesParagraph: `Some examples of reasonable adjustments are:`,
