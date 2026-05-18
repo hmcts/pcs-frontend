@@ -6,6 +6,8 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimAbout,
+  counterClaimAgainstWhom,
   counterClaimFee,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
@@ -37,11 +39,13 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { haveYouAlreadyAppliedForHelp } from '../data/page-data/genApps-page-data/haveYouAlreadyAppliedForHelp.page.data';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
 import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
+import { counterClaimFeeErrorValidation } from '../functional/counterClaimFee.pft';
 import { counterClaimSpecificSumErrorValidation } from '../functional/counterClaimSpecificSumOfMoney.pft';
 import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/counterClaimWhatAreYouClaimingFor.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
@@ -51,12 +55,15 @@ import { doYouHaveAnyDependantChildrenErrorValidation } from '../functional/doYo
 import { doYouHaveAnyOtherDependantsErrorValidation } from '../functional/doYouHaveAnyOtherDependants.pft';
 import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
 import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pft';
+import { haveYouAppliedForUniversalCreditErrorValidation } from '../functional/haveYouAppliedForUniversalCredit.pft';
 import { incomeAndExpensesErrorValidation } from '../functional/incomeAndExpenses.pft';
 import { languageUsedErrorValidation } from '../functional/languageUsed.pft';
 import { nonRentArrearsDisputeErrorValidation } from '../functional/nonRentArrearsDispute.pft';
 import { noticeDateWhenNotProvidedErrorValidation } from '../functional/noticeDateWhenNotProvided.pft';
 import { noticeDateWhenProvidedErrorValidation } from '../functional/noticeDateWhenProvided.pft';
 import { otherConsiderationsErrorValidation } from '../functional/otherConsiderations.pft';
+import { priorityDebtDetailsErrorValidation } from '../functional/priorityDebtDetails.pft';
+import { priorityDebtsErrorValidation } from '../functional/priorityDebts.pft';
 import { rentArrearsErrorValidation } from '../functional/rentArrears.pft';
 import { repaymentsAgreedErrorValidation } from '../functional/repaymentsAgreed.pft';
 import { repaymentsMadeErrorValidation } from '../functional/repaymentsMade.pft';
@@ -293,6 +300,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
+
     await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
     await performAction('counterClaimSpecificSumOfMoney', {
       question: counterClaimSpecificSumOfMoney.mainHeader,
@@ -300,10 +308,18 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
 
-    await softErrorMessageValidation('counterClaimFee', NO_EMV_READ_ONLY);
+    await softErrorMessageValidation('counterClaimFee', counterClaimFeeErrorValidation);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
 
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await softErrorMessageValidation('counterClaimAgainstWhom', NO_EMV_READ_ONLY);
+    await performAction('clickButton', counterClaimAgainstWhom.continueButton);
+
+    await softErrorMessageValidation('counterClaimAbout', NO_EMV_READ_ONLY);
+    await performAction('clickButton', counterClaimAbout.continueButton);
 
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
@@ -395,15 +411,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
         ],
       ],
     });
-
-    await softErrorMessageValidation('priorityDebts', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-
-    await softErrorMessageValidation('priorityDebtDetails', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
-
+    await softErrorMessageValidation('priorityDebts', priorityDebtsErrorValidation);
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
     await softErrorMessageValidation(
       'what-other-regular-expenses-do-you-have',
       whatOtherRegularExpensesDoYouHaveErrorValidation
@@ -515,6 +527,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
+
     await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
     await performAction('selectWhatAreYouClaimingFor', {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
@@ -528,9 +541,15 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
 
-    await softErrorMessageValidation('counterClaimFee', NO_EMV_READ_ONLY);
-    await performValidation('mainHeader', counterClaimFee.mainHeader);
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await softErrorMessageValidation('counterClaimFee', counterClaimFeeErrorValidation);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+
+    await softErrorMessageValidation('haveYouAlreadyAppliedForHelp', NO_EMV_READ_ONLY);
+    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
@@ -579,19 +598,26 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
     await performAction('selectWhatRegularIncomeDoYouReceive');
-
-    await softErrorMessageValidation('haveYouAppliedForUniversalCredit', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', haveYouAppliedForUniversalCredit.mainHeader);
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
-
-    await softErrorMessageValidation('priorityDebts', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', priorityDebts.mainHeader);
-    await performAction('clickButton', priorityDebts.continueButton);
-
-    await softErrorMessageValidation('priorityDebtDetails', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', priorityDebtDetails.mainHeader);
-    await performAction('clickButton', priorityDebtDetails.continueButton);
-
+    await softErrorMessageValidation(
+      'haveYouAppliedForUniversalCredit',
+      haveYouAppliedForUniversalCreditErrorValidation
+    );
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await softErrorMessageValidation('priorityDebts', priorityDebtsErrorValidation);
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await softErrorMessageValidation('priorityDebtDetails', priorityDebtDetailsErrorValidation);
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatOtherRegularExpensesDoYouHaveErrorValidation);
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
 

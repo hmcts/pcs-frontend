@@ -9,7 +9,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   customTemplate: `${__dirname}/alternativeAccommodation.njk`,
   translationKeys: {
-    caption: 'caption',
     question: 'question',
     pageTitle: 'pageTitle',
   },
@@ -56,7 +55,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const result: Record<string, unknown> = { confirmAlternativeAccommodation: formValue };
 
     if (existingDate) {
-      result.alternativeAccommodationDate = parseISOToDateParts(existingDate);
+      // Dotted key so the form-builder matches this against the subField inputs
+      // (named confirmAlternativeAccommodation.alternativeAccommodationDate-{day,month,year}).
+      result['confirmAlternativeAccommodation.alternativeAccommodationDate'] = parseISOToDateParts(existingDate);
     }
 
     return result;

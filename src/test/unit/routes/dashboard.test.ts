@@ -263,9 +263,7 @@ describe('Dashboard Routes', () => {
       };
       const [configuredTask] = renderArgs.taskGroups[0].tasks;
 
-      expect(configuredTask.href).toBe(
-        '/case/1234567890123456/upload-additional-documents/upload-additional-documents/start-evidence-upload'
-      );
+      expect(configuredTask.href).toBe('/case/1234567890123456/upload-additional-documents/start-evidence-upload');
     });
 
     it('should disable href for COMPLETED tasks and use configured href for AVAILABLE view-response', async () => {

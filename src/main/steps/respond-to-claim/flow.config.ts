@@ -16,9 +16,14 @@ import {
   hasProvidedFinanceDetails,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
+  shouldShowCounterClaimAboutStep,
+  shouldShowCounterClaimAgainstWhoStep,
+  shouldShowCounterClaimHelpWithFeesStep,
   shouldShowInstallmentPaymentsStep,
+  shouldShowPriorityDebtDetailsStep,
   shouldShowUniversalCreditStep,
 } from './flowConditions';
+import { respondToClaimSections } from './sections.config';
 import { isMoneyCounterClaim } from './utils';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
@@ -30,59 +35,8 @@ export const flowConfig: JourneyFlowConfig = {
   journeyName: 'respondToClaim',
   useShowConditions: true,
   useSessionFormData: false,
-  stepOrder: [
-    'start-now',
-    'free-legal-advice',
-    'defendant-name-confirmation',
-    'defendant-name-capture',
-    'defendant-date-of-birth',
-    'correspondence-address',
-    'contact-preferences-email-or-post',
-    'contact-preferences-telephone',
-    'contact-preferences-text-message',
-    'dispute-claim-interstitial',
-    'landlord-registered',
-    'landlord-licensed',
-    'written-terms',
-    'tenancy-type-details',
-    'tenancy-date-details',
-    'tenancy-date-unknown',
-    'confirmation-of-notice-given',
-    'confirmation-of-notice-date-when-provided',
-    'confirmation-of-notice-date-when-not-provided',
-    'rent-arrears-dispute',
-    'non-rent-arrears-dispute',
-    'counter-claim',
-    'counter-claim-what-are-you-claiming-for',
-    'counter-claim-specific-sum',
-    'counter-claim-fee',
-    'payment-interstitial',
-    'repayments-made',
-    'repayments-agreed',
-    'installment-payments',
-    'how-much-afford-to-pay',
-    'your-household-and-circumstances',
-    'do-you-have-any-dependant-children',
-    'do-you-have-any-other-dependants',
-    'do-any-other-adults-live-in-your-home',
-    'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
-    'your-circumstances',
-    'exceptional-hardship',
-    'income-and-expenses',
-    'what-regular-income-do-you-receive',
-    'have-you-applied-for-universal-credit',
-    'priority-debts',
-    'priority-debt-details',
-    'what-other-regular-expenses-do-you-have',
-    'other-considerations',
-    'upload-document',
-    'support-needs',
-    'equality-and-diversity-start',
-    'equality-and-diversity-end',
-    'language-used',
-    'check-your-answers',
-    'end-now',
-  ],
+  sections: respondToClaimSections,
+  nonSectionStepOrder: ['end-now'],
   steps: {
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
@@ -111,7 +65,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       showCondition: (req: Request) => isNoticeServed(req),
     },
-
     'confirmation-of-notice-date-when-provided': {
       showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
@@ -132,6 +85,15 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counter-claim-fee': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-have-you-applied-for-help': {
+      showCondition: (req: Request) => shouldShowCounterClaimHelpWithFeesStep(req),
+    },
+    'counter-claim-against-whom': {
+      showCondition: (req: Request) => shouldShowCounterClaimAgainstWhoStep(req),
+    },
+    'counter-claim-about': {
+      showCondition: (req: Request) => shouldShowCounterClaimAboutStep(req),
     },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
@@ -158,7 +120,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'priority-debt-details': {
-      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
+      showCondition: (req: Request) => shouldShowPriorityDebtDetailsStep(req),
     },
     'what-other-regular-expenses-do-you-have': {
       showCondition: (req: Request) => hasProvidedFinanceDetails(req),
