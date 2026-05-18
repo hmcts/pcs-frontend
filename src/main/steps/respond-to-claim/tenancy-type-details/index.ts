@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { getClaimantName } from '../../utils/getClaimantName';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -135,7 +136,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       (req.body?.correctType as string) ||
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
       '';
-    const claimantName = req.res?.locals.validatedCase?.data?.claimantName as string;
+    const claimantName = getClaimantName(req);
     const caseData = req.res?.locals.validatedCase?.data;
     const walesProperty = isWalesProperty(caseData);
     const orgName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string;
