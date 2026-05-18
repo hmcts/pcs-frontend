@@ -131,6 +131,13 @@ export interface CcdClaimantOrganisation {
   id: string;
 }
 
+/** Parties involved in the claim  */
+export interface CcdParty {
+  firstName?: string;
+  lastName?: string;
+  orgName?: string;
+}
+
 /** Claimant-entered defendant details captured when the claim was created. */
 export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
@@ -211,6 +218,7 @@ export interface CcdDefendantResponses {
 
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
+  needHelpWithFees?: YesNoValue;
   claimType?: string;
   isClaimAmountKnown?: string;
   claimAmount?: PenceAmount;
@@ -224,6 +232,7 @@ export interface PossessionClaimResponse {
   };
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
+  currentDefendantPartyId?: string;
 }
 
 export type CaseData = CcdCaseData;
@@ -260,6 +269,8 @@ export interface CcdCaseData {
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
   genApps?: CcdCollectionItem<GenApp>[];
+  allClaimants?: CcdCollectionItem<CcdParty>[];
+  allDefendants?: CcdCollectionItem<CcdParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
