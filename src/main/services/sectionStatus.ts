@@ -40,9 +40,7 @@ export async function getAllSectionStatuses(
     );
   }
 
-  // Walk in declaration order — validateSectionConfig asserts at startup that the
-  // declaration order is topologically valid, so each section's dependsOn ids
-  // already have their statuses computed by the time we reach it.
+  // Declaration order is topological — validateSectionConfig enforces it at startup.
   const statuses = new Map<string, SectionStatus>();
   for (const section of flowConfig.sections) {
     const status = await getSectionStatus(section, flowConfig, stepRegistry, req, statuses);
@@ -105,9 +103,7 @@ export function validateSectionConfig(flowConfig: JourneyFlowConfig): void {
   assertDeclarationOrderIsTopological(sections, journeyLabel);
 }
 
-// Declaration order must list each section after all of its dependsOn ids. This single
-// invariant subsumes cycle detection (any cycle would force a back-reference) and lets
-// getAllSectionStatuses skip a per-request topological sort.
+// Catches cycles too — any cycle has at least one back-reference.
 function assertDeclarationOrderIsTopological(sections: readonly SectionConfig[], journeyLabel: string): void {
   const seen = new Set<string>();
   for (const section of sections) {
