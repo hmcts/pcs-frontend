@@ -83,13 +83,13 @@ describe('upload-your-documents step', () => {
       expect(testedStep.customTemplate).toContain('uploadYourDocuments.njk');
     });
 
-    it('declares a file field that is not required', () => {
+    it('declares a required file field', () => {
       expect(testedStep.fields).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
             name: 'documents',
             type: 'file',
-            required: false,
+            required: true,
           }),
         ])
       );
