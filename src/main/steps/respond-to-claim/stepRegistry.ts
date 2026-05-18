@@ -9,7 +9,10 @@ import { step as contactPreferencesTelephone } from './contact-preferences-telep
 import { step as contactPreferencesTextMessage } from './contact-preferences-text-message';
 import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
+import { step as counterClaimAbout } from './counter-claim-about';
+import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
 import { step as counterClaimFee } from './counter-claim-fee';
+import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
 import { step as yourCircumstances } from './current-circumstances';
@@ -43,7 +46,6 @@ import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
-import { step as supportNeeds } from './support-needs';
 import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
@@ -77,11 +79,13 @@ export const stepRegistry = {
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'upload-document': uploadDocument,
-  'support-needs': supportNeeds,
   'counter-claim': counterClaim,
   'counter-claim-what-are-you-claiming-for': counterClaimWhatAreYouClaimingFor,
   'counter-claim-specific-sum': counterClaimSpecificSum,
   'counter-claim-fee': counterClaimFee,
+  'counter-claim-about': counterClaimAbout,
+  'counter-claim-against-whom': counterClaimAgainstWhom,
+  'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,

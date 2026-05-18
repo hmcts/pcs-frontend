@@ -10,7 +10,6 @@ const CITIZEN_ONLY_STEPS = [
   'other-considerations',
   'reasonable-adjustments-triage',
   'upload-document',
-  'support-needs',
 ];
 
 describe('respond-to-claim legalrep flow config', () => {

@@ -9,6 +9,7 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimFee,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -87,6 +88,7 @@ export class RespondToClaimAction implements IAction {
         'selectWhatRegularIncomeDoYouReceive',
         () => this.selectWhatRegularIncomeDoYouReceive(fieldName as actionRecord),
       ],
+      ['selectCounterClaimFee', () => this.selectCounterClaimFee(fieldName as actionRecord)],
       ['yourCircumstances', () => this.yourCircumstances(fieldName as actionRecord)],
       ['exceptionalHardship', () => this.exceptionalHardship(fieldName as actionRecord)],
       [
@@ -254,9 +256,7 @@ export class RespondToClaimAction implements IAction {
       claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     }
     const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
-    const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
     await performValidation('text', { elementType: 'heading', text: mainHeader });
-    await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
@@ -509,7 +509,7 @@ export class RespondToClaimAction implements IAction {
     });
     await performValidation('text', {
       elementType: 'paragraph',
-      text: `When making their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
+      text: `When they made their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
     const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {
@@ -581,7 +581,7 @@ export class RespondToClaimAction implements IAction {
 
   private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: yourCircumstancesData.question,
+      question: yourCircumstancesData.wouldYouLikeToShareHeader,
       option: yourCircumstancesData.yourCircumstancesOption,
     });
     if (yourCircumstancesData.yourCircumstancesOption === yourCircumstances.yesRadioOption) {
@@ -592,6 +592,48 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  }
+
+  private async selectCounterClaimFee(counterClaimFeeOption: actionRecord) {
+    let counterClaimFeeValue: number | string = 0;
+    if (counterClaimFeeOption.typeOfClaim === 'Something else') {
+      counterClaimFeeValue = 377;
+    } else if (
+      counterClaimFeeOption.typeOfClaim === 'A sum of money or compensation' ||
+      counterClaimFeeOption.typeOfClaim === 'Both'
+    ) {
+      if (counterClaimFeeOption.amount === null) {
+        throw new Error('Amount is required for this type of claim');
+      }
+      const amount = Number(counterClaimFeeOption.amount);
+      if (amount <= 300) {
+        counterClaimFeeValue = 35; // FEE0514
+      } else if (amount <= 500) {
+        counterClaimFeeValue = 50; // FEE0513
+      } else if (amount <= 1000) {
+        counterClaimFeeValue = 70; // FEE0512
+      } else if (amount <= 1500) {
+        counterClaimFeeValue = 80; // FEE0511
+      } else if (amount <= 3000) {
+        counterClaimFeeValue = 115; // FEE0510
+      } else if (amount <= 5000) {
+        counterClaimFeeValue = 205; // FEE0509
+      } else if (amount <= 10000) {
+        counterClaimFeeValue = 455; // FEE0508
+      } else if (amount <= 200000) {
+        counterClaimFeeValue = Number((amount * 0.05).toFixed(2)); // FEE0507
+      } else {
+        counterClaimFeeValue = 10000; // FEE0506
+      }
+    }
+    const basedOnInformationParagraph = `Based on the information provided, it will cost £${counterClaimFeeValue} to make your counterclaim.`;
+    await performValidation('text', { elementType: 'paragraph', text: basedOnInformationParagraph });
+
+    await performAction('clickRadioButton', {
+      question: counterClaimFee.doYouNeedHelpPayingCounterClaimQuestion,
+      option: counterClaimFeeOption.radioOption,
+    });
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   }
 
   private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {

@@ -1,6 +1,5 @@
 export const doAnyOtherAdultsLiveInYourHome = {
   mainHeader: `Do any other adults live in your home?`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   giveDetailsAboutOtherAdultsHiddenTextLabel: `Give details about the other adults living in your home`,
   youShouldIncludeDetailsHiddenHintText: `You should include details about how many adults live in your home, their relationship to you, as well as anything else you think the court should know about them`,
