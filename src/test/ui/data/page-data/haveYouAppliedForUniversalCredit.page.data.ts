@@ -1,5 +1,4 @@
 export const haveYouAppliedForUniversalCredit = {
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   mainHeader: `Have you applied for Universal Credit?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
