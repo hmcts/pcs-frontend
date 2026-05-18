@@ -74,7 +74,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
-    const t = getTranslationFunction(req, 'installment-payments', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       paragraph1: t('paragraph1', { claimantName }),

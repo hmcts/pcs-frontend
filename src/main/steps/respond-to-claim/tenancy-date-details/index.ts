@@ -121,7 +121,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     // Format tenancy date with ordinal
     const tenancyStartDate = existingStartDate ? format(parseISO(existingStartDate), 'do LLLL yyyy') : undefined;
 
-    const t = getTranslationFunction(req, 'tenancy-date-details', ['common']);
+    const t = getTranslationFunction(req);
     const bulletPoint = t('bulletPoint', { returnObjects: true, tenancyStartDate });
     const subHeading = t('subHeading', { returnObjects: true, claimantName });
 
