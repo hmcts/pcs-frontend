@@ -45,8 +45,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'priority-debt-details',
   isAnswered: req =>
     Boolean(
-      req.res?.locals?.validatedCase?.defendantResponses?.householdCircumstances?.debtTotal ||
-      req.res?.locals?.validatedCase?.defendantResponses?.householdCircumstances?.debtContribution
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.debtTotal ||
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.debtContribution
     ),
   stepDir: __dirname,
   beforeRedirect: async req => {

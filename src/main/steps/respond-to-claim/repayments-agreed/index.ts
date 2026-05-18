@@ -8,7 +8,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-agreed',
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.paymentAgreement?.repaymentPlanAgreed),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.repaymentPlanAgreed),
   showCancelButton: false,
   stepDir: __dirname,
   beforeRedirect: async req => {
@@ -43,7 +43,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     question: 'question',
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const pcr = caseData?.possessionClaimResponse as
       | {
           defendantResponses?: {
@@ -79,7 +79,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return initial;
   },
   extendGetContent: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
     const claimIssueDate = '20th May 2025';
 

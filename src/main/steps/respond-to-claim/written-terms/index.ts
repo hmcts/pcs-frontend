@@ -10,7 +10,7 @@ const STEP_NAME = 'written-terms';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.writtenTerms),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.writtenTerms),
   stepDir: __dirname,
   customTemplate: `${__dirname}/writtenTerms.njk`,
   translationKeys: {
@@ -35,7 +35,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: async req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const writtenTerms = caseData?.possessionClaimResponse?.defendantResponses?.writtenTerms as string | undefined;
     return { writtenTerms };
   },

@@ -14,7 +14,7 @@ const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 d
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'rent-arrears-dispute',
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.rentArrearsAmountConfirmation),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.rentArrearsAmountConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
@@ -46,7 +46,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const response = caseData?.possessionClaimResponse?.defendantResponses;
     const formValue = fromYesNoNotSureEnum(response?.rentArrearsAmountConfirmation);
 

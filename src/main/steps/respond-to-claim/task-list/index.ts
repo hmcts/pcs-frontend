@@ -26,7 +26,7 @@ const stepNavigation = createStepNavigation(() => flowConfig);
 
 const redirectLegalrepToDashboard: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   if (getUserVariant(req) === 'legalrep') {
-    return res.redirect(303, getDashboardUrl(req.res?.locals?.validatedCase?.id) ?? '/');
+    return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/');
   }
   next();
 };

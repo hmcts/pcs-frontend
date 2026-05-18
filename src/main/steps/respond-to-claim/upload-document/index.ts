@@ -21,7 +21,7 @@ import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/doc
 // must remain journey-agnostic for genapps and other journeys (see PR #1259).
 const storage: DocumentStorage = {
   async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-    const docs = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.defendantDocuments;
+    const docs = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.defendantDocuments;
     return Array.isArray(docs) ? docs : [];
   },
 
@@ -47,8 +47,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'upload-document',
   isAnswered: req =>
     Boolean(
-      req.res?.locals?.validatedCase?.defendantResponses?.defendantDocuments &&
-      req.res?.locals?.validatedCase?.defendantResponses.defendantDocuments.length > 0
+      req.res?.locals.validatedCase?.defendantResponses?.defendantDocuments &&
+      req.res?.locals.validatedCase?.defendantResponses.defendantDocuments.length > 0
     ),
   documentStorage: storage,
   stepDir: __dirname,

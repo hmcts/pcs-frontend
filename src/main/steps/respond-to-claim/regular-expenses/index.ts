@@ -448,7 +448,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const draftHc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances as
       | HouseholdCircumstances
       | undefined;

@@ -64,7 +64,7 @@ const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.tenancyTypeConfirmation),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.tenancyTypeConfirmation),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -79,7 +79,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const existingTenancyTypeConfirmation =
       caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeConfirmation;
     const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses?.tenancyType;

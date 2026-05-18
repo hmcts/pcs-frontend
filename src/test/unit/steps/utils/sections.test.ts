@@ -20,7 +20,7 @@ const testSections: SectionConfig[] = [
     id: 'sectionB',
     titleKey: 'sectionB',
     steps: ['step-b1'],
-    isApplicable: async req => Boolean(req.res?.locals?.validatedCase),
+    isApplicable: async req => Boolean(req.res?.locals.validatedCase),
   },
 ];
 

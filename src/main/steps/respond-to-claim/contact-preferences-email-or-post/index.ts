@@ -9,8 +9,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'contact-preferences-email-or-post',
   isAnswered: req =>
     Boolean(
-      req.res?.locals?.validatedCase?.defendantResponses?.contactByEmail ||
-      req.res?.locals?.validatedCase?.defendantResponses?.contactByPost
+      req.res?.locals.validatedCase?.defendantResponses?.contactByEmail ||
+      req.res?.locals.validatedCase?.defendantResponses?.contactByPost
     ),
   showCancelButton: false,
   stepDir: __dirname,
@@ -66,7 +66,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
 
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.possessionClaimResponse;
+    const caseData = req.res?.locals.validatedCase?.possessionClaimResponse;
     const defendantResponses = caseData?.defendantResponses;
     const emailAddress = caseData?.defendantContactDetails?.party?.emailAddress;
 

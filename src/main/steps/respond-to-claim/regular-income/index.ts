@@ -65,7 +65,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   showCancelButton: false,
 
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const hc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
 
     if (!hc) {

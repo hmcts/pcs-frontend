@@ -20,7 +20,7 @@ export interface DraftDefendantResponse extends PossessionClaimResponse {
 // Get a deep clone of defendant-only fields from the existing draft/case data.
 // All nested objects are pre-initialised so callers can set/delete fields directly.
 export const buildDraftDefendantResponse = (req: Request): DraftDefendantResponse => {
-  const existing = req.res?.locals?.validatedCase?.data?.possessionClaimResponse;
+  const existing = req.res?.locals.validatedCase?.data?.possessionClaimResponse;
 
   const defendantOnly: PossessionClaimResponse = {
     defendantResponses: existing?.defendantResponses ? cloneDeep(existing.defendantResponses) : {},

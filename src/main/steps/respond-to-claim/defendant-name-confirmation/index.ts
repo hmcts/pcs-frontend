@@ -7,7 +7,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-name-confirmation',
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.defendantNameConfirmation),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.defendantNameConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   beforeRedirect: async req => {
@@ -43,7 +43,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     contactUs: 'contactUs',
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const defendantResponses = caseData?.possessionClaimResponse?.defendantResponses;
     const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
 
@@ -71,7 +71,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: (req: Request) => {
     // Provides dynamic values for the template (defendant name and organization name)
     // These get interpolated into the question text and hint translations
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
     const defendantName =
       claimantEntry?.firstName && claimantEntry?.lastName ? `${claimantEntry.firstName} ${claimantEntry.lastName}` : '';

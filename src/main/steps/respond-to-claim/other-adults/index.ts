@@ -6,7 +6,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-any-other-adults-live-in-your-home',
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.householdCircumstances?.otherTenants),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.otherTenants),
   stepDir: __dirname,
   customTemplate: `${__dirname}/otherAdults.njk`,
   translationKeys: {
@@ -47,7 +47,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: req => {
-    const hc = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const hc = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
     // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and the
     // otherTenantsDetails textarea pre-fill below would never run.

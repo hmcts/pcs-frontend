@@ -102,8 +102,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'correspondence-address',
   isAnswered: req =>
     Boolean(
-      req.res?.locals?.validatedCase?.defendantResponses?.correspondenceAddressConfirmation ||
-      req.res?.locals?.validatedCase?.defendantContactDetailsPartyAddress?.AddressLine1
+      req.res?.locals.validatedCase?.defendantResponses?.correspondenceAddressConfirmation ||
+      req.res?.locals.validatedCase?.defendantContactDetailsPartyAddress?.AddressLine1
     ),
   stepDir: __dirname,
   customTemplate: 'respond-to-claim/correspondence-address/correspondenceAddress.njk',
@@ -131,7 +131,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: (req: Request) => {
-    const possessionClaimResponse = req.res?.locals?.validatedCase?.possessionClaimResponse;
+    const possessionClaimResponse = req.res?.locals.validatedCase?.possessionClaimResponse;
     const confirmed = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
 
@@ -152,7 +152,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req, 'correspondence-address', ['common']);
-    const possessionClaimResponse = req.res?.locals?.validatedCase?.possessionClaimResponse;
+    const possessionClaimResponse = req.res?.locals.validatedCase?.possessionClaimResponse;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
 
@@ -234,7 +234,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 });
 
 function getExistingAddress(req: Request): { formattedAddress: string } {
-  const caseData = req.res?.locals?.validatedCase?.data;
+  const caseData = req.res?.locals.validatedCase?.data;
   const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address;
 
   if (originalAddress && 'AddressLine1' in originalAddress && originalAddress.AddressLine1) {

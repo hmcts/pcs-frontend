@@ -15,7 +15,7 @@ const logger = Logger.getLogger('confirmation-of-notice-date-when-provided');
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-date-when-provided',
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.noticeReceivedDate),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.noticeReceivedDate),
   stepDir: __dirname,
   customTemplate: `${__dirname}/confirmationOfNoticeDateWhenProvided.njk`,
   translationKeys: {
@@ -93,7 +93,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
 
   extendGetContent: req => {
-    const validatedCase = req.res?.locals?.validatedCase;
+    const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
 
     const noticeDateRaw = validatedCase?.noticeDate || '';

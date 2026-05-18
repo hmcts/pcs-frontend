@@ -5,7 +5,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-what-are-you-claiming-for',
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.counterClaim?.claimType),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.counterClaim?.claimType),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimWhatAreYouClaimingFor.njk`,
   translationKeys: {
@@ -31,7 +31,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: req => {
     const claimType =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim?.claimType;
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim?.claimType;
 
     if (!claimType) {
       return {};

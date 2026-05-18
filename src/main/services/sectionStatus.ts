@@ -81,7 +81,7 @@ export async function getSectionStatus(
 }
 
 function userHasConfirmedSectionViaCya(section: SectionConfig, req: Request): boolean {
-  const confirmed = req.res?.locals?.validatedCase?.defendantResponses?.confirmedSections ?? [];
+  const confirmed = req.res?.locals.validatedCase?.defendantResponses?.confirmedSections ?? [];
   return confirmed.includes(sectionIdToBackendEnum(section.id as RespondToClaimSectionId));
 }
 

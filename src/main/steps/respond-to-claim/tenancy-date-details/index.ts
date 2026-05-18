@@ -15,7 +15,7 @@ function getTenancyStartDate(caseData: CcdCaseData | undefined): string | undefi
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'tenancy-date-details',
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.tenancyStartDateConfirmation),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.tenancyStartDateConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/tenancyDateDetails.njk`,
   translationKeys: {
@@ -58,7 +58,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const existingDateIsCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateConfirmation;
     const existingTenancyStartDate = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDate;
 
@@ -113,7 +113,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const claimantNameFromValidatedCase = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
     const claimantNameFromSession = caseData?.claimantName;
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession;

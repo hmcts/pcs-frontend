@@ -9,7 +9,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'non-rent-arrears-dispute',
-  isAnswered: req => Boolean(req.res?.locals?.validatedCase?.defendantResponses?.disputeClaim),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.disputeClaim),
   stepDir: __dirname,
   customTemplate: `${__dirname}/nonRentArrearsDispute.njk`,
   translationKeys: {
@@ -44,7 +44,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const response = caseData?.possessionClaimResponse?.defendantResponses;
 
     if (!response?.disputeClaim) {
@@ -74,7 +74,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return initialValues;
   },
   extendGetContent: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const caseReference = req.params.caseReference;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
 
