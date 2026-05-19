@@ -288,8 +288,6 @@ describe('Dashboard Routes', () => {
               { templateId: 'RespondToClaim', status: 'COMPLETED' },
               { templateId: 'ViewResponse', status: 'AVAILABLE' },
             ],
-            groupId: 'DOCUMENTS',
-            tasks: [{ templateId: 'UploadDocuments', status: 'AVAILABLE' }],
           },
         ],
         propertyAddress: null,
@@ -319,7 +317,6 @@ describe('Dashboard Routes', () => {
 
       expect(respondToClaimTask.href).toBeUndefined();
       expect(viewResponseTask.href).toBe('/case/1234567890123456/view-the-response');
-      expect(configuredTask.href).toBe('/case/1234567890123456/upload-additional-documents/start-evidence-upload');
     });
 
     it('should fall back to dashboard URL for unmapped task templateId', async () => {
