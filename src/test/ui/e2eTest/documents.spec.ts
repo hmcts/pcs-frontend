@@ -3,6 +3,7 @@ import {
   confirmIfTheseDocumentsRelateToAnApplication,
   startEvidenceUpload,
   uploadYourDocuments,
+  viewDocuments,
 } from '../data/page-data/documents-page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -23,10 +24,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
-  await performAction(
-    'navigateToUrl',
-    home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
-  );
 });
 
 test.afterEach(async () => {
@@ -35,13 +32,50 @@ test.afterEach(async () => {
 
 test.describe('Documents - e2e Journey @nightly', async () => {
   test('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
-    await performAction('clickButton', startEvidenceUpload.startNowButton);
+    await performAction('startEvidenceUpload');
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
   });
 
   test('Upload documents when GenApps not submitted @regression', async () => {
-    await performAction('clickButton', startEvidenceUpload.startNowButton);
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
+    await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+  });
+
+  test('View documents submitted through make a claim @regression', async () => {
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
+    await performAction('validateViewDocuments', {
+      caseNumber: viewDocuments.getCaseNumber(),
+      documents: [
+        {
+          sectionHeader: viewDocuments.statementsOfCaseSubHeader,
+          documentName: viewDocuments.noticeServiceJurisdictionLink,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+        {
+          sectionHeader: viewDocuments.propertyDocumentsSubHeader,
+          documentName: viewDocuments.rentStatementLink,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+        {
+          sectionHeader: viewDocuments.evidenceSubHeader,
+          documentName: viewDocuments.witnessStatementLink,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+        {
+          sectionHeader: viewDocuments.correspondenceSubHeader,
+          documentName: viewDocuments.certificateOfSuitabilityLink,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+      ],
+    });
   });
 });
