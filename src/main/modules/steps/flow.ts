@@ -282,6 +282,10 @@ export function getStepUrl(stepName: string, flowConfig: JourneyFlowConfig, case
     basePath = basePath.replace(':caseReference', caseReference);
   }
 
+  if (flowConfig.entryStepIdAtBasePath === stepName) {
+    return basePath;
+  }
+
   return `${basePath}/${stepName}`;
 }
 
@@ -350,21 +354,33 @@ export function createStepNavigation(
 
 export function stepDependencyCheckMiddleware(flowConfigOrResolver: JourneyFlowConfig | JourneyFlowConfigResolver) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const urlParts = req.path.split('/');
-    const stepName = urlParts[urlParts.length - 1];
+    const urlParts = req.path.split('/').filter(Boolean);
+    const lastSegment = urlParts[urlParts.length - 1];
 
-    if (!stepName) {
+    if (!lastSegment) {
       return next();
     }
 
     const flowConfig = await resolveFlowConfig(req, flowConfigOrResolver);
     const formData = req.session?.formData || {};
 
+    const caseId = res.locals?.validatedCase?.id;
+    let basePath = flowConfig.basePath || '';
+    if (caseId && basePath.includes(':caseReference')) {
+      basePath = basePath.replace(':caseReference', caseId);
+    }
+    const baseLastSegment = basePath.split('/').filter(Boolean).pop();
+
+    let stepName = lastSegment;
+    if (flowConfig.entryStepIdAtBasePath && baseLastSegment && lastSegment === baseLastSegment) {
+      stepName = flowConfig.entryStepIdAtBasePath;
+    }
+
     const missingDependency = checkStepDependencies(stepName, flowConfig, formData);
 
     if (missingDependency) {
       logger.debug(`Step ${stepName} has unmet dependency: ${missingDependency}`);
-      const dependencyUrl = getStepUrl(missingDependency, flowConfig);
+      const dependencyUrl = getStepUrl(missingDependency, flowConfig, caseId);
       return res.redirect(303, dependencyUrl);
     }
 
