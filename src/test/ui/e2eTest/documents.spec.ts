@@ -37,7 +37,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
-    await performAction('startEvidenceUpload');
+    await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
   });
 
