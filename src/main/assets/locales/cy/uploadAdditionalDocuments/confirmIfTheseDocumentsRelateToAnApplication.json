@@ -6,7 +6,6 @@
   "question": "cyDo these documents relate to an existing application?",
   "applicationOptionAdjourn": "cyYes, the documents I'm uploading relate to the application to adjourn the hearing - submitted on {{date}}",
   "applicationOptionSetAside": "cyYes, the documents I'm uploading relate to the application to set aside the order - submitted on {{date}}",
-  "applicationOptionSuspend": "cyYes, the documents I'm uploading relate to the application to suspend the eviction - submitted on {{date}}",
   "applicationOptionGeneric": "cyYes, the documents I'm uploading relate to the application submitted on {{date}}",
   "optionClaimOrCounterclaim": "cyNo, the documents I'm uploading relate to the main claim or counterclaim"
 }
