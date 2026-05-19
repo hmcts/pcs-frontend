@@ -36,10 +36,6 @@
   },
   "change": "cyChange",
   "back": "cyBack",
-  "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
-  },
   "date": {
     "day": "cyDay",
     "month": "cyMonth",
@@ -75,7 +71,8 @@
     },
     "documentUpload": {
       "wrongFileTypeDocStore": "cyThe selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
-      "fileTooLargeDocStore": "cyThe selected file must be smaller than 1GB",
+      "fileTooLargeDocStore": "cyThe selected file must be smaller than {{maxSize}}MB",
+      "fileTotalTooLargeDocStore": "cyThe total size of all uploaded files must be smaller than {{maxSize}}MB",
       "noFileSelected": "cySelect a file to upload",
       "uploadFailed": "cyThe file could not be uploaded – try again",
       "fileDeleteFailed": "cyThe file could not be removed – try again",
