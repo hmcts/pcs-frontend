@@ -10,6 +10,7 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
+export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export enum LanguageUsed {
   ENGLISH = 'ENGLISH',
   WELSH = 'WELSH',
@@ -18,7 +19,6 @@ export enum LanguageUsed {
 
 export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
-export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
 export interface IncomeExpenseDetails {
@@ -48,14 +48,19 @@ export interface HouseholdCircumstances {
   pensionAmount?: PenceAmount;
   pensionFrequency?: FrequencyValue;
   universalCredit?: YesNoValue;
-  universalCreditAmount?: PenceAmount;
-  universalCreditFrequency?: FrequencyValue;
-  ucApplicationDate?: string;
+  hasAppliedForUniversalCredit?: YesNoValue;
+  universalCreditAmount?: PenceAmount | null;
+  universalCreditFrequency?: FrequencyValue | null;
+  ucApplicationDate?: string | null;
   otherBenefits?: YesNoValue;
   otherBenefitsAmount?: PenceAmount;
   otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
+  priorityDebts?: YesNoValue;
+  debtTotal?: string;
+  debtContribution?: string;
+  debtContributionFrequency?: FrequencyValue;
   householdBills?: IncomeExpenseDetails;
   loanPayments?: IncomeExpenseDetails;
   childSpousalMaintenance?: IncomeExpenseDetails;
@@ -121,6 +126,13 @@ export interface CcdClaimantOrganisation {
   id: string;
 }
 
+/** Parties involved in the claim  */
+export interface CcdParty {
+  firstName?: string;
+  lastName?: string;
+  orgName?: string;
+}
+
 /** Claimant-entered defendant details captured when the claim was created. */
 export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
@@ -145,6 +157,7 @@ export interface CcdDefendantParty {
 
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
+  needHelpWithFees?: YesNoValue;
   appliedForHwf?: YesNoValue;
   hwfReferenceNumber?: string;
   claimType?: string;
@@ -176,10 +189,10 @@ export interface CcdCollectionItem<T> {
 
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
-  tenancyTypeCorrect?: YesNoNotSureValue;
+  tenancyTypeConfirmation?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
-  tenancyStartDateCorrect?: string;
+  tenancyStartDateConfirmation?: YesNoNotSureValue;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;
@@ -216,6 +229,7 @@ export interface PossessionClaimResponse {
   };
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
+  currentDefendantPartyId?: string;
 }
 
 export type CaseData = CcdCaseData;
@@ -251,6 +265,8 @@ export interface CcdCaseData {
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
+  allClaimants?: CcdCollectionItem<CcdParty>[];
+  allDefendants?: CcdCollectionItem<CcdParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
@@ -344,6 +360,8 @@ export interface CitizenGenAppRequest {
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
   whatOrderWanted?: string;
+  hasSupportingDocuments?: YesNoValue;
+  uploadedDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   sotAccepted?: YesNoValue;
   sotFullName?: string;
   clientReference?: string;

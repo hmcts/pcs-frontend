@@ -102,35 +102,52 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes back from your-household-and-circumstances to repayments-agreed when no payment steps visible', async () => {
+  const rentArrearsData = {
+    claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
+  };
+
+  it('routes back from your-household-and-circumstances to counter-claim when no counter-claim data in CCD', async () => {
     const req = createReq({});
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'counter-claim-have-you-already-applied-for-help-with-your-fees'
+      'counter-claim'
     );
   });
 
-  it('routes counter-claim forward to HWF step when what-are-you-claiming-for is skipped (non-rent-arrears-only)', async () => {
+  it('uses valid static previous step for household interstitial path', async () => {
+    const req = createReq({ data: rentArrearsData });
+    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
+      'repayments-agreed'
+    );
+  });
+
+  it('routes counter-claim forward to your-household-and-circumstances when makeCounterClaim is NO (non-rent-arrears-only)', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+        possessionClaimResponse: {
+          defendantResponses: {
+            makeCounterClaim: 'NO',
+          },
+        },
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'counter-claim-have-you-already-applied-for-help-with-your-fees'
-    );
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('your-household-and-circumstances');
   });
 
-  it('routes counter-claim forward to HWF step when what-are-you-claiming-for is skipped (rent-arrears)', async () => {
+  it('routes counter-claim forward to payment-interstitial when makeCounterClaim is NO (rent-arrears)', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }, { value: { isRentArrears: 'NO' } }],
+        possessionClaimResponse: {
+          defendantResponses: {
+            makeCounterClaim: 'NO',
+          },
+        },
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'counter-claim-have-you-already-applied-for-help-with-your-fees'
-    );
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('payment-interstitial');
   });
 
   it('routes counter-claim YES to what-are-you-claiming-for', async () => {
@@ -149,10 +166,6 @@ describe('respond-to-claim navigation from CCD case data', () => {
       'counter-claim-what-are-you-claiming-for'
     );
   });
-
-  const rentArrearsData = {
-    claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
-  };
 
   const noRentArrearsData = {
     claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
@@ -192,6 +205,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('routes installment-payments forward from CCD state', async () => {
     const req = createReq({
       data: {
+        ...rentArrearsData,
         possessionClaimResponse: {
           defendantResponses: {
             paymentAgreement: { repayArrearsInstalments: 'YES' },
@@ -204,6 +218,28 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     await expect(getNextStep(createReq({}), 'installment-payments', flowConfig, {})).resolves.toBe(
       'your-household-and-circumstances'
+    );
+  });
+
+  it('routes installment-payments forward when repayArrearsInstalments is stored at possessionClaimResponse.paymentAgreement', async () => {
+    const req = createReq({
+      data: {
+        ...rentArrearsData,
+        possessionClaimResponse: {
+          paymentAgreement: { repayArrearsInstalments: 'YES' },
+        },
+      },
+    });
+
+    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
+  });
+
+  it('routes installment-payments forward from the submitted answer before CCD state is refreshed', async () => {
+    const req = createReq({ data: rentArrearsData });
+    req.body = { confirmInstallmentOffer: 'yes' };
+
+    await expect(getNextStep(req, 'installment-payments', flowConfig, {}, req.body)).resolves.toBe(
+      'how-much-afford-to-pay'
     );
   });
 
@@ -243,8 +279,18 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     expect(hasConfirmedInstallmentOffer(howMuchReq)).toBe(true);
+    const howMuchTopLevelReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          paymentAgreement: { repayArrearsInstalments: 'YES' },
+        },
+      },
+    });
+    expect(hasConfirmedInstallmentOffer(howMuchTopLevelReq)).toBe(true);
+    const howMuchSubmittedAnswerReq = createReq({});
+    howMuchSubmittedAnswerReq.body = { confirmInstallmentOffer: 'yes' };
+    expect(hasConfirmedInstallmentOffer(howMuchSubmittedAnswerReq)).toBe(true);
     expect(hasConfirmedInstallmentOffer(createReq({}))).toBe(false);
-
     const financeProvidedReq = createReq({
       data: {
         possessionClaimResponse: {
@@ -278,6 +324,8 @@ describe('respond-to-claim navigation from CCD case data', () => {
             householdCircumstances: {
               shareIncomeExpenseDetails: 'YES',
               universalCredit: 'YES',
+              universalCreditAmount: '20000',
+              universalCreditFrequency: 'MONTHLY',
             },
           },
         },
@@ -316,38 +364,40 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes regular-income to priority-debts when universal credit is selected', async () => {
+  it('routes regular-income to priority-debts when universalCredit is YES in case data', async () => {
     const req = createReq({
       data: {
         possessionClaimResponse: {
           defendantResponses: {
             householdCircumstances: {
               shareIncomeExpenseDetails: 'YES',
+              universalCredit: 'YES',
+              universalCreditAmount: '20000',
+              universalCreditFrequency: 'MONTHLY',
             },
           },
         },
       },
     });
-    req.body = { regularIncome: ['universalCredit'] };
 
     await expect(getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
       'priority-debts'
     );
   });
 
-  it('routes regular-income to universal-credit when universal credit is not selected', async () => {
+  it('routes regular-income to universal-credit when universalCredit is NO in case data', async () => {
     const req = createReq({
       data: {
         possessionClaimResponse: {
           defendantResponses: {
             householdCircumstances: {
               shareIncomeExpenseDetails: 'YES',
+              universalCredit: 'NO',
             },
           },
         },
       },
     });
-    req.body = { regularIncome: ['incomeFromJobs'] };
 
     await expect(getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
       'have-you-applied-for-universal-credit'
@@ -359,15 +409,15 @@ describe('respond-to-claim navigation from CCD case data', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            counterClaim: { appliedForHwf: 'YES' },
+            counterClaim: { needHelpWithFees: 'YES', appliedForHwf: 'YES' },
           },
         },
       },
     });
 
-    await expect(
-      getNextStep(req, 'counter-claim-have-you-already-applied-for-help-with-your-fees', flowConfig, {})
-    ).resolves.toBe('counter-claim-about');
+    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
+      'counter-claim-about'
+    );
   });
 
   it('routes counter-claim HWF step to you-need-to-apply when user has not applied for HWF (NO)', async () => {
@@ -375,15 +425,15 @@ describe('respond-to-claim navigation from CCD case data', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            counterClaim: { appliedForHwf: 'NO' },
+            counterClaim: { needHelpWithFees: 'YES', appliedForHwf: 'NO' },
           },
         },
       },
     });
 
-    await expect(
-      getNextStep(req, 'counter-claim-have-you-already-applied-for-help-with-your-fees', flowConfig, {})
-    ).resolves.toBe('counter-claim-you-need-to-apply-for-help-with-your-fees');
+    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
+      'counter-claim-you-need-to-apply-for-help-with-your-fees'
+    );
   });
 
   it('HWF show condition helpers are derived from CCD counterClaim data', () => {

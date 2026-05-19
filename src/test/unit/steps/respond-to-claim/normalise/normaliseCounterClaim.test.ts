@@ -134,4 +134,85 @@ describe('normaliseCounterClaim', () => {
 
     expect(response.defendantResponses).toEqual({ makeCounterClaim: 'YES' });
   });
+
+  // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — keep counterClaim alive when
+  // makeCounterClaim comes back as "Yes" instead of "YES".
+  it('treats PascalCase "Yes" on makeCounterClaim the same as "YES"', () => {
+    const response = {
+      defendantResponses: {
+        // Cast simulates BE returning out-of-type casing — the static type is 'YES'/'NO'.
+        makeCounterClaim: 'Yes' as 'YES',
+        counterClaim: { claimType: 'OTHER' },
+      },
+    } as PossessionClaimResponse;
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaim).toEqual({ claimType: 'OTHER' });
+  });
+
+  describe('HWF fields when needHelpWithFees is not YES', () => {
+    it('deletes appliedForHwf and hwfReferenceNumber when needHelpWithFees is NO', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'NO',
+            appliedForHwf: 'NO',
+            hwfReferenceNumber: 'HWF-123',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+        needHelpWithFees: 'NO',
+      });
+    });
+
+    it('deletes appliedForHwf and hwfReferenceNumber when needHelpWithFees is undefined', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            appliedForHwf: 'YES',
+            hwfReferenceNumber: 'HWF-456',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+      });
+    });
+
+    it('preserves appliedForHwf and hwfReferenceNumber when needHelpWithFees is YES', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'YES',
+            appliedForHwf: 'YES',
+            hwfReferenceNumber: 'HWF-789',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+        needHelpWithFees: 'YES',
+        appliedForHwf: 'YES',
+        hwfReferenceNumber: 'HWF-789',
+      });
+    });
+  });
 });

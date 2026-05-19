@@ -26,7 +26,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       return { submitDisabled };
     }
 
-    const t = getTranslationFunction(req, 'check-your-answers', ['common']);
+    const t = getTranslationFunction(req);
     const translated = t('errors.submitResponseFailed');
     const message =
       translated && translated !== 'errors.submitResponseFailed'

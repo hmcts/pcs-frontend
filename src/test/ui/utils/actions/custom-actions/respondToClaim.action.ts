@@ -9,6 +9,7 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimFee,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -20,6 +21,7 @@ import {
   doYouHaveAnyOtherDependants,
   exceptionalHardship,
   freeLegalAdvice,
+  haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
   incomeAndExpenses,
   installmentPayments,
@@ -31,6 +33,8 @@ import {
   noticeDateWhenProvided,
   otherConsiderations,
   paymentInterstitial,
+  priorityDebtDetails,
+  priorityDebts,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
@@ -83,6 +87,7 @@ export class RespondToClaimAction implements IAction {
         'selectWhatRegularIncomeDoYouReceive',
         () => this.selectWhatRegularIncomeDoYouReceive(fieldName as actionRecord),
       ],
+      ['selectCounterClaimFee', () => this.selectCounterClaimFee(fieldName as actionRecord)],
       ['yourCircumstances', () => this.yourCircumstances(fieldName as actionRecord)],
       ['exceptionalHardship', () => this.exceptionalHardship(fieldName as actionRecord)],
       [
@@ -99,6 +104,9 @@ export class RespondToClaimAction implements IAction {
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
+      ['selectUniversalCredit', () => this.selectUniversalCredit(fieldName as actionRecord)],
+      ['selectPriorityDebts', () => this.selectPriorityDebts(fieldName as actionRecord)],
+      ['enterPriorityDebtDetails', () => this.enterPriorityDebtDetails(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
       ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
@@ -246,9 +254,7 @@ export class RespondToClaimAction implements IAction {
       claimantsName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
     }
     const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
-    const whenTheyMadeParagraph = disputeClaimInterstitial.getWhenTheyMadeTheirClaimParagraph(claimantsName);
     await performValidation('text', { elementType: 'heading', text: mainHeader });
-    await performValidation('text', { elementType: 'paragraph', text: whenTheyMadeParagraph });
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
@@ -501,7 +507,7 @@ export class RespondToClaimAction implements IAction {
     });
     await performValidation('text', {
       elementType: 'paragraph',
-      text: `When making their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
+      text: `When they made their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
     const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {
@@ -586,6 +592,48 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', yourCircumstances.saveAndContinueButton);
   }
 
+  private async selectCounterClaimFee(counterClaimFeeOption: actionRecord) {
+    let counterClaimFeeValue: number | string = 0;
+    if (counterClaimFeeOption.typeOfClaim === 'Something else') {
+      counterClaimFeeValue = 377;
+    } else if (
+      counterClaimFeeOption.typeOfClaim === 'A sum of money or compensation' ||
+      counterClaimFeeOption.typeOfClaim === 'Both'
+    ) {
+      if (counterClaimFeeOption.amount === null) {
+        throw new Error('Amount is required for this type of claim');
+      }
+      const amount = Number(counterClaimFeeOption.amount);
+      if (amount <= 300) {
+        counterClaimFeeValue = 35; // FEE0514
+      } else if (amount <= 500) {
+        counterClaimFeeValue = 50; // FEE0513
+      } else if (amount <= 1000) {
+        counterClaimFeeValue = 70; // FEE0512
+      } else if (amount <= 1500) {
+        counterClaimFeeValue = 80; // FEE0511
+      } else if (amount <= 3000) {
+        counterClaimFeeValue = 115; // FEE0510
+      } else if (amount <= 5000) {
+        counterClaimFeeValue = 205; // FEE0509
+      } else if (amount <= 10000) {
+        counterClaimFeeValue = 455; // FEE0508
+      } else if (amount <= 200000) {
+        counterClaimFeeValue = Number((amount * 0.05).toFixed(2)); // FEE0507
+      } else {
+        counterClaimFeeValue = 10000; // FEE0506
+      }
+    }
+    const basedOnInformationParagraph = `Based on the information provided, it will cost £${counterClaimFeeValue} to make your counterclaim.`;
+    await performValidation('text', { elementType: 'paragraph', text: basedOnInformationParagraph });
+
+    await performAction('clickRadioButton', {
+      question: counterClaimFee.doYouNeedHelpPayingCounterClaimQuestion,
+      option: counterClaimFeeOption.radioOption,
+    });
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+  }
+
   private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
       question: exceptionalHardshipData.question,
@@ -637,6 +685,48 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
+  private async selectUniversalCredit(universalCreditDateData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      option: universalCreditDateData.creditRadioOption,
+    });
+    if (
+      universalCreditDateData.creditRadioOption === 'Yes' &&
+      universalCreditDateData?.day &&
+      universalCreditDateData?.month &&
+      universalCreditDateData?.year
+    ) {
+      await performActions(
+        'Enter Date',
+        ['inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, universalCreditDateData.day],
+        ['inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, universalCreditDateData.month],
+        ['inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, universalCreditDateData.year]
+      );
+    }
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  }
+
+  private async selectPriorityDebts(priorityDebtsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebtsData.option,
+    });
+    await performAction('clickButton', priorityDebts.saveAndContinueButton);
+  }
+
+  private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      priorityDebtDetails.whatIsTheTotalAmountQuestion,
+      priorityDebtDetailsData.totalAmount
+    );
+    await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetailsData.payAmount);
+    await performAction('clickRadioButton', {
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetailsData.option,
+    });
+    await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  }
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
       await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);

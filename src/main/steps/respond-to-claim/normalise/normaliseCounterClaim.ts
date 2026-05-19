@@ -1,3 +1,5 @@
+import { normalizeYesNoValue } from '../../utils';
+
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export function normaliseCounterClaim(response: PossessionClaimResponse): void {
@@ -7,7 +9,7 @@ export function normaliseCounterClaim(response: PossessionClaimResponse): void {
   }
 
   // No counterclaim → all downstream counter-claim screens are skipped
-  if (dr.makeCounterClaim !== 'YES') {
+  if (normalizeYesNoValue(dr.makeCounterClaim) !== 'YES') {
     delete dr.counterClaim;
     return;
   }
@@ -22,6 +24,12 @@ export function normaliseCounterClaim(response: PossessionClaimResponse): void {
     delete cc.hwfReferenceNumber;
   }
 
+  // needHelpWithFees not YES → "have you applied" + reference are stale
+  if (normalizeYesNoValue(cc.needHelpWithFees) !== 'YES') {
+    delete cc.appliedForHwf;
+    delete cc.hwfReferenceNumber;
+  }
+
   // Counterclaim isn't a money/payment claim → counter-claim-specific-sum is skipped
   if (cc.claimType !== 'PAYMENT_OR_COMPENSATION' && cc.claimType !== 'BOTH') {
     delete cc.isClaimAmountKnown;
@@ -31,9 +39,10 @@ export function normaliseCounterClaim(response: PossessionClaimResponse): void {
   }
 
   // Specific amount known → estimate is stale; not known → exact amount is stale
-  if (cc.isClaimAmountKnown === 'YES') {
+  const amountKnown = normalizeYesNoValue(cc.isClaimAmountKnown);
+  if (amountKnown === 'YES') {
     delete cc.estimatedMaxClaimAmount;
-  } else if (cc.isClaimAmountKnown === 'NO') {
+  } else if (amountKnown === 'NO') {
     delete cc.claimAmount;
   }
 }
