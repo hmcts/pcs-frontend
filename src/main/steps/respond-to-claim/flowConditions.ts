@@ -97,6 +97,10 @@ export function shouldShowCounterClaimHelpWithFeesStep(req: Request): boolean {
   return getCounterClaimNeedHelpWithFees(req) === 'YES';
 }
 
+export function shouldShowCounterClaimNeedToApplyStep(req: Request): boolean {
+  return shouldShowCounterClaimHelpWithFeesStep(req) && hasNotAppliedForCounterClaimHwf(req);
+}
+
 export function shouldShowCounterClaimAgainstWhoStep(req: Request): boolean {
   return getCounterClaimNeedHelpWithFees(req) === 'NO' && hasMultipleParties(req);
 }
