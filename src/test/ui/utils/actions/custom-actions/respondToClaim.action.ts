@@ -43,6 +43,7 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
   uploadFiles,
+  uploadFilesToSupportYourCounterclaim,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -99,6 +100,8 @@ export class RespondToClaimAction implements IAction {
         'selectIfAnyOtherAdultsLiveInYourHouse',
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
       ],
+      ['uploadFilesToSupportCounterclaim', () => this.uploadFilesToSupportCounterclaim(fieldName as actionRecord)],
+      ['doYouWantToUploadFiles', () => this.doYouWantToUploadFiles(fieldName as actionRecord)],
       ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
       ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
@@ -793,6 +796,19 @@ export class RespondToClaimAction implements IAction {
       await performAction('uploadFile', uploadDocs.files);
     }
     await performAction('clickButton', uploadFiles.saveAndContinueButton);
+  }
+
+  private async doYouWantToUploadFiles(uploadOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader,
+      option: uploadOption.option,
+    });
+    await performAction('clickButton', doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton);
+  }
+
+  private async uploadFilesToSupportCounterclaim(uploadCounterClaimFiles: actionRecord): Promise<void> {
+    await performAction('uploadFile', uploadCounterClaimFiles.files);
+    await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   }
 
   private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {

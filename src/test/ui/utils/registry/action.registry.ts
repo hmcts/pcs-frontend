@@ -88,6 +88,8 @@ export class ActionRegistry {
     ['enterPriorityDebtDetails', new RespondToClaimAction()],
     ['selectCounterClaim', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
+    ['uploadFilesToSupportCounterclaim', new RespondToClaimAction()],
+    ['doYouWantToUploadFiles', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],

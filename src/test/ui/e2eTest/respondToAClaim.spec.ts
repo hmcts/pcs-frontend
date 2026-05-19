@@ -17,6 +17,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
   equalityAndDiversityEnd,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -302,6 +303,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+    });
+    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
     // Below routing is commented due to https://tools.hmcts.net/jira/browse/HDPI-6339 bug, needs to be uncommented once the issue is fixed
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -443,6 +448,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -542,6 +550,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -600,7 +611,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute @secureFlexible @regression', async () => {
+  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute - CounterClaimFee - INeedHelp @secureFlexible @regression', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('inputDefendantDetails', {
@@ -660,6 +671,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -745,7 +759,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
+  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - CounterClaimFee - INeedHelp @secureFlexible @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -801,6 +815,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -933,6 +950,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1081,6 +1101,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaimAgainstWhom.continueButton);
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -1206,6 +1229,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', counterClaimAgainstWhom.continueButton);
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+    });
+    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),

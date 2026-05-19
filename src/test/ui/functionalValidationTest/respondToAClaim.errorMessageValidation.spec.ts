@@ -17,6 +17,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
   equalityAndDiversityEnd,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -53,6 +54,7 @@ import { defendantNameConfirmationErrorValidation } from '../functional/defendan
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
 import { doYouHaveAnyDependantChildrenErrorValidation } from '../functional/doYouHaveAnyDependantChildren.pft';
 import { doYouHaveAnyOtherDependantsErrorValidation } from '../functional/doYouHaveAnyOtherDependants.pft';
+import { doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation } from '../functional/doYouWantToUploadFilesToSupportYourCounterclaim.pft';
 import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
 import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pft';
 import { haveYouAppliedForUniversalCreditErrorValidation } from '../functional/haveYouAppliedForUniversalCredit.pft';
@@ -70,6 +72,7 @@ import { repaymentsMadeErrorValidation } from '../functional/repaymentsMade.pft'
 import { tenancyDateDetailsErrorValidation } from '../functional/tenancyDateDetails.pft';
 import { tenancyDateUnknownErrorValidation } from '../functional/tenancyDateUnknown.pft';
 import { tenancyTypeDetailsErrorValidation } from '../functional/tenancyTypeDetails.pft';
+import { uploadFilesToSupportYourCounterclaimErrorValidation } from '../functional/uploadFilesToSupportYourCounterclaim.pft';
 import { whatOtherRegularExpensesDoYouHaveErrorValidation } from '../functional/whatOtherRegularExpensesDoYouHave.pft';
 import { whatRegularIncomeDoYouReceiveErrorValidation } from '../functional/whatRegularIncomeDoYouReceive.pft';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation } from '../functional/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.pft';
@@ -321,6 +324,20 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('counterClaimAbout', NO_EMV_READ_ONLY);
     await performAction('clickButton', counterClaimAbout.continueButton);
 
+    await softErrorMessageValidation(
+      'doYouWantToUploadFilesToSupportYourCounterclaim',
+      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+    });
+
+    await softErrorMessageValidation(
+      'uploadFilesToSupportYourCounterclaim',
+      uploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
+
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
 
@@ -550,6 +567,14 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('haveYouAlreadyAppliedForHelp', NO_EMV_READ_ONLY);
     await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
+
+    await softErrorMessageValidation(
+      'doYouWantToUploadFilesToSupportYourCounterclaim',
+      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');

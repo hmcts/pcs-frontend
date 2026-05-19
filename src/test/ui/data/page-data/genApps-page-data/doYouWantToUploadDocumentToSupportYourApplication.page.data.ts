@@ -7,4 +7,7 @@ export const doYouWantToUploadDocumentToSupportYourApplication = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   cancelLink: `Cancel`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `counter-claim-do-you-want-to-upload-files`,
+  backLink: `Back`,
 };
