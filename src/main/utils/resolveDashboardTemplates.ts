@@ -1,5 +1,7 @@
 import type { TFunction } from 'i18next';
 
+import { getNotificationUrlPlaceholders } from './dashboardTaskPaths';
+
 export interface ResolvedNotification {
   title: string;
   body: string;
@@ -28,7 +30,10 @@ export function resolveNotification(
   values: Record<string, unknown>,
   caseReference: string
 ): ResolvedNotification | null {
-  const merged = withCaseRef(values, caseReference);
+  const merged = {
+    ...withCaseRef(values, caseReference),
+    ...getNotificationUrlPlaceholders(caseReference),
+  };
   const title = lookup(t, `dashboard:notifications.${templateId}.title`);
   const body = lookup(t, `dashboard:notifications.${templateId}.body`, merged, true);
   if (!title || !body) {

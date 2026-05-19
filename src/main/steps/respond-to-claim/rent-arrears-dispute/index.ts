@@ -69,7 +69,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
     const rentArrearsAmount = currency(amountInPounds);
 
-    const t = getTranslationFunction(req, 'rent-arrears-dispute', ['common']);
+    const t = getTranslationFunction(req);
 
     const insetIntroText = t('insetIntroText');
     const insetDetailsText = t('insetDetailsText', { claimantName });
