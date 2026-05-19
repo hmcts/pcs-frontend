@@ -238,9 +238,9 @@ describe('respond-to-claim counter-claim HWF show conditions', () => {
   describe('counter-claim-you-need-to-apply showCondition', () => {
     const showCondition = flowConfig.steps['counter-claim-you-need-to-apply-for-help-with-your-fees']?.showCondition;
 
-     
     const makeNeedToApplyReq = (
       counterClaim: { needHelpWithFees?: string; appliedForHwf?: string } | undefined
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): any => ({
       res: {
         locals: {
