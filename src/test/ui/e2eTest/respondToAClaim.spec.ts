@@ -214,6 +214,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
     claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
+    process.env.CLAIMANT_NAME = claimantName;
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
@@ -1437,7 +1438,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - @multiParty', async () => {
-    // claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
