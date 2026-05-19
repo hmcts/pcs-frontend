@@ -409,7 +409,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            counterClaim: { appliedForHwf: 'YES' },
+            counterClaim: { needHelpWithFees: 'YES', appliedForHwf: 'YES' },
           },
         },
       },
@@ -425,7 +425,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            counterClaim: { appliedForHwf: 'NO' },
+            counterClaim: { needHelpWithFees: 'YES', appliedForHwf: 'NO' },
           },
         },
       },

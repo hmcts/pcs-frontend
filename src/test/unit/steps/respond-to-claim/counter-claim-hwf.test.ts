@@ -238,12 +238,35 @@ describe('respond-to-claim counter-claim HWF show conditions', () => {
   describe('counter-claim-you-need-to-apply showCondition', () => {
     const showCondition = flowConfig.steps['counter-claim-you-need-to-apply-for-help-with-your-fees']?.showCondition;
 
-    it('is visible when appliedForHwf is NO', () => {
-      expect(showCondition?.(makeReq('NO'))).toBe(true);
+    const makeNeedToApplyReq = (
+      counterClaim: { needHelpWithFees?: string; appliedForHwf?: string } | undefined
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): any => ({
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  counterClaim,
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    it('is visible when needHelpWithFees is YES and appliedForHwf is NO', () => {
+      expect(showCondition?.(makeNeedToApplyReq({ needHelpWithFees: 'YES', appliedForHwf: 'NO' }))).toBe(true);
     });
 
     it('is not visible when appliedForHwf is YES', () => {
-      expect(showCondition?.(makeReq('YES'))).toBe(false);
+      expect(showCondition?.(makeNeedToApplyReq({ needHelpWithFees: 'YES', appliedForHwf: 'YES' }))).toBe(false);
+    });
+
+    it('is not visible when needHelpWithFees is not YES', () => {
+      expect(showCondition?.(makeNeedToApplyReq({ appliedForHwf: 'NO' }))).toBe(false);
     });
 
     it('is not visible when counterClaim data is absent', () => {
@@ -255,14 +278,14 @@ describe('respond-to-claim counter-claim HWF show conditions', () => {
     const showCondition = flowConfig.steps['counter-claim-have-you-applied-for-help']?.showCondition;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const makeCounterClaimReq = (makeCounterClaim: string | undefined): any => ({
+    const makeNeedHelpReq = (needHelpWithFees: string | undefined): any => ({
       res: {
         locals: {
           validatedCase: {
             data: {
               possessionClaimResponse: {
                 defendantResponses: {
-                  makeCounterClaim,
+                  counterClaim: needHelpWithFees !== undefined ? { needHelpWithFees } : undefined,
                 },
               },
             },
@@ -271,16 +294,16 @@ describe('respond-to-claim counter-claim HWF show conditions', () => {
       },
     });
 
-    it('is visible when makeCounterClaim is YES', () => {
-      expect(showCondition?.(makeCounterClaimReq('YES'))).toBe(true);
+    it('is visible when needHelpWithFees is YES', () => {
+      expect(showCondition?.(makeNeedHelpReq('YES'))).toBe(true);
     });
 
-    it('is not visible when makeCounterClaim is NO', () => {
-      expect(showCondition?.(makeCounterClaimReq('NO'))).toBe(false);
+    it('is not visible when needHelpWithFees is NO', () => {
+      expect(showCondition?.(makeNeedHelpReq('NO'))).toBe(false);
     });
 
-    it('is not visible when makeCounterClaim is absent', () => {
-      expect(showCondition?.(makeCounterClaimReq(undefined))).toBe(false);
+    it('is not visible when needHelpWithFees is absent', () => {
+      expect(showCondition?.(makeNeedHelpReq(undefined))).toBe(false);
     });
   });
 });
