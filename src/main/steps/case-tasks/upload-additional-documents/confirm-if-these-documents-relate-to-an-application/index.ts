@@ -36,8 +36,6 @@ function buildApplicationText(t: TFunction, type: GenAppType | undefined, submit
       return t('applicationOptionAdjourn', { date: formatted });
     case GenAppType.SET_ASIDE:
       return t('applicationOptionSetAside', { date: formatted });
-    case GenAppType.SUSPEND:
-      return t('applicationOptionSuspend', { date: formatted });
     case GenAppType.SOMETHING_ELSE:
     default:
       return t('applicationOptionGeneric', { date: formatted });
