@@ -1,0 +1,49 @@
+{
+  "pageTitle": "cy Check your answers",
+  "heading": "cy Check your answers",
+  "sections": {
+    "freeLegalAdvice": "cy Free legal advice",
+    "personalDetails": "cy Personal details",
+    "response": "cy Response",
+    "householdAndCircumstances": "cy Your household and circumstances",
+    "incomeAndExpenses": "cy Income and expenses",
+    "documents": "cy Documents",
+    "otherConsiderations": "cy Other considerations",
+    "languageUsed": "cy Language used"
+  },
+  "rows": {
+    "otherConsiderations": {
+      "label": "cy Is there anything else you want the court to consider?",
+      "changeHidden": "cy whether there is anything else you want the court to consider"
+    },
+    "otherConsiderationsDetails": {
+      "label": "cy Give details about what else you want the court to consider",
+      "changeHidden": "cy the details about what else you want the court to consider"
+    },
+    "languageUsed": {
+      "label": "cy Which language did you use to complete this service?",
+      "changeHidden": "cy which language you used to complete this service",
+      "options": {
+        "ENGLISH": "cy English",
+        "WELSH": "cy Welsh",
+        "ENGLISH_AND_WELSH": "cy English and Welsh"
+      }
+    }
+  },
+  "statementOfTruth": {
+    "heading": "cy Statement of truth",
+    "contemptFieldLabel": "cy Statement of truth",
+    "contemptOption": "cy I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth",
+    "beliefFieldLabel": "cy Statement of truth",
+    "beliefOption": "cy I believe that the facts stated in this defence form are true",
+    "fullNameLabel": "cy Full name"
+  },
+  "errors": {
+    "statementOfTruthContempt": "cy Select if you understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth",
+    "statementOfTruthBelief": "cy Select if you believe that the facts stated in this defence form are true",
+    "fullName": "cy Enter your full name"
+  },
+  "buttons": {
+    "submit": "cy Accept and submit"
+  }
+}

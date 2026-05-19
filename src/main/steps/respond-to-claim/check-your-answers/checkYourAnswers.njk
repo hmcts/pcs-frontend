@@ -1,14 +1,48 @@
 {% extends "stepsTemplate.njk" %}
-{% from "macros/stepButtons.njk" import stepButtons %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "macros/csrf.njk" import csrfProtection %}
+{% from "govuk/components/error-summary/macro.njk"  import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk"   import govukSummaryList %}
+{% from "govuk/components/checkboxes/macro.njk"     import govukCheckboxes %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/button/macro.njk"         import govukButton %}
+{% from "macros/csrf.njk"                           import csrfProtection %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">Check your answers (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for Check your answers step.</p>
-  <form method="post" action="{{ url }}">
+
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  {% for section in sections %}
+    {% if section.rows.length > 0 %}
+      <h2 class="govuk-heading-m">{{ section.heading }}</h2>
+      {{ govukSummaryList({ rows: section.rows }) }}
+    {% endif %}
+  {% endfor %}
+
+  <form method="post" action="{{ url }}" novalidate>
     {{ csrfProtection(csrfToken) }}
+
+    <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>
+
+    {% for field in fields %}
+      {% if field.componentType == 'checkboxes' %}
+        {{ govukCheckboxes(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    {% for field in fields %}
+      {% if field.componentType == 'characterCount' %}
+        {{ govukCharacterCount(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    {{ govukButton({
+      text: t('buttons.submit'),
+      attributes: { type: 'submit' },
+      preventDoubleClick: true
+    }) }}
   </form>
 {% endblock %}
