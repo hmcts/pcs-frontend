@@ -1,13 +1,8 @@
 export const doYouWantToUploadDocumentToSupportYourApplication = {
   mainHeader: `Do you want to upload documents to support your application?`,
   doYouWantToUploadDocumentQuestion: `Do you want to upload documents to support your application?`,
-  theClaimantWillBeAbleToSeeParagraph: `The claimant will be able to see these files`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  saveAndContinueButton: `Save and continue`,
-  saveForLaterButton: `Save for later`,
+  continueButton: `Continue`,
   cancelLink: `Cancel`,
-  feedbackLink: `feedback (opens in new tab)`,
-  pageSlug: `counter-claim-do-you-want-to-upload-files`,
-  backLink: `Back`,
 };
