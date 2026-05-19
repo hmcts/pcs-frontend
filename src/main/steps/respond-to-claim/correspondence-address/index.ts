@@ -146,7 +146,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return result;
   },
   extendGetContent: async (req, formContent) => {
-    const t = getTranslationFunction(req, 'correspondence-address', ['common']);
+    const t = getTranslationFunction(req);
     const possessionClaimResponse = req.res?.locals?.validatedCase?.possessionClaimResponse;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
@@ -187,7 +187,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       isManualOpen: addressConfirmedRadioSelection === 'no',
       legendNa: t('legendNa'),
       legendhintNa: t('legend.hintNa'),
-      caption: t('caption'),
       labels: {
         yes: t('labels.yes'),
         no: t('labels.no'),

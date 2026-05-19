@@ -72,14 +72,14 @@ describe('resolveDashboardTemplates', () => {
   describe('resolveTask', () => {
     it('returns null when task title key is missing', () => {
       const t = createT({});
-      expect(resolveTask(t, 'Defendant.MissingTask')).toBeNull();
+      expect(resolveTask(t, 'MissingTask')).toBeNull();
     });
 
     it('returns title when task translation exists', () => {
       const t = createT({
-        'dashboard:tasks.Defendant.ViewClaim.title': 'View the claim',
+        'dashboard:tasks.ViewClaim.title': 'View the claim',
       });
-      expect(resolveTask(t, 'Defendant.ViewClaim')).toEqual({ title: 'View the claim' });
+      expect(resolveTask(t, 'ViewClaim')).toEqual({ title: 'View the claim' });
     });
   });
 });
