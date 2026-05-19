@@ -3,7 +3,7 @@ export const counterClaimAbout = {
   youWillBeParagraph: `You will be able to upload any evidence you have on the next page.`,
   theClaimantWillBeParagraph: `The claimant will be able to see your answers.`,
   whatIsYourCounterClaimLabelText: `What is your counterclaim for?`,
-  youCanEnterUpToHintText: `You can enter up to 6,800 characters`,
+  youCanEnterUpToHintText: `You have 6,800 characters remaining`,
   whatAreYourReasonsLabelText: `What are your reasons for making the counterclaim?`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,

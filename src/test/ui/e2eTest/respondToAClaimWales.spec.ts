@@ -186,12 +186,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
-    await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
+    //Below routing needs to updated once HDPI-5193 is implemented and merged and enable commented out lines as part of routing
+   /* await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
     await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
-    });
+    });*/
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
