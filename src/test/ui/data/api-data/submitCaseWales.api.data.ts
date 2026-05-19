@@ -220,7 +220,6 @@ export const submitCaseApiDataWales = {
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
     prohibitedConductWalesClaim: 'NO',
-    claimingCostsWanted: 'YES',
     hasUnderlesseeOrMortgagee: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
