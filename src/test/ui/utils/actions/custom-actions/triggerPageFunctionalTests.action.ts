@@ -297,10 +297,22 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     try {
       const { pathname } = new URL(url);
       const segments = pathname.split('/').filter(Boolean);
-      return segments.at(-1) || 'home';
+
+      const lastSegment = segments.at(-1);
+
+      if (lastSegment === 'check-your-answers') {
+        return segments.slice(-2).join('/');
+      }
+      return lastSegment || 'home';
     } catch {
       const segments = url.split('/').filter(Boolean);
-      return segments.at(-1) || 'home';
+
+      const last = segments.at(-1);
+
+      if (last === 'check-your-answers') {
+        return segments.slice(-2).join('/');
+      }
+      return last || 'home';
     }
   }
 

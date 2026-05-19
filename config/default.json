@@ -158,5 +158,7 @@
   },
   "documentUpload": {
     "maxFileSizeMB": 1024
+    "maxFileSizePerFileMB": 100,
+    "maxTotalFileSizeMB": 1024
   }
 }
