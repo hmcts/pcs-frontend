@@ -124,10 +124,8 @@ export const submitCaseApiData = {
             documentType: 'WITNESS_STATEMENT',
             description: 'Witness Document',
             document: {
-              document_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/e49660db-7a90-4532-ae67-092aa67604d7',
-              document_binary_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/e49660db-7a90-4532-ae67-092aa67604d7/binary',
+              document_url: `${process.env.DM_STORE_URL}/documents/e49660db-7a90-4532-ae67-092aa67604d7`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/e49660db-7a90-4532-ae67-092aa67604d7/binary`,
               document_filename: 'WitnessStatement.png',
             },
           },
@@ -138,10 +136,8 @@ export const submitCaseApiData = {
             documentType: 'RENT_STATEMENT',
             description: 'Rent Document',
             document: {
-              document_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e',
-              document_binary_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e/binary',
+              document_url: `${process.env.DM_STORE_URL}/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e/binary`,
               document_filename: 'RentStatement.pdf',
             },
           },
@@ -152,10 +148,8 @@ export const submitCaseApiData = {
             documentType: 'NOTICE_FOR_SERVICE_OUT_OF_JURISDICTION',
             description: 'Notice Document',
             document: {
-              document_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/d5936738-2338-4c9b-918c-33f7cd199dca',
-              document_binary_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/d5936738-2338-4c9b-918c-33f7cd199dca/binary',
+              document_url: `${process.env.DM_STORE_URL}/documents/d5936738-2338-4c9b-918c-33f7cd199dca`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/d5936738-2338-4c9b-918c-33f7cd199dca/binary`,
               document_filename: 'NoticeServiceJurisdiction.docx',
             },
           },
@@ -166,10 +160,8 @@ export const submitCaseApiData = {
             documentType: 'CERTIFICATE_OF_SUITABILITY_AS_LF',
             description: 'Certificate of Suitability',
             document: {
-              document_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/17f75c63-488a-4404-afd2-0aa3a9d65170',
-              document_binary_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/17f75c63-488a-4404-afd2-0aa3a9d65170/binary',
+              document_url: `${process.env.DM_STORE_URL}/documents/17f75c63-488a-4404-afd2-0aa3a9d65170`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/17f75c63-488a-4404-afd2-0aa3a9d65170/binary`,
               document_filename: 'CertificateOfSuitability.xlsx',
             },
           },
