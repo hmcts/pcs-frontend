@@ -5,11 +5,10 @@ import {
   feedback,
 } from '../data/page-data';
 import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
-import { doYouWantToUploadDocumentToSupportYourApplication } from '../data/page-data/genApps-page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation(): Promise<void> {
-  await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.saveAndContinueButton);
+  await performAction('clickButton', doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouWantToUploadFilesToSupportYourCounterclaim.thereIsAProblemErrorMessageHeader,
     message: doYouWantToUploadFilesToSupportYourCounterclaim.selectIfYouWantToUploadErrorMessage,
@@ -17,28 +16,28 @@ export async function doYouWantToUploadFilesToSupportYourCounterclaimErrorValida
 }
 
 export async function doYouWantToUploadFilesToSupportYourCounterclaimNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', doYouWantToUploadDocumentToSupportYourApplication.feedbackLink, {
+  await performValidation('pageNavigation', doYouWantToUploadFilesToSupportYourCounterclaim.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
-    pageSlug: doYouWantToUploadDocumentToSupportYourApplication.pageSlug,
+    pageSlug: doYouWantToUploadFilesToSupportYourCounterclaim.pageSlug,
   });
 
   if (process.env.I_NEED_HELP === 'NO') {
     await performValidation(
       'pageNavigation',
-      doYouWantToUploadDocumentToSupportYourApplication.backLink,
+      doYouWantToUploadFilesToSupportYourCounterclaim.backLink,
       counterClaimAbout.mainHeader
     );
   } else if (process.env.I_NEED_HELP === 'YES') {
     await performValidation(
       'pageNavigation',
-      doYouWantToUploadDocumentToSupportYourApplication.backLink,
+      doYouWantToUploadFilesToSupportYourCounterclaim.backLink,
       counterClaimHaveYouAppliedForHelp.mainHeader
     );
   }
-  await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.noRadioOption);
+  await performAction('clickRadioButton', doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption);
   await performValidation(
     'pageNavigation',
-    doYouWantToUploadDocumentToSupportYourApplication.saveForLaterButton,
+    doYouWantToUploadFilesToSupportYourCounterclaim.saveForLaterButton,
     dashboard.mainHeader
   );
 }
