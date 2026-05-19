@@ -4,7 +4,10 @@ import { shouldShowStep } from '../../';
 import { flowConfig } from '../flow.config';
 
 import { getFormData } from '@modules/steps';
-import { GenAppType, LanguageUsed } from '@services/ccdCase.interface';
+import { CcdCollectionItem, CcdUploadedDocument, GenAppType, LanguageUsed } from '@services/ccdCase.interface';
+import { toCaseReference16 } from '@utils/caseReference';
+
+const UPLOAD_STEP_NAME = 'upload-documents-to-support-your-application';
 
 export type FieldDetails<T> = {
   stepName: string;
@@ -77,6 +80,15 @@ export default class VisibleFormDataView {
 
   getWhichLanguageField(): FieldDetails<LanguageUsed> | undefined {
     return this.getField<LanguageUsed>('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
+  }
+
+  getUploadedDocuments(): CcdCollectionItem<CcdUploadedDocument>[] {
+    const caseRef = toCaseReference16(this.req.params?.caseReference);
+    if (!caseRef) {
+      return [];
+    }
+    const docs = this.req.session.uploadedDocs?.[caseRef]?.[UPLOAD_STEP_NAME];
+    return Array.isArray(docs) ? (docs as CcdCollectionItem<CcdUploadedDocument>[]) : [];
   }
 
   private getField<T>(stepName: string, fieldName: string): FieldDetails<T> | undefined {

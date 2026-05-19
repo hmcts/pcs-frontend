@@ -1,6 +1,7 @@
 import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
 import type { Environment } from 'nunjucks';
 
+import { VIEW_ALL_APPLICATIONS_ROUTE } from '../../../main/constants/caseRoutes';
 import { oidcMiddleware } from '../../../main/middleware';
 
 import viewAllApplicationsRoutes from '@routes/viewAllApplications';
@@ -103,6 +104,7 @@ describe('View All Application Route', () => {
       },
     });
 
+    expect(app.get).toHaveBeenCalledWith(VIEW_ALL_APPLICATIONS_ROUTE, expect.any(Function), expect.any(Function));
     expect(res.render).toHaveBeenCalledWith(
       'view-all-applications',
       expect.objectContaining({

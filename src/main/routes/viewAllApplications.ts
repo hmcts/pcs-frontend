@@ -1,6 +1,7 @@
 import { Application, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
+import { VIEW_ALL_APPLICATIONS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
 
 import { Logger } from '@modules/logger';
@@ -30,7 +31,7 @@ type PartyGenApps = {
 };
 
 export default function viewAllApplicationsRoutes(app: Application): void {
-  app.get('/case/:caseReference/view-all-applications', oidcMiddleware, async (req: Request, res: Response) => {
+  app.get(VIEW_ALL_APPLICATIONS_ROUTE, oidcMiddleware, async (req: Request, res: Response) => {
     const accessToken = req.session.user?.accessToken;
     if (!accessToken) {
       logger.warn('User not authenticated - no access token');
