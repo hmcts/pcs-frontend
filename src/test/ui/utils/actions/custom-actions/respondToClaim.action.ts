@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
+  accessYourCase,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -52,6 +53,8 @@ import {
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
+
+import { pins } from './fetchPINsAndValidateAccessCodeAPI.action';
 export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -112,6 +115,7 @@ export class RespondToClaimAction implements IAction {
       ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
+      ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -810,6 +814,17 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
+  }
+
+  private async accessYourCase(accessCode: actionRecord): Promise<void> {
+    const pin = pins[0];
+    if (!pin) {
+      throw new Error('PIN is not available. Ensure fetchPINsAPI is called before enterAccessCode');
+    }
+    await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
+
+    await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
+    await performAction('clickButton', accessYourCase.continueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
