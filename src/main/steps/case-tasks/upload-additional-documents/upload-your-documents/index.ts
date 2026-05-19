@@ -7,7 +7,7 @@ import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/doc
 
 const stepName = 'upload-your-documents';
 
-const storage = sessionDocs({ stepName, fieldName: 'documents' });
+const storage = sessionDocs({ stepName });
 
 export const step: StepDefinition = createFormStep({
   stepName,

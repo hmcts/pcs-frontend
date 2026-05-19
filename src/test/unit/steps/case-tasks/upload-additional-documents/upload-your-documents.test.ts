@@ -52,18 +52,16 @@ const doc2: CcdCollectionItem<CcdUploadedDocument> = {
   },
 };
 
-type SessionFormData = {
-  [key: string]: { documents?: CcdCollectionItem<CcdUploadedDocument>[] };
-};
+const CASE_REF = '1234567890123456';
 
-function makeReq(formData: SessionFormData = {}): Request {
+function makeReq(docs?: CcdCollectionItem<CcdUploadedDocument>[]): Request {
   return {
+    params: { caseReference: CASE_REF },
     session: {
-      formData,
+      uploadedDocs: docs !== undefined ? { [CASE_REF]: { [STEP_NAME]: docs } } : undefined,
       reload: jest.fn((cb: (err: null) => void) => cb(null)),
       save: jest.fn((cb: (err: null) => void) => cb(null)),
     },
-    params: { caseReference: '1234567890123456' },
   } as unknown as Request;
 }
 
@@ -124,17 +122,17 @@ describe('upload-your-documents step', () => {
 
   describe('getInitialFormData', () => {
     it('returns empty documents when no documents exist in session', async () => {
-      const result = await testedStep.getInitialFormData(makeReq({}));
+      const result = await testedStep.getInitialFormData(makeReq());
       expect(result).toEqual({ documents: [] });
     });
 
     it('returns empty documents when documents array is empty', async () => {
-      const result = await testedStep.getInitialFormData(makeReq({ [STEP_NAME]: { documents: [] } }));
+      const result = await testedStep.getInitialFormData(makeReq([]));
       expect(result).toEqual({ documents: [] });
     });
 
     it('returns display-only data with index and filename, no CDAM URLs', async () => {
-      const result = await testedStep.getInitialFormData(makeReq({ [STEP_NAME]: { documents: [doc1] } }));
+      const result = await testedStep.getInitialFormData(makeReq([doc1]));
 
       expect(result.documents).toHaveLength(1);
       expect(result.documents[0]).toEqual({
@@ -149,7 +147,7 @@ describe('upload-your-documents step', () => {
     });
 
     it('assigns sequential indexes to multiple documents', async () => {
-      const result = await testedStep.getInitialFormData(makeReq({ [STEP_NAME]: { documents: [doc1, doc2] } }));
+      const result = await testedStep.getInitialFormData(makeReq([doc1, doc2]));
 
       expect(result.documents[0].index).toBe(0);
       expect(result.documents[1].index).toBe(1);

@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next';
 import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
-import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
+import { type TranslationContent, getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
 
 import { Logger } from '@modules/logger';
 import { StepNavigation } from '@modules/steps/flow';
@@ -12,6 +12,22 @@ import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig
 import type { StepFormData } from '@modules/steps/stepFormData.interface';
 
 const logger = Logger.getLogger('controllerFactory');
+
+/**
+ * Top-level keys removed from step locale JSON before merging into GET render locals. Templates that
+ * need messages should use `t('errors.…')` or other namespaced keys rather than exporting `errors`
+ * onto the view. `addressLookup.njk` expects `errors` to mean server validation maps with keys like
+ * `prefix-addressLine1`, which must not collide with duplicate-shaped copy from JSON.
+ */
+const RESERVED_STEP_TRANSLATION_KEYS = ['errors', 'error', 'fields', 'backUrl'] as const;
+
+function withoutReservedStepTranslationKeys(translations: TranslationContent): TranslationContent {
+  const result: TranslationContent = { ...translations };
+  for (const key of RESERVED_STEP_TRANSLATION_KEYS) {
+    delete result[key];
+  }
+  return result;
+}
 
 type PostControllerCallback = (req: Request, res: Response) => Promise<void> | void;
 type TranslationFn = (req: Request) => StepFormData | Promise<StepFormData>;
@@ -79,7 +95,7 @@ export const createGetController = (
       backUrl: await stepNavigation.getBackUrl(req, stepName),
       ...commonI18nTranslations,
       ...commonContent,
-      ...stepTranslations,
+      ...withoutReservedStepTranslationKeys(stepTranslations),
     };
 
     if (extendContent) {

@@ -8,6 +8,7 @@ import {
   createPostRedirectController,
 } from '@modules/steps/controller';
 import { StepNavigation } from '@modules/steps/flow';
+import { getStepTranslations } from '@modules/steps/i18n';
 
 const mockGetFormData = jest.fn();
 const mockSetFormData = jest.fn();
@@ -30,6 +31,8 @@ jest.mock('@modules/steps/i18n', () => ({
   loadStepNamespace: jest.fn(),
 }));
 
+const mockGetStepTranslations = jest.mocked(getStepTranslations);
+
 const stepNavigation: StepNavigation = {
   getBackUrl: jest.fn(() => Promise.resolve(null)),
   getNextStepUrl: jest.fn(() => Promise.resolve('/next-step')),
@@ -49,6 +52,7 @@ describe('createGetController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockExtendContent.mockReturnValue(mockContent);
+    mockGetStepTranslations.mockReturnValue({});
     mockGetRequestLanguage.mockImplementation((req: Request) => req.language || 'en');
     mockGetTranslationFunction.mockImplementation((req: Request) => {
       // Use req.t if available, otherwise create a mock that returns values different from keys
@@ -116,6 +120,63 @@ describe('createGetController', () => {
         phase: 'ALPHA',
         back: 'Back',
         languageToggle: 'Language toggle',
+      })
+    );
+  });
+
+  it('does not merge reserved step locale keys onto the render context (bundle copy vs validation props)', async () => {
+    mockGetStepTranslations.mockReturnValue({
+      pageTitle: 'Kept from step bundle',
+      subtitle: 'Also kept',
+      errors: {
+        correspondenceAddressConfirm: 'must not leak to locals',
+        'correspondenceAddressConfirm.addressLine1': 'phantom inline',
+      },
+      error: { field: 'x', text: 'must not leak' },
+      fields: [{ name: 'must-not-leak' }],
+      backUrl: '/must-not-override-computed',
+    });
+
+    const mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        serviceName: 'Test Service',
+        phase: 'ALPHA',
+        back: 'Back',
+        languageToggle: 'Language toggle',
+      };
+      return translations[key] || key;
+    }) as unknown as TFunction;
+    const req = {
+      body: {},
+      originalUrl: '/',
+      query: { lang: 'en' },
+      language: 'en',
+      session: { formData: { [stepName]: {} } },
+      t: mockT,
+      i18n: undefined,
+    } as unknown as Request;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { render: jest.fn() } as any;
+
+    mockGetFormData.mockReturnValue({});
+
+    const controller = createGetController(viewPath, stepName, stepNavigation, mockExtendContent);
+    await controller.get(req, res);
+
+    expect(mockExtendContent).toHaveBeenCalledWith(req);
+
+    const renderLocals = res.render.mock.calls[0][1];
+    expect(renderLocals).not.toHaveProperty('errors');
+    expect(renderLocals.error).toBeUndefined();
+    expect(renderLocals).not.toHaveProperty('fields');
+    expect(renderLocals.backUrl).toBe(null);
+
+    expect(renderLocals).toEqual(
+      expect.objectContaining({
+        pageTitle: 'Kept from step bundle',
+        subtitle: 'Also kept',
+        lang: 'en',
+        pageUrl: '/',
       })
     );
   });
