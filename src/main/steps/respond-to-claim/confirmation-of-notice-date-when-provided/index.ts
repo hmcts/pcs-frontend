@@ -15,7 +15,7 @@ const logger = Logger.getLogger('confirmation-of-notice-date-when-provided');
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-date-when-provided',
-  // No isAnswered — date is optional. Excluded from section status counting; shown on CYA per GDS.
+  isAnswered: () => true,
   stepDir: __dirname,
   customTemplate: `${__dirname}/confirmationOfNoticeDateWhenProvided.njk`,
   translationKeys: {

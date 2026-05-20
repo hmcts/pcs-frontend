@@ -7,7 +7,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-date-of-birth',
-  // No isAnswered — DOB is optional. Excluded from section status counting; shown on CYA per GDS.
+  isAnswered: () => true,
   stepDir: __dirname,
   showCancelButton: false,
   beforeRedirect: async req => {

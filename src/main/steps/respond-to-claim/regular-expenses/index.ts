@@ -91,7 +91,7 @@ const regularExpenseKeys = [
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-other-regular-expenses-do-you-have',
-  // No isAnswered — expense breakdown is optional. Excluded from section status counting; shown on CYA per GDS.
+  isAnswered: () => true,
   stepDir: __dirname,
   showCancelButton: false,
   translationKeys: {

@@ -60,7 +60,7 @@ const validateOtherBenefitsAmount = createAmountValidator(
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-regular-income-do-you-receive',
-  // No isAnswered — income breakdown is optional. Excluded from section status counting; shown on CYA per GDS.
+  isAnswered: () => true,
   stepDir: __dirname,
   showCancelButton: false,
 

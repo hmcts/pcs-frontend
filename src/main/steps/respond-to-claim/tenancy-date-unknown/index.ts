@@ -11,7 +11,7 @@ const STEP_NAME = 'tenancy-date-unknown';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  // No isAnswered — date is optional when tenancy start date is unknown. Excluded from section status counting; shown on CYA per GDS.
+  isAnswered: () => true,
   stepDir: __dirname,
   customTemplate: `${__dirname}/tenancyDateUnknown.njk`,
   translationKeys: {
