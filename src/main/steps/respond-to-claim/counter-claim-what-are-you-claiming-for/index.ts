@@ -45,8 +45,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     if (claimType) {
       response.defendantResponses.counterClaim.claimType = claimType;
+      if (claimType === 'SOMETHING_ELSE') {
+        delete response.defendantResponses.counterClaim.isClaimAmountKnown;
+        delete response.defendantResponses.counterClaim.claimAmount;
+        delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
+      }
     } else {
       delete response.defendantResponses.counterClaim.claimType;
+      delete response.defendantResponses.counterClaim.isClaimAmountKnown;
+      delete response.defendantResponses.counterClaim.claimAmount;
+      delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
     }
 
     await saveDraftDefendantResponse(req, response);
