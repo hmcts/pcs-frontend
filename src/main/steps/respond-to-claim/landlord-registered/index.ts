@@ -51,14 +51,4 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       response
     );
   },
-  getInitialFormData: async req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const landlordRegistered = caseData?.possessionClaimResponse?.defendantResponses?.landlordRegistered as
-      | string
-      | undefined;
-
-    return {
-      landlordRegistered,
-    };
-  },
 });
