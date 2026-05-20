@@ -176,14 +176,18 @@ export function registerAllJourneys(app: Application): void {
     const journeyRouter = Router({ mergeParams: true });
 
     const eventId = journey.default.flowConfig.eventId;
+    const basePath = journey.default.flowConfig.basePath;
     if (!eventId) {
       throw new Error(`Journey '${journeyName}' is missing required flowConfig.eventId`);
+    }
+    if (!basePath) {
+      throw new Error(`Journey '${journeyName}' is missing required flowConfig.basePath`);
     }
 
     // Apply journey-specific middleware
     // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
     journeyRouter.param('caseReference', caseReferenceParamMiddleware);
-    journeyRouter.use(requireEventAccess(eventId));
+    journeyRouter.use(basePath, requireEventAccess(eventId));
 
     // Register all steps for this journey on the journey router
     registerSteps(journeyRouter, journeyName);
