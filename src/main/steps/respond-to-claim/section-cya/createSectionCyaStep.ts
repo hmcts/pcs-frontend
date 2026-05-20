@@ -92,17 +92,19 @@ export function createSectionCyaStep({
           }
         }
 
-        if (isSaveForLater) {
-          const dashboardUrl = getDashboardUrl(caseId);
-          return res.redirect(303, dashboardUrl ?? '/');
-        }
-
+        // Hub-first: both S&C and SFL land on the task-list for the citizen variant.
+        // Status differs (Done vs In progress) via the completedSections write above.
         const activeFlow = resolveFlow(req);
         const hub = activeFlow.hubStepName;
         if (hub) {
           return res.redirect(303, getStepUrl(hub, activeFlow, caseId));
         }
 
+        // Legalrep / no-hub fallback — preserves existing behaviour for variants without a task-list.
+        if (isSaveForLater) {
+          const dashboardUrl = getDashboardUrl(caseId);
+          return res.redirect(303, dashboardUrl ?? '/');
+        }
         const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
         if (!redirectPath) {
           return res.status(404).render('not-found');

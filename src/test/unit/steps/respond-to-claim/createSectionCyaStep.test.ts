@@ -34,12 +34,9 @@ describe('createSectionCyaStep postController — hub-and-spoke redirect', () =>
     expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234123412341234/respond-to-claim/task-list');
   });
 
-  it('redirects saveForLater submissions to the dashboard, not the hub', async () => {
+  it('redirects saveForLater submissions to the task-list hub for citizen RTC', async () => {
     const res = mkRes();
     await step.postController!.post(reqWith({ action: 'saveForLater' }), res, jest.fn());
-    const redirectMock = res.redirect as unknown as jest.Mock;
-    const target = redirectMock.mock.calls[0][1] as string;
-    expect(redirectMock).toHaveBeenCalledWith(303, expect.any(String));
-    expect(target).not.toContain('/respond-to-claim/task-list');
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234123412341234/respond-to-claim/task-list');
   });
 });
