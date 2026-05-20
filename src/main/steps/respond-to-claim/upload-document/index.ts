@@ -75,5 +75,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   getInitialFormData: async req => ({ documents: toDisplayDocuments(await storage.read(req)) }),
   // No extendGetContent — formBuilder auto-wires uploadUrl/deleteUrl when documentStorage is set.
-  // No beforeRedirect — documents are saved to CCD via documentProxy on upload/delete (holistic save).
+  // Documents themselves are saved via documentProxy on upload/delete. beforeRedirect here
+  // re-saves the existing state so clearSectionCompletionOnEdit fires — dropping the section
+  // back to In progress when the citizen walks the section after it was Done.
+  beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    await saveDraftDefendantResponse(req, response);
+  },
 });
