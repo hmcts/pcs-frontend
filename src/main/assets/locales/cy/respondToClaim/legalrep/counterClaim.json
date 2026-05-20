@@ -1,0 +1,14 @@
+{
+  "pageTitle": "cyCounterclaim",
+  "whatCounterClaimIsHeading": "",
+  "counterClaimFeesParagraph2": "cyThere will be a link to make a counterclaim once you've submitted the response.",
+  "counterClaimFeesCourtFeesLinkText": "",
+  "question": "cyIs the defendant planning to make a counterclaim against {{claimantName}}?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
+  "errors": {
+    "makeCounterClaim": "cySelect if the defendant is planning to make a counterclaim"
+  }
+}
