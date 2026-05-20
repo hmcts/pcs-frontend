@@ -1,4 +1,5 @@
 {% extends "stepsTemplate.njk" %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
@@ -15,15 +16,7 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {% if heading %}
-     <p class="govuk-heading-m">{{ heading }} </p>
-  {% endif %}
-
   <p class="govuk-body">{{ introText }}</p>
-
-  {% if termsQuestion %}
-     <p class="govuk-heading-s">{{ termsQuestion }} </p>
-  {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
