@@ -68,7 +68,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: doYouWantToUploadDocumentsToSupportYourApplication.yesRadioOption,
     });
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
-    await performAction('uploadFiles', { files: ['genApps.xlsx'] });
+    await performAction('uploadFilesGenApps', { files: ['genApps.xlsx'] });
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
