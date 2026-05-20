@@ -420,6 +420,45 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
+  it('routes counter-claim-have-you-applied-for-help to counter-claim-against-whom when HWF YES, applied YES, and multiple parties', async () => {
+    const req = createReq({
+      data: {
+        possessionClaimResponse: {
+          currentDefendantPartyId: 'def-1',
+          defendantResponses: {
+            counterClaim: { needHelpWithFees: 'YES', appliedForHwf: 'YES' },
+          },
+        },
+        allDefendants: [
+          { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } },
+          { id: 'def-2', value: { firstName: 'Other', lastName: 'Defendant' } },
+        ],
+        allClaimants: [{ id: 'claim-1', value: { orgName: 'Landlord Org' } }],
+      },
+    });
+
+    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
+      'counter-claim-against-whom'
+    );
+  });
+
+  it('routes counter-claim-fee forward to counter-claim-about when needHelpWithFees is NO and not multiple parties', async () => {
+    const req = createReq({
+      data: {
+        possessionClaimResponse: {
+          currentDefendantPartyId: 'def-1',
+          defendantResponses: {
+            counterClaim: { needHelpWithFees: 'NO' },
+          },
+        },
+        allDefendants: [{ id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } }],
+        allClaimants: [{ id: 'claim-1', value: { orgName: 'Landlord Org' } }],
+      },
+    });
+
+    await expect(getNextStep(req, 'counter-claim-fee', flowConfig, {})).resolves.toBe('counter-claim-about');
+  });
+
   it('routes counter-claim HWF step to you-need-to-apply when user has not applied for HWF (NO)', async () => {
     const req = createReq({
       data: {
