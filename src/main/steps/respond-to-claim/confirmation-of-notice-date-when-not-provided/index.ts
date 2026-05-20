@@ -19,7 +19,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     subTitle: 'subTitle',
-    caption: 'caption',
     question: 'question',
     paragraph: 'paragraph',
   },
@@ -90,7 +89,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
 
-    const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-not-provided', ['common']);
+    const t = getTranslationFunction(req);
 
     const paragraph = t('paragraph', { returnObjects: true, claimantName });
 

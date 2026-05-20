@@ -63,7 +63,7 @@ describe('ccdDashboardUtils', () => {
             tasks: [
               {
                 id: 't1',
-                value: { templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' },
+                value: { templateId: 'ViewClaim', status: 'AVAILABLE' },
               },
             ],
           },
@@ -73,7 +73,7 @@ describe('ccdDashboardUtils', () => {
       expect(unwrapTaskGroups(raw)).toEqual([
         {
           groupId: 'CLAIM',
-          tasks: [{ templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' }],
+          tasks: [{ templateId: 'ViewClaim', status: 'AVAILABLE' }],
         },
       ]);
     });

@@ -277,6 +277,55 @@ describe('buildSummaryListRows', () => {
     expect(summaryListRows).toEqual([expected]);
   });
 
+  it('creates summary list row for uploaded documents when user said yes', () => {
+    (mockVisibleFormDataView.getHasSupportingDocuments as jest.Mock).mockReturnValue({
+      stepName: 'has-supporting-documents',
+      fieldValue: 'yes',
+    });
+    (mockVisibleFormDataView.getUploadedDocuments as jest.Mock).mockReturnValue([
+      { id: '1', value: { document: { document_filename: 'first.pdf' } } },
+      { id: '2', value: { document: { document_filename: 'second.pdf' } } },
+    ]);
+
+    const summaryListRows = buildSummaryListRows(req, t);
+
+    const uploadedDocumentsRow = summaryListRows.find(
+      row => row.key.text === 'translation for: answers.uploadedDocuments.label'
+    );
+
+    expect(uploadedDocumentsRow).toEqual({
+      key: { text: 'translation for: answers.uploadedDocuments.label' },
+      value: { html: 'first.pdf<br>second.pdf' },
+      actions: {
+        items: [
+          {
+            href: './upload-documents-to-support-your-application',
+            text: 'translation for: change',
+            visuallyHiddenText: 'translation for: answers.uploadedDocuments.changeHint',
+          },
+        ],
+      },
+    });
+  });
+
+  it('does not create uploaded documents row when user said no', () => {
+    (mockVisibleFormDataView.getHasSupportingDocuments as jest.Mock).mockReturnValue({
+      stepName: 'has-supporting-documents',
+      fieldValue: 'no',
+    });
+    (mockVisibleFormDataView.getUploadedDocuments as jest.Mock).mockReturnValue([
+      { id: '1', value: { document: { document_filename: 'first.pdf' } } },
+    ]);
+
+    const summaryListRows = buildSummaryListRows(req, t);
+
+    const uploadedDocumentsRow = summaryListRows.find(
+      row => row.key.text === 'translation for: answers.uploadedDocuments.label'
+    );
+
+    expect(uploadedDocumentsRow).toBeUndefined();
+  });
+
   it('creates summary list row for reason for which language field', () => {
     (mockVisibleFormDataView.getWhichLanguageField as jest.Mock).mockReturnValue({
       stepName: 'which-language',
@@ -315,6 +364,7 @@ function createMockVisibleFormDataView() {
     getReasonForNotSharingField: jest.fn(),
     getWhatOrderWantedField: jest.fn(),
     getHasSupportingDocuments: jest.fn(),
+    getUploadedDocuments: jest.fn(),
     getWhichLanguageField: jest.fn(),
   };
 }
@@ -330,5 +380,6 @@ function resetMockVisibleFormDataView() {
   (mockVisibleFormDataView.getReasonForNotSharingField as jest.Mock).mockReset();
   (mockVisibleFormDataView.getWhatOrderWantedField as jest.Mock).mockReset();
   (mockVisibleFormDataView.getHasSupportingDocuments as jest.Mock).mockReset();
+  (mockVisibleFormDataView.getUploadedDocuments as jest.Mock).mockReset();
   (mockVisibleFormDataView.getWhichLanguageField as jest.Mock).mockReset();
 }

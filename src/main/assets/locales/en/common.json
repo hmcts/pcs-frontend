@@ -1,5 +1,5 @@
 {
-  "serviceName": "Respond to a property possession claim",
+  "serviceName": "Possession Claims",
   "phase": "ALPHA",
   "feedback": "This is a new service – your <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">feedback (opens in new tab)</a> will help us to improve it.",
   "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link language\">Cymraeg</a>",
@@ -36,10 +36,6 @@
   },
   "change": "Change",
   "back": "Back",
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
   "date": {
     "day": "Day",
     "month": "Month",
@@ -51,7 +47,7 @@
     "required": "Enter a value",
     "defaultRequired": "This field is required",
     "defaultInvalid": "Invalid format",
-    "defaultMaxLength": "Must be {max} characters or fewer",
+    "defaultMaxLength": "Must be {max} characters or less",
     "defaultSpecialCharacter": "{fieldName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
     "chooseOption": "Choose an option",
     "email": {
@@ -76,7 +72,8 @@
     },
     "documentUpload": {
       "wrongFileTypeDocStore": "The selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
-      "fileTooLargeDocStore": "The selected file must be smaller than 1GB",
+      "fileTooLargeDocStore": "The selected file must be smaller than {{maxSize}}MB",
+      "fileTotalTooLargeDocStore": "The total size of all uploaded files must be smaller than {{maxSize}}MB",
       "noFileSelected": "Select a file to upload",
       "uploadFailed": "The file could not be uploaded – try again",
       "fileDeleteFailed": "The file could not be removed – try again",

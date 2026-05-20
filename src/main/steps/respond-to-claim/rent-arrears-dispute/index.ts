@@ -18,7 +18,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'captionHeading',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -70,17 +69,15 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
     const rentArrearsAmount = currency(amountInPounds);
 
-    const t = getTranslationFunction(req, 'rent-arrears-dispute', ['common']);
+    const t = getTranslationFunction(req);
 
     const insetIntroText = t('insetIntroText');
     const insetDetailsText = t('insetDetailsText', { claimantName });
-    const insetConditionalYesText = t('insetConditionalYesText');
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
     return {
       insetIntroText,
       insetDetailsText,
-      insetConditionalYesText,
       amountOwedHeading,
       rentArrearsAmount,
       rentArrearsAmountCorrection,

@@ -12,6 +12,7 @@
 {% endblock %}
 
 {% block mainContent %}
+  {% set fieldErrors = validationErrors or {} %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
@@ -38,7 +39,7 @@
   </div>
 
   <form method="post" action="{{ url }}" novalidate>
-    {% set hasAddressErrors = errors['correspondenceAddressConfirm.addressLine1'] or errors['correspondenceAddressConfirm.townOrCity'] or errors['correspondenceAddressConfirm.postcode'] %}
+    {% set hasAddressErrors = fieldErrors['correspondenceAddressConfirm.addressLine1'] or fieldErrors['correspondenceAddressConfirm.townOrCity'] or fieldErrors['correspondenceAddressConfirm.postcode'] %}
 
     {% set postcodeFinderHtml %}
     <div class="postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
@@ -110,8 +111,8 @@
               autocomplete: 'address-line1',
               value: correspondenceAddressLine1 if correspondenceAddressLine1 else '',
               errorMessage: {
-                text: errors['correspondenceAddressConfirm.addressLine1']
-              } if errors['correspondenceAddressConfirm.addressLine1']
+                text: fieldErrors['correspondenceAddressConfirm.addressLine1']
+              } if fieldErrors['correspondenceAddressConfirm.addressLine1']
             }) }}
 
         {{ govukInput({
@@ -124,8 +125,8 @@
               autocomplete: 'address-line2',
               value: correspondenceAddressLine2 if correspondenceAddressLine2 else '',
               errorMessage: {
-                text: errors['correspondenceAddressConfirm.addressLine2']
-              } if errors['correspondenceAddressConfirm.addressLine2']
+                text: fieldErrors['correspondenceAddressConfirm.addressLine2']
+              } if fieldErrors['correspondenceAddressConfirm.addressLine2']
             }) }}
 
         {{ govukInput({
@@ -138,8 +139,8 @@
               autocomplete: 'address-level2',
               value: correspondenceTownOrCity if correspondenceTownOrCity else '',
               errorMessage: {
-                text: errors['correspondenceAddressConfirm.townOrCity']
-              } if errors['correspondenceAddressConfirm.townOrCity']
+                text: fieldErrors['correspondenceAddressConfirm.townOrCity']
+              } if fieldErrors['correspondenceAddressConfirm.townOrCity']
             }) }}
 
         {{ govukInput({
@@ -151,8 +152,8 @@
               classes: 'govuk-!-width-two-thirds',
               value: correspondenceCounty if correspondenceCounty else '',
               errorMessage: {
-                text: errors['correspondenceAddressConfirm.county']
-              } if errors['correspondenceAddressConfirm.county']
+                text: fieldErrors['correspondenceAddressConfirm.county']
+              } if fieldErrors['correspondenceAddressConfirm.county']
             }) }}
 
         {{ govukInput({
@@ -165,8 +166,8 @@
               autocomplete: 'postal-code',
               value: correspondencePostcode if correspondencePostcode else '',
               errorMessage: {
-                text: errors['correspondenceAddressConfirm.postcode']
-              } if errors['correspondenceAddressConfirm.postcode']
+                text: fieldErrors['correspondenceAddressConfirm.postcode']
+              } if fieldErrors['correspondenceAddressConfirm.postcode']
             }) }}
       </div>
       {% endset %}
@@ -180,7 +181,6 @@
     </div>
     {% endset %}
 
-    <span class="govuk-caption-l">{{ caption or serviceName }}</span>
     {% if isAddressKnown %}
       {% if subtitle %}
         <p class="govuk-body">{{ subtitle }}</p>

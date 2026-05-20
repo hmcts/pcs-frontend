@@ -1,5 +1,18 @@
 export const counterClaimFee = {
   mainHeader: `Counterclaim fee`,
+  helpWithCourtFeesHeader: `Help with court fees`,
+  youMayBeAbleParagraph: `You may be able to get help paying the fee if you (one or more of the following):`,
+  areOnBenefitList: `are on certain benefits`,
+  haveLittleList: `have little or no savings`,
+  haveLowIncomeList: `have low income`,
+  doYouNeedHelpPayingCounterClaimQuestion: `Do you need help paying the counterclaim fee?`,
+  backLink: `Back`,
+  iNeedHelpRadioOption: `I need help paying the fee`,
+  iDoNotNeedHelpRadioOption: `I do not need help paying the fee`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfYouNeedHelpErrorMessage: `Select if you need help paying the counterclaim fee`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `counter-claim-fee`,
 };

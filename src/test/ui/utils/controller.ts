@@ -81,7 +81,7 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-  const testPages = ['start-now', 'choose-an-application'];
+  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload'];
   if (!startAxeAudit && testPages.some(page => currentUrl.includes(page))) {
     startAxeAudit = true;
     startFunctionalTests = true;
@@ -136,6 +136,13 @@ export async function performAction(
   value?: actionData | actionRecord
 ): Promise<void> {
   const executor = getExecutor();
+  if (action === 'reloadPage') {
+    await test.step('reloadPage', async () => {
+      await executor.page.reload({ waitUntil: 'networkidle' });
+    });
+
+    return;
+  }
   await validatePageIfNavigated(action);
   const actionInstance = ActionRegistry.getAction(action);
 

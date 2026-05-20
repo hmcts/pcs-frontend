@@ -22,3 +22,11 @@ export function getStaticBasePath(flowConfigOrResolver: FormBuilderFlowConfig, f
 
   return flowConfigOrResolver.basePath || fallbackBasePath;
 }
+
+export function getStaticEntryStepId(flowConfigOrResolver: FormBuilderFlowConfig): string | undefined {
+  if (typeof flowConfigOrResolver === 'function') {
+    return undefined;
+  }
+
+  return flowConfigOrResolver.entryStepIdAtBasePath;
+}
