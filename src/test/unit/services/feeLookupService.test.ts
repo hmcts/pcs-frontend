@@ -108,8 +108,9 @@ describe('feeLookupService', () => {
       expect(getCounterClaimFeeType('SOMETHING_ELSE')).toEqual(FeeType.counterClaimFlatFeeFEE0450);
     });
 
-    it('returns FEE0514 for amount up to 300', () => {
-      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '30000')).toEqual(FeeType.counterClaimFee0514);
+    it('returns ranged fee type for amount up to 5,000', () => {
+      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '30000')).toEqual(FeeType.counterClaimRanged);
+      expect(getCounterClaimFeeType('BOTH', '500000')).toEqual(FeeType.counterClaimRanged);
     });
 
     it('returns FEE0507 for amount between 10,000.01 and 200,000', () => {

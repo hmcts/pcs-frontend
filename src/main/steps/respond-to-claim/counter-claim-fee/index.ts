@@ -70,7 +70,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const feeType = getCounterClaimFeeType(counterClaim.claimType, claimAmountInPence);
     const directCode = DIRECT_LOOKUP_FEE_CODES[feeType];
-    const counterClaimFee = directCode ? await getFeeDirect(directCode, claimAmountInPence) : await getFee(feeType);
+    const counterClaimFee = directCode
+      ? await getFeeDirect(directCode, claimAmountInPence)
+      : await getFee(feeType, claimAmountInPence);
     return { counterClaimFee };
   },
 });

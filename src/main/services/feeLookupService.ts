@@ -12,21 +12,17 @@ export interface FeeLookupParams {
   channel: string;
   event: string;
   keyword: string;
+  amount_or_volume?: number;
 }
 
 export enum FeeType {
   genAppStandardFee,
   genAppMaxFee,
   counterClaimFlatFeeFEE0450,
+  counterClaimRanged,
   counterClaimFee0506,
   counterClaimFee0507,
   counterClaimFee0508,
-  counterClaimFee0509,
-  counterClaimFee0510,
-  counterClaimFee0511,
-  counterClaimFee0512,
-  counterClaimFee0513,
-  counterClaimFee0514,
 }
 
 export const getCounterClaimFeeType = (claimType?: string, claimAmountInPence?: string): FeeType => {
@@ -45,23 +41,8 @@ export const getCounterClaimFeeType = (claimType?: string, claimAmountInPence?: 
 
   const amountInPounds = amountInPence / 100;
 
-  if (amountInPounds <= 300) {
-    return FeeType.counterClaimFee0514;
-  }
-  if (amountInPounds <= 500) {
-    return FeeType.counterClaimFee0513;
-  }
-  if (amountInPounds <= 1_000) {
-    return FeeType.counterClaimFee0512;
-  }
-  if (amountInPounds <= 1_500) {
-    return FeeType.counterClaimFee0511;
-  }
-  if (amountInPounds <= 3_000) {
-    return FeeType.counterClaimFee0510;
-  }
   if (amountInPounds <= 5_000) {
-    return FeeType.counterClaimFee0509;
+    return FeeType.counterClaimRanged;
   }
   if (amountInPounds <= 10_000) {
     return FeeType.counterClaimFee0508;
@@ -99,16 +80,20 @@ function getFeeLookupParams(feeType: FeeType): FeeLookupParams {
   return config.get<FeeLookupParams>(configPath);
 }
 
-export const getFee = async (feeType: FeeType): Promise<number> => {
-  const feeLookupParams = getFeeLookupParams(feeType);
+export const getFee = async (feeType: FeeType, claimAmountInPence?: string): Promise<number> => {
+  const params: FeeLookupParams = { ...getFeeLookupParams(feeType) };
+
+  if (feeType === FeeType.counterClaimRanged && claimAmountInPence) {
+    params.amount_or_volume = Number(claimAmountInPence) / 100;
+  }
 
   const url = `${getBaseUrl()}/fees-register/fees/lookup`;
 
   try {
-    const response = await axios.get<FeeLookupResponse>(url, { params: feeLookupParams });
+    const response = await axios.get<FeeLookupResponse>(url, { params });
     return response.data.fee_amount;
   } catch (e) {
-    logger.error('Fee lookup request failed', { err: e, url, params: feeLookupParams });
+    logger.error('Fee lookup request failed', { err: e, url, params });
     throw new Error('Error fetching fee');
   }
 };
