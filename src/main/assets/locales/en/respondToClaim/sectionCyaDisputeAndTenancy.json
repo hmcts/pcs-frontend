@@ -8,12 +8,12 @@
   },
   "rows": {
     "landlordRegistered": {
-      "label": "Is your landlord registered with Rent Smart Wales?",
-      "changeHidden": "whether your landlord is registered with Rent Smart Wales"
+      "label": "Is your landlord registered?",
+      "changeHidden": "whether your landlord is registered"
     },
     "landlordLicensed": {
-      "label": "Does your landlord have a Rent Smart Wales licence?",
-      "changeHidden": "whether your landlord has a Rent Smart Wales licence"
+      "label": "Is your landlord licensed?",
+      "changeHidden": "whether your landlord is licensed"
     },
     "writtenTerms": {
       "label": "Did you have a written tenancy agreement?",
