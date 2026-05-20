@@ -12931,13 +12931,13 @@ __metadata:
   linkType: hard
 
 "saucectl@npm:^0.205.0":
-  version: 0.205.1
-  resolution: "saucectl@npm:0.205.1"
+  version: 0.205.2
+  resolution: "saucectl@npm:0.205.2"
   dependencies:
     "@saucelabs/bin-wrapper": "npm:^2.1.0"
   bin:
     saucectl: index.js
-  checksum: 10/48784bdeb4fccdfcd6a392dcf8b415a347c81b4e1c88885e814221f06bac1aac0fbd1630207ed214cee8f6e6951318fd6b8e5996d5edc88849708f0118c36178
+  checksum: 10/c44dc0f4b549dc42d5733ae09330da031f399cb61806ba6ea1dbd6715c0dedd85ead7c839dec15244a0c7a5e7d8e989f179f2c7cccd8d93d06689bde0dfa5c11
   languageName: node
   linkType: hard
 
