@@ -48,7 +48,7 @@ export function createSectionCyaStep({
     getController: () =>
       createGetController(VIEW, stepName, stepNavigation, async (req: Request) => {
         const caseRef = req.res?.locals.validatedCase?.id;
-        const t: TFunction = getTranslationFunction(req, ['common']);
+        const t: TFunction = getTranslationFunction(req);
 
         return {
           summaryData: {
