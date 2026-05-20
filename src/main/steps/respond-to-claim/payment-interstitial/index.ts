@@ -11,7 +11,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
     paragraph2: 'paragraph2',
     paragraph3: 'paragraph3',
     paragraph4: 'paragraph4',
@@ -21,7 +20,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   fields: [],
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
-    const t = getTranslationFunction(req, 'payment-interstitial', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       paragraph1: t('paragraph1', { claimantName }),

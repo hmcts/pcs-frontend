@@ -11,7 +11,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
   },
   fields: [
     {
@@ -48,7 +47,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   customTemplate: `${__dirname}/currentCircumstances.njk`,
   extendGetContent: req => {
-    const t = getTranslationFunction(req, 'your-circumstances', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       introParagraph: t('introParagraph'),

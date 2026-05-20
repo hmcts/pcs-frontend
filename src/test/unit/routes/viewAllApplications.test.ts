@@ -1,5 +1,7 @@
 import type { Application, Request, Response } from 'express';
 
+import { VIEW_ALL_APPLICATIONS_ROUTE } from '../../../main/constants/caseRoutes';
+
 import viewAllApplicationsRoute from '@routes/viewAllApplications';
 
 jest.mock('../../../main/middleware', () => ({
@@ -22,11 +24,7 @@ describe('viewAllApplications route', () => {
   it('should register GET /case/:caseReference/view-all-applications with oidc middleware', () => {
     viewAllApplicationsRoute(app);
 
-    expect(app.get).toHaveBeenCalledWith(
-      '/case/:caseReference/view-all-applications',
-      expect.any(Function),
-      expect.any(Function)
-    );
+    expect(app.get).toHaveBeenCalledWith(VIEW_ALL_APPLICATIONS_ROUTE, expect.any(Function), expect.any(Function));
   });
 
   it('should render the view-all-applications template', () => {
@@ -37,6 +35,6 @@ describe('viewAllApplications route', () => {
 
     handler({} as Request, res);
 
-    expect(res.render).toHaveBeenCalledWith('view-all-applications');
+    expect(res.render).toHaveBeenCalledWith('view-all-applications', { dashboardUrl: null });
   });
 });

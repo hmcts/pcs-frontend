@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/upload-additional-documents/flow.config';
+import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from './respond-to-claim/draftEvent';
@@ -10,6 +12,7 @@ import { getUserType } from './utils';
 
 import type { CcdDraftEvent } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
+import { getStepOrder } from '@modules/steps/flow';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
@@ -58,6 +61,14 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     default: {
       flowConfig: makeAnApplicationFlowConfig,
       stepRegistry: makeAnApplicationStepRegistry,
+    },
+  },
+  uploadAdditionalDocuments: {
+    name: 'uploadAdditionalDocuments',
+    slug: 'upload-additional-documents',
+    default: {
+      flowConfig: uploadAdditionalDocumentsFlowConfig,
+      stepRegistry: uploadAdditionalDocumentsStepRegistry,
     },
   },
 };
@@ -110,9 +121,9 @@ function getJourneyConfigForRequest(journeyName: string, req?: Request): Resolve
 
 function getRegistrationStepNames(journey: JourneyConfig): string[] {
   const stepNames = new Set<string>([
-    ...journey.default.flowConfig.stepOrder,
+    ...getStepOrder(journey.default.flowConfig),
     ...Object.keys(journey.default.stepRegistry),
-    ...(journey.legalrep?.flowConfig.stepOrder ?? []),
+    ...(journey.legalrep ? getStepOrder(journey.legalrep.flowConfig) : []),
     ...Object.keys(journey.legalrep?.stepRegistry ?? {}),
   ]);
 
@@ -135,7 +146,7 @@ export function getStepsForJourney(journeyName: string, req?: Request): StepDefi
   }
 
   const activeJourney = getJourneyConfigForRequest(journeyName, req);
-  const stepNames = req && activeJourney ? activeJourney.flowConfig.stepOrder : getRegistrationStepNames(journey);
+  const stepNames = req && activeJourney ? getStepOrder(activeJourney.flowConfig) : getRegistrationStepNames(journey);
 
   return stepNames
     .map(stepName => {

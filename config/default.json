@@ -64,6 +64,54 @@
         "channel": "default",
         "event": "issue",
         "keyword": "AnyOtherRemedy"
+      },
+      "counterClaimFee0509": {
+        "service": "civil money claims",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "civil",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "CMCCounterUpTo5k"
+      },
+      "counterClaimFee0510": {
+        "service": "civil money claims",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "civil",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "CMCCounterUpTo3K"
+      },
+      "counterClaimFee0511": {
+        "service": "civil money claims",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "civil",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "CMCCounterUpTo1500"
+      },
+      "counterClaimFee0512": {
+        "service": "civil money claims",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "civil",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "CMCCounterUpTo1000"
+      },
+      "counterClaimFee0513": {
+        "service": "civil money claims",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "civil",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "CMCCounterUpTo500"
+      },
+      "counterClaimFee0514": {
+        "service": "civil money claims",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "civil",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "CMCCounterUpTo300"
       }
     }
   },
@@ -109,17 +157,7 @@
     "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
   },
   "documentUpload": {
-    "maxFileSizeMB": 1024
-  },
-  "dashboard": {
-    "taskRoutes": {
-      "ViewClaim": "/case/:caseReference/view-the-claim",
-      "RespondToClaim": "/case/:caseReference/respond-to-claim/start-now",
-      "MakeGeneralApplication": "/case/:caseReference/make-an-application/choose-an-application",
-      "ViewAllApplications": "/case/:caseReference/view-all-applications",
-      "ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
-      "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
-      "ViewDocuments": "/case/:caseReference/view-documents"
-    }
+    "maxFileSizePerFileMB": 100,
+    "maxTotalFileSizeMB": 1024
   }
 }

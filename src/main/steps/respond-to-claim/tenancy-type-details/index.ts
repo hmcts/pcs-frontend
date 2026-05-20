@@ -67,7 +67,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
     heading: 'heading',
     insetText: 'insetText',
     saveAndContinue: 'saveAndContinue',
@@ -152,7 +151,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         ? `${formContent.detailsHeading}${orgName}${':'}`
         : formContent.detailsHeading;
 
-    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+    const t = getTranslationFunction(req);
     let tenancyType: unknown;
     if (walesProperty) {
       if (occupationLicenceTypeWales === 'OTHER') {
