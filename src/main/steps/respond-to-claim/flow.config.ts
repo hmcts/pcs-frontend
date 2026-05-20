@@ -39,7 +39,8 @@ export const flowConfig: JourneyFlowConfig = {
   nonSectionStepOrder: ['end-now'],
   steps: {
     'ask-your-solicitor-to-respond-to-the-claim': {
-      showCondition: (req: Request) => req.body?.hasSolicitor === 'YES',
+      showCondition: (req: Request) =>
+        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',
     },
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
