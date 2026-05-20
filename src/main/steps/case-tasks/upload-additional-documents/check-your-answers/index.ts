@@ -13,7 +13,7 @@ const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'check-your-answers';
 const templatePath = 'case-tasks/upload-additional-documents/check-your-answers/checkYourAnswers.njk';
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
-const uploadStorage = sessionDocs({ stepName: uploadYourDocumentsStep, fieldName: 'documents' });
+const uploadStorage = sessionDocs({ stepName: uploadYourDocumentsStep });
 
 export const step: StepDefinition = {
   url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
