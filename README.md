@@ -1,4 +1,4 @@
-# pcs-frontend
+# pcs-frontend - hdpi 6272
 
 ## Getting Started
 
