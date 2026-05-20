@@ -220,49 +220,4 @@ describe('getSectionStatus', () => {
       expect(status).toBe('DONE');
     });
   });
-
-  describe('section with no countable question steps but a CYA (uploadFiles shape)', () => {
-    const reqWithCompleted = (ids: string[]): Request =>
-      ({
-        res: {
-          locals: {
-            validatedCase: { possessionClaimResponse: { defendantResponses: { completedSections: ids } } },
-          },
-        },
-      }) as unknown as Request;
-
-    const reviewOnlySection = () =>
-      section({
-        id: 'uploadFiles',
-        steps: ['upload-document', 'support-needs', 'check-your-answers-documents'],
-      });
-
-    const reviewOnlyRegistry = () => ({
-      'upload-document': { ...stub(), isAnswered: undefined },
-      'support-needs': { ...stub(), isAnswered: undefined },
-      'check-your-answers-documents': { ...stub(), isAnswered: undefined },
-    });
-
-    it('returns AVAILABLE when the citizen has not yet confirmed via CYA', async () => {
-      const status = await getSectionStatus(
-        reviewOnlySection(),
-        flow(),
-        reviewOnlyRegistry(),
-        reqWithCompleted([]),
-        new Map()
-      );
-      expect(status).toBe('AVAILABLE');
-    });
-
-    it('returns DONE once the section enum is in completedSections (CYA Save and continue)', async () => {
-      const status = await getSectionStatus(
-        reviewOnlySection(),
-        flow(),
-        reviewOnlyRegistry(),
-        reqWithCompleted(['UPLOAD_FILES']),
-        new Map()
-      );
-      expect(status).toBe('DONE');
-    });
-  });
 });

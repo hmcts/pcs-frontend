@@ -68,12 +68,6 @@ export async function getSectionStatus(
 
   const questionSteps = visibleQuestionSteps(section, stepRegistry, flowConfig, req);
   if (questionSteps.length === 0) {
-    // No countable question steps. If the section has a CYA the citizen still has to walk to,
-    // status is gated purely on completedSections — they reach Done by visiting the CYA and
-    // clicking Save and continue, with nothing to fill in beforehand.
-    if (sectionHasCya(section)) {
-      return userHasCompletedSectionViaCya(section, req) ? 'DONE' : 'AVAILABLE';
-    }
     return 'NOT_APPLICABLE';
   }
 
