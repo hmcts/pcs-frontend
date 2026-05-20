@@ -215,6 +215,18 @@ function addCounterClaimDetailsRows(ctx: RowContext): void {
   const cc = ctx.responses.counterClaim;
   addCounterClaimTypeRow(ctx, cc);
   addCounterClaimAmountRow(ctx, cc);
+  addCounterClaimNeedHelpWithFeesRow(ctx, cc);
+}
+
+function addCounterClaimNeedHelpWithFeesRow({ rows, t, change, yesNoNotSure }: RowContext, cc: CcdCounterClaim): void {
+  if (!cc.needHelpWithFees) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.counterClaimNeedHelpWithFees.label') },
+    value: { text: yesNoNotSure(cc.needHelpWithFees) },
+    actions: { items: [change('counter-claim-fee', 'rows.counterClaimNeedHelpWithFees.changeHidden')] },
+  });
 }
 
 function addCounterClaimTypeRow({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
