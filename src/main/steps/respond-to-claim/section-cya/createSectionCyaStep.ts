@@ -52,7 +52,7 @@ export function createSectionCyaStep({
         stepNavigation,
         async (req: Request) => {
           const caseRef = req.res?.locals.validatedCase?.id;
-          const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+          const t: TFunction = getTranslationFunction(req);
 
           return {
             summaryData: {
