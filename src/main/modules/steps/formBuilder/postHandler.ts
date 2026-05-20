@@ -58,9 +58,9 @@ export function createPostHandler(
 
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
-      await loadStepNamespace(req, stepName, journeyFolder);
+      await loadStepNamespace(req);
 
-      const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+      const t: TFunction = getTranslationFunction(req);
       const action = req.body.action as string | undefined;
 
       const nunjucksEnv = req.app.locals.nunjucksEnv;

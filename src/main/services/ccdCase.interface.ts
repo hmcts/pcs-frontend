@@ -358,6 +358,8 @@ export interface CitizenGenAppRequest {
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
   whatOrderWanted?: string;
+  hasSupportingDocuments?: YesNoValue;
+  uploadedDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   sotAccepted?: YesNoValue;
   sotFullName?: string;
   clientReference?: string;
