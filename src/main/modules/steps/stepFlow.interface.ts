@@ -56,6 +56,7 @@ export interface JourneyFlowConfig {
   journeyName?: string;
   useShowConditions?: boolean;
   useSessionFormData?: boolean;
+  entryStepIdAtBasePath?: string;
   stepOrder?: readonly string[];
   nonSectionStepOrder?: readonly string[];
   steps: Record<string, StepConfig>;

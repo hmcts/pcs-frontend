@@ -8,12 +8,12 @@
   },
   "rows": {
     "landlordRegistered": {
-      "label": "cy Is your landlord registered with Rent Smart Wales?",
-      "changeHidden": "cy whether your landlord is registered with Rent Smart Wales"
+      "label": "cy Is your landlord registered?",
+      "changeHidden": "cy whether your landlord is registered"
     },
     "landlordLicensed": {
-      "label": "cy Does your landlord have a Rent Smart Wales licence?",
-      "changeHidden": "cy whether your landlord has a Rent Smart Wales licence"
+      "label": "cy Is your landlord licensed?",
+      "changeHidden": "cy whether your landlord is licensed"
     },
     "writtenTerms": {
       "label": "cy Did you have a written tenancy agreement?",
@@ -72,6 +72,10 @@
       "label": "cy How much are you counterclaiming?",
       "changeHidden": "cy how much you are counterclaiming",
       "estimatedMaxPrefix": "cy Estimated maximum:"
+    },
+    "counterClaimNeedHelpWithFees": {
+      "label": "cy Do you need help paying the counterclaim fee?",
+      "changeHidden": "cy whether you need help paying the counterclaim fee"
     }
   }
 }

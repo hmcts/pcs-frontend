@@ -13,9 +13,18 @@ import { Logger } from '@modules/logger';
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 import type { CdamDocument } from '@services/documentUpload.interface';
-import { UPLOAD_MAX_FILE_SIZE_BYTES, validateFileType } from '@utils/documentUploadValidation';
+import {
+  UPLOAD_MAX_FILE_SIZE_BYTES,
+  UPLOAD_MAX_FILE_SIZE_MB,
+  UPLOAD_MAX_TOTAL_SIZE_BYTES,
+  UPLOAD_MAX_TOTAL_SIZE_MB,
+  validateFileType,
+} from '@utils/documentUploadValidation';
 
 const logger = Logger.getLogger('document-proxy');
+
+/** Thrown from saveDraftWithNewDocument when total draft size would exceed the cap (CDAM doc is deleted first). */
+const DOCUMENT_TOTAL_SIZE_EXCEEDED = 'DOCUMENT_TOTAL_SIZE_EXCEEDED';
 
 export function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
   const result = validateFileType(file.mimetype, file.originalname);
@@ -37,7 +46,10 @@ function getErrorTranslations(req: Request) {
   const t = req.t;
   return {
     wrongType: t('errors.documentUpload.wrongFileTypeDocStore'),
-    tooLarge: t('errors.documentUpload.fileTooLargeDocStore'),
+    tooLarge: t('errors.documentUpload.fileTooLargeDocStore', { maxSize: String(UPLOAD_MAX_FILE_SIZE_MB) }),
+    totalTooLarge: t('errors.documentUpload.fileTotalTooLargeDocStore', {
+      maxSize: String(UPLOAD_MAX_TOTAL_SIZE_MB),
+    }),
     noFile: t('errors.documentUpload.noFileSelected'),
     uploadFailed: t('errors.documentUpload.uploadFailed'),
     deleteFailed: t('errors.documentUpload.fileDeleteFailed'),
@@ -45,6 +57,10 @@ function getErrorTranslations(req: Request) {
     downloadFailed: t('errors.documentUpload.downloadFailed'),
     uploadSuccess: (filename: string) => t('errors.documentUpload.uploadSuccess', { filename }),
   };
+}
+
+function getTotalDocumentSizeBytes(docs: CcdCollectionItem<CcdUploadedDocument>[]): number {
+  return docs.reduce((total, doc) => total + (doc.value.sizeInBytes || 0), 0);
 }
 
 export function handleMulterError(
@@ -106,9 +122,21 @@ async function withCaseLock<T>(caseId: string, fn: () => Promise<T>): Promise<T>
 async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<CcdUploadedDocument>): Promise<number> {
   const caseId = req.params.caseReference as string;
   const { storage } = uploadCtx(req);
+  const token = getUserToken(req);
 
   return withCaseLock(caseId, async () => {
     const existing = await storage.readFresh(req);
+    const newTotalSize = getTotalDocumentSizeBytes(existing) + (entry.value.sizeInBytes ?? 0);
+    if (newTotalSize > UPLOAD_MAX_TOTAL_SIZE_BYTES) {
+      try {
+        await deleteDocument(entry.value.document.document_url, token);
+      } catch (deleteErr) {
+        logger.error('Failed to delete CDAM document after total-size cap rejection', {
+          error: deleteErr instanceof Error ? deleteErr.message : String(deleteErr),
+        });
+      }
+      throw new HTTPError(DOCUMENT_TOTAL_SIZE_EXCEEDED, 400);
+    }
     const updated = [...existing, entry];
     await storage.save(req, updated);
     return updated.length - 1;
@@ -132,12 +160,12 @@ async function removeDraftDocument(req: Request, docId: string): Promise<'remove
   });
 }
 
-function toCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocument> {
-  // Generate the collection-item id on the frontend. CCD treats collection items
-  // with stable ids as "existing" (preserved across draft round-trips); items
-  // without ids are treated as new each round-trip and can be lost/duplicated by
-  // the backend's merge logic. This matches the original fileUpload.ts behaviour
-  // that was dropped during the BFF proxy refactor.
+// Generate the collection-item id on the frontend. CCD treats collection items
+// with stable ids as "existing" (preserved across draft round-trips); items
+// without ids are treated as new each round-trip and can be lost/duplicated by
+// the backend's merge logic. This matches the original fileUpload.ts behaviour
+// that was dropped during the BFF proxy refactor.
+function cdamToCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploadedDocument> {
   return {
     id: randomUUID(),
     value: {
@@ -259,13 +287,17 @@ export default function documentProxyRoutes(app: Application): void {
           return res.status(400).json({ error: { message: errors.noFile } });
         }
 
+        uploadCtx(req);
         const cdamDoc = await uploadDocument(req.file, getUserToken(req));
-        const entry = toCcdDocument(cdamDoc);
+        const entry = cdamToCcdDocument(cdamDoc);
         const index = await saveDraftWithNewDocument(req, entry);
         return res.json(buildUploadResponse(errors, cdamDoc, entry.id as string, index));
       } catch (error) {
         if (error instanceof HTTPError && error.status === 404) {
           return res.status(404).json({ error: { message: errors.documentNotFound } });
+        }
+        if (error instanceof HTTPError && error.status === 400 && error.message === DOCUMENT_TOTAL_SIZE_EXCEEDED) {
+          return res.status(400).json({ error: { message: errors.totalTooLarge } });
         }
         logger.error('Failed to upload document to CDAM', {
           error: error instanceof Error ? error.message : String(error),

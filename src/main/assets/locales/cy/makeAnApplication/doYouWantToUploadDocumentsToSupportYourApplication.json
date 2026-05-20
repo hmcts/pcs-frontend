@@ -1,9 +1,10 @@
 {
   "pageTitle": "cyDo you want to upload documents to support your application?",
   "caption": "cyMake an application",
-  "heading": "cyDo you want to upload documents to support your application?",
+  "heading": "cyDo you want to upload documents to support your application? (Optional)",
   "question": "cyDo you want to upload documents to support your application?",
+  "multipleApplicationsText": "cyIf you have selected multiple applications, you should upload documents that relate to all of them.",
   "errors": {
-    "typeOfApplication": "cyYou must select whether you want to upload documents to support your application"
+    "uploadDocuments": "cyConfirm if you want to upload documents to support your application"
   }
 }

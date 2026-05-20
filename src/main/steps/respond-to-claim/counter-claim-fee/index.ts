@@ -3,7 +3,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
-import { DIRECT_LOOKUP_FEE_CODES, getCounterClaimFeeType, getFee, getFeeDirect } from '@services/feeLookupService';
+import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-fee',
@@ -69,8 +69,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     const feeType = getCounterClaimFeeType(counterClaim.claimType, claimAmountInPence);
-    const directCode = DIRECT_LOOKUP_FEE_CODES[feeType];
-    const counterClaimFee = directCode ? await getFeeDirect(directCode, claimAmountInPence) : await getFee(feeType);
+    const counterClaimFee = await getFee(feeType, claimAmountInPence);
     return { counterClaimFee };
   },
 });

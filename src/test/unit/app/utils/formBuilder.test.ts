@@ -52,7 +52,6 @@ jest.mock('@modules/steps/i18n', () => ({
   getValidatedLanguage: (...args: unknown[]) => mockGetValidatedLanguage(...args),
   getRequestLanguage: (...args: unknown[]) => mockGetRequestLanguage(...args),
   getTranslationFunction: (...args: unknown[]) => mockGetTranslationFunction(...args),
-  getStepNamespace: jest.fn((stepName: string) => stepName),
   loadStepNamespace: jest.fn(),
   getStepTranslations: jest.fn(() => ({})),
 }));

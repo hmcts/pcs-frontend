@@ -7,7 +7,7 @@ import { createGetController } from '../controller';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
-import { getStaticBasePath, resolveFormBuilderFlowConfig } from './flowConfig';
+import { getStaticBasePath, getStaticEntryStepId, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
@@ -68,10 +68,11 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = getStaticBasePath(flowConfig, configuredBasePath || `/steps/${journeyPath}`);
-  const stepNavigation = createStepNavigation(req => resolveFormBuilderFlowConfig(req, flowConfig));
+  const stepNavigation = createStepNavigation(flowConfig);
+  const stepUrl = getStaticEntryStepId(flowConfig) === stepName ? basePath : path.join(basePath, stepName);
 
   return {
-    url: path.join(basePath, stepName),
+    url: stepUrl,
     name: stepName,
     view: viewPath,
     stepDir,
@@ -80,9 +81,9 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     isAnswered,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
-        await loadStepNamespace(req, stepName, journeyFolder);
+        await loadStepNamespace(req);
 
-        const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+        const t: TFunction = getTranslationFunction(req);
 
         const nunjucksEnv = req.app.locals.nunjucksEnv;
         if (!nunjucksEnv) {
@@ -120,6 +121,9 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
 
         const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
         const result = extraContent ? { ...formContent, ...extraContent } : formContent;
+        const navigationBackUrl = await stepNavigation.getBackUrl(req, stepName);
+        const resultProps = result as Record<string, unknown>;
+        const backUrl = typeof resultProps.backUrl === 'string' ? resultProps.backUrl : navigationBackUrl;
         return {
           ...result,
           ccdId: req.res?.locals.validatedCase?.id,
@@ -128,7 +132,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),
-          backUrl: await stepNavigation.getBackUrl(req, stepName),
+          backUrl,
           showCancelButton,
           url: req.originalUrl, // Form action URL - POST to current page
         };

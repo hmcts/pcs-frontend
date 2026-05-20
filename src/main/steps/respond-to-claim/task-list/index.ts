@@ -19,7 +19,6 @@ import { getAllSectionStatuses, getFirstVisibleStep, getStatusTagClasses } from 
 import { getUserVariant } from '@steps';
 
 const stepName = 'task-list';
-const journeyName = 'respondToClaim';
 const VIEW = 'respond-to-claim/task-list/taskList.njk';
 
 const stepNavigation = createStepNavigation(() => flowConfig);
@@ -52,49 +51,43 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   middleware: [redirectLegalrepToDashboard],
   getController: () =>
-    createGetController(
-      VIEW,
-      stepName,
-      stepNavigation,
-      async (req: Request) => {
-        const validatedCase = req.res?.locals.validatedCase;
-        const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+    createGetController(VIEW, stepName, stepNavigation, async (req: Request) => {
+      const validatedCase = req.res?.locals.validatedCase;
+      const t: TFunction = getTranslationFunction(req);
 
-        const allStatuses = await getAllSectionStatuses(flowConfig, stepRegistry, req);
-        const groups = buildGroups(validatedCase, allStatuses, t, req);
+      const allStatuses = await getAllSectionStatuses(flowConfig, stepRegistry, req);
+      const groups = buildGroups(validatedCase, allStatuses, t, req);
 
-        const caseId = validatedCase?.id;
-        return {
-          backUrl: getDashboardUrl(caseId) ?? '/',
-          propertyAddress: formatCcdAddress(validatedCase?.propertyAddress),
-          caseNumber: formatCaseNumber(caseId),
-          groups,
-          iWantToLinks: [
-            {
-              key: 'iWantTo.makeApplication',
-              href: caseId ? `/case/${caseId}/make-an-application/choose-an-application` : '#',
-            },
-            {
-              key: 'iWantTo.breathingSpace',
-              href: 'https://www.gov.uk/options-for-dealing-with-your-debts/breathing-space',
-            },
-            { key: 'iWantTo.legalAdviser', href: 'https://www.gov.uk/find-legal-advice' },
-          ],
-          helpSupportLinks: [
-            { key: 'helpSupport.fees', href: 'https://www.gov.uk/get-help-with-court-fees' },
-            { key: 'helpSupport.mediation', href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation' },
-            {
-              key: 'helpSupport.hearing',
-              href: 'https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal',
-            },
-            { key: 'helpSupport.representYourself', href: 'https://www.gov.uk/represent-yourself-in-court' },
-            { key: 'helpSupport.findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
-            { key: 'helpSupport.findCourt', href: 'https://www.gov.uk/find-court-tribunal' },
-          ],
-        };
-      },
-      journeyName
-    ),
+      const caseId = validatedCase?.id;
+      return {
+        backUrl: getDashboardUrl(caseId) ?? '/',
+        propertyAddress: formatCcdAddress(validatedCase?.propertyAddress),
+        caseNumber: formatCaseNumber(caseId),
+        groups,
+        iWantToLinks: [
+          {
+            key: 'iWantTo.makeApplication',
+            href: caseId ? `/case/${caseId}/make-an-application/choose-an-application` : '#',
+          },
+          {
+            key: 'iWantTo.breathingSpace',
+            href: 'https://www.gov.uk/options-for-dealing-with-your-debts/breathing-space',
+          },
+          { key: 'iWantTo.legalAdviser', href: 'https://www.gov.uk/find-legal-advice' },
+        ],
+        helpSupportLinks: [
+          { key: 'helpSupport.fees', href: 'https://www.gov.uk/get-help-with-court-fees' },
+          { key: 'helpSupport.mediation', href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation' },
+          {
+            key: 'helpSupport.hearing',
+            href: 'https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal',
+          },
+          { key: 'helpSupport.representYourself', href: 'https://www.gov.uk/represent-yourself-in-court' },
+          { key: 'helpSupport.findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
+          { key: 'helpSupport.findCourt', href: 'https://www.gov.uk/find-court-tribunal' },
+        ],
+      };
+    }),
 };
 
 function buildGroups(

@@ -55,10 +55,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const makeCounterClaim = req.body?.makeCounterClaim as YesNoValue | undefined;
     const response = buildDraftDefendantResponse(req);
 
-    if (makeCounterClaim) {
-      response.defendantResponses.makeCounterClaim = makeCounterClaim;
+    if (makeCounterClaim === 'YES') {
+      response.defendantResponses.makeCounterClaim = 'YES';
+    } else if (makeCounterClaim === 'NO') {
+      response.defendantResponses.makeCounterClaim = 'NO';
+      delete response.defendantResponses.counterClaim;
     } else {
       delete response.defendantResponses.makeCounterClaim;
+      delete response.defendantResponses.counterClaim;
     }
 
     await saveDraftDefendantResponse(req, response);

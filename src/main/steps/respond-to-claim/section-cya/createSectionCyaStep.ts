@@ -50,25 +50,19 @@ export function createSectionCyaStep({
     view: VIEW,
     stepDir,
     getController: () =>
-      createGetController(
-        VIEW,
-        stepName,
-        stepNavigation,
-        async (req: Request) => {
-          const caseRef = req.res?.locals.validatedCase?.id;
-          const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+      createGetController(VIEW, stepName, stepNavigation, async (req: Request) => {
+        const caseRef = req.res?.locals.validatedCase?.id;
+        const t: TFunction = getTranslationFunction(req);
 
-          return {
-            summaryData: {
-              card: { title: { text: t(cardTitleKey) } },
-              rows: buildRows(req, t),
-            },
-            formAction: `/case/${caseRef}/respond-to-claim/${stepName}`,
-            backUrl: await stepNavigation.getBackUrl(req, stepName),
-          };
-        },
-        journeyName
-      ),
+        return {
+          summaryData: {
+            card: { title: { text: t(cardTitleKey) } },
+            rows: buildRows(req, t),
+          },
+          formAction: `/case/${caseRef}/respond-to-claim/${stepName}`,
+          backUrl: await stepNavigation.getBackUrl(req, stepName),
+        };
+      }),
     postController: {
       post: async (req: Request, res: Response, next: NextFunction) => {
         const action = req.body?.action;
