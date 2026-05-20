@@ -123,8 +123,8 @@ describe('steps/i18n', () => {
 
       await loadStepNamespace(req, 'test-step', 'testFolder');
 
-      expect(addResourceBundle).toHaveBeenCalledWith('en', 'testStep', mockTranslations, true, true);
-      expect(loadNamespaces).toHaveBeenCalledWith('testStep', expect.any(Function));
+      expect(addResourceBundle).toHaveBeenCalledWith('en', 'testFolder/testStep', mockTranslations, true, true);
+      expect(loadNamespaces).toHaveBeenCalledWith('testFolder/testStep', expect.any(Function));
     });
 
     it('should merge legalrep translations over default translations', async () => {
@@ -155,7 +155,7 @@ describe('steps/i18n', () => {
 
       expect(addResourceBundle).toHaveBeenCalledWith(
         'en',
-        'testStep',
+        'testFolder/legalrep/testStep',
         {
           title: 'Professional title',
           nested: {
@@ -256,7 +256,7 @@ describe('steps/i18n', () => {
   describe('getStepTranslations', () => {
     it('should return empty object if req.i18n is missing', () => {
       const req = {} as Request;
-      const result = getStepTranslations(req, 'test-step');
+      const result = getStepTranslations(req, 'test-step', 'folder');
       expect(result).toEqual({});
     });
 
@@ -269,9 +269,9 @@ describe('steps/i18n', () => {
         i18n: { getResourceBundle },
       } as any;
 
-      const result = getStepTranslations(req, 'test-step');
+      const result = getStepTranslations(req, 'test-step', 'folder');
 
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'testStep');
+      expect(getResourceBundle).toHaveBeenCalledWith('en', 'folder/testStep');
       expect(result).toEqual(mockTranslations);
     });
 
@@ -283,7 +283,7 @@ describe('steps/i18n', () => {
         i18n: { getResourceBundle },
       } as any;
 
-      const result = getStepTranslations(req, 'test-step');
+      const result = getStepTranslations(req, 'test-step', 'folder');
 
       expect(result).toEqual({});
     });
@@ -295,7 +295,7 @@ describe('steps/i18n', () => {
       (mainI18n.getTranslationFunction as jest.Mock).mockReturnValue(mockT);
 
       const req = {} as Request;
-      const result = getTranslationFunction(req);
+      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
 
       expect(mainI18n.getTranslationFunction).toHaveBeenCalledWith(req, ['common']);
       expect(result).toBe(mockT);
@@ -310,9 +310,25 @@ describe('steps/i18n', () => {
         i18n: { getFixedT },
       } as any;
 
-      const result = getTranslationFunction(req, 'test-step');
+      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
 
-      expect(getFixedT).toHaveBeenCalledWith('en', ['testStep', 'common']);
+      expect(getFixedT).toHaveBeenCalledWith('en', ['testFolder/testStep', 'common']);
+      expect(result).toBe(mockFixedT);
+    });
+
+    it('should return fixedT with legalrep namespace when user is legalrep', () => {
+      const mockFixedT = jest.fn();
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+      mockGetUserType.mockReturnValue('legalrep');
+
+      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
+      const req = {
+        i18n: { getFixedT },
+      } as any;
+
+      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
+
+      expect(getFixedT).toHaveBeenCalledWith('en', ['testFolder/legalrep/testStep', 'common']);
       expect(result).toBe(mockFixedT);
     });
 
@@ -326,10 +342,27 @@ describe('steps/i18n', () => {
         i18n: { getFixedT },
       } as any;
 
-      const result = getTranslationFunction(req, 'test-step');
+      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
 
       expect(mainI18n.getTranslationFunction).toHaveBeenCalledWith(req, ['common']);
       expect(result).toBe(mockT);
+    });
+  });
+
+  describe('getTranslationFunction with step context', () => {
+    it('should use step namespace from req.res.locals.step when journeyFolder is not passed', () => {
+      const mockFixedT = jest.fn();
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
+      const req = {
+        i18n: { getFixedT },
+        res: { locals: { step: { journey: 'testFolder' } } },
+      } as any;
+
+      const result = getTranslationFunction(req, 'test-step');
+
+      expect(getFixedT).toHaveBeenCalledWith('en', ['testFolder/testStep', 'common']);
+      expect(result).toBe(mockFixedT);
     });
   });
 
