@@ -52,14 +52,14 @@ export const createGetController = (
     const lang = getRequestLanguage(req);
 
     const t: TFunction = journeyFolder
-      ? getTranslationFunction(req, stepName, ['common'])
+      ? getTranslationFunction(req, stepName, ['common'], journeyFolder)
       : getTranslationFunction(req);
 
     req.t = t;
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
 
-    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName) : {};
+    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName, journeyFolder) : {};
     const commonTranslations = req.i18n?.getResourceBundle(lang, 'common') || {};
     const commonContent: Record<string, unknown> = {};
     for (const key of ['change', 'buttons']) {
@@ -122,7 +122,7 @@ export const createPostController = (
 
       const reqLang = getRequestLanguage(req);
       const t: TFunction = journeyFolder
-        ? getTranslationFunction(req, stepName, ['common'])
+        ? getTranslationFunction(req, stepName, ['common'], journeyFolder)
         : getTranslationFunction(req);
 
       const fields = getFields(t);

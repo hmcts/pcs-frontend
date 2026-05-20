@@ -57,9 +57,14 @@ export function getStepTranslationPath(stepName: string, folder: string): string
   return `${folder}/${getStepNamespace(stepName)}`;
 }
 
-function getStepTranslationPaths(req: Request, stepName: string, folder: string): string[] {
+function buildStepNamespace(stepName: string, folder: string, userType: string): string {
+  return userType === 'citizen'
+    ? getStepTranslationPath(stepName, folder)
+    : `${folder}/${userType}/${getStepNamespace(stepName)}`;
+}
+
+function getStepTranslationPaths(stepName: string, folder: string, userType: string): string[] {
   const defaultPath = getStepTranslationPath(stepName, folder);
-  const userType = getUserType(req);
 
   if (userType === 'citizen') {
     return [defaultPath];
@@ -73,7 +78,8 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
     return;
   }
 
-  const stepNamespace = getStepNamespace(stepName);
+  const userType = getUserType(req);
+  const stepNamespace = buildStepNamespace(stepName, folder, userType);
   const lang = getMainRequestLanguage(req);
 
   if (req.i18n.getResourceBundle(lang, stepNamespace)) {
@@ -91,7 +97,7 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
   try {
     let translations: Record<string, unknown> = {};
 
-    for (const translationPath of getStepTranslationPaths(req, stepName, folder)) {
+    for (const translationPath of getStepTranslationPaths(stepName, folder, userType)) {
       const filePath = path.join(localesDir, lang, `${translationPath}.json`);
       const resolvedPath = path.resolve(filePath);
       const resolvedLocalesDir = path.resolve(localesDir);
@@ -134,26 +140,41 @@ export async function loadStepNamespace(req: Request, stepName: string, folder: 
   }
 }
 
-export function getStepTranslations(req: Request, stepName: string): TranslationContent {
+export function getStepTranslations(req: Request, stepName: string, folder: string): TranslationContent {
   if (!req.i18n) {
     return {};
   }
 
+  const userType = getUserType(req);
   const lang = getMainRequestLanguage(req);
-  const resources = req.i18n.getResourceBundle(lang, getStepNamespace(stepName));
+  const resources = req.i18n.getResourceBundle(lang, buildStepNamespace(stepName, folder, userType));
   return (resources as TranslationContent) || {};
 }
 
-/** Gets the translation function for a request with step namespace support. */
-export function getTranslationFunction(req: Request, stepName?: string, namespaces: string[] = ['common']): TFunction {
+export function getTranslationFunction(
+  req: Request,
+  stepName?: string,
+  namespaces: string[] = ['common'],
+  journeyFolder?: string
+): TFunction {
   if (!req.i18n) {
     return getMainTranslationFunction(req, namespaces);
   }
 
   const lang = getMainRequestLanguage(req);
-  const allNamespaces = stepName ? [getStepNamespace(stepName), ...namespaces] : namespaces;
-  const fixedT = req.i18n.getFixedT(lang, allNamespaces);
-  return fixedT || getMainTranslationFunction(req, namespaces);
+  if (!stepName) {
+    const fixedT = req.i18n.getFixedT(lang, namespaces);
+    return fixedT || getMainTranslationFunction(req, namespaces);
+  }
+
+  const folder = journeyFolder || req.res?.locals?.step?.journey;
+  if (typeof folder === 'string' && folder.length > 0) {
+    const userType = getUserType(req);
+    const fixedT = req.i18n.getFixedT(lang, [buildStepNamespace(stepName, folder, userType), ...namespaces]);
+    return fixedT || getMainTranslationFunction(req, namespaces);
+  }
+
+  return getMainTranslationFunction(req, namespaces);
 }
 
 /** Validates and warns about missing translation keys in development. */

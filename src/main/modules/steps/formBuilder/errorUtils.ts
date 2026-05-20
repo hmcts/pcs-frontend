@@ -142,7 +142,7 @@ export async function renderWithErrors(
   showCancelButton?: boolean
 ): Promise<void> {
   const lang = getRequestLanguage(req);
-  const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+  const t: TFunction = getTranslationFunction(req, stepName, ['common'], journeyFolder);
   const extraHeaders = res.locals?.extraHeaders ?? {};
 
   // formContent already includes errorSummary from buildFormContent, so we don't need to rebuild it
