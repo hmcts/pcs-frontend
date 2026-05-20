@@ -84,7 +84,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
-      'check-your-answers-personal-details'
+      'dispute-claim-interstitial'
     );
   });
 
