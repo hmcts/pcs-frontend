@@ -6,6 +6,7 @@ import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
+import { wireFileUploadOnPostError } from './fileUploadUtils';
 import { type FormBuilderFlowConfig, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import {
@@ -18,6 +19,7 @@ import {
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
 
+import type { DocumentStorage } from '@modules/documents/storage';
 import type {
   BuiltFormContent,
   ExtendGetContent,
@@ -41,7 +43,8 @@ export function createPostHandler(
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
   showCancelButton?: boolean,
-  extendGetContent?: ExtendGetContent
+  extendGetContent?: ExtendGetContent,
+  documentStorage?: DocumentStorage
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -116,6 +119,7 @@ export function createPostHandler(
           interpolationValues,
           showCancelButton
         );
+        wireFileUploadOnPostError(formContent, req, documentStorage);
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };

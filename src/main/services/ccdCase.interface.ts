@@ -208,6 +208,7 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  counterClaimWantToUploadFiles?: YesNoValue;
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */
