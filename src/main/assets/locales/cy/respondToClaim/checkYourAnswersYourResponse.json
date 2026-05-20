@@ -72,6 +72,10 @@
       "label": "cy How much are you counterclaiming?",
       "changeHidden": "cy how much you are counterclaiming",
       "estimatedMaxPrefix": "cy Estimated maximum:"
+    },
+    "counterClaimNeedHelpWithFees": {
+      "label": "cy Do you need help paying the counterclaim fee?",
+      "changeHidden": "cy whether you need help paying the counterclaim fee"
     }
   }
 }
