@@ -98,6 +98,7 @@ export class RespondToClaimAction implements IAction {
         'selectIfAnyOtherAdultsLiveInYourHouse',
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
       ],
+      ['taskList', () => this.taskList(fieldName as actionRecord)],
       ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
       ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
@@ -750,6 +751,16 @@ export class RespondToClaimAction implements IAction {
       console.log('frequency' + frequency);
     }
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+  }
+
+  private async taskList(taskListData: actionRecord): Promise<void> {
+    const caseNumber = `${process.env.CASE_NUMBER?.replace(/(\d{4})(?=\d)/g, '$1 ').trim()}`;
+    await performValidation('text', { elementType: 'paragraph', text: 'Case number: ' + caseNumber });
+    if (taskListData.subSection !== 'Read information about responding and free legal advice') {
+      // await performValidation('text', { elementType: 'paragraph', text: 'Case number: '+caseNumber });
+      // await expect(availableStatus).toBeVisible();
+    }
+    await performAction('clickLink', taskListData.subSection);
   }
 
   private async languageUsed(languageScreenData: actionRecord): Promise<void> {
