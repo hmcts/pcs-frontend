@@ -23,7 +23,8 @@
     "deadline": 15000
   },
   "api": {
-    "url": "https://pcs-api-pr-1779.preview.platform.hmcts.net"
+    // "url": "http://pcs-api-aat.service.core-compute-aat.internal"
+    "url": "https://pcs-api-pr-1847.preview.platform.hmcts.net"
   },
   "s2s": {
     "microservice": "pcs_frontend",
@@ -32,8 +33,9 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-1779.preview.platform.hmcts.net",
-    "caseTypeId": "PCS"
+    // "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
+    "url": "https://ccd-data-store-api-pcs-api-pr-1847.preview.platform.hmcts.net",
+    "caseTypeId": "PCS-1847"
   },
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"

@@ -208,6 +208,8 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  responseSubmittedDate?: string;
+  statementOfTruthCompletedBy?: string;
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */

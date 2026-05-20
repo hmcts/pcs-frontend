@@ -37,7 +37,7 @@ import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import { CaseState } from '@services/ccdCase.interface';
+import { CaseState, GenAppType } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
 import type { DashboardNotification, DashboardTaskGroup } from '@services/dashboard.interface';
 import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
@@ -48,10 +48,17 @@ interface EventTokenResponse {
   token: string;
 }
 
+export interface RelatedApplication {
+  id: string;
+  type?: GenAppType;
+  applicationSubmittedDate?: string;
+}
+
 export interface TransformedDashboardData {
   notifications: DashboardNotification[];
   taskGroups: DashboardTaskGroup[];
   propertyAddress: string | undefined;
+  relatedApplications: RelatedApplication[];
 }
 
 function getBaseUrl(): string {
@@ -367,7 +374,12 @@ export const ccdCaseService = {
       const notifications = unwrapNotifications(raw.notifications);
       const taskGroups = unwrapTaskGroups(raw.taskGroups);
 
-      return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress) };
+      return {
+        notifications,
+        taskGroups,
+        propertyAddress: formatAddress(raw.propertyAddress),
+        relatedApplications: [],
+      };
     } catch (error) {
       const httpError = convertAxiosErrorToHttpError(error, 'getDashboardView');
       if (httpError.status === 400 || httpError.status === 404) {
