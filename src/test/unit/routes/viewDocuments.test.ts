@@ -1,7 +1,10 @@
+import { PassThrough } from 'stream';
+
 import type { Application, Request, Response } from 'express';
 
 import viewDocumentsRoute from '@routes/viewDocuments';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { getDocumentBinary } from '@services/cdamService';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void>;
 
@@ -13,6 +16,10 @@ jest.mock('../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
     getCaseById: jest.fn(),
   },
+}));
+
+jest.mock('@services/cdamService', () => ({
+  getDocumentBinary: jest.fn(),
 }));
 
 describe('viewDocuments route', () => {
@@ -106,15 +113,39 @@ describe('viewDocuments route', () => {
     );
   });
 
-  it('should render empty view-document template for document page', async () => {
+  it('should stream document binary for document page', async () => {
     viewDocumentsRoute(app);
+
+    const stream = new PassThrough();
+    const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
+    (getDocumentBinary as jest.Mock).mockResolvedValue({
+      stream,
+      contentType: 'application/pdf',
+      contentLength: '1234',
+    });
+
+    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+      id: '1777570813792018',
+      data: {
+        allDocuments: [
+          {
+            id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+            value: {
+              document_filename: 'claim-form.pdf',
+              document_binary_url: 'http://dm-store/documents/abc-123/binary',
+            },
+          },
+        ],
+      },
+    });
 
     const handler = (app.get as jest.Mock).mock.calls.find(
       call => call[0] === '/case/:caseId/view-documents/:documentId'
     )?.[2] as RouteHandler;
     const res = {
-      render: jest.fn(),
+      setHeader: jest.fn(),
     } as unknown as Response;
+
     const next = jest.fn();
 
     await handler(
@@ -129,7 +160,44 @@ describe('viewDocuments route', () => {
       next
     );
 
-    expect(res.render).toHaveBeenCalledWith('view-document');
+    expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/abc-123/binary', 'token');
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Length', '1234');
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', 'inline; filename="claim-form.pdf"');
+    expect(pipeSpy).toHaveBeenCalledWith(res);
     expect(next).not.toHaveBeenCalled();
+  });
+
+  it('should return 404 when documentId is not a valid UUID', async () => {
+    viewDocumentsRoute(app);
+
+    const handler = (app.get as jest.Mock).mock.calls.find(
+      call => call[0] === '/case/:caseId/view-documents/:documentId'
+    )?.[2] as RouteHandler;
+    const res = {
+      locals: {
+        validatedCase: {
+          id: '1777570813792018',
+          data: {},
+        },
+      },
+      setHeader: jest.fn(),
+    } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(
+      {
+        params: {
+          caseId: '1777570813792018',
+          documentId: 'not-a-uuid',
+        },
+        session: { user: { accessToken: 'token' } },
+      } as unknown as Request,
+      res,
+      next
+    );
+
+    expect(getDocumentBinary).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Document not found', status: 404 }));
   });
 });
