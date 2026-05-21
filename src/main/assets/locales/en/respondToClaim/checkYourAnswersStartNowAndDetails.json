@@ -2,7 +2,7 @@
   "pageTitle": "Check your answers",
   "rows": {
     "freeLegalAdvice": {
-      "label": "Have you had free legal advice?",
+      "label": "Have you had any free legal advice?",
       "changeHidden": "free legal advice",
       "options": {
         "YES": "Yes",
