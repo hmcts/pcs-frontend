@@ -159,5 +159,8 @@
   "documentUpload": {
     "maxFileSizePerFileMB": 100,
     "maxTotalFileSizeMB": 1024
+  },
+  "redirects": {
+    "manageCaseReturnURL": "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
   }
 }
