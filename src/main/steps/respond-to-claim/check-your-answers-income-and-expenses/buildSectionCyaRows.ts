@@ -48,6 +48,26 @@ interface RowContext extends BaseRowContext {
   hc: HouseholdCircumstances;
 }
 
+export function buildOtherConsiderationsRows(req: Request, t: TFunction): SummaryListRow[] {
+  const validatedCase = getValidatedCase(req);
+  const caseRef = validatedCase?.id;
+  if (!validatedCase || !caseRef) {
+    return [];
+  }
+
+  const responses = validatedCase.defendantResponses ?? {};
+  const ctx: RowContext = {
+    rows: [],
+    responses,
+    hc: responses.householdCircumstances ?? {},
+    t,
+    change: makeChange(caseRef, SECTION_ID, t),
+    yesNoNotSure: makeYesNoNotSure(t),
+  };
+  addOtherConsiderationsRow(ctx);
+  return ctx.rows;
+}
+
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
   if (!base) {

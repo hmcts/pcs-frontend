@@ -232,6 +232,8 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  statementOfTruthAccepted?: YesNoValue;
+  statementOfTruthFullName?: string;
   completedSections?: RespondToClaimSectionEnum[];
 }
 
