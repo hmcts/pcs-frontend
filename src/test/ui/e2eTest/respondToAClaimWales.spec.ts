@@ -8,6 +8,7 @@ import {
   counterClaim,
   counterClaimAbout,
   counterClaimFee,
+  counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimUploadDocuments,
@@ -43,7 +44,6 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
-//import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -186,10 +186,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
-    //Below routing needs to updated once HDPI-5193 is implemented and merged and enable commented out lines as part of routing
-    /* await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
+
+    await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
-    await performAction('counterClaimAbout', {
+    //Below routing needs to updated once HDPI-5193 is implemented and merged and enable commented out lines as part of routing
+    /*await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });*/

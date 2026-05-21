@@ -40,7 +40,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-//import { haveYouAlreadyAppliedForHelp } from '../data/page-data/genApps-page-data/haveYouAlreadyAppliedForHelp.page.data';
+import { haveYouAlreadyAppliedForHelp } from '../data/page-data/genApps-page-data/haveYouAlreadyAppliedForHelp.page.data';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
@@ -557,11 +557,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-    // Following steps need to be enabled and update routing once HDPI-5193 is merged
-    /*await softErrorMessageValidation('haveYouAlreadyAppliedForHelp', NO_EMV_READ_ONLY);
-    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
 
-    await softErrorMessageValidation('counterClaimAbout', counterClaimAboutErrorValidation);
+    await softErrorMessageValidation('haveYouAlreadyAppliedForHelp', NO_EMV_READ_ONLY);
+    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
+    // Following steps need to be enabled and update routing once HDPI-5193 is merged
+    /* await softErrorMessageValidation('counterClaimAbout', counterClaimAboutErrorValidation);
     await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
