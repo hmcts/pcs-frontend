@@ -12,13 +12,38 @@ export interface FeeLookupParams {
   channel: string;
   event: string;
   keyword: string;
+  amount_or_volume?: number;
 }
 
 export enum FeeType {
   genAppStandardFee,
   genAppMaxFee,
   counterClaimFlatFeeFEE0450,
+  counterClaimRanged,
+  counterClaim,
 }
+
+export const getCounterClaimFeeType = (claimType?: string, claimAmountInPence?: string): FeeType => {
+  if (claimType === 'SOMETHING_ELSE') {
+    return FeeType.counterClaimFlatFeeFEE0450;
+  }
+
+  if (claimType !== 'PAYMENT_OR_COMPENSATION' && claimType !== 'BOTH') {
+    throw new Error(`Unsupported counterclaim claim type: ${claimType}`);
+  }
+
+  const amountInPence = Number(claimAmountInPence);
+  if (Number.isNaN(amountInPence) || amountInPence < 0) {
+    return FeeType.counterClaim;
+  }
+
+  const amountInPounds = amountInPence / 100;
+
+  if (amountInPounds <= 5_000) {
+    return FeeType.counterClaimRanged;
+  }
+  return FeeType.counterClaim;
+};
 
 interface FeeLookupResponse {
   code: string;
@@ -40,18 +65,20 @@ function getFeeLookupParams(feeType: FeeType): FeeLookupParams {
   return config.get<FeeLookupParams>(configPath);
 }
 
-export const getFee = async (feeType: FeeType): Promise<number> => {
-  const feeLookupParams = getFeeLookupParams(feeType);
+export const getFee = async (feeType: FeeType, claimAmountInPence?: string): Promise<number> => {
+  const params: FeeLookupParams = { ...getFeeLookupParams(feeType) };
+
+  if (claimAmountInPence) {
+    params.amount_or_volume = Number(claimAmountInPence) / 100;
+  }
 
   const url = `${getBaseUrl()}/fees-register/fees/lookup`;
 
   try {
-    const response = await axios.get<FeeLookupResponse>(url, { params: feeLookupParams });
-
-    logger.debug(`Fee service response data: ${JSON.stringify(response.data, null, 2)}`);
+    const response = await axios.get<FeeLookupResponse>(url, { params });
     return response.data.fee_amount;
   } catch (e) {
-    logger.error('Error fetching fee ', e);
+    logger.error('Fee lookup request failed', { err: e, url, params });
     throw new Error('Error fetching fee');
   }
 };
