@@ -24,8 +24,8 @@ export const step: StepDefinition = {
       const caseId = req.res?.locals.validatedCase?.id;
       const dashboardUrl = getDashboardUrl(caseId);
       let backUrl = dashboardUrl;
-      if (isLegalRepresentativeUser(req) && caseId && config.has('redirects.legalRepSaveForLaterUrl')) {
-        backUrl = `${config.get<string>('redirects.legalRepSaveForLaterUrl')}/${caseId}`;
+      if (isLegalRepresentativeUser(req) && caseId && config.has('redirects.manageCaseReturnURL')) {
+        backUrl = `${config.get<string>('redirects.manageCaseReturnURL')}/${caseId}`;
       }
       return {
         backUrl,

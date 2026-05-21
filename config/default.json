@@ -161,6 +161,6 @@
     "maxTotalFileSizeMB": 1024
   },
   "redirects": {
-    "legalRepSaveForLaterUrl": "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
+    "manageCaseReturnURL": "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
   }
 }

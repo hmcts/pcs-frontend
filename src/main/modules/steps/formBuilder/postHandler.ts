@@ -164,8 +164,8 @@ export function createPostHandler(
         }
 
         if (isLegalRepresentativeUser(req)) {
-          const caseDetailsBaseUrl = config.has('redirects.legalRepSaveForLaterUrl')
-            ? config.get<string>('redirects.legalRepSaveForLaterUrl')
+          const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
+            ? config.get<string>('redirects.manageCaseReturnURL')
             : null;
           if (caseDetailsBaseUrl) {
             const caseDetailsUrl = `${caseDetailsBaseUrl}/${caseId}`;
