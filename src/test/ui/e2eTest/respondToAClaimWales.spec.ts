@@ -541,7 +541,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - Yes - SomethingElse @noDefendants @regression @PR', async () => {
+  test('Respond to a claim - Wales - Standard contract - NonRentArrears - CounterClaim - Yes - CounterClaimFee - INeedHelp - SomethingElse @noDefendants @regression @PR', async () => {
     //Single named party - Something else - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
@@ -600,16 +600,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatAreYouClaimingFor', {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
-      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
-    });
-    await performAction('counterClaimSpecificSumOfMoney', {
-      question: counterClaimSpecificSumOfMoney.mainHeader,
-      option: counterClaimSpecificSumOfMoney.yesRadioOption,
-      amount: counterClaimSpecificSumOfMoney.claimInput,
+      option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
