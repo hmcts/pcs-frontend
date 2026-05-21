@@ -36,11 +36,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-year'] as string | undefined) ?? ''
       ).trim();
       if (!day || !month || !year) {
-        throw new Error('Missing universal credit application date submitted');
+        // Reached via Save for later with a partial date — validation is bypassed for SFL,
+        // so don't crash. Preserve prior `hasAppliedForUniversalCredit`/`ucApplicationDate`.
+        return;
       }
       const isoDate = formatDatePartsToISODate(day, month, year);
       if (!isoDate) {
-        throw new Error('Invalid universal credit application date submitted');
+        // Same as above — SFL with invalid date parts (e.g. 31 Feb) must not throw.
+        return;
       }
       hc.hasAppliedForUniversalCredit = toYesNoEnum('yes');
       hc.ucApplicationDate = isoDate;

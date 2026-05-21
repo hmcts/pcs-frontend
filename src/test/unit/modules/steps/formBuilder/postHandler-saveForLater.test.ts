@@ -172,17 +172,18 @@ describe('PostHandler - Save for Later Fix', () => {
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/next-step');
     });
 
-    it('should validate form before saving for later', async () => {
+    it('should bypass validation when saving for later (AC10) — citizen exits with whatever they have', async () => {
       const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
 
-      // Empty form + save for later
+      // Empty form + save for later — mandatory-field validation must NOT block the exit
       mockRequest.body = { action: 'saveForLater' };
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
-      // Should show validation errors (NOT redirect)
-      expect(mockResponse.redirect).not.toHaveBeenCalled();
-      expect(mockResponse.render).toHaveBeenCalled();
+      // Should redirect (not render error page). flowConfig in this fixture has no hubStepName,
+      // so SFL falls back to the dashboard.
+      expect(mockResponse.render).not.toHaveBeenCalled();
+      expect(mockResponse.redirect).toHaveBeenCalled();
     });
 
     it('should save valid data and redirect to dashboard', async () => {
