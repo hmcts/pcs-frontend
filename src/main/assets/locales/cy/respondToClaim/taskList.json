@@ -14,8 +14,11 @@
       "checkBeforeYouStart": "cyCheck before you start",
       "yourResponse": "cyYour response",
       "provideEvidence": "cyProvide evidence",
+      "informationAboutYou": "cyInformation about you",
       "reviewAndSubmit": "cyReview and submit"
-    }
+    },
+    "equalityAndDiversity": "cyEquality and diversity",
+    "tellUsIfYouNeedSupport": "cyTell us if you need support"
   },
   "iWantTo": {
     "heading": "cyI want to...",

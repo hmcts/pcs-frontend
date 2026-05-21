@@ -7,7 +7,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-date-of-birth',
-  isAnswered: () => true,
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.dateOfBirth),
   stepDir: __dirname,
   showCancelButton: false,
   beforeRedirect: async req => {

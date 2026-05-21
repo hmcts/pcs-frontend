@@ -49,20 +49,23 @@ describe('respond-to-claim sections config', () => {
   });
 
   it('maps upload section steps', () => {
-    expect(findSection('uploadFiles')?.steps).toEqual([
-      'upload-document',
-      'support-needs',
-      'check-your-answers-documents',
-    ]);
+    expect(findSection('uploadFiles')?.steps).toEqual(['upload-document', 'check-your-answers-documents']);
   });
 
-  it('maps end-of-journey steps into final section', () => {
-    expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
+  it('maps equality-and-diversity section steps', () => {
+    expect(findSection('equalityAndDiversity')?.steps).toEqual([
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',
-      'check-your-answers',
     ]);
+  });
+
+  it('maps tell-us-if-you-need-support section steps', () => {
+    expect(findSection('tellUsIfYouNeedSupport')?.steps).toEqual(['support-needs']);
+  });
+
+  it('maps end-of-journey steps into final section', () => {
+    expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual(['check-your-answers']);
   });
 
   it('treats payments section as applicable for rent arrears claims', async () => {
@@ -107,6 +110,8 @@ describe('respond-to-claim sections config', () => {
         situationAndCircumstances: 'SITUATION_AND_CIRCUMSTANCES',
         incomeAndExpenditure: 'INCOME_AND_EXPENDITURE',
         uploadFiles: 'UPLOAD_FILES',
+        equalityAndDiversity: 'EQUALITY_AND_DIVERSITY',
+        tellUsIfYouNeedSupport: 'TELL_US_IF_YOU_NEED_SUPPORT',
         checkYourAnswersAndSubmit: 'CHECK_YOUR_ANSWERS_AND_SUBMIT',
       };
       for (const id of RESPOND_TO_CLAIM_SECTION_IDS) {

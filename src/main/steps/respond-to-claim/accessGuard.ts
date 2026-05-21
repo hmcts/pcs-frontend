@@ -83,11 +83,24 @@ function getCyaRedirectIfBlocked(
   req: Request
 ): string | undefined {
   const section = sectionById.get(sectionId);
-  if (!section || sectionHasAnyAnswer(section, req)) {
+  if (!section) {
+    return undefined;
+  }
+  // Sections with no countable question steps (e.g. uploadFiles, where every step is optional)
+  // reach the CYA via the happy-path Save and continue. Don't bounce them back to the first step;
+  // the citizen confirms the empty section by clicking Save and continue on the CYA itself.
+  if (!sectionHasCountableSteps(section) || sectionHasAnyAnswer(section, req)) {
     return undefined;
   }
   const firstStep = getFirstVisibleStep(section, flowConfig, req);
   return firstStep ? `/case/${caseId}/respond-to-claim/${firstStep}` : hubUrl;
+}
+
+function sectionHasCountableSteps(section: SectionConfig): boolean {
+  return section.steps.some(stepName => {
+    const def = stepRegistry[stepName as keyof typeof stepRegistry];
+    return def?.isAnswered !== undefined;
+  });
 }
 
 function sectionHasAnyAnswer(section: SectionConfig, req: Request): boolean {

@@ -67,16 +67,31 @@ export async function getSectionStatus(
     return 'NOT_AVAILABLE_YET';
   }
 
+  // CYA confirmation is the citizen's explicit "I'm done" — it overrides per-step scoring.
+  // Edits revoke it via clearSectionCompletionOnEdit (buildDraftDefendantResponse), so the
+  // section auto-drops back to whatever scoreAnsweredness reports.
+  if (sectionHasCya(section) && userHasCompletedSectionViaCya(section, req)) {
+    return 'DONE';
+  }
+
   const questionSteps = visibleQuestionSteps(section, stepRegistry, flowConfig, req);
   if (questionSteps.length === 0) {
-    return 'NOT_APPLICABLE';
+    // No countable question steps. If the section has a CYA the citizen still has to walk to,
+    // status is gated purely on completedSections — handled above for DONE. Otherwise: stay
+    // AVAILABLE as long as any step is visible (e.g. all-placeholder sections like
+    // tellUsIfYouNeedSupport); if no step is visible, the section has nothing to show.
+    if (sectionHasCya(section)) {
+      return 'AVAILABLE';
+    }
+    const hasVisibleStep = section.steps.some(stepName => isStepVisible(stepName, flowConfig, req));
+    return hasVisibleStep ? 'AVAILABLE' : 'NOT_APPLICABLE';
   }
 
   const raw = scoreAnsweredness(questionSteps, req);
-  if (raw !== 'DONE' || !sectionHasCya(section)) {
-    return raw;
+  if (raw === 'DONE') {
+    return sectionHasCya(section) ? 'IN_PROGRESS' : 'DONE';
   }
-  return userHasCompletedSectionViaCya(section, req) ? 'DONE' : 'IN_PROGRESS';
+  return raw;
 }
 
 function userHasCompletedSectionViaCya(section: SectionConfig, req: Request): boolean {

@@ -137,10 +137,12 @@ describe('getSectionStatus', () => {
     expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('IN_PROGRESS');
   });
 
-  it('treats a section with no question steps (no isAnswered predicates) as NOT_APPLICABLE', async () => {
+  it('returns AVAILABLE for a section with no countable steps but at least one visible step', async () => {
+    // tellUsIfYouNeedSupport shape: a visible step with no isAnswered, no CYA. Citizen can
+    // walk into it any time; section never reaches DONE without a CYA confirmation path.
     const sec = section({ steps: ['stepA'] });
     const registry = { stepA: { ...stub(), isAnswered: undefined } };
-    expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('NOT_APPLICABLE');
+    expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('AVAILABLE');
   });
 
   it('skips steps not present in the registry (graceful)', async () => {
@@ -190,7 +192,7 @@ describe('getSectionStatus', () => {
       expect(status).toBe('DONE');
     });
 
-    it('passes IN_PROGRESS through unchanged regardless of completedSections (raw wins)', async () => {
+    it('returns DONE via completedSections override even when raw scoring is IN_PROGRESS', async () => {
       const sec = section({
         id: 'personalDetails',
         steps: ['stepA', 'stepB', 'check-your-answers-personal-details'],
@@ -200,9 +202,11 @@ describe('getSectionStatus', () => {
         stepB: stub({ isAnswered: () => false }),
         'check-your-answers-personal-details': { ...stub(), isAnswered: undefined },
       };
-      // Stale flag present (somehow) — raw status says IN_PROGRESS → that wins.
+      // CYA confirmation is the citizen's explicit "I'm done" — it overrides per-step scoring
+      // so that skipping an optional step doesn't trap the section at IN_PROGRESS.
+      // Edits revoke the flag via clearSectionCompletionOnEdit, so this can't go stale in practice.
       const status = await getSectionStatus(sec, flow(), registry, reqWithCompleted(['PERSONAL_DETAILS']), new Map());
-      expect(status).toBe('IN_PROGRESS');
+      expect(status).toBe('DONE');
     });
 
     it('does not apply the override for sections without a CYA (e.g. checkYourAnswersAndSubmit)', async () => {
