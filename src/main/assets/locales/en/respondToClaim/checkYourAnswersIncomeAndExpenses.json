@@ -33,14 +33,16 @@
       "label": "Do you have any priority debts?",
       "changeHidden": "whether you have any priority debts"
     },
-    "priorityDebtDetails": {
-      "label": "Priority debt details",
-      "changeHidden": "your priority debt details",
-      "total": "Total amount owed",
-      "contribution": "Regular contribution"
+    "priorityDebtTotal": {
+      "label": "What is the total amount you owe for all your priority debts?",
+      "changeHidden": "the total amount you owe for all your priority debts"
+    },
+    "priorityDebtContribution": {
+      "label": "How much do you pay towards your priority debts each week or month?",
+      "changeHidden": "how much you pay towards your priority debts each week or month"
     },
     "regularExpenses": {
-      "label": "What regular expenses do you have?",
+      "label": "What other regular expenses do you have?",
       "changeHidden": "the regular expenses you have",
       "options": {
         "householdBills": "Household bills",
