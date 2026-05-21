@@ -3,7 +3,7 @@
   "introText": "It is required under the Renting Homes Wales Act 2016 for a landlord to send the defendant written terms of the occupation contract.",
   "question": "Has the landlord sent the defendant written terms of the occupation contract?",
   "options": {
-    "imNotSure": "Defendant not sure"
+    "imNotSure": "Defendant is not sure"
   },
   "errors": {
     "writtenTerms": "Select if the landlord has sent you written terms of the occupation contract"
