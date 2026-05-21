@@ -283,7 +283,7 @@ export const submitCaseApiData = {
       orgNameFound: 'YES',
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'YES',
-      claimantContactEmail: 'pcs-solicitor-automation@test.com',
+      claimantContactEmail: process.env.PCS_SOLICITOR_AUTOMATION_EMAIL,
       isCorrectClaimantContactEmail: 'YES',
       orgAddressFound: 'YES',
       organisationAddress: {
@@ -583,7 +583,7 @@ export const submitCaseApiData = {
       orgNameFound: 'YES',
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'YES',
-      claimantContactEmail: 'pcs-solicitor-automation@test.com',
+      claimantContactEmail: process.env.PCS_SOLICITOR_AUTOMATION_EMAIL,
       isCorrectClaimantContactEmail: 'YES',
       orgAddressFound: 'YES',
       organisationAddress: {
@@ -668,7 +668,7 @@ export const submitCaseApiData = {
       orgNameFound: 'YES',
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'YES',
-      claimantContactEmail: 'pcs-solicitor-automation@test.com',
+      claimantContactEmail: process.env.PCS_SOLICITOR_AUTOMATION_EMAIL,
       isCorrectClaimantContactEmail: 'YES',
       orgAddressFound: 'YES',
       organisationAddress: {

@@ -181,7 +181,7 @@ export const submitCaseApiDataWales = {
     // walesRegistered: 'NO',
     // walesLicensed: 'NO',
     // walesLicensedAgentAppointed: 'NO',
-    claimantContactEmail: 'pcs-solicitor-automation@test.com',
+    claimantContactEmail: process.env.PCS_SOLICITOR_AUTOMATION_EMAIL,
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'Yes',
     organisationAddress: {
@@ -272,7 +272,7 @@ export const submitCaseApiDataWales = {
     // walesRegistered: 'NOT_APPLICABLE',
     // walesLicensed: 'NOT_APPLICABLE',
     // walesLicensedAgentAppointed: 'NOT_APPLICABLE',
-    claimantContactEmail: 'pcs-solicitor-automation@test.com',
+    claimantContactEmail: process.env.PCS_SOLICITOR_AUTOMATION_EMAIL,
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'YES',
     organisationAddress: {
@@ -359,7 +359,7 @@ export const submitCaseApiDataWales = {
     // walesRegistered: 'NO',
     // walesLicensed: 'NO',
     // walesLicensedAgentAppointed: 'NO',
-    claimantContactEmail: 'pcs-solicitor-automation@test.com',
+    claimantContactEmail: process.env.PCS_SOLICITOR_AUTOMATION_EMAIL,
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'Yes',
     organisationAddress: {
