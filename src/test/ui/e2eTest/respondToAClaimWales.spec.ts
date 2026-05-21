@@ -606,11 +606,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: counterClaimFee.iNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    await performAction('selectCounterClaimFee', {
-      radioOption: counterClaimFee.iNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
-      amount: counterClaimSpecificSumOfMoney.claimInput,
-    });
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
