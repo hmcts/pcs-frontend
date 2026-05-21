@@ -14,6 +14,7 @@ import {
   OptionListValidation,
   RadioButtonValidation,
   TextValidation,
+  ValidateDocumentUnderSectionValidation,
 } from '../validations/element-validations';
 
 export class ValidationRegistry {
@@ -32,6 +33,7 @@ export class ValidationRegistry {
     ['autoValidatePageContent', new PageContentValidation()],
     ['pageNavigation', new PageNavigationValidation()],
     ['inputTextValue', new InputTextValueValidation()],
+    ['validateDocumentUnderSection', new ValidateDocumentUnderSectionValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {
