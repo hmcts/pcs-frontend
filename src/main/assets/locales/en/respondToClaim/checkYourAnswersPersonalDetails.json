@@ -7,16 +7,16 @@
       "changeHidden": "your name"
     },
     "defendantName": {
-      "label": "Your name",
+      "label": "What’s your name?",
       "changeHidden": "your name"
     },
     "dateOfBirth": {
-      "label": "What is your date of birth?",
+      "label": "What’s your date of birth?",
       "changeHidden": "your date of birth"
     },
     "correspondenceAddressConfirmation": {
       "label": "Is your correspondence address {{address}}?",
-      "fallbackLabel": "Correspondence address",
+      "fallbackLabel": "What’s your correspondence address?",
       "changeHidden": "your correspondence address"
     },
     "contactByEmailOrPost": {

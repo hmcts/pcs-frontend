@@ -112,7 +112,7 @@ const sectionDefs = [
     id: 'uploadFiles',
     groupId: 'provideEvidence',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document', 'support-needs', 'check-your-answers-documents'],
+    steps: ['upload-document', 'check-your-answers-documents'],
   },
   {
     id: 'checkYourAnswersAndSubmit',
@@ -127,7 +127,13 @@ const sectionDefs = [
       'incomeAndExpenditure',
       'uploadFiles',
     ],
-    steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used', 'check-your-answers'],
+    steps: [
+      'support-needs',
+      'equality-and-diversity-start',
+      'equality-and-diversity-end',
+      'language-used',
+      'check-your-answers',
+    ],
   },
 ] as const satisfies readonly {
   id: string;
