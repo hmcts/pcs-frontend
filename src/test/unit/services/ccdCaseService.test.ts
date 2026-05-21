@@ -295,6 +295,64 @@ describe('ccdCaseService', () => {
     });
   });
 
+  describe('submitUploadDocuments', () => {
+    it('throws HTTPError if case id is missing', async () => {
+      await expect(ccdCaseService.submitUploadDocuments(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.submitUploadDocuments(accessToken, { id: '', data: {} })).rejects.toThrow(
+        'Cannot upload documents, case ID not specified'
+      );
+    });
+
+    it('submits the uploaded documents via the uploadDocuments CCD event', async () => {
+      const caseId = '1234';
+      const uploadedAdditionalDocuments = [
+        {
+          id: '1',
+          value: {
+            document: {
+              document_url: 'http://dm/doc/1',
+              document_filename: 'file-1.pdf',
+              document_binary_url: 'http://dm/doc/1/binary',
+            },
+            contentType: 'application/pdf',
+            sizeInBytes: 100,
+          },
+        },
+      ];
+      const ccdData: CcdCase = { id: caseId, data: { uploadedAdditionalDocuments } };
+      const eventToken = 'event token here';
+
+      mockGet.mockResolvedValue({ data: { token: eventToken } });
+      mockPost.mockResolvedValue({ data: {} });
+
+      await ccdCaseService.submitUploadDocuments(accessToken, ccdData);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/uploadDocuments`,
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: `Bearer ${accessToken}` }),
+        })
+      );
+
+      expect(mockPost).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/events`,
+        {
+          data: { uploadedAdditionalDocuments },
+          event: {
+            id: 'uploadDocuments',
+            summary: 'Citizen uploadDocuments summary',
+            description: 'Citizen uploadDocuments description',
+          },
+          event_token: eventToken,
+          ignore_warning: false,
+        },
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: `Bearer ${accessToken}` }),
+        })
+      );
+    });
+  });
+
   describe('getExistingCaseData', () => {
     it('throws if case data errors', async () => {
       mockGet.mockRejectedValue({ response: { status: 400 } });

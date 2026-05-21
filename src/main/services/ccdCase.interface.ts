@@ -265,6 +265,7 @@ export interface CcdCaseData {
   allClaimants?: CcdCollectionItem<CcdParty>[];
   allDefendants?: CcdCollectionItem<CcdParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
+  uploadedAdditionalDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
   applicantSurname?: string;
