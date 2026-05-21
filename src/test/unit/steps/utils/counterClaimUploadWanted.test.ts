@@ -2,11 +2,15 @@ import type { Request } from 'express';
 
 import { counterClaimUploadWanted } from '../../../../main/steps/utils/counterClaimUploadWanted';
 
-const makeReq = (counterClaimWantToUploadFiles?: string): Request =>
+import type { YesNoValue } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
+
+const makeReq = (counterClaimWantToUploadFiles?: YesNoValue): Request =>
   ({
     res: {
       locals: {
-        validatedCase: {
+        validatedCase: new CcdCaseModel({
+          id: '',
           data: {
             possessionClaimResponse: {
               defendantResponses: {
@@ -14,7 +18,7 @@ const makeReq = (counterClaimWantToUploadFiles?: string): Request =>
               },
             },
           },
-        },
+        }),
       },
     },
   }) as unknown as Request;
@@ -34,6 +38,24 @@ describe('counterClaimUploadWanted', () => {
 
   it('returns false when res.locals is absent', () => {
     const req = { res: undefined } as unknown as Request;
+    expect(counterClaimUploadWanted(req)).toBe(false);
+  });
+
+  it('returns false when validatedCase is not a CcdCaseModel', () => {
+    const req = {
+      res: {
+        locals: {
+          validatedCase: {
+            id: '',
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { counterClaimWantToUploadFiles: 'YES' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as Request;
     expect(counterClaimUploadWanted(req)).toBe(false);
   });
 });
