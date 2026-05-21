@@ -1,5 +1,7 @@
+import config from 'config';
 import type { Request, Response } from 'express';
 
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 
 import { createGetController, createStepNavigation } from '@modules/steps';
@@ -19,8 +21,15 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   getController: () => {
     return createGetController('respond-to-claim/start-now/startNow.njk', stepName, stepNavigation, (req: Request) => {
+      const caseId = req.res?.locals.validatedCase?.id;
+      const dashboardUrl = getDashboardUrl(caseId);
+      let backUrl = dashboardUrl;
+      if (isLegalRepresentativeUser(req) && caseId && config.has('redirects.legalRepSaveForLaterUrl')) {
+        backUrl = `${config.get<string>('redirects.legalRepSaveForLaterUrl')}/${caseId}`;
+      }
       return {
-        backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+        backUrl,
+        dashboardUrl,
       };
     });
   },
