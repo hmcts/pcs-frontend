@@ -68,10 +68,17 @@
         "BOTH": "cy Both"
       }
     },
-    "counterClaimAmount": {
-      "label": "cy How much are you counterclaiming?",
-      "changeHidden": "cy how much you are counterclaiming",
-      "estimatedMaxPrefix": "cy Estimated maximum:"
+    "isClaimAmountKnown": {
+      "label": "cy Are you claiming for a specific sum of money?",
+      "changeHidden": "cy whether you are claiming for a specific sum of money"
+    },
+    "claimAmount": {
+      "label": "cy How much are you claiming?",
+      "changeHidden": "cy how much you are claiming"
+    },
+    "estimatedMaxClaimAmount": {
+      "label": "cy What’s the maximum value of your claim?",
+      "changeHidden": "cy the maximum value of your claim"
     },
     "counterClaimNeedHelpWithFees": {
       "label": "cy Do you need help paying the counterclaim fee?",

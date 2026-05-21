@@ -68,10 +68,17 @@
         "BOTH": "Both"
       }
     },
-    "counterClaimAmount": {
-      "label": "How much are you counterclaiming?",
-      "changeHidden": "how much you are counterclaiming",
-      "estimatedMaxPrefix": "Estimated maximum:"
+    "isClaimAmountKnown": {
+      "label": "Are you claiming for a specific sum of money?",
+      "changeHidden": "whether you are claiming for a specific sum of money"
+    },
+    "claimAmount": {
+      "label": "How much are you claiming?",
+      "changeHidden": "how much you are claiming"
+    },
+    "estimatedMaxClaimAmount": {
+      "label": "What’s the maximum value of your claim?",
+      "changeHidden": "the maximum value of your claim"
     },
     "counterClaimNeedHelpWithFees": {
       "label": "Do you need help paying the counterclaim fee?",
