@@ -757,11 +757,14 @@ export class RespondToClaimAction implements IAction {
     const caseNumber = `${process.env.CASE_NUMBER?.replace(/(\d{4})(?=\d)/g, '$1 ').trim()}`;
     await performValidation('text', { elementType: 'paragraph', text: 'Case number: ' + caseNumber });
     if (taskListData.subSection !== 'Read information about responding and free legal advice') {
-      // await performValidation('text', { elementType: 'paragraph', text: 'Case number: '+caseNumber });
-      // await expect(availableStatus).toBeVisible();
+      await performValidation('text', taskListData.subSection, { elementType: 'taskListStatus', text: 'Available' });
     }
     await performAction('clickLink', taskListData.subSection);
   }
+
+  // private async taskListStatus(subSection: actionRecord): Promise<void> {
+  //
+  // }
 
   private async languageUsed(languageScreenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
