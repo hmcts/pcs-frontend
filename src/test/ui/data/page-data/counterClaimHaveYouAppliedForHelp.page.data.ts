@@ -1,4 +1,4 @@
-export const counterClaimHaveYouAlreadyAppliedForHelpWithYourFees = {
+export const counterClaimHaveYouAppliedForHelp = {
   mainHeader: `Have you already applied for help with your counterclaim fee?`,
   backLink: `Back`,
   haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion: `Have you already applied for help with your counterclaim fee?`,

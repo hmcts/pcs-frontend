@@ -9,7 +9,7 @@ import {
   counterClaimAbout,
   counterClaimAgainstWhom,
   counterClaimFee,
-  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
+  counterClaimHaveYouAppliedForHelp,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   counterclaimYouNeedToApplyForHelpWithYourFees,
@@ -549,7 +549,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
-      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.noRadioOption,
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
   });
@@ -610,8 +610,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
-      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
-      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
@@ -732,8 +732,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
-      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
-      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
@@ -877,8 +877,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
-      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
-      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
@@ -1013,8 +1013,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueFEE0508Input,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
-      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
-      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAgainstWhom.mainHeader);
     await performAction('clickButton', counterClaimAgainstWhom.continueButton);

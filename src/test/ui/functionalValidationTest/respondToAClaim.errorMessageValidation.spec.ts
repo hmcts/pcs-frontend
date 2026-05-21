@@ -9,7 +9,7 @@ import {
   counterClaimAbout,
   counterClaimAgainstWhom,
   counterClaimFee,
-  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
+  counterClaimHaveYouAppliedForHelp,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -46,7 +46,7 @@ import { contactPreferencesTelephoneErrorValidation } from '../functional/contac
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
 import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
 import { counterClaimFeeErrorValidation } from '../functional/counterClaimFee.pft';
-import { counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation } from '../functional/counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.pft';
+import { counterClaimHaveYouAppliedForHelpErrorValidation } from '../functional/counterClaimHaveYouAppliedForHelp.pft';
 import { counterClaimSpecificSumErrorValidation } from '../functional/counterClaimSpecificSumOfMoney.pft';
 import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/counterClaimWhatAreYouClaimingFor.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
@@ -549,12 +549,12 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation(
-      'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
-      counterClaimHaveYouAlreadyAppliedForHelpWithYourFeesErrorValidation
+      'counterClaimHaveYouAppliedForHelp',
+      counterClaimHaveYouAppliedForHelpErrorValidation
     );
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
-      helpWithFeeOption: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.yesRadioOption,
-      feeReference: counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.helpWithFeeReferenceTextInput,
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
     });
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
