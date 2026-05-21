@@ -137,12 +137,10 @@ describe('getSectionStatus', () => {
     expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('IN_PROGRESS');
   });
 
-  it('returns AVAILABLE for a section with no countable steps but at least one visible step', async () => {
-    // tellUsIfYouNeedSupport shape: a visible step with no isAnswered, no CYA. Citizen can
-    // walk into it any time; section never reaches DONE without a CYA confirmation path.
+  it('treats a section with no question steps (no isAnswered predicates) as NOT_APPLICABLE', async () => {
     const sec = section({ steps: ['stepA'] });
     const registry = { stepA: { ...stub(), isAnswered: undefined } };
-    expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('AVAILABLE');
+    expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('NOT_APPLICABLE');
   });
 
   it('skips steps not present in the registry (graceful)', async () => {

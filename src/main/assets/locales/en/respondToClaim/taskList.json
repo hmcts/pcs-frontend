@@ -14,11 +14,8 @@
       "checkBeforeYouStart": "Check before you start",
       "yourResponse": "Your response",
       "provideEvidence": "Provide evidence",
-      "informationAboutYou": "Information about you",
       "reviewAndSubmit": "Review and submit"
-    },
-    "equalityAndDiversity": "Equality and diversity",
-    "tellUsIfYouNeedSupport": "Tell us if you need support"
+    }
   },
   "iWantTo": {
     "heading": "I want to...",

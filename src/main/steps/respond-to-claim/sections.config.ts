@@ -10,7 +10,6 @@ export const RESPOND_TO_CLAIM_SECTION_GROUPS = [
   { id: 'checkBeforeYouStart', titleKey: 'taskList.groups.checkBeforeYouStart' },
   { id: 'yourResponse', titleKey: 'taskList.groups.yourResponse' },
   { id: 'provideEvidence', titleKey: 'taskList.groups.provideEvidence' },
-  { id: 'informationAboutYou', titleKey: 'taskList.groups.informationAboutYou' },
   { id: 'reviewAndSubmit', titleKey: 'taskList.groups.reviewAndSubmit' },
 ] as const;
 
@@ -113,19 +112,7 @@ const sectionDefs = [
     id: 'uploadFiles',
     groupId: 'provideEvidence',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document', 'check-your-answers-documents'],
-  },
-  {
-    id: 'equalityAndDiversity',
-    groupId: 'informationAboutYou',
-    titleKey: 'taskList.equalityAndDiversity',
-    steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used'],
-  },
-  {
-    id: 'tellUsIfYouNeedSupport',
-    groupId: 'informationAboutYou',
-    titleKey: 'taskList.tellUsIfYouNeedSupport',
-    steps: ['support-needs'],
+    steps: ['upload-document', 'support-needs', 'check-your-answers-documents'],
   },
   {
     id: 'checkYourAnswersAndSubmit',
@@ -140,7 +127,7 @@ const sectionDefs = [
       'incomeAndExpenditure',
       'uploadFiles',
     ],
-    steps: ['check-your-answers'],
+    steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used', 'check-your-answers'],
   },
 ] as const satisfies readonly {
   id: string;
@@ -167,8 +154,6 @@ export const RESPOND_TO_CLAIM_SECTION_ENUMS = [
   'SITUATION_AND_CIRCUMSTANCES',
   'INCOME_AND_EXPENDITURE',
   'UPLOAD_FILES',
-  'EQUALITY_AND_DIVERSITY',
-  'TELL_US_IF_YOU_NEED_SUPPORT',
   'CHECK_YOUR_ANSWERS_AND_SUBMIT',
 ] as const;
 

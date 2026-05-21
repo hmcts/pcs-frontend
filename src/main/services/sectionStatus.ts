@@ -77,14 +77,11 @@ export async function getSectionStatus(
   const questionSteps = visibleQuestionSteps(section, stepRegistry, flowConfig, req);
   if (questionSteps.length === 0) {
     // No countable question steps. If the section has a CYA the citizen still has to walk to,
-    // status is gated purely on completedSections — handled above for DONE. Otherwise: stay
-    // AVAILABLE as long as any step is visible (e.g. all-placeholder sections like
-    // tellUsIfYouNeedSupport); if no step is visible, the section has nothing to show.
+    // status is gated purely on completedSections — handled above for DONE. Otherwise AVAILABLE.
     if (sectionHasCya(section)) {
       return 'AVAILABLE';
     }
-    const hasVisibleStep = section.steps.some(stepName => isStepVisible(stepName, flowConfig, req));
-    return hasVisibleStep ? 'AVAILABLE' : 'NOT_APPLICABLE';
+    return 'NOT_APPLICABLE';
   }
 
   const raw = scoreAnsweredness(questionSteps, req);
