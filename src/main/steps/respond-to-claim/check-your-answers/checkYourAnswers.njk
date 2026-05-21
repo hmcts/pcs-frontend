@@ -17,8 +17,10 @@
 
   {% for section in sections %}
     {% if section.rows.length > 0 %}
-      <h2 class="govuk-heading-m">{{ section.heading }}</h2>
-      {{ govukSummaryList({ rows: section.rows }) }}
+      {{ govukSummaryList({
+        card: { title: { text: section.heading } },
+        rows: section.rows
+      }) }}
     {% endif %}
   {% endfor %}
 
