@@ -498,9 +498,9 @@ export function validateForm(
         // HTML/script tag validation - prevent stored XSS
         if (field.type === 'character-count' || field.type === 'text' || (field.type === 'textarea' && value)) {
           const text = (value as string)?.trim();
-          const htmlTagRegex = /<[^>]*>/;
+          const containsHtmlTag = !!text && text.includes('<') && text.includes('>');
 
-          if (text && htmlTagRegex.test(text)) {
+          if (containsHtmlTag) {
             if (!errors[fieldName]) {
               const translationLabelKey =
                 typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
