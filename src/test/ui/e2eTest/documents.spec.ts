@@ -1,14 +1,19 @@
 import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  checkYourAnswers,
   confirmIfTheseDocumentsRelateToAnApplication,
   startEvidenceUpload,
-  uploadYourDocuments,
   viewDocuments,
 } from '../data/page-data/documents-page-data';
+import { uploadYourDocumentsErrorValidation } from '../functional/documents-functional/uploadYourDocuments.pft';
+import {
+  clearErrorMessageValidationFailures,
+  softErrorMessageValidation,
+} from '../utils/common/error-message-validation-helper';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
-
+import { ErrorMessageValidation } from '../utils/validations/custom-validations';
 const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }, testInfo) => {
@@ -28,6 +33,8 @@ test.beforeEach(async ({ page }, testInfo) => {
 
 test.afterEach(async () => {
   finaliseAllValidations();
+  ErrorMessageValidation.clearResults();
+  clearErrorMessageValidationFailures();
 });
 
 test.describe('Documents - e2e Journey @nightly', async () => {
@@ -47,7 +54,9 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+    await softErrorMessageValidation('uploadYourDocuments', uploadYourDocumentsErrorValidation);
+    await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
 
   test('View documents submitted through make a claim @regression', async () => {

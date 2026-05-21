@@ -46,8 +46,8 @@ export class ActionRegistry {
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
-    ['startEvidenceUpload', new DocumentsAction()],
-    ['validateViewDocuments', new DocumentsAction()],
+
+    //Respond To Claim
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
@@ -116,6 +116,11 @@ export class ActionRegistry {
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
+
+    //Documents
+    ['startEvidenceUpload', new DocumentsAction()],
+    ['uploadDocuments', new DocumentsAction()],
+    ['validateViewDocuments', new DocumentsAction()],
   ]);
 
   static getAction(actionName: string): IAction {
