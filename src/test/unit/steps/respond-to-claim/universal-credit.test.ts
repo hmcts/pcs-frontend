@@ -213,11 +213,7 @@ describe('respond-to-claim universal-credit step', () => {
     });
   });
 
-  it('no-ops when selection is yes and date is partial (preserves prior state)', async () => {
-    // beforeRedirect must NOT throw on a partial date — Save for later bypasses validation
-    // upstream in postHandler, so beforeRedirect can be called with whatever's in req.body.
-    // Returning early preserves any prior `hasAppliedForUniversalCredit` / `ucApplicationDate`,
-    // instead of crashing or writing an invalid date to CCD.
+  it('no-ops when selection is yes and date is partial', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {

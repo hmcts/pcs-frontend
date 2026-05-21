@@ -11,9 +11,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   beforeRedirect: async req => {
     const selection = req.body?.havePriorityDebts as string | undefined;
     if (selection !== 'yes' && selection !== 'no') {
-      // Reached via Save for later when the radio is empty — validation is bypassed for SFL,
-      // so don't crash. Preserve prior state (no-op) instead of clearing the answer; the
-      // normaliser would otherwise cascade-clear `priority-debt-details` answers.
       return;
     }
 

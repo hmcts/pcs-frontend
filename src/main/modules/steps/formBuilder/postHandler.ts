@@ -32,6 +32,15 @@ function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
   return flowConfig?.useSessionFormData !== false;
 }
 
+function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig | undefined): string {
+  const caseId = req.res?.locals.validatedCase?.id;
+  const hubStepName = flowConfig?.hubStepName;
+  if (hubStepName && caseId && flowConfig) {
+    return getStepUrl(hubStepName, flowConfig, caseId);
+  }
+  return (caseId && getDashboardUrl(caseId)) || '/';
+}
+
 export function createPostHandler(
   fields: FormFieldConfig[],
   stepName: string,
@@ -102,10 +111,6 @@ export function createPostHandler(
       const fieldErrors = getTranslationErrors(t, fields, undefined, interpolationValues);
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
-      // Save for later is a pure exit: the citizen explicitly chose to leave with whatever
-      // they've typed. Validation must not gate them on a step they don't want to complete now.
-      // Brittle step `beforeRedirect` functions (priority-debts, universal-credit) handle partial
-      // input by returning early — see docs/HDPI-5350/sfl-fix.md.
       if (!isSaveForLater && Object.keys(errors).length > 0) {
         const formContent = buildFormContent(
           fields,
@@ -160,21 +165,7 @@ export function createPostHandler(
       }
 
       if (isSaveForLater) {
-        const caseId = req.res?.locals.validatedCase?.id;
-
-        // Sectioned flows define a hub step (e.g. `task-list` for citizen respond-to-claim);
-        // SFL lands the citizen there (AC10). Mirrors `createSectionCyaStep.ts:89-95`.
-        const hubStepName = resolvedFlowConfig?.hubStepName;
-        if (hubStepName && caseId && resolvedFlowConfig) {
-          return safeRedirect303(res, getStepUrl(hubStepName, resolvedFlowConfig, caseId), '/', ['/']);
-        }
-
-        // Fallback for flows without a hub (legalrep, makeAnApplication, etc.) — dashboard.
-        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
-        if (!dashboardUrl) {
-          return safeRedirect303(res, '/', '/', ['/']);
-        }
-        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
+        return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
       }
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);

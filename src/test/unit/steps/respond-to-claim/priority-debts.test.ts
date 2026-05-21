@@ -89,12 +89,7 @@ describe('respond-to-claim priority-debts step', () => {
     );
   });
 
-  it('no-ops when priority debts selection is missing (preserves prior state)', async () => {
-    // beforeRedirect must NOT throw on empty input — Save for later bypasses validation
-    // upstream in postHandler, so beforeRedirect can be called with whatever's in req.body.
-    // Returning early preserves any prior `priorityDebts` value (and downstream
-    // `priority-debt-details` answers via the normaliser cascade), instead of crashing or
-    // wiping the citizen's earlier responses.
+  it('no-ops when priority debts selection is missing', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({ body: { action: 'continue' } });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

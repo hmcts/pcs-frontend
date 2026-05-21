@@ -965,10 +965,7 @@ describe('formBuilder', () => {
         expect(res.redirect).toHaveBeenCalledWith(303, '/');
       });
 
-      it('should bypass validation when saveForLater is clicked with invalid data (AC10)', async () => {
-        // Per AC10, Save for later is a pure exit — validation must not gate the citizen on a
-        // step they explicitly chose not to complete now. With the fix, SFL bypasses the
-        // validation-error render and proceeds to the redirect path.
+      it('bypasses validation on saveForLater and redirects', async () => {
         mockValidateForm.mockReturnValueOnce({ testField: 'This field is required' });
 
         const step = createFormStep(baseConfig);
@@ -999,10 +996,8 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        // No error render, no 400 status — the citizen is allowed to leave.
         expect(res.status).not.toHaveBeenCalledWith(400);
         expect(res.render).not.toHaveBeenCalled();
-        // baseConfig has no hubStepName, so SFL falls back to the dashboard.
         expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
       });
 
