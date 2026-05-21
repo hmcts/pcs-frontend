@@ -2,7 +2,7 @@ import { resolveIdamPassword } from '../../utils/idamPassword';
 
 export const user = {
   claimantSolicitor: {
-    email: 'pcs-solicitor-automation@test.com',
+    email: process.env.PCS_SOLICITOR_AUTOMATION_EMAIL,
     get password() {
       return resolveIdamPassword();
     },
