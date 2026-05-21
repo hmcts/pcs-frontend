@@ -20,8 +20,7 @@
     "NOTICE": "cyOrders and notices from the court",
     "DOCUMENTS": "cyDocuments",
     "RESPONSE": "cyThe response",
-    "APPLICATIONS": "cyApplications",
-    "DOCUMENTS": "cyDocuments"
+    "APPLICATIONS": "cyApplications"
   },
 
   "notifications": {
