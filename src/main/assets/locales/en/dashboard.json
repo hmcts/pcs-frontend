@@ -49,7 +49,7 @@
     "ViewDocuments": { "title": "View documents" },
     "ViewHearingDocuments": { "title": "View hearing documents" },
     "ViewOrdersAndNotices": { "title": "View orders and notices" },
-    "UploadDocuments": { "title": "Upload documents" },
+    "UploadDocuments": { "title": "Upload additional documents" },
     "ReviewResponse": { "title": "Review the response" },
     "SubmitResponse": { "title": "Submit the response" },
     "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
@@ -58,6 +58,13 @@
 
   "viewDocuments": {
     "pageTitle": "View documents",
-    "noDocuments": "There are no documents to display."
+    "noDocuments": "There are no documents to display.",
+    "submittedOn": "Submitted on",
+    "folders": {
+      "statementsOfCase": "Statements of case",
+      "propertyDocuments": "Property documents",
+      "evidence": "Evidence",
+      "correspondence": "Correspondence"
+    }
   }
 }
