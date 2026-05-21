@@ -95,12 +95,18 @@ const sectionDefs = [
   {
     id: 'uploadFiles',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document', 'support-needs', 'section-cya-upload-files'],
+    steps: ['upload-document', 'section-cya-upload-files'],
   },
   {
     id: 'checkYourAnswersAndSubmit',
     titleKey: 'taskList.checkYourAnswersAndSubmit',
-    steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used', 'check-your-answers'],
+    steps: [
+      'support-needs',
+      'equality-and-diversity-start',
+      'equality-and-diversity-end',
+      'language-used',
+      'check-your-answers',
+    ],
   },
 ] as const;
 

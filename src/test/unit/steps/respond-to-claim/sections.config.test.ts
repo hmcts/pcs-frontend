@@ -45,11 +45,12 @@ describe('respond-to-claim sections config', () => {
   });
 
   it('maps upload section steps', () => {
-    expect(findSection('uploadFiles')?.steps).toEqual(['upload-document', 'support-needs', 'section-cya-upload-files']);
+    expect(findSection('uploadFiles')?.steps).toEqual(['upload-document', 'section-cya-upload-files']);
   });
 
   it('maps end-of-journey steps into final section', () => {
     expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
+      'support-needs',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',
