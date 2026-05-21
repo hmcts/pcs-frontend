@@ -2,6 +2,8 @@ import {
   ACCEPT_ATTRIBUTE_EXTENSIONS,
   UPLOAD_MAX_FILE_SIZE_BYTES,
   UPLOAD_MAX_FILE_SIZE_MB,
+  UPLOAD_MAX_TOTAL_SIZE_BYTES,
+  UPLOAD_MAX_TOTAL_SIZE_MB,
   getFileExtensionLower,
   isBlockedExtension,
   validateFileType,
@@ -118,9 +120,14 @@ describe('documentUploadValidation', () => {
   });
 
   describe('constants', () => {
-    it('has 1GB max file size', () => {
-      expect(UPLOAD_MAX_FILE_SIZE_MB).toBe(1024);
-      expect(UPLOAD_MAX_FILE_SIZE_BYTES).toBe(1024 * 1024 * 1024);
+    it('has 100MB max file size per file', () => {
+      expect(UPLOAD_MAX_FILE_SIZE_MB).toBe(100);
+      expect(UPLOAD_MAX_FILE_SIZE_BYTES).toBe(100 * 1024 * 1024);
+    });
+
+    it('has 1GB max total file size', () => {
+      expect(UPLOAD_MAX_TOTAL_SIZE_MB).toBe(1024);
+      expect(UPLOAD_MAX_TOTAL_SIZE_BYTES).toBe(1024 * 1024 * 1024);
     });
 
     it('has accept attribute string with sorted extensions', () => {

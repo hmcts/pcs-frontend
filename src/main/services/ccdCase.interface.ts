@@ -126,6 +126,13 @@ export interface CcdClaimantOrganisation {
   id: string;
 }
 
+/** Parties involved in the claim  */
+export interface CcdParty {
+  firstName?: string;
+  lastName?: string;
+  orgName?: string;
+}
+
 /** Claimant-entered defendant details captured when the claim was created. */
 export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
@@ -206,6 +213,7 @@ export interface CcdDefendantResponses {
 
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
+  needHelpWithFees?: YesNoValue;
   claimType?: string;
   isClaimAmountKnown?: string;
   claimAmount?: PenceAmount;
@@ -219,6 +227,7 @@ export interface PossessionClaimResponse {
   };
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
+  currentDefendantPartyId?: string;
 }
 
 export type CaseData = CcdCaseData;
@@ -254,12 +263,21 @@ export interface CcdCaseData {
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
+  allClaimants?: CcdCollectionItem<CcdParty>[];
+  allDefendants?: CcdCollectionItem<CcdParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
-  allDocuments?: CcdCollectionItem<Partial<CcdDocumentReference>>[];
+  allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+}
+
+export interface CcdCaseDocument {
+  document_binary_url?: string;
+  document_filename?: string;
+  upload_timestamp?: string;
+  category_id?: string;
 }
 
 /** Case representation used by services: id + case_data. */
@@ -348,6 +366,8 @@ export interface CitizenGenAppRequest {
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
   whatOrderWanted?: string;
+  hasSupportingDocuments?: YesNoValue;
+  uploadedDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   sotAccepted?: YesNoValue;
   sotFullName?: string;
   clientReference?: string;

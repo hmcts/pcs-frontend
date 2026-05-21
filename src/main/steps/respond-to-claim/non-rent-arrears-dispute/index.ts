@@ -14,7 +14,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -78,7 +77,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseReference = req.params.caseReference;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
 
-    const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
+    const t = getTranslationFunction(req);
 
     // Pre-translate content with interpolation (following rent-arrears pattern)
     return {

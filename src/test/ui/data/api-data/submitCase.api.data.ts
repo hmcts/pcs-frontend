@@ -110,15 +110,64 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
       hasUnderlesseeOrMortgagee: 'NO',
-      wantToUploadDocuments: 'NO',
       applicationWithClaim: 'NO',
       languageUsed: 'ENGLISH',
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
+      wantToUploadDocuments: 'YES',
+      additionalDocuments: [
+        {
+          value: {
+            documentType: 'WITNESS_STATEMENT',
+            description: 'Witness Document',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/e49660db-7a90-4532-ae67-092aa67604d7`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/e49660db-7a90-4532-ae67-092aa67604d7/binary`,
+              document_filename: 'WitnessStatement.png',
+            },
+          },
+          id: 'e29294e8-2f34-4a7f-992a-4a494596912b',
+        },
+        {
+          value: {
+            documentType: 'RENT_STATEMENT',
+            description: 'Rent Document',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e/binary`,
+              document_filename: 'RentStatement.pdf',
+            },
+          },
+          id: 'de2256bc-69ef-4b8e-a485-32d7902cfba8',
+        },
+        {
+          value: {
+            documentType: 'NOTICE_FOR_SERVICE_OUT_OF_JURISDICTION',
+            description: 'Notice Document',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/d5936738-2338-4c9b-918c-33f7cd199dca`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/d5936738-2338-4c9b-918c-33f7cd199dca/binary`,
+              document_filename: 'NoticeServiceJurisdiction.docx',
+            },
+          },
+          id: '4917573c-18aa-4cd4-aec9-b7fb761a1035',
+        },
+        {
+          value: {
+            documentType: 'CERTIFICATE_OF_SUITABILITY_AS_LF',
+            description: 'Certificate of Suitability',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/17f75c63-488a-4404-afd2-0aa3a9d65170`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/17f75c63-488a-4404-afd2-0aa3a9d65170/binary`,
+              document_filename: 'CertificateOfSuitability.xlsx',
+            },
+          },
+          id: 'c681d9af-67eb-4298-87b6-e539fc1b6370',
+        },
+      ],
       statementOfTruth: {
         completedBy: 'CLAIMANT',
         fullNameClaimant: 'Test',
@@ -186,7 +235,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
@@ -311,7 +359,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
@@ -331,11 +378,14 @@ export const submitCaseApiData = {
   //Assured tenancy with Tenancy Licence date unknown for Non-Rent arrears only
   get submitCasePayloadAssuredTenancy() {
     return {
+      orgNameFound: 'Yes',
+      claimantName: 'Possession Claims Solicitor Org',
+      isClaimantNameCorrect: 'YES',
       legislativeCountry: 'England',
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
-          label: 'Registered provider of social housing',
+          label: 'Registered provider of social housing or local authority',
         },
         list_items: [
           {
@@ -344,7 +394,7 @@ export const submitCaseApiData = {
           },
           {
             code: 'PROVIDER_OF_SOCIAL_HOUSING',
-            label: 'Registered provider of social housing',
+            label: 'Registered provider of social housing or local authority',
           },
           {
             code: 'MORTGAGE_LENDER',
@@ -358,12 +408,9 @@ export const submitCaseApiData = {
         valueCode: 'PROVIDER_OF_SOCIAL_HOUSING',
       },
       claimAgainstTrespassers: 'NO',
-      orgNameFound: 'YES',
-      claimantName: 'Possession Claims Solicitor Org',
-      isClaimantNameCorrect: 'YES',
       claimantContactEmail: 'pcs-solicitor1@test.com',
       isCorrectClaimantContactEmail: 'YES',
-      orgAddressFound: 'YES',
+      orgAddressFound: 'Yes',
       organisationAddress: {
         AddressLine1: 'Ministry Of Justice',
         AddressLine2: 'Seventh Floor 102 Petty France',
@@ -381,25 +428,25 @@ export const submitCaseApiData = {
       addAnotherDefendant: 'NO',
       tenancy_TypeOfTenancyLicence: process.env.TENANCY_TYPE,
       tenancy_TenancyLicenceDate: null,
-      tenancy_TenancyLicenceDocuments: [],
-      claimDueToRentArrears: 'NO',
+      tenancy_HasCopyOfTenancyLicence: 'NO',
+      tenancy_ReasonsForNoTenancyLicenceDocuments: 'Test-reason',
+      claimDueToRentArrears: 'No',
+      showRentSectionPage: 'No',
+      noRentArrears_ShowGroundReasonPage: 'Yes',
+      noRentArrears_MandatoryGrounds: [],
+      noRentArrears_DiscretionaryGrounds: ['ALTERNATIVE_ACCOMMODATION_GROUND9'],
+      assuredNoArrearsReasons_SuitableAlternativeAccomodation: 'accommodation details test',
       preActionProtocolCompleted: 'NO',
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
       noticeServed: process.env.NOTICE_SERVED,
-      showRentSectionPage: 'NO',
-      noRentArrears_ShowGroundReasonPage: 'YES',
-      noRentArrears_MandatoryGrounds: [],
-      noRentArrears_DiscretionaryGrounds: ['ALTERNATIVE_ACCOMMODATION_GROUND9'],
-      assuredNoArrearsReasons_SuitableAlternativeAccomodation: 'accommodation details test',
       claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
       claimantCircumstancesSelect: 'NO',
       hasDefendantCircumstancesInfo: 'NO',
-      suspensionOfRTB_ShowHousingActsPage: 'NO',
-      demotionOfTenancy_ShowHousingActsPage: 'NO',
-      suspensionToBuyDemotionOfTenancyPages: 'NO',
+      suspensionOfRTB_ShowHousingActsPage: 'No',
+      demotionOfTenancy_ShowHousingActsPage: 'No',
+      suspensionToBuyDemotionOfTenancyPages: 'No',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
@@ -408,6 +455,7 @@ export const submitCaseApiData = {
       applicationWithClaim: 'NO',
       languageUsed: 'ENGLISH_AND_WELSH',
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
+      endButtonLabel: null,
     };
   },
   //Secure and Flexible Tenancy with Tenancy Licence date unknown for Non-Rent arrears only
@@ -481,7 +529,6 @@ export const submitCaseApiData = {
       suspensionOfRTB_ShowHousingActsPage: 'NO',
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
-      claimingCostsWanted: 'NO',
       hasUnderlesseeOrMortgagee: 'NO',
       wantToUploadDocuments: 'NO',
       applicationWithClaim: 'NO',
@@ -573,7 +620,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },
@@ -680,7 +726,6 @@ export const submitCaseApiData = {
       demotionOfTenancy_ShowHousingActsPage: 'NO',
       suspensionToBuyDemotionOfTenancyPages: 'NO',
       alternativesToPossession: [],
-      claimingCostsWanted: 'NO',
       additionalReasonsForPossession: {
         hasReasons: 'NO',
       },

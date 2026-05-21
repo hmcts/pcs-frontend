@@ -17,17 +17,11 @@ export const step: StepDefinition = {
   view: 'respond-to-claim/start-now/startNow.njk',
   stepDir: __dirname,
   getController: () => {
-    return createGetController(
-      'respond-to-claim/start-now/startNow.njk',
-      stepName,
-      stepNavigation,
-      (req: Request) => {
-        return {
-          backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-        };
-      },
-      'respondToClaim'
-    );
+    return createGetController('respond-to-claim/start-now/startNow.njk', stepName, stepNavigation, (req: Request) => {
+      return {
+        backUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+      };
+    });
   },
   postController: {
     post: async (req: Request, res: Response) => {
