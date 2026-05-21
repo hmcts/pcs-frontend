@@ -3,7 +3,14 @@ import type { Request } from 'express';
 import type { DocumentStorage } from '@modules/documents/storage';
 import type { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
-/** Hidden MOJ multifile inputs post as uploadedDocuments[]; map back for error re-render. */
+/**
+ * Parses already-uploaded document metadata from POST `req.body`, not from multipart file parts.
+ *
+ * Actual files are uploaded by multer on the step's AJAX `/upload` route; successful uploads are
+ * written into hidden `<input name="uploadedDocuments[]">` fields (JSON strings) by the MOJ script.
+ * On "Save and continue" those arrive as ordinary form fields — not as `req.files`. This helper
+ * decodes them so validation-error re-renders can restore the file list on the MOJ multi-file-upload.
+ */
 export function parseUploadedDocumentsFromBody(body: Record<string, unknown>): Record<string, unknown>[] {
   const raw = body['uploadedDocuments[]'];
   if (raw === undefined || raw === null) {

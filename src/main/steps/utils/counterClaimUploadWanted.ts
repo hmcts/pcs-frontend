@@ -1,8 +1,12 @@
 import type { Request } from 'express';
 
+import { YesNoEnum } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
+
 export const counterClaimUploadWanted = (req: Request): boolean => {
-  return (
-    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaimWantToUploadFiles ===
-    'YES'
-  );
+  const caseModel = req.res?.locals?.validatedCase;
+  if (!(caseModel instanceof CcdCaseModel)) {
+    return false;
+  }
+  return caseModel.defendantResponsesCounterClaimWantToUploadFiles === YesNoEnum.YES;
 };
