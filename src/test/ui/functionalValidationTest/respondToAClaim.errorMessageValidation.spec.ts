@@ -9,6 +9,7 @@ import {
   counterClaimAbout,
   counterClaimAgainstWhom,
   counterClaimFee,
+  counterClaimHaveYouAppliedForHelp,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -39,13 +40,13 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-import { haveYouAlreadyAppliedForHelp } from '../data/page-data/genApps-page-data/haveYouAlreadyAppliedForHelp.page.data';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
 import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
 import { counterClaimFeeErrorValidation } from '../functional/counterClaimFee.pft';
+import { counterClaimHaveYouAppliedForHelpErrorValidation } from '../functional/counterClaimHaveYouAppliedForHelp.pft';
 import { counterClaimSpecificSumErrorValidation } from '../functional/counterClaimSpecificSumOfMoney.pft';
 import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/counterClaimWhatAreYouClaimingFor.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
@@ -294,7 +295,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-
     await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
     await performAction('selectWhatAreYouClaimingFor', {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
@@ -451,7 +451,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     assertAllErrorMessageValidations();
   });
 
-  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
+  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
 
@@ -531,10 +531,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
     await performAction('selectWhatAreYouClaimingFor', {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
-      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
 
-    await await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
+    await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
     await performAction('counterClaimSpecificSumOfMoney', {
       question: counterClaimSpecificSumOfMoney.mainHeader,
       option: counterClaimSpecificSumOfMoney.noRadioOption,
@@ -548,9 +548,16 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
 
-    await softErrorMessageValidation('haveYouAlreadyAppliedForHelp', NO_EMV_READ_ONLY);
-    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
-
+    await softErrorMessageValidation(
+      'counterClaimHaveYouAppliedForHelp',
+      counterClaimHaveYouAppliedForHelpErrorValidation
+    );
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
+    });
+    await performValidation('mainHeader', counterClaimAbout.mainHeader);
+    await performAction('clickButton', counterClaimAbout.continueButton);
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
 

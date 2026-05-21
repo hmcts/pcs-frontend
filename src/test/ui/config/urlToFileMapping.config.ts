@@ -38,6 +38,8 @@ export default {
   'do-you-have-any-dependant-children': 'doYouHaveAnyDependantChildren',
   'do-you-have-any-other-dependants': 'doYouHaveAnyOtherDependants',
   'choose-an-application': 'chooseAnApplication',
+  'counter-claim-you-need-to-apply-for-help-with-your-fees': 'counterclaimYouNeedToApplyForHelpWithYourFees',
+  'counter-claim-have-you-applied-for-help': 'counterClaimHaveYouAlreadyAppliedForHelpWithYourFees',
   'make-an-application/check-your-answers': 'checkYourAnswersGenApps',
   'respond-to-claim/check-your-answers': 'checkYourAnswers',
   'language-used': 'languageUsed',
