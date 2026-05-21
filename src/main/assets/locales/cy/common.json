@@ -48,7 +48,7 @@
     "defaultRequired": "cyThis field is required",
     "defaultInvalid": "cyInvalid format",
     "defaultMaxLength": "cyMust be {max} characters or fewer",
-    "defaultSpecialCharacter": "cy{fieldName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
+    "defaultSpecialCharacter": "{fieldName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
     "chooseOption": "cyChoose an option",
     "email": {
       "required": "cyEnter an email address",
