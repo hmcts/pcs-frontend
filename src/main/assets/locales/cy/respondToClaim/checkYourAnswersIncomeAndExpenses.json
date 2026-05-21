@@ -14,10 +14,10 @@
       "label": "cy What regular income do you receive?",
       "changeHidden": "cy the regular income you receive",
       "options": {
-        "incomeFromJobs": "cy Income from jobs",
-        "pension": "cy Pension",
+        "incomeFromJobs": "cy Income from all jobs you do",
+        "pension": "cy Pension – state and private",
         "universalCredit": "cy Universal Credit",
-        "otherBenefits": "cy Other benefits",
+        "otherBenefits": "cy Other benefits and credits",
         "moneyFromElsewhere": "cy Money from somewhere else"
       }
     },

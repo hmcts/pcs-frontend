@@ -3,24 +3,24 @@
   "cardTitle": "Payments and agreements",
   "rows": {
     "anyPaymentsMade": {
-      "label": "Have you made any repayments to your landlord?",
-      "changeHidden": "whether you have made any repayments"
+      "label": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
+      "changeHidden": "whether you have paid any money since the claim was issued"
     },
     "paymentDetails": {
       "label": "What repayments have you made?",
       "changeHidden": "the repayments you have made"
     },
     "repaymentPlanAgreed": {
-      "label": "Have you agreed a repayment plan?",
-      "changeHidden": "whether you have agreed a repayment plan"
+      "label": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+      "changeHidden": "whether you have come to a repayment agreement since the claim was issued"
     },
     "repaymentAgreedDetails": {
       "label": "What repayment plan have you agreed?",
       "changeHidden": "the repayment plan you have agreed"
     },
     "repayArrearsInstalments": {
-      "label": "Can you pay your rent and contribute to the arrears?",
-      "changeHidden": "whether you can pay rent and contribute to arrears"
+      "label": "Would you like to offer to pay your arrears in instalments?",
+      "changeHidden": "whether you would like to offer to pay your arrears in instalments"
     },
     "affordToPay": {
       "label": "How much can you afford to pay towards arrears?",
