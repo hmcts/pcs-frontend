@@ -28,7 +28,7 @@ const storage: DocumentStorage = {
     if (!caseId) {
       throw new HTTPError('Invalid case reference format', 404);
     }
-    const fresh = await ccdCaseService.getCaseById(token, caseId, RESPOND_TO_CLAIM_DRAFT_EVENT.id);
+    const fresh = await ccdCaseService.getCaseByIdForEvent(token, caseId, RESPOND_TO_CLAIM_DRAFT_EVENT.id);
     const docs = fresh.data?.possessionClaimResponse?.defendantResponses?.counterClaimDocuments;
     return Array.isArray(docs) ? docs : [];
   },
