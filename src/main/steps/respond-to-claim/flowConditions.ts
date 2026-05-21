@@ -102,9 +102,11 @@ export function shouldShowCounterClaimNeedToApplyStep(req: Request): boolean {
 }
 
 export function shouldShowCounterClaimAgainstWhoStep(req: Request): boolean {
-  return getCounterClaimNeedHelpWithFees(req) === 'NO' && hasMultipleParties(req);
+  return (
+    hasMultipleParties(req) && (getCounterClaimNeedHelpWithFees(req) === 'NO' || hasAppliedForCounterClaimHwf(req))
+  );
 }
 
 export function shouldShowCounterClaimAboutStep(req: Request): boolean {
-  return getCounterClaimNeedHelpWithFees(req) === 'NO';
+  return hasAppliedForCounterClaimHwf(req) || getCounterClaimNeedHelpWithFees(req) === 'NO';
 }

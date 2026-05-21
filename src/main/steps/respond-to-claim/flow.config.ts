@@ -15,11 +15,11 @@ import {
 } from '../utils';
 
 import {
-  hasAppliedForCounterClaimHwf,
   hasConfirmedInstallmentOffer,
   hasProvidedFinanceDetails,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
+  shouldShowCounterClaimAboutStep,
   shouldShowCounterClaimAgainstWhoStep,
   shouldShowCounterClaimHelpWithFeesStep,
   shouldShowCounterClaimNeedToApplyStep,
@@ -100,7 +100,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => shouldShowCounterClaimAgainstWhoStep(req),
     },
     'counter-claim-about': {
-      showCondition: (req: Request) => hasAppliedForCounterClaimHwf(req),
+      showCondition: (req: Request) => shouldShowCounterClaimAboutStep(req),
     },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
