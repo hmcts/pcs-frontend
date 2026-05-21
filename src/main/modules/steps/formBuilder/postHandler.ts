@@ -164,6 +164,7 @@ export function createPostHandler(
       }
 
       if (isSaveForLater) {
+        delete req.session.returnToCya;
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
       }
 

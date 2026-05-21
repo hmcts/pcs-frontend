@@ -24,13 +24,13 @@ export type EndOfJourneyCyaSection = {
 };
 
 export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJourneyCyaSection[] {
-  const tStartNow = getTranslationFunction(req, 'check-your-answers-start-now-and-details', ['common']);
-  const tPersonal = getTranslationFunction(req, 'check-your-answers-personal-details', ['common']);
-  const tResponse = getTranslationFunction(req, 'check-your-answers-your-response', ['common']);
-  const tPayments = getTranslationFunction(req, 'check-your-answers-payments-and-agreements', ['common']);
-  const tCircumstances = getTranslationFunction(req, 'check-your-answers-your-circumstances', ['common']);
-  const tIncome = getTranslationFunction(req, 'check-your-answers-income-and-expenses', ['common']);
-  const tDocuments = getTranslationFunction(req, 'check-your-answers-documents', ['common']);
+  const tStartNow = getTranslationFunction(req, ['respondToClaim/checkYourAnswersStartNowAndDetails', 'common']);
+  const tPersonal = getTranslationFunction(req, ['respondToClaim/checkYourAnswersPersonalDetails', 'common']);
+  const tResponse = getTranslationFunction(req, ['respondToClaim/checkYourAnswersYourResponse', 'common']);
+  const tPayments = getTranslationFunction(req, ['respondToClaim/checkYourAnswersPaymentsAndAgreements', 'common']);
+  const tCircumstances = getTranslationFunction(req, ['respondToClaim/checkYourAnswersYourCircumstances', 'common']);
+  const tIncome = getTranslationFunction(req, ['respondToClaim/checkYourAnswersIncomeAndExpenses', 'common']);
+  const tDocuments = getTranslationFunction(req, ['respondToClaim/checkYourAnswersDocuments', 'common']);
 
   const sections: EndOfJourneyCyaSection[] = [];
 
@@ -80,5 +80,13 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
     rows: buildLanguageUsedRows(req, t),
   });
 
-  return sections;
+  return sections.map(section => ({
+    ...section,
+    rows: section.rows.map(row => ({
+      ...row,
+      actions: {
+        items: row.actions.items.map(item => ({ ...item, href: `${item.href}&cyaReturn=1` })),
+      },
+    })),
+  }));
 }

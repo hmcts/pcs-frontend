@@ -15,7 +15,7 @@ import { shouldShowStep } from '@steps';
 const logger = Logger.getLogger('respondToClaimAccessGuard');
 
 export function respondToClaimAccessGuard(): RequestHandler {
-  return async (req, res, next) => {
+  return async (req: Request, res, next) => {
     if (shouldSkipGuard(req)) {
       return next();
     }
@@ -33,6 +33,10 @@ export function respondToClaimAccessGuard(): RequestHandler {
     const caseId = req.res?.locals.validatedCase?.id;
     if (!caseId) {
       return next();
+    }
+
+    if (req.query.cyaReturn) {
+      req.session.returnToCya = `/case/${caseId}/respond-to-claim/check-your-answers`;
     }
 
     const hubUrl = getStepUrl(hubStepName, flowConfig, caseId);

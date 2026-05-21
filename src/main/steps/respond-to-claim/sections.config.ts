@@ -153,7 +153,7 @@ export const RESPOND_TO_CLAIM_SECTION_IDS: readonly RespondToClaimSectionId[] = 
 
 export const respondToClaimSections: readonly SectionConfig[] = sectionDefs;
 
-export const CYA_STEP_PREFIX = 'check-your-answers-' as const;
+export const CYA_STEP_PREFIX = 'check-your-answers' as const;
 
 export const RESPOND_TO_CLAIM_SECTION_ENUMS = [
   'START_NOW_AND_DETAILS',
