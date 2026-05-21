@@ -67,7 +67,11 @@
     },
     "counterClaimNeedHelpWithFees": {
       "label": "Do you need help paying the counterclaim fee?",
-      "changeHidden": "whether you need help paying the counterclaim fee"
+      "changeHidden": "whether you need help paying the counterclaim fee",
+      "options": {
+        "YES": "I need help paying the fee",
+        "NO": "I do not need help paying the fee"
+      }
     }
   }
 }
