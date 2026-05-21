@@ -231,13 +231,13 @@ function addCounterClaimDetailsRows(ctx: RowContext): void {
   addCounterClaimNeedHelpWithFeesRow(ctx, cc);
 }
 
-function addCounterClaimNeedHelpWithFeesRow({ rows, t, change, yesNoNotSure }: RowContext, cc: CcdCounterClaim): void {
+function addCounterClaimNeedHelpWithFeesRow({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
   if (!cc.needHelpWithFees) {
     return;
   }
   rows.push({
     key: { text: t('rows.counterClaimNeedHelpWithFees.label') },
-    value: { text: yesNoNotSure(cc.needHelpWithFees) },
+    value: { text: t(`rows.counterClaimNeedHelpWithFees.options.${cc.needHelpWithFees}`) },
     actions: { items: [change('counter-claim-fee', 'rows.counterClaimNeedHelpWithFees.changeHidden')] },
   });
 }
