@@ -148,6 +148,7 @@ export const createPostController = (
           pageUrl: req.originalUrl || '/',
           t,
           backUrl: await stepNavigation.getBackUrl(req, stepName),
+          ...(res.locals?.extraHeaders ?? {}),
         });
       }
 
