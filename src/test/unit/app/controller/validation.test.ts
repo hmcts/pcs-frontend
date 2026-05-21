@@ -104,5 +104,26 @@ describe('validateForm', () => {
       expect(errors.textareaField).toContain('must only include letters a to z');
       expect(errors.charCountField).toContain('must only include letters a to z');
     });
+
+    it('should set HTML tag error using defaultSpecialCharacter translation with field name interpolated', () => {
+      const req = { body: { testField: `<script>alert('x')</script>` }, session: {} } as Partial<Request>;
+      const translations = {
+        defaultSpecialCharacter: '{fieldName} must only include letters a to z',
+      };
+
+      const errors = validateForm(req as Request, emojiFields, translations);
+
+      expect(errors.testField).toBe('Test field must only include letters a to z');
+    });
+
+    it('should fall back to hardcoded message for HTML-like input when no translations provided', () => {
+      const req = { body: { testField: '<strong>oops</strong>' }, session: {} } as Partial<Request>;
+
+      const errors = validateForm(req as Request, emojiFields, {});
+
+      expect(errors.testField).toBe(
+        'Test field must only include letters a to z, and special characters such as hyphens, spaces and apostrophes'
+      );
+    });
   });
 });

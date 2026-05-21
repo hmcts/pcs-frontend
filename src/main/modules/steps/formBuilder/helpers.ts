@@ -495,6 +495,31 @@ export function validateForm(
           }
         }
 
+        // HTML/script tag validation - prevent stored XSS
+        if (field.type === 'character-count' || field.type === 'text' || (field.type === 'textarea' && value)) {
+          const text = (value as string)?.trim();
+          const htmlTagRegex = /<[^>]*>/;
+
+          if (text && htmlTagRegex.test(text)) {
+            if (!errors[fieldName]) {
+              const translationLabelKey =
+                typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
+
+              const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
+
+              const displayName = resolvedLabel ?? toSentenceCase(fieldName);
+
+              const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
+                '{fieldName}',
+                displayName
+              );
+              errors[fieldName] =
+                defaultSpecialCharacterMsg ||
+                `${displayName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`;
+            }
+          }
+        }
+
         // Run validate function if provided (cross-field validation)
         if (field.validate) {
           try {
