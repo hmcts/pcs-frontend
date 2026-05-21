@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { penceToPounds } from '../../utils';
+import { formatIsoDate, penceToPounds } from '../../utils';
 import {
   type SummaryListRow,
   escapeWithLineBreaks,
@@ -19,6 +19,8 @@ const SECTION_ID: RespondToClaimSectionId = 'payments';
 interface RowContext {
   rows: SummaryListRow[];
   paymentAgreement: PaymentAgreement;
+  claimantName: string;
+  claimIssueDate: string;
   t: TFunction;
   change: ReturnType<typeof makeChange>;
   yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
@@ -34,6 +36,8 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   const ctx: RowContext = {
     rows: [],
     paymentAgreement: validatedCase.defendantResponses?.paymentAgreement ?? {},
+    claimantName: validatedCase.claimantName ?? '',
+    claimIssueDate: validatedCase.claimIssueDate ? formatIsoDate(validatedCase.claimIssueDate) : '',
     t,
     change: makeChange(caseRef, SECTION_ID, t),
     yesNoNotSure: makeYesNoNotSure(t),
@@ -47,12 +51,20 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
-function addAnyPaymentsMadeRows({ rows, paymentAgreement, t, change, yesNoNotSure }: RowContext): void {
+function addAnyPaymentsMadeRows({
+  rows,
+  paymentAgreement,
+  claimantName,
+  claimIssueDate,
+  t,
+  change,
+  yesNoNotSure,
+}: RowContext): void {
   if (!paymentAgreement.anyPaymentsMade) {
     return;
   }
   rows.push({
-    key: { text: t('rows.anyPaymentsMade.label') },
+    key: { text: t('rows.anyPaymentsMade.label', { claimantName, claimIssueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
     actions: { items: [change('repayments-made', 'rows.anyPaymentsMade.changeHidden')] },
   });
@@ -68,12 +80,20 @@ function addAnyPaymentsMadeRows({ rows, paymentAgreement, t, change, yesNoNotSur
   });
 }
 
-function addRepaymentPlanAgreedRows({ rows, paymentAgreement, t, change, yesNoNotSure }: RowContext): void {
+function addRepaymentPlanAgreedRows({
+  rows,
+  paymentAgreement,
+  claimantName,
+  claimIssueDate,
+  t,
+  change,
+  yesNoNotSure,
+}: RowContext): void {
   if (!paymentAgreement.repaymentPlanAgreed) {
     return;
   }
   rows.push({
-    key: { text: t('rows.repaymentPlanAgreed.label') },
+    key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, claimIssueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
     actions: { items: [change('repayments-agreed', 'rows.repaymentPlanAgreed.changeHidden')] },
   });

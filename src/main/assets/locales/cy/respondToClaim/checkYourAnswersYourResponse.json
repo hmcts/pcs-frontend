@@ -4,7 +4,7 @@
   "options": {
     "yes": "cy Yes",
     "no": "cy No",
-    "imNotSure": "cy I'm not sure"
+    "imNotSure": "cy I’m not sure"
   },
   "rows": {
     "landlordRegistered": {
@@ -16,8 +16,8 @@
       "changeHidden": "cy whether your landlord is licensed"
     },
     "writtenTerms": {
-      "label": "cy Did you have a written tenancy agreement?",
-      "changeHidden": "cy whether you had a written tenancy agreement"
+      "label": "cy Has your landlord sent you written terms of the occupation contract?",
+      "changeHidden": "cy whether your landlord has sent you written terms of the occupation contract"
     },
     "tenancyTypeCorrect": {
       "label": "cy Is the tenancy type on the claim correct?",
@@ -48,8 +48,8 @@
       "changeHidden": "cy how much you believe you owe in rent arrears"
     },
     "disputeClaim": {
-      "label": "cy Are you disputing other parts of the claim?",
-      "changeHidden": "cy whether you are disputing other parts of the claim"
+      "label": "cy Do you want to dispute any other parts of the claim?",
+      "changeHidden": "cy whether you want to dispute any other parts of the claim"
     },
     "disputeClaimDetails": {
       "label": "cy Why are you disputing this claim?",
@@ -68,10 +68,17 @@
         "BOTH": "cy Both"
       }
     },
-    "counterClaimAmount": {
-      "label": "cy How much are you counterclaiming?",
-      "changeHidden": "cy how much you are counterclaiming",
-      "estimatedMaxPrefix": "cy Estimated maximum:"
+    "isClaimAmountKnown": {
+      "label": "cy Are you claiming for a specific sum of money?",
+      "changeHidden": "cy whether you are claiming for a specific sum of money"
+    },
+    "claimAmount": {
+      "label": "cy How much are you claiming?",
+      "changeHidden": "cy how much you are claiming"
+    },
+    "estimatedMaxClaimAmount": {
+      "label": "cy What’s the maximum value of your claim?",
+      "changeHidden": "cy the maximum value of your claim"
     },
     "counterClaimNeedHelpWithFees": {
       "label": "cy Do you need help paying the counterclaim fee?",

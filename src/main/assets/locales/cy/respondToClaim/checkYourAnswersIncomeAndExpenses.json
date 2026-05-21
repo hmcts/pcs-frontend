@@ -14,10 +14,10 @@
       "label": "cy What regular income do you receive?",
       "changeHidden": "cy the regular income you receive",
       "options": {
-        "incomeFromJobs": "cy Income from jobs",
-        "pension": "cy Pension",
+        "incomeFromJobs": "cy Income from all jobs you do",
+        "pension": "cy Pension – state and private",
         "universalCredit": "cy Universal Credit",
-        "otherBenefits": "cy Other benefits",
+        "otherBenefits": "cy Other benefits and credits",
         "moneyFromElsewhere": "cy Money from somewhere else"
       }
     },
@@ -33,14 +33,16 @@
       "label": "cy Do you have any priority debts?",
       "changeHidden": "cy whether you have any priority debts"
     },
-    "priorityDebtDetails": {
-      "label": "cy Priority debt details",
-      "changeHidden": "cy your priority debt details",
-      "total": "cy Total amount owed",
-      "contribution": "cy Regular contribution"
+    "priorityDebtTotal": {
+      "label": "cy What is the total amount you owe for all your priority debts?",
+      "changeHidden": "cy the total amount you owe for all your priority debts"
+    },
+    "priorityDebtContribution": {
+      "label": "cy How much do you pay towards your priority debts each week or month?",
+      "changeHidden": "cy how much you pay towards your priority debts each week or month"
     },
     "regularExpenses": {
-      "label": "cy What regular expenses do you have?",
+      "label": "cy What other regular expenses do you have?",
       "changeHidden": "cy the regular expenses you have",
       "options": {
         "householdBills": "cy Household bills",

@@ -170,27 +170,24 @@ function addPriorityDebtsRow({ rows, hc, t, change, yesNoNotSure }: RowContext):
 
 function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
   // Only present when priorityDebts === YES (the normaliser drops these fields
-  // otherwise). Amounts are stored in pence.
-  if (!hc.debtTotal && !hc.debtContribution) {
-    return;
-  }
-  const items: string[] = [];
+  // otherwise). Amounts are stored in pence. Each step-page question maps to
+  // its own CYA row so the question text matches the step heading verbatim.
   const totalPounds = penceToPounds(hc.debtTotal);
   if (totalPounds) {
-    items.push(`${escapeHtml(t('rows.priorityDebtDetails.total'))}: £${totalPounds}`);
+    rows.push({
+      key: { text: t('rows.priorityDebtTotal.label') },
+      value: { text: `£${totalPounds}` },
+      actions: { items: [change('priority-debt-details', 'rows.priorityDebtTotal.changeHidden')] },
+    });
   }
   const contribution = amountWithFrequency(hc.debtContribution, hc.debtContributionFrequency, t);
   if (contribution) {
-    items.push(`${escapeHtml(t('rows.priorityDebtDetails.contribution'))}: ${escapeHtml(contribution)}`);
+    rows.push({
+      key: { text: t('rows.priorityDebtContribution.label') },
+      value: { text: contribution },
+      actions: { items: [change('priority-debt-details', 'rows.priorityDebtContribution.changeHidden')] },
+    });
   }
-  if (items.length === 0) {
-    return;
-  }
-  rows.push({
-    key: { text: t('rows.priorityDebtDetails.label') },
-    value: { html: listHtml(items) },
-    actions: { items: [change('priority-debt-details', 'rows.priorityDebtDetails.changeHidden')] },
-  });
 }
 
 function addRegularExpensesRow({ rows, hc, t, change }: RowContext): void {

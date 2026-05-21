@@ -258,31 +258,32 @@ function addCounterClaimAmountRow({ rows, t, change, yesNoNotSure }: RowContext,
   if (!claimsMoney || !cc.isClaimAmountKnown) {
     return;
   }
+  // Y/N row mirrors the step page's heading "Are you claiming for a specific sum of money?"
   rows.push({
-    key: { text: t('rows.counterClaimAmount.label') },
-    value: { text: counterClaimAmountText(cc, t, yesNoNotSure) },
-    actions: { items: [change('counter-claim-specific-sum', 'rows.counterClaimAmount.changeHidden')] },
+    key: { text: t('rows.isClaimAmountKnown.label') },
+    value: { text: yesNoNotSure(cc.isClaimAmountKnown) },
+    actions: { items: [change('counter-claim-specific-sum', 'rows.isClaimAmountKnown.changeHidden')] },
   });
-}
 
-function counterClaimAmountText(
-  cc: CcdCounterClaim,
-  t: TFunction,
-  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>
-): string {
-  if (!cc.isClaimAmountKnown) {
-    return '';
-  }
+  // Amount follow-up: matches the step page's sub-question per branch.
   const known = normalizeYesNoValue(cc.isClaimAmountKnown);
   if (known === 'YES' && cc.claimAmount !== undefined) {
     const pounds = penceToPounds(cc.claimAmount);
-    return pounds ? `£${pounds}` : yesNoNotSure(cc.isClaimAmountKnown);
-  }
-  if (known === 'NO' && cc.estimatedMaxClaimAmount !== undefined) {
+    if (pounds) {
+      rows.push({
+        key: { text: t('rows.claimAmount.label') },
+        value: { text: `£${pounds}` },
+        actions: { items: [change('counter-claim-specific-sum', 'rows.claimAmount.changeHidden')] },
+      });
+    }
+  } else if (known === 'NO' && cc.estimatedMaxClaimAmount !== undefined) {
     const pounds = penceToPounds(cc.estimatedMaxClaimAmount);
-    return pounds
-      ? `${t('rows.counterClaimAmount.estimatedMaxPrefix')} £${pounds}`
-      : yesNoNotSure(cc.isClaimAmountKnown);
+    if (pounds) {
+      rows.push({
+        key: { text: t('rows.estimatedMaxClaimAmount.label') },
+        value: { text: `£${pounds}` },
+        actions: { items: [change('counter-claim-specific-sum', 'rows.estimatedMaxClaimAmount.changeHidden')] },
+      });
+    }
   }
-  return yesNoNotSure(cc.isClaimAmountKnown);
 }

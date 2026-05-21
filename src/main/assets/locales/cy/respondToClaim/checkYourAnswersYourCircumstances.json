@@ -47,8 +47,8 @@
       "changeHidden": "cy whether you would experience exceptional hardship"
     },
     "exceptionalHardshipDetails": {
-      "label": "cy Give details about the exceptional hardship you'd experience",
-      "changeHidden": "cy the details about the exceptional hardship you'd experience"
+      "label": "cy Give details about the exceptional hardship you’d experience",
+      "changeHidden": "cy the details about the exceptional hardship you’d experience"
     }
   }
 }
