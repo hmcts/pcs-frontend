@@ -1,5 +1,5 @@
 import {
-  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
+  counterClaimHaveYouAppliedForHelp,
   counterclaimYouNeedToApplyForHelpWithYourFees,
   dashboard,
   feedback,
@@ -14,7 +14,7 @@ export async function counterclaimYouNeedToApplyForHelpWithYourFeesNavigationTes
   await performValidation(
     'pageNavigation',
     counterclaimYouNeedToApplyForHelpWithYourFees.backLink,
-    counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.mainHeader
+    counterClaimHaveYouAppliedForHelp.mainHeader
   );
 
   await performValidation(
