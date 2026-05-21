@@ -1,9 +1,7 @@
-import { PassThrough } from 'stream';
-
 import type { Application, Request, Response } from 'express';
 
 import viewDocumentsRoute from '@routes/viewDocuments';
-import { getDocumentBinary } from '@services/cdamService';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void>;
 
@@ -11,8 +9,10 @@ jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
 }));
 
-jest.mock('@services/cdamService', () => ({
-  getDocumentBinary: jest.fn(),
+jest.mock('../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: {
+    getCaseById: jest.fn(),
+  },
 }));
 
 describe('viewDocuments route', () => {
@@ -28,12 +28,12 @@ describe('viewDocuments route', () => {
     jest.clearAllMocks();
   });
 
-  it('should register GET /case/:caseReference/view-documents with oidc middleware', () => {
+  it('should register GET /case/:caseId/view-documents with oidc middleware', () => {
     viewDocumentsRoute(app);
 
-    expect(app.get).toHaveBeenCalledWith('/case/:caseReference/view-documents', expect.anything(), expect.anything());
+    expect(app.get).toHaveBeenCalledWith('/case/:caseId/view-documents', expect.anything(), expect.anything());
     expect(app.get).toHaveBeenCalledWith(
-      '/case/:caseReference/view-documents/:documentId',
+      '/case/:caseId/view-documents/:documentId',
       expect.anything(),
       expect.anything()
     );
@@ -42,34 +42,33 @@ describe('viewDocuments route', () => {
   it('should render the view-documents template with extracted folders', async () => {
     viewDocumentsRoute(app);
 
+    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+      id: '1777570813792018',
+      data: {
+        allDocuments: [
+          {
+            id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+            value: {
+              document_filename: 'claim-form.pdf',
+              document_binary_url: 'http://doc-store/claim-form/binary',
+              upload_timestamp: '2026-06-24',
+              category_id: 'statementsOfCase',
+            },
+          },
+        ],
+      },
+    });
+
     const handler = (app.get as jest.Mock).mock.calls.find(
-      call => call[0] === '/case/:caseReference/view-documents'
+      call => call[0] === '/case/:caseId/view-documents'
     )?.[2] as RouteHandler;
     const res = {
-      locals: {
-        validatedCase: {
-          id: '1777570813792018',
-          data: {
-            allDocuments: [
-              {
-                id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
-                value: {
-                  document_filename: 'claim-form.pdf',
-                  document_binary_url: 'http://doc-store/claim-form/binary',
-                  upload_timestamp: '2026-06-24',
-                  category_id: 'statementsOfCase',
-                },
-              },
-            ],
-          },
-        },
-      },
       render: jest.fn(),
     } as unknown as Response;
 
     await handler(
       {
-        params: { caseReference: '1777570813792018' },
+        params: { caseId: '1777570813792018' },
         language: 'en',
         session: { user: { accessToken: 'token' } },
         t: (key: string) =>
@@ -107,45 +106,21 @@ describe('viewDocuments route', () => {
     );
   });
 
-  it('should stream document binary for document page', async () => {
+  it('should render empty view-document template for document page', async () => {
     viewDocumentsRoute(app);
 
-    const stream = new PassThrough();
-    const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
-    (getDocumentBinary as jest.Mock).mockResolvedValue({
-      stream,
-      contentType: 'application/pdf',
-      contentLength: '1234',
-    });
-
     const handler = (app.get as jest.Mock).mock.calls.find(
-      call => call[0] === '/case/:caseReference/view-documents/:documentId'
+      call => call[0] === '/case/:caseId/view-documents/:documentId'
     )?.[2] as RouteHandler;
     const res = {
-      locals: {
-        validatedCase: {
-          id: '1777570813792018',
-          data: {
-            allDocuments: [
-              {
-                id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
-                value: {
-                  document_filename: 'claim-form.pdf',
-                  document_binary_url: 'http://dm-store/documents/abc-123/binary',
-                },
-              },
-            ],
-          },
-        },
-      },
-      setHeader: jest.fn(),
+      render: jest.fn(),
     } as unknown as Response;
     const next = jest.fn();
 
     await handler(
       {
         params: {
-          caseReference: '1777570813792018',
+          caseId: '1777570813792018',
           documentId: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
         },
         session: { user: { accessToken: 'token' } },
@@ -154,44 +129,7 @@ describe('viewDocuments route', () => {
       next
     );
 
-    expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/abc-123/binary', 'token');
-    expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
-    expect(res.setHeader).toHaveBeenCalledWith('Content-Length', '1234');
-    expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', 'inline; filename="claim-form.pdf"');
-    expect(pipeSpy).toHaveBeenCalledWith(res);
+    expect(res.render).toHaveBeenCalledWith('view-document');
     expect(next).not.toHaveBeenCalled();
-  });
-
-  it('should return 404 when documentId is not a valid UUID', async () => {
-    viewDocumentsRoute(app);
-
-    const handler = (app.get as jest.Mock).mock.calls.find(
-      call => call[0] === '/case/:caseReference/view-documents/:documentId'
-    )?.[2] as RouteHandler;
-    const res = {
-      locals: {
-        validatedCase: {
-          id: '1777570813792018',
-          data: {},
-        },
-      },
-      setHeader: jest.fn(),
-    } as unknown as Response;
-    const next = jest.fn();
-
-    await handler(
-      {
-        params: {
-          caseReference: '1777570813792018',
-          documentId: 'not-a-uuid',
-        },
-        session: { user: { accessToken: 'token' } },
-      } as unknown as Request,
-      res,
-      next
-    );
-
-    expect(getDocumentBinary).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Document not found', status: 404 }));
   });
 });
