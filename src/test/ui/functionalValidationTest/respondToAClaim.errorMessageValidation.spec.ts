@@ -28,7 +28,6 @@ import {
   otherConsiderations,
   priorityDebtDetails,
   priorityDebts,
-  reasonableAdjustmentsTriage,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
@@ -431,8 +430,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
-    await softErrorMessageValidation('reasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
+    await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
+    await performAction('readReasonableAdjustmentsTriage');
 
     await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -630,8 +629,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
-    await softErrorMessageValidation('reasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
+    await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
+    await performAction('readReasonableAdjustmentsTriage');
 
     await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);

@@ -91,6 +91,7 @@ export class ActionRegistry {
     ['enterPriorityDebtDetails', new RespondToClaimAction()],
     ['selectCounterClaim', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
+    ['readReasonableAdjustmentsTriage', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],

@@ -30,7 +30,6 @@ import {
   otherConsiderations,
   priorityDebtDetails,
   priorityDebts,
-  reasonableAdjustmentsTriage,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
@@ -237,7 +236,7 @@ test.afterEach(async () => {
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim @noDefendants @regression @crossbrowser', async () => {
+  test('Respond to a claim - RegularIncome - Universal Credit @noDefendants @regression @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -369,7 +368,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
+    await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -475,7 +474,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadFiles', { files: ['rentArrears.pdf'] });
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
+    await performAction('readReasonableAdjustmentsTriage');
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
@@ -589,7 +588,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
+    await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -734,7 +733,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
+    await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -863,7 +862,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
+    await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1007,7 +1006,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
+    await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1141,7 +1140,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
+    await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1266,7 +1265,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
+    await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
@@ -1371,7 +1370,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadFiles');
-    await performAction('clickButton', reasonableAdjustmentsTriage.progressButton);
+    await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);

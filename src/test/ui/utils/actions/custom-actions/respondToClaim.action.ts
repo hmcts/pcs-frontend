@@ -35,6 +35,7 @@ import {
   paymentInterstitial,
   priorityDebtDetails,
   priorityDebts,
+  reasonableAdjustmentsTriage,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
@@ -102,6 +103,7 @@ export class RespondToClaimAction implements IAction {
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
       ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
+      ['readReasonableAdjustmentsTriage', () => this.readReasonableAdjustmentsTriage()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['selectUniversalCredit', () => this.selectUniversalCredit(fieldName as actionRecord)],
@@ -810,6 +812,10 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
+  }
+
+  private async readReasonableAdjustmentsTriage(): Promise<void> {
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
