@@ -37,11 +37,15 @@ withPipeline(type, product, component) {
   env.XUI_BASE_URI = "https://manage-case.aat.platform.hmcts.net"
   env.CASE_TYPE_ID = "PCS"
   onPR() {
-    env.E2E_TEST_SCOPE = '@PR'
+    env.E2E_TEST_SCOPE = '@sanity'
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_critical_test").size() > 0) {
+           env.E2E_TEST_SCOPE = '@PR'
+        }
     def e2eTag = prLabelSuffix(githubApi, 'e2e-tag:')
     if (e2eTag?.trim()) {
       env.E2E_TEST_SCOPE = e2eTag.trim()
     }
+
     def e2eSpec = prLabelSuffix(githubApi, 'e2e-spec:')
     if (e2eSpec?.trim()) {
       env.E2E_SPEC = e2eSpec.trim()

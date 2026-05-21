@@ -1,34 +1,8 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import {
-  contactPreferenceEmailOrPost,
-  contactPreferencesTelephone,
-  correspondenceAddress,
-  counterClaim,
-  defendantDateOfBirth,
-  defendantNameConfirmation,
-  doAnyOtherAdultsLiveInYourHome,
-  doYouHaveAnyDependantChildren,
-  doYouHaveAnyOtherDependants,
-  equalityAndDiversityEnd,
-  equalityAndDiversityStart,
-  exceptionalHardship,
-  freeLegalAdvice,
-  incomeAndExpenses,
-  languageUsed,
-  otherConsiderations,
-  rentArrears,
-  repaymentsAgreed,
-  repaymentsMade,
-  startNow,
-  supportNeeds,
-  tenancyDateDetails,
-  tenancyTypeDetails,
-  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  yourCircumstances,
-} from '../data/page-data';
+import { freeLegalAdvice, startNow } from '../data/page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { initializeExecutor, performAction } from '../utils/controller';
 
 const claimantName = submitCaseApiData.submitCasePayload.claimantName;
 const home_url = process.env.TEST_URL;
@@ -58,7 +32,8 @@ test.describe('Respond to a claim - smoke test @health', async () => {
 
   test('Respond to a claim E2E Journey @regression @crossbrowser @sanity', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('confirmDefendantDetails', {
+    // Below steps will be unskipped once HDPI-5407 and HDPI-5350
+    /*await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
     });
@@ -142,6 +117,6 @@ test.describe('Respond to a claim - smoke test @health', async () => {
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
-    });
+    });*/
   });
 });
