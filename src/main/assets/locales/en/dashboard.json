@@ -11,7 +11,7 @@
   "whatToExpectAtTheHearing": "What to expect at a hearing",
   "representMyselfAtTheHearing": "Represent myself at a hearing",
   "findLegalAdvice": "Find legal advice",
-  "getDebtRespite": "Get debt respite (Breathing Space)",
+  "getDebtRespite": "Get debt respite (Breathing Space)",
   "findInformation": "Find information about my court",
 
   "taskGroups": {
@@ -19,6 +19,7 @@
     "HEARING": "Court hearings",
     "JUDGEMENT": "Judgement from the court",
     "NOTICE": "Orders and notices from the court",
+    "DOCUMENTS": "Documents",
     "RESPONSE": "The response",
     "APPLICATIONS": "Applications"
   },
@@ -27,11 +28,11 @@
     "Defendant": {
       "CaseIssued": {
         "title": "Case issued",
-        "body": "Your case has been issued. <a class=\"govuk-link\" href=\"/case/{{caseReference}}/view-the-claim\">View the claim</a>. Respond by {{responseEndDate}}."
+        "body": "Your case has been issued. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">View the claim</a>. Respond by {{responseEndDate}}."
       },
       "ResponseToClaim": {
         "title": "Response to claim",
-        "body": "<a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">{{ctaLabel}}</a>"
+        "body": "<a class=\"govuk-link\" href=\"{{respondToClaimUrl}}\">{{ctaLabel}}</a>"
       }
     }
   },
@@ -44,17 +45,25 @@
       "NOT_STARTED": "Not started"
     },
     "ViewClaim": { "title": "View the claim" },
-    "ViewDocuments": { "title": "View documents" },
-    "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
-    "ViewAllApplications": { "title": "View all applications" },
     "RespondToClaim": { "title": "Respond to the claim" },
+    "ViewDocuments": { "title": "View documents" },
     "ViewHearingDocuments": { "title": "View hearing documents" },
     "ViewOrdersAndNotices": { "title": "View orders and notices" },
+    "UploadDocuments": { "title": "Upload additional documents" },
     "ReviewResponse": { "title": "Review the response" },
-    "SubmitResponse": { "title": "Submit the response" }
+    "SubmitResponse": { "title": "Submit the response" },
+    "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
+    "ViewAllApplications": { "title": "View all applications" }
   },
   "viewDocuments": {
     "pageTitle": "View documents",
-    "noDocuments": "There are no documents to display."
+    "noDocuments": "There are no documents to display.",
+    "submittedOn": "Submitted on",
+    "folders": {
+      "statementsOfCase": "Statements of case",
+      "propertyDocuments": "Property documents",
+      "evidence": "Evidence",
+      "correspondence": "Correspondence"
+    }
   }
 }

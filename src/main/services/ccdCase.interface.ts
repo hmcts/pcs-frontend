@@ -269,6 +269,14 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+}
+
+export interface CcdCaseDocument {
+  document_binary_url?: string;
+  document_filename?: string;
+  upload_timestamp?: string;
+  category_id?: string;
 }
 
 /** Case representation used by services: id + case_data. */
@@ -357,6 +365,8 @@ export interface CitizenGenAppRequest {
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
   whatOrderWanted?: string;
+  hasSupportingDocuments?: YesNoValue;
+  uploadedDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   sotAccepted?: YesNoValue;
   sotFullName?: string;
   clientReference?: string;

@@ -36,7 +36,7 @@ export const step: StepDefinition = createFormStep({
     const typeOfApplication = req.session.formData?.['choose-an-application']?.['typeOfApplication'] ?? '';
 
     let contentList: string[] = [];
-    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+    const t = getTranslationFunction(req);
 
     if (typeOfApplication === 'ADJOURN' || typeOfApplication === 'SOMETHING_ELSE') {
       contentList = t(`list.${typeOfApplication}`, { returnObjects: true }) as unknown as string[];

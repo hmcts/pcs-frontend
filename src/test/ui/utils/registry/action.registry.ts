@@ -1,6 +1,7 @@
 import {
   CitizenCreateGenAppAPIAction,
   CreateCaseAPIAction,
+  DocumentsAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
   LoginAction,
@@ -45,6 +46,8 @@ export class ActionRegistry {
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['startEvidenceUpload', new DocumentsAction()],
+    ['validateViewDocuments', new DocumentsAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
@@ -89,6 +92,11 @@ export class ActionRegistry {
     ['selectCounterClaim', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['readReasonableAdjustmentsTriage', new RespondToClaimAction()],
+    ['otherConsiderations', new RespondToClaimAction()],
+    ['uploadFiles', new RespondToClaimAction()],
+    ['languageUsed', new RespondToClaimAction()],
+    ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
+    ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
@@ -101,17 +109,14 @@ export class ActionRegistry {
     ['selectLanguageUsedToComplete', new GenAppsAction()],
     ['retrieveCYATableData', new GenAppsAction()],
     ['validateCYA', new GenAppsAction()],
+    ['confirmDocumentToUpload', new GenAppsAction()],
     ['recordUserEntry', new RecordAnswers()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
-    ['languageUsed', new RespondToClaimAction()],
     ['confirmOrderDoYouWant', new GenAppsAction()],
     ['reviewCYA', new GenAppsAction()],
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
-    ['otherConsiderations', new RespondToClaimAction()],
-    ['uploadFiles', new RespondToClaimAction()],
-    ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
-    ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['uploadFilesGenApps', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {
