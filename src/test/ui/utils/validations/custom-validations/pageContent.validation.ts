@@ -125,8 +125,7 @@ export class PageContentValidation implements IValidation {
                     .text-content:text-is("${value}"),
                     .govuk-body:text-is("${value}"),
                     .govuk-list:text-is("${value}")`)
-        )
-        .or(page.locator(`p.govuk-body`).filter({ hasText: value })),
+        ),
     List: (page: Page, value: string) =>
       page.locator(`
                     li:text-is("${value}"),
