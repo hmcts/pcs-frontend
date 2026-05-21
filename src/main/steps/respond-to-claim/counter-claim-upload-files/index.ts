@@ -61,7 +61,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         const uploaded = formData['uploadedDocuments[]'];
         const hasFiles =
           uploaded !== undefined && uploaded !== null && !(Array.isArray(uploaded) && uploaded.length === 0);
-        return hasFiles ? undefined : 'Select a file to support your counterclaim';
+        return hasFiles ? undefined : 'errors.documents';
       },
     },
   ],
