@@ -7,9 +7,9 @@ import {
   LoginAction,
   NavigateToUrlAction,
   RecordAnswers,
-  respondPossessionClaimAPIAction,
   RespondToClaimAction,
   TriggerPageFunctionalTestsAction,
+  respondPossessionClaimAPIAction,
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
 import {
@@ -45,10 +45,10 @@ export class ActionRegistry {
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
-    ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()], 
-    ['citizenDashboard', new CitizenDashboardAction()], 
+    ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
+    ['citizenDashboard', new CitizenDashboardAction()],
     ['verifyRespondToClaimNotificationAndTag', new CitizenDashboardAction()],
-    ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()], 
+    ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
