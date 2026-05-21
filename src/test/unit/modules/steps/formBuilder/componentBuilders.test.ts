@@ -835,7 +835,7 @@ describe('componentBuilders', () => {
 
       expect(result.componentType).toBe('fileUpload');
       expect(result.component.accept).toBeTruthy();
-      expect(result.component.maxFileSize).toBe(1024);
+      expect(result.component.maxFileSize).toBe(100);
     });
 
     it('sets translated error messages and button text', () => {
