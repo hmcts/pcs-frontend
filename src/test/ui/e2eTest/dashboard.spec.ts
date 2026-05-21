@@ -136,7 +136,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Validate notification and response status ', async () => {
+  test('Validate notification and response status @regression @crossbrowse', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
     await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
