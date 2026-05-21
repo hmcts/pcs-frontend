@@ -10,7 +10,7 @@ import {
   correspondenceAddress,
   counterClaim,
   counterClaimFee,
-  counterClaimHaveYouAlreadyAppliedForHelpWithYourFees,
+  counterClaimHaveYouAppliedForHelp,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -509,19 +509,18 @@ export class RespondToClaimAction implements IAction {
 
   private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question:
-        counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
+      question: counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
       option: helpWithFee.helpWithFeeOption,
     });
 
     if (helpWithFee.helpWithFeeOption === 'Yes') {
       await performAction(
         'inputText',
-        counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.enterHelpWithFeeReferenceHiddenTextLabel,
+        counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
         helpWithFee.feeReference
       );
     }
-    await performAction('clickButton', counterClaimHaveYouAlreadyAppliedForHelpWithYourFees.saveAndContinueButton);
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
   }
 
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
