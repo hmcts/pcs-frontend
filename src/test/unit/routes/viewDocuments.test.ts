@@ -214,7 +214,9 @@ describe('viewDocuments route', () => {
       next
     );
 
-    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Invalid case reference format', status: 404 }));
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Invalid case reference format', status: 404 })
+    );
   });
 
   it('should return 401 when access token is missing', async () => {
