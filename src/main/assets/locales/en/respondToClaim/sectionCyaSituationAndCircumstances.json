@@ -25,6 +25,10 @@
     "exceptionalHardship": {
       "label": "Would you experience exceptional hardship if you had to leave your home?",
       "changeHidden": "whether you would experience exceptional hardship"
+    },
+    "exceptionalHardshipDetails": {
+      "label": "Give details about the exceptional hardship you’d experience",
+      "changeHidden": "the details about the exceptional hardship you’d experience"
     }
   }
 }

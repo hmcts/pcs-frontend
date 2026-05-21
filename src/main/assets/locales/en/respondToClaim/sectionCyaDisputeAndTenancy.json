@@ -4,7 +4,7 @@
   "options": {
     "yes": "Yes",
     "no": "No",
-    "imNotSure": "I'm not sure"
+    "imNotSure": "I’m not sure"
   },
   "rows": {
     "landlordRegistered": {
@@ -16,8 +16,8 @@
       "changeHidden": "whether your landlord is licensed"
     },
     "writtenTerms": {
-      "label": "Did you have a written tenancy agreement?",
-      "changeHidden": "whether you had a written tenancy agreement"
+      "label": "Has your landlord sent you written terms of the occupation contract?",
+      "changeHidden": "whether your landlord has sent you written terms of the occupation contract"
     },
     "tenancyTypeCorrect": {
       "label": "Is the tenancy type on the claim correct?",
@@ -40,8 +40,8 @@
       "changeHidden": "whether you agree with the rent arrears amount"
     },
     "disputeClaim": {
-      "label": "Are you disputing other parts of the claim?",
-      "changeHidden": "whether you are disputing other parts of the claim"
+      "label": "Do you want to dispute any other parts of the claim?",
+      "changeHidden": "whether you want to dispute any other parts of the claim"
     },
     "disputeClaimDetails": {
       "label": "Why are you disputing this claim?",

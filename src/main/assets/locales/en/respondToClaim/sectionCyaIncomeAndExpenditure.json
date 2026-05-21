@@ -14,10 +14,10 @@
       "label": "What regular income do you receive?",
       "changeHidden": "the regular income you receive",
       "options": {
-        "incomeFromJobs": "Income from jobs",
-        "pension": "Pension",
+        "incomeFromJobs": "Income from all jobs you do",
+        "pension": "Pension – state and private",
         "universalCredit": "Universal Credit",
-        "otherBenefits": "Other benefits",
+        "otherBenefits": "Other benefits and credits",
         "moneyFromElsewhere": "Money from somewhere else"
       }
     },
