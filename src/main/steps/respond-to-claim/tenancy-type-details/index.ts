@@ -149,7 +149,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
     const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
 
-    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+    const t = getTranslationFunction(req);
     let tenancyType: unknown;
     if (walesProperty) {
       if (occupationLicenceTypeWales === 'OTHER') {

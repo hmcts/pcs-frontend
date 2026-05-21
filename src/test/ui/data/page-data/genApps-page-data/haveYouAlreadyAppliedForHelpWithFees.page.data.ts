@@ -17,7 +17,7 @@ export const haveYouAlreadyAppliedForHelpWithFees = {
     },
     errorTextField: [
       { type: 'empty', input: 'EMPTY', errMessage: 'You must enter a reference number for Help with Fees' },
-      { type: 'moreThanMax', input: 65, errMessage: 'Must be 60 characters or fewer' },
+      { type: 'moreThanMax', input: 65, errMessage: 'Must be 60 characters or less' },
     ],
   },
 };
