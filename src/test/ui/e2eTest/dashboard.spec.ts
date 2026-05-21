@@ -1,5 +1,6 @@
 //import { respondPossessionClaimApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { createCaseApiData, respondPossessionClaimApiData, submitCaseApiData } from '../data/api-data';
+import { createCaseApiData, respondPossessionClaimApiData, respondPossessionClaimEventTokenApiData, submitCaseApiData } from '../data/api-data';
+import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
 import { dashboard } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { startEvidenceUpload } from '../data/page-data/documents-page-data';
@@ -132,21 +133,50 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
   });
 
 
-  test('check ', async () => {
+  test('Validate notification and response status ', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
-    await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
+    await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader});
+    await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
+    await performValidation('text', { elementType: 'subHeader', text: dashboard.yourResponseSubHeader});
+   // await performValidation('text', { elementType: 'paragraph', text: dashboard.respondToClaimBeforeHearingParagraph });
+    //await performValidation('text', { elementType: 'link', text: dashboard.startYourResponseLink });
+   await performAction('verifyRespondToClaimNotificationAndTag', {
+    notificationText: dashboard.respondToClaimBeforeHearingParagraph,
+    responseLink: dashboard.startYourResponseLink,
+    respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
+    viewResponseHeader: dashboard.viewTheResponseSubHeader,
+    tag: dashboard.notStartedTag,
+    nextPageHeader: dashboard.respondToAPropertyHeader
+   });
+   await performAction('verifyNavigationFromNotificationLink', {
+    responseLink: dashboard.startYourResponseLink,
+    nextPageHeader: dashboard.respondToAPropertyHeader
+   });
+    await performAction('verifyRespondToClaimNotificationAndTag', {
+    notificationText: dashboard.completeClaimBeforeHearingParagraph,
+    responseLink: dashboard.continueYourResponseLink,
+    respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
+    viewResponseHeader: dashboard.viewTheResponseSubHeader,
+    tag: dashboard.inProgressTag
+   });
+   await performAction('verifyNavigationFromNotificationLink', {
+    responseLink: dashboard.continueYourResponseLink,
+    nextPageHeader: dashboard.respondToAPropertyHeader
+   });
+
     
-    await performAction('clickLinkAndVerifySameTabTitle', {
-      sectionHeader: dashboard.applicationsSubHeader,
-      fieldName: dashboard.askTheCourtToMakeAnOrderLink,
-      header: chooseAnApplication.mainHeader,
-    });
-    await performAction('respondPossessionClaimAPI', { data: respondPossessionClaimApiData.respondPossessionClaimPayload });
-    await performAction('reloadPage');
-    await performAction('clickLinkAndVerifySameTabTitle', {
-      sectionHeader: dashboard.applicationsSubHeader,
-      fieldName: dashboard.viewAllApplicationsLink,
-      header: viewAllApplications.mainHeader,
-    });
+    await performAction('respondPossessionClaimAPI', {data:respondPossessionClaimMidEventApiData.respondPossessionClaimPayload,type: 'midEvent',});
+   // await performAction('reloadPage');
+
+   //await performAction('respondPossessionClaimAPI', { data: respondPossessionClaimApiData.respondPossessionClaimPayload });
+   await performAction('respondPossessionClaimAPI', {data:respondPossessionClaimApiData.respondPossessionClaimPayload,type: 'submit',});
+   await performAction('reloadPage');
+    await performAction('verifyRespondToClaimNotificationAndTag', {
+    notificationText: dashboard.respondedToClaimParagraph,
+    respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
+    viewResponseHeader: dashboard.viewTheResponseSubHeader,
+    tag: dashboard.completedTag
+   });
+
   });
 });

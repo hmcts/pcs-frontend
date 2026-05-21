@@ -32,4 +32,18 @@ export const dashboard = {
   viewOrdersAndNoticesLink: `View orders and notices`,
   applicationsSubHeader: `Applications`,
   viewAllApplicationsLink: `View all applications`,
+  aPropertyPossessionClaimSubHeader: `A property possession claim has been made against you`,
+  courtWillArrangeHearingParagraph: `The court will arrange the hearing and contact you with details.`,
+  yourResponseSubHeader: `Your response`,
+  respondToClaimBeforeHearingParagraph: `You should respond to the claim before the hearing.`,
+  startYourResponseLink: `Start your response`,
+  completeClaimBeforeHearingParagraph: `You should complete your response before the hearing.`,
+  continueYourResponseLink: `Continue with your response`,
+  respondedToClaimParagraph: `You have responded to the claim`,
+  respondToAPropertyHeader: `Respond to a property possession claim online`,
+  respondToTheClaimSubHeader: `Respond to the claim`,
+  viewTheResponseSubHeader: `View the response`,
+  notStartedTag: `Not started`,
+  inProgressTag: `In progress`,
+  completedTag: `Completed`
 };

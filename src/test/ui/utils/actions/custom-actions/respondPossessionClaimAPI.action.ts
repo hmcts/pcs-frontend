@@ -8,10 +8,18 @@ import { respondPossessionClaimApiData } from '../../../data/api-data/respondPos
 import { respondPossessionClaimMidEventApiData } from '../../../data/api-data/respondPossessionClaimMidEvent.api.data';
 
 export class respondPossessionClaimAPIAction implements IAction {
-  async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
+  async execute(
+    page: Page,
+    action: string,
+    fieldName: actionData | actionRecord
+  ): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['respondPossessionClaimAPI', () => this.respondPossessionClaimAPI(fieldName)],
+      [
+        'respondPossessionClaimAPI',
+        () => this.respondPossessionClaimAPI(fieldName),
+      ],
     ]);
+
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
       throw new Error(`No action found for '${action}'`);
@@ -19,62 +27,182 @@ export class respondPossessionClaimAPIAction implements IAction {
     await actionToPerform();
   }
 
-  private async respondPossessionClaimAPI(caseData: actionData): Promise<void> {
-    const respondPossessionClaimApi = Axios.create(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiInstance());
+  private async respondPossessionClaimAPI(
+    caseData: actionData
+  ): Promise<void> {
+    const respondPossessionClaimApi = Axios.create(
+      respondPossessionClaimEventTokenApiData.respondPossessionClaimApiInstance()
+    );
+
     const RESPONDCLAIM_EVENT_TOKEN = (
-      await respondPossessionClaimApi.get(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiEndPoint())
+      await respondPossessionClaimApi.get(
+        respondPossessionClaimEventTokenApiData.respondPossessionClaimApiEndPoint()
+      )
     ).data.token;
-    const respondPossessionClaimPayloadData =
-      typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
 
-    /**MID EVENT - respondPossessionClaimMidEvent*/
+    const respondPossessionClaimPayloadData: actionData =
+      typeof caseData === 'object' &&
+        caseData !== null &&
+        'data' in caseData
+        ? (caseData.data as actionData)
+        : caseData;
 
+    const type =
+      typeof caseData === 'object' &&
+        caseData !== null &&
+        'type' in caseData
+        ? caseData.type
+        : 'both';
+
+    switch (type) {
+      case 'midEvent':
+        await this.respondPossessionClaimMidEvent(
+          respondPossessionClaimPayloadData
+        );
+        break;
+
+      case 'submit':
+        await this.submitRespondPossessionClaim(
+          respondPossessionClaimApi,
+          RESPONDCLAIM_EVENT_TOKEN
+        );
+        break;
+
+      case 'both':
+      default:
+        await this.respondPossessionClaimMidEvent(
+          respondPossessionClaimPayloadData
+        );
+
+        await this.submitRespondPossessionClaim(
+          respondPossessionClaimApi,
+          RESPONDCLAIM_EVENT_TOKEN
+        );
+    }
+  }
+
+  private async respondPossessionClaimMidEvent(
+    payload: actionData
+  ): Promise<void> {
     try {
-      await respondPossessionClaimApi.post(
-        respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint(),{
-         event: { id: respondPossessionClaimMidEventApiData.respondPossessionClaimEventName },     
-          case_details: {
-            id: process.env.CASE_NUMBER,
-           // id: respondPossessionClaimMidEventApiData.caseId,
-           case_type_id: 'PCS-1732',
-            data: respondPossessionClaimPayloadData,
-          },
-        }
+      const respondPossessionClaimMidEventApi = Axios.create(
+        respondPossessionClaimMidEventApiData.respondPossessionClaimMidEventApiInstance()
+      );
+
+      const midEventRequest = {
+        event_id:
+          respondPossessionClaimMidEventApiData.respondPossessionClaimEventName,
+
+        case_details: {
+          id: process.env.CASE_NUMBER,
+          case_type_id: 'PCS-1732',
+          data: payload,
+        },
+      };
+
+      console.log(
+        'RESPONDTOCLAIM MID EVENT REQUEST:\n',
+        JSON.stringify(midEventRequest, null, 2)
+      );
+
+      const midEventResponse =
+        await respondPossessionClaimMidEventApi.post(
+          respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint(),
+          midEventRequest
+        );
+
+      console.log(
+        'MID EVENT RESPONSE:\n',
+        JSON.stringify(midEventResponse.data, null, 2)
       );
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
         const status = error.response?.status;
+
         throw new Error(
-          `respondPossessionClaimMidEvent mid-event failed${status ? ` with status ${status}` : ''
+          `respondPossessionClaimMidEvent failed${status ? ` with status ${status}` : ''
           }. ${error.message}`
         );
       }
-      throw new Error('respondPossessionClaimMidEvent mid-event failed due to an unexpected error.');
-    }
-    /**SUBMIT EVENT - respondPossessionClaim*/
-    try {
-      await respondPossessionClaimApi.post(respondPossessionClaimApiData.respondPossessionClaimApiEndPoint(), {
-        data: respondPossessionClaimPayloadData,
-        event: { id: respondPossessionClaimApiData.respondPossessionClaimEventName },
-        event_token: RESPONDCLAIM_EVENT_TOKEN,
-      });
-    } catch (error: unknown) {
-      if (Axios.isAxiosError(error)) {
-        const status = error.response?.status;
-        if (status === 404) {
-          console.error(respondPossessionClaimApiData.respondPossessionClaimPayload);
 
-          throw new Error(
-            `RESPONDTOCLAIM submission failed: endpoint not found (404). Please check the payload above.\n${error.message}`
-          );
-        }
-        if (!status) {
-          throw new Error('RESPONDTOCLAIM submission failed: no response from server.');
-        }
-        throw new Error(`RESPONDTOCLAIM submission failed with status ${status}.`);
-      }
-      throw new Error('RESPONDTOCLAIM submission failed due to an unexpected error.');
+      throw new Error(
+        'respondPossessionClaimMidEvent failed due to an unexpected error.'
+      );
     }
   }
 
+  private async submitRespondPossessionClaim(
+    respondPossessionClaimApi: ReturnType<typeof Axios.create>,
+    eventToken: string
+  ): Promise<void> {
+    const submitRequest = {
+      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+
+      event: {
+        id: respondPossessionClaimApiData.respondPossessionClaimEventName,
+        summary: 'Save draft',
+        description: 'Defendant Responses - Multiple',
+      },
+
+      event_token: eventToken,
+      ignore_warning: false,
+    };
+
+    try {
+      console.log(
+        'RESPONDTOCLAIM SUBMIT REQUEST:\n',
+        JSON.stringify(submitRequest, null, 2)
+      );
+
+      await respondPossessionClaimApi.post(
+        respondPossessionClaimApiData.respondPossessionClaimApiEndPoint(),
+        submitRequest
+      );
+    } catch (error: unknown) {
+      if (Axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const responseData = error.response?.data;
+        const responseHeaders = error.response?.headers;
+
+        console.error(
+          '========== RESPONDTOCLAIM DEBUG =========='
+        );
+
+        console.error(
+          'ENDPOINT:',
+          respondPossessionClaimApiData.respondPossessionClaimApiEndPoint()
+        );
+
+        console.error(
+          'REQUEST PAYLOAD:',
+          JSON.stringify(submitRequest, null, 2)
+        );
+
+        console.error('STATUS:', status);
+
+        console.error(
+          'RESPONSE DATA:',
+          JSON.stringify(responseData, null, 2)
+        );
+
+        console.error(
+          'RESPONSE HEADERS:',
+          JSON.stringify(responseHeaders, null, 2)
+        );
+
+        console.error(
+          '=========================================='
+        );
+
+        throw new Error(
+          `RESPONDTOCLAIM submission failed${status ? ` with status ${status}` : ''
+          }.`
+        );
+      }
+
+      throw new Error(
+        'RESPONDTOCLAIM submission failed due to an unexpected error.'
+      );
+    }
+  }
 }

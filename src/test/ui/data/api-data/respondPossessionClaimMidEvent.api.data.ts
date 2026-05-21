@@ -1,5 +1,16 @@
 // MID EVENT CALLBACK
 export const respondPossessionClaimMidEventApiData = {
+ respondPossessionClaimMidEventApiInstance: (): Record<string, unknown> => ({
+       baseURL: process.env.PCS_API_URL,
+        headers: {
+            Authorization: `Bearer ${process.env.CITIZEN_ACCESS_TOKEN}`,
+            ServiceAuthorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}`,
+            'Content-Type': 'application/json',
+            experimental: 'experimental',
+            Accept: '*/*',
+        },
+    }),
+
     respondPossessionClaimEventName: 'respondPossessionClaim',
 
     respondPossessionClaimPayload: {
