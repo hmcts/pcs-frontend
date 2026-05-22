@@ -29,7 +29,6 @@ export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
 
     res.locals.headerModel = headerModel;
     res.locals.footerModel = footerModel;
-
   }
 
   next();
