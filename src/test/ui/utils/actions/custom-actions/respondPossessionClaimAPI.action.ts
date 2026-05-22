@@ -60,7 +60,7 @@ export class respondPossessionClaimAPIAction implements IAction {
       );
       const baseUrl = String(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiInstance().baseURL ?? '');
       console.log(baseUrl);
-      const caseTypeId = baseUrl.includes('aat') ? 'PCS' : `PCS-${baseUrl.match(/pr-(\d{4})/)?.[1] }`;
+      const caseTypeId = baseUrl.includes('aat') ? 'PCS' : `PCS-${baseUrl.match(/pr-(\d{4})/)?.[1]}`;
       console.log(caseTypeId);
       const midEventRequest = {
         event_id: respondPossessionClaimMidEventApiData.respondPossessionClaimEventName,
