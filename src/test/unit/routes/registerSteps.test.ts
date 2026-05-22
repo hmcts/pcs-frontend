@@ -197,7 +197,7 @@ describe('registerSteps', () => {
     const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedPostCall).toBeDefined();
     // [url, stepContext, oidc, handler]
-    expect(protectedPostCall!).toHaveLength(4);
+    expect(protectedPostCall!).toHaveLength(5);
     expect(protectedPostCall![0]).toBe('/steps/protected');
     expect(typeof protectedPostCall![1]).toBe('function');
     expect(protectedPostCall![2]).toBe(oidcMiddleware);
@@ -220,7 +220,7 @@ describe('registerSteps', () => {
     const unprotectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/unprotected');
     expect(unprotectedPostCall).toBeDefined();
     // [url, stepContext, handler]
-    expect(unprotectedPostCall!).toHaveLength(3);
+    expect(unprotectedPostCall!).toHaveLength(4);
     expect(unprotectedPostCall![0]).toBe('/steps/unprotected');
     expect(typeof unprotectedPostCall![1]).toBe('function');
     expect(typeof unprotectedPostCall![2]).toBe('function');
