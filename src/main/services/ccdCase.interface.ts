@@ -218,6 +218,11 @@ export interface CcdCounterClaim {
   isClaimAmountKnown?: string;
   claimAmount?: PenceAmount;
   estimatedMaxClaimAmount?: PenceAmount;
+  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
+  counterClaimFor?: string;
+  counterClaimReasons?: string;
+  otherOrderRequestDetails?: string;
+  otherOrderRequestFacts?: string;
 }
 
 export interface PossessionClaimResponse {

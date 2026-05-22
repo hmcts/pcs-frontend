@@ -64,6 +64,9 @@ export default {
   'what-are-you-claiming-for': 'counterClaimWhatAreYouClaimingFor',
   'counter-claim-specific-sum': 'counterClaimSpecificSumOfMoney',
   'counter-claim': 'counterClaim',
+  'counter-claim-against-whom': 'counterClaimAgainstWhom',
+  'counter-claim-about': 'counterClaimAbout',
+  'counter-claim-other-than-sum': 'counterClaimOtherThanSum',
   'counter-claim-fee': 'counterClaimFee',
   'start-evidence-upload': 'startEvidenceUpload',
 };
