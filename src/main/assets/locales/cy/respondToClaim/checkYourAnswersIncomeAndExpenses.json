@@ -2,8 +2,8 @@
   "pageTitle": "cy Check your answers",
   "cardTitle": "cy Income and expenses",
   "frequencies": {
-    "WEEKLY": "cy weekly",
-    "MONTHLY": "cy monthly"
+    "WEEKLY": "cy every week",
+    "MONTHLY": "cy every month"
   },
   "incomeFrequencies": {
     "WEEKLY": "cy received every week",

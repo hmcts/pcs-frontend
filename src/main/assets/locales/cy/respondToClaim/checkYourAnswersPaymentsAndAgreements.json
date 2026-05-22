@@ -26,10 +26,10 @@
       "label": "cy How much can you afford to pay towards arrears?",
       "changeHidden": "cy how much you can afford to pay",
       "frequencies": {
-        "weekly": "cy weekly",
+        "weekly": "cy every week",
         "every2Weeks": "cy every 2 weeks",
         "every4Weeks": "cy every 4 weeks",
-        "monthly": "cy monthly"
+        "monthly": "cy every month"
       }
     }
   }
