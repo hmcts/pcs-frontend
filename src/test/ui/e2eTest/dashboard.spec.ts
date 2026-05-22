@@ -189,6 +189,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
       viewResponseHeader: dashboard.viewTheResponseSubHeader,
       tag: dashboard.completedTag,
+      viewResponsetag: dashboard.availableTag,
     });
   });
 });
