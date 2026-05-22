@@ -58,17 +58,18 @@ export class respondPossessionClaimAPIAction implements IAction {
       const respondPossessionClaimMidEventApi = Axios.create(
         respondPossessionClaimMidEventApiData.respondPossessionClaimMidEventApiInstance()
       );
-
+      const baseUrl = String(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiInstance().baseURL ?? '');
+      console.log(baseUrl);
+      const caseTypeId = baseUrl.includes('aat')? 'PCS' : `PCS-${baseUrl.match(/pr-(\d{4})/)?.[1] || 'XXXX'}`;
+      console.log(caseTypeId);
       const midEventRequest = {
         event_id: respondPossessionClaimMidEventApiData.respondPossessionClaimEventName,
-
         case_details: {
           id: process.env.CASE_NUMBER,
-          case_type_id: 'PCS-1732',
+          case_type_id: caseTypeId,
           data: payload,
         },
       };
-
       console.log('RESPONDTOCLAIM MID EVENT REQUEST:\n', JSON.stringify(midEventRequest, null, 2));
 
       const midEventResponse = await respondPossessionClaimMidEventApi.post(
