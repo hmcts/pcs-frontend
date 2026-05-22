@@ -1,6 +1,5 @@
 {
-  "caption": "cyRespond to a property possession claim",
-  "pageTitle": "cySelect defendant",
+  "pageTitle": "cyRepresentation",
   "detailsHeading": "cyIf you’re representing more than one defendant in this case, you must submit a separate response for each one.",
   "selectDefendantLabel": "cyWhich defendant are you completing this response on behalf of?",
   "errors": {
