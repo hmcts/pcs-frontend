@@ -3,7 +3,7 @@
   "cardTitle": "cy Documents",
   "rows": {
     "uploadedDocuments": {
-      "label": "cy Documents you have uploaded",
+      "label": "cy Upload files",
       "none": "cy No documents uploaded",
       "changeHidden": "cy the documents you have uploaded"
     }

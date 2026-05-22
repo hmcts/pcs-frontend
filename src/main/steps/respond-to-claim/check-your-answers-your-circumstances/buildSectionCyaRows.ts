@@ -151,11 +151,13 @@ function addAlternativeAccommodationRow({ rows, hc, t, change, yesNoNotSure }: R
     yesNoNotSure,
     change
   );
+  // The move-in date is an optional subfield, captured only when the citizen answers "yes".
+  // Render the row whenever the CCD value is YES; "No answer provided" when the date is blank.
   const date = hc.alternativeAccommodationTransferDate;
-  if (isYes(hc.alternativeAccommodation) && date) {
+  if (isYes(hc.alternativeAccommodation)) {
     rows.push({
       key: { text: t('rows.alternativeAccommodationDate.label') },
-      value: { text: formatIsoDate(date) },
+      value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
       actions: {
         items: [
           change(

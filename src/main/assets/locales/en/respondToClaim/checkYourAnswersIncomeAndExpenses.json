@@ -5,6 +5,14 @@
     "WEEKLY": "weekly",
     "MONTHLY": "monthly"
   },
+  "incomeFrequencies": {
+    "WEEKLY": "received every week",
+    "MONTHLY": "received every month"
+  },
+  "paymentFrequencies": {
+    "WEEKLY": "paid every week",
+    "MONTHLY": "paid every month"
+  },
   "rows": {
     "shareIncomeExpenseDetails": {
       "label": "Do you want to provide details about your income and expenses?",

@@ -1,7 +1,8 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { formatIsoDate, normalizeYesNoValue, penceToPounds } from '../../utils';
+import { formatIsoDate, isTenancyStartDateKnown, normalizeYesNoValue, penceToPounds } from '../../utils';
+import { isNoticeDateConfirmedAndNotProvided, isNoticeDateConfirmedAndProvided } from '../flowConditions';
 import {
   type SummaryListRow,
   escapeWithLineBreaks,
@@ -20,6 +21,7 @@ interface RowContext {
   rows: SummaryListRow[];
   validatedCase: CcdCaseModel;
   responses: CcdDefendantResponses;
+  req: Request;
   t: TFunction;
   change: ReturnType<typeof makeChange>;
   yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
@@ -38,6 +40,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     rows: [],
     validatedCase,
     responses: validatedCase.defendantResponses ?? {},
+    req,
     t,
     change: makeChange(caseRef, SECTION_ID, t),
     yesNoNotSure: makeYesNoNotSure(t),
@@ -115,20 +118,30 @@ function addTenancyTypeRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   });
 }
 
-function addTenancyStartDateRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
-  // tenancy-date-details always writes the confirmation answer (plus a date only when
-  // the user corrects it); tenancy-date-unknown writes only a date. Confirmation presence
-  // routes the change link back to whichever step the user took.
+function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure }: RowContext): void {
   const date = responses.tenancyStartDate;
   const confirmation = responses.tenancyStartDateConfirmation;
-  if (!date && !confirmation) {
+
+  if (isTenancyStartDateKnown(req)) {
+    // tenancy-date-details branch — the confirmation answer is mandatory; a date is written
+    // only when the citizen corrects it. Drop the row only if the step is unreached.
+    if (!date && !confirmation) {
+      return;
+    }
+    rows.push({
+      key: { text: t('rows.tenancyStartDate.label') },
+      value: { text: date ? formatIsoDate(date) : yesNoNotSure(confirmation as string) },
+      actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.changeHidden')] },
+    });
     return;
   }
-  const editStep = confirmation ? 'tenancy-date-details' : 'tenancy-date-unknown';
+
+  // tenancy-date-unknown branch — the start date is optional. Always render the row;
+  // "No answer provided" when blank.
   rows.push({
     key: { text: t('rows.tenancyStartDate.label') },
-    value: { text: date ? formatIsoDate(date) : yesNoNotSure(confirmation as string) },
-    actions: { items: [change(editStep, 'rows.tenancyStartDate.changeHidden')] },
+    value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
+    actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHidden')] },
   });
 }
 
@@ -144,19 +157,22 @@ function addPossessionNoticeReceivedRow({ rows, validatedCase, t, change }: RowC
   });
 }
 
-function addNoticeReceivedDateRow({ rows, validatedCase, responses, t, change }: RowContext): void {
-  if (!responses.noticeReceivedDate) {
+function addNoticeReceivedDateRow({ rows, validatedCase, responses, req, t, change }: RowContext): void {
+  // The notice-received date is optional and asked on one of the two notice-date pages.
+  // Render the row when the citizen is on either branch; "No answer provided" when blank.
+  if (!isNoticeDateConfirmedAndProvided(req) && !isNoticeDateConfirmedAndNotProvided(req)) {
     return;
   }
-  // Same field for both notice-date steps; discriminate on the claim's notice date
-  // (the same signal isNoticeDateProvided uses in flow.config) so the change link
-  // routes back to whichever step the user actually took.
+  // Same field for both notice-date steps; discriminate on the claim's notice date so the
+  // change link routes back to whichever step the user actually took.
   const editStep = validatedCase.noticeDate
     ? 'confirmation-of-notice-date-when-provided'
     : 'confirmation-of-notice-date-when-not-provided';
   rows.push({
     key: { text: t('rows.noticeReceivedDate.label', { claimantName: validatedCase.claimantName }) },
-    value: { text: formatIsoDate(responses.noticeReceivedDate) },
+    value: {
+      text: responses.noticeReceivedDate ? formatIsoDate(responses.noticeReceivedDate) : t('noAnswerProvided'),
+    },
     actions: { items: [change(editStep, 'rows.noticeReceivedDate.changeHidden')] },
   });
 }

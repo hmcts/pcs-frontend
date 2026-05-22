@@ -5,6 +5,14 @@
     "WEEKLY": "cy weekly",
     "MONTHLY": "cy monthly"
   },
+  "incomeFrequencies": {
+    "WEEKLY": "cy received every week",
+    "MONTHLY": "cy received every month"
+  },
+  "paymentFrequencies": {
+    "WEEKLY": "cy paid every week",
+    "MONTHLY": "cy paid every month"
+  },
   "rows": {
     "shareIncomeExpenseDetails": {
       "label": "cy Do you want to provide details about your income and expenses?",

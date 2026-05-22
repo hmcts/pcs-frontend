@@ -37,7 +37,7 @@
       "changeHidden": "cy your UK phone number"
     },
     "contactByText": {
-      "label": "cy Receive updates by text message",
+      "label": "cy Are you happy to be contacted by text message?",
       "changeHidden": "cy whether you want to receive text messages"
     }
   }

@@ -78,14 +78,17 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
+// `frequencyNamespace` selects the wording: income reads "received every week",
+// expenses and debt contributions keep the plain "weekly".
 function amountWithFrequency(
   amount: string | null | undefined,
   frequency: string | null | undefined,
-  t: TFunction
+  t: TFunction,
+  frequencyNamespace = 'frequencies'
 ): string {
   const pounds = penceToPounds(amount ?? undefined);
   const money = pounds ? `£${pounds}` : '';
-  const freq = frequency ? t(`frequencies.${String(frequency).trim().toUpperCase()}`) : '';
+  const freq = frequency ? t(`${frequencyNamespace}.${String(frequency).trim().toUpperCase()}`) : '';
   return [money, freq].filter(Boolean).join(' ');
 }
 
@@ -116,8 +119,8 @@ function addRegularIncomeRow({ rows, hc, t, change }: RowContext): void {
       continue;
     }
     const label = t(`rows.regularIncome.options.${source.key}`);
-    const detail = amountWithFrequency(hc[source.amount], hc[source.frequency], t);
-    items.push(detail ? `${escapeHtml(label)}: ${escapeHtml(detail)}` : escapeHtml(label));
+    const detail = amountWithFrequency(hc[source.amount], hc[source.frequency], t, 'incomeFrequencies');
+    items.push(detail ? `${escapeHtml(label)} ${escapeHtml(detail)}` : escapeHtml(label));
   }
   if (isYes(hc.moneyFromElsewhere)) {
     const label = t('rows.regularIncome.options.moneyFromElsewhere');
@@ -180,7 +183,7 @@ function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
       actions: { items: [change('priority-debt-details', 'rows.priorityDebtTotal.changeHidden')] },
     });
   }
-  const contribution = amountWithFrequency(hc.debtContribution, hc.debtContributionFrequency, t);
+  const contribution = amountWithFrequency(hc.debtContribution, hc.debtContributionFrequency, t, 'paymentFrequencies');
   if (contribution) {
     rows.push({
       key: { text: t('rows.priorityDebtContribution.label') },

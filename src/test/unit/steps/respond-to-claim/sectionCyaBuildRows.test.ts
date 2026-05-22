@@ -64,6 +64,11 @@ describe('section-CYA row builders — characterisation', () => {
       expect(keys).toContain('rows.contactByPhone.label');
     });
 
+    it('date-of-birth row: shows "No answer provided" when the optional DOB is left blank', () => {
+      const row = buildPersonalRows(reqWith(model({})), t).find(r => r.key.text === 'rows.dateOfBirth.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
+    });
+
     it('name row: emits separate Q/A and corrected-name rows when user said "No" to claim-recorded name', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
@@ -196,7 +201,12 @@ describe('section-CYA row builders — characterisation', () => {
 
     it('tenancy-date row: "known" branch links to tenancy-date-details', () => {
       const rows = buildDisputeRows(
-        reqWith(model({ tenancyStartDateConfirmation: 'NO', tenancyStartDate: '2023-01-01' })),
+        reqWith(
+          model(
+            { tenancyStartDateConfirmation: 'NO', tenancyStartDate: '2023-01-01' },
+            { tenancy_TenancyLicenceDate: '2023-01-01' }
+          )
+        ),
         t
       );
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
@@ -210,7 +220,10 @@ describe('section-CYA row builders — characterisation', () => {
     });
 
     it('tenancy-date row: shows the confirmation answer when no date entered', () => {
-      const rows = buildDisputeRows(reqWith(model({ tenancyStartDateConfirmation: 'YES' })), t);
+      const rows = buildDisputeRows(
+        reqWith(model({ tenancyStartDateConfirmation: 'YES' }, { tenancy_TenancyLicenceDate: '2023-01-01' })),
+        t
+      );
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
       expect(row?.value).toEqual({ text: 'options.yes' });
     });
@@ -236,6 +249,35 @@ describe('section-CYA row builders — characterisation', () => {
       );
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
       expect(row?.actions.items[0].href).toContain('confirmation-of-notice-date-when-provided');
+    });
+
+    it('tenancy-date row: "unknown" branch shows "No answer provided" when the optional date is blank', () => {
+      const rows = buildDisputeRows(reqWith(model({})), t);
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
+      expect(row?.actions.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
+    });
+
+    it('notice-date row: "not-provided" branch shows "No answer provided" when the optional date is blank', () => {
+      const rows = buildDisputeRows(reqWith(model({ possessionNoticeReceived: 'YES' })), t);
+      const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
+      expect(row?.actions.items[0].href).toContain('confirmation-of-notice-date-when-not-provided');
+    });
+
+    it('notice-date row: "provided" branch shows "No answer provided" when the optional date is blank', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ possessionNoticeReceived: 'YES' }, { notice_NoticePostedDate: '2025-05-01' })),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
+      expect(row?.actions.items[0].href).toContain('confirmation-of-notice-date-when-provided');
+    });
+
+    it('notice-date row: omitted when the citizen is not on a notice-date branch', () => {
+      const rows = buildDisputeRows(reqWith(model({})), t);
+      expect(rows.some(r => r.key.text === 'rows.noticeReceivedDate.label')).toBe(false);
     });
   });
 
@@ -278,6 +320,23 @@ describe('section-CYA row builders — characterisation', () => {
       const keys = rows.map(r => r.key.text);
       expect(keys).toContain('rows.dependantChildren.label');
       expect(keys).toContain('rows.exceptionalHardship.label');
+    });
+
+    it('move-in-date row: shows "No answer provided" when alternative accommodation is "yes" and the date is blank', () => {
+      const rows = buildSituationRows(
+        reqWith(model({ householdCircumstances: { alternativeAccommodation: 'YES' } })),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.alternativeAccommodationDate.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
+    });
+
+    it('move-in-date row: omitted when alternative accommodation is "no"', () => {
+      const rows = buildSituationRows(
+        reqWith(model({ householdCircumstances: { alternativeAccommodation: 'NO' } })),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.alternativeAccommodationDate.label')).toBe(false);
     });
   });
 
