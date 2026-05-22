@@ -40,10 +40,7 @@ export class GetController {
 
   get = async (req: Request, res: Response): Promise<void> => {
     const content = await this.generateContent(req);
-    res.render(this.view, {
-      ...content,
-      ...(res.locals?.extraHeaders ?? {}),
-    });
+    res.render(this.view, content);
   };
 }
 
@@ -148,7 +145,6 @@ export const createPostController = (
           pageUrl: req.originalUrl || '/',
           t,
           backUrl: await stepNavigation.getBackUrl(req, stepName),
-          ...(res.locals?.extraHeaders ?? {}),
         });
       }
 
