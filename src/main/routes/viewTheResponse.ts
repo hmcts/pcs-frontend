@@ -31,10 +31,15 @@ import { formatAddress } from '@utils/ccdDashboardUtils';
 const logger = Logger.getLogger('viewTheResponse');
 
 const GDS_DATE_FORMAT = 'd MMMM yyyy';
+const SUMMARY_KEY_CLASSES = 'govuk-!-font-weight-bold';
 
 interface SummaryRow {
-  key: { text: string };
+  key: { text: string; classes?: string };
   value: { text: string };
+}
+
+function summaryKey(text: string): SummaryRow['key'] {
+  return { text, classes: SUMMARY_KEY_CLASSES };
 }
 
 interface SummarySection {
@@ -120,7 +125,7 @@ function addressToString(address: CcdCaseAddress | Record<string, never> | undef
 
 function pushRow(rows: SummaryRow[], label: string, value: string | null | undefined): void {
   if (value && value.trim().length > 0) {
-    rows.push({ key: { text: label }, value: { text: value } });
+    rows.push({ key: summaryKey(label), value: { text: value } });
   }
 }
 
@@ -152,8 +157,8 @@ function summariseSectionRows(sections: Record<string, SummarySection>): Record<
 function buildCaseDatesSummary(t: TFunction, dateIssued: string | null, dateSubmitted: string | null): SummarySection {
   return {
     rows: [
-      { key: { text: t('viewTheResponse:summary.dateIssued') }, value: { text: dateIssued ?? '' } },
-      { key: { text: t('viewTheResponse:summary.dateSubmitted') }, value: { text: dateSubmitted ?? '' } },
+      { key: summaryKey(t('viewTheResponse:summary.dateIssued')), value: { text: dateIssued ?? '' } },
+      { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } },
     ],
   };
 }
@@ -162,7 +167,7 @@ function buildStatementOfTruthSummary(t: TFunction, completedBy: string | undefi
   return {
     rows: [
       {
-        key: { text: t('viewTheResponse:statementOfTruth.completedBy') },
+        key: summaryKey(t('viewTheResponse:statementOfTruth.completedBy')),
         value: { text: completedBy ?? '' },
       },
     ],
