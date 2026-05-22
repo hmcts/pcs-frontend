@@ -58,6 +58,8 @@ import { FieldsStore } from './recordAnsweredFields.action';
 const rtcCyaMap = new Map<string, string>();
 const rtcSectionAnswers = new Map<string, Map<string, string>>();
 let activeRtcSection = '';
+const rtcUploadedDocumentsQuestion = 'Documents you have uploaded';
+const rtcNoDocumentsUploadedValue = 'No documents uploaded';
 
 const rtcSectionByAction = new Map<string, string>([
   ['selectLegalAdvice', 'startNowAndDetails'],
@@ -172,7 +174,7 @@ export class RespondToClaimAction implements IAction {
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
       ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page)],
       ['validateCYARTC', () => this.validateCYARTC()],
-      ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)]
+      ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -186,12 +188,81 @@ export class RespondToClaimAction implements IAction {
     if (Array.isArray(value)) {
       return value.map(val => String(val)).join(', ');
     }
-
     if (typeof value === 'object' && value !== null) {
       return JSON.stringify(value);
     }
-
     return String(value);
+  }
+
+  private formatRtcCyaCurrency(value: actionData): string {
+    const numericValue = Number(value);
+    if (Number.isNaN(numericValue)) {
+      return String(value);
+    }
+    return `£${numericValue.toFixed(2)}`;
+  }
+
+  private formatRtcCyaFrequency(value: actionData): string {
+    const normalizedFrequency = String(value).trim().toLowerCase();
+    if (normalizedFrequency === 'week') {
+      return 'weekly';
+    }
+    if (normalizedFrequency === 'month') {
+      return 'monthly';
+    }
+    return normalizedFrequency;
+  }
+
+  private getRtcCyaQuestionLabel(question: string): string {
+    return question.replace(/\s*\(Optional\)\s*$/, '').trim();
+  }
+
+  private getRtcCyaChoiceLabel(choice: actionData): string {
+    return String(choice)
+      .replace(/\s*\([^)]*\)\s*$/, '')
+      .trim();
+  }
+
+  private buildRtcCyaAmountAndFrequencyValue(amount: actionData, frequency: actionData): string {
+    return `${this.formatRtcCyaCurrency(amount)} ${this.formatRtcCyaFrequency(frequency)}`;
+  }
+
+  private normalizeRtcCyaComparisonPart(value: string): string {
+    return value
+      .replace(/\s*\([^)]*\)\s*/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private areRtcCyaValuesEquivalent(expectedValue: string, actualValue: string): boolean {
+    if (actualValue.includes(expectedValue)) {
+      return true;
+    }
+
+    const normalizedExpectedValue = this.normalizeRtcCyaComparisonPart(expectedValue);
+    const normalizedActualValue = this.normalizeRtcCyaComparisonPart(actualValue);
+
+    if (normalizedActualValue.includes(normalizedExpectedValue)) {
+      return true;
+    }
+
+    const expectedParts = expectedValue
+      .split(',')
+      .map(part => this.normalizeRtcCyaComparisonPart(part))
+      .filter(Boolean);
+    const actualParts = actualValue
+      .split(',')
+      .map(part => this.normalizeRtcCyaComparisonPart(part))
+      .filter(Boolean);
+
+    if (expectedParts.length <= 1 || expectedParts.length !== actualParts.length) {
+      return false;
+    }
+
+    const normalizedExpected = [...expectedParts].sort();
+    const normalizedActual = [...actualParts].sort();
+
+    return normalizedExpected.every((part, index) => part === normalizedActual[index]);
   }
 
   private recordAnswer(key: string, value: actionData): void {
@@ -304,7 +375,10 @@ export class RespondToClaimAction implements IAction {
           option,
         });
         if (option === contactPreferenceEmailOrPost.byEmailCheckbox && contactPreferenceData.emailAddress) {
-          this.recordAnswer(contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, contactPreferenceData.emailAddress);
+          this.recordAnswer(
+            contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+            contactPreferenceData.emailAddress
+          );
           await performAction(
             'inputText',
             contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
@@ -322,7 +396,10 @@ export class RespondToClaimAction implements IAction {
       });
 
       if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailCheckbox) {
-        this.recordAnswer(contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, contactPreferenceData.emailAddress);
+        this.recordAnswer(
+          contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
+          contactPreferenceData.emailAddress
+        );
         await performAction(
           'inputText',
           contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
@@ -467,10 +544,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectIncomeAndExpenses(incomeAndExpenseData: actionRecord): Promise<void> {
-    this.recordAnswer(
-      incomeAndExpenses.doYouWantToProvideDetailsHeader,
-      incomeAndExpenseData.incomeAndExpensesOption
-    );
+    this.recordAnswer(incomeAndExpenses.doYouWantToProvideDetailsHeader, incomeAndExpenseData.incomeAndExpensesOption);
     await performAction('clickRadioButton', {
       question: incomeAndExpenses.doYouWantToProvideDetailsHeader,
       option: incomeAndExpenseData.incomeAndExpensesOption,
@@ -480,42 +554,50 @@ export class RespondToClaimAction implements IAction {
 
   private async selectWhatRegularIncomeDoYouReceive(regularIncome?: actionRecord): Promise<void> {
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader));
       await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
       return;
     }
 
+    const selectedRegularIncomeValues: string[] = [];
+
     for (const income of regularIncome.regularIncomeOptions) {
       const [option, value, frequency] = income;
 
-      // Select checkbox
       await performAction('check', {
         question: whatRegularIncomeDoYouReceive.mainHeader,
         option,
       });
 
-      // Special case: "moneyFromSomewhereElse"
       if (option === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph) {
-        this.recordAnswer(option, value);
         await performAction(
           'inputText',
           whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
           value
         );
+        selectedRegularIncomeValues.push(`${this.getRtcCyaChoiceLabel(option)}: ${String(value)}`);
         continue;
       }
 
-      // Normal validation
       if (!value || !frequency) {
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
 
-      this.recordAnswer(option, `${value} / ${frequency}`);
-
-      // Enter amount
       await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
-
-      // Select frequency
       await performAction('clickRadioButton', frequency);
+
+      selectedRegularIncomeValues.push(
+        `${this.getRtcCyaChoiceLabel(option)}: ${this.buildRtcCyaAmountAndFrequencyValue(value, frequency)}`
+      );
+    }
+
+    if (selectedRegularIncomeValues.length > 0) {
+      this.recordAnswer(
+        this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader),
+        selectedRegularIncomeValues.join(', ')
+      );
+    } else {
+      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader));
     }
 
     await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
@@ -541,10 +623,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
-    this.recordAnswer(
-      confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(claimantsName),
-      noticeGivenData.option
-    );
+    this.recordAnswer(confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(claimantsName), noticeGivenData.option);
     await performAction('clickRadioButton', {
       question: confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(claimantsName),
       option: noticeGivenData.option,
@@ -598,7 +677,10 @@ export class RespondToClaimAction implements IAction {
     });
 
     if (adultsInHouseDetails.radioOption === 'Yes' && adultsInHouseDetails.details) {
-      this.recordAnswer(doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel, adultsInHouseDetails.details);
+      this.recordAnswer(
+        doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
+        adultsInHouseDetails.details
+      );
       await performAction(
         'inputText',
         doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
@@ -721,7 +803,10 @@ export class RespondToClaimAction implements IAction {
       option: tenancyTypeDetailsInfo.tenancyOption,
     });
     if (tenancyTypeDetailsInfo.tenancyOption === 'No' && tenancyTypeDetailsInfo.tenancyTypeInfo) {
-      this.recordAnswer(tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel, tenancyTypeDetailsInfo.tenancyTypeInfo);
+      this.recordAnswer(
+        tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+        tenancyTypeDetailsInfo.tenancyTypeInfo
+      );
       await performAction(
         'inputText',
         tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
@@ -826,7 +911,10 @@ export class RespondToClaimAction implements IAction {
     });
 
     if (otherDependantsData.otherDependantsOption === doYouHaveAnyOtherDependants.yesRadioOption) {
-      this.recordAnswer(doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel, otherDependantsData.otherDependantsInfo);
+      this.recordAnswer(
+        doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
+        otherDependantsData.otherDependantsInfo
+      );
       await performAction(
         'inputText',
         doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
@@ -846,7 +934,10 @@ export class RespondToClaimAction implements IAction {
     });
 
     if (dependantChildrenData.dependantChildrenOption === doYouHaveAnyDependantChildren.yesRadioOption) {
-      this.recordAnswer(doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel, dependantChildrenData.dependantChildrenInfo);
+      this.recordAnswer(
+        doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
+        dependantChildrenData.dependantChildrenInfo
+      );
       await performAction(
         'inputText',
         doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
@@ -890,9 +981,15 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
-    this.recordAnswer(priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetailsData.totalAmount);
-    this.recordAnswer(priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetailsData.payAmount);
-    this.recordAnswer(priorityDebtDetails.paidEveryParagraph, priorityDebtDetailsData.option);
+    this.recordAnswer(
+      priorityDebtDetails.whatIsTheTotalAmountQuestion,
+      this.formatRtcCyaCurrency(priorityDebtDetailsData.totalAmount)
+    );
+    this.recordAnswer(
+      priorityDebtDetails.howMuchDoYouPayQuestion,
+      this.buildRtcCyaAmountAndFrequencyValue(priorityDebtDetailsData.payAmount, priorityDebtDetailsData.option)
+    );
+    this.deleteAnswer(priorityDebtDetails.paidEveryParagraph);
     await performAction(
       'inputText',
       priorityDebtDetails.whatIsTheTotalAmountQuestion,
@@ -907,9 +1004,12 @@ export class RespondToClaimAction implements IAction {
   }
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader));
       await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
       return;
     }
+
+    const selectedRegularExpenseValues: string[] = [];
 
     for (const income of regularIncome.regularIncomeOptions) {
       const [option, value, frequency] = income;
@@ -918,16 +1018,28 @@ export class RespondToClaimAction implements IAction {
         question: whatOtherRegularExpensesDoYouHave.mainHeader,
         option,
       });
-      console.log('option' + option);
+
       if (!value || !frequency) {
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
-      this.recordAnswer(option, `${value} / ${frequency}`);
+
       await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
-      console.log('input' + value);
       await performAction('clickRadioButton', frequency);
-      console.log('frequency' + frequency);
+
+      selectedRegularExpenseValues.push(
+        `${this.getRtcCyaChoiceLabel(option)}: ${this.buildRtcCyaAmountAndFrequencyValue(value, frequency)}`
+      );
     }
+
+    if (selectedRegularExpenseValues.length > 0) {
+      this.recordAnswer(
+        this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader),
+        selectedRegularExpenseValues.join(', ')
+      );
+    } else {
+      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader));
+    }
+
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   }
 
@@ -961,8 +1073,11 @@ export class RespondToClaimAction implements IAction {
 
   private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
     if (uploadDocs?.files) {
-      this.recordAnswer(uploadFiles.uploadFileParagraph, uploadDocs.files);
+      const uploadedFiles = Array.isArray(uploadDocs.files) ? uploadDocs.files.join(', ') : String(uploadDocs.files);
+      this.recordAnswer(rtcUploadedDocumentsQuestion, uploadedFiles);
       await performAction('uploadFile', uploadDocs.files);
+    } else {
+      this.recordAnswer(rtcUploadedDocumentsQuestion, rtcNoDocumentsUploadedValue);
     }
     await performAction('clickButton', uploadFiles.saveAndContinueButton);
   }
@@ -1043,15 +1158,19 @@ export class RespondToClaimAction implements IAction {
     for (const [expectedKey, expectedValue] of Array.from(FieldsStore.getAll().entries())) {
       const actualValue = rtcCyaMap.get(expectedKey);
       if (actualValue !== undefined) {
-        if (!actualValue.includes(String(expectedValue))) {
-          mismatches.push(`key: "${expectedKey}" -> Expected value containing "${expectedValue}" | Actual: "${actualValue}"`);
+        if (!this.areRtcCyaValuesEquivalent(String(expectedValue), actualValue)) {
+          mismatches.push(
+            `key: "${expectedKey}" -> Expected value containing "${expectedValue}" | Actual: "${actualValue}"`
+          );
         }
         continue;
       }
 
       const matchedByValue = rtcValues.some(value => value.includes(String(expectedValue)));
       if (!matchedByValue) {
-        mismatches.push(`key: "${expectedKey}" -> Expected value containing "${expectedValue}" but no matching CYA row was found`);
+        mismatches.push(
+          `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but no matching CYA row was found`
+        );
       }
     }
 
@@ -1072,7 +1191,7 @@ export class RespondToClaimAction implements IAction {
     const expectedSectionAnswers = rtcSectionAnswers.get(sectionName);
 
     if (!expectedSectionAnswers || expectedSectionAnswers.size === 0) {
-      throw new Error(`No RTC section answers were recorded for "${sectionName}"`);
+      throw new Error(`user selection is empty for ${sectionName}`);
     }
 
     const mismatches: string[] = [];
@@ -1081,8 +1200,10 @@ export class RespondToClaimAction implements IAction {
     for (const [expectedKey, expectedValue] of Array.from(expectedSectionAnswers.entries())) {
       const actualValue = rtcCyaMap.get(expectedKey);
       if (actualValue !== undefined) {
-        if (!actualValue.includes(String(expectedValue))) {
-          mismatches.push(`key: "${expectedKey}" -> Expected value containing "${expectedValue}" | Actual: "${actualValue}"`);
+        if (!this.areRtcCyaValuesEquivalent(String(expectedValue), actualValue)) {
+          mismatches.push(
+            `key: "${expectedKey}" -> Expected value containing "${expectedValue}" | Actual: "${actualValue}"`
+          );
         }
         continue;
       }

@@ -1,5 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  checkYourAnswersRTC,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -231,6 +232,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
     await performAction('confirmDefendantDetails', {
@@ -262,6 +264,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
@@ -320,6 +323,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('counterClaimAbout', NO_EMV_READ_ONLY);
     await performAction('clickButton', counterClaimAbout.continueButton);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
@@ -336,6 +340,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
@@ -376,6 +381,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
     await performAction('selectIncomeAndExpenses', {
@@ -428,9 +434,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('clickButton', supportNeeds.continueButton);
     await softErrorMessageValidation('supportNeeds', NO_EMV_PLACEHOLDER_PAGE);
 
@@ -454,6 +462,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
   test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('defendantNameCapture', defendantNameCaptureErrorValidation);
     await performAction('inputDefendantDetails', {
@@ -486,6 +495,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('contactPreferencesTextMessage', contactPreferencesTextMessageErrorValidation);
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
     await performAction(
@@ -550,6 +560,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('haveYouAlreadyAppliedForHelp', NO_EMV_READ_ONLY);
     await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
@@ -590,6 +601,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
     await performAction('selectIncomeAndExpenses', {
@@ -627,9 +639,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('clickButton', supportNeeds.continueButton);
     await softErrorMessageValidation('supportNeeds', NO_EMV_PLACEHOLDER_PAGE);
 
