@@ -10,12 +10,12 @@ import { buildEndOfJourneyCyaSections } from './buildEndOfJourneyCyaRows';
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-const STEP_NAME = 'check-your-answers';
+const STEP_NAME = 'end-of-journey-cya';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
   stepDir: __dirname,
-  customTemplate: `${__dirname}/checkYourAnswers.njk`,
+  customTemplate: `${__dirname}/endOfJourneyCya.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',

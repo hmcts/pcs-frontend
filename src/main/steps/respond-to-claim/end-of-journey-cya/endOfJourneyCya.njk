@@ -41,10 +41,15 @@
       {% endif %}
     {% endfor %}
 
-    {{ govukButton({
-      text: t('buttons.submit'),
-      attributes: { type: 'submit' },
-      preventDoubleClick: true
-    }) }}
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.submit', { ns: 'common' }),
+        attributes: { type: 'submit' },
+        preventDoubleClick: true
+      }) }}
+      <p class="govuk-body">
+        <a href="{{ dashboardUrl }}" class="govuk-link">{{ t('buttons.cancel', { ns: 'common' }) }}</a>
+      </p>
+    </div>
   </form>
 {% endblock %}

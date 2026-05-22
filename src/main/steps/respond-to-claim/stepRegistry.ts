@@ -1,6 +1,6 @@
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
-import { step as checkYourAnswers } from './check-your-answers';
+import { step as endOfJourneyCya } from './end-of-journey-cya';
 import { step as checkYourAnswersDocuments } from './check-your-answers-documents';
 import { step as checkYourAnswersIncomeAndExpenses } from './check-your-answers-income-and-expenses';
 import { step as checkYourAnswersPaymentsAndAgreements } from './check-your-answers-payments-and-agreements';
@@ -132,7 +132,7 @@ export const stepRegistry = {
   'equality-and-diversity-start': equalityAndDiversityStart,
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,
-  'check-your-answers': checkYourAnswers,
+  'end-of-journey-cya': endOfJourneyCya,
 } satisfies Record<string, StepDefinition>;
 
 export type RespondToClaimStepName = keyof typeof stepRegistry;
