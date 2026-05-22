@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import config from 'config';
 import FormData from 'form-data';
 
@@ -67,18 +68,52 @@ export async function deleteDocument(documentUrl: string, userToken: string): Pr
 export async function getDocumentBinary(
   binaryUrl: string,
   userToken: string
-): Promise<{ stream: NodeJS.ReadableStream; contentType: string }> {
+): Promise<{
+  stream: NodeJS.ReadableStream;
+  contentType: string;
+  contentLength?: string;
+  contentDisposition?: string;
+}> {
   const cdamUrl = getCdamUrl();
   const documentsIndex = binaryUrl.lastIndexOf('/documents');
   const cdamPath = documentsIndex >= 0 ? `/cases${binaryUrl.slice(documentsIndex)}` : binaryUrl;
-  const response = await http.get(`${cdamUrl}${cdamPath}`, {
-    headers: {
-      Authorization: `Bearer ${userToken}`,
-    },
-    responseType: 'stream',
+  const requestUrl = `${cdamUrl}${cdamPath}`;
+
+  logger.debug('Fetching document binary from CDAM', {
+    requestUrl,
+    cdamPath,
+    sourceBinaryUrl: binaryUrl,
   });
 
-  const contentType = (response.headers?.['content-type'] as string) || 'application/octet-stream';
+  let response;
+  try {
+    response = await http.get(requestUrl, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+      responseType: 'stream',
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    logger.error('CDAM document binary fetch failed', {
+      requestUrl,
+      cdamPath,
+      sourceBinaryUrl: binaryUrl,
+      status: axiosError.response?.status,
+      statusText: axiosError.response?.statusText,
+      errorMessage: axiosError.message,
+    });
+    throw error;
+  }
 
-  return { stream: response.data as NodeJS.ReadableStream, contentType };
+  const contentType = (response.headers?.['content-type'] as string) || 'application/octet-stream';
+  const contentLength = response.headers?.['content-length'] as string | undefined;
+  const contentDisposition = response.headers?.['content-disposition'] as string | undefined;
+
+  return {
+    stream: response.data as NodeJS.ReadableStream,
+    contentType,
+    contentLength,
+    contentDisposition,
+  };
 }
