@@ -13,7 +13,9 @@ import { step as counterClaimAbout } from './counter-claim-about';
 import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
 import { step as counterClaimFee } from './counter-claim-fee';
 import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
+import { step as counterClaimOrderOtherThanSum } from './counter-claim-order-other-than-sum';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
+import { step as counterClaimUploadDocuments } from './counter-claim-upload-documents';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
 import { step as counterClaimYouNeedToApplyForHelpWithYourFees } from './counter-claim-you-need-to-apply-for-help-with-your-fees';
 import { step as yourCircumstances } from './current-circumstances';
@@ -89,6 +91,8 @@ export const stepRegistry = {
   'counter-claim-you-need-to-apply-for-help-with-your-fees': counterClaimYouNeedToApplyForHelpWithYourFees,
   'counter-claim-against-whom': counterClaimAgainstWhom,
   'counter-claim-about': counterClaimAbout,
+  'counter-claim-order-other-than-sum': counterClaimOrderOtherThanSum,
+  'counter-claim-upload-documents': counterClaimUploadDocuments,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
