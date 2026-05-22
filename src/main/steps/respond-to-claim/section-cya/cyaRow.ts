@@ -23,8 +23,7 @@ export type ChangeAction = {
   visuallyHiddenText: string;
 };
 
-/** Style a question row and its revealed detail row as one grouped answer:
- *  no divider between them, and the detail key in regular weight. */
+/** Group a question row with its revealed detail: no divider, regular-weight detail key. */
 export function groupQuestionAndDetail(questionRow: SummaryListRow, detailRow: SummaryListRow): void {
   questionRow.classes = 'govuk-summary-list__row--no-border';
   detailRow.key.classes = 'govuk-!-font-weight-regular';

@@ -78,9 +78,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
-// `frequencyNamespace` selects the wording per context: income "received every week"
-// (incomeFrequencies), debt contributions "paid every week" (paymentFrequencies),
-// regular expenses "every week" (the default frequencies namespace).
+// frequencyNamespace picks the per-context wording (incomeFrequencies / paymentFrequencies / frequencies).
 function amountWithFrequency(
   amount: string | null | undefined,
   frequency: string | null | undefined,

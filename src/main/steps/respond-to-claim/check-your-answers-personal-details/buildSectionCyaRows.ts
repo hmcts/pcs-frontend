@@ -109,8 +109,7 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
 }
 
 function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void {
-  // defendant-date-of-birth has no showCondition — every citizen passes through it, and
-  // date of birth is optional. Always render the row; "No answer provided" when blank.
+  // DOB page has no showCondition and the field is optional, so always render the row.
   const dateOfBirth = validatedCase.defendantResponsesDateOfBirth;
   rows.push({
     key: { text: t('rows.dateOfBirth.label') },
@@ -120,15 +119,8 @@ function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void
 }
 
 function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowContext): void {
-  // One row showing the citizen's correspondence address (GOV.UK Check answers shows the
-  // answer — the address — not the "is the recorded address correct?" confirm-question).
-  // When the claim recorded the defendant's address and the citizen confirmed it ("Yes"),
-  // the step deletes party.address, so that recorded address IS the correspondence address;
-  // otherwise — corrected on "No", or typed when the claim had no address — it is on the
-  // defendant party.
-  // `correspondenceAddressConfirmation` is the reliable signal: a forged confirmation is only
-  // ever "no", so a normalised "YES" always means the citizen genuinely confirmed the
-  // claim-recorded address. normalizeYesNoValue keeps it casing-safe (backend may echo "Yes").
+  // On a confirmed "Yes" the step clears party.address, so show the claimant-recorded
+  // address; on "No" or a typed-in one, show the defendant party's.
   const addressConfirmed =
     normalizeYesNoValue(validatedCase.defendantResponses?.correspondenceAddressConfirmation) === 'YES';
 
@@ -200,14 +192,13 @@ function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: 
   if (!phoneNumber) {
     return;
   }
-  // Drop the divider between the question and its revealed detail — they read as one answer.
-  questionRow.classes = 'govuk-summary-list__row--no-border';
-  rows.push({
-    // Regular weight: revealed follow-up detail under its bold "Contact by phone?" question.
-    key: { text: t('rows.contactByPhoneNumber.label'), classes: 'govuk-!-font-weight-regular' },
+  const detailRow: SummaryListRow = {
+    key: { text: t('rows.contactByPhoneNumber.label') },
     value: { html: escapeHtml(phoneNumber) },
     actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhoneNumber.changeHidden')] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
