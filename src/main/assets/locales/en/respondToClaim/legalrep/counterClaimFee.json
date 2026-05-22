@@ -1,0 +1,14 @@
+{
+  "counterClaimFeeCostParagraph": "Based on the information provided, it will cost the defendant {{counterClaimFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to make your counterclaim.",
+  "counterClaimFeeHelpParagraph": "The defendant may be able to get help paying the fee if they (one or more of the following):",
+  "counterClaimFeeHeading2": "Does the defendant need help paying the counterclaim fee?",
+  "counterClaimFeeOptions": {
+    "iNeedHelpWithPayingFee": "The defendant needs help paying the fee",
+    "iDoNotNeedHelpWithPayingFee": "The defendant does not need help paying the fee"
+  },
+  "errors": {
+    "counterClaimFee": {
+      "required": "Select if the defendant needs help paying the counterclaim fee"
+    }
+  }
+}
