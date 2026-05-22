@@ -113,6 +113,16 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       header: viewTheClaim.mainHeader,
     });
     await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.uploadAdditionalDocumentsLink,
+      header: startEvidenceUpload.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.viewDocumentsLink,
+      header: viewDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.courtHearingSubHeader,
       fieldName: dashboard.viewHearingDocumentsLink,
       header: viewHearingDocuments.mainHeader,
