@@ -1,7 +1,7 @@
 import { Request } from 'express';
 
 const eventIdMappings: Record<string, string> = {
-  'make-an-application': 'citizenCreateGenApp',
+  'make-an-application': 'makeAnApplication',
   'respond-to-claim': 'respondPossessionClaim',
 };
 
