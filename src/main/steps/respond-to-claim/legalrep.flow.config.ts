@@ -68,7 +68,7 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     },
 
     'defendant-name-confirmation': {
-      showCondition: (req: Request) => hasSingleLinkedDefendant(req),
+      showCondition: () => true,
     },
   },
 };

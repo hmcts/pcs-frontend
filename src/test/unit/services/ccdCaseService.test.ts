@@ -30,7 +30,7 @@ describe('ccdCaseService', () => {
     jest.clearAllMocks();
   });
 
-  describe('getCaseById', () => {
+  describe('getCaseByIdForEvent', () => {
     it('should retrieve case by ID with default eventId', async () => {
       const caseId = '1234567890123456';
       const mockCaseData = { applicantForename: 'John', applicantSurname: 'Doe' };
@@ -43,7 +43,7 @@ describe('ccdCaseService', () => {
         },
       });
 
-      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId);
 
       expect(mockGet).toHaveBeenCalledWith(
         `${mockUrl}/cases/${caseId}/event-triggers/respondPossessionClaim?ignore-warning=false`,
@@ -72,7 +72,7 @@ describe('ccdCaseService', () => {
         },
       });
 
-      const result = await ccdCaseService.getCaseById(accessToken, caseId, customEventId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId, customEventId);
 
       expect(mockGet).toHaveBeenCalledWith(
         `${mockUrl}/cases/${caseId}/event-triggers/${customEventId}?ignore-warning=false`,
@@ -95,7 +95,7 @@ describe('ccdCaseService', () => {
         data: {},
       });
 
-      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId);
 
       expect(result).toEqual({
         id: caseId,
@@ -112,7 +112,7 @@ describe('ccdCaseService', () => {
         },
       });
 
-      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId);
 
       expect(result).toEqual({
         id: caseId,
@@ -128,8 +128,8 @@ describe('ccdCaseService', () => {
         message: 'Request failed',
       });
 
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Not authorised');
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow('Not authorised');
     });
 
     it('should throw HTTPError on case not found', async () => {
@@ -140,8 +140,8 @@ describe('ccdCaseService', () => {
         message: 'Case not found',
       });
 
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Case not found');
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow('Case not found');
     });
 
     it('should throw HTTPError on unexpected error', async () => {
@@ -149,8 +149,54 @@ describe('ccdCaseService', () => {
 
       mockGet.mockRejectedValue(new Error('Network error'));
 
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('CCD case service error');
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow('CCD case service error');
+    });
+  });
+
+  describe('getCaseById read', () => {
+    it('should retrieve read case data from data', async () => {
+      const caseId = '1234567890123456';
+      const mockCaseData = { statementOfCase: ['document'] };
+
+      mockGet.mockResolvedValue({
+        data: {
+          id: caseId,
+          data: mockCaseData,
+        },
+      });
+
+      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(result).toEqual({
+        id: caseId,
+        data: mockCaseData,
+      });
+    });
+
+    it('should return empty data object when data is missing', async () => {
+      const caseId = '1234567890123456';
+
+      mockGet.mockResolvedValue({
+        data: {
+          id: caseId,
+        },
+      });
+
+      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+
+      expect(result).toEqual({
+        id: caseId,
+        data: {},
+      });
     });
 
     it('should retrieve case by ID with client context headers', async () => {
@@ -169,7 +215,12 @@ describe('ccdCaseService', () => {
         selectedPartyId: 'abc',
       };
 
-      const result = await ccdCaseService.getCaseById(accessToken, caseId, undefined, clientContextHeaders);
+      const result = await ccdCaseService.getCaseByIdForEvent(
+        accessToken,
+        caseId,
+        'respondPossessionClaim',
+        clientContextHeaders
+      );
 
       expect(mockGet).toHaveBeenCalledWith(
         `${mockUrl}/cases/${caseId}/event-triggers/respondPossessionClaim?ignore-warning=false`,
@@ -298,7 +349,7 @@ describe('ccdCaseService', () => {
       await ccdCaseService.submitGeneralApplication(accessToken, ccdData);
 
       expect(mockGet).toHaveBeenCalledWith(
-        `${mockUrl}/cases/${caseId}/event-triggers/citizenCreateGenApp`,
+        `${mockUrl}/cases/${caseId}/event-triggers/makeAnApplication`,
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: `Bearer ${accessToken}`,
@@ -313,9 +364,9 @@ describe('ccdCaseService', () => {
             citizenGenAppRequest,
           },
           event: {
-            id: 'citizenCreateGenApp',
-            summary: 'Citizen citizenCreateGenApp summary',
-            description: 'Citizen citizenCreateGenApp description',
+            id: 'makeAnApplication',
+            summary: 'Citizen makeAnApplication summary',
+            description: 'Citizen makeAnApplication description',
           },
           event_token: eventToken,
           ignore_warning: false,
