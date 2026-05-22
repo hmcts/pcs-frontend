@@ -53,10 +53,12 @@ export class CitizenDashboardAction implements IAction {
       // Verify active link with tag
       await expect(viewResponseLink).toBeVisible();
 
-    const vireResponseTask = page.locator('li.govuk-task-list__item').filter({
-      hasText: String(notificationData.viewResponseHeader),
-    });
-    await expect(vireResponseTask.locator('.govuk-task-list__status')).toHaveText(String(notificationData.viewResponsetag));
+      const vireResponseTask = page.locator('li.govuk-task-list__item').filter({
+        hasText: String(notificationData.viewResponseHeader),
+      });
+      await expect(vireResponseTask.locator('.govuk-task-list__status')).toHaveText(
+        String(notificationData.viewResponsetag)
+      );
     } else {
       // Verify link is deactivated (not rendered as a link)
       await expect(viewResponseLink).toHaveCount(0);

@@ -47,6 +47,6 @@ export const dashboard = {
   viewTheResponseSubHeader: `View the response`,
   notStartedTag: `Not started`,
   inProgressTag: `In progress`,
-  completedTag: `Completed`,	
-  availableTag: `Available`
+  completedTag: `Completed`,
+  availableTag: `Available`,
 };
