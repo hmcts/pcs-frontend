@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next';
 import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
-import { getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
+import { type TranslationContent, getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
 
 import { Logger } from '@modules/logger';
 import { StepNavigation } from '@modules/steps/flow';
@@ -12,6 +12,22 @@ import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig
 import type { StepFormData } from '@modules/steps/stepFormData.interface';
 
 const logger = Logger.getLogger('controllerFactory');
+
+/**
+ * Top-level keys removed from step locale JSON before merging into GET render locals. Templates that
+ * need messages should use `t('errors.…')` or other namespaced keys rather than exporting `errors`
+ * onto the view. `addressLookup.njk` expects `errors` to mean server validation maps with keys like
+ * `prefix-addressLine1`, which must not collide with duplicate-shaped copy from JSON.
+ */
+const RESERVED_STEP_TRANSLATION_KEYS = ['errors', 'error', 'fields', 'backUrl'] as const;
+
+function withoutReservedStepTranslationKeys(translations: TranslationContent): TranslationContent {
+  const result: TranslationContent = { ...translations };
+  for (const key of RESERVED_STEP_TRANSLATION_KEYS) {
+    delete result[key];
+  }
+  return result;
+}
 
 type PostControllerCallback = (req: Request, res: Response) => Promise<void> | void;
 type TranslationFn = (req: Request) => StepFormData | Promise<StepFormData>;
@@ -35,13 +51,12 @@ export const createGetController = (
   view: string,
   stepName: string,
   stepNavigation: StepNavigation,
-  extendContent?: (req: Request) => StepFormData | Promise<StepFormData>,
-  journeyFolder?: string
+  extendContent?: (req: Request) => StepFormData | Promise<StepFormData>
 ): GetController => {
   return new GetController(view, async (req: Request) => {
-    if (journeyFolder && req.i18n) {
+    if (req.i18n) {
       try {
-        await loadStepNamespace(req, stepName, journeyFolder);
+        await loadStepNamespace(req);
       } catch (error) {
         logger.warn(`Failed to load namespace for step ${stepName}:`, error);
       }
@@ -51,15 +66,13 @@ export const createGetController = (
     const postData = req.body || {};
     const lang = getRequestLanguage(req);
 
-    const t: TFunction = journeyFolder
-      ? getTranslationFunction(req, stepName, ['common'], journeyFolder)
-      : getTranslationFunction(req);
+    const t: TFunction = getTranslationFunction(req);
 
     req.t = t;
 
     const selected = formData?.answer || formData?.choices || postData.answer || postData.choices;
 
-    const stepTranslations = journeyFolder ? getStepTranslations(req, stepName, journeyFolder) : {};
+    const stepTranslations = getStepTranslations(req);
     const commonTranslations = req.i18n?.getResourceBundle(lang, 'common') || {};
     const commonContent: Record<string, unknown> = {};
     for (const key of ['change', 'buttons']) {
@@ -82,7 +95,7 @@ export const createGetController = (
       backUrl: await stepNavigation.getBackUrl(req, stepName),
       ...commonI18nTranslations,
       ...commonContent,
-      ...stepTranslations,
+      ...withoutReservedStepTranslationKeys(stepTranslations),
     };
 
     if (extendContent) {
@@ -107,23 +120,20 @@ export const createPostController = (
   stepNavigation: StepNavigation,
   getFields: (t: TFunction) => FormFieldConfig[],
   view: string,
-  beforeRedirect?: PostControllerCallback,
-  journeyFolder?: string
+  beforeRedirect?: PostControllerCallback
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } => {
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
-      if (journeyFolder && req.i18n) {
+      if (req.i18n) {
         try {
-          await loadStepNamespace(req, stepName, journeyFolder);
+          await loadStepNamespace(req);
         } catch (error) {
           logger.warn(`Failed to load namespace for step ${stepName}:`, error);
         }
       }
 
       const reqLang = getRequestLanguage(req);
-      const t: TFunction = journeyFolder
-        ? getTranslationFunction(req, stepName, ['common'], journeyFolder)
-        : getTranslationFunction(req);
+      const t: TFunction = getTranslationFunction(req);
 
       const fields = getFields(t);
       const errors = validateForm(req, fields);
@@ -138,6 +148,7 @@ export const createPostController = (
           pageUrl: req.originalUrl || '/',
           t,
           backUrl: await stepNavigation.getBackUrl(req, stepName),
+          ...(res.locals?.extraHeaders ?? {}),
         });
       }
 

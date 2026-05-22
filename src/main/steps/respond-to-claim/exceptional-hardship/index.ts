@@ -48,7 +48,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   customTemplate: `${__dirname}/exceptionalHardship.njk`,
   extendGetContent: req => {
-    const t = getTranslationFunction(req, 'exceptional-hardship', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       introParagraph1: t('introParagraph1'),

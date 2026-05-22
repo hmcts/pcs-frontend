@@ -36,6 +36,10 @@
       "label": "cyWhat is your Help with Fees reference number?",
       "changeHint": "cyChange your Help with Fees reference number"
     },
+    "uploadedDocuments": {
+      "label": "cyUpload documents",
+      "changeHint": "cyChange uploaded documents"
+    },
     "otherPartiesAgreed": {
       "label": "cyHave the other parties agreed to this application?",
       "changeHint": "cyChange whether the other parties have agreed to this application"

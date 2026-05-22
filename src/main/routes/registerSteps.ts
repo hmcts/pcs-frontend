@@ -4,7 +4,7 @@ import type { RequestHandler } from 'express';
 import { caseReferenceParamMiddleware, legalRepresentativeHeaderMiddleware, oidcMiddleware } from '../middleware';
 
 import { Logger } from '@modules/logger';
-import { getValidatedLanguage, stepDependencyCheckMiddleware } from '@modules/steps';
+import { getValidatedLanguage, stepDependencyCheckMiddleware, withStepContext } from '@modules/steps';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getFlowConfigForJourney, getStepForJourney, getStepsForJourney, journeyRegistry } from '@steps';
@@ -39,14 +39,15 @@ function getJourneysToRegister(specificJourney?: string): [string, (typeof journ
 function buildGetMiddleware(
   requiresAuth: boolean,
   flowConfig: JourneyFlowConfig | ((req: Request) => JourneyFlowConfig),
+  stepContext: RequestHandler,
   stepMiddleware?: RequestHandler[]
 ): RequestHandler[] {
   const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
   const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
 
   return stepMiddleware
-    ? [...authMiddlewares, dependencyCheck, ...stepMiddleware, legalRepresentativeHeaderMiddleware]
-    : [...authMiddlewares, dependencyCheck, legalRepresentativeHeaderMiddleware];
+    ? [stepContext, ...authMiddlewares, dependencyCheck, ...stepMiddleware, legalRepresentativeHeaderMiddleware]
+    : [stepContext, ...authMiddlewares, dependencyCheck, legalRepresentativeHeaderMiddleware];
 }
 
 /**
@@ -90,14 +91,15 @@ function registerStepRoutes(
   const stepConfig = flowConfig.steps[step.name];
   const requiresAuth = stepConfig?.requiresAuth !== false;
   const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
+  const stepContext = withStepContext({ name: step.name, journey: journeyName });
 
   if (step.getController) {
-    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfigResolver, step.middleware);
+    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfigResolver, stepContext, step.middleware);
     router.get(step.url, ...allGetMiddleware, createGetHandler(step, journeyName));
   }
 
   if (step.postController?.post) {
-    router.post(step.url, ...authMiddlewares, legalRepresentativeHeaderMiddleware, (req, res, next) => {
+    router.post(step.url, stepContext, ...authMiddlewares, legalRepresentativeHeaderMiddleware, (req, res, next) => {
       const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
       return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
     });

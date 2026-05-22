@@ -1,6 +1,8 @@
+import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { isLegalRepresentativeUser } from '../../../steps/utils/userRole';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -58,9 +60,9 @@ export function createPostHandler(
 
   return {
     post: async (req: Request, res: Response, next: NextFunction) => {
-      await loadStepNamespace(req, stepName, journeyFolder);
+      await loadStepNamespace(req);
 
-      const t: TFunction = getTranslationFunction(req, stepName, ['common'], journeyFolder);
+      const t: TFunction = getTranslationFunction(req);
       const action = req.body.action as string | undefined;
 
       const nunjucksEnv = req.app.locals.nunjucksEnv;
@@ -155,10 +157,24 @@ export function createPostHandler(
 
       if (action === 'saveForLater') {
         const caseId = req.res?.locals.validatedCase?.id;
-        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
 
-        if (!dashboardUrl) {
+        if (!caseId) {
           // No valid case reference - redirect to home
+          return safeRedirect303(res, '/', '/', ['/']);
+        }
+
+        if (isLegalRepresentativeUser(req)) {
+          const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
+            ? config.get<string>('redirects.manageCaseReturnURL')
+            : null;
+          if (caseDetailsBaseUrl) {
+            const caseDetailsUrl = `${caseDetailsBaseUrl}/${caseId}`;
+            return safeRedirect303(res, caseDetailsUrl, '/', ['/cases/case-details']);
+          }
+        }
+
+        const dashboardUrl = getDashboardUrl(caseId);
+        if (!dashboardUrl) {
           return safeRedirect303(res, '/', '/', ['/']);
         }
 
