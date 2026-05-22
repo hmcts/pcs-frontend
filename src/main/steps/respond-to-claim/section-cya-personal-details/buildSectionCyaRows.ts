@@ -92,13 +92,12 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
 }
 
 function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void {
+  // defendant-date-of-birth has no showCondition — every citizen passes through it, and
+  // date of birth is optional. Always render the row; "No answer provided" when blank.
   const dateOfBirth = validatedCase.defendantResponsesDateOfBirth;
-  if (!dateOfBirth) {
-    return;
-  }
   rows.push({
     key: { text: t('rows.dateOfBirth.label') },
-    value: { text: formatIsoDate(dateOfBirth) },
+    value: { text: dateOfBirth ? formatIsoDate(dateOfBirth) : t('noAnswerProvided') },
     actions: { items: [change('defendant-date-of-birth', 'rows.dateOfBirth.changeHidden')] },
   });
 }

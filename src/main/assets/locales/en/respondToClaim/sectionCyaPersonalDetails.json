@@ -33,7 +33,7 @@
       "changeHidden": "your phone preference"
     },
     "contactByText": {
-      "label": "Receive updates by text message",
+      "label": "Are you happy to be contacted by text message?",
       "changeHidden": "whether you want to receive text messages"
     }
   }
