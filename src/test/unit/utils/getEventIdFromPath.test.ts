@@ -9,9 +9,9 @@ const createMockRequest = (path: string, caseReference = CASE_REF): Request =>
 
 describe('getEventIdFromPath', () => {
   describe('valid path mappings', () => {
-    it('should return citizenCreateGenApp for make-an-application journey', () => {
+    it('should return makeAnApplication for make-an-application journey', () => {
       const req = createMockRequest(`/case/${CASE_REF}/make-an-application`);
-      expect(getEventIdFromPath(req)).toBe('citizenCreateGenApp');
+      expect(getEventIdFromPath(req)).toBe('makeAnApplication');
     });
 
     it('should return respondPossessionClaim for respond-to-claim journey', () => {
@@ -21,7 +21,7 @@ describe('getEventIdFromPath', () => {
 
     it('should match the journey segment with deeper path segments', () => {
       const req = createMockRequest(`/case/${CASE_REF}/make-an-application/check-your-answers`);
-      expect(getEventIdFromPath(req)).toBe('citizenCreateGenApp');
+      expect(getEventIdFromPath(req)).toBe('makeAnApplication');
     });
 
     it('should match regardless of trailing slash', () => {
