@@ -573,7 +573,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await softErrorMessageValidation('counterClaimUploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
-    
+
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
 

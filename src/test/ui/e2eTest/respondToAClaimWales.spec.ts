@@ -9,7 +9,6 @@ import {
   counterClaimAbout,
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
-  counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
