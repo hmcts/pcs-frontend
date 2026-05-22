@@ -1,3 +1,12 @@
 {
-  "pageTitle": "cyResponse and counterclaim submitted"
+  "pageTitle": "cyResponse and counterclaim submitted",
+  "responseAndCounterClaimSubmittedParagraph1": "cyWe’ve sent you a confirmation email.",
+  "responseAndCounterClaimSubmittedParagraph2": "cyBefore the court can send the counterclaim to the other parties or a judge can consider it, the court must review the Help With Fees application linked to the counterclaim.",
+  "responseAndCounterClaimSubmittedParagraph3": "cyIf the court does not approve your Help With Fees application, you might need to pay all or part of the counterclaim fee.",
+  "responseAndCounterClaimSubmittedParagraph4": "cyWe'll notify you of the outcome of your Help With Fees application.",
+  "responseAndCounterClaimSubmittedHeading1": "cyWhat to do next",
+  "responseAndCounterClaimSubmittedListItem1": "cyA hearing date will be scheduled. You’ll get a notification telling you when this has happened. At the hearing, a judge will listen to both sides and make a decision. You should come to the hearing.",
+  "responseAndCounterClaimSubmittedListItem2": "cySome people need support to use HMCTS services, like step-free access to a court for a hearing. If you have not already, you should <a href='#' target='_blank'>request support now (opens in new tab)</a>.",
+  "responseAndCounterClaimSubmittedHeading2": "cyWe’d like to hear your thoughts",
+  "responseAndCounterClaimSubmittedParagraph5": "cy<a href='https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession' rel=\"noopener\" class=\"govuk-link\" target='_blank'>Complete this short survey to help us improve this service (opens in new tab)</a> (usually takes 5 minutes)."
 }

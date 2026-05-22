@@ -8,5 +8,5 @@
   "responseAndCounterClaimSubmittedListItem1": "A hearing date will be scheduled. You’ll get a notification telling you when this has happened. At the hearing, a judge will listen to both sides and make a decision. You should come to the hearing.",
   "responseAndCounterClaimSubmittedListItem2": "Some people need support to use HMCTS services, like step-free access to a court for a hearing. If you have not already, you should <a href='#' target='_blank'>request support now (opens in new tab)</a>.",
   "responseAndCounterClaimSubmittedHeading2": "We’d like to hear your thoughts",
-  "responseAndCounterClaimSubmittedParagraph5": "<a href='#' target='_blank'>Complete this short survey to help us improve this service (opens in new tab)</a> (usually takes 5 minutes)."
+  "responseAndCounterClaimSubmittedParagraph5": "<a href='https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession' rel=\"noopener\" class=\"govuk-link\" target='_blank'>Complete this short survey to help us improve this service (opens in new tab)</a> (usually takes 5 minutes)."
 }
