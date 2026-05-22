@@ -27,6 +27,8 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'rent-arrears-dispute',
   'non-rent-arrears-dispute',
   'counter-claim',
+  'counter-claim-what-are-you-claiming-for',
+  'counter-claim-specific-sum',
   'repayments-made',
   'repayments-agreed',
   'installment-payments',
