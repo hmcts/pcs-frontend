@@ -208,7 +208,10 @@ export function getTranslationFunction(
   }
 
   const userType = getUserType(req);
-  const fixedT = req.i18n.getFixedT(lang, [buildStepNamespace(context.stepName, context.journeyFolder, userType), ...resolvedNamespaces]);
+  const fixedT = req.i18n.getFixedT(lang, [
+    buildStepNamespace(context.stepName, context.journeyFolder, userType),
+    ...resolvedNamespaces,
+  ]);
   return fixedT || getMainTranslationFunction(req, resolvedNamespaces);
 }
 
