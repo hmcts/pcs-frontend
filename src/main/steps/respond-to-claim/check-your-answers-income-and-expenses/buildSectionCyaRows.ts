@@ -8,8 +8,10 @@ import {
   type SummaryListRow,
   createRowContext,
   escapeWithLineBreaks,
+  groupQuestionAndDetail,
   isYes,
   listHtml,
+  pushDetailRow,
   pushYesNoRow,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
@@ -135,7 +137,7 @@ function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
   if (!hc.hasAppliedForUniversalCredit) {
     return;
   }
-  pushYesNoRow(
+  const questionRow = pushYesNoRow(
     rows,
     'rows.hasAppliedForUniversalCredit',
     hc.hasAppliedForUniversalCredit,
@@ -148,13 +150,15 @@ function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
   if (!isYes(hc.hasAppliedForUniversalCredit) || !hc.ucApplicationDate) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.universalCreditApplicationDate.label') },
     value: { text: formatIsoDate(hc.ucApplicationDate) },
     actions: {
       items: [change('have-you-applied-for-universal-credit', 'rows.universalCreditApplicationDate.changeHidden')],
     },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addPriorityDebtsRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
@@ -216,7 +220,7 @@ function addOtherConsiderationsRow({ rows, responses, t, change, yesNoNotSure }:
   if (!responses.otherConsiderations) {
     return;
   }
-  pushYesNoRow(
+  const questionRow = pushYesNoRow(
     rows,
     'rows.otherConsiderations',
     responses.otherConsiderations,
@@ -230,9 +234,5 @@ function addOtherConsiderationsRow({ rows, responses, t, change, yesNoNotSure }:
   if (!isYes(responses.otherConsiderations) || !detail) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.otherConsiderationsDetails.label') },
-    value: { html: escapeWithLineBreaks(detail) },
-    actions: { items: [change('other-considerations', 'rows.otherConsiderationsDetails.changeHidden')] },
-  });
+  pushDetailRow(rows, questionRow, 'rows.otherConsiderationsDetails', detail, 'other-considerations', t, change);
 }

@@ -15,7 +15,7 @@
   },
   "rows": {
     "shareIncomeExpenseDetails": {
-      "label": "Do you want to provide details about your income and expenses?",
+      "label": "Do you want to provide details of your income and expenses?",
       "changeHidden": "whether you want to provide income and expense details"
     },
     "regularIncome": {
@@ -65,12 +65,12 @@
       }
     },
     "otherConsiderations": {
-      "label": "Is there anything else you want the court to consider?",
-      "changeHidden": "whether there is anything else you want the court to consider"
+      "label": "Is there anything else you want to tell the court?",
+      "changeHidden": "whether there is anything else you want to tell the court"
     },
     "otherConsiderationsDetails": {
-      "label": "Give details about what else you want the court to consider",
-      "changeHidden": "the details about what else you want the court to consider"
+      "label": "Give details about what else you want to tell the court",
+      "changeHidden": "the details about what else you want to tell the court"
     }
   }
 }

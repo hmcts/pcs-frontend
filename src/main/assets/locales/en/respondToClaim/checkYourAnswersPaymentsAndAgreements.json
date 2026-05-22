@@ -7,7 +7,7 @@
       "changeHidden": "whether you have paid any money since the claim was issued"
     },
     "paymentDetails": {
-      "label": "What repayments have you made?",
+      "label": "Give details about how much you paid and when",
       "changeHidden": "the repayments you have made"
     },
     "repaymentPlanAgreed": {
