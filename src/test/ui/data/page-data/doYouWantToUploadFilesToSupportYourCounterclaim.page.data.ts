@@ -7,7 +7,7 @@ export const doYouWantToUploadFilesToSupportYourCounterclaim = {
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  selectIfYouWantToUploadErrorMessage: `Select if you want to upload files to support your counterclaim?`,
+  selectIfYouWantToUploadErrorMessage: `Select if you want to upload files to support your counterclaim`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `counter-claim-do-you-want-to-upload-files`,
   backLink: `Back`,
