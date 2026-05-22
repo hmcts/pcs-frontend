@@ -1,10 +1,11 @@
-import { Application, NextFunction, Request, Response } from 'express';
 import { format, parseISO } from 'date-fns';
+import { Application, NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../HttpError';
 import { VIEW_DOCUMENTS_ROUTE, VIEW_RESPONSE_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
+import { penceToPounds } from '../steps/utils';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -24,7 +25,6 @@ import type {
   YesNoValue,
 } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
-import { penceToPounds } from '../steps/utils';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
 
@@ -149,11 +149,7 @@ function summariseSectionRows(sections: Record<string, SummarySection>): Record<
   return Object.fromEntries(Object.entries(sections).map(([name, section]) => [name, section.rows.length]));
 }
 
-function buildCaseDatesSummary(
-  t: TFunction,
-  dateIssued: string | null,
-  dateSubmitted: string | null
-): SummarySection {
+function buildCaseDatesSummary(t: TFunction, dateIssued: string | null, dateSubmitted: string | null): SummarySection {
   return {
     rows: [
       { key: { text: t('viewTheResponse:summary.dateIssued') }, value: { text: dateIssued ?? '' } },
@@ -258,7 +254,11 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.tenancyStartDateConfirmation'),
     yesNoNotSure(t, responses?.tenancyStartDateConfirmation)
   );
-  pushRow(rows, t('viewTheResponse:responseToClaim.tenancyStartDate'), formatGdsDate(responses?.tenancyStartDate) ?? '');
+  pushRow(
+    rows,
+    t('viewTheResponse:responseToClaim.tenancyStartDate'),
+    formatGdsDate(responses?.tenancyStartDate) ?? ''
+  );
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
@@ -274,7 +274,11 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.rentArrearsAmountConfirmation'),
     responses?.rentArrearsAmountConfirmation
   );
-  pushRow(rows, t('viewTheResponse:responseToClaim.rentArrearsAmount'), formatMoneyAmount(responses?.rentArrearsAmount));
+  pushRow(
+    rows,
+    t('viewTheResponse:responseToClaim.rentArrearsAmount'),
+    formatMoneyAmount(responses?.rentArrearsAmount)
+  );
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.landlordRegistered'),
@@ -479,7 +483,7 @@ export default function viewTheResponseRoutes(app: Application): void {
     }
 
     try {
-      const { data: caseData } = await ccdCaseService.getCaseById(accessToken, caseReference);
+      const caseData = await ccdCaseService.getViewDefendantResponse(accessToken, caseReference);
       const responses = caseData.possessionClaimResponse?.defendantResponses;
 
       logger.info('viewTheResponse: case_data from respondPossessionClaim start', {

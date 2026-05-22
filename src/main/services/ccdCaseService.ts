@@ -415,4 +415,18 @@ export const ccdCaseService = {
       throw httpError;
     }
   },
+
+  async getViewDefendantResponse(accessToken: string, caseId: string): Promise<CcdCaseData> {
+    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/viewDefendantResponse?ignore-warning=false`;
+    try {
+      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
+      return response.data.case_details?.case_data ?? {};
+    } catch (error) {
+      const httpError = convertAxiosErrorToHttpError(error, 'getViewDefendantResponse');
+      if (httpError.status === 400 || httpError.status === 404) {
+        throw new HTTPError('Case not found', 404);
+      }
+      throw httpError;
+    }
+  },
 };
