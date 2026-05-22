@@ -1,7 +1,7 @@
 {
   "caption": "Respond to a property possession claim",
   "pageTitle": "Select defendant",
-  "detailsHeading": "If you're representing more than one defendant in this case, you must submit a separate response for each one.",
+  "detailsHeading": "If you’re representing more than one defendant in this case, you must submit a separate response for each one.",
   "selectDefendantLabel": "Which defendant are you completing this response on behalf of?",
   "errors": {
     "selectDefendant": "You must select a defendant to represent"
