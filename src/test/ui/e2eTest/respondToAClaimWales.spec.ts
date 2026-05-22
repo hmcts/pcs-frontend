@@ -115,8 +115,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - Rent and NonRentArrears - CounterClaimFee - INeedHelp @noDefendants @regression', async () => {
-    //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
+  test('Respond to a claim - Wales - Secure contract - Rent and NonRentArrears - CounterClaimFee - INeedHelp @PR @noDefendants @smoke @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
