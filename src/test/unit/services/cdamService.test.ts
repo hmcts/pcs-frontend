@@ -1,13 +1,14 @@
 import config from 'config';
 
 import { http } from '@modules/http';
-import { deleteDocument, uploadDocument } from '@services/cdamService';
+import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 
 jest.mock('config');
 jest.mock('@modules/http');
 
 const mockPost = http.post as jest.Mock;
 const mockDelete = http.delete as jest.Mock;
+const mockGet = http.get as jest.Mock;
 
 const mockCdamUrl = 'http://cdam.example.com';
 const mockCaseTypeId = 'PCS';
@@ -199,6 +200,60 @@ describe('cdamService', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('getDocumentBinary', () => {
+    it('rewrites dm-store binary URL and returns stream plus headers', async () => {
+      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+      mockGet.mockResolvedValue({
+        data: mockStream,
+        headers: {
+          'content-type': 'application/pdf',
+          'content-length': '256',
+          'content-disposition': 'inline; filename="doc.pdf"',
+        },
+      });
+      const uuid = 'dc1e8cec-d2b0-494f-8c2a-d18ece6b3e6d';
+
+      const result = await getDocumentBinary(`http://dm-store/documents/${uuid}/binary`, userToken);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockCdamUrl}/cases/documents/${uuid}/binary`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${userToken}`,
+          }),
+          responseType: 'stream',
+        })
+      );
+      expect(result).toEqual({
+        stream: mockStream,
+        contentType: 'application/pdf',
+        contentLength: '256',
+        contentDisposition: 'inline; filename="doc.pdf"',
+      });
+    });
+
+    it('uses fallback content type when response headers are missing', async () => {
+      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+      mockGet.mockResolvedValue({
+        data: mockStream,
+        headers: {},
+      });
+
+      const result = await getDocumentBinary('http://some-url/binary', userToken);
+
+      expect(result.contentType).toBe('application/octet-stream');
+      expect(result.contentLength).toBeUndefined();
+      expect(result.contentDisposition).toBeUndefined();
+    });
+
+    it('rethrows fetch errors from CDAM', async () => {
+      const error = new Error('boom');
+      mockGet.mockRejectedValue(error);
+
+      await expect(getDocumentBinary('http://dm-store/documents/test/binary', userToken)).rejects.toThrow('boom');
     });
   });
 });

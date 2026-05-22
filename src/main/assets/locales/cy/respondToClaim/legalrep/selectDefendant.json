@@ -4,6 +4,6 @@
   "detailsHeading": "cyIf you're representing more than one defendant in this case, you must submit a separate response for each one.",
   "selectDefendantLabel": "cyWhich defendant are you completing this response on behalf of?",
   "errors": {
-    "selectDefendant": "cyYou must select a defendant to represent."
+    "selectDefendant": "cyYou must select a defendant to represent"
   }
 }

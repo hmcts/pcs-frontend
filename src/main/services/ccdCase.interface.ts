@@ -162,6 +162,7 @@ export interface CcdDocumentReference {
   document_filename: string;
   document_hash?: string;
   category_id?: string;
+  upload_timestamp?: string;
 }
 
 /** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
@@ -264,12 +265,20 @@ export interface CcdCaseData {
   submitDraftAnswers?: string;
   allClaimants?: CcdCollectionItem<CcdParty>[];
   allDefendants?: CcdCollectionItem<CcdParty>[];
+  allLinkedDefendants?: CcdCollectionItem<CcdDefendantParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
-  allLinkedDefendants?: CcdCollectionItem<CcdDefendantParty>[];
+  allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+}
+
+export interface CcdCaseDocument {
+  document_binary_url?: string;
+  document_filename?: string;
+  upload_timestamp?: string;
+  category_id?: string;
 }
 
 /** Case representation used by services: id + case_data. */
