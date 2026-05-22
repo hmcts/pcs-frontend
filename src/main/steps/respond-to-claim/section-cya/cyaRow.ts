@@ -49,7 +49,7 @@ export const listHtml = (items: string[]): string =>
  * `options.no`, `options.imNotSure`). Unknown values fall through lowercased so
  * mistakes surface as a missing-key, not as a silent miscast.
  */
-export const toOptionKey = (value: string): string => {
+const toOptionKey = (value: string): string => {
   const upper = value.trim().toUpperCase();
   if (upper === 'YES') {
     return 'yes';
@@ -79,3 +79,79 @@ export const makeChange =
     text: t('change'),
     visuallyHiddenText: t(hiddenKey),
   });
+
+export interface BaseRowContext {
+  rows: SummaryListRow[];
+  validatedCase: CcdCaseModel;
+  t: TFunction;
+  change: ReturnType<typeof makeChange>;
+  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
+}
+
+/** Bootstrap shared by every section-CYA builder — validates the case and wires the
+ *  change-link + yes/no helpers. Returns undefined when there is no validated case. */
+export function createRowContext(
+  req: Request,
+  sectionId: RespondToClaimSectionId,
+  t: TFunction
+): BaseRowContext | undefined {
+  const validatedCase = getValidatedCase(req);
+  const caseRef = validatedCase?.id;
+  if (!validatedCase || !caseRef) {
+    return undefined;
+  }
+  return { rows: [], validatedCase, t, change: makeChange(caseRef, sectionId, t), yesNoNotSure: makeYesNoNotSure(t) };
+}
+
+/** Push a yes/no/not-sure summary row, deriving `.label`/`.changeHidden` from `labelKey`. */
+export function pushYesNoRow(
+  rows: SummaryListRow[],
+  labelKey: string,
+  answer: string,
+  step: string,
+  t: TFunction,
+  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>,
+  change: ReturnType<typeof makeChange>
+): SummaryListRow {
+  const row: SummaryListRow = {
+    key: { text: t(`${labelKey}.label`) },
+    value: { text: yesNoNotSure(answer) },
+    actions: { items: [change(step, `${labelKey}.changeHidden`)] },
+  };
+  rows.push(row);
+  return row;
+}
+
+/** Push a revealed free-text detail row grouped under its question row. */
+export function pushDetailRow(
+  rows: SummaryListRow[],
+  questionRow: SummaryListRow,
+  labelKey: string,
+  detail: string,
+  step: string,
+  t: TFunction,
+  change: ReturnType<typeof makeChange>
+): void {
+  const detailRow: SummaryListRow = {
+    key: { text: t(`${labelKey}.label`) },
+    value: { html: escapeWithLineBreaks(detail) },
+    actions: { items: [change(step, `${labelKey}.changeHidden`)] },
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
+}
+
+// GDS multi-select pattern: a single value renders as text; many values render as a
+// govuk-list. Items in `userSuppliedItems` are HTML-escaped (the rest are translation
+// strings that are safe to render verbatim).
+export function multiSelectValue(items: string[], userSuppliedItems: Set<string> = new Set()): SummaryListRow['value'] {
+  if (items.length === 0) {
+    return { text: '' };
+  }
+  if (items.length === 1) {
+    const item = items[0];
+    return userSuppliedItems.has(item) ? { html: escapeHtml(item) } : { text: item };
+  }
+  const lis = items.map(item => `<li>${userSuppliedItems.has(item) ? escapeHtml(item) : item}</li>`).join('\n');
+  return { html: `<ul class="govuk-list">\n${lis}\n</ul>` };
+}

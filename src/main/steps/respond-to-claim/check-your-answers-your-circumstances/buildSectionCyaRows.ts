@@ -3,13 +3,13 @@ import type { TFunction } from 'i18next';
 
 import { formatIsoDate } from '../../utils';
 import {
+  type BaseRowContext,
   type SummaryListRow,
-  escapeWithLineBreaks,
-  getValidatedCase,
+  createRowContext,
   groupQuestionAndDetail,
   isYes,
-  makeChange,
-  makeYesNoNotSure,
+  pushDetailRow,
+  pushYesNoRow,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
@@ -17,27 +17,19 @@ import type { HouseholdCircumstances } from '@services/ccdCase.interface';
 
 const SECTION_ID: RespondToClaimSectionId = 'situationAndCircumstances';
 
-interface RowContext {
-  rows: SummaryListRow[];
+interface RowContext extends BaseRowContext {
   hc: HouseholdCircumstances;
-  t: TFunction;
-  change: ReturnType<typeof makeChange>;
-  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
 }
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = getValidatedCase(req);
-  const caseRef = validatedCase?.id;
-  if (!validatedCase || !caseRef) {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {
     return [];
   }
 
   const ctx: RowContext = {
-    rows: [],
-    hc: validatedCase.defendantResponses?.householdCircumstances ?? {},
-    t,
-    change: makeChange(caseRef, SECTION_ID, t),
-    yesNoNotSure: makeYesNoNotSure(t),
+    ...base,
+    hc: base.validatedCase.defendantResponses?.householdCircumstances ?? {},
   };
 
   // your-household-and-circumstances is an interstitial with no input — no row.
@@ -49,42 +41,6 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   addExceptionalHardshipRow(ctx);
 
   return ctx.rows;
-}
-
-function pushYesNoRow(
-  rows: SummaryListRow[],
-  labelKey: string,
-  answer: string,
-  step: string,
-  t: TFunction,
-  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>,
-  change: ReturnType<typeof makeChange>
-): SummaryListRow {
-  const row: SummaryListRow = {
-    key: { text: t(`${labelKey}.label`) },
-    value: { text: yesNoNotSure(answer) },
-    actions: { items: [change(step, `${labelKey}.changeHidden`)] },
-  };
-  rows.push(row);
-  return row;
-}
-
-function pushDetailRow(
-  rows: SummaryListRow[],
-  questionRow: SummaryListRow,
-  labelKey: string,
-  detail: string,
-  step: string,
-  t: TFunction,
-  change: ReturnType<typeof makeChange>
-): void {
-  const detailRow: SummaryListRow = {
-    key: { text: t(`${labelKey}.label`) },
-    value: { html: escapeWithLineBreaks(detail) },
-    actions: { items: [change(step, `${labelKey}.changeHidden`)] },
-  };
-  groupQuestionAndDetail(questionRow, detailRow);
-  rows.push(detailRow);
 }
 
 function addDependantChildrenRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {

@@ -5,56 +5,25 @@ import type { TFunction } from 'i18next';
 import { formatIsoDate, normalizeYesNoValue } from '../../utils';
 import { formatCcdAddressLines } from '../../utils/ccdAddress';
 import {
+  type BaseRowContext,
   type SummaryListRow,
-  getValidatedCase,
+  createRowContext,
   groupQuestionAndDetail,
   isYes,
-  makeChange,
-  makeYesNoNotSure,
+  multiSelectValue,
+  pushYesNoRow,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
-import type { CcdCaseModel } from '@services/ccdCaseData.model';
-
 const SECTION_ID: RespondToClaimSectionId = 'personalDetails';
 
-interface RowContext {
-  rows: SummaryListRow[];
-  validatedCase: CcdCaseModel;
-  t: TFunction;
-  change: ReturnType<typeof makeChange>;
-  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
-}
-
-// GDS multi-select pattern: a single value renders as text; many values render as a
-// govuk-list. Items in `userSuppliedItems` are HTML-escaped (the rest are translation
-// strings that are safe to render verbatim).
-function multiSelectValue(items: string[], userSuppliedItems: Set<string> = new Set()): SummaryListRow['value'] {
-  if (items.length === 0) {
-    return { text: '' };
-  }
-  if (items.length === 1) {
-    const item = items[0];
-    return userSuppliedItems.has(item) ? { html: escapeHtml(item) } : { text: item };
-  }
-  const lis = items.map(item => `<li>${userSuppliedItems.has(item) ? escapeHtml(item) : item}</li>`).join('\n');
-  return { html: `<ul class="govuk-list">\n${lis}\n</ul>` };
-}
+type RowContext = BaseRowContext;
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = getValidatedCase(req);
-  const caseRef = validatedCase?.id;
-  if (!validatedCase || !caseRef) {
+  const ctx = createRowContext(req, SECTION_ID, t);
+  if (!ctx) {
     return [];
   }
-
-  const ctx: RowContext = {
-    rows: [],
-    validatedCase,
-    t,
-    change: makeChange(caseRef, SECTION_ID, t),
-    yesNoNotSure: makeYesNoNotSure(t),
-  };
 
   addNameRow(ctx);
   addDateOfBirthRow(ctx);
@@ -178,12 +147,15 @@ function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: 
   if (!contactByPhone) {
     return;
   }
-  const questionRow: SummaryListRow = {
-    key: { text: t('rows.contactByPhone.label') },
-    value: { text: yesNoNotSure(contactByPhone) },
-    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')] },
-  };
-  rows.push(questionRow);
+  const questionRow = pushYesNoRow(
+    rows,
+    'rows.contactByPhone',
+    contactByPhone,
+    'contact-preferences-telephone',
+    t,
+    yesNoNotSure,
+    change
+  );
 
   if (!isYes(contactByPhone)) {
     return;
@@ -211,9 +183,5 @@ function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: R
   if (!contactByText) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.contactByText.label') },
-    value: { text: yesNoNotSure(contactByText) },
-    actions: { items: [change('contact-preferences-text-message', 'rows.contactByText.changeHidden')] },
-  });
+  pushYesNoRow(rows, 'rows.contactByText', contactByText, 'contact-preferences-text-message', t, yesNoNotSure, change);
 }

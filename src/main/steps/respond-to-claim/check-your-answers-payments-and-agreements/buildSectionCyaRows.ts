@@ -3,13 +3,13 @@ import type { TFunction } from 'i18next';
 
 import { formatIsoDate, penceToPounds } from '../../utils';
 import {
+  type BaseRowContext,
   type SummaryListRow,
+  createRowContext,
   escapeWithLineBreaks,
-  getValidatedCase,
   groupQuestionAndDetail,
   isYes,
-  makeChange,
-  makeYesNoNotSure,
+  pushYesNoRow,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
@@ -17,31 +17,24 @@ import type { PaymentAgreement } from '@services/ccdCase.interface';
 
 const SECTION_ID: RespondToClaimSectionId = 'payments';
 
-interface RowContext {
-  rows: SummaryListRow[];
+interface RowContext extends BaseRowContext {
   paymentAgreement: PaymentAgreement;
   claimantName: string;
   claimIssueDate: string;
-  t: TFunction;
-  change: ReturnType<typeof makeChange>;
-  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
 }
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = getValidatedCase(req);
-  const caseRef = validatedCase?.id;
-  if (!validatedCase || !caseRef) {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {
     return [];
   }
 
+  const { validatedCase } = base;
   const ctx: RowContext = {
-    rows: [],
+    ...base,
     paymentAgreement: validatedCase.defendantResponses?.paymentAgreement ?? {},
     claimantName: validatedCase.claimantName ?? '',
     claimIssueDate: validatedCase.claimIssueDate ? formatIsoDate(validatedCase.claimIssueDate) : '',
-    t,
-    change: makeChange(caseRef, SECTION_ID, t),
-    yesNoNotSure: makeYesNoNotSure(t),
   };
 
   addAnyPaymentsMadeRows(ctx);
@@ -120,11 +113,15 @@ function addRepayArrearsInstalmentsRow({ rows, paymentAgreement, t, change, yesN
   if (!paymentAgreement.repayArrearsInstalments) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.repayArrearsInstalments.label') },
-    value: { text: yesNoNotSure(paymentAgreement.repayArrearsInstalments) },
-    actions: { items: [change('installment-payments', 'rows.repayArrearsInstalments.changeHidden')] },
-  });
+  pushYesNoRow(
+    rows,
+    'rows.repayArrearsInstalments',
+    paymentAgreement.repayArrearsInstalments,
+    'installment-payments',
+    t,
+    yesNoNotSure,
+    change
+  );
 }
 
 function addAffordToPayRow({ rows, paymentAgreement, t, change }: RowContext): void {

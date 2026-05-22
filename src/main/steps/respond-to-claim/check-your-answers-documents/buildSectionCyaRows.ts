@@ -2,32 +2,26 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { type SummaryListRow, getValidatedCase, listHtml, makeChange } from '../section-cya/cyaRow';
+import { type BaseRowContext, type SummaryListRow, createRowContext, listHtml } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
 import type { CcdDefendantResponses } from '@services/ccdCase.interface';
 
 const SECTION_ID: RespondToClaimSectionId = 'uploadFiles';
 
-interface RowContext {
-  rows: SummaryListRow[];
+interface RowContext extends BaseRowContext {
   responses: CcdDefendantResponses;
-  t: TFunction;
-  change: ReturnType<typeof makeChange>;
 }
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = getValidatedCase(req);
-  const caseRef = validatedCase?.id;
-  if (!validatedCase || !caseRef) {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {
     return [];
   }
 
   const ctx: RowContext = {
-    rows: [],
-    responses: validatedCase.defendantResponses ?? {},
-    t,
-    change: makeChange(caseRef, SECTION_ID, t),
+    ...base,
+    responses: base.validatedCase.defendantResponses ?? {},
   };
 
   addUploadedDocumentsRow(ctx);
