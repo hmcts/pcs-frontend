@@ -9,10 +9,12 @@ import {
 } from '../check-your-answers-income-and-expenses/buildSectionCyaRows';
 import { buildSectionCyaRows as buildPaymentsRows } from '../check-your-answers-payments-and-agreements/buildSectionCyaRows';
 import { buildSectionCyaRows as buildPersonalRows } from '../check-your-answers-personal-details/buildSectionCyaRows';
-import { buildSectionCyaRows as buildStartNowRows } from '../check-your-answers-start-now-and-details/buildSectionCyaRows';
-import { buildSectionCyaRows as buildCircumstancesRows } from '../check-your-answers-your-circumstances/buildSectionCyaRows';
+import {
+  buildCircumstancesOnlyRows,
+  buildDependantsRows,
+} from '../check-your-answers-your-circumstances/buildSectionCyaRows';
 import { buildSectionCyaRows as buildResponseRows } from '../check-your-answers-your-response/buildSectionCyaRows';
-import { type SummaryListRow } from '../section-cya/cyaRow';
+import { type SummaryListRow, getValidatedCase } from '../section-cya/cyaRow';
 
 import { buildLanguageUsedRows } from './buildLanguageUsedRows';
 
@@ -24,7 +26,6 @@ export type EndOfJourneyCyaSection = {
 };
 
 export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJourneyCyaSection[] {
-  const tStartNow = getTranslationFunction(req, ['respondToClaim/checkYourAnswersStartNowAndDetails', 'common']);
   const tPersonal = getTranslationFunction(req, ['respondToClaim/checkYourAnswersPersonalDetails', 'common']);
   const tResponse = getTranslationFunction(req, ['respondToClaim/checkYourAnswersYourResponse', 'common']);
   const tPayments = getTranslationFunction(req, ['respondToClaim/checkYourAnswersPaymentsAndAgreements', 'common']);
@@ -32,12 +33,8 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
   const tIncome = getTranslationFunction(req, ['respondToClaim/checkYourAnswersIncomeAndExpenses', 'common']);
   const tDocuments = getTranslationFunction(req, ['respondToClaim/checkYourAnswersDocuments', 'common']);
 
+  const claimantName = getValidatedCase(req)?.claimantName ?? '';
   const sections: EndOfJourneyCyaSection[] = [];
-
-  sections.push({
-    heading: t('sections.freeLegalAdvice'),
-    rows: buildStartNowRows(req, tStartNow),
-  });
 
   sections.push({
     heading: t('sections.personalDetails'),
@@ -47,13 +44,18 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
   const paymentsRows = hasAnyRentArrearsGround(req) ? buildPaymentsRows(req, tPayments) : [];
 
   sections.push({
-    heading: t('sections.response'),
+    heading: t('sections.claimantsClaim', { claimantName }),
     rows: [...buildResponseRows(req, tResponse), ...paymentsRows],
   });
 
   sections.push({
-    heading: t('sections.householdAndCircumstances'),
-    rows: buildCircumstancesRows(req, tCircumstances),
+    heading: t('sections.dependantsAndOtherResidents'),
+    rows: buildDependantsRows(req, tCircumstances),
+  });
+
+  sections.push({
+    heading: t('sections.yourCircumstances'),
+    rows: buildCircumstancesOnlyRows(req, tCircumstances),
   });
 
   const incomeRows = buildIncomeRows(req, tIncome).filter(
@@ -66,13 +68,13 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
   });
 
   sections.push({
-    heading: t('sections.otherConsiderations'),
-    rows: buildOtherConsiderationsRows(req, t),
+    heading: t('sections.uploadFiles'),
+    rows: buildDocumentsRows(req, tDocuments),
   });
 
   sections.push({
-    heading: t('sections.documents'),
-    rows: buildDocumentsRows(req, tDocuments),
+    heading: t('sections.otherConsiderations'),
+    rows: buildOtherConsiderationsRows(req, t),
   });
 
   sections.push({

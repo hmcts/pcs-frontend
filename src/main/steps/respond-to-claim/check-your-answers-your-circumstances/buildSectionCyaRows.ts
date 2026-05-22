@@ -43,6 +43,84 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
+<<<<<<< HEAD
+=======
+export function buildDependantsRows(req: Request, t: TFunction): SummaryListRow[] {
+  const validatedCase = getValidatedCase(req);
+  const caseRef = validatedCase?.id;
+  if (!validatedCase || !caseRef) {
+    return [];
+  }
+
+  const ctx: RowContext = {
+    rows: [],
+    hc: validatedCase.defendantResponses?.householdCircumstances ?? {},
+    t,
+    change: makeChange(caseRef, SECTION_ID, t),
+    yesNoNotSure: makeYesNoNotSure(t),
+  };
+
+  addDependantChildrenRow(ctx);
+  addOtherDependantsRow(ctx);
+  addOtherTenantsRow(ctx);
+
+  return ctx.rows;
+}
+
+export function buildCircumstancesOnlyRows(req: Request, t: TFunction): SummaryListRow[] {
+  const validatedCase = getValidatedCase(req);
+  const caseRef = validatedCase?.id;
+  if (!validatedCase || !caseRef) {
+    return [];
+  }
+
+  const ctx: RowContext = {
+    rows: [],
+    hc: validatedCase.defendantResponses?.householdCircumstances ?? {},
+    t,
+    change: makeChange(caseRef, SECTION_ID, t),
+    yesNoNotSure: makeYesNoNotSure(t),
+  };
+
+  addAlternativeAccommodationRow(ctx);
+  addShareAdditionalCircumstancesRow(ctx);
+  addExceptionalHardshipRow(ctx);
+
+  return ctx.rows;
+}
+
+function pushYesNoRow(
+  rows: SummaryListRow[],
+  labelKey: string,
+  answer: string,
+  step: string,
+  t: TFunction,
+  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>,
+  change: ReturnType<typeof makeChange>
+): void {
+  rows.push({
+    key: { text: t(`${labelKey}.label`) },
+    value: { text: yesNoNotSure(answer) },
+    actions: { items: [change(step, `${labelKey}.changeHidden`)] },
+  });
+}
+
+function pushDetailRow(
+  rows: SummaryListRow[],
+  labelKey: string,
+  detail: string,
+  step: string,
+  t: TFunction,
+  change: ReturnType<typeof makeChange>
+): void {
+  rows.push({
+    key: { text: t(`${labelKey}.label`) },
+    value: { html: escapeWithLineBreaks(detail) },
+    actions: { items: [change(step, `${labelKey}.changeHidden`)] },
+  });
+}
+
+>>>>>>> f782e8e9d (HDPI-3794:Restructuring cya sections as per latest figma)
 function addDependantChildrenRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
   if (!hc.dependantChildren) {
     return;

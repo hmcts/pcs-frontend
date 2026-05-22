@@ -2,12 +2,12 @@
   "pageTitle": "cy Check your answers",
   "heading": "cy Check your answers",
   "sections": {
-    "freeLegalAdvice": "cy Free legal advice",
     "personalDetails": "cy Personal details",
-    "response": "cy Response",
-    "householdAndCircumstances": "cy Your household and circumstances",
+    "claimantsClaim": "cy {{claimantName}}'s claim",
+    "dependantsAndOtherResidents": "cy Dependants and other residents",
+    "yourCircumstances": "cy Your circumstances",
     "incomeAndExpenses": "cy Income and expenses",
-    "documents": "cy Documents",
+    "uploadFiles": "cy Upload files",
     "otherConsiderations": "cy Other considerations",
     "languageUsed": "cy Language used"
   },

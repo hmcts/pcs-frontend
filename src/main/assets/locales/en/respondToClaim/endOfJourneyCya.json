@@ -2,12 +2,12 @@
   "pageTitle": "Check your answers",
   "heading": "Check your answers",
   "sections": {
-    "freeLegalAdvice": "Free legal advice",
     "personalDetails": "Personal details",
-    "response": "Response",
-    "householdAndCircumstances": "Your household and circumstances",
+    "claimantsClaim": "{{claimantName}}'s claim",
+    "dependantsAndOtherResidents": "Dependants and other residents",
+    "yourCircumstances": "Your circumstances",
     "incomeAndExpenses": "Income and expenses",
-    "documents": "Documents",
+    "uploadFiles": "Upload files",
     "otherConsiderations": "Other considerations",
     "languageUsed": "Language used"
   },
