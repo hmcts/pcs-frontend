@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -362,7 +364,6 @@ describe('steps/i18n', () => {
 
       const getFixedT = jest.fn().mockReturnValue(mockFixedT);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const req = {
         i18n: { getFixedT },
       } as any;
@@ -414,7 +415,7 @@ describe('steps/i18n', () => {
       const mockFixedT = jest.fn();
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
       const getFixedT = jest.fn().mockReturnValue(mockFixedT);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const req = {
         i18n: { getFixedT },
         res: { locals: { step: { journey: 'testFolder' } } },
