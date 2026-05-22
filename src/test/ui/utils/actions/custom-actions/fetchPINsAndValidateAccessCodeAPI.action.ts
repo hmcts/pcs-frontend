@@ -109,15 +109,26 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
     if (!accessCode) {
       throw new Error('No access code available for validation');
     }
-    try {
-      await validateApi.post(validateAccessCodeApiData.validateAccessCodeApiEndPoint(), {
-        accessCode,
-      });
-    } catch (error: unknown) {
-      if (Axios.isAxiosError(error)) {
-        throw new Error(`Validate access code failed: ${error.response?.status}`);
+    const maxRetries = actionRetries;
+    const delayMs = VERY_SHORT_TIMEOUT;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await validateApi.post(validateAccessCodeApiData.validateAccessCodeApiEndPoint(), {
+          accessCode,
+        });
+        if (response.status === 200) {
+          return;
+        }
+      } catch (error: unknown) {
+        if (attempt === maxRetries) {
+          if (Axios.isAxiosError(error)) {
+            throw new Error(`Validate access code failed after retries: ${error.response?.status}`);
+          }
+          throw new Error('Validate access code failed unexpectedly after retries.');
+        }
       }
-      throw new Error('Validate access code failed unexpectedly.');
+      await new Promise(res => setTimeout(res, delayMs));
     }
+    throw new Error('Validate access code API failed after multiple retries');
   }
 }
