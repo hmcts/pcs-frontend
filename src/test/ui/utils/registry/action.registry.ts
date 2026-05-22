@@ -94,6 +94,7 @@ export class ActionRegistry {
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
     ['taskList', new RespondToClaimAction()],
+    ['taskListStatus', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],

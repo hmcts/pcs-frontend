@@ -38,6 +38,7 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  taskList,
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
@@ -113,6 +114,7 @@ export class RespondToClaimAction implements IAction {
       ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
+      ['taskListStatus', () => this.taskListStatus(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -756,15 +758,22 @@ export class RespondToClaimAction implements IAction {
   private async taskList(taskListData: actionRecord): Promise<void> {
     const caseNumber = `${process.env.CASE_NUMBER?.replace(/(\d{4})(?=\d)/g, '$1 ').trim()}`;
     await performValidation('text', { elementType: 'paragraph', text: 'Case number: ' + caseNumber });
-    if (taskListData.subSection !== 'Read information about responding and free legal advice') {
+    if (taskListData.subSection !== taskList.readInformationAboutLink) {
       await performValidation('text', taskListData.subSection, { elementType: 'taskListStatus', text: 'Available' });
     }
     await performAction('clickLink', taskListData.subSection);
   }
 
-  // private async taskListStatus(subSection: actionRecord): Promise<void> {
-  //
-  // }
+  private async taskListStatus(subSection: actionRecord): Promise<void> {
+    const sections = Array.isArray(subSection.subSecArray) ? subSection.subSecArray : [subSection.subSecArray];
+
+    for (const section of sections) {
+      await performValidation('text', section, {
+        elementType: 'taskListStatus',
+        text: subSection.status,
+      });
+    }
+  }
 
   private async languageUsed(languageScreenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
