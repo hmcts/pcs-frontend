@@ -48,7 +48,7 @@
     "ViewDocuments": { "title": "cyView documents" },
     "ViewHearingDocuments": { "title": "cyView hearing documents" },
     "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
-    "UploadDocuments": { "title": "cyUpload documents" },
+    "UploadDocuments": { "title": "cyUpload additional documents" },
     "ReviewResponse": { "title": "cyReview the response" },
     "SubmitResponse": { "title": "cySubmit the response" },
     "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
@@ -56,6 +56,13 @@
   },
   "viewDocuments": {
     "pageTitle": "cyView documents",
-    "noDocuments": "cyThere are no documents to display."
+    "noDocuments": "cyThere are no documents to display.",
+    "submittedOn": "cySubmitted on",
+    "folders": {
+      "statementsOfCase": "cyStatements of case",
+      "propertyDocuments": "cyProperty documents",
+      "evidence": "cyEvidence",
+      "correspondence": "cyCorrespondence"
+    }
   }
 }
