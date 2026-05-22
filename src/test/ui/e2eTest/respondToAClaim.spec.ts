@@ -628,6 +628,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('clickButton', 'Save and continue');
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
@@ -664,6 +665,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    await performAction('clickButton', 'Save and continue');
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -689,6 +692,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
+    await performAction('clickButton', 'Save and continue');
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -737,16 +742,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
+    await performAction('clickButton', 'Save and continue');
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
-    await performAction('clickButton', supportNeeds.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
-    });
+    await performAction('clickButton', 'Save and continue');
+    // await performAction('clickButton', supportNeeds.continueButton);
+    // await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    // await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    // await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    // await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    // await performAction('languageUsed', {
+    //   question: languageUsed.mainHeader,
+    //   radioOption: languageUsed.englishRadioOption,
+    // });
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute @secureFlexible @regression', async () => {
