@@ -3,8 +3,15 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { formatIsoDate, normalizeYesNoValue } from '../../utils';
-import { formatCcdAddress } from '../../utils/ccdAddress';
-import { type SummaryListRow, getValidatedCase, isYes, makeChange, makeYesNoNotSure } from '../section-cya/cyaRow';
+import { formatCcdAddressLines } from '../../utils/ccdAddress';
+import {
+  type SummaryListRow,
+  getValidatedCase,
+  groupQuestionAndDetail,
+  isYes,
+  makeChange,
+  makeYesNoNotSure,
+} from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -66,11 +73,12 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
     // Branch 1: claim recorded the defendant name — user confirmed (Y/N).
     // When "No", the corrected name is rendered as a separate follow-up row so each
     // answer keeps its own Change link (matches disputeClaim + disputeClaimDetails).
-    rows.push({
+    const questionRow: SummaryListRow = {
       key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
       value: { text: yesNoNotSure(nameConfirmation) },
       actions: { items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')] },
-    });
+    };
+    rows.push(questionRow);
 
     if (normalizeYesNoValue(nameConfirmation) === 'YES') {
       return;
@@ -79,11 +87,13 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
     if (!correctedName) {
       return;
     }
-    rows.push({
+    const detailRow: SummaryListRow = {
       key: { text: t('rows.defendantName.label') },
       value: { html: escapeHtml(correctedName) },
       actions: { items: [change('defendant-name-confirmation', 'rows.defendantName.changeHidden')] },
-    });
+    };
+    groupQuestionAndDetail(questionRow, detailRow);
+    rows.push(detailRow);
     return;
   }
   // Branch 2: name captured via defendant-name-capture (shown when nameKnown !== 'YES').
@@ -109,47 +119,30 @@ function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void
   });
 }
 
-function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
-  // The page renders the Y/N confirmation template iff the claim recorded a defendant
-  // correspondence address (see correspondence-address/index.ts:getExistingAddress). Use the
-  // same signal here — `correspondenceAddressConfirmation` alone can't tell us which template
-  // the user actually saw, because the NA template submits a hidden `=no` purely to drive
-  // sub-field validation, not as a user answer.
-  const claimantAddress = formatCcdAddress(validatedCase.claimantEnteredDefendantDetails?.address);
-  const partyAddress = formatCcdAddress(validatedCase.defendantContactDetailsPartyAddress);
+function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowContext): void {
+  // One row showing the citizen's correspondence address (GOV.UK Check answers shows the
+  // answer — the address — not the "is the recorded address correct?" confirm-question).
+  // When the claim recorded the defendant's address and the citizen confirmed it ("Yes"),
+  // the step deletes party.address, so that recorded address IS the correspondence address;
+  // otherwise — corrected on "No", or typed when the claim had no address — it is on the
+  // defendant party.
+  // `correspondenceAddressConfirmation` is the reliable signal: a forged confirmation is only
+  // ever "no", so a normalised "YES" always means the citizen genuinely confirmed the
+  // claim-recorded address. normalizeYesNoValue keeps it casing-safe (backend may echo "Yes").
+  const addressConfirmed =
+    normalizeYesNoValue(validatedCase.defendantResponses?.correspondenceAddressConfirmation) === 'YES';
 
-  if (claimantAddress) {
-    // Y/N path — render the confirmation Q/A keyed off the claimant-provided anchor.
-    const confirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
-    if (!confirmation) {
-      return;
-    }
-    rows.push({
-      key: { text: t('rows.correspondenceAddressConfirmation.label', { address: claimantAddress }) },
-      value: { text: yesNoNotSure(confirmation) },
-      actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
-    });
+  const address = addressConfirmed
+    ? validatedCase.claimantEnteredDefendantDetails?.address
+    : validatedCase.defendantContactDetailsPartyAddress;
 
-    if (normalizeYesNoValue(confirmation) === 'YES' || !partyAddress) {
-      return;
-    }
-    rows.push({
-      key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
-      value: { html: escapeHtml(partyAddress) },
-      actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
-    });
-    return;
-  }
-
-  // NA path — no confirmation question was asked. Render a plain row when the user has typed
-  // an address; ignore any storage-level `correspondenceAddressConfirmation` value (it's
-  // form-builder plumbing on this branch, not a user answer).
-  if (!partyAddress) {
+  const lines = formatCcdAddressLines(address);
+  if (lines.length === 0) {
     return;
   }
   rows.push({
     key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
-    value: { html: escapeHtml(partyAddress) },
+    value: { html: lines.map(escapeHtml).join('<br>') },
     actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
   });
 }
@@ -193,11 +186,12 @@ function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: 
   if (!contactByPhone) {
     return;
   }
-  rows.push({
+  const questionRow: SummaryListRow = {
     key: { text: t('rows.contactByPhone.label') },
     value: { text: yesNoNotSure(contactByPhone) },
     actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')] },
-  });
+  };
+  rows.push(questionRow);
 
   if (!isYes(contactByPhone)) {
     return;
@@ -206,8 +200,11 @@ function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: 
   if (!phoneNumber) {
     return;
   }
+  // Drop the divider between the question and its revealed detail — they read as one answer.
+  questionRow.classes = 'govuk-summary-list__row--no-border';
   rows.push({
-    key: { text: t('rows.contactByPhoneNumber.label') },
+    // Regular weight: revealed follow-up detail under its bold "Contact by phone?" question.
+    key: { text: t('rows.contactByPhoneNumber.label'), classes: 'govuk-!-font-weight-regular' },
     value: { html: escapeHtml(phoneNumber) },
     actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhoneNumber.changeHidden')] },
   });

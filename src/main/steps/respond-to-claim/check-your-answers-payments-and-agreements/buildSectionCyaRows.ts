@@ -6,6 +6,7 @@ import {
   type SummaryListRow,
   escapeWithLineBreaks,
   getValidatedCase,
+  groupQuestionAndDetail,
   isYes,
   makeChange,
   makeYesNoNotSure,
@@ -63,21 +64,24 @@ function addAnyPaymentsMadeRows({
   if (!paymentAgreement.anyPaymentsMade) {
     return;
   }
-  rows.push({
+  const questionRow: SummaryListRow = {
     key: { text: t('rows.anyPaymentsMade.label', { claimantName, claimIssueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
     actions: { items: [change('repayments-made', 'rows.anyPaymentsMade.changeHidden')] },
-  });
+  };
+  rows.push(questionRow);
 
   const details = paymentAgreement.paymentDetails?.trim();
   if (!isYes(paymentAgreement.anyPaymentsMade) || !details) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.paymentDetails.label') },
     value: { html: escapeWithLineBreaks(details) },
     actions: { items: [change('repayments-made', 'rows.paymentDetails.changeHidden')] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addRepaymentPlanAgreedRows({
@@ -92,21 +96,24 @@ function addRepaymentPlanAgreedRows({
   if (!paymentAgreement.repaymentPlanAgreed) {
     return;
   }
-  rows.push({
+  const questionRow: SummaryListRow = {
     key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, claimIssueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
     actions: { items: [change('repayments-agreed', 'rows.repaymentPlanAgreed.changeHidden')] },
-  });
+  };
+  rows.push(questionRow);
 
   const details = paymentAgreement.repaymentAgreedDetails?.trim();
   if (!isYes(paymentAgreement.repaymentPlanAgreed) || !details) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.repaymentAgreedDetails.label') },
     value: { html: escapeWithLineBreaks(details) },
     actions: { items: [change('repayments-agreed', 'rows.repaymentAgreedDetails.changeHidden')] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addRepayArrearsInstalmentsRow({ rows, paymentAgreement, t, change, yesNoNotSure }: RowContext): void {

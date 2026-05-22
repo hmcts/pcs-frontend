@@ -7,6 +7,7 @@ import {
   type SummaryListRow,
   escapeWithLineBreaks,
   getValidatedCase,
+  groupQuestionAndDetail,
   makeChange,
   makeYesNoNotSure,
 } from '../section-cya/cyaRow';
@@ -98,24 +99,27 @@ function addTenancyTypeRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   if (!responses.tenancyTypeConfirmation) {
     return;
   }
-  rows.push({
+  const questionRow: SummaryListRow = {
     key: { text: t('rows.tenancyTypeCorrect.label') },
     value: { text: yesNoNotSure(responses.tenancyTypeConfirmation) },
     actions: { items: [change('tenancy-type-details', 'rows.tenancyTypeCorrect.changeHidden')] },
-  });
+  };
+  rows.push(questionRow);
 
-  if (normalizeYesNoValue(responses.tenancyTypeConfirmation) === 'YES') {
+  if (normalizeYesNoValue(responses.tenancyTypeConfirmation) !== 'NO') {
     return;
   }
   const correctedType = responses.tenancyType?.trim();
   if (!correctedType) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.tenancyTypeDetails.label') },
     value: { text: correctedType },
     actions: { items: [change('tenancy-type-details', 'rows.tenancyTypeDetails.changeHidden')] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure }: RowContext): void {
@@ -181,13 +185,14 @@ function addRentArrearsRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   if (!responses.rentArrearsAmountConfirmation) {
     return;
   }
-  rows.push({
+  const questionRow: SummaryListRow = {
     key: { text: t('rows.rentArrearsAmountConfirmation.label') },
     value: { text: yesNoNotSure(responses.rentArrearsAmountConfirmation) },
     actions: { items: [change('rent-arrears-dispute', 'rows.rentArrearsAmountConfirmation.changeHidden')] },
-  });
+  };
+  rows.push(questionRow);
 
-  if (normalizeYesNoValue(responses.rentArrearsAmountConfirmation) === 'YES') {
+  if (normalizeYesNoValue(responses.rentArrearsAmountConfirmation) !== 'NO') {
     return;
   }
   // rentArrearsAmount is stored in pence.
@@ -195,22 +200,25 @@ function addRentArrearsRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   if (!disputedAmount) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.rentArrearsAmountDetails.label') },
     value: { text: `£${disputedAmount}` },
     actions: { items: [change('rent-arrears-dispute', 'rows.rentArrearsAmountDetails.changeHidden')] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addDisputeClaimRows({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.disputeClaim) {
     return;
   }
-  rows.push({
+  const questionRow: SummaryListRow = {
     key: { text: t('rows.disputeClaim.label') },
     value: { text: yesNoNotSure(responses.disputeClaim) },
     actions: { items: [change('non-rent-arrears-dispute', 'rows.disputeClaim.changeHidden')] },
-  });
+  };
+  rows.push(questionRow);
 
   if (normalizeYesNoValue(responses.disputeClaim) !== 'YES') {
     return;
@@ -219,11 +227,13 @@ function addDisputeClaimRows({ rows, responses, t, change, yesNoNotSure }: RowCo
   if (!details) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.disputeClaimDetails.label') },
     value: { html: escapeWithLineBreaks(details) },
     actions: { items: [change('non-rent-arrears-dispute', 'rows.disputeClaimDetails.changeHidden')] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addCounterClaimRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
@@ -275,31 +285,36 @@ function addCounterClaimAmountRow({ rows, t, change, yesNoNotSure }: RowContext,
     return;
   }
   // Y/N row mirrors the step page's heading "Are you claiming for a specific sum of money?"
-  rows.push({
+  const questionRow: SummaryListRow = {
     key: { text: t('rows.isClaimAmountKnown.label') },
     value: { text: yesNoNotSure(cc.isClaimAmountKnown) },
     actions: { items: [change('counter-claim-specific-sum', 'rows.isClaimAmountKnown.changeHidden')] },
-  });
+  };
+  rows.push(questionRow);
 
   // Amount follow-up: matches the step page's sub-question per branch.
   const known = normalizeYesNoValue(cc.isClaimAmountKnown);
   if (known === 'YES' && cc.claimAmount !== undefined) {
     const pounds = penceToPounds(cc.claimAmount);
     if (pounds) {
-      rows.push({
+      const detailRow: SummaryListRow = {
         key: { text: t('rows.claimAmount.label') },
         value: { text: `£${pounds}` },
         actions: { items: [change('counter-claim-specific-sum', 'rows.claimAmount.changeHidden')] },
-      });
+      };
+      groupQuestionAndDetail(questionRow, detailRow);
+      rows.push(detailRow);
     }
   } else if (known === 'NO' && cc.estimatedMaxClaimAmount !== undefined) {
     const pounds = penceToPounds(cc.estimatedMaxClaimAmount);
     if (pounds) {
-      rows.push({
+      const detailRow: SummaryListRow = {
         key: { text: t('rows.estimatedMaxClaimAmount.label') },
         value: { text: `£${pounds}` },
         actions: { items: [change('counter-claim-specific-sum', 'rows.estimatedMaxClaimAmount.changeHidden')] },
-      });
+      };
+      groupQuestionAndDetail(questionRow, detailRow);
+      rows.push(detailRow);
     }
   }
 }

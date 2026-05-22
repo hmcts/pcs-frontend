@@ -11,7 +11,8 @@ import type { CcdCaseModel } from '@services/ccdCaseData.model';
 // instead of redefining them — one source of truth, no drift.
 
 export type SummaryListRow = {
-  key: { text: string };
+  classes?: string;
+  key: { text: string; classes?: string };
   value: { text?: string; html?: string };
   actions: { items: ChangeAction[] };
 };
@@ -21,6 +22,13 @@ export type ChangeAction = {
   text: string;
   visuallyHiddenText: string;
 };
+
+/** Style a question row and its revealed detail row as one grouped answer:
+ *  no divider between them, and the detail key in regular weight. */
+export function groupQuestionAndDetail(questionRow: SummaryListRow, detailRow: SummaryListRow): void {
+  questionRow.classes = 'govuk-summary-list__row--no-border';
+  detailRow.key.classes = 'govuk-!-font-weight-regular';
+}
 
 /** The typed read of the validated case off the request — one cast, in one place. */
 export const getValidatedCase = (req: Request): CcdCaseModel | undefined =>

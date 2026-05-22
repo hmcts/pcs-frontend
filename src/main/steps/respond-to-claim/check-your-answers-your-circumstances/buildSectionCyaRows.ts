@@ -6,6 +6,7 @@ import {
   type SummaryListRow,
   escapeWithLineBreaks,
   getValidatedCase,
+  groupQuestionAndDetail,
   isYes,
   makeChange,
   makeYesNoNotSure,
@@ -58,34 +59,39 @@ function pushYesNoRow(
   t: TFunction,
   yesNoNotSure: ReturnType<typeof makeYesNoNotSure>,
   change: ReturnType<typeof makeChange>
-): void {
-  rows.push({
+): SummaryListRow {
+  const row: SummaryListRow = {
     key: { text: t(`${labelKey}.label`) },
     value: { text: yesNoNotSure(answer) },
     actions: { items: [change(step, `${labelKey}.changeHidden`)] },
-  });
+  };
+  rows.push(row);
+  return row;
 }
 
 function pushDetailRow(
   rows: SummaryListRow[],
+  questionRow: SummaryListRow,
   labelKey: string,
   detail: string,
   step: string,
   t: TFunction,
   change: ReturnType<typeof makeChange>
 ): void {
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t(`${labelKey}.label`) },
     value: { html: escapeWithLineBreaks(detail) },
     actions: { items: [change(step, `${labelKey}.changeHidden`)] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addDependantChildrenRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
   if (!hc.dependantChildren) {
     return;
   }
-  pushYesNoRow(
+  const questionRow = pushYesNoRow(
     rows,
     'rows.dependantChildren',
     hc.dependantChildren,
@@ -96,7 +102,15 @@ function addDependantChildrenRow({ rows, hc, t, change, yesNoNotSure }: RowConte
   );
   const detail = hc.dependantChildrenDetails?.trim();
   if (isYes(hc.dependantChildren) && detail) {
-    pushDetailRow(rows, 'rows.dependantChildrenDetails', detail, 'do-you-have-any-dependant-children', t, change);
+    pushDetailRow(
+      rows,
+      questionRow,
+      'rows.dependantChildrenDetails',
+      detail,
+      'do-you-have-any-dependant-children',
+      t,
+      change
+    );
   }
 }
 
@@ -104,7 +118,7 @@ function addOtherDependantsRow({ rows, hc, t, change, yesNoNotSure }: RowContext
   if (!hc.otherDependants) {
     return;
   }
-  pushYesNoRow(
+  const questionRow = pushYesNoRow(
     rows,
     'rows.otherDependants',
     hc.otherDependants,
@@ -115,7 +129,15 @@ function addOtherDependantsRow({ rows, hc, t, change, yesNoNotSure }: RowContext
   );
   const detail = hc.otherDependantDetails?.trim();
   if (isYes(hc.otherDependants) && detail) {
-    pushDetailRow(rows, 'rows.otherDependantsDetails', detail, 'do-you-have-any-other-dependants', t, change);
+    pushDetailRow(
+      rows,
+      questionRow,
+      'rows.otherDependantsDetails',
+      detail,
+      'do-you-have-any-other-dependants',
+      t,
+      change
+    );
   }
 }
 
@@ -123,7 +145,7 @@ function addOtherTenantsRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
   if (!hc.otherTenants) {
     return;
   }
-  pushYesNoRow(
+  const questionRow = pushYesNoRow(
     rows,
     'rows.otherTenants',
     hc.otherTenants,
@@ -134,7 +156,15 @@ function addOtherTenantsRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
   );
   const detail = hc.otherTenantsDetails?.trim();
   if (isYes(hc.otherTenants) && detail) {
-    pushDetailRow(rows, 'rows.otherTenantsDetails', detail, 'do-any-other-adults-live-in-your-home', t, change);
+    pushDetailRow(
+      rows,
+      questionRow,
+      'rows.otherTenantsDetails',
+      detail,
+      'do-any-other-adults-live-in-your-home',
+      t,
+      change
+    );
   }
 }
 
@@ -142,7 +172,7 @@ function addAlternativeAccommodationRow({ rows, hc, t, change, yesNoNotSure }: R
   if (!hc.alternativeAccommodation) {
     return;
   }
-  pushYesNoRow(
+  const questionRow = pushYesNoRow(
     rows,
     'rows.alternativeAccommodation',
     hc.alternativeAccommodation,
@@ -155,7 +185,7 @@ function addAlternativeAccommodationRow({ rows, hc, t, change, yesNoNotSure }: R
   // Render the row whenever the CCD value is YES; "No answer provided" when the date is blank.
   const date = hc.alternativeAccommodationTransferDate;
   if (isYes(hc.alternativeAccommodation)) {
-    rows.push({
+    const detailRow: SummaryListRow = {
       key: { text: t('rows.alternativeAccommodationDate.label') },
       value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
       actions: {
@@ -166,7 +196,9 @@ function addAlternativeAccommodationRow({ rows, hc, t, change, yesNoNotSure }: R
           ),
         ],
       },
-    });
+    };
+    groupQuestionAndDetail(questionRow, detailRow);
+    rows.push(detailRow);
   }
 }
 
@@ -174,7 +206,7 @@ function addShareAdditionalCircumstancesRow({ rows, hc, t, change, yesNoNotSure 
   if (!hc.shareAdditionalCircumstances) {
     return;
   }
-  pushYesNoRow(
+  const questionRow = pushYesNoRow(
     rows,
     'rows.shareAdditionalCircumstances',
     hc.shareAdditionalCircumstances,
@@ -185,7 +217,15 @@ function addShareAdditionalCircumstancesRow({ rows, hc, t, change, yesNoNotSure 
   );
   const detail = hc.additionalCircumstancesDetails?.trim();
   if (isYes(hc.shareAdditionalCircumstances) && detail) {
-    pushDetailRow(rows, 'rows.shareAdditionalCircumstancesDetails', detail, 'your-circumstances', t, change);
+    pushDetailRow(
+      rows,
+      questionRow,
+      'rows.shareAdditionalCircumstancesDetails',
+      detail,
+      'your-circumstances',
+      t,
+      change
+    );
   }
 }
 
@@ -193,7 +233,7 @@ function addExceptionalHardshipRow({ rows, hc, t, change, yesNoNotSure }: RowCon
   if (!hc.exceptionalHardship) {
     return;
   }
-  pushYesNoRow(
+  const questionRow = pushYesNoRow(
     rows,
     'rows.exceptionalHardship',
     hc.exceptionalHardship,
@@ -204,6 +244,6 @@ function addExceptionalHardshipRow({ rows, hc, t, change, yesNoNotSure }: RowCon
   );
   const detail = hc.exceptionalHardshipDetails?.trim();
   if (isYes(hc.exceptionalHardship) && detail) {
-    pushDetailRow(rows, 'rows.exceptionalHardshipDetails', detail, 'exceptional-hardship', t, change);
+    pushDetailRow(rows, questionRow, 'rows.exceptionalHardshipDetails', detail, 'exceptional-hardship', t, change);
   }
 }
