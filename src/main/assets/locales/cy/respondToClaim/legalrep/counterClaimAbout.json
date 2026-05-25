@@ -1,0 +1,14 @@
+{
+  "pageTitle": "cyAbout the defendant's counterclaim",
+  "heading": "cyAbout the defendant's counterclaim",
+  "infoParagraph1": "cyYou will be able to upload any evidence you have on the next page.",
+  "infoParagraph2": "cyThe claimant will be able to see your answers.",
+  "counterClaimForLabel": "cyWhat is the defendant's counterclaim for?",
+  "counterClaimReasonsLabel": "cyWhat are their reasons for making the counterclaim?",
+  "errors": {
+    "counterClaimForRequired": "cyEnter what the defendant's counterclaim is for",
+    "counterClaimForMaxLength": "cyWhat the defendant's counterclaim is for must be 6800 characters or less",
+    "counterClaimReasonsRequired": "cyEnter what the defendant's reasons are for making the counterclaim",
+    "counterClaimReasonsMaxLength": "cyWhat the defendant's reasons are for making the counterclaim must be 6800 characters or less"
+  }
+}
