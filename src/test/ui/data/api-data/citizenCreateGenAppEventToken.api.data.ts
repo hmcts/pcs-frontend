@@ -10,5 +10,5 @@ export const citizenCreateGenAppEventTokenApiData = {
     },
   }),
 
-  citizenCreateGenAppApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/event-triggers/citizenCreateGenApp`,
+  citizenCreateGenAppApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/event-triggers/makeAnApplication`,
 };
