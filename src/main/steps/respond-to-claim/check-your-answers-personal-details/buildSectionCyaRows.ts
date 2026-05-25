@@ -121,7 +121,7 @@ function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowConte
     const emailLabel = t('rows.contactByEmailOrPost.options.email');
     const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress?.trim();
     if (emailAddress) {
-      const item = `${emailLabel} (${emailAddress})`;
+      const item = `${emailLabel}: ${emailAddress}`;
       items.push(item);
       userSupplied.add(item);
     } else {
