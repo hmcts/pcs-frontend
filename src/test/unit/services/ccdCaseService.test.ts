@@ -186,7 +186,6 @@ describe('ccdCaseService', () => {
     });
 
     it('should retrieve case by ID with client context headers', async () => {
-      const caseId = '1234567890123456';
       const mockCaseData = { applicantForename: 'John', applicantSurname: 'Doe' };
 
       mockGet.mockResolvedValue({
@@ -514,7 +513,6 @@ describe('updateCase', () => {
   });
 
   it('should call CCD validate endpoint with client context headers and return merged data with caller-supplied id', async () => {
-    const caseId = '1234567890123456';
     const mockData = { defendantName: 'John Doe' };
 
     mockPost.mockResolvedValue({
