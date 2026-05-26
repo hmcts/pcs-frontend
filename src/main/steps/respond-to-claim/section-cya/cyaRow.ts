@@ -14,7 +14,7 @@ export type SummaryListRow = {
   classes?: string;
   key: { text: string; classes?: string };
   value: { text?: string; html?: string };
-  actions: { items: ChangeAction[] };
+  actions?: { items: ChangeAction[] };
 };
 
 export type ChangeAction = {

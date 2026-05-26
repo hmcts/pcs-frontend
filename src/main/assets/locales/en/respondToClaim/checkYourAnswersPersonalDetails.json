@@ -36,13 +36,13 @@
       "label": "Are you happy to be contacted by telephone?",
       "changeHidden": "whether you are happy to be contacted by telephone"
     },
-    "contactByPhoneNumber": {
-      "label": "UK phone number",
-      "changeHidden": "your UK phone number"
-    },
     "contactByText": {
       "label": "Are you happy to be contacted by text message?",
       "changeHidden": "whether you want to receive text messages"
+    },
+    "contactDetails": {
+      "label": "Contact details",
+      "changeHidden": "your contact details"
     }
   }
 }

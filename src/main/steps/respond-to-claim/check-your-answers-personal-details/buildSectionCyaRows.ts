@@ -31,6 +31,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   addContactByEmailOrPostRow(ctx);
   addContactByPhoneRow(ctx);
   addContactByTextRow(ctx);
+  addContactDetailsRow(ctx);
 
   return ctx.rows;
 }
@@ -122,29 +123,11 @@ function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowConte
     items.push(t('rows.contactByEmailOrPost.options.post'));
   }
 
-  const questionRow: SummaryListRow = {
+  rows.push({
     key: { text: t('rows.contactByEmailOrPost.label') },
     value: items.length === 0 ? { text: t('rows.contactByEmailOrPost.options.none') } : multiSelectValue(items),
     actions: { items: [change('contact-preferences-email-or-post', 'rows.contactByEmailOrPost.changeHidden')] },
-  };
-  rows.push(questionRow);
-
-  // When email is chosen and an address is present, surface it as its own grouped
-  // detail row — same shape as the contact-by-phone Q/number pair.
-  if (!isYes(contactByEmail)) {
-    return;
-  }
-  const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress?.trim();
-  if (!emailAddress) {
-    return;
-  }
-  const detailRow: SummaryListRow = {
-    key: { text: t('rows.contactByEmailAddress.label') },
-    value: { html: escapeHtml(emailAddress) },
-    actions: { items: [change('contact-preferences-email-or-post', 'rows.contactByEmailAddress.changeHidden')] },
-  };
-  groupQuestionAndDetail(questionRow, detailRow);
-  rows.push(detailRow);
+  });
 }
 
 function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
@@ -152,30 +135,7 @@ function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: 
   if (!contactByPhone) {
     return;
   }
-  const questionRow = pushYesNoRow(
-    rows,
-    'rows.contactByPhone',
-    contactByPhone,
-    'contact-preferences-telephone',
-    t,
-    yesNoNotSure,
-    change
-  );
-
-  if (!isYes(contactByPhone)) {
-    return;
-  }
-  const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber?.trim();
-  if (!phoneNumber) {
-    return;
-  }
-  const detailRow: SummaryListRow = {
-    key: { text: t('rows.contactByPhoneNumber.label') },
-    value: { html: escapeHtml(phoneNumber) },
-    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhoneNumber.changeHidden')] },
-  };
-  groupQuestionAndDetail(questionRow, detailRow);
-  rows.push(detailRow);
+  pushYesNoRow(rows, 'rows.contactByPhone', contactByPhone, 'contact-preferences-telephone', t, yesNoNotSure, change);
 }
 
 function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
@@ -189,4 +149,33 @@ function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: R
     return;
   }
   pushYesNoRow(rows, 'rows.contactByText', contactByText, 'contact-preferences-text-message', t, yesNoNotSure, change);
+}
+
+// Per the GOV.UK check-answers contact-details example: a single row that stacks
+// phone and email when the citizen has opted in to either. Change link targets the
+// step that captures the only displayed value; when both are shown, defaults to the
+// email-or-post step (first contact-preferences step in section order).
+function addContactDetailsRow({ rows, validatedCase, t, change }: RowContext): void {
+  const lines: string[] = [];
+  const phoneNumber = isYes(validatedCase.defendantResponsesContactByPhone)
+    ? validatedCase.defendantContactDetailsPartyPhoneNumber?.trim()
+    : undefined;
+  const emailAddress = isYes(validatedCase.defendantResponsesContactByEmail)
+    ? validatedCase.defendantContactDetailsPartyEmailAddress?.trim()
+    : undefined;
+  if (phoneNumber) {
+    lines.push(phoneNumber);
+  }
+  if (emailAddress) {
+    lines.push(emailAddress);
+  }
+  if (lines.length === 0) {
+    return;
+  }
+  const changeStep = emailAddress ? 'contact-preferences-email-or-post' : 'contact-preferences-telephone';
+  rows.push({
+    key: { text: t('rows.contactDetails.label') },
+    value: { html: lines.map(line => `<p class="govuk-body">${escapeHtml(line)}</p>`).join('') },
+    actions: { items: [change(changeStep, 'rows.contactDetails.changeHidden')] },
+  });
 }
