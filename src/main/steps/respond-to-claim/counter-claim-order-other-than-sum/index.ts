@@ -6,9 +6,9 @@ import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
-  stepName: 'counter-claim-about',
+  stepName: 'counter-claim-order-other-than-sum',
   stepDir: __dirname,
-  customTemplate: `${__dirname}/counterClaimAbout.njk`,
+  customTemplate: `${__dirname}/counterClaimOrderOtherThanSum.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
@@ -17,25 +17,26 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   fields: [
     {
-      name: 'counterClaimFor',
+      name: 'otherOrderRequestDetails',
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.counterClaimForRequired',
+      errorMessage: 'errors.otherOrderRequestDetailsRequired',
       labelClasses: 'govuk-label--m',
       translationKey: {
-        label: 'counterClaimForLabel',
+        label: 'otherOrderRequestDetailsLabel',
+        hint: 'characterCountHint',
       },
     },
     {
-      name: 'counterClaimReasons',
+      name: 'otherOrderRequestFacts',
       type: 'character-count',
       required: true,
       maxLength: 6800,
-      errorMessage: 'errors.counterClaimReasonsRequired',
+      errorMessage: 'errors.otherOrderRequestFactsRequired',
       labelClasses: 'govuk-label--m',
       translationKey: {
-        label: 'counterClaimReasonsLabel',
+        label: 'otherOrderRequestFactsLabel',
       },
     },
   ],
@@ -46,27 +47,29 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       return {};
     }
     return {
-      ...(counterClaim.counterClaimFor ? { counterClaimFor: counterClaim.counterClaimFor } : {}),
-      ...(counterClaim.counterClaimReasons ? { counterClaimReasons: counterClaim.counterClaimReasons } : {}),
+      ...(counterClaim.otherOrderRequestDetails
+        ? { otherOrderRequestDetails: counterClaim.otherOrderRequestDetails }
+        : {}),
+      ...(counterClaim.otherOrderRequestFacts ? { otherOrderRequestFacts: counterClaim.otherOrderRequestFacts } : {}),
     };
   },
   beforeRedirect: async (req: Request) => {
-    const counterClaimFor = (req.body?.counterClaimFor as string | undefined)?.trim();
-    const counterClaimReasons = (req.body?.counterClaimReasons as string | undefined)?.trim();
+    const otherOrderRequestDetails = (req.body?.otherOrderRequestDetails as string | undefined)?.trim();
+    const otherOrderRequestFacts = (req.body?.otherOrderRequestFacts as string | undefined)?.trim();
 
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
 
-    if (counterClaimFor) {
-      response.defendantResponses.counterClaim.counterClaimFor = counterClaimFor;
+    if (otherOrderRequestDetails) {
+      response.defendantResponses.counterClaim.otherOrderRequestDetails = otherOrderRequestDetails;
     } else {
-      delete response.defendantResponses.counterClaim.counterClaimFor;
+      delete response.defendantResponses.counterClaim.otherOrderRequestDetails;
     }
 
-    if (counterClaimReasons) {
-      response.defendantResponses.counterClaim.counterClaimReasons = counterClaimReasons;
+    if (otherOrderRequestFacts) {
+      response.defendantResponses.counterClaim.otherOrderRequestFacts = otherOrderRequestFacts;
     } else {
-      delete response.defendantResponses.counterClaim.counterClaimReasons;
+      delete response.defendantResponses.counterClaim.otherOrderRequestFacts;
     }
 
     await saveDraftDefendantResponse(req, response);

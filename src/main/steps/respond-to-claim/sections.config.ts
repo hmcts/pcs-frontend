@@ -56,6 +56,8 @@ export const respondToClaimSections: SectionConfig[] = [
       'counter-claim-have-you-applied-for-help',
       'counter-claim-against-whom',
       'counter-claim-about',
+      'counter-claim-order-other-than-sum',
+      'counter-claim-upload-documents',
     ],
   },
   {
