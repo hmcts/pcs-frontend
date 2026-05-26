@@ -4,7 +4,7 @@
   "sections": {
     "legalAdvice": "Legal advice",
     "personalDetails": "Personal details",
-    "claimantsClaim": "{{claimantName}}'s claim",
+    "claimantsClaim": "{{claimantName, pluralPossessive}} claim",
     "dependantsAndOtherResidents": "Dependants and other residents",
     "yourCircumstances": "Your circumstances",
     "incomeAndExpenses": "Income and expenses",
