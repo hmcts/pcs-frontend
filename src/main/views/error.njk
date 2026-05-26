@@ -1,6 +1,70 @@
 {% extends "stepsTemplate.njk" %}
 
 {% block mainContent %}
-  <h1 class="govuk-heading-l">{{ errorTitle or t('errorPages.500.title') or "Something went wrong" }}</h1>
-  <p class="govuk-body">{{ errorParagraph or t('errorPages.500.paragraph') or "An error occurred while processing your request." }}</p>
+  {% if errorPageKey == 'pageNotFound' %}
+
+    <h1 class="govuk-heading-l">{{ t('errorPages.pageNotFound.title') }}</h1>
+    <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph') }}</p>
+    <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph2') }}</p>
+    <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph3') }}</p>
+
+    <h2 class="govuk-heading-m">{{ t('errorPages.pageNotFound.heading') }}</h2>
+    <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph4') | safe }}</p>
+    <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph5') }}</p>
+
+    <h2 class="govuk-heading-m">{{ t('errorPages.pageNotFound.heading2') }}</h2>
+    <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph6') }}</p>
+    <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph7') }}</p>
+    <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph8') | safe }}</p>
+
+  {% elif errorPageKey == 'serviceUnavailable' %}
+
+    <h1 class="govuk-heading-l">{{ t('errorPages.serviceUnavailable.title') }}</h1>
+    <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph') }}</p>
+    <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph2') }}</p>
+
+    <h2 class="govuk-heading-m">{{ t('errorPages.serviceUnavailable.heading') }}</h2>
+    <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph3') | safe }}</p>
+    <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph4') }}</p>
+
+    <h2 class="govuk-heading-m">{{ t('errorPages.serviceUnavailable.heading2') }}</h2>
+    <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph5') }}</p>
+    <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph6') }}</p>
+    <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph7') | safe }}</p>
+
+  {% elif errorPageKey == 'technicalError' %}
+
+    <h1 class="govuk-heading-l">{{ t('errorPages.technicalError.title') }}</h1>
+    <p class="govuk-body">{{ t('errorPages.technicalError.paragraph') }}</p>
+    <p class="govuk-body">{{ t('errorPages.technicalError.paragraph2') }}</p>
+
+    <h2 class="govuk-heading-m">{{ t('errorPages.technicalError.heading') }}</h2>
+    <p class="govuk-body">{{ t('errorPages.technicalError.paragraph3') | safe }}</p>
+    <p class="govuk-body">{{ t('errorPages.technicalError.paragraph4') }}</p>
+
+    <h2 class="govuk-heading-m">{{ t('errorPages.technicalError.heading2') }}</h2>
+    <p class="govuk-body">{{ t('errorPages.technicalError.paragraph5') }}</p>
+    <p class="govuk-body">{{ t('errorPages.technicalError.paragraph6') }}</p>
+    <p class="govuk-body">{{ t('errorPages.technicalError.paragraph7') | safe }}</p>
+
+  {% elif errorPageKey == 'accessDenied' %}
+
+    <h1 class="govuk-heading-l">{{ t('errorPages.accessDenied.title') }}</h1>
+    <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph') }}</p>
+
+    <h2 class="govuk-heading-m">{{ t('errorPages.accessDenied.heading') }}</h2>
+    <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph2') | safe }}</p>
+    <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph3') }}</p>
+
+    <h2 class="govuk-heading-m">{{ t('errorPages.accessDenied.heading2') }}</h2>
+    <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph4') }}</p>
+    <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph5') }}</p>
+    <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph6') | safe }}</p>
+
+  {% else %}
+
+    <h1 class="govuk-heading-l">{{ errorTitle or t('errorPages.technicalError.title') or "Something went wrong" }}</h1>
+    <p class="govuk-body">{{ errorParagraph or t('errorPages.technicalError.paragraph') or "An error occurred while processing your request." }}</p>
+
+  {% endif %}
 {% endblock %}
