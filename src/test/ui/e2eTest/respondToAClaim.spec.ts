@@ -17,6 +17,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  doYouHaveASolicitor,
   equalityAndDiversityEnd,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -243,6 +244,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
+    //Priya changes
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('askYourSolicitorToRespond');
+
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
