@@ -1,5 +1,6 @@
 export enum ApplicationErrorCode {
   noApplicationIdInSession = 'noApplicationIdInSession',
+  documentNotAvailable = 'documentNotAvailable',
 }
 
 export class ApplicationError extends Error {
