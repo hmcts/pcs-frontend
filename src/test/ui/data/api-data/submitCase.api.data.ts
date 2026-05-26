@@ -422,10 +422,40 @@ export const submitCaseApiData = {
       isCorrectClaimantContactAddress: 'YES',
       claimantProvidePhoneNumber: 'NO',
       defendant1: {
-        nameKnown: 'NO',
-        addressKnown: 'NO',
+        nameKnown: 'YES',
+        firstName: 'Test',
+        lastName: 'John',
+        addressKnown: 'YES',
+        addressSameAsPossession: 'NO',
+        correspondenceAddress: {
+          AddressLine1: '10 Second Avenue',
+          AddressLine2: '',
+          AddressLine3: '',
+          PostTown: 'London',
+          County: '',
+          Country: '',
+          PostCode: 'W3 7RX',
+        },
       },
-      addAnotherDefendant: 'NO',
+      addAnotherDefendant: 'YES',
+      additionalDefendants: [
+        {
+          value: {
+            nameKnown: 'YES',
+            firstName: 'Jeremiah',
+            lastName: 'Fisher',
+            addressKnown: 'NO',
+          },
+        },
+        {
+          value: {
+            nameKnown: 'YES',
+            firstName: 'Conrad',
+            lastName: 'Fisher',
+            addressKnown: 'NO',
+          },
+        },
+      ],
       tenancy_TypeOfTenancyLicence: process.env.TENANCY_TYPE,
       tenancy_TenancyLicenceDate: null,
       tenancy_HasCopyOfTenancyLicence: 'NO',
