@@ -483,15 +483,8 @@ function lastVisibleAndCanGoBack(
 // True when stepName belongs to a section but is not that section's first
 // visible step. Flat journeys (no sections) and non-section steps return false.
 function isMiddleSectionStep(stepName: string, flowConfig: JourneyFlowConfig, req: Request): boolean {
-  const sections = flowConfig.sections;
-  if (!sections) {
-    return false;
-  }
-  const section = sections.find(s => s.steps.includes(stepName));
-  if (!section) {
-    return false;
-  }
-  return firstVisible(section.steps, flowConfig, req) !== stepName;
+  const section = flowConfig.sections?.find(s => s.steps.includes(stepName));
+  return section !== undefined && firstVisible(section.steps, flowConfig, req) !== stepName;
 }
 
 // Tags an internal-navigation URL (Back / Save and continue) that points at a
