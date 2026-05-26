@@ -215,12 +215,6 @@ export class RespondToClaimAction implements IAction {
 
   private formatRtcCyaFrequency(value: actionData): string {
     const normalizedFrequency = String(value).trim().toLowerCase();
-    if (normalizedFrequency === 'week') {
-      return 'weekly';
-    }
-    if (normalizedFrequency === 'month') {
-      return 'monthly';
-    }
     return normalizedFrequency;
   }
 
@@ -234,8 +228,12 @@ export class RespondToClaimAction implements IAction {
       .trim();
   }
 
-  private buildRtcCyaAmountAndFrequencyValue(amount: actionData, frequency: actionData): string {
-    return `${this.formatRtcCyaCurrency(amount)} ${this.formatRtcCyaFrequency(frequency)}`;
+  private buildRtcCyaAmountAndFrequencyValue(
+    amount: actionData,
+    frequency: actionData,
+    descriptor: string = 'every'
+  ): string {
+    return `${this.formatRtcCyaCurrency(amount)} ${descriptor} ${this.formatRtcCyaFrequency(frequency)}`;
   }
 
   private normalizeRtcCyaComparisonPart(value: string): string {
@@ -607,7 +605,7 @@ export class RespondToClaimAction implements IAction {
       await performAction('clickRadioButton', frequency);
 
       selectedRegularIncomeValues.push(
-        `${this.getRtcCyaChoiceLabel(option)}: ${this.buildRtcCyaAmountAndFrequencyValue(value, frequency)}`
+        `${this.getRtcCyaChoiceLabel(option)} ${this.buildRtcCyaAmountAndFrequencyValue(value, frequency, 'received every')}`
       );
     }
 
@@ -1023,7 +1021,11 @@ export class RespondToClaimAction implements IAction {
     );
     this.recordAnswer(
       priorityDebtDetails.howMuchDoYouPayQuestion,
-      this.buildRtcCyaAmountAndFrequencyValue(priorityDebtDetailsData.payAmount, priorityDebtDetailsData.option)
+      this.buildRtcCyaAmountAndFrequencyValue(
+        priorityDebtDetailsData.payAmount,
+        priorityDebtDetailsData.option,
+        'paid every'
+      )
     );
     this.deleteAnswer(priorityDebtDetails.paidEveryParagraph);
     await performAction(

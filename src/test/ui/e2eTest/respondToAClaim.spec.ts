@@ -420,8 +420,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
-      });
-    
+    });
+
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
@@ -739,6 +739,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -1058,6 +1061,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -1232,6 +1238,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -1544,6 +1553,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -1669,6 +1681,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -1794,6 +1809,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('clickButton', supportNeeds.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
