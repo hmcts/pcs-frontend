@@ -26,7 +26,7 @@ export function requireEventAccess(eventId: string): RequestHandler {
     }
 
     try {
-      const validatedCase = await ccdCaseService.getCaseById(accessToken, caseReference, eventId);
+      const validatedCase = await ccdCaseService.getCaseByIdForEvent(accessToken, caseReference, eventId);
       res.locals.validatedCase = new CcdCaseModel(validatedCase);
       return next();
     } catch (error) {

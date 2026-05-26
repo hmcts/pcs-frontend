@@ -1,0 +1,15 @@
+{
+  "pageTitle": "cyClaim for something else",
+  "heading": "cyCounterclaim for an order other than a sum of money",
+  "infoParagraph1": "cyYou will be able to upload any evidence you have on the next page.",
+  "infoParagraph2": "cyThe claimant will be able to see your answers.",
+  "characterCountHint": "cyFor example, 'for the landlord to conduct remedial works'",
+  "otherOrderRequestDetailsLabel": "cyWhat orders are you asking the court to make?",
+  "otherOrderRequestFactsLabel": "cyWhat facts would you like the court to consider when deciding the claim?",
+  "errors": {
+    "otherOrderRequestDetailsRequired": "cyEnter what orders you are asking the court to make",
+    "otherOrderRequestDetailsMaxLength": "cyWhat orders you are asking the court to make must be 6800 characters or less",
+    "otherOrderRequestFactsRequired": "cyEnter what facts you would like the court to consider when deciding the claim",
+    "otherOrderRequestFactsMaxLength": "cyWhat facts you would like the court to consider must be 6800 characters or less"
+  }
+}

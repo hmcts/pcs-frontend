@@ -13,11 +13,11 @@ jest.mock('@modules/logger', () => ({
   },
 }));
 
-const mockGetCaseById = jest.fn();
+const mockGetCaseByIdForEvent = jest.fn();
 
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
-    getCaseById: (...args: unknown[]) => mockGetCaseById(...args),
+    getCaseByIdForEvent: (...args: unknown[]) => mockGetCaseByIdForEvent(...args),
   },
 }));
 
@@ -59,26 +59,26 @@ describe('requireEventAccess', () => {
   describe('successful access', () => {
     it('should hydrate res.locals.validatedCase and call next()', async () => {
       const mockCase = { id: validCaseRef, data: {} };
-      mockGetCaseById.mockResolvedValue(mockCase);
+      mockGetCaseByIdForEvent.mockResolvedValue(mockCase);
 
       const middleware = requireEventAccess(eventId);
       await middleware(mockReq as Request, mockRes as Response, next);
 
-      expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef, eventId);
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, eventId);
       expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
       expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
       expect(next).toHaveBeenCalledTimes(1);
       expect(next).toHaveBeenCalledWith();
     });
 
-    it('should pass the provided eventId through to getCaseById', async () => {
+    it('should pass the provided eventId through to getCaseByIdForEvent', async () => {
       const mockCase = { id: validCaseRef, data: {} };
-      mockGetCaseById.mockResolvedValue(mockCase);
+      mockGetCaseByIdForEvent.mockResolvedValue(mockCase);
 
       const middleware = requireEventAccess('citizenCreateGenApp');
       await middleware(mockReq as Request, mockRes as Response, next);
 
-      expect(mockGetCaseById).toHaveBeenCalledWith(mockAccessToken, validCaseRef, 'citizenCreateGenApp');
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, 'citizenCreateGenApp');
     });
   });
 
@@ -93,7 +93,7 @@ describe('requireEventAccess', () => {
       const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
       expect(error.status).toBe(404);
       expect(error.message).toBe('Invalid case reference format');
-      expect(mockGetCaseById).not.toHaveBeenCalled();
+      expect(mockGetCaseByIdForEvent).not.toHaveBeenCalled();
     });
   });
 
@@ -108,7 +108,7 @@ describe('requireEventAccess', () => {
       const error = (next as jest.Mock).mock.calls[0][0] as HTTPError;
       expect(error.status).toBe(401);
       expect(error.message).toBe('Authentication required');
-      expect(mockGetCaseById).not.toHaveBeenCalled();
+      expect(mockGetCaseByIdForEvent).not.toHaveBeenCalled();
       expect(mockLogger.error).toHaveBeenCalledWith('User not authenticated - no access token', {
         caseReference: validCaseRef,
       });
@@ -117,7 +117,7 @@ describe('requireEventAccess', () => {
 
   describe('error handling', () => {
     it('should preserve HTTPError status when getCaseById throws an HTTPError', async () => {
-      mockGetCaseById.mockRejectedValue(new HTTPError('Forbidden', 403));
+      mockGetCaseByIdForEvent.mockRejectedValue(new HTTPError('Forbidden', 403));
 
       const middleware = requireEventAccess(eventId);
       await middleware(mockReq as Request, mockRes as Response, next);
@@ -129,7 +129,7 @@ describe('requireEventAccess', () => {
     });
 
     it('should wrap generic errors in a 500 HTTPError', async () => {
-      mockGetCaseById.mockRejectedValue(new Error('boom'));
+      mockGetCaseByIdForEvent.mockRejectedValue(new Error('boom'));
 
       const middleware = requireEventAccess(eventId);
       await middleware(mockReq as Request, mockRes as Response, next);
