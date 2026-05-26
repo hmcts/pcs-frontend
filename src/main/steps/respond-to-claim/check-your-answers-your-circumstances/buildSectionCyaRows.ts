@@ -286,7 +286,9 @@ function addExceptionalHardshipRow({ rows, hc, t, change, yesNoNotSure }: RowCon
 
 export function buildEOJDependantsRows(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
-  if (!base) {return [];}
+  if (!base) {
+    return [];
+  }
   const ctx: RowContext = { ...base, hc: base.validatedCase.defendantResponses?.householdCircumstances ?? {} };
   addDependantChildrenRow(ctx);
   addOtherDependantsRow(ctx);
@@ -296,7 +298,9 @@ export function buildEOJDependantsRows(req: Request, t: TFunction): SummaryListR
 
 export function buildEOJCircumstancesRows(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
-  if (!base) {return [];}
+  if (!base) {
+    return [];
+  }
   const ctx: RowContext = { ...base, hc: base.validatedCase.defendantResponses?.householdCircumstances ?? {} };
   addAlternativeAccommodationRow(ctx);
   addShareAdditionalCircumstancesRow(ctx);

@@ -242,7 +242,7 @@ function pushExpandedRows(
   items: { label: string; value: SummaryListRow['value'] }[],
   headerLabel: string,
   step: string,
-  changeHidden: string,
+  changeHidden: string
 ): void {
   rows.push({
     key: { text: headerLabel },
@@ -261,7 +261,7 @@ function pushExpandedRows(
 
 function addEOJRegularIncomeRows(ctx: RowContext): void {
   const { hc, t } = ctx;
-  if (!isYes(hc.shareIncomeExpenseDetails)) return;
+  if (!isYes(hc.shareIncomeExpenseDetails)) {return;}
   const items = [];
   for (const source of INCOME_SOURCES) {
     if (isYes(hc[source.key])) {
@@ -278,25 +278,42 @@ function addEOJRegularIncomeRows(ctx: RowContext): void {
       value: detail ? { html: escapeWithLineBreaks(detail) } : { text: '' },
     });
   }
-  pushExpandedRows(ctx, items, t('rows.regularIncome.label'), 'what-regular-income-do-you-receive', 'rows.regularIncome.changeHidden');
+  pushExpandedRows(
+    ctx,
+    items,
+    t('rows.regularIncome.label'),
+    'what-regular-income-do-you-receive',
+    'rows.regularIncome.changeHidden'
+  );
 }
 
 function addEOJRegularExpensesRows(ctx: RowContext): void {
   const { hc, t } = ctx;
-  if (!isYes(hc.shareIncomeExpenseDetails)) return;
+  if (!isYes(hc.shareIncomeExpenseDetails)) {return;}
   const items = [];
   for (const key of EXPENSE_KEYS) {
     const details = hc[key];
     if (details && isYes(details.applies)) {
-      items.push({ label: t(`rows.regularExpenses.options.${key}`), value: { text: amountWithFrequency(details.amount, details.frequency, t) } });
+      items.push({
+        label: t(`rows.regularExpenses.options.${key}`),
+        value: { text: amountWithFrequency(details.amount, details.frequency, t) },
+      });
     }
   }
-  pushExpandedRows(ctx, items, t('rows.regularExpenses.label'), 'what-other-regular-expenses-do-you-have', 'rows.regularExpenses.changeHidden');
+  pushExpandedRows(
+    ctx,
+    items,
+    t('rows.regularExpenses.label'),
+    'what-other-regular-expenses-do-you-have',
+    'rows.regularExpenses.changeHidden'
+  );
 }
 
 export function buildEOJIncomeAndExpensesRow(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
-  if (!base) {return [];}
+  if (!base) {
+    return [];
+  }
   const responses = base.validatedCase.defendantResponses ?? {};
   const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
   addShareIncomeExpenseDetailsRow(ctx);
@@ -305,7 +322,9 @@ export function buildEOJIncomeAndExpensesRow(req: Request, t: TFunction): Summar
 
 export function buildEOJRegularIncomeRows(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
-  if (!base) {return [];}
+  if (!base) {
+    return [];
+  }
   const responses = base.validatedCase.defendantResponses ?? {};
   const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
   addEOJRegularIncomeRows(ctx);
@@ -314,7 +333,9 @@ export function buildEOJRegularIncomeRows(req: Request, t: TFunction): SummaryLi
 
 export function buildEOJUniversalCreditRows(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
-  if (!base) {return [];}
+  if (!base) {
+    return [];
+  }
   const responses = base.validatedCase.defendantResponses ?? {};
   const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
   addAppliedForUcRow(ctx);
@@ -323,7 +344,9 @@ export function buildEOJUniversalCreditRows(req: Request, t: TFunction): Summary
 
 export function buildEOJPriorityDebtsRows(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
-  if (!base) {return [];}
+  if (!base) {
+    return [];
+  }
   const responses = base.validatedCase.defendantResponses ?? {};
   const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
   addPriorityDebtsRow(ctx);
@@ -333,7 +356,9 @@ export function buildEOJPriorityDebtsRows(req: Request, t: TFunction): SummaryLi
 
 export function buildEOJRegularExpensesRows(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
-  if (!base) {return [];}
+  if (!base) {
+    return [];
+  }
   const responses = base.validatedCase.defendantResponses ?? {};
   const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
   addEOJRegularExpensesRows(ctx);
@@ -342,7 +367,9 @@ export function buildEOJRegularExpensesRows(req: Request, t: TFunction): Summary
 
 export function buildEOJOtherConsiderationsRows(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
-  if (!base) {return [];}
+  if (!base) {
+    return [];
+  }
   const responses = base.validatedCase.defendantResponses ?? {};
   const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
   addOtherConsiderationsRow(ctx);
