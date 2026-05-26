@@ -244,7 +244,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
-    //Priya changes
+
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('askYourSolicitorToRespond');
 
