@@ -1230,9 +1230,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('doYouWantToUploadFiles', {
-      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
