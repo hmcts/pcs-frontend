@@ -41,7 +41,6 @@ import { sessionDocs } from '@modules/documents/storage';
 import { getFormData } from '@modules/steps';
 import { ccdCaseService } from '@services/ccdCaseService';
 
-
 const mockSubmit = ccdCaseService.submitUploadDocuments as jest.Mock;
 const mockGetFormData = getFormData as jest.Mock;
 const storage = (sessionDocs as jest.Mock).mock.results[0]?.value as { read: jest.Mock; save: jest.Mock } | undefined;

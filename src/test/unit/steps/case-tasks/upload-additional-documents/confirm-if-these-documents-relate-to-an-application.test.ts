@@ -35,7 +35,6 @@ import { createGetController, getFormData, getTranslationFunction, setFormData }
 import type { CcdCase, CcdCollectionItem, RelatedApplicationOption } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
-
 const mockGetCaseByIdForEvent = ccdCaseService.getCaseByIdForEvent as jest.Mock;
 const mockGetFormData = getFormData as jest.Mock;
 const mockGetTranslationFunction = getTranslationFunction as jest.Mock;
