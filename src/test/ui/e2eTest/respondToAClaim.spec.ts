@@ -315,8 +315,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
-    await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -473,13 +471,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
-     await performAction('counterClaimAbout', {
+    await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
-    await performValidation('mainHeader', counterClaimAbout.mainHeader);
-    await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -736,7 +732,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
-     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -894,7 +890,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
-     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1357,7 +1353,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-     await performAction('selectClaimAgainstWhom', {
+    await performAction('selectClaimAgainstWhom', {
       question: counterClaimAgainstWhom.mainHeader,
       options: [claimantName],
     });

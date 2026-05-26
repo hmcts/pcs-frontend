@@ -392,6 +392,9 @@ export class RespondToClaimAction implements IAction {
           );
         }
       }
+      if (!contactPreferenceData.options.includes(contactPreferenceEmailOrPost.byEmailCheckbox)) {
+        this.deleteAnswer(contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel);
+      }
     }
     // Handle single selection
     else if (contactPreferenceData.radioOption) {
@@ -411,6 +414,8 @@ export class RespondToClaimAction implements IAction {
           contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
           contactPreferenceData.emailAddress
         );
+      } else {
+        this.deleteAnswer(contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel);
       }
     }
     await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
@@ -429,6 +434,8 @@ export class RespondToClaimAction implements IAction {
         contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
         contactByPhoneData.phoneNumber
       );
+    } else {
+      this.deleteAnswer(contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel);
     }
     await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
   }
@@ -1191,7 +1198,6 @@ export class RespondToClaimAction implements IAction {
 
     console.log('\n✅ RTC CHECK YOUR ANSWERS VALIDATION PASSED!\n');
   }
-}
 
   private async validateRTCSectionCYA(sectionData: actionData): Promise<void> {
     const sectionName = String(sectionData);
@@ -1226,8 +1232,11 @@ export class RespondToClaimAction implements IAction {
     if (mismatches.length > 0) {
       throw new Error(`RTC ${sectionName} section CYA validation failed:\n${mismatches.join('\n')}`);
     }
+  }
+
   private async selectClaimAgainstWhom(claimAgainstWhom: actionRecord): Promise<void> {
     if (Array.isArray(claimAgainstWhom.options)) {
+      this.recordAnswer(String(claimAgainstWhom.question), claimAgainstWhom.options);
       for (const option of claimAgainstWhom.options) {
         await performAction('check', {
           question: claimAgainstWhom.question,
@@ -1235,6 +1244,7 @@ export class RespondToClaimAction implements IAction {
         });
       }
     } else if (claimAgainstWhom.radioOption) {
+      this.recordAnswer(String(claimAgainstWhom.question), claimAgainstWhom.radioOption);
       await performAction('check', {
         question: claimAgainstWhom.question,
         option: claimAgainstWhom.radioOption,
@@ -1244,12 +1254,16 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async counterClaimAbout(claimAbout: actionRecord): Promise<void> {
+    this.recordAnswer(counterClaimAbout.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
+    this.recordAnswer(counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('inputText', counterClaimAbout.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
     await performAction('inputText', counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
   }
 
   private async counterClaimOrderOtherThanSum(cliamOtherThanSum: actionRecord): Promise<void> {
+    this.recordAnswer(counterClaimOrderOtherThanSum.whatOrdersAreYouAskingLabelText, cliamOtherThanSum.ordersInput);
+    this.recordAnswer(counterClaimOrderOtherThanSum.whatFactsWouldYouLikeLabelText, cliamOtherThanSum.factsInput);
     await performAction(
       'inputText',
       counterClaimOrderOtherThanSum.whatOrdersAreYouAskingLabelText,
