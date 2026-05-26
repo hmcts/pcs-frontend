@@ -1,6 +1,4 @@
 {% extends "stepsTemplate.njk" %}
-{% from "macros/stepButtons.njk" import stepButtons %}
-{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}{{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
@@ -9,12 +7,7 @@
 
   <p class="govuk-body">{{ paragraph1 }}</p>
 
-  <form method="post" action="{{ url }}">
-    {{ stepButtons(saveAndContinue, saveForLater) }}
-    {{ csrfProtection(csrfToken) }}
-  </form>
-
   <p class="govuk-body">
-    <a href="{{ dashboardUrl }}" class="govuk-button govuk-button--secondary">{{ closeAndReturnToTaskList }}</a>
+    <a href="{{ dashboardUrl }}" class="govuk-button">{{ closeAndReturnToTaskList }}</a>
   </p>
 {% endblock %}
