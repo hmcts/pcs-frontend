@@ -572,7 +572,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - SomethingElse - SelectCounterClaim - Yes @secureFlexible', async () => {
-    //Income and expenses - yes - no option On regular Income - universal credit, 4 parties, 2 unknown (unknown defendant counterclaim) - Counterclaim - yes - SomethingElse -  I need help
+    //Income and expenses - yes - no option On regular Income - universal credit, no defendants - Counterclaim - yes - SomethingElse -  I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -629,16 +629,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
       feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
-    });
-    const pin2User = await getPinUserAt(1);
-    let firstName, lastName;
-    if (pin2User.firstName === undefined) {
-      firstName = submitCaseApiData.submitCasePayloadDefault.defendant1.firstName;
-      lastName = submitCaseApiData.submitCasePayloadDefault.defendant1.lastName;
-    }
-    await performAction('selectClaimAgainstWhom', {
-      question: counterClaimAgainstWhom.mainHeader,
-      options: [claimantName, `${firstName} ${lastName}`],
     });
     await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
@@ -768,16 +758,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
       feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
-    });
-    const pin2User = await getPinUserAt(1);
-    let firstName, lastName;
-    if (pin2User.firstName === undefined) {
-      firstName = submitCaseApiData.submitCasePayloadDefault.defendant1.firstName;
-      lastName = submitCaseApiData.submitCasePayloadDefault.defendant1.lastName;
-    }
-    await performAction('selectClaimAgainstWhom', {
-      question: counterClaimAgainstWhom.mainHeader,
-      options: [claimantName, `${firstName} ${lastName}`],
     });
     await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
@@ -927,16 +907,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
       feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
-    });
-    const pin2User = await getPinUserAt(1);
-    let firstName, lastName;
-    if (pin2User.firstName === undefined) {
-      firstName = submitCaseApiData.submitCasePayloadDefault.defendant1.firstName;
-      lastName = submitCaseApiData.submitCasePayloadDefault.defendant1.lastName;
-    }
-    await performAction('selectClaimAgainstWhom', {
-      question: counterClaimAgainstWhom.mainHeader,
-      options: [claimantName, `${firstName} ${lastName}`],
     });
     await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
