@@ -247,13 +247,14 @@ function pushExpandedRows(
   rows.push({
     key: { text: headerLabel },
     value: items.length ? {} : { text: t('noAnswerProvided') },
-    classes: items.length ? 'govuk-summary-list__row--no-border' : undefined,
+    classes: 'govuk-summary-list__row--no-border',
     actions: { items: [change(step, changeHidden)] },
   });
   items.forEach(({ label, value }) =>
     rows.push({
       key: { text: label, classes: 'govuk-!-font-weight-regular' },
       value,
+      classes: 'govuk-summary-list__row--no-border',
       actions: { items: [change(step, changeHidden)] },
     })
   );
@@ -261,7 +262,9 @@ function pushExpandedRows(
 
 function addEOJRegularIncomeRows(ctx: RowContext): void {
   const { hc, t } = ctx;
-  if (!isYes(hc.shareIncomeExpenseDetails)) {return;}
+  if (!isYes(hc.shareIncomeExpenseDetails)) {
+    return;
+  }
   const items = [];
   for (const source of INCOME_SOURCES) {
     if (isYes(hc[source.key])) {
@@ -289,7 +292,9 @@ function addEOJRegularIncomeRows(ctx: RowContext): void {
 
 function addEOJRegularExpensesRows(ctx: RowContext): void {
   const { hc, t } = ctx;
-  if (!isYes(hc.shareIncomeExpenseDetails)) {return;}
+  if (!isYes(hc.shareIncomeExpenseDetails)) {
+    return;
+  }
   const items = [];
   for (const key of EXPENSE_KEYS) {
     const details = hc[key];
