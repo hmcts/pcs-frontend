@@ -15,8 +15,27 @@ describe('respond-to-claim counter-claim-about', () => {
     expect((step as any).journeyFolder).toBe('respondToClaim');
   });
 
-  it('has no form fields', () => {
+  it('has the correct form fields', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((step as any).fields).toEqual([]);
+    expect((step as any).fields).toEqual([
+      {
+        name: 'counterClaimFor',
+        type: 'character-count',
+        required: true,
+        maxLength: 6800,
+        errorMessage: 'errors.counterClaimForRequired',
+        labelClasses: 'govuk-label--m',
+        translationKey: { label: 'counterClaimForLabel' },
+      },
+      {
+        name: 'counterClaimReasons',
+        type: 'character-count',
+        required: true,
+        maxLength: 6800,
+        errorMessage: 'errors.counterClaimReasonsRequired',
+        labelClasses: 'govuk-label--m',
+        translationKey: { label: 'counterClaimReasonsLabel' },
+      },
+    ]);
   });
 });

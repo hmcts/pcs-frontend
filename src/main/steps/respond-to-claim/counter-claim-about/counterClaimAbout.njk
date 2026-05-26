@@ -1,17 +1,28 @@
 {% extends "stepsTemplate.njk" %}
-{% from "macros/stepButtons.njk" import stepButtons %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/stepButtons.njk" import stepButtons %}
 {% from "macros/csrf.njk" import csrfProtection %}
-{% block pageTitle %}About your counter-claim &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
-  <h1 class="govuk-heading-l">About your counter-claim (placeholder)</h1>
-  <p class="govuk-body">This is a placeholder for About Your Counter-Claim step.</p>
-  <form method="post" action="{{ url }}">
-    {{ stepButtons(continue, saveForLater) }}
+
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+  <p class="govuk-body">{{ infoParagraph1 }}</p>
+  <p class="govuk-body">{{ infoParagraph2 }}</p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'characterCount' %}
+        {{ govukCharacterCount(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
