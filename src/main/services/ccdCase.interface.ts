@@ -234,6 +234,8 @@ export interface CcdCounterClaim {
 
 export interface PossessionClaimResponse {
   claimantOrganisations?: CcdClaimantOrganisation[];
+  claimantName?: string;
+  claimantServiceAddress?: CcdCaseAddress;
   defendantContactDetails?: {
     party?: CcdDefendantParty;
   };

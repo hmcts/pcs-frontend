@@ -25,7 +25,9 @@
   },
 
   "claimantDetails": {
-    "organisation": "Claimant organisation"
+    "organisation": "Claimant organisation",
+    "name": "Name",
+    "address": "Address for service"
   },
 
   "defendant1": {

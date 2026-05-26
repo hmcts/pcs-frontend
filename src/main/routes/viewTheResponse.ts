@@ -17,7 +17,6 @@ import type {
   CcdCounterClaim,
   CcdDefendantParty,
   CcdDefendantResponses,
-  CcdParty,
   HouseholdCircumstances,
   IncomeExpenseDetails,
   PaymentAgreement,
@@ -31,15 +30,14 @@ import { formatAddress } from '@utils/ccdDashboardUtils';
 const logger = Logger.getLogger('viewTheResponse');
 
 const GDS_DATE_FORMAT = 'd MMMM yyyy';
-const SUMMARY_KEY_CLASSES = 'govuk-!-font-weight-bold';
 
 interface SummaryRow {
-  key: { text: string; classes?: string };
+  key: { text: string };
   value: { text: string };
 }
 
 function summaryKey(text: string): SummaryRow['key'] {
-  return { text, classes: SUMMARY_KEY_CLASSES };
+  return { text };
 }
 
 interface SummarySection {
@@ -163,12 +161,12 @@ function buildCaseDatesSummary(t: TFunction, dateIssued: string | null, dateSubm
   };
 }
 
-function buildStatementOfTruthSummary(t: TFunction, completedBy: string | undefined): SummarySection {
+function buildStatementOfTruthSummary(t: TFunction, completedByName: string | undefined): SummarySection {
   return {
     rows: [
       {
         key: summaryKey(t('viewTheResponse:statementOfTruth.completedBy')),
-        value: { text: completedBy ?? '' },
+        value: { text: completedByName?.trim() ?? '' },
       },
     ],
   };
@@ -176,20 +174,13 @@ function buildStatementOfTruthSummary(t: TFunction, completedBy: string | undefi
 
 function buildClaimantDetails(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
-  const orgs = caseData.possessionClaimResponse?.claimantOrganisations ?? [];
-  for (const org of orgs) {
-    pushRow(rows, t('viewTheResponse:claimantDetails.organisation'), org.value);
-  }
-  if (orgs.length === 0) {
-    const fallbackClaimants = (caseData.allClaimants ?? []).map(c => c.value).filter((p): p is CcdParty => !!p);
-    for (const claimant of fallbackClaimants) {
-      pushRow(
-        rows,
-        t('viewTheResponse:claimantDetails.organisation'),
-        claimant.orgName ?? joinName(claimant.firstName, claimant.lastName)
-      );
-    }
-  }
+  const response = caseData.possessionClaimResponse;
+  pushRow(rows, t('viewTheResponse:claimantDetails.name'), response?.claimantName);
+  pushRow(
+    rows,
+    t('viewTheResponse:claimantDetails.address'),
+    response?.claimantServiceAddress ? (formatAddress(response.claimantServiceAddress) ?? '') : ''
+  );
   return { rows };
 }
 

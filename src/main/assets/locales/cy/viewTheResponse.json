@@ -25,7 +25,9 @@
   },
 
   "claimantDetails": {
-    "organisation": "cyClaimant organisation"
+    "organisation": "cyClaimant organisation",
+    "name": "cyName",
+    "address": "cyAddress for service"
   },
 
   "defendant1": {
