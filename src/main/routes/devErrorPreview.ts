@@ -1,4 +1,5 @@
-import type { Application, Request, Response, NextFunction } from 'express';
+import type { Application, NextFunction, Request, Response } from 'express';
+
 import { HTTPError } from '../HttpError';
 
 // This route is used to preview error pages in development mode
