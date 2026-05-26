@@ -349,6 +349,58 @@ describe('section-CYA row builders — characterisation', () => {
       const rows = buildDisputeRows(reqWith(model({})), t);
       expect(rows.some(r => r.key.text === 'rows.noticeReceivedDate.label')).toBe(false);
     });
+
+    it('counterclaim applied-for-HWF row: renders Y/N and links to the HWF question step', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: { claimType: 'PAYMENT_OR_COMPENSATION', appliedForHwf: 'NO' },
+          })
+        ),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.counterClaimAppliedForHwf.label');
+      expect(row?.value).toEqual({ text: 'options.no' });
+      expect(row?.actions?.items[0].href).toContain('counter-claim-have-you-applied-for-help');
+    });
+
+    it('counterclaim HWF reference row: rendered as the detail when applied-for-HWF is YES', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: {
+              claimType: 'OTHER',
+              appliedForHwf: 'YES',
+              hwfReferenceNumber: 'HWF-ABC-123',
+            },
+          })
+        ),
+        t
+      );
+      const ref = rows.find(r => r.key.text === 'rows.counterClaimHwfReference.label');
+      expect(ref?.value).toEqual({ text: 'HWF-ABC-123' });
+      expect(ref?.actions?.items[0].href).toContain('counter-claim-have-you-applied-for-help');
+    });
+
+    it('counterclaim HWF reference row: omitted when applied-for-HWF is NO', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: { claimType: 'OTHER', appliedForHwf: 'NO', hwfReferenceNumber: 'stale-ref' },
+          })
+        ),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.counterClaimHwfReference.label')).toBe(false);
+    });
+
+    it('counterclaim applied-for-HWF row: omitted when there is no counter-claim', () => {
+      const rows = buildDisputeRows(reqWith(model({ makeCounterClaim: 'NO' })), t);
+      expect(rows.some(r => r.key.text === 'rows.counterClaimAppliedForHwf.label')).toBe(false);
+    });
   });
 
   describe('payments', () => {

@@ -87,6 +87,14 @@
         "YES": "I need help paying the fee",
         "NO": "I do not need help paying the fee"
       }
+    },
+    "counterClaimAppliedForHwf": {
+      "label": "Have you already applied for help with your counterclaim fee?",
+      "changeHidden": "whether you have already applied for help with the counterclaim fee"
+    },
+    "counterClaimHwfReference": {
+      "label": "Help with Fees reference number",
+      "changeHidden": "your Help with Fees reference number"
     }
   }
 }
