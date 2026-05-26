@@ -206,7 +206,8 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 ### PR & Master (Jenkinsfile_CNP)
 
 - **PR:** Runs `yarn test:functional` on Chrome.
-- **PR default scope:** `E2E_TEST_SCOPE=@PR`.
+- **PR default scope:** `E2E_TEST_SCOPE=@sanity`.
+- **PR Label overrides: `enable_critical_test`:** Runs the critical tests (`E2E_TEST_SCOPE=@PR`) on Chrome.
 - **PR label overrides:**
   - `e2e-tag:<tag>` sets `E2E_TEST_SCOPE` (for example `e2e-tag:@smoke`).
   - `e2e-spec:<specFilter>` sets `E2E_SPEC` (spec path filter, case-sensitive).
