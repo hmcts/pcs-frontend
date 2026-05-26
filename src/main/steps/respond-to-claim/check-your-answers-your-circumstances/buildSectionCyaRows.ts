@@ -44,6 +44,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 export function buildDependantsRows(req: Request, t: TFunction): SummaryListRow[] {
   const validatedCase = getValidatedCase(req);
@@ -121,6 +122,8 @@ function pushDetailRow(
 }
 
 >>>>>>> f782e8e9d (HDPI-3794:Restructuring cya sections as per latest figma)
+=======
+>>>>>>> 118e5e093 (HDPI-3794:Adding income and expenses sections)
 function addDependantChildrenRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
   if (!hc.dependantChildren) {
     return;
@@ -279,4 +282,24 @@ function addExceptionalHardshipRow({ rows, hc, t, change, yesNoNotSure }: RowCon
   if (isYes(hc.exceptionalHardship) && detail) {
     pushDetailRow(rows, questionRow, 'rows.exceptionalHardshipDetails', detail, 'exceptional-hardship', t, change);
   }
+}
+
+export function buildEOJDependantsRows(req: Request, t: TFunction): SummaryListRow[] {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {return [];}
+  const ctx: RowContext = { ...base, hc: base.validatedCase.defendantResponses?.householdCircumstances ?? {} };
+  addDependantChildrenRow(ctx);
+  addOtherDependantsRow(ctx);
+  addOtherTenantsRow(ctx);
+  return ctx.rows;
+}
+
+export function buildEOJCircumstancesRows(req: Request, t: TFunction): SummaryListRow[] {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {return [];}
+  const ctx: RowContext = { ...base, hc: base.validatedCase.defendantResponses?.householdCircumstances ?? {} };
+  addAlternativeAccommodationRow(ctx);
+  addShareAdditionalCircumstancesRow(ctx);
+  addExceptionalHardshipRow(ctx);
+  return ctx.rows;
 }

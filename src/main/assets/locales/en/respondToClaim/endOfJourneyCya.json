@@ -2,11 +2,16 @@
   "pageTitle": "Check your answers",
   "heading": "Check your answers",
   "sections": {
+    "legalAdvice": "Legal advice",
     "personalDetails": "Personal details",
     "claimantsClaim": "{{claimantName}}'s claim",
     "dependantsAndOtherResidents": "Dependants and other residents",
     "yourCircumstances": "Your circumstances",
     "incomeAndExpenses": "Income and expenses",
+    "regularIncome": "Regular income",
+    "universalCredit": "Universal credit",
+    "priorityDebts": "Priority debts",
+    "regularExpenses": "Regular expenses",
     "uploadFiles": "Upload files",
     "otherConsiderations": "Other considerations",
     "languageUsed": "Language used"

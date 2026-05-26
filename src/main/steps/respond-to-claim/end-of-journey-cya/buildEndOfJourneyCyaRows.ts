@@ -4,14 +4,19 @@ import type { TFunction } from 'i18next';
 import { hasAnyRentArrearsGround } from '../../utils';
 import { buildSectionCyaRows as buildDocumentsRows } from '../check-your-answers-documents/buildSectionCyaRows';
 import {
-  buildSectionCyaRows as buildIncomeRows,
-  buildOtherConsiderationsRows,
+  buildEOJIncomeAndExpensesRow,
+  buildEOJOtherConsiderationsRows,
+  buildEOJPriorityDebtsRows,
+  buildEOJRegularExpensesRows,
+  buildEOJRegularIncomeRows,
+  buildEOJUniversalCreditRows,
 } from '../check-your-answers-income-and-expenses/buildSectionCyaRows';
 import { buildSectionCyaRows as buildPaymentsRows } from '../check-your-answers-payments-and-agreements/buildSectionCyaRows';
 import { buildSectionCyaRows as buildPersonalRows } from '../check-your-answers-personal-details/buildSectionCyaRows';
+import { buildSectionCyaRows as buildStartNowRows } from '../check-your-answers-start-now-and-details/buildSectionCyaRows';
 import {
-  buildCircumstancesOnlyRows,
-  buildDependantsRows,
+  buildEOJCircumstancesRows,
+  buildEOJDependantsRows,
 } from '../check-your-answers-your-circumstances/buildSectionCyaRows';
 import { buildSectionCyaRows as buildResponseRows } from '../check-your-answers-your-response/buildSectionCyaRows';
 import { type SummaryListRow, getValidatedCase } from '../section-cya/cyaRow';
@@ -26,6 +31,7 @@ export type EndOfJourneyCyaSection = {
 };
 
 export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJourneyCyaSection[] {
+  const tStartNow = getTranslationFunction(req, ['respondToClaim/checkYourAnswersStartNowAndDetails', 'common']);
   const tPersonal = getTranslationFunction(req, ['respondToClaim/checkYourAnswersPersonalDetails', 'common']);
   const tResponse = getTranslationFunction(req, ['respondToClaim/checkYourAnswersYourResponse', 'common']);
   const tPayments = getTranslationFunction(req, ['respondToClaim/checkYourAnswersPaymentsAndAgreements', 'common']);
@@ -35,6 +41,11 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
 
   const claimantName = getValidatedCase(req)?.claimantName ?? '';
   const sections: EndOfJourneyCyaSection[] = [];
+
+  sections.push({
+    heading: t('sections.legalAdvice'),
+    rows: buildStartNowRows(req, tStartNow),
+  });
 
   sections.push({
     heading: t('sections.personalDetails'),
@@ -50,21 +61,37 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
 
   sections.push({
     heading: t('sections.dependantsAndOtherResidents'),
-    rows: buildDependantsRows(req, tCircumstances),
+    rows: buildEOJDependantsRows(req, tCircumstances),
   });
 
   sections.push({
     heading: t('sections.yourCircumstances'),
-    rows: buildCircumstancesOnlyRows(req, tCircumstances),
+    rows: buildEOJCircumstancesRows(req, tCircumstances),
   });
-
-  const incomeRows = buildIncomeRows(req, tIncome).filter(
-    row => !row.actions.items.some(item => item.href.includes('other-considerations'))
-  );
 
   sections.push({
     heading: t('sections.incomeAndExpenses'),
-    rows: incomeRows,
+    rows: buildEOJIncomeAndExpensesRow(req, tIncome),
+  });
+
+  sections.push({
+    heading: t('sections.regularIncome'),
+    rows: buildEOJRegularIncomeRows(req, tIncome),
+  });
+
+  sections.push({
+    heading: t('sections.universalCredit'),
+    rows: buildEOJUniversalCreditRows(req, tIncome),
+  });
+
+  sections.push({
+    heading: t('sections.priorityDebts'),
+    rows: buildEOJPriorityDebtsRows(req, tIncome),
+  });
+
+  sections.push({
+    heading: t('sections.regularExpenses'),
+    rows: buildEOJRegularExpensesRows(req, tIncome),
   });
 
   sections.push({
@@ -74,7 +101,7 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
 
   sections.push({
     heading: t('sections.otherConsiderations'),
-    rows: buildOtherConsiderationsRows(req, t),
+    rows: buildEOJOtherConsiderationsRows(req, t),
   });
 
   sections.push({

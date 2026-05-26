@@ -2,11 +2,16 @@
   "pageTitle": "cy Check your answers",
   "heading": "cy Check your answers",
   "sections": {
+    "legalAdvice": "cy Legal advice",
     "personalDetails": "cy Personal details",
     "claimantsClaim": "cy {{claimantName}}'s claim",
     "dependantsAndOtherResidents": "cy Dependants and other residents",
     "yourCircumstances": "cy Your circumstances",
     "incomeAndExpenses": "cy Income and expenses",
+    "regularIncome": "cy Regular income",
+    "universalCredit": "cy Universal credit",
+    "priorityDebts": "cy Priority debts",
+    "regularExpenses": "cy Regular expenses",
     "uploadFiles": "cy Upload files",
     "otherConsiderations": "cy Other considerations",
     "languageUsed": "cy Language used"

@@ -48,26 +48,6 @@ interface RowContext extends BaseRowContext {
   hc: HouseholdCircumstances;
 }
 
-export function buildOtherConsiderationsRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = getValidatedCase(req);
-  const caseRef = validatedCase?.id;
-  if (!validatedCase || !caseRef) {
-    return [];
-  }
-
-  const responses = validatedCase.defendantResponses ?? {};
-  const ctx: RowContext = {
-    rows: [],
-    responses,
-    hc: responses.householdCircumstances ?? {},
-    t,
-    change: makeChange(caseRef, SECTION_ID, t),
-    yesNoNotSure: makeYesNoNotSure(t),
-  };
-  addOtherConsiderationsRow(ctx);
-  return ctx.rows;
-}
-
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
   if (!base) {
@@ -255,4 +235,59 @@ function addOtherConsiderationsRow({ rows, responses, t, change, yesNoNotSure }:
     return;
   }
   pushDetailRow(rows, questionRow, 'rows.otherConsiderationsDetails', detail, 'other-considerations', t, change);
+}
+
+export function buildEOJIncomeAndExpensesRow(req: Request, t: TFunction): SummaryListRow[] {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {return [];}
+  const responses = base.validatedCase.defendantResponses ?? {};
+  const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
+  addShareIncomeExpenseDetailsRow(ctx);
+  return ctx.rows;
+}
+
+export function buildEOJRegularIncomeRows(req: Request, t: TFunction): SummaryListRow[] {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {return [];}
+  const responses = base.validatedCase.defendantResponses ?? {};
+  const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
+  addRegularIncomeRow(ctx);
+  return ctx.rows;
+}
+
+export function buildEOJUniversalCreditRows(req: Request, t: TFunction): SummaryListRow[] {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {return [];}
+  const responses = base.validatedCase.defendantResponses ?? {};
+  const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
+  addAppliedForUcRow(ctx);
+  return ctx.rows;
+}
+
+export function buildEOJPriorityDebtsRows(req: Request, t: TFunction): SummaryListRow[] {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {return [];}
+  const responses = base.validatedCase.defendantResponses ?? {};
+  const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
+  addPriorityDebtsRow(ctx);
+  addPriorityDebtDetailsRow(ctx);
+  return ctx.rows;
+}
+
+export function buildEOJRegularExpensesRows(req: Request, t: TFunction): SummaryListRow[] {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {return [];}
+  const responses = base.validatedCase.defendantResponses ?? {};
+  const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
+  addRegularExpensesRow(ctx);
+  return ctx.rows;
+}
+
+export function buildEOJOtherConsiderationsRows(req: Request, t: TFunction): SummaryListRow[] {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {return [];}
+  const responses = base.validatedCase.defendantResponses ?? {};
+  const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
+  addOtherConsiderationsRow(ctx);
+  return ctx.rows;
 }
