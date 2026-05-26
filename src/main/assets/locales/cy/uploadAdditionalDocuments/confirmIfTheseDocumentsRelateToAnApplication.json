@@ -7,5 +7,11 @@
   "applicationOptionAdjourn": "cyYes, the documents I'm uploading relate to the application to adjourn the hearing - submitted on {{date}}",
   "applicationOptionSetAside": "cyYes, the documents I'm uploading relate to the application to set aside the order - submitted on {{date}}",
   "applicationOptionGeneric": "cyYes, the documents I'm uploading relate to the application submitted on {{date}}",
-  "optionClaimOrCounterclaim": "cyNo, the documents I'm uploading relate to the main claim or counterclaim"
+  "optionClaimOrCounterclaim": "cyNo, the documents I'm uploading relate to the main claim or counterclaim",
+  "errors": {
+    "title": "cyThere is a problem",
+    "relatedApplicationId": {
+      "required": "cySelect if these documents relate to an existing application"
+    }
+  }
 }
