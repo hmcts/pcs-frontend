@@ -13,6 +13,7 @@ import {
   counterClaimAbout,
   counterClaimAgainstWhom,
   counterClaimFee,
+  counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
@@ -84,6 +85,10 @@ export class RespondToClaimAction implements IAction {
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
       ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
+      [
+        'counterClaimHaveYouAppliedForHelpWithFee',
+        () => this.counterClaimHaveYouAppliedForHelpWithFee(fieldName as actionRecord),
+      ],
       ['selectCounterClaim', () => this.selectCounterClaim(fieldName as actionRecord)],
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
@@ -346,6 +351,8 @@ export class RespondToClaimAction implements IAction {
       question: counterClaim.doYouWantToMakeACounterclaim,
       option: counterClaimOption.option,
     });
+
+    process.env.SELECT_COUNTER_CLAIM = String(counterClaimOption.option).toUpperCase();
     await performAction('clickButton', counterClaim.saveAndContinueButton);
   }
 
@@ -508,6 +515,22 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  }
+
+  private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
+      option: helpWithFee.helpWithFeeOption,
+    });
+
+    if (helpWithFee.helpWithFeeOption === 'Yes') {
+      await performAction(
+        'inputText',
+        counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
+        helpWithFee.feeReference
+      );
+    }
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
   }
 
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
