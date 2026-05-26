@@ -162,6 +162,7 @@ export interface CcdDocumentReference {
   document_filename: string;
   document_hash?: string;
   category_id?: string;
+  upload_timestamp?: string;
 }
 
 /** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
@@ -219,6 +220,11 @@ export interface CcdCounterClaim {
   isClaimAmountKnown?: string;
   claimAmount?: PenceAmount;
   estimatedMaxClaimAmount?: PenceAmount;
+  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
+  counterClaimFor?: string;
+  counterClaimReasons?: string;
+  otherOrderRequestDetails?: string;
+  otherOrderRequestFacts?: string;
 }
 
 export interface PossessionClaimResponse {
