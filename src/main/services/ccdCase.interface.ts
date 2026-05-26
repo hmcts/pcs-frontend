@@ -281,6 +281,7 @@ export interface CcdCaseData {
   // Populated by the uploadDocuments START handler (@JsonUnwrapped on PCSCase).
   showRelatedApplicationsPage?: YesNoValue;
   relatedApplicationOptions?: CcdCollectionItem<RelatedApplicationOption>[];
+  selectedRelatedApplicationId?: string;
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
   applicantSurname?: string;
@@ -303,6 +304,7 @@ export type DocumentUploadCategoryCode =
   | 'MAIN_CLAIM_OR_COUNTERCLAIM';
 
 export interface RelatedApplicationOption {
+  genAppId?: string;
   category: DocumentUploadCategoryCode;
   submittedDate?: string;
 }

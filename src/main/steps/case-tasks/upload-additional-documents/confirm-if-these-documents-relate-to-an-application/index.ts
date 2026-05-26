@@ -14,11 +14,7 @@ import {
 } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
-import type {
-  CcdCollectionItem,
-  DocumentUploadCategoryCode,
-  RelatedApplicationOption,
-} from '@services/ccdCase.interface';
+import type { CcdCollectionItem, RelatedApplicationOption } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getFlowConfigForJourney } from '@steps';
 
@@ -27,6 +23,7 @@ const stepName = 'confirm-if-these-documents-relate-to-an-application';
 const templatePath =
   'case-tasks/upload-additional-documents/confirm-if-these-documents-relate-to-an-application/confirmIfTheseDocumentsRelateToAnApplication.njk';
 const UPLOAD_DOCUMENTS_EVENT_ID = 'uploadDocuments';
+const MAIN_CLAIM_OPTION_VALUE = 'MAIN_CLAIM_OR_COUNTERCLAIM';
 
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
@@ -56,12 +53,6 @@ async function loadRelatedApplicationOptions(req: Request): Promise<CcdCollectio
   return startResponse.data?.relatedApplicationOptions ?? [];
 }
 
-function codeToValue(category: DocumentUploadCategoryCode): string {
-  return category;
-}
-
-const MAIN_CLAIM_OPTION_VALUE = 'MAIN_CLAIM_OR_COUNTERCLAIM';
-
 export const step: StepDefinition = {
   url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
   name: stepName,
@@ -76,11 +67,13 @@ export const step: StepDefinition = {
 
       const options = await loadRelatedApplicationOptions(req);
       const applications = [
-        ...options.map(item => ({
-          value: codeToValue(item.value.category),
-          text: labelForOption(t, item.value),
-          checked: selectedApplicationId === item.value.category,
-        })),
+        ...options
+          .filter(item => Boolean(item.value.genAppId))
+          .map(item => ({
+            value: item.value.genAppId as string,
+            text: labelForOption(t, item.value),
+            checked: selectedApplicationId === item.value.genAppId,
+          })),
         {
           value: MAIN_CLAIM_OPTION_VALUE,
           text: t('optionClaimOrCounterclaim'),
@@ -100,19 +93,23 @@ export const step: StepDefinition = {
       const relatedApplicationId = req.body.relatedApplicationId as string | undefined;
 
       const t = getTranslationFunction(req);
+      let relatedApplicationCategory: string | undefined;
       let relatedApplicationText = '';
       if (relatedApplicationId === MAIN_CLAIM_OPTION_VALUE) {
+        relatedApplicationCategory = MAIN_CLAIM_OPTION_VALUE;
         relatedApplicationText = t('optionClaimOrCounterclaim');
       } else if (relatedApplicationId) {
         const options = await loadRelatedApplicationOptions(req);
-        const match = options.find(item => item.value.category === relatedApplicationId);
+        const match = options.find(item => item.value.genAppId === relatedApplicationId);
         if (match) {
+          relatedApplicationCategory = match.value.category;
           relatedApplicationText = labelForOption(t, match.value);
         }
       }
 
       setFormData(req, stepName, {
         relatedApplicationId,
+        relatedApplicationCategory,
         relatedApplicationText,
       });
 

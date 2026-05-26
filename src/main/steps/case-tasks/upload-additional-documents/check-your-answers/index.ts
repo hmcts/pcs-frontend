@@ -47,11 +47,17 @@ export const step: StepDefinition = {
       }
 
       const uploadedAdditionalDocuments = await uploadStorage.read(req);
+      const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
+      const relatedApplicationId = confirmData?.relatedApplicationId as string | undefined;
+      const selectedRelatedApplicationId =
+        relatedApplicationId && relatedApplicationId !== 'MAIN_CLAIM_OR_COUNTERCLAIM'
+          ? relatedApplicationId
+          : undefined;
 
       try {
         await ccdCaseService.submitUploadDocuments(req.session?.user?.accessToken, {
           id: caseId,
-          data: { uploadedAdditionalDocuments },
+          data: { uploadedAdditionalDocuments, selectedRelatedApplicationId },
         });
 
         const caseRef = toCaseReference16(req.params?.caseReference);
