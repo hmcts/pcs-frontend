@@ -61,6 +61,8 @@ const sectionDefs = [
       'counter-claim-have-you-applied-for-help',
       'counter-claim-against-whom',
       'counter-claim-about',
+      'counter-claim-order-other-than-sum',
+      'counter-claim-upload-documents',
       'check-your-answers-your-response',
     ],
   },

@@ -4,13 +4,15 @@ import type { TFunction } from 'i18next';
 
 import { formatIsoDate, penceToPounds } from '../../utils';
 import {
+  type BaseRowContext,
   type SummaryListRow,
+  createRowContext,
   escapeWithLineBreaks,
-  getValidatedCase,
+  groupQuestionAndDetail,
   isYes,
   listHtml,
-  makeChange,
-  makeYesNoNotSure,
+  pushDetailRow,
+  pushYesNoRow,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
@@ -41,30 +43,22 @@ const EXPENSE_KEYS = [
   'otherExpenses',
 ] as const;
 
-interface RowContext {
-  rows: SummaryListRow[];
+interface RowContext extends BaseRowContext {
   responses: CcdDefendantResponses;
   hc: HouseholdCircumstances;
-  t: TFunction;
-  change: ReturnType<typeof makeChange>;
-  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
 }
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = getValidatedCase(req);
-  const caseRef = validatedCase?.id;
-  if (!validatedCase || !caseRef) {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {
     return [];
   }
 
-  const responses = validatedCase.defendantResponses ?? {};
+  const responses = base.validatedCase.defendantResponses ?? {};
   const ctx: RowContext = {
-    rows: [],
+    ...base,
     responses,
     hc: responses.householdCircumstances ?? {},
-    t,
-    change: makeChange(caseRef, SECTION_ID, t),
-    yesNoNotSure: makeYesNoNotSure(t),
   };
 
   addShareIncomeExpenseDetailsRow(ctx);
@@ -78,14 +72,16 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
+// frequencyNamespace picks the per-context wording (incomeFrequencies / paymentFrequencies / frequencies).
 function amountWithFrequency(
   amount: string | null | undefined,
   frequency: string | null | undefined,
-  t: TFunction
+  t: TFunction,
+  frequencyNamespace = 'frequencies'
 ): string {
   const pounds = penceToPounds(amount ?? undefined);
   const money = pounds ? `£${pounds}` : '';
-  const freq = frequency ? t(`frequencies.${String(frequency).trim().toUpperCase()}`) : '';
+  const freq = frequency ? t(`${frequencyNamespace}.${String(frequency).trim().toUpperCase()}`) : '';
   return [money, freq].filter(Boolean).join(' ');
 }
 
@@ -95,11 +91,15 @@ function addShareIncomeExpenseDetailsRow({ rows, hc, t, change, yesNoNotSure }: 
   if (!hc.shareIncomeExpenseDetails) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.shareIncomeExpenseDetails.label') },
-    value: { text: yesNoNotSure(hc.shareIncomeExpenseDetails) },
-    actions: { items: [change('income-and-expenses', 'rows.shareIncomeExpenseDetails.changeHidden')] },
-  });
+  pushYesNoRow(
+    rows,
+    'rows.shareIncomeExpenseDetails',
+    hc.shareIncomeExpenseDetails,
+    'income-and-expenses',
+    t,
+    yesNoNotSure,
+    change
+  );
 }
 
 function addRegularIncomeRow({ rows, hc, t, change }: RowContext): void {
@@ -116,8 +116,8 @@ function addRegularIncomeRow({ rows, hc, t, change }: RowContext): void {
       continue;
     }
     const label = t(`rows.regularIncome.options.${source.key}`);
-    const detail = amountWithFrequency(hc[source.amount], hc[source.frequency], t);
-    items.push(detail ? `${escapeHtml(label)}: ${escapeHtml(detail)}` : escapeHtml(label));
+    const detail = amountWithFrequency(hc[source.amount], hc[source.frequency], t, 'incomeFrequencies');
+    items.push(detail ? `${escapeHtml(label)} ${escapeHtml(detail)}` : escapeHtml(label));
   }
   if (isYes(hc.moneyFromElsewhere)) {
     const label = t('rows.regularIncome.options.moneyFromElsewhere');
@@ -137,35 +137,35 @@ function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
   if (!hc.hasAppliedForUniversalCredit) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.hasAppliedForUniversalCredit.label') },
-    value: { text: yesNoNotSure(hc.hasAppliedForUniversalCredit) },
-    actions: {
-      items: [change('have-you-applied-for-universal-credit', 'rows.hasAppliedForUniversalCredit.changeHidden')],
-    },
-  });
+  const questionRow = pushYesNoRow(
+    rows,
+    'rows.hasAppliedForUniversalCredit',
+    hc.hasAppliedForUniversalCredit,
+    'have-you-applied-for-universal-credit',
+    t,
+    yesNoNotSure,
+    change
+  );
 
   if (!isYes(hc.hasAppliedForUniversalCredit) || !hc.ucApplicationDate) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.universalCreditApplicationDate.label') },
     value: { text: formatIsoDate(hc.ucApplicationDate) },
     actions: {
       items: [change('have-you-applied-for-universal-credit', 'rows.universalCreditApplicationDate.changeHidden')],
     },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addPriorityDebtsRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
   if (!hc.priorityDebts) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.priorityDebts.label') },
-    value: { text: yesNoNotSure(hc.priorityDebts) },
-    actions: { items: [change('priority-debts', 'rows.priorityDebts.changeHidden')] },
-  });
+  pushYesNoRow(rows, 'rows.priorityDebts', hc.priorityDebts, 'priority-debts', t, yesNoNotSure, change);
 }
 
 function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
@@ -180,7 +180,7 @@ function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
       actions: { items: [change('priority-debt-details', 'rows.priorityDebtTotal.changeHidden')] },
     });
   }
-  const contribution = amountWithFrequency(hc.debtContribution, hc.debtContributionFrequency, t);
+  const contribution = amountWithFrequency(hc.debtContribution, hc.debtContributionFrequency, t, 'paymentFrequencies');
   if (contribution) {
     rows.push({
       key: { text: t('rows.priorityDebtContribution.label') },
@@ -220,19 +220,19 @@ function addOtherConsiderationsRow({ rows, responses, t, change, yesNoNotSure }:
   if (!responses.otherConsiderations) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.otherConsiderations.label') },
-    value: { text: yesNoNotSure(responses.otherConsiderations) },
-    actions: { items: [change('other-considerations', 'rows.otherConsiderations.changeHidden')] },
-  });
+  const questionRow = pushYesNoRow(
+    rows,
+    'rows.otherConsiderations',
+    responses.otherConsiderations,
+    'other-considerations',
+    t,
+    yesNoNotSure,
+    change
+  );
 
   const detail = responses.otherConsiderationsDetails?.trim();
   if (!isYes(responses.otherConsiderations) || !detail) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.otherConsiderationsDetails.label') },
-    value: { html: escapeWithLineBreaks(detail) },
-    actions: { items: [change('other-considerations', 'rows.otherConsiderationsDetails.changeHidden')] },
-  });
+  pushDetailRow(rows, questionRow, 'rows.otherConsiderationsDetails', detail, 'other-considerations', t, change);
 }

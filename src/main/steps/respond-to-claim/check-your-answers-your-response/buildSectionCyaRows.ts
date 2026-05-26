@@ -1,46 +1,39 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { formatIsoDate, normalizeYesNoValue, penceToPounds } from '../../utils';
+import { formatIsoDate, isTenancyStartDateKnown, normalizeYesNoValue, penceToPounds } from '../../utils';
+import { isNoticeDateConfirmedAndNotProvided, isNoticeDateConfirmedAndProvided } from '../flowConditions';
 import {
+  type BaseRowContext,
   type SummaryListRow,
+  createRowContext,
   escapeWithLineBreaks,
-  getValidatedCase,
-  makeChange,
-  makeYesNoNotSure,
+  groupQuestionAndDetail,
+  pushYesNoRow,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
 import type { CcdCounterClaim, CcdDefendantResponses } from '@services/ccdCase.interface';
-import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
 const SECTION_ID: RespondToClaimSectionId = 'disputeAndTenancy';
 
-interface RowContext {
-  rows: SummaryListRow[];
-  validatedCase: CcdCaseModel;
+interface RowContext extends BaseRowContext {
   responses: CcdDefendantResponses;
-  t: TFunction;
-  change: ReturnType<typeof makeChange>;
-  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
+  req: Request;
 }
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = getValidatedCase(req);
-  const caseRef = validatedCase?.id;
-  if (!validatedCase || !caseRef) {
+  const base = createRowContext(req, SECTION_ID, t);
+  if (!base) {
     return [];
   }
 
   // Trust the Normaliser: every field present here is reachable in the current
   // state — each row helper does a presence check only.
   const ctx: RowContext = {
-    rows: [],
-    validatedCase,
-    responses: validatedCase.defendantResponses ?? {},
-    t,
-    change: makeChange(caseRef, SECTION_ID, t),
-    yesNoNotSure: makeYesNoNotSure(t),
+    ...base,
+    responses: base.validatedCase.defendantResponses ?? {},
+    req,
   };
 
   addLandlordRegisteredRow(ctx);
@@ -62,73 +55,85 @@ function addLandlordRegisteredRow({ rows, responses, t, change, yesNoNotSure }: 
   if (!responses.landlordRegistered) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.landlordRegistered.label') },
-    value: { text: yesNoNotSure(responses.landlordRegistered) },
-    actions: { items: [change('landlord-registered', 'rows.landlordRegistered.changeHidden')] },
-  });
+  pushYesNoRow(
+    rows,
+    'rows.landlordRegistered',
+    responses.landlordRegistered,
+    'landlord-registered',
+    t,
+    yesNoNotSure,
+    change
+  );
 }
 
 function addLandlordLicensedRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.landlordLicensed) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.landlordLicensed.label') },
-    value: { text: yesNoNotSure(responses.landlordLicensed) },
-    actions: { items: [change('landlord-licensed', 'rows.landlordLicensed.changeHidden')] },
-  });
+  pushYesNoRow(rows, 'rows.landlordLicensed', responses.landlordLicensed, 'landlord-licensed', t, yesNoNotSure, change);
 }
 
 function addWrittenTermsRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.writtenTerms) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.writtenTerms.label') },
-    value: { text: yesNoNotSure(responses.writtenTerms) },
-    actions: { items: [change('written-terms', 'rows.writtenTerms.changeHidden')] },
-  });
+  pushYesNoRow(rows, 'rows.writtenTerms', responses.writtenTerms, 'written-terms', t, yesNoNotSure, change);
 }
 
 function addTenancyTypeRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.tenancyTypeConfirmation) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.tenancyTypeCorrect.label') },
-    value: { text: yesNoNotSure(responses.tenancyTypeConfirmation) },
-    actions: { items: [change('tenancy-type-details', 'rows.tenancyTypeCorrect.changeHidden')] },
-  });
+  const questionRow = pushYesNoRow(
+    rows,
+    'rows.tenancyTypeCorrect',
+    responses.tenancyTypeConfirmation,
+    'tenancy-type-details',
+    t,
+    yesNoNotSure,
+    change
+  );
 
-  if (normalizeYesNoValue(responses.tenancyTypeConfirmation) === 'YES') {
+  if (normalizeYesNoValue(responses.tenancyTypeConfirmation) !== 'NO') {
     return;
   }
   const correctedType = responses.tenancyType?.trim();
   if (!correctedType) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.tenancyTypeDetails.label') },
     value: { text: correctedType },
     actions: { items: [change('tenancy-type-details', 'rows.tenancyTypeDetails.changeHidden')] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
-function addTenancyStartDateRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
-  // tenancy-date-details always writes the confirmation answer (plus a date only when
-  // the user corrects it); tenancy-date-unknown writes only a date. Confirmation presence
-  // routes the change link back to whichever step the user took.
+function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure }: RowContext): void {
   const date = responses.tenancyStartDate;
   const confirmation = responses.tenancyStartDateConfirmation;
-  if (!date && !confirmation) {
+
+  if (isTenancyStartDateKnown(req)) {
+    // tenancy-date-details branch — the confirmation answer is mandatory; a date is written
+    // only when the citizen corrects it. Drop the row only if the step is unreached.
+    if (!date && !confirmation) {
+      return;
+    }
+    rows.push({
+      key: { text: t('rows.tenancyStartDate.label') },
+      value: { text: date ? formatIsoDate(date) : yesNoNotSure(confirmation as string) },
+      actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.changeHidden')] },
+    });
     return;
   }
-  const editStep = confirmation ? 'tenancy-date-details' : 'tenancy-date-unknown';
+
+  // tenancy-date-unknown branch — the start date is optional. Always render the row;
+  // "No answer provided" when blank.
   rows.push({
     key: { text: t('rows.tenancyStartDate.label') },
-    value: { text: date ? formatIsoDate(date) : yesNoNotSure(confirmation as string) },
-    actions: { items: [change(editStep, 'rows.tenancyStartDate.changeHidden')] },
+    value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
+    actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHidden')] },
   });
 }
 
@@ -144,19 +149,22 @@ function addPossessionNoticeReceivedRow({ rows, validatedCase, t, change }: RowC
   });
 }
 
-function addNoticeReceivedDateRow({ rows, validatedCase, responses, t, change }: RowContext): void {
-  if (!responses.noticeReceivedDate) {
+function addNoticeReceivedDateRow({ rows, validatedCase, responses, req, t, change }: RowContext): void {
+  // The notice-received date is optional and asked on one of the two notice-date pages.
+  // Render the row when the citizen is on either branch; "No answer provided" when blank.
+  if (!isNoticeDateConfirmedAndProvided(req) && !isNoticeDateConfirmedAndNotProvided(req)) {
     return;
   }
-  // Same field for both notice-date steps; discriminate on the claim's notice date
-  // (the same signal isNoticeDateProvided uses in flow.config) so the change link
-  // routes back to whichever step the user actually took.
+  // Same field for both notice-date steps; discriminate on the claim's notice date so the
+  // change link routes back to whichever step the user actually took.
   const editStep = validatedCase.noticeDate
     ? 'confirmation-of-notice-date-when-provided'
     : 'confirmation-of-notice-date-when-not-provided';
   rows.push({
     key: { text: t('rows.noticeReceivedDate.label', { claimantName: validatedCase.claimantName }) },
-    value: { text: formatIsoDate(responses.noticeReceivedDate) },
+    value: {
+      text: responses.noticeReceivedDate ? formatIsoDate(responses.noticeReceivedDate) : t('noAnswerProvided'),
+    },
     actions: { items: [change(editStep, 'rows.noticeReceivedDate.changeHidden')] },
   });
 }
@@ -165,13 +173,17 @@ function addRentArrearsRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   if (!responses.rentArrearsAmountConfirmation) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.rentArrearsAmountConfirmation.label') },
-    value: { text: yesNoNotSure(responses.rentArrearsAmountConfirmation) },
-    actions: { items: [change('rent-arrears-dispute', 'rows.rentArrearsAmountConfirmation.changeHidden')] },
-  });
+  const questionRow = pushYesNoRow(
+    rows,
+    'rows.rentArrearsAmountConfirmation',
+    responses.rentArrearsAmountConfirmation,
+    'rent-arrears-dispute',
+    t,
+    yesNoNotSure,
+    change
+  );
 
-  if (normalizeYesNoValue(responses.rentArrearsAmountConfirmation) === 'YES') {
+  if (normalizeYesNoValue(responses.rentArrearsAmountConfirmation) !== 'NO') {
     return;
   }
   // rentArrearsAmount is stored in pence.
@@ -179,22 +191,28 @@ function addRentArrearsRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   if (!disputedAmount) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.rentArrearsAmountDetails.label') },
     value: { text: `£${disputedAmount}` },
     actions: { items: [change('rent-arrears-dispute', 'rows.rentArrearsAmountDetails.changeHidden')] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addDisputeClaimRows({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.disputeClaim) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.disputeClaim.label') },
-    value: { text: yesNoNotSure(responses.disputeClaim) },
-    actions: { items: [change('non-rent-arrears-dispute', 'rows.disputeClaim.changeHidden')] },
-  });
+  const questionRow = pushYesNoRow(
+    rows,
+    'rows.disputeClaim',
+    responses.disputeClaim,
+    'non-rent-arrears-dispute',
+    t,
+    yesNoNotSure,
+    change
+  );
 
   if (normalizeYesNoValue(responses.disputeClaim) !== 'YES') {
     return;
@@ -203,22 +221,20 @@ function addDisputeClaimRows({ rows, responses, t, change, yesNoNotSure }: RowCo
   if (!details) {
     return;
   }
-  rows.push({
+  const detailRow: SummaryListRow = {
     key: { text: t('rows.disputeClaimDetails.label') },
     value: { html: escapeWithLineBreaks(details) },
     actions: { items: [change('non-rent-arrears-dispute', 'rows.disputeClaimDetails.changeHidden')] },
-  });
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addCounterClaimRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.makeCounterClaim) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.makeCounterClaim.label') },
-    value: { text: yesNoNotSure(responses.makeCounterClaim) },
-    actions: { items: [change('counter-claim', 'rows.makeCounterClaim.changeHidden')] },
-  });
+  pushYesNoRow(rows, 'rows.makeCounterClaim', responses.makeCounterClaim, 'counter-claim', t, yesNoNotSure, change);
 }
 
 function addCounterClaimDetailsRows(ctx: RowContext): void {
@@ -259,31 +275,39 @@ function addCounterClaimAmountRow({ rows, t, change, yesNoNotSure }: RowContext,
     return;
   }
   // Y/N row mirrors the step page's heading "Are you claiming for a specific sum of money?"
-  rows.push({
-    key: { text: t('rows.isClaimAmountKnown.label') },
-    value: { text: yesNoNotSure(cc.isClaimAmountKnown) },
-    actions: { items: [change('counter-claim-specific-sum', 'rows.isClaimAmountKnown.changeHidden')] },
-  });
+  const questionRow = pushYesNoRow(
+    rows,
+    'rows.isClaimAmountKnown',
+    cc.isClaimAmountKnown,
+    'counter-claim-specific-sum',
+    t,
+    yesNoNotSure,
+    change
+  );
 
   // Amount follow-up: matches the step page's sub-question per branch.
   const known = normalizeYesNoValue(cc.isClaimAmountKnown);
   if (known === 'YES' && cc.claimAmount !== undefined) {
     const pounds = penceToPounds(cc.claimAmount);
     if (pounds) {
-      rows.push({
+      const detailRow: SummaryListRow = {
         key: { text: t('rows.claimAmount.label') },
         value: { text: `£${pounds}` },
         actions: { items: [change('counter-claim-specific-sum', 'rows.claimAmount.changeHidden')] },
-      });
+      };
+      groupQuestionAndDetail(questionRow, detailRow);
+      rows.push(detailRow);
     }
   } else if (known === 'NO' && cc.estimatedMaxClaimAmount !== undefined) {
     const pounds = penceToPounds(cc.estimatedMaxClaimAmount);
     if (pounds) {
-      rows.push({
+      const detailRow: SummaryListRow = {
         key: { text: t('rows.estimatedMaxClaimAmount.label') },
         value: { text: `£${pounds}` },
         actions: { items: [change('counter-claim-specific-sum', 'rows.estimatedMaxClaimAmount.changeHidden')] },
-      });
+      };
+      groupQuestionAndDetail(questionRow, detailRow);
+      rows.push(detailRow);
     }
   }
 }

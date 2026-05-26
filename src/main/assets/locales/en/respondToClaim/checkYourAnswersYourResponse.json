@@ -20,7 +20,7 @@
       "changeHidden": "whether your landlord has sent you written terms of the occupation contract"
     },
     "tenancyTypeCorrect": {
-      "label": "Is the tenancy type on the claim correct?",
+      "label": "Is the tenancy, occupation contract or licence agreement type correct?",
       "changeHidden": "whether the tenancy type on the claim is correct"
     },
     "tenancyTypeDetails": {
@@ -32,15 +32,15 @@
       "changeHidden": "your tenancy start date"
     },
     "possessionNoticeReceived": {
-      "label": "Did you receive a possession notice?",
+      "label": "Did {{claimantName}} give you notice of their intention to begin possession proceedings?",
       "changeHidden": "whether you received a possession notice"
     },
     "noticeReceivedDate": {
-      "label": "When did you receive the notice?",
+      "label": "When did you receive notice from {{claimantName}}?",
       "changeHidden": "the date you received the notice"
     },
     "rentArrearsAmountConfirmation": {
-      "label": "Do you agree with the rent arrears amount?",
+      "label": "Do you owe this amount in rent arrears?",
       "changeHidden": "whether you agree with the rent arrears amount"
     },
     "rentArrearsAmountDetails": {
@@ -52,7 +52,7 @@
       "changeHidden": "whether you want to dispute any other parts of the claim"
     },
     "disputeClaimDetails": {
-      "label": "Why are you disputing this claim?",
+      "label": "Explain which parts of the claim you do not agree with",
       "changeHidden": "why you are disputing this claim"
     },
     "makeCounterClaim": {
@@ -60,7 +60,7 @@
       "changeHidden": "whether you want to make a counterclaim"
     },
     "counterClaimType": {
-      "label": "What are you counterclaiming for?",
+      "label": "What are you claiming for?",
       "changeHidden": "what you are counterclaiming for",
       "options": {
         "PAYMENT_OR_COMPENSATION": "A sum of money or compensation",
