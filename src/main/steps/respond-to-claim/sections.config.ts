@@ -125,23 +125,6 @@ export const respondToClaimSections: readonly SectionConfig[] = sectionDefs;
 
 export const CYA_STEP_PREFIX = 'check-your-answers-' as const;
 
-export const RESPOND_TO_CLAIM_SECTION_ENUMS = [
-  'START_NOW_AND_DETAILS',
-  'PERSONAL_DETAILS',
-  'DISPUTE_AND_TENANCY',
-  'PAYMENTS',
-  'SITUATION_AND_CIRCUMSTANCES',
-  'INCOME_AND_EXPENDITURE',
-  'UPLOAD_FILES',
-  'CHECK_YOUR_ANSWERS_AND_SUBMIT',
-] as const;
-
-export type RespondToClaimSectionEnum = (typeof RESPOND_TO_CLAIM_SECTION_ENUMS)[number];
-
-export function sectionIdToBackendEnum(id: RespondToClaimSectionId): RespondToClaimSectionEnum {
-  return id.replace(/([A-Z])/g, '_$1').toUpperCase() as RespondToClaimSectionEnum;
-}
-
 export function sectionHasCya(section: SectionConfig): boolean {
   return section.steps.some(stepName => stepName.startsWith(CYA_STEP_PREFIX));
 }
@@ -167,17 +150,4 @@ function buildStepToSectionIdMap(): Map<string, RespondToClaimSectionId> {
     }
   }
   return map;
-}
-
-assertEverySectionMapsToBackendEnum();
-
-function assertEverySectionMapsToBackendEnum(): void {
-  for (const section of sectionDefs) {
-    const enumValue = sectionIdToBackendEnum(section.id);
-    if (!RESPOND_TO_CLAIM_SECTION_ENUMS.includes(enumValue)) {
-      throw new Error(
-        `Section id "${section.id}" derives backend enum "${enumValue}" which is not in RESPOND_TO_CLAIM_SECTION_ENUMS`
-      );
-    }
-  }
 }

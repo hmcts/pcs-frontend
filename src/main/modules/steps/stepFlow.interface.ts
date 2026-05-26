@@ -44,7 +44,6 @@ export type SectionStatus = (typeof SECTION_STATUS)[keyof typeof SECTION_STATUS]
 
 export interface SectionConfig {
   id: string;
-  groupId?: string;
   titleKey: string;
   steps: readonly string[];
   isApplicable?: SectionApplicabilityCondition;
@@ -61,7 +60,4 @@ export interface JourneyFlowConfig {
   nonSectionStepOrder?: readonly string[];
   steps: Record<string, StepConfig>;
   sections?: readonly SectionConfig[];
-  // When set, the back-link from the first visible step of any section returns
-  // here instead of walking back into the previous section.
-  hubStepName?: string;
 }

@@ -212,10 +212,6 @@ async function getPreviousStepBySectionTraversal(req: Request, currentStepName: 
     }
   }
 
-  if (flowConfig.hubStepName && nonSectionSteps.includes(flowConfig.hubStepName)) {
-    return flowConfig.hubStepName;
-  }
-
   // Walk previous applicable sections in reverse.
   for (let i = sectionIndex - 1; i >= 0; i--) {
     const section = sections[i];

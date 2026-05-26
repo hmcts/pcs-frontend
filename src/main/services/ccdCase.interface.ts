@@ -1,5 +1,3 @@
-import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
-
 export enum CaseState {
   DRAFT = 'Draft',
   SUBMITTED = 'Submitted',
@@ -211,7 +209,6 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
-  completedSections?: RespondToClaimSectionEnum[];
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */

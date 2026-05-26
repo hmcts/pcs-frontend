@@ -559,41 +559,6 @@ describe('stepFlow', () => {
 
       await expect(getPreviousStep(mockReq, 'step-a2', flowConfig, {})).resolves.toBeNull();
     });
-
-    it('returns hubStepName for the first visible step of a section when hub-and-spoke is opted in', async () => {
-      const flowConfig: JourneyFlowConfig = {
-        useShowConditions: true,
-        sections: [
-          { id: 'a', titleKey: 'a', steps: ['step-a1', 'step-a2'] },
-          { id: 'b', titleKey: 'b', steps: ['step-b1', 'step-b2'] },
-        ],
-        nonSectionStepOrder: ['hub'],
-        hubStepName: 'hub',
-        steps: {},
-      };
-
-      // First step of section b → hub (not last step of section a).
-      await expect(getPreviousStep(mockReq, 'step-b1', flowConfig, {})).resolves.toBe('hub');
-      // First step of the very first section also → hub.
-      await expect(getPreviousStep(mockReq, 'step-a1', flowConfig, {})).resolves.toBe('hub');
-      // Mid-section back navigation unaffected.
-      await expect(getPreviousStep(mockReq, 'step-b2', flowConfig, {})).resolves.toBe('step-b1');
-    });
-
-    it('ignores hubStepName when the referenced step is not in nonSectionStepOrder', async () => {
-      const flowConfig: JourneyFlowConfig = {
-        useShowConditions: true,
-        sections: [
-          { id: 'a', titleKey: 'a', steps: ['step-a1'] },
-          { id: 'b', titleKey: 'b', steps: ['step-b1'] },
-        ],
-        hubStepName: 'missing-hub',
-        steps: {},
-      };
-
-      // Falls back to cross-section walk because the hub isn't registered.
-      await expect(getPreviousStep(mockReq, 'step-b1', flowConfig, {})).resolves.toBe('step-a1');
-    });
   });
 
   describe('getPreviousStep without show conditions', () => {
