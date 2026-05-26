@@ -115,31 +115,36 @@ function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowConte
     return;
   }
   const items: string[] = [];
-  const userSupplied = new Set<string>();
-
   if (isYes(contactByEmail)) {
-    const emailLabel = t('rows.contactByEmailOrPost.options.email');
-    const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress?.trim();
-    if (emailAddress) {
-      const item = `${emailLabel}: ${emailAddress}`;
-      items.push(item);
-      userSupplied.add(item);
-    } else {
-      items.push(emailLabel);
-    }
+    items.push(t('rows.contactByEmailOrPost.options.email'));
   }
   if (isYes(contactByPost)) {
     items.push(t('rows.contactByEmailOrPost.options.post'));
   }
 
-  rows.push({
+  const questionRow: SummaryListRow = {
     key: { text: t('rows.contactByEmailOrPost.label') },
-    value:
-      items.length === 0
-        ? { text: t('rows.contactByEmailOrPost.options.none') }
-        : multiSelectValue(items, userSupplied),
+    value: items.length === 0 ? { text: t('rows.contactByEmailOrPost.options.none') } : multiSelectValue(items),
     actions: { items: [change('contact-preferences-email-or-post', 'rows.contactByEmailOrPost.changeHidden')] },
-  });
+  };
+  rows.push(questionRow);
+
+  // When email is chosen and an address is present, surface it as its own grouped
+  // detail row — same shape as the contact-by-phone Q/number pair.
+  if (!isYes(contactByEmail)) {
+    return;
+  }
+  const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress?.trim();
+  if (!emailAddress) {
+    return;
+  }
+  const detailRow: SummaryListRow = {
+    key: { text: t('rows.contactByEmailAddress.label') },
+    value: { html: escapeHtml(emailAddress) },
+    actions: { items: [change('contact-preferences-email-or-post', 'rows.contactByEmailAddress.changeHidden')] },
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {

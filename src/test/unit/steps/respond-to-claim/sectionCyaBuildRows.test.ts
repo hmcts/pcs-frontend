@@ -83,6 +83,36 @@ describe('section-CYA row builders — characterisation', () => {
       expect(phoneRow?.key.classes).toBe('govuk-!-font-weight-regular');
     });
 
+    it('contact-by-email: question and revealed email-address detail read as one grouped answer', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { contactByEmail: 'YES' },
+            defendantContactDetails: { party: { emailAddress: 'alice@example.com' } },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const questionRow = rows.find(r => r.key.text === 'rows.contactByEmailOrPost.label');
+      const emailRow = rows.find(r => r.key.text === 'rows.contactByEmailAddress.label');
+      // No divider between the question and its revealed detail; detail key in regular weight.
+      expect(questionRow?.classes).toBe('govuk-summary-list__row--no-border');
+      expect(emailRow?.value).toEqual({ html: 'alice@example.com' });
+      expect(emailRow?.key.classes).toBe('govuk-!-font-weight-regular');
+    });
+
+    it('contact-by-email: post-only does not produce an email detail row', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: { defendantResponses: { contactByPost: 'YES' } },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      expect(rows.some(r => r.key.text === 'rows.contactByEmailAddress.label')).toBe(false);
+    });
+
     it('date-of-birth row: shows "No answer provided" when the optional DOB is left blank', () => {
       const row = buildPersonalRows(reqWith(model({})), t).find(r => r.key.text === 'rows.dateOfBirth.label');
       expect(row?.value).toEqual({ text: 'noAnswerProvided' });

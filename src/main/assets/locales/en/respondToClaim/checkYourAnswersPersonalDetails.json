@@ -28,6 +28,10 @@
         "none": "None"
       }
     },
+    "contactByEmailAddress": {
+      "label": "Email",
+      "changeHidden": "your email address"
+    },
     "contactByPhone": {
       "label": "Are you happy to be contacted by telephone?",
       "changeHidden": "whether you are happy to be contacted by telephone"
