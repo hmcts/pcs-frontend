@@ -1,0 +1,141 @@
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+import type { TFunction } from 'i18next';
+
+import { formatCcdAddress } from '../../utils/ccdAddress';
+import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+import {
+  RESPOND_TO_CLAIM_SECTION_GROUPS,
+  type RespondToClaimGroupId,
+  respondToClaimSections,
+} from '../sections.config';
+import { stepRegistry } from '../stepRegistry';
+
+import { createGetController, createStepNavigation, getTranslationFunction } from '@modules/steps';
+import type { SectionConfig, SectionStatus } from '@modules/steps/stepFlow.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { getDashboardUrl } from '@routes/dashboard';
+import type { CcdCaseModel } from '@services/ccdCaseData.model';
+import { getAllSectionStatuses, getFirstVisibleStep, getStatusTagClasses } from '@services/sectionStatus';
+import { getUserVariant } from '@steps';
+
+const stepName = 'task-list';
+const VIEW = 'respond-to-claim/task-list/taskList.njk';
+
+const stepNavigation = createStepNavigation(() => flowConfig);
+
+const redirectLegalrepToDashboard: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+  if (getUserVariant(req) === 'legalrep') {
+    return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/');
+  }
+  next();
+};
+
+interface TaskListItem {
+  title: { text: string };
+  href?: string;
+  status: { text?: string; tag?: { text: string; classes: string }; classes?: string };
+  hint?: { text: string };
+}
+
+interface TaskListGroup {
+  id: RespondToClaimGroupId;
+  number: number;
+  title: string;
+  items: TaskListItem[];
+}
+
+export const step: StepDefinition = {
+  url: `${RESPOND_TO_CLAIM_ROUTE}/${stepName}`,
+  name: stepName,
+  view: VIEW,
+  stepDir: __dirname,
+  middleware: [redirectLegalrepToDashboard],
+  getController: () =>
+    createGetController(VIEW, stepName, stepNavigation, async (req: Request) => {
+      const validatedCase = req.res?.locals.validatedCase;
+      const t: TFunction = getTranslationFunction(req);
+
+      const allStatuses = await getAllSectionStatuses(flowConfig, stepRegistry, req);
+      const groups = buildGroups(validatedCase, allStatuses, t, req);
+
+      const caseId = validatedCase?.id;
+      return {
+        backUrl: getDashboardUrl(caseId) ?? '/',
+        propertyAddress: formatCcdAddress(validatedCase?.propertyAddress),
+        caseNumber: formatCaseNumber(caseId),
+        groups,
+        iWantToLinks: [
+          {
+            key: 'iWantTo.makeApplication',
+            href: caseId ? `/case/${caseId}/make-an-application/choose-an-application` : '#',
+          },
+          {
+            key: 'iWantTo.breathingSpace',
+            href: 'https://www.gov.uk/options-for-dealing-with-your-debts/breathing-space',
+          },
+          { key: 'iWantTo.legalAdviser', href: 'https://www.gov.uk/find-legal-advice' },
+        ],
+        helpSupportLinks: [
+          { key: 'helpSupport.fees', href: 'https://www.gov.uk/get-help-with-court-fees' },
+          { key: 'helpSupport.mediation', href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation' },
+          {
+            key: 'helpSupport.hearing',
+            href: 'https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal',
+          },
+          { key: 'helpSupport.representYourself', href: 'https://www.gov.uk/represent-yourself-in-court' },
+          { key: 'helpSupport.findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
+          { key: 'helpSupport.findCourt', href: 'https://www.gov.uk/find-court-tribunal' },
+        ],
+      };
+    }),
+};
+
+function buildGroups(
+  validatedCase: CcdCaseModel | undefined,
+  allStatuses: Map<string, SectionStatus>,
+  t: TFunction,
+  req: Request
+): TaskListGroup[] {
+  const caseRef = validatedCase?.id ?? '';
+  return RESPOND_TO_CLAIM_SECTION_GROUPS.map((group, index) => {
+    const sectionsInGroup = respondToClaimSections.filter(s => s.groupId === group.id);
+    const items = sectionsInGroup
+      .filter(section => allStatuses.get(section.id) !== 'NOT_APPLICABLE')
+      .map(section => buildItem(section, allStatuses.get(section.id) ?? 'AVAILABLE', caseRef, t, req));
+    return {
+      id: group.id,
+      number: index + 1,
+      title: t(group.titleKey),
+      items,
+    };
+  });
+}
+
+function buildItem(
+  section: SectionConfig,
+  status: SectionStatus,
+  caseRef: string,
+  t: TFunction,
+  req: Request
+): TaskListItem {
+  const title = { text: t(section.titleKey) };
+  const statusText = t(`taskList.status.${status}`);
+
+  // Locked sections render the same tag as the rest, but without a link target.
+  const firstStep = status === 'NOT_AVAILABLE_YET' ? undefined : getFirstVisibleStep(section, flowConfig, req);
+  const href = firstStep ? `/case/${caseRef}/respond-to-claim/${firstStep}` : undefined;
+
+  return {
+    title,
+    href,
+    status: { tag: { text: statusText, classes: getStatusTagClasses(status) ?? '' } },
+  };
+}
+
+// 4-digit groups, e.g. 1234567890123456 -> "1234 5678 9012 3456".
+function formatCaseNumber(caseId: string | undefined): string {
+  if (!caseId) {
+    return '';
+  }
+  return caseId.replace(/(\d{4})(?=\d)/g, '$1 ');
+}

@@ -2,10 +2,12 @@ import type { Request } from 'express';
 
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import {
+  RESPOND_TO_CLAIM_SECTION_ENUMS,
   RESPOND_TO_CLAIM_SECTION_IDS,
   findSectionIdForStep,
   respondToClaimSections,
   sectionHasCya,
+  sectionIdToBackendEnum,
 } from '../../../../main/steps/respond-to-claim/sections.config';
 import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegistry';
 import { getSectionCoverage, getSectionForStep } from '../../../../main/steps/utils/sections';
@@ -92,7 +94,29 @@ describe('respond-to-claim sections config', () => {
     await expect(findSection('payments')?.isApplicable?.(req)).resolves.toBe(false);
   });
 
-  describe('section helpers', () => {
+  describe('completedSections helpers', () => {
+    it('sectionIdToBackendEnum derives the correct pcs-api enum value for every section id', () => {
+      const expected: Record<string, string> = {
+        startNowAndDetails: 'START_NOW_AND_DETAILS',
+        personalDetails: 'PERSONAL_DETAILS',
+        disputeAndTenancy: 'DISPUTE_AND_TENANCY',
+        payments: 'PAYMENTS',
+        situationAndCircumstances: 'SITUATION_AND_CIRCUMSTANCES',
+        incomeAndExpenditure: 'INCOME_AND_EXPENDITURE',
+        uploadFiles: 'UPLOAD_FILES',
+        checkYourAnswersAndSubmit: 'CHECK_YOUR_ANSWERS_AND_SUBMIT',
+      };
+      for (const id of RESPOND_TO_CLAIM_SECTION_IDS) {
+        expect(sectionIdToBackendEnum(id)).toBe(expected[id]);
+      }
+    });
+
+    it('every derived backend enum value is in RESPOND_TO_CLAIM_SECTION_ENUMS (FE↔BE bond)', () => {
+      for (const id of RESPOND_TO_CLAIM_SECTION_IDS) {
+        expect(RESPOND_TO_CLAIM_SECTION_ENUMS).toContain(sectionIdToBackendEnum(id));
+      }
+    });
+
     it('findSectionIdForStep returns the owning section id for a known step', () => {
       expect(findSectionIdForStep('defendant-name-confirmation')).toBe('personalDetails');
       expect(findSectionIdForStep('check-your-answers-personal-details')).toBe('personalDetails');

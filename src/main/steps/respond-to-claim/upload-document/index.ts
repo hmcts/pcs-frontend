@@ -45,7 +45,8 @@ const storage: DocumentStorage = {
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'upload-document',
-  // Upload is optional — no isAnswered gate.
+  // No isAnswered — upload is optional. The uploadFiles section reaches Done
+  // purely via CYA Save and continue (gated on completedSections in the status engine).
   documentStorage: storage,
   stepDir: __dirname,
   customTemplate: `${__dirname}/uploadDocument.njk`,
