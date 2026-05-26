@@ -37,7 +37,7 @@ describe('section-CYA row builders — characterisation', () => {
       const rows = buildStartNowRows(reqWith(model({ freeLegalAdvice: 'YES' })), t);
       expect(rows).toHaveLength(1);
       expect(rows[0].key.text).toBe('rows.freeLegalAdvice.label');
-      expect(rows[0].actions.items[0].href).toBe(
+      expect(rows[0].actions?.items[0].href).toBe(
         '/case/1234123412341234/respond-to-claim/free-legal-advice?edit=startNowAndDetails'
       );
     });
@@ -64,7 +64,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(keys).toContain('rows.contactByPhone.label');
     });
 
-    it('contact-by-phone: question and revealed phone-number detail read as one grouped answer', () => {
+    it('contact-by-phone: preference row stands alone; phone number lives in the Contact details row', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -76,14 +76,18 @@ describe('section-CYA row builders — characterisation', () => {
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
       const questionRow = rows.find(r => r.key.text === 'rows.contactByPhone.label');
-      const phoneRow = rows.find(r => r.key.text === 'rows.contactByPhoneNumber.label');
-      // No divider between the question and its revealed detail; detail key in regular weight.
-      expect(questionRow?.classes).toBe('govuk-summary-list__row--no-border');
-      expect(phoneRow?.value).toEqual({ html: '07123456789' });
-      expect(phoneRow?.key.classes).toBe('govuk-!-font-weight-regular');
+      const contactDetailsRow = rows.find(r => r.key.text === 'rows.contactDetails.label');
+      // Preference row no longer groups a detail row underneath it.
+      expect(questionRow?.classes).toBeUndefined();
+      expect(contactDetailsRow?.value.html).toContain('<p class="govuk-body">07123456789</p>');
+      // Phone-only: Change link targets the telephone step.
+      expect(contactDetailsRow?.actions?.items[0].href).toContain(
+        '/contact-preferences-telephone?edit=personalDetails'
+      );
+      expect(contactDetailsRow?.actions?.items[0].visuallyHiddenText).toBe('rows.contactDetails.changeHidden');
     });
 
-    it('contact-by-email: question and revealed email-address detail read as one grouped answer', () => {
+    it('contact-by-email: preference row stands alone; email lives in the Contact details row', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -95,14 +99,30 @@ describe('section-CYA row builders — characterisation', () => {
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
       const questionRow = rows.find(r => r.key.text === 'rows.contactByEmailOrPost.label');
-      const emailRow = rows.find(r => r.key.text === 'rows.contactByEmailAddress.label');
-      // No divider between the question and its revealed detail; detail key in regular weight.
-      expect(questionRow?.classes).toBe('govuk-summary-list__row--no-border');
-      expect(emailRow?.value).toEqual({ html: 'alice@example.com' });
-      expect(emailRow?.key.classes).toBe('govuk-!-font-weight-regular');
+      const contactDetailsRow = rows.find(r => r.key.text === 'rows.contactDetails.label');
+      expect(questionRow?.classes).toBeUndefined();
+      expect(contactDetailsRow?.value.html).toContain('<p class="govuk-body">alice@example.com</p>');
+      // Email present: Change link targets the email-or-post step.
+      expect(contactDetailsRow?.actions?.items[0].href).toContain(
+        '/contact-preferences-email-or-post?edit=personalDetails'
+      );
     });
 
-    it('contact-by-email: post-only does not produce an email detail row', () => {
+    it('contact details row: stacks phone and email as separate paragraphs when both are selected', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { contactByPhone: 'YES', contactByEmail: 'YES' },
+            defendantContactDetails: { party: { phoneNumber: '07123456789', emailAddress: 'alice@example.com' } },
+          },
+        },
+      });
+      const row = buildPersonalRows(reqWith(validatedCase), t).find(r => r.key.text === 'rows.contactDetails.label');
+      expect(row?.value.html).toBe('<p class="govuk-body">07123456789</p><p class="govuk-body">alice@example.com</p>');
+    });
+
+    it('contact details row: omitted when only post is selected (no phone/email values)', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -110,7 +130,7 @@ describe('section-CYA row builders — characterisation', () => {
         },
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
-      expect(rows.some(r => r.key.text === 'rows.contactByEmailAddress.label')).toBe(false);
+      expect(rows.some(r => r.key.text === 'rows.contactDetails.label')).toBe(false);
     });
 
     it('date-of-birth row: shows "No answer provided" when the optional DOB is left blank', () => {
@@ -260,13 +280,13 @@ describe('section-CYA row builders — characterisation', () => {
         t
       );
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
-      expect(row?.actions.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
+      expect(row?.actions?.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
     });
 
     it('tenancy-date row: "unknown" branch links to tenancy-date-unknown', () => {
       const rows = buildDisputeRows(reqWith(model({ tenancyStartDate: '2023-01-01' })), t);
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
-      expect(row?.actions.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
+      expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
     });
 
     it('tenancy-date row: shows the confirmation answer when no date entered', () => {
@@ -284,7 +304,7 @@ describe('section-CYA row builders — characterisation', () => {
         t
       );
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
-      expect(row?.actions.items[0].href).toContain('confirmation-of-notice-date-when-not-provided');
+      expect(row?.actions?.items[0].href).toContain('confirmation-of-notice-date-when-not-provided');
     });
 
     it('notice-date row: links to "provided" step when the claim has a notice date', () => {
@@ -298,21 +318,21 @@ describe('section-CYA row builders — characterisation', () => {
         t
       );
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
-      expect(row?.actions.items[0].href).toContain('confirmation-of-notice-date-when-provided');
+      expect(row?.actions?.items[0].href).toContain('confirmation-of-notice-date-when-provided');
     });
 
     it('tenancy-date row: "unknown" branch shows "No answer provided" when the optional date is blank', () => {
       const rows = buildDisputeRows(reqWith(model({})), t);
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
       expect(row?.value).toEqual({ text: 'noAnswerProvided' });
-      expect(row?.actions.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
+      expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
     });
 
     it('notice-date row: "not-provided" branch shows "No answer provided" when the optional date is blank', () => {
       const rows = buildDisputeRows(reqWith(model({ possessionNoticeReceived: 'YES' })), t);
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
       expect(row?.value).toEqual({ text: 'noAnswerProvided' });
-      expect(row?.actions.items[0].href).toContain('confirmation-of-notice-date-when-not-provided');
+      expect(row?.actions?.items[0].href).toContain('confirmation-of-notice-date-when-not-provided');
     });
 
     it('notice-date row: "provided" branch shows "No answer provided" when the optional date is blank', () => {
@@ -322,7 +342,7 @@ describe('section-CYA row builders — characterisation', () => {
       );
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
       expect(row?.value).toEqual({ text: 'noAnswerProvided' });
-      expect(row?.actions.items[0].href).toContain('confirmation-of-notice-date-when-provided');
+      expect(row?.actions?.items[0].href).toContain('confirmation-of-notice-date-when-provided');
     });
 
     it('notice-date row: omitted when the citizen is not on a notice-date branch', () => {

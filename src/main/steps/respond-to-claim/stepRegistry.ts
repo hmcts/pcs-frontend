@@ -130,3 +130,5 @@ export const stepRegistry = {
   'language-used': languageUsed,
   'check-your-answers': checkYourAnswers,
 } satisfies Record<string, StepDefinition>;
+
+export type RespondToClaimStepName = keyof typeof stepRegistry;

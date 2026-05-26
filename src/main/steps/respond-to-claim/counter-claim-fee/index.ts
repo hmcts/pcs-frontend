@@ -7,6 +7,7 @@ import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-fee',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.counterClaim?.needHelpWithFees),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimFee.njk`,
   translationKeys: {
@@ -35,7 +36,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const counterClaimNeedHelpWithFees: YesNoValue | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.counterClaim?.needHelpWithFees;
 
@@ -55,8 +56,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async req => {
-    const counterClaim =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+    const counterClaim = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
     const claimAmountInPence =
       counterClaim?.isClaimAmountKnown === 'YES'
         ? counterClaim?.claimAmount

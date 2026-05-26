@@ -13,7 +13,7 @@ import {
 } from '../utils';
 
 export function isNoticeDateConfirmedAndProvided(req: Request): boolean {
-  if (req.res?.locals?.validatedCase?.defendantResponsesPossessionNoticeReceived !== 'yes') {
+  if (req.res?.locals.validatedCase?.defendantResponsesPossessionNoticeReceived !== 'yes') {
     return false;
   }
 
@@ -21,7 +21,7 @@ export function isNoticeDateConfirmedAndProvided(req: Request): boolean {
 }
 
 export function isNoticeDateConfirmedAndNotProvided(req: Request): boolean {
-  if (req.res?.locals?.validatedCase?.defendantResponsesPossessionNoticeReceived !== 'yes') {
+  if (req.res?.locals.validatedCase?.defendantResponsesPossessionNoticeReceived !== 'yes') {
     return false;
   }
 
@@ -30,7 +30,7 @@ export function isNoticeDateConfirmedAndNotProvided(req: Request): boolean {
 
 export function hasRejectedRepaymentAgreement(req: Request): boolean {
   const ccdAnswer =
-    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
+    req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
       ?.repaymentPlanAgreed;
   return normalizeYesNoValue(ccdAnswer) === 'NO';
 }
@@ -40,7 +40,7 @@ export function hasConfirmedInstallmentOffer(req: Request): boolean {
     return true;
   }
 
-  const possessionClaimResponse = req.res?.locals?.validatedCase?.data?.possessionClaimResponse as
+  const possessionClaimResponse = req.res?.locals.validatedCase?.data?.possessionClaimResponse as
     | {
         defendantResponses?: { paymentAgreement?: { repayArrearsInstalments?: string } };
         paymentAgreement?: { repayArrearsInstalments?: string };
@@ -77,7 +77,7 @@ export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
 }
 
 function getCounterClaimNeedHelpWithFees(req: Request) {
-  return req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim
+  return req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim
     ?.needHelpWithFees;
 }
 

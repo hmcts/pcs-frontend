@@ -38,7 +38,8 @@ export function createSectionCyaStep({
   stepDir,
   buildRows,
 }: SectionCyaStepConfig): StepDefinition {
-  const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
+  const resolveFlow = (req: Request) => getFlowConfigForJourney(journeyName, req) || flowConfig;
+  const stepNavigation = createStepNavigation(resolveFlow);
 
   return {
     url: `${RESPOND_TO_CLAIM_ROUTE}/${stepName}`,
@@ -62,13 +63,13 @@ export function createSectionCyaStep({
     postController: {
       post: async (req: Request, res: Response) => {
         const action = req.body?.action;
+        const isSaveForLater = action === 'saveForLater';
+        const caseId = req.res?.locals.validatedCase?.id;
 
-        if (action === 'saveForLater') {
-          const caseId = req.res?.locals.validatedCase?.id;
+        if (isSaveForLater) {
           const dashboardUrl = getDashboardUrl(caseId);
           return res.redirect(303, dashboardUrl ?? '/');
         }
-
         const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
         if (!redirectPath) {
           return res.status(404).render('not-found');

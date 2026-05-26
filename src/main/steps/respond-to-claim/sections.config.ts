@@ -3,6 +3,8 @@ import type { Request } from 'express';
 import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 import { hasAnyRentArrearsGround } from '../utils';
 
+import type { RespondToClaimStepName } from './stepRegistry';
+
 const sectionDefs = [
   {
     id: 'startNowAndDetails',
@@ -108,13 +110,44 @@ const sectionDefs = [
       'check-your-answers',
     ],
   },
-] as const;
+] as const satisfies readonly {
+  id: string;
+  titleKey: string;
+  steps: readonly RespondToClaimStepName[];
+  isApplicable?: (req: Request) => Promise<boolean>;
+}[];
 
 export type RespondToClaimSectionId = (typeof sectionDefs)[number]['id'];
 
 export const RESPOND_TO_CLAIM_SECTION_IDS: readonly RespondToClaimSectionId[] = sectionDefs.map(s => s.id);
 
-export const respondToClaimSections: SectionConfig[] = sectionDefs.map(s => ({
-  ...s,
-  steps: [...s.steps],
-}));
+export const respondToClaimSections: readonly SectionConfig[] = sectionDefs;
+
+export const CYA_STEP_PREFIX = 'check-your-answers-' as const;
+
+export function sectionHasCya(section: SectionConfig): boolean {
+  return section.steps.some(stepName => stepName.startsWith(CYA_STEP_PREFIX));
+}
+
+const stepToSectionId = buildStepToSectionIdMap();
+
+export const sectionById: ReadonlyMap<RespondToClaimSectionId, SectionConfig> = new Map(
+  sectionDefs.map(section => [section.id, section as unknown as SectionConfig])
+);
+
+export function findSectionIdForStep(stepName: string): RespondToClaimSectionId | undefined {
+  return stepToSectionId.get(stepName);
+}
+
+function buildStepToSectionIdMap(): Map<string, RespondToClaimSectionId> {
+  const map = new Map<string, RespondToClaimSectionId>();
+  for (const section of sectionDefs) {
+    for (const stepName of section.steps) {
+      if (map.has(stepName)) {
+        throw new Error(`Step "${stepName}" appears in more than one respond-to-claim section`);
+      }
+      map.set(stepName, section.id);
+    }
+  }
+  return map;
+}

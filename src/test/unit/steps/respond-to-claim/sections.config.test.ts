@@ -3,7 +3,9 @@ import type { Request } from 'express';
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import {
   RESPOND_TO_CLAIM_SECTION_IDS,
+  findSectionIdForStep,
   respondToClaimSections,
+  sectionHasCya,
 } from '../../../../main/steps/respond-to-claim/sections.config';
 import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegistry';
 import { getSectionCoverage, getSectionForStep } from '../../../../main/steps/utils/sections';
@@ -88,6 +90,33 @@ describe('respond-to-claim sections config', () => {
     } as unknown as Request;
 
     await expect(findSection('payments')?.isApplicable?.(req)).resolves.toBe(false);
+  });
+
+  describe('section helpers', () => {
+    it('findSectionIdForStep returns the owning section id for a known step', () => {
+      expect(findSectionIdForStep('defendant-name-confirmation')).toBe('personalDetails');
+      expect(findSectionIdForStep('check-your-answers-personal-details')).toBe('personalDetails');
+      expect(findSectionIdForStep('upload-document')).toBe('uploadFiles');
+    });
+
+    it('findSectionIdForStep returns undefined for steps not in any section', () => {
+      expect(findSectionIdForStep('task-list')).toBeUndefined();
+      expect(findSectionIdForStep('end-now')).toBeUndefined();
+      expect(findSectionIdForStep('totally-fictional-step')).toBeUndefined();
+    });
+
+    it('sectionHasCya is true for sections with a check-your-answers-* step', () => {
+      const personalDetails = findSection('personalDetails')!;
+      expect(sectionHasCya(personalDetails)).toBe(true);
+
+      const uploadFiles = findSection('uploadFiles')!;
+      expect(sectionHasCya(uploadFiles)).toBe(true);
+    });
+
+    it('sectionHasCya is false for checkYourAnswersAndSubmit (no per-section CYA)', () => {
+      const finalSection = findSection('checkYourAnswersAndSubmit')!;
+      expect(sectionHasCya(finalSection)).toBe(false);
+    });
   });
 
   describe('section coherence — no cross-section navigation references', () => {

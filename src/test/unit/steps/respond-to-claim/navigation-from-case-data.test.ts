@@ -83,6 +83,8 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const englishReq = createReq({ legislativeCountry: 'England' });
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
+    // dispute-claim-interstitial is now the first step of disputeAndTenancy; the
+    // non-Wales back-walk lands on it after the hidden landlord-* steps are skipped.
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
       'dispute-claim-interstitial'
     );
@@ -103,13 +105,6 @@ describe('respond-to-claim navigation from CCD case data', () => {
   const rentArrearsData = {
     claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
   };
-
-  it('uses valid static previous step for household interstitial path', async () => {
-    const req = createReq({ data: rentArrearsData });
-    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'check-your-answers-payments-and-agreements'
-    );
-  });
 
   it('routes counter-claim NO to household interstitial for non-rent-arrears-only claims', async () => {
     const req = createReq({

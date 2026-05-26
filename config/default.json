@@ -127,5 +127,16 @@
   "documentUpload": {
     "maxFileSizePerFileMB": 100,
     "maxTotalFileSizeMB": 1024
+  },
+  "dashboard": {
+    "taskRoutes": {
+      "ViewClaim": "/case/:caseReference/view-the-claim",
+      "RespondToClaim": "/case/:caseReference/respond-to-claim/task-list",
+      "MakeGeneralApplication": "/case/:caseReference/make-an-application/choose-an-application",
+      "ViewAllApplications": "/case/:caseReference/view-all-applications",
+      "ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
+      "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
+      "ViewDocuments": "/case/:caseReference/view-documents"
+    }
   }
 }
