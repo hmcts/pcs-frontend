@@ -68,6 +68,18 @@ export function shouldShowUniversalCreditStep(req: Request): boolean {
   return !isUniversalCreditSelected(req) && !hasSelectedUniversalCredit(req);
 }
 
+export function hasAppliedForCounterClaimHwf(req: Request): boolean {
+  const caseData = req.res?.locals?.validatedCase?.data;
+  const counterClaim = caseData?.possessionClaimResponse?.defendantResponses?.counterClaim;
+  return counterClaim?.appliedForHwf === 'YES';
+}
+
+export function hasNotAppliedForCounterClaimHwf(req: Request): boolean {
+  const caseData = req.res?.locals?.validatedCase?.data;
+  const counterClaim = caseData?.possessionClaimResponse?.defendantResponses?.counterClaim;
+  return counterClaim?.appliedForHwf === 'NO';
+}
+
 export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
   if (!hasProvidedFinanceDetails(req)) {
     return false;
@@ -85,10 +97,16 @@ export function shouldShowCounterClaimHelpWithFeesStep(req: Request): boolean {
   return getCounterClaimNeedHelpWithFees(req) === 'YES';
 }
 
+export function shouldShowCounterClaimNeedToApplyStep(req: Request): boolean {
+  return shouldShowCounterClaimHelpWithFeesStep(req) && hasNotAppliedForCounterClaimHwf(req);
+}
+
 export function shouldShowCounterClaimAgainstWhoStep(req: Request): boolean {
-  return getCounterClaimNeedHelpWithFees(req) === 'NO' && hasMultipleParties(req);
+  return (
+    hasMultipleParties(req) && (getCounterClaimNeedHelpWithFees(req) === 'NO' || hasAppliedForCounterClaimHwf(req))
+  );
 }
 
 export function shouldShowCounterClaimAboutStep(req: Request): boolean {
-  return getCounterClaimNeedHelpWithFees(req) === 'NO';
+  return hasAppliedForCounterClaimHwf(req) || getCounterClaimNeedHelpWithFees(req) === 'NO';
 }
