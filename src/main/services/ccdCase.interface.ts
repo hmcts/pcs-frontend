@@ -232,9 +232,27 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
-  statementOfTruthAccepted?: YesNoValue;
-  statementOfTruthFullName?: string;
+  statementOfTruth?: StatementOfTruth;
   completedSections?: RespondToClaimSectionEnum[];
+}
+
+export interface StatementOfTruth {
+  accepted?: YesNoValue;
+  fullName?: string;
+}
+
+/** Counter-claim data captured across the counterclaim journey screens. */
+export interface CcdCounterClaim {
+  needHelpWithFees?: YesNoValue;
+  claimType?: string;
+  isClaimAmountKnown?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
+  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
+  counterClaimFor?: string;
+  counterClaimReasons?: string;
+  otherOrderRequestDetails?: string;
+  otherOrderRequestFacts?: string;
 }
 
 export interface PossessionClaimResponse {

@@ -51,9 +51,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: (req: Request) => {
-    const responses = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses;
-    const accepted = responses?.statementOfTruthAccepted === 'YES';
-    const fullName = responses?.statementOfTruthFullName;
+    const sot = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.statementOfTruth;
+    const accepted = sot?.accepted === 'YES';
+    const fullName = sot?.fullName;
     return {
       ...(accepted ? { statementOfTruthContempt: ['yes'], statementOfTruthBelief: ['yes'] } : {}),
       ...(fullName ? { fullName } : {}),
@@ -79,8 +79,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const contempt = req.body?.statementOfTruthContempt as string[] | undefined;
     const belief = req.body?.statementOfTruthBelief as string[] | undefined;
     const bothAccepted = contempt?.includes('yes') && belief?.includes('yes');
-    draft.defendantResponses.statementOfTruthAccepted = bothAccepted ? 'YES' : 'NO';
-    draft.defendantResponses.statementOfTruthFullName = (req.body?.fullName as string | undefined)?.trim();
+    draft.defendantResponses.statementOfTruth = {
+      accepted: bothAccepted ? 'YES' : 'NO',
+      fullName: (req.body?.fullName as string | undefined)?.trim(),
+    };
 
     const enumValue = sectionIdToBackendEnum('checkYourAnswersAndSubmit');
     const current = draft.defendantResponses.completedSections ?? [];
