@@ -245,6 +245,7 @@ function addCounterClaimDetailsRows(ctx: RowContext): void {
   addCounterClaimTypeRow(ctx, cc);
   addCounterClaimAmountRow(ctx, cc);
   addCounterClaimNeedHelpWithFeesRow(ctx, cc);
+  addCounterClaimAppliedForHwfRow(ctx, cc);
 }
 
 function addCounterClaimNeedHelpWithFeesRow({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
@@ -256,6 +257,40 @@ function addCounterClaimNeedHelpWithFeesRow({ rows, t, change }: RowContext, cc:
     value: { text: t(`rows.counterClaimNeedHelpWithFees.options.${cc.needHelpWithFees}`) },
     actions: { items: [change('counter-claim-fee', 'rows.counterClaimNeedHelpWithFees.changeHidden')] },
   });
+}
+
+function addCounterClaimAppliedForHwfRow({ rows, t, change, yesNoNotSure }: RowContext, cc: CcdCounterClaim): void {
+  if (!cc.appliedForHwf) {
+    return;
+  }
+  // Y/N row mirrors the step page's "Have you already applied for help with your counterclaim fee?".
+  const questionRow = pushYesNoRow(
+    rows,
+    'rows.counterClaimAppliedForHwf',
+    cc.appliedForHwf,
+    'counter-claim-have-you-applied-for-help',
+    t,
+    yesNoNotSure,
+    change
+  );
+
+  // HWF reference is captured only when the citizen has already applied.
+  if (normalizeYesNoValue(cc.appliedForHwf) !== 'YES') {
+    return;
+  }
+  const reference = cc.hwfReferenceNumber?.trim();
+  if (!reference) {
+    return;
+  }
+  const detailRow: SummaryListRow = {
+    key: { text: t('rows.counterClaimHwfReference.label') },
+    value: { text: reference },
+    actions: {
+      items: [change('counter-claim-have-you-applied-for-help', 'rows.counterClaimHwfReference.changeHidden')],
+    },
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addCounterClaimTypeRow({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
