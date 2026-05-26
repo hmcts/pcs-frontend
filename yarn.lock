@@ -8850,17 +8850,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-fs-backend@npm:2.6.5":
-  version: 2.6.5
-  resolution: "i18next-fs-backend@npm:2.6.5"
-  checksum: 10/4f38212d9b53f60f57fb87055c7badf811ec749aea7643da8648b30195247bbebc178ccd4c14553804e410b19c016caf9b688083650c90fe99eef5b61180bbc0
+"i18next-fs-backend@npm:2.6.6":
+  version: 2.6.6
+  resolution: "i18next-fs-backend@npm:2.6.6"
+  checksum: 10/1be64a7fb945692c2d6700c2739f92ecc2fe2d32e3047e98bb21a6b2531ed162e0cc0b13ad996b64e0db50d9e828f3de8b2684e730b212ba04d85a00f19c10c5
   languageName: node
   linkType: hard
 
-"i18next-http-middleware@npm:3.9.6":
-  version: 3.9.6
-  resolution: "i18next-http-middleware@npm:3.9.6"
-  checksum: 10/98fac01c9afdf0281fbdb6f33f57a4ac6409435d38fcb3557aa07813a65ae38de2b5adb8db5a3a3152eb86062db8f85a682ae7041d78573e5f59648aee472e07
+"i18next-http-middleware@npm:3.9.7":
+  version: 3.9.7
+  resolution: "i18next-http-middleware@npm:3.9.7"
+  checksum: 10/b698193d196a136d75565d5fef4842b532fdfafd13d42733674604c7ebf89fae31309196654456aa369c5d00708c00229c41c0ae82ccb1be7a52cabfd5ef2d1d
   languageName: node
   linkType: hard
 
@@ -11846,8 +11846,8 @@ __metadata:
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
     i18next: "npm:26.2.0"
-    i18next-fs-backend: "npm:2.6.5"
-    i18next-http-middleware: "npm:3.9.6"
+    i18next-fs-backend: "npm:2.6.6"
+    i18next-http-middleware: "npm:3.9.7"
     ioredis: "npm:5.10.1"
     jest: "npm:30.4.2"
     jest-environment-jsdom: "npm:30.4.1"
@@ -11876,7 +11876,7 @@ __metadata:
     stylelint-config-standard: "npm:40.0.0"
     stylelint-config-standard-scss: "npm:17.0.0"
     totp-generator: "npm:1.0.0"
-    ts-jest: "npm:29.4.10"
+    ts-jest: "npm:29.4.11"
     ts-loader: "npm:9.5.7"
     ts-node: "npm:10.9.2"
     tsconfig-paths: "npm:4.2.0"
@@ -12307,11 +12307,11 @@ __metadata:
   linkType: hard
 
 "protobufjs@npm:^8.0.0":
-  version: 8.4.0
-  resolution: "protobufjs@npm:8.4.0"
+  version: 8.4.2
+  resolution: "protobufjs@npm:8.4.2"
   dependencies:
     long: "npm:^5.3.2"
-  checksum: 10/eeaeee9a7ab97105cb2dc74033cddbf52059745e630a556d39c0812f87f87c2cbdb6f5c7f5bea4e28cbad6bfb33464322998836344e6ca20de63a51eaf0f45ea
+  checksum: 10/478b80c8619904e23510fb89a05636ae9379f5b5ea374601542f57fac9ba064c0cfc75f81460d9818c6a98b45f77bae6371de246a907bc61a8b7e82f23b892fd
   languageName: node
   linkType: hard
 
@@ -12968,11 +12968,11 @@ __metadata:
   linkType: hard
 
 "semver@npm:^7.5.2":
-  version: 7.8.0
-  resolution: "semver@npm:7.8.0"
+  version: 7.8.1
+  resolution: "semver@npm:7.8.1"
   bin:
     semver: bin/semver.js
-  checksum: 10/039a8f68a581c03c1ac17c990316da57a79a93af9b109b712739c50cd4d464079f7e3fee31c008b472e390c7ba48a11ed2b86e91d8602bf06059d4a266db1426
+  checksum: 10/3244f6c4cb3f8126fea0426d353829ed4967e41e1f4696337c6fdcad87426466fe2badaf49d7dc85849acfc496ea0599432a4aecc33802d2d774e723acfa30e6
   languageName: node
   linkType: hard
 
@@ -14142,9 +14142,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:29.4.10":
-  version: 29.4.10
-  resolution: "ts-jest@npm:29.4.10"
+"ts-jest@npm:29.4.11":
+  version: 29.4.11
+  resolution: "ts-jest@npm:29.4.11"
   dependencies:
     bs-logger: "npm:^0.2.6"
     fast-json-stable-stringify: "npm:^2.1.0"
@@ -14178,7 +14178,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: 10/babc9836b9e33bc00cb4e7e0800fe44e1fbe0c54739384aa0a112516f38a6991afa5d545d2a43eff1643fd3641134921d4391a2144195cb7167fa204d21c804f
+  checksum: 10/8a76800cac1c102c789429a82655adde1d540d7ff025fc888006f4f458afe07ca4d3f73622a10a604edea06aa12c298605cd1a208a6380c0e3d591a3daed8af6
   languageName: node
   linkType: hard
 
