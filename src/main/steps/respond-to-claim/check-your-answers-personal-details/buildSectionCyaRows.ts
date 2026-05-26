@@ -3,51 +3,27 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { formatIsoDate, normalizeYesNoValue } from '../../utils';
-import { formatCcdAddress } from '../../utils/ccdAddress';
-import { type SummaryListRow, getValidatedCase, isYes, makeChange, makeYesNoNotSure } from '../section-cya/cyaRow';
+import { formatCcdAddressLines } from '../../utils/ccdAddress';
+import {
+  type BaseRowContext,
+  type SummaryListRow,
+  createRowContext,
+  groupQuestionAndDetail,
+  isYes,
+  multiSelectValue,
+  pushYesNoRow,
+} from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
-
-import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
 const SECTION_ID: RespondToClaimSectionId = 'personalDetails';
 
-interface RowContext {
-  rows: SummaryListRow[];
-  validatedCase: CcdCaseModel;
-  t: TFunction;
-  change: ReturnType<typeof makeChange>;
-  yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
-}
-
-// GDS multi-select pattern: a single value renders as text; many values render as a
-// govuk-list. Items in `userSuppliedItems` are HTML-escaped (the rest are translation
-// strings that are safe to render verbatim).
-function multiSelectValue(items: string[], userSuppliedItems: Set<string> = new Set()): SummaryListRow['value'] {
-  if (items.length === 0) {
-    return { text: '' };
-  }
-  if (items.length === 1) {
-    const item = items[0];
-    return userSuppliedItems.has(item) ? { html: escapeHtml(item) } : { text: item };
-  }
-  const lis = items.map(item => `<li>${userSuppliedItems.has(item) ? escapeHtml(item) : item}</li>`).join('\n');
-  return { html: `<ul class="govuk-list">\n${lis}\n</ul>` };
-}
+type RowContext = BaseRowContext;
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
-  const validatedCase = getValidatedCase(req);
-  const caseRef = validatedCase?.id;
-  if (!validatedCase || !caseRef) {
+  const ctx = createRowContext(req, SECTION_ID, t);
+  if (!ctx) {
     return [];
   }
-
-  const ctx: RowContext = {
-    rows: [],
-    validatedCase,
-    t,
-    change: makeChange(caseRef, SECTION_ID, t),
-    yesNoNotSure: makeYesNoNotSure(t),
-  };
 
   addNameRow(ctx);
   addDateOfBirthRow(ctx);
@@ -55,6 +31,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   addContactByEmailOrPostRow(ctx);
   addContactByPhoneRow(ctx);
   addContactByTextRow(ctx);
+  addContactDetailsRow(ctx);
 
   return ctx.rows;
 }
@@ -66,11 +43,12 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
     // Branch 1: claim recorded the defendant name — user confirmed (Y/N).
     // When "No", the corrected name is rendered as a separate follow-up row so each
     // answer keeps its own Change link (matches disputeClaim + disputeClaimDetails).
-    rows.push({
+    const questionRow: SummaryListRow = {
       key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
       value: { text: yesNoNotSure(nameConfirmation) },
       actions: { items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')] },
-    });
+    };
+    rows.push(questionRow);
 
     if (normalizeYesNoValue(nameConfirmation) === 'YES') {
       return;
@@ -79,11 +57,13 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
     if (!correctedName) {
       return;
     }
-    rows.push({
+    const detailRow: SummaryListRow = {
       key: { text: t('rows.defendantName.label') },
       value: { html: escapeHtml(correctedName) },
       actions: { items: [change('defendant-name-confirmation', 'rows.defendantName.changeHidden')] },
-    });
+    };
+    groupQuestionAndDetail(questionRow, detailRow);
+    rows.push(detailRow);
     return;
   }
   // Branch 2: name captured via defendant-name-capture (shown when nameKnown !== 'YES').
@@ -99,58 +79,32 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
 }
 
 function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void {
+  // DOB page has no showCondition and the field is optional, so always render the row.
   const dateOfBirth = validatedCase.defendantResponsesDateOfBirth;
-  if (!dateOfBirth) {
-    return;
-  }
   rows.push({
     key: { text: t('rows.dateOfBirth.label') },
-    value: { text: formatIsoDate(dateOfBirth) },
+    value: { text: dateOfBirth ? formatIsoDate(dateOfBirth) : t('noAnswerProvided') },
     actions: { items: [change('defendant-date-of-birth', 'rows.dateOfBirth.changeHidden')] },
   });
 }
 
-function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
-  // The page renders the Y/N confirmation template iff the claim recorded a defendant
-  // correspondence address (see correspondence-address/index.ts:getExistingAddress). Use the
-  // same signal here — `correspondenceAddressConfirmation` alone can't tell us which template
-  // the user actually saw, because the NA template submits a hidden `=no` purely to drive
-  // sub-field validation, not as a user answer.
-  const claimantAddress = formatCcdAddress(validatedCase.claimantEnteredDefendantDetails?.address);
-  const partyAddress = formatCcdAddress(validatedCase.defendantContactDetailsPartyAddress);
+function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowContext): void {
+  // On a confirmed "Yes" the step clears party.address, so show the claimant-recorded
+  // address; on "No" or a typed-in one, show the defendant party's.
+  const addressConfirmed =
+    normalizeYesNoValue(validatedCase.defendantResponses?.correspondenceAddressConfirmation) === 'YES';
 
-  if (claimantAddress) {
-    // Y/N path — render the confirmation Q/A keyed off the claimant-provided anchor.
-    const confirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
-    if (!confirmation) {
-      return;
-    }
-    rows.push({
-      key: { text: t('rows.correspondenceAddressConfirmation.label', { address: claimantAddress }) },
-      value: { text: yesNoNotSure(confirmation) },
-      actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
-    });
+  const address = addressConfirmed
+    ? validatedCase.claimantEnteredDefendantDetails?.address
+    : validatedCase.defendantContactDetailsPartyAddress;
 
-    if (normalizeYesNoValue(confirmation) === 'YES' || !partyAddress) {
-      return;
-    }
-    rows.push({
-      key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
-      value: { html: escapeHtml(partyAddress) },
-      actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
-    });
-    return;
-  }
-
-  // NA path — no confirmation question was asked. Render a plain row when the user has typed
-  // an address; ignore any storage-level `correspondenceAddressConfirmation` value (it's
-  // form-builder plumbing on this branch, not a user answer).
-  if (!partyAddress) {
+  const lines = formatCcdAddressLines(address);
+  if (lines.length === 0) {
     return;
   }
   rows.push({
     key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
-    value: { html: escapeHtml(partyAddress) },
+    value: { html: lines.map(escapeHtml).join('<br>') },
     actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
   });
 }
@@ -162,18 +116,8 @@ function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowConte
     return;
   }
   const items: string[] = [];
-  const userSupplied = new Set<string>();
-
   if (isYes(contactByEmail)) {
-    const emailLabel = t('rows.contactByEmailOrPost.options.email');
-    const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress?.trim();
-    if (emailAddress) {
-      const item = `${emailLabel} (${emailAddress})`;
-      items.push(item);
-      userSupplied.add(item);
-    } else {
-      items.push(emailLabel);
-    }
+    items.push(t('rows.contactByEmailOrPost.options.email'));
   }
   if (isYes(contactByPost)) {
     items.push(t('rows.contactByEmailOrPost.options.post'));
@@ -181,10 +125,7 @@ function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowConte
 
   rows.push({
     key: { text: t('rows.contactByEmailOrPost.label') },
-    value:
-      items.length === 0
-        ? { text: t('rows.contactByEmailOrPost.options.none') }
-        : multiSelectValue(items, userSupplied),
+    value: items.length === 0 ? { text: t('rows.contactByEmailOrPost.options.none') } : multiSelectValue(items),
     actions: { items: [change('contact-preferences-email-or-post', 'rows.contactByEmailOrPost.changeHidden')] },
   });
 }
@@ -194,24 +135,7 @@ function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: 
   if (!contactByPhone) {
     return;
   }
-  rows.push({
-    key: { text: t('rows.contactByPhone.label') },
-    value: { text: yesNoNotSure(contactByPhone) },
-    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')] },
-  });
-
-  if (!isYes(contactByPhone)) {
-    return;
-  }
-  const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber?.trim();
-  if (!phoneNumber) {
-    return;
-  }
-  rows.push({
-    key: { text: t('rows.contactByPhoneNumber.label') },
-    value: { html: escapeHtml(phoneNumber) },
-    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhoneNumber.changeHidden')] },
-  });
+  pushYesNoRow(rows, 'rows.contactByPhone', contactByPhone, 'contact-preferences-telephone', t, yesNoNotSure, change);
 }
 
 function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
@@ -224,9 +148,34 @@ function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: R
   if (!contactByText) {
     return;
   }
+  pushYesNoRow(rows, 'rows.contactByText', contactByText, 'contact-preferences-text-message', t, yesNoNotSure, change);
+}
+
+// Per the GOV.UK check-answers contact-details example: a single row that stacks
+// phone and email when the citizen has opted in to either. Change link targets the
+// step that captures the only displayed value; when both are shown, defaults to the
+// email-or-post step (first contact-preferences step in section order).
+function addContactDetailsRow({ rows, validatedCase, t, change }: RowContext): void {
+  const lines: string[] = [];
+  const phoneNumber = isYes(validatedCase.defendantResponsesContactByPhone)
+    ? validatedCase.defendantContactDetailsPartyPhoneNumber?.trim()
+    : undefined;
+  const emailAddress = isYes(validatedCase.defendantResponsesContactByEmail)
+    ? validatedCase.defendantContactDetailsPartyEmailAddress?.trim()
+    : undefined;
+  if (phoneNumber) {
+    lines.push(phoneNumber);
+  }
+  if (emailAddress) {
+    lines.push(emailAddress);
+  }
+  if (lines.length === 0) {
+    return;
+  }
+  const changeStep = emailAddress ? 'contact-preferences-email-or-post' : 'contact-preferences-telephone';
   rows.push({
-    key: { text: t('rows.contactByText.label') },
-    value: { text: yesNoNotSure(contactByText) },
-    actions: { items: [change('contact-preferences-text-message', 'rows.contactByText.changeHidden')] },
+    key: { text: t('rows.contactDetails.label') },
+    value: { html: lines.map(line => `<p class="govuk-body">${escapeHtml(line)}</p>`).join('') },
+    actions: { items: [change(changeStep, 'rows.contactDetails.changeHidden')] },
   });
 }

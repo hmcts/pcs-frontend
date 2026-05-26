@@ -114,10 +114,60 @@ export const submitCaseApiData = {
         hasReasons: 'NO',
       },
       hasUnderlesseeOrMortgagee: 'NO',
-      wantToUploadDocuments: 'NO',
       applicationWithClaim: 'NO',
       languageUsed: 'ENGLISH',
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
+      wantToUploadDocuments: 'YES',
+      additionalDocuments: [
+        {
+          value: {
+            documentType: 'WITNESS_STATEMENT',
+            description: 'Witness Document',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/e49660db-7a90-4532-ae67-092aa67604d7`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/e49660db-7a90-4532-ae67-092aa67604d7/binary`,
+              document_filename: 'WitnessStatement.png',
+            },
+          },
+          id: 'e29294e8-2f34-4a7f-992a-4a494596912b',
+        },
+        {
+          value: {
+            documentType: 'RENT_STATEMENT',
+            description: 'Rent Document',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e/binary`,
+              document_filename: 'RentStatement.pdf',
+            },
+          },
+          id: 'de2256bc-69ef-4b8e-a485-32d7902cfba8',
+        },
+        {
+          value: {
+            documentType: 'NOTICE_FOR_SERVICE_OUT_OF_JURISDICTION',
+            description: 'Notice Document',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/d5936738-2338-4c9b-918c-33f7cd199dca`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/d5936738-2338-4c9b-918c-33f7cd199dca/binary`,
+              document_filename: 'NoticeServiceJurisdiction.docx',
+            },
+          },
+          id: '4917573c-18aa-4cd4-aec9-b7fb761a1035',
+        },
+        {
+          value: {
+            documentType: 'CERTIFICATE_OF_SUITABILITY_AS_LF',
+            description: 'Certificate of Suitability',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/17f75c63-488a-4404-afd2-0aa3a9d65170`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/17f75c63-488a-4404-afd2-0aa3a9d65170/binary`,
+              document_filename: 'CertificateOfSuitability.xlsx',
+            },
+          },
+          id: 'c681d9af-67eb-4298-87b6-e539fc1b6370',
+        },
+      ],
       statementOfTruth: {
         completedBy: 'CLAIMANT',
         fullNameClaimant: 'Test',
@@ -617,7 +667,8 @@ export const submitCaseApiData = {
       claimAgainstTrespassers: 'NO',
       orgNameFound: 'YES',
       claimantName: 'Possession Claims Solicitor Org',
-      isClaimantNameCorrect: 'YES',
+      isClaimantNameCorrect: 'NO',
+      overriddenClaimantName: 'John Doe',
       claimantContactEmail: 'pcs-solicitor-automation@test.com',
       isCorrectClaimantContactEmail: 'YES',
       orgAddressFound: 'YES',
@@ -635,8 +686,8 @@ export const submitCaseApiData = {
         nameKnown: 'YES',
         addressKnown: 'YES',
         addressSameAsPossession: 'YES',
-        firstName: 'John',
-        lastName: 'Doe',
+        firstName: 'Tipsy',
+        lastName: 'Tom',
       },
       addAnotherDefendant: 'YES',
       additionalDefendants: [
@@ -663,8 +714,11 @@ export const submitCaseApiData = {
       tenancy_TenancyLicenceDocuments: [],
       showIntroductoryDemotedOtherGroundReasonPage: 'YES',
       introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
-      introGrounds_IntroductoryDemotedOrOtherGrounds: ['ANTI_SOCIAL'],
+      introGrounds_IntroductoryDemotedOrOtherGrounds: ['ANTI_SOCIAL', 'RENT_ARREARS'],
       antiSocialBehaviourGround: 'Antisocial behaviour',
+      rentArrears_Total: '200000',
+      rentArrears_RecoveryAttempted: 'NO',
+      arrearsJudgmentWanted: 'NO',
       preActionProtocolCompleted: 'NO',
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',

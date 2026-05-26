@@ -3,11 +3,11 @@
   "cardTitle": "Your circumstances",
   "rows": {
     "dependantChildren": {
-      "label": "Do you have any dependant children?",
+      "label": "Do you have any dependent children?",
       "changeHidden": "whether you have any dependant children"
     },
     "dependantChildrenDetails": {
-      "label": "Give details about your dependant children",
+      "label": "Give details about your dependent children",
       "changeHidden": "the details about your dependant children"
     },
     "otherDependants": {
@@ -35,7 +35,7 @@
       "changeHidden": "when you would be able to move in"
     },
     "shareAdditionalCircumstances": {
-      "label": "Do you want to share any other details about your circumstances?",
+      "label": "Would you like to share anything about your circumstances?",
       "changeHidden": "whether you want to share other details about your circumstances"
     },
     "shareAdditionalCircumstancesDetails": {
@@ -43,7 +43,7 @@
       "changeHidden": "the details about your circumstances"
     },
     "exceptionalHardship": {
-      "label": "Would you experience exceptional hardship if you had to leave your home?",
+      "label": "Would you experience exceptional hardship if you were asked to leave your home?",
       "changeHidden": "whether you would experience exceptional hardship"
     },
     "exceptionalHardshipDetails": {

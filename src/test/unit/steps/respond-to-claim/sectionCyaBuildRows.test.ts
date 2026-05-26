@@ -37,7 +37,7 @@ describe('section-CYA row builders — characterisation', () => {
       const rows = buildStartNowRows(reqWith(model({ freeLegalAdvice: 'YES' })), t);
       expect(rows).toHaveLength(1);
       expect(rows[0].key.text).toBe('rows.freeLegalAdvice.label');
-      expect(rows[0].actions.items[0].href).toBe(
+      expect(rows[0].actions?.items[0].href).toBe(
         '/case/1234123412341234/respond-to-claim/free-legal-advice?edit=startNowAndDetails'
       );
     });
@@ -62,6 +62,80 @@ describe('section-CYA row builders — characterisation', () => {
       const keys = rows.map(r => r.key.text);
       expect(keys).toContain('rows.dateOfBirth.label');
       expect(keys).toContain('rows.contactByPhone.label');
+    });
+
+    it('contact-by-phone: preference row stands alone; phone number lives in the Contact details row', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { contactByPhone: 'YES' },
+            defendantContactDetails: { party: { phoneNumber: '07123456789' } },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const questionRow = rows.find(r => r.key.text === 'rows.contactByPhone.label');
+      const contactDetailsRow = rows.find(r => r.key.text === 'rows.contactDetails.label');
+      // Preference row no longer groups a detail row underneath it.
+      expect(questionRow?.classes).toBeUndefined();
+      expect(contactDetailsRow?.value.html).toContain('<p class="govuk-body">07123456789</p>');
+      // Phone-only: Change link targets the telephone step.
+      expect(contactDetailsRow?.actions?.items[0].href).toContain(
+        '/contact-preferences-telephone?edit=personalDetails'
+      );
+      expect(contactDetailsRow?.actions?.items[0].visuallyHiddenText).toBe('rows.contactDetails.changeHidden');
+    });
+
+    it('contact-by-email: preference row stands alone; email lives in the Contact details row', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { contactByEmail: 'YES' },
+            defendantContactDetails: { party: { emailAddress: 'alice@example.com' } },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const questionRow = rows.find(r => r.key.text === 'rows.contactByEmailOrPost.label');
+      const contactDetailsRow = rows.find(r => r.key.text === 'rows.contactDetails.label');
+      expect(questionRow?.classes).toBeUndefined();
+      expect(contactDetailsRow?.value.html).toContain('<p class="govuk-body">alice@example.com</p>');
+      // Email present: Change link targets the email-or-post step.
+      expect(contactDetailsRow?.actions?.items[0].href).toContain(
+        '/contact-preferences-email-or-post?edit=personalDetails'
+      );
+    });
+
+    it('contact details row: stacks phone and email as separate paragraphs when both are selected', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { contactByPhone: 'YES', contactByEmail: 'YES' },
+            defendantContactDetails: { party: { phoneNumber: '07123456789', emailAddress: 'alice@example.com' } },
+          },
+        },
+      });
+      const row = buildPersonalRows(reqWith(validatedCase), t).find(r => r.key.text === 'rows.contactDetails.label');
+      expect(row?.value.html).toBe('<p class="govuk-body">07123456789</p><p class="govuk-body">alice@example.com</p>');
+    });
+
+    it('contact details row: omitted when only post is selected (no phone/email values)', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: { defendantResponses: { contactByPost: 'YES' } },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      expect(rows.some(r => r.key.text === 'rows.contactDetails.label')).toBe(false);
+    });
+
+    it('date-of-birth row: shows "No answer provided" when the optional DOB is left blank', () => {
+      const row = buildPersonalRows(reqWith(model({})), t).find(r => r.key.text === 'rows.dateOfBirth.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
     });
 
     it('name row: emits separate Q/A and corrected-name rows when user said "No" to claim-recorded name', () => {
@@ -114,7 +188,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(row?.value).toEqual({ text: 'options.yes' });
     });
 
-    it('correspondence-address: shows confirmation Q/A when claim has a defendant address and user said YES', () => {
+    it('correspondence-address: shows the confirmed claimant address as one row when the citizen answered Yes', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -127,13 +201,14 @@ describe('section-CYA row builders — characterisation', () => {
           },
         },
       });
-      const row = buildPersonalRows(reqWith(validatedCase), t).find(
-        r => r.key.text === 'rows.correspondenceAddressConfirmation.label'
-      );
-      expect(row?.value).toEqual({ text: 'options.yes' });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
+      // The confirmed address shows as one multi-line row — no "is it correct?" Y/N row.
+      expect(addressRow?.value).toEqual({ html: '1 Claim Street<br>AB1 2CD' });
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
     });
 
-    it('correspondence-address: emits separate Q/A and corrected-address rows when claim has a defendant address and user said NO', () => {
+    it('correspondence-address: shows the corrected address as one row when the citizen answered No', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -144,23 +219,24 @@ describe('section-CYA row builders — characterisation', () => {
               address: { AddressLine1: '1 Claim Street', PostCode: 'AB1 2CD' },
             },
             defendantContactDetails: {
-              party: { address: { AddressLine1: '99 New Road', PostCode: 'XY1 9ZZ' } },
+              party: {
+                address: { AddressLine1: '99 New Road', PostTown: 'London', PostCode: 'XY1 9ZZ' },
+              },
             },
           },
         },
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
-      const confirmation = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.label');
-      const correction = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
-      expect(confirmation?.value).toEqual({ text: 'options.no' });
-      expect(correction?.value).toMatchObject({ html: expect.stringContaining('99 New Road') });
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
+      // The corrected address, one part per line; no Y/N row.
+      expect(addressRow?.value).toEqual({ html: '99 New Road<br>London<br>XY1 9ZZ' });
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
     });
 
-    it('correspondence-address: renders plain row (no fabricated Q/A) when claim recorded no defendant address', () => {
-      // Reproduces case 1777294706554860: claimant ticked "I don't know defendant's address" at
-      // filing, user typed their address on the NA page. The forged correspondenceAddressConfirmation
-      // value coming from the NA template's hidden field must NOT cause CYA to render a Y/N row
-      // anchored on propertyAddress.
+    it('correspondence-address: shows the typed address as one row when the claim recorded no defendant address', () => {
+      // Case 1777294706554860: claimant ticked "I don't know defendant's address" at filing,
+      // the citizen typed their address on the NA page. Forged storage-level
+      // correspondenceAddressConfirmation must not change what the CYA shows.
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -175,9 +251,8 @@ describe('section-CYA row builders — characterisation', () => {
         },
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
-      const row = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
-      expect(row?.value).toMatchObject({ html: expect.stringContaining('3 Wiltshire Close') });
-      // Crucially: the Y/N confirmation row must not be present.
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
+      expect(addressRow?.value).toEqual({ html: '3 Wiltshire Close<br>WA1 4DA' });
       expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
     });
   });
@@ -196,21 +271,29 @@ describe('section-CYA row builders — characterisation', () => {
 
     it('tenancy-date row: "known" branch links to tenancy-date-details', () => {
       const rows = buildDisputeRows(
-        reqWith(model({ tenancyStartDateConfirmation: 'NO', tenancyStartDate: '2023-01-01' })),
+        reqWith(
+          model(
+            { tenancyStartDateConfirmation: 'NO', tenancyStartDate: '2023-01-01' },
+            { tenancy_TenancyLicenceDate: '2023-01-01' }
+          )
+        ),
         t
       );
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
-      expect(row?.actions.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
+      expect(row?.actions?.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
     });
 
     it('tenancy-date row: "unknown" branch links to tenancy-date-unknown', () => {
       const rows = buildDisputeRows(reqWith(model({ tenancyStartDate: '2023-01-01' })), t);
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
-      expect(row?.actions.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
+      expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
     });
 
     it('tenancy-date row: shows the confirmation answer when no date entered', () => {
-      const rows = buildDisputeRows(reqWith(model({ tenancyStartDateConfirmation: 'YES' })), t);
+      const rows = buildDisputeRows(
+        reqWith(model({ tenancyStartDateConfirmation: 'YES' }, { tenancy_TenancyLicenceDate: '2023-01-01' })),
+        t
+      );
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
       expect(row?.value).toEqual({ text: 'options.yes' });
     });
@@ -221,7 +304,7 @@ describe('section-CYA row builders — characterisation', () => {
         t
       );
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
-      expect(row?.actions.items[0].href).toContain('confirmation-of-notice-date-when-not-provided');
+      expect(row?.actions?.items[0].href).toContain('confirmation-of-notice-date-when-not-provided');
     });
 
     it('notice-date row: links to "provided" step when the claim has a notice date', () => {
@@ -235,7 +318,36 @@ describe('section-CYA row builders — characterisation', () => {
         t
       );
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
-      expect(row?.actions.items[0].href).toContain('confirmation-of-notice-date-when-provided');
+      expect(row?.actions?.items[0].href).toContain('confirmation-of-notice-date-when-provided');
+    });
+
+    it('tenancy-date row: "unknown" branch shows "No answer provided" when the optional date is blank', () => {
+      const rows = buildDisputeRows(reqWith(model({})), t);
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
+      expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
+    });
+
+    it('notice-date row: "not-provided" branch shows "No answer provided" when the optional date is blank', () => {
+      const rows = buildDisputeRows(reqWith(model({ possessionNoticeReceived: 'YES' })), t);
+      const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
+      expect(row?.actions?.items[0].href).toContain('confirmation-of-notice-date-when-not-provided');
+    });
+
+    it('notice-date row: "provided" branch shows "No answer provided" when the optional date is blank', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ possessionNoticeReceived: 'YES' }, { notice_NoticePostedDate: '2025-05-01' })),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
+      expect(row?.actions?.items[0].href).toContain('confirmation-of-notice-date-when-provided');
+    });
+
+    it('notice-date row: omitted when the citizen is not on a notice-date branch', () => {
+      const rows = buildDisputeRows(reqWith(model({})), t);
+      expect(rows.some(r => r.key.text === 'rows.noticeReceivedDate.label')).toBe(false);
     });
   });
 
@@ -278,6 +390,23 @@ describe('section-CYA row builders — characterisation', () => {
       const keys = rows.map(r => r.key.text);
       expect(keys).toContain('rows.dependantChildren.label');
       expect(keys).toContain('rows.exceptionalHardship.label');
+    });
+
+    it('move-in-date row: shows "No answer provided" when alternative accommodation is "yes" and the date is blank', () => {
+      const rows = buildSituationRows(
+        reqWith(model({ householdCircumstances: { alternativeAccommodation: 'YES' } })),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.alternativeAccommodationDate.label');
+      expect(row?.value).toEqual({ text: 'noAnswerProvided' });
+    });
+
+    it('move-in-date row: omitted when alternative accommodation is "no"', () => {
+      const rows = buildSituationRows(
+        reqWith(model({ householdCircumstances: { alternativeAccommodation: 'NO' } })),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.alternativeAccommodationDate.label')).toBe(false);
     });
   });
 

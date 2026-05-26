@@ -28,17 +28,21 @@
         "none": "cy None"
       }
     },
+    "contactByEmailAddress": {
+      "label": "cy Email",
+      "changeHidden": "cy your email address"
+    },
     "contactByPhone": {
       "label": "cy Are you happy to be contacted by telephone?",
       "changeHidden": "cy whether you are happy to be contacted by telephone"
     },
-    "contactByPhoneNumber": {
-      "label": "cy UK phone number",
-      "changeHidden": "cy your UK phone number"
-    },
     "contactByText": {
-      "label": "cy Receive updates by text message",
+      "label": "cy Are you happy to be contacted by text message?",
       "changeHidden": "cy whether you want to receive text messages"
+    },
+    "contactDetails": {
+      "label": "cy Contact details",
+      "changeHidden": "cy your contact details"
     }
   }
 }

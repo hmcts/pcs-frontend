@@ -1,6 +1,7 @@
 import {
   CitizenCreateGenAppAPIAction,
   CreateCaseAPIAction,
+  DocumentsAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
   LoginAction,
@@ -45,6 +46,8 @@ export class ActionRegistry {
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['startEvidenceUpload', new DocumentsAction()],
+    ['validateViewDocuments', new DocumentsAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
@@ -112,6 +115,12 @@ export class ActionRegistry {
     ['reviewCYA', new GenAppsAction()],
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
+    ['otherConsiderations', new RespondToClaimAction()],
+    ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
+    ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['selectClaimAgainstWhom', new RespondToClaimAction()],
+    ['counterClaimAbout', new RespondToClaimAction()],
+    ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
   ]);
 
