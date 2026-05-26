@@ -237,6 +237,63 @@ function addOtherConsiderationsRow({ rows, responses, t, change, yesNoNotSure }:
   pushDetailRow(rows, questionRow, 'rows.otherConsiderationsDetails', detail, 'other-considerations', t, change);
 }
 
+function pushExpandedRows(
+  { rows, t, change }: BaseRowContext,
+  items: { label: string; value: SummaryListRow['value'] }[],
+  headerLabel: string,
+  step: string,
+  changeHidden: string,
+): void {
+  rows.push({
+    key: { text: headerLabel },
+    value: items.length ? {} : { text: t('noAnswerProvided') },
+    classes: items.length ? 'govuk-summary-list__row--no-border' : undefined,
+    actions: { items: [change(step, changeHidden)] },
+  });
+  items.forEach(({ label, value }) =>
+    rows.push({
+      key: { text: label, classes: 'govuk-!-font-weight-regular' },
+      value,
+      actions: { items: [change(step, changeHidden)] },
+    })
+  );
+}
+
+function addEOJRegularIncomeRows(ctx: RowContext): void {
+  const { hc, t } = ctx;
+  if (!isYes(hc.shareIncomeExpenseDetails)) return;
+  const items = [];
+  for (const source of INCOME_SOURCES) {
+    if (isYes(hc[source.key])) {
+      items.push({
+        label: t(`rows.regularIncome.options.${source.key}`),
+        value: { text: amountWithFrequency(hc[source.amount], hc[source.frequency], t, 'incomeFrequencies') },
+      });
+    }
+  }
+  if (isYes(hc.moneyFromElsewhere)) {
+    const detail = hc.moneyFromElsewhereDetails?.trim() ?? '';
+    items.push({
+      label: t('rows.regularIncome.options.moneyFromElsewhere'),
+      value: detail ? { html: escapeWithLineBreaks(detail) } : { text: '' },
+    });
+  }
+  pushExpandedRows(ctx, items, t('rows.regularIncome.label'), 'what-regular-income-do-you-receive', 'rows.regularIncome.changeHidden');
+}
+
+function addEOJRegularExpensesRows(ctx: RowContext): void {
+  const { hc, t } = ctx;
+  if (!isYes(hc.shareIncomeExpenseDetails)) return;
+  const items = [];
+  for (const key of EXPENSE_KEYS) {
+    const details = hc[key];
+    if (details && isYes(details.applies)) {
+      items.push({ label: t(`rows.regularExpenses.options.${key}`), value: { text: amountWithFrequency(details.amount, details.frequency, t) } });
+    }
+  }
+  pushExpandedRows(ctx, items, t('rows.regularExpenses.label'), 'what-other-regular-expenses-do-you-have', 'rows.regularExpenses.changeHidden');
+}
+
 export function buildEOJIncomeAndExpensesRow(req: Request, t: TFunction): SummaryListRow[] {
   const base = createRowContext(req, SECTION_ID, t);
   if (!base) {return [];}
@@ -251,7 +308,7 @@ export function buildEOJRegularIncomeRows(req: Request, t: TFunction): SummaryLi
   if (!base) {return [];}
   const responses = base.validatedCase.defendantResponses ?? {};
   const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
-  addRegularIncomeRow(ctx);
+  addEOJRegularIncomeRows(ctx);
   return ctx.rows;
 }
 
@@ -279,7 +336,7 @@ export function buildEOJRegularExpensesRows(req: Request, t: TFunction): Summary
   if (!base) {return [];}
   const responses = base.validatedCase.defendantResponses ?? {};
   const ctx: RowContext = { ...base, responses, hc: responses.householdCircumstances ?? {} };
-  addRegularExpensesRow(ctx);
+  addEOJRegularExpensesRows(ctx);
   return ctx.rows;
 }
 
