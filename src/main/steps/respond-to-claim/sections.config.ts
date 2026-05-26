@@ -5,26 +5,14 @@ import { hasAnyRentArrearsGround } from '../utils';
 
 import type { RespondToClaimStepName } from './stepRegistry';
 
-// Visual groups on the task-list page. Section order within a group follows declaration order below.
-export const RESPOND_TO_CLAIM_SECTION_GROUPS = [
-  { id: 'checkBeforeYouStart', titleKey: 'taskList.groups.checkBeforeYouStart' },
-  { id: 'yourResponse', titleKey: 'taskList.groups.yourResponse' },
-  { id: 'provideEvidence', titleKey: 'taskList.groups.provideEvidence' },
-  { id: 'reviewAndSubmit', titleKey: 'taskList.groups.reviewAndSubmit' },
-] as const;
-
-export type RespondToClaimGroupId = (typeof RESPOND_TO_CLAIM_SECTION_GROUPS)[number]['id'];
-
 const sectionDefs = [
   {
     id: 'startNowAndDetails',
-    groupId: 'checkBeforeYouStart',
     titleKey: 'taskList.startNowAndDetails',
     steps: ['start-now', 'free-legal-advice', 'check-your-answers-start-now-and-details'],
   },
   {
     id: 'personalDetails',
-    groupId: 'yourResponse',
     titleKey: 'taskList.personalDetails',
     steps: [
       'defendant-name-confirmation',
@@ -39,7 +27,6 @@ const sectionDefs = [
   },
   {
     id: 'disputeAndTenancy',
-    groupId: 'yourResponse',
     titleKey: 'taskList.disputeAndTenancy',
     steps: [
       'dispute-claim-interstitial',
@@ -68,7 +55,6 @@ const sectionDefs = [
   },
   {
     id: 'payments',
-    groupId: 'yourResponse',
     titleKey: 'taskList.payments',
     steps: [
       'payment-interstitial',
@@ -82,7 +68,6 @@ const sectionDefs = [
   },
   {
     id: 'situationAndCircumstances',
-    groupId: 'yourResponse',
     titleKey: 'taskList.situationAndCircumstances',
     steps: [
       'your-household-and-circumstances',
@@ -97,7 +82,6 @@ const sectionDefs = [
   },
   {
     id: 'incomeAndExpenditure',
-    groupId: 'yourResponse',
     titleKey: 'taskList.incomeAndExpenditure',
     steps: [
       'income-and-expenses',
@@ -112,23 +96,12 @@ const sectionDefs = [
   },
   {
     id: 'uploadFiles',
-    groupId: 'provideEvidence',
     titleKey: 'taskList.uploadFiles',
     steps: ['upload-document', 'check-your-answers-documents'],
   },
   {
     id: 'checkYourAnswersAndSubmit',
-    groupId: 'reviewAndSubmit',
     titleKey: 'taskList.checkYourAnswersAndSubmit',
-    dependsOn: [
-      'startNowAndDetails',
-      'personalDetails',
-      'disputeAndTenancy',
-      'payments',
-      'situationAndCircumstances',
-      'incomeAndExpenditure',
-      'uploadFiles',
-    ],
     steps: [
       'support-needs',
       'equality-and-diversity-start',
@@ -139,11 +112,9 @@ const sectionDefs = [
   },
 ] as const satisfies readonly {
   id: string;
-  groupId: string;
   titleKey: string;
   steps: readonly RespondToClaimStepName[];
   isApplicable?: (req: Request) => Promise<boolean>;
-  dependsOn?: readonly string[];
 }[];
 
 export type RespondToClaimSectionId = (typeof sectionDefs)[number]['id'];

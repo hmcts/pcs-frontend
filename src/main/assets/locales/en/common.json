@@ -16,7 +16,7 @@
   "contactUsDetailsTelephoneHeading": "Telephone",
   "contactUsDetailsTelephoneNumber": "0300 123 7050",
   "contactUsDetailsTelephoneHours": "Monday to Friday, 8.30am to 5pm.",
-  "contactUsDetailsCallChargesLinkText": "Find out about call charges",
+  "contactUsDetailsCallChargesLinkText": "Find out about call charges (opens in new tab)",
   "buttons": {
     "saveAndContinue": "Save and continue",
     "continue": "Continue",
@@ -73,8 +73,7 @@
     },
     "documentUpload": {
       "wrongFileTypeDocStore": "The selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
-      "fileTooLargeDocStore": "The selected file must be smaller than {{maxSize}}MB",
-      "fileTotalTooLargeDocStore": "The total size of all uploaded files must be smaller than {{maxSize}}MB",
+      "fileTooLargeDocStore": "The selected file must be smaller than 1GB",
       "noFileSelected": "Select a file to upload",
       "uploadFailed": "The file could not be uploaded – try again",
       "fileDeleteFailed": "The file could not be removed – try again",
@@ -153,13 +152,9 @@
     }
   },
   "taskList": {
-    "startNowAndDetails": "Read information about responding and free legal advice",
+    "startNowAndDetails": "Free Legal Advice",
     "personalDetails": "Confirm your details and contact preferences",
-    "disputeAndTenancy": "Respond to specific parts of the claimant’s claim",
-    "situationAndCircumstances": "Give details about your household and circumstances",
-    "payments": "Declare recent payments or agreements made",
-    "incomeAndExpenditure": "Give details about your income and expenses",
-    "uploadFiles": "Upload documents",
-    "checkYourAnswersAndSubmit": "Check your answers and submit"
+    "disputeAndTenancy": "Response",
+    "situationAndCircumstances": "Your circumstances"
   }
 }

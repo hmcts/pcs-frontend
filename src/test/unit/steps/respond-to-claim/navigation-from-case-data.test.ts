@@ -106,11 +106,6 @@ describe('respond-to-claim navigation from CCD case data', () => {
     claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
   };
 
-  it('routes back from the first step of situationAndCircumstances to the task-list hub', async () => {
-    const req = createReq({ data: rentArrearsData });
-    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe('task-list');
-  });
-
   it('routes counter-claim NO to household interstitial for non-rent-arrears-only claims', async () => {
     const req = createReq({
       data: {

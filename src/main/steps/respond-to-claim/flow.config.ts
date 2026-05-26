@@ -38,9 +38,7 @@ export const flowConfig: JourneyFlowConfig = {
   useShowConditions: true,
   useSessionFormData: false,
   sections: respondToClaimSections,
-  nonSectionStepOrder: ['end-now', 'task-list'],
-  // First visible step of any section back-links to this hub step.
-  hubStepName: 'task-list',
+  nonSectionStepOrder: ['end-now'],
   steps: {
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),

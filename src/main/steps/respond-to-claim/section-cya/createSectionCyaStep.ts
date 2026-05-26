@@ -1,14 +1,11 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
-import { findSectionIdForStep, sectionIdToBackendEnum } from '../sections.config';
 
 import type { SummaryListRow } from './cyaRow';
 
 import { createGetController, createStepNavigation, getTranslationFunction } from '@modules/steps';
-import { getStepUrl } from '@modules/steps/flow';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
@@ -64,37 +61,11 @@ export function createSectionCyaStep({
         };
       }),
     postController: {
-      post: async (req: Request, res: Response, next: NextFunction) => {
+      post: async (req: Request, res: Response) => {
         const action = req.body?.action;
         const isSaveForLater = action === 'saveForLater';
         const caseId = req.res?.locals.validatedCase?.id;
-        const sectionId = findSectionIdForStep(stepName);
 
-        if (sectionId) {
-          try {
-            const draft = buildDraftDefendantResponse(req);
-            const enumValue = sectionIdToBackendEnum(sectionId);
-            const current = draft.defendantResponses.completedSections ?? [];
-            draft.defendantResponses.completedSections = isSaveForLater
-              ? current.filter(s => s !== enumValue)
-              : current.includes(enumValue)
-                ? current
-                : [...current, enumValue];
-            await saveDraftDefendantResponse(req, draft);
-          } catch (error) {
-            return next(error);
-          }
-        }
-
-        // Hub-first: both S&C and SFL land on the task-list for the citizen variant.
-        // Status differs (Done vs In progress) via the completedSections write above.
-        const activeFlow = resolveFlow(req);
-        const hub = activeFlow.hubStepName;
-        if (hub) {
-          return res.redirect(303, getStepUrl(hub, activeFlow, caseId));
-        }
-
-        // Legalrep / no-hub fallback — preserves existing behaviour for variants without a task-list.
         if (isSaveForLater) {
           const dashboardUrl = getDashboardUrl(caseId);
           return res.redirect(303, dashboardUrl ?? '/');
