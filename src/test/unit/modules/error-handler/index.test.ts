@@ -26,14 +26,15 @@ describe('error-handler', () => {
 
   const createMockTranslation = () => {
     const translations: Record<string, string> = {
-      'errorPages.400.title': 'Bad request',
-      'errorPages.400.paragraph': 'The request you made is not valid. Please check the request and try again.',
-      'errorPages.403.title': 'Not Authorised',
-      'errorPages.403.paragraph': 'Sorry you do not have access to this account.',
-      'errorPages.404.title': 'Page not found',
-      'errorPages.404.paragraph': "This could be because you've followed a broken or outdated link.",
-      'errorPages.500.title': "Sorry, we're having technical problems",
-      'errorPages.500.paragraph': 'Please try again in a few minutes.',
+      'errorPages.pageNotFound.title': 'Page not found',
+      'errorPages.pageNotFound.paragraph': 'If you typed the web address, check it is correct.',
+      'errorPages.serviceUnavailable.title': 'Sorry, the service is unavailable',
+      'errorPages.serviceUnavailable.paragraph': 'You will be able to use the service from [retryAfter].',
+      'errorPages.technicalError.title': 'Sorry, there is a problem with the service',
+      'errorPages.technicalError.paragraph': 'Try again later.',
+      'errorPages.accessDenied.title': 'You do not have access to this page',
+      'errorPages.accessDenied.paragraph':
+        'Contact us if you think you should have access, or if you need help with your case.',
       'applicationErrors.noApplicationIdInSession.title': 'translated noApplicationIdInSession title',
       'applicationErrors.noApplicationIdInSession.paragraph': 'translated noApplicationIdInSession paragraph',
       serviceName: 'Possession claims',
@@ -209,8 +210,11 @@ describe('error-handler', () => {
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.render).toHaveBeenCalledWith('error');
-      expect(res.locals.errorTitle).toBe('Not Authorised');
-      expect(res.locals.errorParagraph).toBe('Sorry you do not have access to this account.');
+      expect(res.locals.errorPageKey).toBe('accessDenied');
+      expect(res.locals.t('errorPages.accessDenied.title')).toBe('You do not have access to this page');
+      expect(res.locals.t('errorPages.accessDenied.paragraph')).toBe(
+        'Contact us if you think you should have access, or if you need help with your case.'
+      );
     });
 
     it('should handle HTTPError with status 404', () => {
@@ -232,7 +236,11 @@ describe('error-handler', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.render).toHaveBeenCalledWith('error');
-      expect(res.locals.errorTitle).toBe('Page not found');
+      expect(res.locals.errorPageKey).toBe('pageNotFound');
+      expect(res.locals.t('errorPages.pageNotFound.title')).toBe('Page not found');
+      expect(res.locals.t('errorPages.pageNotFound.paragraph')).toBe(
+        'If you typed the web address, check it is correct.'
+      );
     });
 
     it('should handle HTTPError with status 500', () => {
@@ -254,8 +262,9 @@ describe('error-handler', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.render).toHaveBeenCalledWith('error');
-      expect(res.locals.errorTitle).toBe("Sorry, we're having technical problems");
-      expect(res.locals.errorParagraph).toBe('Please try again in a few minutes.');
+      expect(res.locals.errorPageKey).toBe('technicalError');
+      expect(res.locals.t('errorPages.technicalError.title')).toBe('Sorry, there is a problem with the service');
+      expect(res.locals.t('errorPages.technicalError.paragraph')).toBe('Try again later.');
     });
 
     it('should convert non-HTTPError to HTTPError with status 500', () => {
@@ -277,7 +286,9 @@ describe('error-handler', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.render).toHaveBeenCalledWith('error');
-      expect(res.locals.errorTitle).toBe("Sorry, we're having technical problems");
+      expect(res.locals.errorPageKey).toBe('technicalError');
+      expect(res.locals.t('errorPages.technicalError.title')).toBe('Sorry, there is a problem with the service');
+      expect(res.locals.t('errorPages.technicalError.paragraph')).toBe('Try again later.');
     });
 
     it('should use fallback message when error has no message', () => {
@@ -448,7 +459,7 @@ describe('error-handler', () => {
       expect(res.render).toHaveBeenCalledWith('error');
     });
 
-    it('should handle 400 status with its own error message', () => {
+    it('should handle 400 status with access denied error message', () => {
       const errorHandler = createErrorHandler('test');
       const err = new HTTPError('Bad request', 400);
       const req = {
@@ -466,7 +477,8 @@ describe('error-handler', () => {
       errorHandler(err, req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.locals.errorTitle).toBe('Not Authorised');
+      expect(res.locals.errorPageKey).toBe('accessDenied');
+      expect(res.locals.t('errorPages.accessDenied.title')).toBe('You do not have access to this page');
     });
 
     it('should use fallback translation function if i18n is not available', () => {
@@ -484,7 +496,7 @@ describe('error-handler', () => {
       errorHandler(err, req, res, next);
 
       expect(res.render).toHaveBeenCalledWith('error');
-      expect(res.locals.errorTitle).toBe('errorPages.500.title');
+      expect(res.locals.errorPageKey).toBe('technicalError');
     });
 
     it('should handle application error with custom error codes', () => {
