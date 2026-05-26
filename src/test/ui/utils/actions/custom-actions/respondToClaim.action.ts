@@ -9,7 +9,10 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimAbout,
+  counterClaimAgainstWhom,
   counterClaimFee,
+  counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -175,6 +178,9 @@ export class RespondToClaimAction implements IAction {
       ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page)],
       ['validateCYARTC', () => this.validateCYARTC()],
       ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
+      ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
+      ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
+      ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -1185,6 +1191,7 @@ export class RespondToClaimAction implements IAction {
 
     console.log('\n✅ RTC CHECK YOUR ANSWERS VALIDATION PASSED!\n');
   }
+}
 
   private async validateRTCSectionCYA(sectionData: actionData): Promise<void> {
     const sectionName = String(sectionData);
@@ -1219,6 +1226,41 @@ export class RespondToClaimAction implements IAction {
     if (mismatches.length > 0) {
       throw new Error(`RTC ${sectionName} section CYA validation failed:\n${mismatches.join('\n')}`);
     }
+  private async selectClaimAgainstWhom(claimAgainstWhom: actionRecord): Promise<void> {
+    if (Array.isArray(claimAgainstWhom.options)) {
+      for (const option of claimAgainstWhom.options) {
+        await performAction('check', {
+          question: claimAgainstWhom.question,
+          option,
+        });
+      }
+    } else if (claimAgainstWhom.radioOption) {
+      await performAction('check', {
+        question: claimAgainstWhom.question,
+        option: claimAgainstWhom.radioOption,
+      });
+    }
+    await performAction('clickButton', counterClaimAgainstWhom.saveAndContinueButton);
+  }
+
+  private async counterClaimAbout(claimAbout: actionRecord): Promise<void> {
+    await performAction('inputText', counterClaimAbout.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
+    await performAction('inputText', counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
+    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+  }
+
+  private async counterClaimOrderOtherThanSum(cliamOtherThanSum: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      counterClaimOrderOtherThanSum.whatOrdersAreYouAskingLabelText,
+      cliamOtherThanSum.ordersInput
+    );
+    await performAction(
+      'inputText',
+      counterClaimOrderOtherThanSum.whatFactsWouldYouLikeLabelText,
+      cliamOtherThanSum.factsInput
+    );
+    await performAction('clickButton', counterClaimOrderOtherThanSum.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

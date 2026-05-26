@@ -36,6 +36,7 @@
   },
   "change": "cyChange",
   "back": "cyBack",
+  "noAnswerProvided": "cyNo answer provided",
   "date": {
     "day": "cyDay",
     "month": "cyMonth",
@@ -149,5 +150,11 @@
       "title": "cyApplication not available",
       "paragraph": "cyThis application is not available. It may have already been submitted in a different window."
     }
+  },
+  "taskList": {
+    "startNowAndDetails": "cy Free Legal Advice",
+    "personalDetails": "cy Confirm your details and contact preferences",
+    "disputeAndTenancy": "cy Response",
+    "situationAndCircumstances": "cy Your circumstances"
   }
 }

@@ -1,24 +1,13 @@
+import type { Request } from 'express';
+
 import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 import { hasAnyRentArrearsGround } from '../utils';
 
-export const RESPOND_TO_CLAIM_SECTION_IDS = [
-  'startNowAndDetails',
-  'personalDetails',
-  'disputeAndTenancy',
-  'payments',
-  'situationAndCircumstances',
-  'incomeAndExpenditure',
-  'uploadFiles',
-  'checkYourAnswersAndSubmit',
-] as const;
-
-export type RespondToClaimSectionId = (typeof RESPOND_TO_CLAIM_SECTION_IDS)[number];
-
-export const respondToClaimSections: SectionConfig[] = [
+const sectionDefs = [
   {
     id: 'startNowAndDetails',
     titleKey: 'taskList.startNowAndDetails',
-    steps: ['start-now', 'free-legal-advice'],
+    steps: ['start-now', 'free-legal-advice', 'check-your-answers-start-now-and-details'],
   },
   {
     id: 'personalDetails',
@@ -31,6 +20,7 @@ export const respondToClaimSections: SectionConfig[] = [
       'contact-preferences-email-or-post',
       'contact-preferences-telephone',
       'contact-preferences-text-message',
+      'check-your-answers-personal-details',
     ],
   },
   {
@@ -56,6 +46,9 @@ export const respondToClaimSections: SectionConfig[] = [
       'counter-claim-have-you-applied-for-help',
       'counter-claim-against-whom',
       'counter-claim-about',
+      'counter-claim-order-other-than-sum',
+      'counter-claim-upload-documents',
+      'check-your-answers-your-response',
     ],
   },
   {
@@ -67,8 +60,9 @@ export const respondToClaimSections: SectionConfig[] = [
       'repayments-agreed',
       'installment-payments',
       'how-much-afford-to-pay',
+      'check-your-answers-payments-and-agreements',
     ],
-    isApplicable: async req => hasAnyRentArrearsGround(req),
+    isApplicable: async (req: Request) => hasAnyRentArrearsGround(req),
   },
   {
     id: 'situationAndCircumstances',
@@ -81,6 +75,7 @@ export const respondToClaimSections: SectionConfig[] = [
       'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
       'your-circumstances',
       'exceptional-hardship',
+      'check-your-answers-your-circumstances',
     ],
   },
   {
@@ -94,16 +89,32 @@ export const respondToClaimSections: SectionConfig[] = [
       'priority-debt-details',
       'what-other-regular-expenses-do-you-have',
       'other-considerations',
+      'check-your-answers-income-and-expenses',
     ],
   },
   {
     id: 'uploadFiles',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document', 'support-needs'],
+    steps: ['upload-document', 'check-your-answers-documents'],
   },
   {
     id: 'checkYourAnswersAndSubmit',
     titleKey: 'taskList.checkYourAnswersAndSubmit',
-    steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used', 'check-your-answers'],
+    steps: [
+      'support-needs',
+      'equality-and-diversity-start',
+      'equality-and-diversity-end',
+      'language-used',
+      'check-your-answers',
+    ],
   },
-];
+] as const;
+
+export type RespondToClaimSectionId = (typeof sectionDefs)[number]['id'];
+
+export const RESPOND_TO_CLAIM_SECTION_IDS: readonly RespondToClaimSectionId[] = sectionDefs.map(s => s.id);
+
+export const respondToClaimSections: SectionConfig[] = sectionDefs.map(s => ({
+  ...s,
+  steps: [...s.steps],
+}));

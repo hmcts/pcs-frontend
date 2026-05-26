@@ -12,7 +12,7 @@ const findSection = (id: string) => respondToClaimSections.find(section => secti
 
 describe('respond-to-claim sections config', () => {
   it('maps every sectioned flow step to exactly one section', () => {
-    const nonSectionStepSlugs = new Set(['end-now']);
+    const nonSectionStepSlugs = new Set(flowConfig.nonSectionStepOrder ?? []);
     const flowStepSlugs = Object.keys(stepRegistry).filter(stepSlug => !nonSectionStepSlugs.has(stepSlug));
     const coverage = getSectionCoverage(flowStepSlugs, respondToClaimSections);
 
@@ -45,11 +45,12 @@ describe('respond-to-claim sections config', () => {
   });
 
   it('maps upload section steps', () => {
-    expect(findSection('uploadFiles')?.steps).toEqual(['upload-document', 'support-needs']);
+    expect(findSection('uploadFiles')?.steps).toEqual(['upload-document', 'check-your-answers-documents']);
   });
 
   it('maps end-of-journey steps into final section', () => {
     expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
+      'support-needs',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',

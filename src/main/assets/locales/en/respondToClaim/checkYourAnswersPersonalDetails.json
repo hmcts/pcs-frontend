@@ -1,0 +1,48 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Personal details",
+  "rows": {
+    "defendantNameConfirmation": {
+      "label": "Is your name {{name}}?",
+      "changeHidden": "your name"
+    },
+    "defendantName": {
+      "label": "What’s your name?",
+      "changeHidden": "your name"
+    },
+    "dateOfBirth": {
+      "label": "What’s your date of birth?",
+      "changeHidden": "your date of birth"
+    },
+    "correspondenceAddressConfirmation": {
+      "label": "Is your correspondence address {{address}}?",
+      "fallbackLabel": "What’s your correspondence address?",
+      "changeHidden": "your correspondence address"
+    },
+    "contactByEmailOrPost": {
+      "label": "How do you want to receive updates?",
+      "changeHidden": "how you want to receive updates",
+      "options": {
+        "email": "By email",
+        "post": "By post",
+        "none": "None"
+      }
+    },
+    "contactByEmailAddress": {
+      "label": "Email",
+      "changeHidden": "your email address"
+    },
+    "contactByPhone": {
+      "label": "Are you happy to be contacted by telephone?",
+      "changeHidden": "whether you are happy to be contacted by telephone"
+    },
+    "contactByPhoneNumber": {
+      "label": "UK phone number",
+      "changeHidden": "your UK phone number"
+    },
+    "contactByText": {
+      "label": "Are you happy to be contacted by text message?",
+      "changeHidden": "whether you want to receive text messages"
+    }
+  }
+}

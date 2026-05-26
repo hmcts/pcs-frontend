@@ -37,7 +37,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       'contact-preferences-text-message'
     );
     await expect(getNextStep(optedOutReq, 'contact-preferences-telephone', flowConfig, {})).resolves.toBe(
-      'dispute-claim-interstitial'
+      'check-your-answers-personal-details'
     );
   });
 
@@ -107,7 +107,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('uses valid static previous step for household interstitial path', async () => {
     const req = createReq({ data: rentArrearsData });
     await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'repayments-agreed'
+      'check-your-answers-payments-and-agreements'
     );
   });
 
@@ -119,7 +119,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'your-household-and-circumstances'
+      'check-your-answers-your-response'
     );
   });
 
@@ -131,7 +131,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'payment-interstitial'
+      'check-your-answers-your-response'
     );
   });
 

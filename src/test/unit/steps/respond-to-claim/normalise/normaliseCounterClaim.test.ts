@@ -150,4 +150,27 @@ describe('normaliseCounterClaim', () => {
 
     expect(response.defendantResponses?.counterClaim).toEqual({ claimType: 'OTHER' });
   });
+
+  it('drops other-order fields when claimType is PAYMENT_OR_COMPENSATION (other-order step is skipped)', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'YES',
+        counterClaim: {
+          claimType: 'PAYMENT_OR_COMPENSATION',
+          isClaimAmountKnown: 'YES',
+          claimAmount: '50000',
+          otherOrderRequestDetails: 'Stale detail from when SOMETHING_ELSE was selected',
+          otherOrderRequestFacts: 'Stale facts',
+        },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaim).toEqual({
+      claimType: 'PAYMENT_OR_COMPENSATION',
+      isClaimAmountKnown: 'YES',
+      claimAmount: '50000',
+    });
+  });
 });

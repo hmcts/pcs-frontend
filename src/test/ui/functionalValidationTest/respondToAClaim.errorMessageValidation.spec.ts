@@ -11,6 +11,7 @@ import {
   counterClaimAgainstWhom,
   counterClaimFee,
   counterClaimSpecificSumOfMoney,
+  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
@@ -46,6 +47,8 @@ import { contactPreferenceEmailOrPostErrorValidation } from '../functional/conta
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
 import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
 import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
+import { counterClaimAboutErrorValidation } from '../functional/counterClaimAbout.pft';
+import { counterClaimAgainstWhomErrorValidation } from '../functional/counterClaimAgainstWhom.pft';
 import { counterClaimFeeErrorValidation } from '../functional/counterClaimFee.pft';
 import { counterClaimSpecificSumErrorValidation } from '../functional/counterClaimSpecificSumOfMoney.pft';
 import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/counterClaimWhatAreYouClaimingFor.pft';
@@ -318,13 +321,19 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
 
-    await softErrorMessageValidation('counterClaimAgainstWhom', NO_EMV_READ_ONLY);
-    await performAction('clickButton', counterClaimAgainstWhom.continueButton);
+    await softErrorMessageValidation('counterClaimAgainstWhom', counterClaimAgainstWhomErrorValidation);
+    await performAction('selectClaimAgainstWhom', {
+      question: counterClaimAgainstWhom.mainHeader,
+      options: [claimantName],
+    });
 
-    await softErrorMessageValidation('counterClaimAbout', NO_EMV_READ_ONLY);
-    await performAction('clickButton', counterClaimAbout.continueButton);
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-
+    await softErrorMessageValidation('counterClaimAbout', counterClaimAboutErrorValidation);
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await softErrorMessageValidation('counterClaimUploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
 
@@ -561,6 +570,14 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('haveYouAlreadyAppliedForHelp', NO_EMV_READ_ONLY);
     await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    // Following steps need to be enabled and update routing once HDPI-5193 is merged
+    /* await softErrorMessageValidation('counterClaimAbout', counterClaimAboutErrorValidation);
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });*/
+    await softErrorMessageValidation('counterClaimUploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');

@@ -1,0 +1,18 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/stepButtons.njk"                   import stepButtons %}
+{% from "macros/csrf.njk"                          import csrfProtection %}
+
+{% block pageTitle %}{{ summaryData.card.title.text }} &ndash; {{ t('pageTitle') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-l">{{ t('pageTitle') }}</h1>
+
+  {{ govukSummaryList(summaryData) }}
+
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+    {{ stepButtons(t('buttons.saveAndContinue'), t('buttons.saveForLater')) }}
+  </form>
+{% endblock %}

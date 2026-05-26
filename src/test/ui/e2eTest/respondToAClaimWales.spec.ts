@@ -9,7 +9,10 @@ import {
   counterClaim,
   counterClaimAbout,
   counterClaimFee,
+  counterClaimHaveYouAppliedForHelp,
+  counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
+  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
@@ -42,7 +45,6 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
-import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -114,8 +116,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - Rent and NonRentArrears - CounterClaimFee - INeedHelp @noDefendants @regression', async () => {
-    //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
+  test('Respond to a claim - Wales - Secure contract - Rent and NonRentArrears - CounterClaimFee - INeedHelp @PR @noDefendants @smoke @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
@@ -191,8 +192,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
+
     await performValidation('mainHeader', counterClaimHaveYouAppliedForHelp.mainHeader);
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.continueButton);
+    //Below routing needs to updated once HDPI-5193 is implemented and merged and enable commented out lines as part of routing
+    /*await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });*/
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -366,6 +374,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('retrieveCYATableDataRTC');
@@ -565,6 +578,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('counterClaimOrderOtherThanSum', {
+      ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
+      factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
+    });
+    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performValidation('mainHeader', counterClaimAbout.mainHeader);
     await performAction('clickButton', counterClaimAbout.continueButton);
     await performAction('retrieveCYATableDataRTC');

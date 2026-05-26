@@ -15,13 +15,6 @@ export interface StepRoute {
   nextStep: string;
 }
 
-/**
- * Type for previousStep configuration.
- * Can be:
- * - A static string: the step name to navigate back to
- * - A function with Request only
- * - A function with Request and formData
- */
 export type PreviousStep =
   | string
   | ((req: Request) => string | Promise<string>)
@@ -44,6 +37,7 @@ export interface SectionConfig {
   titleKey: string;
   steps: string[];
   isApplicable?: SectionApplicabilityCondition;
+  dependsOn?: string[];
 }
 
 export interface JourneyFlowConfig {

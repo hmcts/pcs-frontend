@@ -5,7 +5,21 @@ import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegist
 
 import { getNextStep } from '@modules/steps/flow';
 
-const CITIZEN_ONLY_STEPS = ['free-legal-advice', 'other-considerations', 'upload-document', 'support-needs'];
+const CITIZEN_ONLY_STEPS = [
+  'free-legal-advice',
+  'other-considerations',
+  'upload-document',
+  'support-needs',
+  // Per-section CYAs are citizen-only — legal rep gets the single whole-claim CYA
+  // at check-your-answers, not these per-section summaries.
+  'check-your-answers-start-now-and-details',
+  'check-your-answers-personal-details',
+  'check-your-answers-your-response',
+  'check-your-answers-payments-and-agreements',
+  'check-your-answers-your-circumstances',
+  'check-your-answers-income-and-expenses',
+  'check-your-answers-documents',
+];
 
 describe('respond-to-claim legalrep flow config', () => {
   it('every stepOrder entry resolves to a registered step', () => {

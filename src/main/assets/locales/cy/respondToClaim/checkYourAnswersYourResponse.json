@@ -1,0 +1,92 @@
+{
+  "pageTitle": "cy Check your answers",
+  "cardTitle": "cy Response",
+  "options": {
+    "yes": "cy Yes",
+    "no": "cy No",
+    "imNotSure": "cy I’m not sure"
+  },
+  "rows": {
+    "landlordRegistered": {
+      "label": "cy Is your landlord registered?",
+      "changeHidden": "cy whether your landlord is registered"
+    },
+    "landlordLicensed": {
+      "label": "cy Is your landlord licensed?",
+      "changeHidden": "cy whether your landlord is licensed"
+    },
+    "writtenTerms": {
+      "label": "cy Has your landlord sent you written terms of the occupation contract?",
+      "changeHidden": "cy whether your landlord has sent you written terms of the occupation contract"
+    },
+    "tenancyTypeCorrect": {
+      "label": "cy Is the tenancy, occupation contract or licence agreement type correct?",
+      "changeHidden": "cy whether the tenancy type on the claim is correct"
+    },
+    "tenancyTypeDetails": {
+      "label": "cy Give the correct tenancy, occupation contract or licence type",
+      "changeHidden": "cy the correct tenancy, occupation contract or licence type"
+    },
+    "tenancyStartDate": {
+      "label": "cy When did your tenancy start?",
+      "changeHidden": "cy your tenancy start date"
+    },
+    "possessionNoticeReceived": {
+      "label": "cy Did {{claimantName}} give you notice of their intention to begin possession proceedings?",
+      "changeHidden": "cy whether you received a possession notice"
+    },
+    "noticeReceivedDate": {
+      "label": "cy When did you receive notice from {{claimantName}}?",
+      "changeHidden": "cy the date you received the notice"
+    },
+    "rentArrearsAmountConfirmation": {
+      "label": "cy Do you owe this amount in rent arrears?",
+      "changeHidden": "cy whether you agree with the rent arrears amount"
+    },
+    "rentArrearsAmountDetails": {
+      "label": "cy How much do you believe you owe in rent arrears?",
+      "changeHidden": "cy how much you believe you owe in rent arrears"
+    },
+    "disputeClaim": {
+      "label": "cy Do you want to dispute any other parts of the claim?",
+      "changeHidden": "cy whether you want to dispute any other parts of the claim"
+    },
+    "disputeClaimDetails": {
+      "label": "cy Explain which parts of the claim you do not agree with",
+      "changeHidden": "cy why you are disputing this claim"
+    },
+    "makeCounterClaim": {
+      "label": "cy Do you want to make a counterclaim?",
+      "changeHidden": "cy whether you want to make a counterclaim"
+    },
+    "counterClaimType": {
+      "label": "cy What are you claiming for?",
+      "changeHidden": "cy what you are counterclaiming for",
+      "options": {
+        "PAYMENT_OR_COMPENSATION": "cy A sum of money or compensation",
+        "SOMETHING_ELSE": "cy Something else",
+        "BOTH": "cy Both"
+      }
+    },
+    "isClaimAmountKnown": {
+      "label": "cy Are you claiming for a specific sum of money?",
+      "changeHidden": "cy whether you are claiming for a specific sum of money"
+    },
+    "claimAmount": {
+      "label": "cy How much are you claiming?",
+      "changeHidden": "cy how much you are claiming"
+    },
+    "estimatedMaxClaimAmount": {
+      "label": "cy What’s the maximum value of your claim?",
+      "changeHidden": "cy the maximum value of your claim"
+    },
+    "counterClaimNeedHelpWithFees": {
+      "label": "cy Do you need help paying the counterclaim fee?",
+      "changeHidden": "cy whether you need help paying the counterclaim fee",
+      "options": {
+        "YES": "cy I need help paying the fee",
+        "NO": "cy I do not need help paying the fee"
+      }
+    }
+  }
+}

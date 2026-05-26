@@ -36,6 +36,7 @@
   },
   "change": "Change",
   "back": "Back",
+  "noAnswerProvided": "No answer provided",
   "date": {
     "day": "Day",
     "month": "Month",
@@ -150,5 +151,11 @@
       "title": "Application not available",
       "paragraph": "This application is not available. It may have already been submitted in a different window."
     }
+  },
+  "taskList": {
+    "startNowAndDetails": "Free Legal Advice",
+    "personalDetails": "Confirm your details and contact preferences",
+    "disputeAndTenancy": "Response",
+    "situationAndCircumstances": "Your circumstances"
   }
 }

@@ -19,6 +19,12 @@ export function normaliseCounterClaim(response: PossessionClaimResponse): void {
     return;
   }
 
+  // Other-order fields are captured only when claimType is SOMETHING_ELSE or BOTH
+  if (cc.claimType !== 'SOMETHING_ELSE' && cc.claimType !== 'BOTH') {
+    delete cc.otherOrderRequestDetails;
+    delete cc.otherOrderRequestFacts;
+  }
+
   // Counterclaim isn't a money/payment claim → counter-claim-specific-sum is skipped
   if (cc.claimType !== 'PAYMENT_OR_COMPENSATION' && cc.claimType !== 'BOTH') {
     delete cc.isClaimAmountKnown;

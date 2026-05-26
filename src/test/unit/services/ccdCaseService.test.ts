@@ -310,7 +310,7 @@ describe('ccdCaseService', () => {
       await ccdCaseService.submitGeneralApplication(accessToken, ccdData);
 
       expect(mockGet).toHaveBeenCalledWith(
-        `${mockUrl}/cases/${caseId}/event-triggers/citizenCreateGenApp`,
+        `${mockUrl}/cases/${caseId}/event-triggers/makeAnApplication`,
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: `Bearer ${accessToken}`,
@@ -325,9 +325,9 @@ describe('ccdCaseService', () => {
             citizenGenAppRequest,
           },
           event: {
-            id: 'citizenCreateGenApp',
-            summary: 'Citizen citizenCreateGenApp summary',
-            description: 'Citizen citizenCreateGenApp description',
+            id: 'makeAnApplication',
+            summary: 'Citizen makeAnApplication summary',
+            description: 'Citizen makeAnApplication description',
           },
           event_token: eventToken,
           ignore_warning: false,
