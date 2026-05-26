@@ -101,7 +101,7 @@ describe('ccdDashboardUtils', () => {
           id: 'a1',
           value: {
             id: 'APP-1',
-            type: GenAppType.SUSPEND,
+            type: GenAppType.SOMETHING_ELSE,
             applicationSubmittedDate: '2026-05-01',
           },
         },
@@ -122,7 +122,7 @@ describe('ccdDashboardUtils', () => {
       expect(unwrapRelatedApplications(raw)).toEqual([
         {
           id: 'APP-1',
-          type: GenAppType.SUSPEND,
+          type: GenAppType.SOMETHING_ELSE,
           applicationSubmittedDate: '2026-05-01',
         },
         {
