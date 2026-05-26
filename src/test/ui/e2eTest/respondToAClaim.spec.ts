@@ -1086,10 +1086,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('counterClaimOrderOtherThanSum', {
-      ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
-      factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
-    });
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
