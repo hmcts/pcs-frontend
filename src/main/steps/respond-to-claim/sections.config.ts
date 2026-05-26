@@ -45,6 +45,8 @@ const sectionDefs = [
       'counter-claim-have-you-applied-for-help',
       'counter-claim-against-whom',
       'counter-claim-about',
+      'counter-claim-order-other-than-sum',
+      'counter-claim-upload-documents',
       'section-cya-dispute-and-tenancy',
     ],
   },

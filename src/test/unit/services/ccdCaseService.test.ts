@@ -3,7 +3,7 @@ import config from 'config';
 import { HTTPError } from '../../../main/HttpError';
 
 import { http } from '@modules/http';
-import { CaseState, CcdCase, CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
+import { CcdCase, CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('config');
@@ -14,6 +14,7 @@ const mockGet = http.get as jest.Mock;
 
 const accessToken = 'token';
 const mockUrl = 'http://ccd.example.com';
+const caseId = '1234567890123456';
 
 (config.get as jest.Mock).mockImplementation(key => {
   if (key === 'ccd.url') {
@@ -29,9 +30,8 @@ describe('ccdCaseService', () => {
     jest.clearAllMocks();
   });
 
-  describe('getCaseById', () => {
+  describe('getCaseByIdForEvent', () => {
     it('should retrieve case by ID with default eventId', async () => {
-      const caseId = '1234567890123456';
       const mockCaseData = { applicantForename: 'John', applicantSurname: 'Doe' };
 
       mockGet.mockResolvedValue({
@@ -42,7 +42,7 @@ describe('ccdCaseService', () => {
         },
       });
 
-      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId);
 
       expect(mockGet).toHaveBeenCalledWith(
         `${mockUrl}/cases/${caseId}/event-triggers/respondPossessionClaim?ignore-warning=false`,
@@ -59,7 +59,6 @@ describe('ccdCaseService', () => {
     });
 
     it('should retrieve case by ID with custom eventId', async () => {
-      const caseId = '1234567890123456';
       const customEventId = 'customEvent';
       const mockCaseData = { applicantForename: 'Jane' };
 
@@ -71,7 +70,7 @@ describe('ccdCaseService', () => {
         },
       });
 
-      const result = await ccdCaseService.getCaseById(accessToken, caseId, customEventId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId, customEventId);
 
       expect(mockGet).toHaveBeenCalledWith(
         `${mockUrl}/cases/${caseId}/event-triggers/${customEventId}?ignore-warning=false`,
@@ -88,13 +87,11 @@ describe('ccdCaseService', () => {
     });
 
     it('should return empty data object when case_details is missing', async () => {
-      const caseId = '1234567890123456';
-
       mockGet.mockResolvedValue({
         data: {},
       });
 
-      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId);
 
       expect(result).toEqual({
         id: caseId,
@@ -103,11 +100,79 @@ describe('ccdCaseService', () => {
     });
 
     it('should return empty data object when case_data is missing', async () => {
-      const caseId = '1234567890123456';
-
       mockGet.mockResolvedValue({
         data: {
           case_details: {},
+        },
+      });
+
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId);
+
+      expect(result).toEqual({
+        id: caseId,
+        data: {},
+      });
+    });
+
+    it('should throw HTTPError with 403 status on unauthorized access', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 403, data: { message: 'Forbidden' } },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow('Not authorised');
+    });
+
+    it('should throw HTTPError on case not found', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 404, data: { message: 'Not found' } },
+        message: 'Case not found',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow('Case not found');
+    });
+
+    it('should throw HTTPError on unexpected error', async () => {
+      mockGet.mockRejectedValue(new Error('Network error'));
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow('CCD case service error');
+    });
+  });
+
+  describe('getCaseById read', () => {
+    it('should retrieve read case data from data', async () => {
+      const mockCaseData = { statementOfCase: ['document'] };
+
+      mockGet.mockResolvedValue({
+        data: {
+          id: caseId,
+          data: mockCaseData,
+        },
+      });
+
+      const result = await ccdCaseService.getCaseById(accessToken, caseId);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(result).toEqual({
+        id: caseId,
+        data: mockCaseData,
+      });
+    });
+
+    it('should return empty data object when data is missing', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          id: caseId,
         },
       });
 
@@ -117,80 +182,6 @@ describe('ccdCaseService', () => {
         id: caseId,
         data: {},
       });
-    });
-
-    it('should throw HTTPError with 403 status on unauthorized access', async () => {
-      const caseId = '1234567890123456';
-
-      mockGet.mockRejectedValue({
-        response: { status: 403, data: { message: 'Forbidden' } },
-        message: 'Request failed',
-      });
-
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Not authorised');
-    });
-
-    it('should throw HTTPError on case not found', async () => {
-      const caseId = '1234567890123456';
-
-      mockGet.mockRejectedValue({
-        response: { status: 404, data: { message: 'Not found' } },
-        message: 'Case not found',
-      });
-
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Case not found');
-    });
-
-    it('should throw HTTPError on unexpected error', async () => {
-      const caseId = '1234567890123456';
-
-      mockGet.mockRejectedValue(new Error('Network error'));
-
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('CCD case service error');
-    });
-  });
-
-  describe('getCase', () => {
-    it('returns latest draft case if found', async () => {
-      mockPost.mockResolvedValue({
-        data: {
-          cases: [
-            { id: '123', state: CaseState.DRAFT, case_data: { applicantForename: 'value' } },
-            { id: '456', state: 'SUBMITTED', case_data: {} },
-          ],
-        },
-      });
-
-      const result = await ccdCaseService.getCase(accessToken);
-
-      expect(result).toEqual({ id: '123', data: { applicantForename: 'value' } });
-    });
-
-    it('returns null if no draft case found', async () => {
-      mockPost.mockResolvedValue({
-        data: { cases: [{ id: '456', state: 'SUBMITTED', case_data: {} }] },
-      });
-
-      const result = await ccdCaseService.getCase(accessToken);
-
-      expect(result).toBeNull();
-    });
-
-    it('returns null on 404 error', async () => {
-      mockPost.mockRejectedValue({ response: { status: 404 } });
-
-      const result = await ccdCaseService.getCase(accessToken);
-      expect(result).toBeNull();
-    });
-
-    it('throws HTTPError on unexpected error', async () => {
-      mockPost.mockRejectedValue(new Error('Unexpected'));
-
-      await expect(ccdCaseService.getCase(accessToken)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCase(accessToken)).rejects.toThrow('CCD case service error');
     });
   });
 
@@ -246,7 +237,6 @@ describe('ccdCaseService', () => {
     });
 
     it('submits via a CCD event', async () => {
-      const caseId = '1234';
       const citizenGenAppRequest: CitizenGenAppRequest = { applicationType: GenAppType.ADJOURN };
       const ccdData: CcdCase = { id: caseId, data: { citizenGenAppRequest } };
       const eventToken = 'event token here';
@@ -264,7 +254,7 @@ describe('ccdCaseService', () => {
       await ccdCaseService.submitGeneralApplication(accessToken, ccdData);
 
       expect(mockGet).toHaveBeenCalledWith(
-        `${mockUrl}/cases/${caseId}/event-triggers/citizenCreateGenApp`,
+        `${mockUrl}/cases/${caseId}/event-triggers/makeAnApplication`,
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: `Bearer ${accessToken}`,
@@ -279,9 +269,9 @@ describe('ccdCaseService', () => {
             citizenGenAppRequest,
           },
           event: {
-            id: 'citizenCreateGenApp',
-            summary: 'Citizen citizenCreateGenApp summary',
-            description: 'Citizen citizenCreateGenApp description',
+            id: 'makeAnApplication',
+            summary: 'Citizen makeAnApplication summary',
+            description: 'Citizen makeAnApplication description',
           },
           event_token: eventToken,
           ignore_warning: false,
@@ -295,16 +285,7 @@ describe('ccdCaseService', () => {
     });
   });
 
-  describe('getExistingCaseData', () => {
-    it('throws if case data errors', async () => {
-      mockGet.mockRejectedValue({ response: { status: 400 } });
-      await expect(ccdCaseService.getExistingCaseData(accessToken, '')).rejects.toThrow(HTTPError);
-    });
-  });
-
   describe('getDashboardView', () => {
-    const caseId = '1234567890123456';
-
     it('GETs dashboardView event trigger and returns transformed dashboard data', async () => {
       mockGet.mockResolvedValue({
         data: {
@@ -328,7 +309,7 @@ describe('ccdCaseService', () => {
                       tasks: [
                         {
                           id: 't1',
-                          value: { templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' },
+                          value: { templateId: 'ViewClaim', status: 'AVAILABLE' },
                         },
                       ],
                     },
@@ -361,7 +342,7 @@ describe('ccdCaseService', () => {
         taskGroups: [
           {
             groupId: 'CLAIM',
-            tasks: [{ templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' }],
+            tasks: [{ templateId: 'ViewClaim', status: 'AVAILABLE' }],
           },
         ],
         propertyAddress: '1 Test Street, London, SW1A 1AA',
@@ -433,7 +414,6 @@ describe('updateCase', () => {
   });
 
   it('should call CCD validate endpoint and return merged data with caller-supplied id', async () => {
-    const caseId = '1234567890123456';
     const mockData = { defendantName: 'John Doe' };
 
     mockPost.mockResolvedValue({
@@ -466,8 +446,6 @@ describe('updateCase', () => {
   });
 
   it('should throw HTTPError when draft save fails with a generic error', async () => {
-    const caseId = '1234567890123456';
-
     mockPost.mockRejectedValue({
       response: { status: 500 },
       message: 'Server exploded',
@@ -483,8 +461,6 @@ describe('updateCase', () => {
   });
 
   it('should surface CCD callback errors when the validate endpoint returns 422', async () => {
-    const caseId = '1234567890123456';
-
     mockPost.mockRejectedValue({
       response: {
         status: 422,
