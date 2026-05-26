@@ -232,49 +232,6 @@ export const ccdCaseService = {
     }
   },
 
-  async getCase(accessToken: string | undefined): Promise<CcdCase | null> {
-    const url = `${getBaseUrl()}/searchCases?ctid=${getCaseTypeId()}`;
-    const headersConfig = getCaseHeaders(accessToken || '');
-
-    const requestBody = {
-      query: { match_all: {} },
-      sort: [{ created_date: { order: 'desc' } }],
-    };
-
-    logger.info(`Calling ccdCaseService search with URL: ${url}`);
-    logger.info(`Request body: ${JSON.stringify(requestBody, null, 2)}`);
-
-    try {
-      const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
-      const allCases = response?.data?.cases;
-      logger.info(`Response data: ${JSON.stringify(response?.data?.cases, null, 2)}`);
-      const draftCase = allCases?.find(c => c.state === CaseState.DRAFT);
-
-      if (draftCase) {
-        logger.info(`Draft case found: ${JSON.stringify(draftCase, null, 2)}`);
-        return {
-          id: draftCase.id,
-          data: draftCase.case_data as CcdCaseData,
-        };
-      }
-
-      return null;
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 404) {
-        logger.warn('No case found, returning null.');
-        return null;
-      }
-      if (axiosError.response?.status === 400) {
-        logger.warn(
-          `Bad request (400) when searching for cases. Response: ${JSON.stringify(axiosError.response?.data, null, 2)}`
-        );
-        return null;
-      }
-      throw convertAxiosErrorToHttpError(error, 'getCase');
-    }
-  },
-
   /**
    * Create a new case in CCD
    *
