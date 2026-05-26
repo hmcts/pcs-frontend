@@ -20,6 +20,7 @@ import {
   shouldShowCounterClaimAboutStep,
   shouldShowCounterClaimAgainstWhoStep,
   shouldShowCounterClaimHelpWithFeesStep,
+  shouldShowCounterClaimNeedToApplyStep,
   shouldShowInstallmentPaymentsStep,
   shouldShowPriorityDebtDetailsStep,
   shouldShowUniversalCreditStep,
@@ -90,6 +91,9 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counter-claim-have-you-applied-for-help': {
       showCondition: (req: Request) => shouldShowCounterClaimHelpWithFeesStep(req),
+    },
+    'counter-claim-you-need-to-apply-for-help-with-your-fees': {
+      showCondition: (req: Request) => shouldShowCounterClaimNeedToApplyStep(req),
     },
     'counter-claim-against-whom': {
       showCondition: (req: Request) => shouldShowCounterClaimAgainstWhoStep(req),
