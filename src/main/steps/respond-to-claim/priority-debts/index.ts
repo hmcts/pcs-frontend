@@ -21,15 +21,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
-    const priorityDebts = getValidatedCaseHouseholdCircumstances(req)?.priorityDebts;
-
-    if (fromYesNoEnum(priorityDebts) === 'yes') {
-      return { havePriorityDebts: 'yes' };
-    }
-    if (fromYesNoEnum(priorityDebts) === 'no') {
-      return { havePriorityDebts: 'no' };
-    }
-    return {};
+    const selection = fromYesNoEnum(getValidatedCaseHouseholdCircumstances(req)?.priorityDebts);
+    return selection ? { havePriorityDebts: selection } : {};
   },
   translationKeys: {
     pageTitle: 'pageTitle',

@@ -34,9 +34,8 @@ function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
 
 function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig | undefined): string {
   const caseId = req.res?.locals.validatedCase?.id;
-  const hubStepName = flowConfig?.hubStepName;
-  if (hubStepName && caseId && flowConfig) {
-    return getStepUrl(hubStepName, flowConfig, caseId);
+  if (flowConfig?.hubStepName && caseId) {
+    return getStepUrl(flowConfig.hubStepName, flowConfig, caseId);
   }
   return (caseId && getDashboardUrl(caseId)) || '/';
 }
