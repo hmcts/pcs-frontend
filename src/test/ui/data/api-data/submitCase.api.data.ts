@@ -170,8 +170,8 @@ export const submitCaseApiData = {
       ],
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'Test',
-        positionClaimant: 'Leah',
+        fullNameParty: 'Test',
+        positionParty: 'Leah',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -245,8 +245,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'Test',
-        positionClaimant: 'Leah',
+        fullNameParty: 'Test',
+        positionParty: 'Leah',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -369,8 +369,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -574,8 +574,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -660,8 +660,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -770,8 +770,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
