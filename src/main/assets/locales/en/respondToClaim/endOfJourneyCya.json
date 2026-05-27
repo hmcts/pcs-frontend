@@ -46,6 +46,7 @@
   "errors": {
     "statementOfTruthContempt": "Select if you understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth",
     "statementOfTruthBelief": "Select if you believe that the facts stated in this defence form are true",
-    "fullName": "Enter your full name"
+    "fullName": "Enter your full name",
+    "fullNameMaxLength": "Your full name must be 100 characters or fewer"
   }
 }

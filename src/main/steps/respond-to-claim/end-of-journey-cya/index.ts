@@ -42,7 +42,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
     {
       name: 'fullName',
-      type: 'character-count',
+      type: 'text',
       required: true,
       maxLength: 100,
       labelClasses: 'govuk-label--s',

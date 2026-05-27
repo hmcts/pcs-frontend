@@ -2,7 +2,7 @@
 {% from "govuk/components/error-summary/macro.njk"  import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk"   import govukSummaryList %}
 {% from "govuk/components/checkboxes/macro.njk"     import govukCheckboxes %}
-{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/input/macro.njk"          import govukInput %}
 {% from "govuk/components/button/macro.njk"         import govukButton %}
 {% from "macros/csrf.njk"                           import csrfProtection %}
 
@@ -36,8 +36,8 @@
     {% endfor %}
 
     {% for field in fields %}
-      {% if field.componentType == 'characterCount' %}
-        {{ govukCharacterCount(field.component) }}
+      {% if field.componentType == 'input' %}
+        {{ govukInput(field.component) }}
       {% endif %}
     {% endfor %}
 
