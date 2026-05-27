@@ -22,7 +22,7 @@ export let pinUsers: PinUser[] = [];
 export let selectedPinUser: PinUser | undefined;
 
 function hasKnownDefendantDetails(pinUser: PinUser): boolean {
-  return Boolean(pinUser.firstName && pinUser.lastName && pinUser.address?.trim());
+  return Boolean(pinUser.firstName && pinUser.lastName);
 }
 
 function setSelectedPinUser(pinUser: PinUser | undefined): PinUser | undefined {
