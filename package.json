@@ -59,7 +59,7 @@
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/properties-volume": "1.4.0",
-    "@launchdarkly/node-server-sdk": "9.10.14",
+    "@launchdarkly/node-server-sdk": "9.11.0",
     "@ministryofjustice/frontend": "^9.0.0",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/instrumentation-winston": "0.62.0",
