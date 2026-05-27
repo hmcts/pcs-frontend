@@ -63,17 +63,15 @@ describe('viewTheClaimUtils', () => {
       rentArrears_Total: '200000',
       rentArrears_RecoveryAttempted: 'NO',
       arrearsJudgmentWanted: 'YES',
-      rentArrears_StatementDocuments: [
+      allDocuments: [
         {
           id: '11111111-1111-1111-1111-111111111111',
           value: {
-            document_url: 'http://doc-store/rent-statement',
-            document_binary_url: 'http://doc-store/rent-statement/binary',
             document_filename: 'rent-statement.pdf',
+            document_binary_url: 'http://doc-store/rent-statement/binary',
+            document_type: 'RENT_STATEMENT',
           },
         },
-      ],
-      allDocuments: [
         {
           id: '22222222-2222-2222-2222-222222222222',
           value: {

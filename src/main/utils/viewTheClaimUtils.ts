@@ -318,7 +318,7 @@ function buildClaimPdfSection(
   const claimDocument = documents.find(
     document =>
       document.categoryId === 'statementsOfCase' ||
-      (document.sourceField === 'allDocuments' && document.filename.toLowerCase().includes('claim'))
+      document.filename.toLowerCase().includes('claim')
   );
 
   return {
@@ -441,7 +441,6 @@ function buildRentArrearsSection(
     htmlRow(
       'Rent statement',
       documentLinksHtml(documents, caseReference, {
-        sourceFields: ['rentArrears_StatementDocuments'],
         documentTypes: ['RENT_STATEMENT'],
       })
     ),
@@ -507,7 +506,6 @@ function buildNoticeDetailsSection(
     htmlRow(
       'Notice or certificate of service',
       documentLinksHtml(documents, caseReference, {
-        sourceFields: ['notice_NoticeDocuments'],
         documentTypes: ['NOTICE_FOR_SERVICE_OUT_OF_JURISDICTION', 'NOTICE', 'CERTIFICATE_OF_SERVICE'],
       })
     ),
@@ -541,7 +539,7 @@ function buildTenancySection(
     htmlRow(
       'Tenancy, occupation contract or licence',
       documentLinksHtml(documents, caseReference, {
-        sourceFields: ['tenancy_TenancyLicenceDocuments', 'licenceDocuments'],
+        filenameIncludes: ['tenancy', 'licence', 'license', 'occupation'],
       })
     ),
   ];
@@ -688,7 +686,6 @@ function buildRequiredDocumentsSection(
     htmlRow(
       'Energy performance certificate',
       documentLinksHtml(documents, caseReference, {
-        sourceFields: ['energyPerformanceCertificateDocuments'],
         documentTypes: ['ENERGY_PERFORMANCE_CERTIFICATE'],
       })
     ),
@@ -703,7 +700,6 @@ function buildRequiredDocumentsSection(
     htmlRow(
       'Current gas safety report',
       documentLinksHtml(documents, caseReference, {
-        sourceFields: ['gasSafetyReportDocuments'],
         documentTypes: ['GAS_SAFETY_REPORT'],
       })
     ),
@@ -718,7 +714,6 @@ function buildRequiredDocumentsSection(
     htmlRow(
       'Electrical Installation Condition Report (EICR)',
       documentLinksHtml(documents, caseReference, {
-        sourceFields: ['electricalInstallationConditionReportDocuments'],
         documentTypes: ['ELECTRICAL_INSTALLATION_CONDITION_REPORT'],
       })
     ),
@@ -981,15 +976,20 @@ function selectedAlternative(data: UnknownRecord, value: string): string | undef
 function documentLinksHtml(
   documents: CaseDocumentLookupItem[],
   caseReference: string,
-  options: { sourceFields?: string[]; documentTypes?: string[] }
+  options: { documentTypes?: string[]; categoryIds?: string[]; filenameIncludes?: string[] }
 ): string | undefined {
-  const sourceFields = new Set(options.sourceFields ?? []);
   const documentTypes = new Set(options.documentTypes ?? []);
-  const links = documents.filter(
-    document =>
-      (sourceFields.size > 0 && sourceFields.has(document.sourceField)) ||
-      (documentTypes.size > 0 && !!document.documentType && documentTypes.has(document.documentType))
-  );
+  const categoryIds = new Set(options.categoryIds ?? []);
+  const filenameIncludes = (options.filenameIncludes ?? []).map(value => value.toLowerCase());
+
+  const links = documents.filter(document => {
+    const filename = document.filename.toLowerCase();
+    return (
+      (documentTypes.size > 0 && !!document.documentType && documentTypes.has(document.documentType)) ||
+      (categoryIds.size > 0 && !!document.categoryId && categoryIds.has(document.categoryId)) ||
+      (filenameIncludes.length > 0 && filenameIncludes.some(part => filename.includes(part)))
+    );
+  });
 
   return links.length > 0
     ? links

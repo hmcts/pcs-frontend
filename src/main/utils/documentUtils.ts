@@ -83,10 +83,6 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
 
   addFlatDocuments(documents, seen, caseData, 'allDocuments');
 
-  for (const sourceField of DOCUMENT_COLLECTION_FIELDS) {
-    addNestedDocuments(documents, seen, caseData, sourceField);
-  }
-
   return documents;
 }
 
@@ -109,17 +105,6 @@ function createFolders(
 function isDocumentFolderKey(value: unknown): value is DocumentFolderKey {
   return typeof value === 'string' && value in DOCUMENT_FOLDER_TITLES;
 }
-
-const DOCUMENT_COLLECTION_FIELDS = [
-  'rentArrears_StatementDocuments',
-  'notice_NoticeDocuments',
-  'tenancy_TenancyLicenceDocuments',
-  'licenceDocuments',
-  'energyPerformanceCertificateDocuments',
-  'gasSafetyReportDocuments',
-  'electricalInstallationConditionReportDocuments',
-  'additionalDocuments',
-] as const;
 
 function addFlatDocuments(
   documents: CaseDocumentLookupItem[],
@@ -144,35 +129,6 @@ function addFlatDocuments(
       binaryUrl,
       categoryId: stringValue(value?.category_id),
       documentType: stringValue(value?.document_type ?? value?.documentType ?? value?.type),
-      sourceField,
-    });
-  }
-}
-
-function addNestedDocuments(
-  documents: CaseDocumentLookupItem[],
-  seen: Set<string>,
-  caseData: CaseDataRecord,
-  sourceField: string
-): void {
-  for (const item of asCollection(caseData[sourceField])) {
-    const id = stringValue(item.id);
-    const value = asRecord(item.value);
-    const document = asRecord(value?.document) ?? value;
-    const filename = stringValue(document?.document_filename);
-    const binaryUrl = stringValue(document?.document_binary_url);
-
-    if (!id || !filename || !binaryUrl || seen.has(id)) {
-      continue;
-    }
-
-    seen.add(id);
-    documents.push({
-      id,
-      filename,
-      binaryUrl,
-      categoryId: stringValue(value?.category_id ?? document?.category_id),
-      documentType: stringValue(value?.documentType),
       sourceField,
     });
   }
