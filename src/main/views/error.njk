@@ -20,7 +20,7 @@
   {% elif errorPageKey == 'serviceUnavailable' %}
 
     <h1 class="govuk-heading-l">{{ t('errorPages.serviceUnavailable.title') }}</h1>
-    <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph') }}</p>
+    <p class="govuk-body">{{ serviceUnavailableParagraph or t('errorPages.serviceUnavailable.paragraphFallback') }}</p>
     <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph2') }}</p>
 
     <h2 class="govuk-heading-m">{{ t('errorPages.serviceUnavailable.heading') }}</h2>

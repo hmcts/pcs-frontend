@@ -9,6 +9,7 @@ export default function (app: Application): void {
   }
   app.get('/dev/error/:status', (req: Request, _res: Response, next: NextFunction) => {
     const statusCode = Number(req.params.status);
-    next(new HTTPError('Dev preview', statusCode));
+    const retryAfter = typeof req.query.retryAfter === 'string' ? req.query.retryAfter : undefined;
+    next(new HTTPError('Dev preview', statusCode, retryAfter));
   });
 }

@@ -147,7 +147,9 @@
     },
     "serviceUnavailable": {
       "title": "Sorry, the service is unavailable",
-      "paragraph": "You will be able to use the service from [time] on [date].",
+      "paragraphMinutes": "You will be able to use the service in {{minutes}} minutes.",
+      "paragraphDateAndTime": "You will be able to use the service from {{dateAndTime}}.",
+      "paragraphFallback": "Try again later.",
       "paragraph2": "For help with your case, contact us by email or telephone.",
       "heading": "Email",
       "paragraph3": "Use the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",

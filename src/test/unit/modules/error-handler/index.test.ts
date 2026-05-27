@@ -29,7 +29,8 @@ describe('error-handler', () => {
       'errorPages.pageNotFound.title': 'Page not found',
       'errorPages.pageNotFound.paragraph': 'If you typed the web address, check it is correct.',
       'errorPages.serviceUnavailable.title': 'Sorry, the service is unavailable',
-      'errorPages.serviceUnavailable.paragraph': 'You will be able to use the service from [retryAfter].',
+      'errorPages.serviceUnavailable.paragraphMinutes': 'You will be able to use the service in [minutes] minutes.',
+      'errorPages.serviceUnavailable.paragraphDateAndTime': 'You will be able to use the service from [dateAndTime].',
       'errorPages.technicalError.title': 'Sorry, there is a problem with the service',
       'errorPages.technicalError.paragraph': 'Try again later.',
       'errorPages.accessDenied.title': 'You do not have access to this page',
@@ -265,6 +266,48 @@ describe('error-handler', () => {
       expect(res.locals.errorPageKey).toBe('technicalError');
       expect(res.locals.t('errorPages.technicalError.title')).toBe('Sorry, there is a problem with the service');
       expect(res.locals.t('errorPages.technicalError.paragraph')).toBe('Try again later.');
+    });
+
+    it('should handle service unavailable with retry after seconds', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Service unavailable', 503, '120');
+      const req = {
+        i18n: { getFixedT: () => createMockTranslation() },
+        language: 'en',
+      } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t: createMockTranslation() },
+        headersSent: false,
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      errorHandler(err, req, res, next);
+
+      expect(res.locals.errorPageKey).toBe('serviceUnavailable');
+      expect(res.locals.serviceUnavailableParagraph).toBe('You will be able to use the service in [minutes] minutes.');
+    });
+
+    it('should handle service unavailable with retry after date and time', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Service unavailable', 503, 'Wed, 21 Apr 2026 07:28:00 GMT');
+      const req = {
+        i18n: { getFixedT: () => createMockTranslation() },
+        language: 'en',
+      } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t: createMockTranslation() },
+        headersSent: false,
+      } as any;
+      const next = jest.fn() as NextFunction;
+
+      errorHandler(err, req, res, next);
+
+      expect(res.locals.errorPageKey).toBe('serviceUnavailable');
+      expect(res.locals.serviceUnavailableParagraph).toBe('You will be able to use the service from [dateAndTime].');
     });
 
     it('should convert non-HTTPError to HTTPError with status 500', () => {

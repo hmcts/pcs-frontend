@@ -64,7 +64,15 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
       res.locals.errorTitle = t(`applicationErrors.${err.errorCode}.title`);
       res.locals.errorParagraph = t(`applicationErrors.${err.errorCode}.paragraph`);
     } else {
-      res.locals.errorPageKey = getErrorPageKey(status);
+      const errorPageKey = getErrorPageKey(status);
+      res.locals.errorPageKey = errorPageKey;
+
+      if (errorPageKey === 'serviceUnavailable' && httpError.retryAfter) {
+        const seconds = Number(httpError.retryAfter);
+        res.locals.serviceUnavailableParagraph = Number.isNaN(seconds)
+          ? t('errorPages.serviceUnavailable.paragraphDateAndTime', { dateAndTime: httpError.retryAfter })
+          : t('errorPages.serviceUnavailable.paragraphMinutes', { minutes: Math.ceil(seconds / 60) });
+      }
     }
 
     populateCommonTranslations(req, res, t);
