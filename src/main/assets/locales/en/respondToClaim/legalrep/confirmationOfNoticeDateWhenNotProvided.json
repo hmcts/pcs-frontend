@@ -1,5 +1,14 @@
 {
   "question": "When did the defendant receive notice from {{claimantName}}? (Optional)",
   "noticeDateHint": "",
-  "paragraph": "{{claimantName}} did not provide the date they served the defendant notice."
+  "paragraph": "{{claimantName}} did not provide the date they served the defendant notice.",
+  "errors": {
+    "date": {
+      "notRealDate": "The date the defendant received notice must be a real date",
+      "futureDate": "The date the defendant received notice must either be today’s date or in the past",
+      "invalidValue": "The date the defendant received notice must be a real date",
+      "missingOne": "The date the defendant received notice must include a {{missingField}}",
+      "missingTwo": "The date the defendant received notice must include a {{first}} and {{second}}"
+    }
+  }
 }
