@@ -8,6 +8,7 @@ import { IAction } from '../../interfaces';
 
 export type PinUser = {
   pin: string;
+  nameKnown?: boolean;
   firstName: string;
   lastName: string;
   address: string;
@@ -22,7 +23,7 @@ export let pinUsers: PinUser[] = [];
 export let selectedPinUser: PinUser | undefined;
 
 function hasKnownDefendantDetails(pinUser: PinUser): boolean {
-  return Boolean(pinUser.firstName && pinUser.lastName);
+  return pinUser.nameKnown ?? Boolean(pinUser.firstName || pinUser.lastName);
 }
 
 function setSelectedPinUser(pinUser: PinUser | undefined): PinUser | undefined {
@@ -40,6 +41,11 @@ export function getSelectedPinUser(): PinUser | undefined {
 export function selectPinUserByDefendantDetails(detailsKnown: boolean): PinUser | undefined {
   const matchingPinUser = pinUsers.find(pinUser => hasKnownDefendantDetails(pinUser) === detailsKnown) ?? pinUsers[0];
   return setSelectedPinUser(matchingPinUser);
+}
+
+function getDefaultPinUser(): PinUser | undefined {
+  const hasUnknownDefendant = pinUsers.some(pinUser => !hasKnownDefendantDetails(pinUser));
+  return hasUnknownDefendant ? selectPinUserByDefendantDetails(false) : setSelectedPinUser(pinUsers[0]);
 }
 
 export async function getPinUserAt(index: number, timeoutMs = 5000): Promise<PinUser> {
@@ -88,12 +94,16 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
           }
           return {
             pin,
+            nameKnown:
+              typeof pinData.nameKnown === 'string'
+                ? pinData.nameKnown === 'YES'
+                : Boolean(pinData.firstName || pinData.lastName),
             firstName: pinData.firstName,
             lastName: pinData.lastName,
             address: formattedAddress,
           };
         });
-        setSelectedPinUser(pinUsers[0]);
+        getDefaultPinUser();
         return;
       }
       await new Promise(res => setTimeout(res, delayMs));

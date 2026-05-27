@@ -176,10 +176,10 @@ export class RespondToClaimAction implements IAction {
       option: defendantData.option,
     });
     if (defendantData.option === defendantNameConfirmation.noRadioOption) {
-      await this.inputDefendantDetails(defendantData);
-    } else {
-      await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+      await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
+      await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
     }
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
@@ -861,19 +861,12 @@ export class RespondToClaimAction implements IAction {
     const explicitDefendantTypeKnown =
       typeof accessCode.defendantType === 'string' ? accessCode.defendantType === 'known' : undefined;
 
-    const defendantNameKnownFromEnv =
-      process.env.DEFENDANT_NAME_KNOWN === 'YES' ? true : process.env.DEFENDANT_NAME_KNOWN === 'NO' ? false : undefined;
-
-    const defendantDetailsKnown =
-      explicitDefendantDetailsKnown ??
-      explicitDefendantTypeKnown ??
-      defendantNameKnownFromEnv ??
-      (process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN' ? false : undefined);
+    const defendantDetailsKnown = explicitDefendantDetailsKnown ?? explicitDefendantTypeKnown;
 
     const pin =
       typeof defendantDetailsKnown === 'boolean'
         ? selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin
-        : pins[0];
+        : (getSelectedPinUser()?.pin ?? pins[0]);
 
     if (!pin) {
       throw new Error('PIN is not available. Ensure fetchPINsAPI is called before accessYourCase');
