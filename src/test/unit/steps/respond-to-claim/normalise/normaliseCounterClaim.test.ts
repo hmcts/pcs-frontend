@@ -238,4 +238,96 @@ describe('normaliseCounterClaim', () => {
       });
     });
   });
+
+  describe('counter-claim-against-whom and counter-claim-about become unreachable when needsHelp=YES + applied !== YES', () => {
+    it('drops counterClaimAgainst, counterClaimFor and counterClaimReasons when applied is NO', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'YES',
+            appliedForHwf: 'NO',
+            counterClaimAgainst: [{ id: 'p1', value: { firstName: 'Jane', lastName: 'Doe' } }],
+            counterClaimFor: 'Stale "for" answer from a previous walk-through',
+            counterClaimReasons: 'Stale reasons',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+        needHelpWithFees: 'YES',
+        appliedForHwf: 'NO',
+      });
+    });
+
+    it('drops counterClaimAgainst, counterClaimFor and counterClaimReasons when appliedForHwf is undefined', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'YES',
+            counterClaimAgainst: [{ id: 'p1', value: { firstName: 'Jane', lastName: 'Doe' } }],
+            counterClaimFor: 'Stale',
+            counterClaimReasons: 'Stale',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+        needHelpWithFees: 'YES',
+      });
+    });
+
+    it('preserves counterClaimAgainst, counterClaimFor and counterClaimReasons when applied is YES', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'YES',
+            appliedForHwf: 'YES',
+            hwfReferenceNumber: 'HWF-123',
+            counterClaimAgainst: [{ id: 'p1', value: { firstName: 'Jane', lastName: 'Doe' } }],
+            counterClaimFor: 'Real for',
+            counterClaimReasons: 'Real reasons',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim?.counterClaimAgainst).toBeDefined();
+      expect(response.defendantResponses?.counterClaim?.counterClaimFor).toBe('Real for');
+      expect(response.defendantResponses?.counterClaim?.counterClaimReasons).toBe('Real reasons');
+    });
+
+    it('preserves counterClaimAgainst, counterClaimFor and counterClaimReasons when needsHelp is NO', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'NO',
+            counterClaimAgainst: [{ id: 'p1', value: { firstName: 'Jane', lastName: 'Doe' } }],
+            counterClaimFor: 'Real for',
+            counterClaimReasons: 'Real reasons',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim?.counterClaimAgainst).toBeDefined();
+      expect(response.defendantResponses?.counterClaim?.counterClaimFor).toBe('Real for');
+      expect(response.defendantResponses?.counterClaim?.counterClaimReasons).toBe('Real reasons');
+    });
+  });
 });

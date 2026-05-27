@@ -432,6 +432,67 @@ describe('section-CYA row builders — characterisation', () => {
       expect(rows.some(r => r.key.text === 'rows.counterClaimFor.label')).toBe(false);
       expect(rows.some(r => r.key.text === 'rows.counterClaimReasons.label')).toBe(false);
     });
+
+    it('counterclaim-against row: renders party names and links to counter-claim-against-whom', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: {
+              claimType: 'OTHER',
+              counterClaimAgainst: [
+                { id: 'p1', value: { firstName: 'Jane', lastName: 'Doe' } },
+                { id: 'p2', value: { orgName: 'Acme Lettings' } },
+              ],
+            },
+          })
+        ),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.counterClaimAgainst.label');
+      expect(row?.value.html).toContain('Jane Doe');
+      expect(row?.value.html).toContain('Acme Lettings');
+      expect(row?.actions?.items[0].href).toContain('counter-claim-against-whom');
+    });
+
+    it('counterclaim-against row: omitted when no parties are selected', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ makeCounterClaim: 'YES', counterClaim: { claimType: 'OTHER', counterClaimAgainst: [] } })),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.counterClaimAgainst.label')).toBe(false);
+    });
+
+    it('counter-claim-order-other-than-sum rows: render otherOrderRequestDetails and otherOrderRequestFacts as long-text rows', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: {
+              claimType: 'SOMETHING_ELSE',
+              otherOrderRequestDetails: 'Repairs to be done within 28 days',
+              otherOrderRequestFacts: 'The boiler has been broken since January',
+            },
+          })
+        ),
+        t
+      );
+      const details = rows.find(r => r.key.text === 'rows.otherOrderRequestDetails.label');
+      const facts = rows.find(r => r.key.text === 'rows.otherOrderRequestFacts.label');
+      expect(details?.value.html).toContain('Repairs to be done within 28 days');
+      expect(facts?.value.html).toContain('The boiler has been broken since January');
+      expect(details?.actions?.items[0].href).toContain('counter-claim-order-other-than-sum');
+      expect(facts?.actions?.items[0].href).toContain('counter-claim-order-other-than-sum');
+    });
+
+    it('counter-claim-order-other-than-sum rows: omitted when the fields are absent', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ makeCounterClaim: 'YES', counterClaim: { claimType: 'SOMETHING_ELSE' } })),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.otherOrderRequestDetails.label')).toBe(false);
+      expect(rows.some(r => r.key.text === 'rows.otherOrderRequestFacts.label')).toBe(false);
+    });
   });
 
   describe('payments', () => {

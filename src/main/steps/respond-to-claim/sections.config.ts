@@ -131,7 +131,7 @@ const sectionDefs = [
       'uploadFiles',
     ],
     steps: [
-      'support-needs',
+      'reasonable-adjustments-triage',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',

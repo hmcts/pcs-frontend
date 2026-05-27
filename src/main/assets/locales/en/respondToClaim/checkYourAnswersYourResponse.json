@@ -105,6 +105,18 @@
     "counterClaimReasons": {
       "label": "What are your reasons for making the counterclaim?",
       "changeHidden": "What are your reasons for making the counterclaim?"
+    },
+    "counterClaimAgainst": {
+      "label": "Who are you making the counterclaim against?",
+      "changeHidden": "Who are you making the counterclaim against?"
+    },
+    "otherOrderRequestDetails": {
+      "label": "What orders are you asking the court to make?",
+      "changeHidden": "What orders are you asking the court to make?"
+    },
+    "otherOrderRequestFacts": {
+      "label": "What facts would you like the court to consider when deciding the claim?",
+      "changeHidden": "What facts would you like the court to consider when deciding the claim?"
     }
   }
 }
