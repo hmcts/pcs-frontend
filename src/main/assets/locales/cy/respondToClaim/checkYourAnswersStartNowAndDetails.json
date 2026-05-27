@@ -3,8 +3,8 @@
   "cardTitle": "cy Free legal advice",
   "rows": {
     "freeLegalAdvice": {
-      "label": "cy Have you had free legal advice?",
-      "changeHidden": "cy free legal advice",
+      "label": "cy Have you had any free legal advice?",
+      "changeHidden": "cy whether you have had any free legal advice",
       "options": {
         "YES": "cy Yes",
         "NO": "cy No",

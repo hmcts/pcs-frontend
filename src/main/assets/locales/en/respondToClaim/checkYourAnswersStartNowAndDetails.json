@@ -4,7 +4,7 @@
   "rows": {
     "freeLegalAdvice": {
       "label": "Have you had any free legal advice?",
-      "changeHidden": "free legal advice",
+      "changeHidden": "whether you have had any free legal advice",
       "options": {
         "YES": "Yes",
         "NO": "No",
