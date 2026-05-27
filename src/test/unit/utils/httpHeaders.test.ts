@@ -17,6 +17,14 @@ describe('asHeaderString', () => {
     expect(asHeaderString(['inline', 'attachment'])).toBe('inline');
   });
 
+  it('returns trimmed first array item when it contains surrounding spaces', () => {
+    expect(asHeaderString(['  inline  ', 'attachment'])).toBe('inline');
+  });
+
+  it('returns undefined when first array item is blank after trimming', () => {
+    expect(asHeaderString(['   ', 'attachment'])).toBeUndefined();
+  });
+
   it('returns undefined for unsupported input', () => {
     expect(asHeaderString(undefined)).toBeUndefined();
   });

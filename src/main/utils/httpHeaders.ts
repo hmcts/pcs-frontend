@@ -7,7 +7,8 @@ export function asHeaderString(value: unknown): string | undefined {
     return String(value);
   }
   if (Array.isArray(value) && value.length > 0) {
-    return String(value[0]);
+    const firstValue = String(value[0]).trim();
+    return firstValue || undefined;
   }
   return undefined;
 }
