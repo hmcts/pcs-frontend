@@ -40,7 +40,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   addAnyPaymentsMadeRows(ctx);
   addRepaymentPlanAgreedRows(ctx);
   addRepayArrearsInstalmentsRow(ctx);
-  addAffordToPayRow(ctx);
+  addInstallmentRows(ctx);
 
   return ctx.rows;
 }
@@ -124,17 +124,27 @@ function addRepayArrearsInstalmentsRow({ rows, paymentAgreement, t, change, yesN
   );
 }
 
-function addAffordToPayRow({ rows, paymentAgreement, t, change }: RowContext): void {
+// Instalment step asks two peer questions (amount + frequency). Render each as its own
+// CYA row with its own Change link — both link back to the same step page, where the
+// citizen can edit either field. Mirrors the counter-claim-about pattern.
+function addInstallmentRows({ rows, paymentAgreement, t, change }: RowContext): void {
   if (!isYes(paymentAgreement.repayArrearsInstalments) || paymentAgreement.additionalRentContribution === undefined) {
     return;
   }
   const pounds = penceToPounds(paymentAgreement.additionalRentContribution);
+  if (pounds) {
+    rows.push({
+      key: { text: t('rows.installmentAmount.label') },
+      value: { text: `£${pounds}` },
+      actions: { items: [change('how-much-afford-to-pay', 'rows.installmentAmount.changeHidden')] },
+    });
+  }
   const frequency = paymentAgreement.additionalContributionFrequency;
-  const amountText = pounds ? `£${pounds}` : '';
-  const frequencyText = frequency ? t(`rows.affordToPay.frequencies.${frequency}`) : '';
-  rows.push({
-    key: { text: t('rows.affordToPay.label') },
-    value: { text: [amountText, frequencyText].filter(Boolean).join(' ') },
-    actions: { items: [change('how-much-afford-to-pay', 'rows.affordToPay.changeHidden')] },
-  });
+  if (frequency) {
+    rows.push({
+      key: { text: t('rows.installmentFrequency.label') },
+      value: { text: t(`rows.installmentFrequency.frequencies.${frequency}`) },
+      actions: { items: [change('how-much-afford-to-pay', 'rows.installmentFrequency.changeHidden')] },
+    });
+  }
 }

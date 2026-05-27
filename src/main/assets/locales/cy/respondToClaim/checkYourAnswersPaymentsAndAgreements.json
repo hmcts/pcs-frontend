@@ -22,14 +22,18 @@
       "label": "cy Would you like to offer to pay your arrears in instalments?",
       "changeHidden": "cy Would you like to offer to pay your arrears in instalments?"
     },
-    "affordToPay": {
-      "label": "cy How much can you afford to pay towards arrears?",
-      "changeHidden": "cy How much can you afford to pay towards arrears?",
+    "installmentAmount": {
+      "label": "cy How much could you afford to pay in addition to the current rent?",
+      "changeHidden": "cy How much could you afford to pay in addition to the current rent?"
+    },
+    "installmentFrequency": {
+      "label": "cy How frequently could you afford to pay this amount?",
+      "changeHidden": "cy How frequently could you afford to pay this amount?",
       "frequencies": {
-        "weekly": "cy every week",
-        "every2Weeks": "cy every 2 weeks",
-        "every4Weeks": "cy every 4 weeks",
-        "monthly": "cy every month"
+        "weekly": "cy Weekly",
+        "every2Weeks": "cy Every 2 weeks",
+        "every4Weeks": "cy Every 4 weeks",
+        "monthly": "cy Monthly"
       }
     }
   }

@@ -454,6 +454,34 @@ describe('section-CYA row builders — characterisation', () => {
       const row = rows.find(r => r.key.text === 'rows.anyPaymentsMade.label');
       expect(row?.value).toEqual({ text: 'options.yes' });
     });
+
+    it('renders instalment amount + frequency as two peer rows when instalments offered', () => {
+      const rows = buildPaymentsRows(
+        reqWith(
+          model({
+            paymentAgreement: {
+              repayArrearsInstalments: 'YES',
+              additionalRentContribution: '14800',
+              additionalContributionFrequency: 'every2Weeks',
+            },
+          })
+        ),
+        t
+      );
+      const amountRow = rows.find(r => r.key.text === 'rows.installmentAmount.label');
+      const frequencyRow = rows.find(r => r.key.text === 'rows.installmentFrequency.label');
+      expect(amountRow?.value).toEqual({ text: '£148.00' });
+      expect(frequencyRow?.value).toEqual({ text: 'rows.installmentFrequency.frequencies.every2Weeks' });
+      // Each row carries its own Change link back to the same step page.
+      expect(amountRow?.actions?.items[0].href).toContain('how-much-afford-to-pay');
+      expect(frequencyRow?.actions?.items[0].href).toContain('how-much-afford-to-pay');
+    });
+
+    it('omits instalment rows when instalments not offered', () => {
+      const rows = buildPaymentsRows(reqWith(model({ paymentAgreement: { repayArrearsInstalments: 'NO' } })), t);
+      expect(rows.some(r => r.key.text === 'rows.installmentAmount.label')).toBe(false);
+      expect(rows.some(r => r.key.text === 'rows.installmentFrequency.label')).toBe(false);
+    });
   });
 
   describe('situation-and-circumstances', () => {
