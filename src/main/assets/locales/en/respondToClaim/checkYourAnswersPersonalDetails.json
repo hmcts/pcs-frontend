@@ -4,24 +4,24 @@
   "rows": {
     "defendantNameConfirmation": {
       "label": "Is your name {{name}}?",
-      "changeHidden": "your name"
+      "changeHidden": "Is your name {{name}}?"
     },
     "defendantName": {
       "label": "What’s your name?",
-      "changeHidden": "your name"
+      "changeHidden": "What’s your name?"
     },
     "dateOfBirth": {
       "label": "What’s your date of birth?",
-      "changeHidden": "your date of birth"
+      "changeHidden": "What’s your date of birth?"
     },
     "correspondenceAddressConfirmation": {
       "label": "Is your correspondence address {{address}}?",
       "fallbackLabel": "What’s your correspondence address?",
-      "changeHidden": "your correspondence address"
+      "changeHidden": "Is your correspondence address {{address}}?"
     },
     "contactByEmailOrPost": {
       "label": "How do you want to receive updates?",
-      "changeHidden": "how you want to receive updates",
+      "changeHidden": "How do you want to receive updates?",
       "options": {
         "email": "By email",
         "post": "By post",
@@ -30,19 +30,19 @@
     },
     "contactByEmailAddress": {
       "label": "Email",
-      "changeHidden": "your email address"
+      "changeHidden": "Email"
     },
     "contactByPhone": {
       "label": "Are you happy to be contacted by telephone?",
-      "changeHidden": "whether you are happy to be contacted by telephone"
+      "changeHidden": "Are you happy to be contacted by telephone?"
     },
     "contactByText": {
       "label": "Are you happy to be contacted by text message?",
-      "changeHidden": "whether you want to receive text messages"
+      "changeHidden": "Are you happy to be contacted by text message?"
     },
     "contactDetails": {
       "label": "Contact details",
-      "changeHidden": "your contact details"
+      "changeHidden": "Contact details"
     }
   }
 }

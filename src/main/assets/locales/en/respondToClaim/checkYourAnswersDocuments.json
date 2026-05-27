@@ -5,7 +5,7 @@
     "uploadedDocuments": {
       "label": "Upload files",
       "none": "No documents uploaded",
-      "changeHidden": "the documents you have uploaded"
+      "changeHidden": "Upload files"
     }
   }
 }
