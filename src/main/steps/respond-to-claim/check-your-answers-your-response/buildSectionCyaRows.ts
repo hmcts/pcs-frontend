@@ -9,6 +9,7 @@ import {
   createRowContext,
   escapeWithLineBreaks,
   groupQuestionAndDetail,
+  multiSelectValue,
   pushYesNoRow,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
@@ -248,6 +249,49 @@ function addCounterClaimDetailsRows(ctx: RowContext): void {
   addCounterClaimNeedHelpWithFeesRow(ctx, cc);
   addCounterClaimAppliedForHwfRow(ctx, cc);
   addCounterClaimAboutRows(ctx, cc);
+  addCounterClaimAgainstRow(ctx, cc);
+  addCounterClaimOrderOtherThanSumRows(ctx, cc);
+}
+
+function addCounterClaimAgainstRow({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
+  const parties = cc.counterClaimAgainst;
+  if (!parties || parties.length === 0) {
+    return;
+  }
+  const names = parties
+    .map(p => [p.value?.orgName, p.value?.firstName, p.value?.lastName].filter(Boolean).join(' ').trim())
+    .filter(Boolean);
+  if (names.length === 0) {
+    return;
+  }
+  rows.push({
+    key: { text: t('rows.counterClaimAgainst.label') },
+    value: multiSelectValue(names, new Set(names)),
+    actions: { items: [change('counter-claim-against-whom', 'rows.counterClaimAgainst.changeHidden')] },
+  });
+}
+
+function addCounterClaimOrderOtherThanSumRows({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
+  const details = cc.otherOrderRequestDetails?.trim();
+  if (details) {
+    rows.push({
+      key: { text: t('rows.otherOrderRequestDetails.label') },
+      value: { html: escapeWithLineBreaks(details) },
+      actions: {
+        items: [change('counter-claim-order-other-than-sum', 'rows.otherOrderRequestDetails.changeHidden')],
+      },
+    });
+  }
+  const facts = cc.otherOrderRequestFacts?.trim();
+  if (facts) {
+    rows.push({
+      key: { text: t('rows.otherOrderRequestFacts.label') },
+      value: { html: escapeWithLineBreaks(facts) },
+      actions: {
+        items: [change('counter-claim-order-other-than-sum', 'rows.otherOrderRequestFacts.changeHidden')],
+      },
+    });
+  }
 }
 
 function addCounterClaimAboutRows({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
