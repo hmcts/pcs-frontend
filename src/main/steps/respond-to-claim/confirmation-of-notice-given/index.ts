@@ -15,7 +15,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     question: 'question',
     hintText: 'hintText',
-    noticeDateHint: 'noticeDateHint'
+    noticeDateHint: 'noticeDateHint',
   },
   fields: [
     {
@@ -38,7 +38,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               legendClasses: 'govuk-label--s govuk-!-font-weight-bold',
               translationKey: {
                 label: 'noticeDateLabel',
-                hint: 'noticeDateHint'
+                hint: 'noticeDateHint',
               },
             },
           },
