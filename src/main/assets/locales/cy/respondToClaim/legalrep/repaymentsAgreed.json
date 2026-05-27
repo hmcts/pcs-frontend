@@ -1,6 +1,7 @@
 {
   "heading": "cyRepayment agreement",
-  "question": "cyHas the defendant come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+  "question": " ",
+  "repaymentsAgreedQuestion": "cyHas the defendant come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
   "options": {
     "or": " ",
     "imNotSure": "cyDefendant is not sure"

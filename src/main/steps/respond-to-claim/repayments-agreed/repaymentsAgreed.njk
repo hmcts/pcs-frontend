@@ -16,7 +16,11 @@
   {% endif %}
 
   {% if heading %}
-    <h1 class="govuk-heading-xl">{{ heading }}</h1>
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% endif %}
+
+  {% if repaymentsAgreedQuestion %}
+    <h2 class="govuk-heading-m">{{ repaymentsAgreedQuestion }}</h2>
   {% endif %}
 
    <form method="post" action="{{ url }}" novalidate>

@@ -42,6 +42,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     heading: 'heading',
     question: 'question',
+    repaymentsAgreedQuestion: 'repaymentsAgreedQuestion'
   },
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals?.validatedCase?.data;
