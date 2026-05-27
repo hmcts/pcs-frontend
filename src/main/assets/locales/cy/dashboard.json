@@ -19,7 +19,7 @@
     "JUDGEMENT": "cyJudgement from the court",
     "NOTICE": "cyOrders and notices from the court",
     "DOCUMENTS": "cyDocuments",
-    "RESPONSE": "cyThe response",
+    "RESPONSE": "cyYour response",
     "APPLICATIONS": "cyApplications"
   },
 
@@ -32,6 +32,22 @@
       "ResponseToClaim": {
         "title": "cyResponse to claim",
         "body": "<a class=\"govuk-link\" href=\"{{respondToClaimUrl}}\">{{ctaLabel}}</a>"
+      },
+      "ResponseNotStarted": {
+        "title": "cyYour response",
+        "body": "cyYou should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Start your response</a>"
+      },
+      "ResponseInProgress": {
+        "title": "cyYour response",
+        "body": "cyYou should complete your response before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Continue with your response</a>"
+      },
+      "ResponseSubmitted": {
+        "title": "cyYour response",
+        "body": "cyYou have responded to the claim."
+      },
+      "NoHearingArranged": {
+        "title": "cyA property possession claim has been made against you",
+        "body": "cyThe court will arrange the hearing and contact you with details."
       }
     }
   },
@@ -45,10 +61,11 @@
     },
     "ViewClaim": { "title": "cyView the claim" },
     "RespondToClaim": { "title": "cyRespond to the claim" },
+    "ViewResponse": { "title": "cyView the response" },
     "ViewDocuments": { "title": "cyView documents" },
     "ViewHearingDocuments": { "title": "cyView hearing documents" },
     "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
-    "UploadDocuments": { "title": "cyUpload documents" },
+    "UploadDocuments": { "title": "cyUpload additional documents" },
     "ReviewResponse": { "title": "cyReview the response" },
     "SubmitResponse": { "title": "cySubmit the response" },
     "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
@@ -56,6 +73,13 @@
   },
   "viewDocuments": {
     "pageTitle": "cyView documents",
-    "noDocuments": "cyThere are no documents to display."
+    "noDocuments": "cyThere are no documents to display.",
+    "submittedOn": "cySubmitted on",
+    "folders": {
+      "statementsOfCase": "cyStatements of case",
+      "propertyDocuments": "cyProperty documents",
+      "evidence": "cyEvidence",
+      "correspondence": "cyCorrespondence"
+    }
   }
 }

@@ -149,6 +149,10 @@
     "noApplicationIdInSession": {
       "title": "cyApplication not available",
       "paragraph": "cyThis application is not available. It may have already been submitted in a different window."
+    },
+    "documentNotAvailable": {
+      "title": "cyDocument not available",
+      "paragraph": "cyThe selected file could not be downloaded – try again."
     }
   }
 }
