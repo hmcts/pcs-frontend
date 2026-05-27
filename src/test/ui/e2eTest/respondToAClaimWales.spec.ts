@@ -11,7 +11,6 @@ import {
   counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
-  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,

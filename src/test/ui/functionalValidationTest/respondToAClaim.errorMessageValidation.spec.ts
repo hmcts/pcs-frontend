@@ -332,7 +332,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    
+
     await softErrorMessageValidation(
       'doYouWantToUploadFilesToSupportYourCounterclaim',
       doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
