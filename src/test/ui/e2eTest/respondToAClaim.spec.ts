@@ -246,7 +246,7 @@ test.afterEach(async () => {
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt, < 2 named parties - CounterClaimAppliedForHelp - Yes - about your counterclaim
   //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
-  test('Respond to a claim - RegularIncome - Universal Credit - SelectCounterClaim - Yes @noDefendants @regression @crossbrowser', async () => {
+  test('Respond to a claim - SelectCounterClaim - Yes @noDefendants @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
