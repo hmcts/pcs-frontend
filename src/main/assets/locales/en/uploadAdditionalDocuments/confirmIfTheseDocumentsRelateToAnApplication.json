@@ -2,12 +2,12 @@
   "pageTitle": "Confirm if these documents relate to an existing application",
   "heading": "Confirm if these documents relate to an existing application",
   "paragraph1": "We usually share anything you upload with the other party, for example your landlord, housing association or mortgage provider.",
-  "paragraph2": "If your application is 'without notice' (where you have asked us to consider your application without telling the other party) we will not share anything with them.",
+  "paragraph2": "If your application is ‘without notice’ (where you have asked us to consider your application without telling the other party) we will not share anything with them.",
   "question": "Do these documents relate to an existing application?",
-  "applicationOptionAdjourn": "Yes, the documents I'm uploading relate to the application to adjourn the hearing - submitted on {{date}}",
-  "applicationOptionSetAside": "Yes, the documents I'm uploading relate to the application to set aside the order - submitted on {{date}}",
-  "applicationOptionGeneric": "Yes, the documents I'm uploading relate to the application submitted on {{date}}",
-  "optionClaimOrCounterclaim": "No, the documents I'm uploading relate to the main claim or counterclaim",
+  "applicationOptionAdjourn": "Yes, the documents I’m uploading relate to the application to adjourn the hearing - submitted on {{date}}",
+  "applicationOptionSetAside": "Yes, the documents I’m uploading relate to the application to set aside the order - submitted on {{date}}",
+  "applicationOptionGeneric": "Yes, the documents I’m uploading relate to the application submitted on {{date}}",
+  "optionClaimOrCounterclaim": "No, the documents I’m uploading relate to the main claim or counterclaim",
   "errors": {
     "title": "There is a problem",
     "relatedApplicationId": {
