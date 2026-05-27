@@ -853,20 +853,24 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async accessYourCase(accessCode: actionRecord): Promise<void> {
-    const defendantDetailsKnownValue = accessCode.defendantDetailsKnown;
     const explicitDefendantDetailsKnown =
-      typeof defendantDetailsKnownValue === 'boolean' ? defendantDetailsKnownValue : undefined;
-    const defendantTypeValue = accessCode.defendantType;
-    const defendantTypeKnown = typeof defendantTypeValue === 'string' ? defendantTypeValue === 'known' : undefined;
-    const correspondenceAddressKnown = process.env.CORRESPONDENCE_ADDRESS !== 'UNKNOWN';
-    const defendantDetailsKnown = explicitDefendantDetailsKnown ?? defendantTypeKnown ?? correspondenceAddressKnown;
-    const pin = selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin ?? pins[0];
+      typeof accessCode.defendantDetailsKnown === 'boolean' ? accessCode.defendantDetailsKnown : undefined;
+
+    const explicitDefendantTypeKnown =
+      typeof accessCode.defendantType === 'string' ? accessCode.defendantType === 'known' : undefined;
+
+    const defendantDetailsKnown = explicitDefendantDetailsKnown ?? explicitDefendantTypeKnown;
+
+    const pin =
+      typeof defendantDetailsKnown === 'boolean'
+        ? selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin
+        : pins[0];
 
     if (!pin) {
-      throw new Error('PIN is not available. Ensure fetchPINsAPI is called before enterAccessCode');
+      throw new Error('PIN is not available. Ensure fetchPINsAPI is called before accessYourCase');
     }
-    await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
 
+    await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
     await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
     await performAction('clickButton', accessYourCase.continueButton);
   }
