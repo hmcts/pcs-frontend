@@ -207,28 +207,23 @@ describe('documentUtils', () => {
     expect(formatCaseReferenceForDisplay('1777570813792018')).toBe('1777 5708 1379 2018');
   });
 
-  it('extracts nested make-a-claim document collections for direct links', () => {
+  it('extracts direct links from allDocuments only', () => {
     const documents = extractCaseDocuments({
-      rentArrears_StatementDocuments: [
+      allDocuments: [
         {
           id: '11111111-1111-1111-1111-111111111111',
           value: {
-            document_url: 'http://doc-store/rent-statement',
             document_binary_url: 'http://doc-store/rent-statement/binary',
             document_filename: 'rent-statement.pdf',
+            document_type: 'RENT_STATEMENT',
           },
         },
-      ],
-      additionalDocuments: [
         {
           id: '22222222-2222-2222-2222-222222222222',
           value: {
-            documentType: 'NOTICE',
-            document: {
-              document_url: 'http://doc-store/notice',
-              document_binary_url: 'http://doc-store/notice/binary',
-              document_filename: 'notice.pdf',
-            },
+            document_binary_url: 'http://doc-store/notice/binary',
+            document_filename: 'notice.pdf',
+            document_type: 'NOTICE',
           },
         },
       ],
@@ -240,8 +235,8 @@ describe('documentUtils', () => {
         filename: 'rent-statement.pdf',
         binaryUrl: 'http://doc-store/rent-statement/binary',
         categoryId: undefined,
-        documentType: undefined,
-        sourceField: 'rentArrears_StatementDocuments',
+        documentType: 'RENT_STATEMENT',
+        sourceField: 'allDocuments',
       },
       {
         id: '22222222-2222-2222-2222-222222222222',
@@ -249,21 +244,21 @@ describe('documentUtils', () => {
         binaryUrl: 'http://doc-store/notice/binary',
         categoryId: undefined,
         documentType: 'NOTICE',
-        sourceField: 'additionalDocuments',
+        sourceField: 'allDocuments',
       },
     ]);
   });
 
-  it('finds documents from all supported claim document collections by id', () => {
+  it('finds documents from allDocuments by id', () => {
     const document = findCaseDocumentById(
       {
-        notice_NoticeDocuments: [
+        allDocuments: [
           {
             id: '33333333-3333-3333-3333-333333333333',
             value: {
-              document_url: 'http://doc-store/notice',
               document_binary_url: 'http://doc-store/notice/binary',
               document_filename: 'notice.pdf',
+              document_type: 'NOTICE',
             },
           },
         ],
