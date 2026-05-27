@@ -14,6 +14,7 @@ import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
 import { step as counterClaimDoYouWantToUploadFiles } from './counter-claim-do-you-want-to-upload-files';
 import { step as counterClaimFee } from './counter-claim-fee';
 import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
+import { step as counterClaimOrderOtherThanSum } from './counter-claim-order-other-than-sum';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
 import { step as counterClaimUploadFiles } from './counter-claim-upload-files';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
@@ -89,6 +90,7 @@ export const stepRegistry = {
   'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
   'counter-claim-against-whom': counterClaimAgainstWhom,
   'counter-claim-about': counterClaimAbout,
+  'counter-claim-order-other-than-sum': counterClaimOrderOtherThanSum,
   'counter-claim-do-you-want-to-upload-files': counterClaimDoYouWantToUploadFiles,
   'counter-claim-upload-files': counterClaimUploadFiles,
   'payment-interstitial': paymentInterstitial,
