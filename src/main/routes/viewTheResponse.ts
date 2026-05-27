@@ -129,9 +129,7 @@ function pushRow(rows: SummaryRow[], label: string, value: string | null | undef
 
 function buildCaseDatesSummary(t: TFunction, dateSubmitted: string | null): SummarySection {
   return {
-    rows: [
-      { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } },
-    ],
+    rows: [{ key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } }],
   };
 }
 
