@@ -6,7 +6,7 @@ function getDefendantResponses(caseData: CcdCaseData | undefined) {
 //  Response submitted (no counterclaim).
 export function shouldShowResponseSubmittedConfirmationStep(caseData: CcdCaseData | undefined): boolean {
   const makeCounterClaim = getDefendantResponses(caseData)?.makeCounterClaim;
-  
+
   return makeCounterClaim === 'NO' || makeCounterClaim === undefined;
 }
 
