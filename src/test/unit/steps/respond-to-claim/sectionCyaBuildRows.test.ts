@@ -401,6 +401,37 @@ describe('section-CYA row builders — characterisation', () => {
       const rows = buildDisputeRows(reqWith(model({ makeCounterClaim: 'NO' })), t);
       expect(rows.some(r => r.key.text === 'rows.counterClaimAppliedForHwf.label')).toBe(false);
     });
+
+    it('counterclaim-about rows: render counterClaimFor and counterClaimReasons as long-text rows', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: {
+              claimType: 'OTHER',
+              counterClaimFor: 'Damage to property',
+              counterClaimReasons: 'Repairs were never completed',
+            },
+          })
+        ),
+        t
+      );
+      const forRow = rows.find(r => r.key.text === 'rows.counterClaimFor.label');
+      const reasonsRow = rows.find(r => r.key.text === 'rows.counterClaimReasons.label');
+      expect(forRow?.value.html).toContain('Damage to property');
+      expect(reasonsRow?.value.html).toContain('Repairs were never completed');
+      expect(forRow?.actions?.items[0].href).toContain('counter-claim-about');
+      expect(reasonsRow?.actions?.items[0].href).toContain('counter-claim-about');
+    });
+
+    it('counterclaim-about rows: omitted when the fields are absent', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ makeCounterClaim: 'YES', counterClaim: { claimType: 'OTHER' } })),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.counterClaimFor.label')).toBe(false);
+      expect(rows.some(r => r.key.text === 'rows.counterClaimReasons.label')).toBe(false);
+    });
   });
 
   describe('payments', () => {
