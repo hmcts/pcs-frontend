@@ -106,7 +106,7 @@ describe('validateForm', () => {
     });
 
     it('should set HTML tag error using defaultSpecialCharacter translation with field name interpolated', () => {
-      const req = { body: { testField: '<script>alert(\'x\')</script>' }, session: {} } as Partial<Request>;
+      const req = { body: { testField: "<script>alert('x')</script>" }, session: {} } as Partial<Request>;
       const translations = {
         defaultSpecialCharacter: '{fieldName} must only include letters a to z',
       };
