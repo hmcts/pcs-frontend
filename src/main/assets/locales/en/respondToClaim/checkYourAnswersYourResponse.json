@@ -28,8 +28,10 @@
       "changeHidden": "Give the correct tenancy, occupation contract or licence type"
     },
     "tenancyStartDate": {
-      "label": "When did your tenancy start?",
-      "changeHidden": "When did your tenancy start?"
+      "labelConfirm": "Is the tenancy, licence or occupation contract start date correct?",
+      "labelEntered": "When did your tenancy, occupation contract or licence start?",
+      "changeHiddenConfirm": "Is the tenancy, licence or occupation contract start date correct?",
+      "changeHiddenEntered": "When did your tenancy, occupation contract or licence start?"
     },
     "possessionNoticeReceived": {
       "label": "Did {{claimantName}} give you notice of their intention to begin possession proceedings?",

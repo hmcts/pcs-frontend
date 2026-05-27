@@ -269,7 +269,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(keys).toContain('rows.makeCounterClaim.label');
     });
 
-    it('tenancy-date row: "known" branch links to tenancy-date-details', () => {
+    it('tenancy-date row: "known" branch links to tenancy-date-details and uses the confirm label', () => {
       const rows = buildDisputeRows(
         reqWith(
           model(
@@ -279,13 +279,13 @@ describe('section-CYA row builders — characterisation', () => {
         ),
         t
       );
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelConfirm');
       expect(row?.actions?.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
     });
 
-    it('tenancy-date row: "unknown" branch links to tenancy-date-unknown', () => {
+    it('tenancy-date row: "unknown" branch links to tenancy-date-unknown and uses the entered label', () => {
       const rows = buildDisputeRows(reqWith(model({ tenancyStartDate: '2023-01-01' })), t);
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelEntered');
       expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
     });
 
@@ -294,7 +294,7 @@ describe('section-CYA row builders — characterisation', () => {
         reqWith(model({ tenancyStartDateConfirmation: 'YES' }, { tenancy_TenancyLicenceDate: '2023-01-01' })),
         t
       );
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelConfirm');
       expect(row?.value).toEqual({ text: 'options.yes' });
     });
 
@@ -323,7 +323,7 @@ describe('section-CYA row builders — characterisation', () => {
 
     it('tenancy-date row: "unknown" branch shows "No answer provided" when the optional date is blank', () => {
       const rows = buildDisputeRows(reqWith(model({})), t);
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelEntered');
       expect(row?.value).toEqual({ text: 'noAnswerProvided' });
       expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
     });

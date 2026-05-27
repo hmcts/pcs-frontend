@@ -115,25 +115,26 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
   const confirmation = responses.tenancyStartDateConfirmation;
 
   if (isTenancyStartDateKnown(req)) {
-    // tenancy-date-details branch — the confirmation answer is mandatory; a date is written
-    // only when the citizen corrects it. Drop the row only if the step is unreached.
+    // tenancy-date-details branch — confirmation Y/N is mandatory; a date is written only
+    // when the citizen corrects it. Use the confirmation-style label so the CYA row echoes
+    // the step page question and the Change link reads identically.
     if (!date && !confirmation) {
       return;
     }
     rows.push({
-      key: { text: t('rows.tenancyStartDate.label') },
+      key: { text: t('rows.tenancyStartDate.labelConfirm') },
       value: { text: date ? formatIsoDate(date) : yesNoNotSure(confirmation as string) },
-      actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.changeHidden')] },
+      actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.changeHiddenConfirm')] },
     });
     return;
   }
 
-  // tenancy-date-unknown branch — the start date is optional. Always render the row;
-  // "No answer provided" when blank.
+  // tenancy-date-unknown branch — start date is optional. Use the open-entry label so the
+  // CYA row echoes the step page question.
   rows.push({
-    key: { text: t('rows.tenancyStartDate.label') },
+    key: { text: t('rows.tenancyStartDate.labelEntered') },
     value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
-    actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHidden')] },
+    actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHiddenEntered')] },
   });
 }
 
