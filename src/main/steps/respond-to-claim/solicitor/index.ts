@@ -10,14 +10,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/solicitor.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
-    heading: 'heading',
   },
   fields: [
     {
       name: 'hasSolicitor',
       type: 'radio',
       required: true,
-      legendClasses: 'govuk-fieldset__legend--l',
+      legendClasses: 'govuk-fieldset__legend govuk-visually-hidden',
       translationKey: {
         label: 'question',
       },
