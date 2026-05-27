@@ -1,4 +1,4 @@
-import { contactPreferencesTelephone, contactPreferencesTextMessage, dashboard, feedback } from '../data/page-data';
+import { contactPreferencesTextMessage } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferencesTextMessageErrorValidation(): Promise<void> {
@@ -9,6 +9,8 @@ export async function contactPreferencesTextMessageErrorValidation(): Promise<vo
   });
 }
 
+// Needs to be enabled after counterclaim journey is implemented
+/*
 export async function contactPreferencesTextMessageNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', contactPreferencesTextMessage.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
@@ -25,3 +27,4 @@ export async function contactPreferencesTextMessageNavigationTests(): Promise<vo
   });
   await performValidation('pageNavigation', contactPreferencesTextMessage.saveForLaterButton, dashboard.mainHeader);
 }
+ */
