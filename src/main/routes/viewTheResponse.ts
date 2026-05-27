@@ -127,35 +127,9 @@ function pushRow(rows: SummaryRow[], label: string, value: string | null | undef
   }
 }
 
-/** Lists defendantResponses keys that have a non-empty value (for terminal debugging). */
-function summarisePopulatedResponseFields(responses: CcdDefendantResponses | undefined): string[] {
-  if (!responses) {
-    return [];
-  }
-  return Object.entries(responses)
-    .filter(([, value]) => {
-      if (value === null || value === undefined) {
-        return false;
-      }
-      if (typeof value === 'string') {
-        return value.trim().length > 0;
-      }
-      if (typeof value === 'object') {
-        return Object.keys(value as object).length > 0;
-      }
-      return true;
-    })
-    .map(([key]) => key);
-}
-
-function summariseSectionRows(sections: Record<string, SummarySection>): Record<string, number> {
-  return Object.fromEntries(Object.entries(sections).map(([name, section]) => [name, section.rows.length]));
-}
-
-function buildCaseDatesSummary(t: TFunction, dateIssued: string | null, dateSubmitted: string | null): SummarySection {
+function buildCaseDatesSummary(t: TFunction, dateSubmitted: string | null): SummarySection {
   return {
     rows: [
-      { key: summaryKey(t('viewTheResponse:summary.dateIssued')), value: { text: dateIssued ?? '' } },
       { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } },
     ],
   };
@@ -482,24 +456,8 @@ export default function viewTheResponseRoutes(app: Application): void {
       const caseData = await ccdCaseService.getViewDefendantResponse(accessToken, caseReference);
       const responses = caseData.possessionClaimResponse?.defendantResponses;
 
-      logger.info('viewTheResponse: case_data from respondPossessionClaim start', {
-        caseReference,
-        claimIssueDate: caseData.claimIssueDate ?? null,
-        hasUnsubmittedCaseData:
-          (caseData as CcdCaseData & { hasUnsubmittedCaseData?: string }).hasUnsubmittedCaseData ?? null,
-        populatedDefendantResponseFields: summarisePopulatedResponseFields(responses),
-        defendantResponses: responses ?? null,
-        possessionClaimResponse: caseData.possessionClaimResponse ?? null,
-      });
-
-      logger.info('viewTheResponse: full case_data JSON', {
-        caseReference,
-        caseDataJson: JSON.stringify(caseData, null, 2),
-      });
-
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
 
-      const dateIssued = formatGdsDate(caseData.claimIssueDate);
       const dateSubmitted = formatGdsDate(responses?.responseSubmittedDate);
       const completedBy = responses?.statementOfTruthCompletedBy;
 
@@ -516,16 +474,11 @@ export default function viewTheResponseRoutes(app: Application): void {
         counterclaim: buildCounterclaim(t, caseData),
       };
 
-      logger.info('viewTheResponse: summary row counts (empty fields are omitted by pushRow)', {
-        caseReference,
-        sectionRowCounts: summariseSectionRows(sections),
-      });
-
       return res.render('view-the-response', {
         t,
         propertyAddress: formatAddress(caseData.propertyAddress),
         caseReferenceDisplay: caseReference.replace(/(\d{4})(?=\d)/g, '$1 '),
-        caseDates: buildCaseDatesSummary(t, dateIssued, dateSubmitted),
+        caseDates: buildCaseDatesSummary(t, dateSubmitted),
         statementOfTruth: buildStatementOfTruthSummary(t, completedBy),
         dateSubmitted,
         ...sections,

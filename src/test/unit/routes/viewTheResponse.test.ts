@@ -45,7 +45,6 @@ describe('viewTheResponse route', () => {
 
   beforeEach(() => {
     (ccdCaseService.getViewDefendantResponse as jest.Mock).mockResolvedValue({
-      claimIssueDate: '2026-01-15',
       propertyAddress: {
         AddressLine1: '10 Second Avenue',
         PostTown: 'London',
@@ -98,10 +97,6 @@ describe('viewTheResponse route', () => {
         caseReferenceDisplay: '1234 5678 9012 3456',
         caseDates: expect.objectContaining({
           rows: expect.arrayContaining([
-            expect.objectContaining({
-              key: { text: 'viewTheResponse:summary.dateIssued' },
-              value: { text: '15 January 2026' },
-            }),
             expect.objectContaining({
               key: { text: 'viewTheResponse:summary.dateSubmitted' },
               value: { text: '1 February 2026' },
