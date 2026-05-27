@@ -11,7 +11,7 @@
   "errors": {
     "title": "cyThere is a problem",
     "relatedApplicationId": {
-      "required": "cySelect if these documents relate to an existing application"
+      "required": "cyConfirm if these documents relate to an existing application"
     }
   }
 }

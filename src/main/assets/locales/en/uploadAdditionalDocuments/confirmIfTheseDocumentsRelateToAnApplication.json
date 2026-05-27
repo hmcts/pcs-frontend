@@ -11,7 +11,7 @@
   "errors": {
     "title": "There is a problem",
     "relatedApplicationId": {
-      "required": "Select if these documents relate to an existing application"
+      "required": "Confirm if these documents relate to an existing application"
     }
   }
 }
