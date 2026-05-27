@@ -110,9 +110,6 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-order-other-than-sum': {
       showCondition: (req: Request) => isSomethingElseCounterClaim(req),
     },
-    'counter-claim-upload-documents': {
-      showCondition: (req: Request) => hasMadeCounterClaim(req),
-    },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
