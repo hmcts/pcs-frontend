@@ -12,7 +12,6 @@ import {
   counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
-  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   counterclaimYouNeedToApplyForHelpWithYourFees,
   defendantDateOfBirth,
@@ -1612,7 +1611,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
       factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),

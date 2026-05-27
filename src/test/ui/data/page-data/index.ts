@@ -59,4 +59,3 @@ export * from './counterClaimWhatAreYouClaimingFor.page.data';
 export * from './counterClaimAgainstWhom.page.data';
 export * from './uploadFilesToSupportYourCounterclaim.page.data';
 export * from './counterClaimOrderOtherThanSum.page.data';
-export * from './counterClaimUploadDocuments.page.data';

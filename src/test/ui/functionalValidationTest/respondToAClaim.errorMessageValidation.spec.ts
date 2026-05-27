@@ -11,7 +11,6 @@ import {
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
   counterClaimSpecificSumOfMoney,
-  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
@@ -585,8 +584,14 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await softErrorMessageValidation('counterClaimUploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+
+    await softErrorMessageValidation(
+      'doYouWantToUploadFilesToSupportYourCounterclaim',
+      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
 
     await softErrorMessageValidation(
       'doYouWantToUploadFilesToSupportYourCounterclaim',
