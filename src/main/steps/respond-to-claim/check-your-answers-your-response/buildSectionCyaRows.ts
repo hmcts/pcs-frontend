@@ -246,6 +246,26 @@ function addCounterClaimDetailsRows(ctx: RowContext): void {
   addCounterClaimAmountRow(ctx, cc);
   addCounterClaimNeedHelpWithFeesRow(ctx, cc);
   addCounterClaimAppliedForHwfRow(ctx, cc);
+  addCounterClaimAboutRows(ctx, cc);
+}
+
+function addCounterClaimAboutRows({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
+  const counterClaimFor = cc.counterClaimFor?.trim();
+  if (counterClaimFor) {
+    rows.push({
+      key: { text: t('rows.counterClaimFor.label') },
+      value: { html: escapeWithLineBreaks(counterClaimFor) },
+      actions: { items: [change('counter-claim-about', 'rows.counterClaimFor.changeHidden')] },
+    });
+  }
+  const counterClaimReasons = cc.counterClaimReasons?.trim();
+  if (counterClaimReasons) {
+    rows.push({
+      key: { text: t('rows.counterClaimReasons.label') },
+      value: { html: escapeWithLineBreaks(counterClaimReasons) },
+      actions: { items: [change('counter-claim-about', 'rows.counterClaimReasons.changeHidden')] },
+    });
+  }
 }
 
 function addCounterClaimNeedHelpWithFeesRow({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {

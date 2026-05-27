@@ -95,6 +95,14 @@
     "counterClaimHwfReference": {
       "label": "Help with Fees reference number",
       "changeHidden": "your Help with Fees reference number"
+    },
+    "counterClaimFor": {
+      "label": "What is your counterclaim for?",
+      "changeHidden": "what your counterclaim is for"
+    },
+    "counterClaimReasons": {
+      "label": "What are your reasons for making the counterclaim?",
+      "changeHidden": "your reasons for making the counterclaim"
     }
   }
 }
