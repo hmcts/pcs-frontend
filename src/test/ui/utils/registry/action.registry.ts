@@ -93,6 +93,8 @@ export class ActionRegistry {
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['uploadFilesToSupportCounterclaim', new RespondToClaimAction()],
     ['doYouWantToUploadFiles', new RespondToClaimAction()],
+    ['readReasonableAdjustmentsTriage', new RespondToClaimAction()],
+    ['counterClaimHaveYouAppliedForHelpWithFee', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
