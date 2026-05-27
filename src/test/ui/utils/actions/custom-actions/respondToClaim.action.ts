@@ -861,7 +861,14 @@ export class RespondToClaimAction implements IAction {
     const explicitDefendantTypeKnown =
       typeof accessCode.defendantType === 'string' ? accessCode.defendantType === 'known' : undefined;
 
-    const defendantDetailsKnown = explicitDefendantDetailsKnown ?? explicitDefendantTypeKnown;
+    const defendantNameKnownFromEnv =
+      process.env.DEFENDANT_NAME_KNOWN === 'YES' ? true : process.env.DEFENDANT_NAME_KNOWN === 'NO' ? false : undefined;
+
+    const defendantDetailsKnown =
+      explicitDefendantDetailsKnown ??
+      explicitDefendantTypeKnown ??
+      defendantNameKnownFromEnv ??
+      (process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN' ? false : undefined);
 
     const pin =
       typeof defendantDetailsKnown === 'boolean'
