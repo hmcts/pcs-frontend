@@ -19,6 +19,28 @@ export let firstName: string = '';
 export let lastName: string = '';
 export let address: string = '';
 export let pinUsers: PinUser[] = [];
+export let selectedPinUser: PinUser | undefined;
+
+function hasKnownDefendantDetails(pinUser: PinUser): boolean {
+  return Boolean(pinUser.firstName && pinUser.lastName && pinUser.address?.trim());
+}
+
+function setSelectedPinUser(pinUser: PinUser | undefined): PinUser | undefined {
+  selectedPinUser = pinUser;
+  firstName = pinUser?.firstName ?? '';
+  lastName = pinUser?.lastName ?? '';
+  address = pinUser?.address ?? '';
+  return selectedPinUser;
+}
+
+export function getSelectedPinUser(): PinUser | undefined {
+  return selectedPinUser;
+}
+
+export function selectPinUserByDefendantDetails(detailsKnown: boolean): PinUser | undefined {
+  const matchingPinUser = pinUsers.find(pinUser => hasKnownDefendantDetails(pinUser) === detailsKnown) ?? pinUsers[0];
+  return setSelectedPinUser(matchingPinUser);
+}
 
 export async function getPinUserAt(index: number, timeoutMs = 5000): Promise<PinUser> {
   const pollInterval = 200;
@@ -71,16 +93,7 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
             address: formattedAddress,
           };
         });
-        const pinData = response.data[pins[0]];
-        firstName = pinData.firstName;
-        lastName = pinData.lastName;
-        const addressObj = pinData.address;
-        if (pinData.address) {
-          const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country } = addressObj;
-          address = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country]
-            .filter(value => value && typeof value === 'string' && value.trim() !== '')
-            .join(', ');
-        }
+        setSelectedPinUser(pinUsers[0]);
         return;
       }
       await new Promise(res => setTimeout(res, delayMs));

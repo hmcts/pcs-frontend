@@ -222,6 +222,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
     claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
     process.env.CLAIMANT_NAME = claimantName;
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });

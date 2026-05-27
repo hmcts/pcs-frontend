@@ -58,7 +58,7 @@ import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../com
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
-import { pins } from './fetchPINsAndValidateAccessCodeAPI.action';
+import { getSelectedPinUser, pins, selectPinUserByDefendantDetails } from './fetchPINsAndValidateAccessCodeAPI.action';
 export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -144,8 +144,14 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {
-    await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantData.fName);
-    await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantData.lName);
+    const selectedPinUser = getSelectedPinUser();
+    const firstNameValue = defendantData.fName ?? selectedPinUser?.firstName;
+    const lastNameValue = defendantData.lName ?? selectedPinUser?.lastName;
+
+    await performValidation('mainHeader', defendantNameCapture.mainHeader);
+
+    await performAction('inputText', defendantNameCapture.firstNameTextLabel, firstNameValue);
+    await performAction('inputText', defendantNameCapture.lastNameTextLabel, lastNameValue);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
@@ -162,6 +168,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async confirmDefendantDetails(defendantData: actionRecord) {
+    await performValidation('mainHeader', defendantData.question);
     await performAction('clickRadioButton', {
       question: defendantData.question,
       option: defendantData.option,
@@ -846,7 +853,15 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async accessYourCase(accessCode: actionRecord): Promise<void> {
-    const pin = pins[0];
+    const defendantDetailsKnownValue = accessCode.defendantDetailsKnown;
+    const explicitDefendantDetailsKnown =
+      typeof defendantDetailsKnownValue === 'boolean' ? defendantDetailsKnownValue : undefined;
+    const defendantTypeValue = accessCode.defendantType;
+    const defendantTypeKnown = typeof defendantTypeValue === 'string' ? defendantTypeValue === 'known' : undefined;
+    const correspondenceAddressKnown = process.env.CORRESPONDENCE_ADDRESS !== 'UNKNOWN';
+    const defendantDetailsKnown = explicitDefendantDetailsKnown ?? defendantTypeKnown ?? correspondenceAddressKnown;
+    const pin = selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin ?? pins[0];
+
     if (!pin) {
       throw new Error('PIN is not available. Ensure fetchPINsAPI is called before enterAccessCode');
     }
