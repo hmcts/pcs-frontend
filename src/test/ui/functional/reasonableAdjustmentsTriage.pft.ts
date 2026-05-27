@@ -1,0 +1,10 @@
+import { feedback, reasonableAdjustmentsTriage, uploadFiles } from '../data/page-data';
+import { performValidation } from '../utils/controller';
+
+export async function reasonableAdjustmentsTriageNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', reasonableAdjustmentsTriage.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: reasonableAdjustmentsTriage.pageSlug,
+  });
+  await performValidation('pageNavigation', reasonableAdjustmentsTriage.backLink, uploadFiles.mainHeader);
+}
