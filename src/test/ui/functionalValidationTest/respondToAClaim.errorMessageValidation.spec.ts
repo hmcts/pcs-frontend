@@ -147,7 +147,7 @@ test.beforeEach(async ({ page }, testInfo) => {
       break;
   }
 
-  //Check if No or Im not sure is selected on NoticeDetails page - for back link navigation
+  //Check if No, or I'm not sure is selected on NoticeDetails page - for back link navigation
   if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
   }

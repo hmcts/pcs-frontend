@@ -398,7 +398,6 @@ export class RespondToClaimAction implements IAction {
         continue;
       }
 
-      // Normal validation
       if (!value || !frequency) {
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
