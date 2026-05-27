@@ -9,7 +9,11 @@ import {
   contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
+  counterClaimAbout,
+  counterClaimAgainstWhom,
   counterClaimFee,
+  counterClaimHaveYouAppliedForHelp,
+  counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
@@ -79,6 +83,10 @@ export class RespondToClaimAction implements IAction {
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
       ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
+      [
+        'counterClaimHaveYouAppliedForHelpWithFee',
+        () => this.counterClaimHaveYouAppliedForHelpWithFee(fieldName as actionRecord),
+      ],
       ['selectCounterClaim', () => this.selectCounterClaim(fieldName as actionRecord)],
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
       ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
@@ -114,6 +122,9 @@ export class RespondToClaimAction implements IAction {
       ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
+      ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
+      ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
+      ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -338,6 +349,8 @@ export class RespondToClaimAction implements IAction {
       question: counterClaim.doYouWantToMakeACounterclaim,
       option: counterClaimOption.option,
     });
+
+    process.env.SELECT_COUNTER_CLAIM = String(counterClaimOption.option).toUpperCase();
     await performAction('clickButton', counterClaim.saveAndContinueButton);
   }
 
@@ -502,14 +515,30 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
   }
 
+  private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
+      option: helpWithFee.helpWithFeeOption,
+    });
+
+    if (helpWithFee.helpWithFeeOption === 'Yes') {
+      await performAction(
+        'inputText',
+        counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
+        helpWithFee.feeReference
+      );
+    }
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
+  }
+
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
     await performValidation('text', {
       elementType: 'subHeader',
-      text: `Amount you owe in rent arrears given by ${submitCaseApiData.submitCasePayload.claimantName}:`,
+      text: `Amount you owe in rent arrears given by ${claimantsName}:`,
     });
     await performValidation('text', {
       elementType: 'paragraph',
-      text: `When they made their claim, ${submitCaseApiData.submitCasePayload.claimantName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
+      text: `When they made their claim, ${claimantsName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
     const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {
@@ -816,6 +845,43 @@ export class RespondToClaimAction implements IAction {
 
   private async readReasonableAdjustmentsTriage(): Promise<void> {
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+  }
+  
+  private async selectClaimAgainstWhom(claimAgainstWhom: actionRecord): Promise<void> {
+    if (Array.isArray(claimAgainstWhom.options)) {
+      for (const option of claimAgainstWhom.options) {
+        await performAction('check', {
+          question: claimAgainstWhom.question,
+          option,
+        });
+      }
+    } else if (claimAgainstWhom.radioOption) {
+      await performAction('check', {
+        question: claimAgainstWhom.question,
+        option: claimAgainstWhom.radioOption,
+      });
+    }
+    await performAction('clickButton', counterClaimAgainstWhom.saveAndContinueButton);
+  }
+
+  private async counterClaimAbout(claimAbout: actionRecord): Promise<void> {
+    await performAction('inputText', counterClaimAbout.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
+    await performAction('inputText', counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
+    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+  }
+
+  private async counterClaimOrderOtherThanSum(cliamOtherThanSum: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      counterClaimOrderOtherThanSum.whatOrdersAreYouAskingLabelText,
+      cliamOtherThanSum.ordersInput
+    );
+    await performAction(
+      'inputText',
+      counterClaimOrderOtherThanSum.whatFactsWouldYouLikeLabelText,
+      cliamOtherThanSum.factsInput
+    );
+    await performAction('clickButton', counterClaimOrderOtherThanSum.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596

@@ -92,6 +92,7 @@ export class ActionRegistry {
     ['selectCounterClaim', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
     ['readReasonableAdjustmentsTriage', new RespondToClaimAction()],
+    ['counterClaimHaveYouAppliedForHelpWithFee', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
@@ -116,6 +117,12 @@ export class ActionRegistry {
     ['reviewCYA', new GenAppsAction()],
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
+    ['otherConsiderations', new RespondToClaimAction()],
+    ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
+    ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['selectClaimAgainstWhom', new RespondToClaimAction()],
+    ['counterClaimAbout', new RespondToClaimAction()],
+    ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
   ]);
 
