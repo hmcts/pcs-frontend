@@ -273,7 +273,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(keys).toContain('rows.makeCounterClaim.label');
     });
 
-    it('tenancy-date row: "known" branch links to tenancy-date-details', () => {
+    it('tenancy-date row: "known" branch links to tenancy-date-details and uses the confirm label', () => {
       const rows = buildDisputeRows(
         reqWith(
           model(
@@ -283,13 +283,13 @@ describe('section-CYA row builders — characterisation', () => {
         ),
         t
       );
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelConfirm');
       expect(row?.actions?.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
     });
 
-    it('tenancy-date row: "unknown" branch links to tenancy-date-unknown', () => {
+    it('tenancy-date row: "unknown" branch links to tenancy-date-unknown and uses the entered label', () => {
       const rows = buildDisputeRows(reqWith(model({ tenancyStartDate: '2023-01-01' })), t);
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelEntered');
       expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
     });
 
@@ -298,7 +298,7 @@ describe('section-CYA row builders — characterisation', () => {
         reqWith(model({ tenancyStartDateConfirmation: 'YES' }, { tenancy_TenancyLicenceDate: '2023-01-01' })),
         t
       );
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelConfirm');
       expect(row?.value).toEqual({ text: 'options.yes' });
     });
 
@@ -327,7 +327,7 @@ describe('section-CYA row builders — characterisation', () => {
 
     it('tenancy-date row: "unknown" branch shows "No answer provided" when the optional date is blank', () => {
       const rows = buildDisputeRows(reqWith(model({})), t);
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.label');
+      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelEntered');
       expect(row?.value).toEqual({ text: 'noAnswerProvided' });
       expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
     });
@@ -405,6 +405,37 @@ describe('section-CYA row builders — characterisation', () => {
       const rows = buildDisputeRows(reqWith(model({ makeCounterClaim: 'NO' })), t);
       expect(rows.some(r => r.key.text === 'rows.counterClaimAppliedForHwf.label')).toBe(false);
     });
+
+    it('counterclaim-about rows: render counterClaimFor and counterClaimReasons as long-text rows', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: {
+              claimType: 'OTHER',
+              counterClaimFor: 'Damage to property',
+              counterClaimReasons: 'Repairs were never completed',
+            },
+          })
+        ),
+        t
+      );
+      const forRow = rows.find(r => r.key.text === 'rows.counterClaimFor.label');
+      const reasonsRow = rows.find(r => r.key.text === 'rows.counterClaimReasons.label');
+      expect(forRow?.value.html).toContain('Damage to property');
+      expect(reasonsRow?.value.html).toContain('Repairs were never completed');
+      expect(forRow?.actions?.items[0].href).toContain('counter-claim-about');
+      expect(reasonsRow?.actions?.items[0].href).toContain('counter-claim-about');
+    });
+
+    it('counterclaim-about rows: omitted when the fields are absent', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ makeCounterClaim: 'YES', counterClaim: { claimType: 'OTHER' } })),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.counterClaimFor.label')).toBe(false);
+      expect(rows.some(r => r.key.text === 'rows.counterClaimReasons.label')).toBe(false);
+    });
   });
 
   describe('payments', () => {
@@ -426,6 +457,34 @@ describe('section-CYA row builders — characterisation', () => {
       const rows = buildPaymentsRows(reqWith(model({ paymentAgreement: { anyPaymentsMade: 'Yes' } })), t);
       const row = rows.find(r => r.key.text === 'rows.anyPaymentsMade.label');
       expect(row?.value).toEqual({ text: 'options.yes' });
+    });
+
+    it('renders instalment amount + frequency as two peer rows when instalments offered', () => {
+      const rows = buildPaymentsRows(
+        reqWith(
+          model({
+            paymentAgreement: {
+              repayArrearsInstalments: 'YES',
+              additionalRentContribution: '14800',
+              additionalContributionFrequency: 'every2Weeks',
+            },
+          })
+        ),
+        t
+      );
+      const amountRow = rows.find(r => r.key.text === 'rows.installmentAmount.label');
+      const frequencyRow = rows.find(r => r.key.text === 'rows.installmentFrequency.label');
+      expect(amountRow?.value).toEqual({ text: '£148.00' });
+      expect(frequencyRow?.value).toEqual({ text: 'rows.installmentFrequency.frequencies.every2Weeks' });
+      // Each row carries its own Change link back to the same step page.
+      expect(amountRow?.actions?.items[0].href).toContain('how-much-afford-to-pay');
+      expect(frequencyRow?.actions?.items[0].href).toContain('how-much-afford-to-pay');
+    });
+
+    it('omits instalment rows when instalments not offered', () => {
+      const rows = buildPaymentsRows(reqWith(model({ paymentAgreement: { repayArrearsInstalments: 'NO' } })), t);
+      expect(rows.some(r => r.key.text === 'rows.installmentAmount.label')).toBe(false);
+      expect(rows.some(r => r.key.text === 'rows.installmentFrequency.label')).toBe(false);
     });
   });
 

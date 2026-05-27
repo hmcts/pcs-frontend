@@ -9,59 +9,61 @@
   "rows": {
     "landlordRegistered": {
       "label": "Is your landlord registered?",
-      "changeHidden": "whether your landlord is registered"
+      "changeHidden": "Is your landlord registered?"
     },
     "landlordLicensed": {
       "label": "Is your landlord licensed?",
-      "changeHidden": "whether your landlord is licensed"
+      "changeHidden": "Is your landlord licensed?"
     },
     "writtenTerms": {
       "label": "Has your landlord sent you written terms of the occupation contract?",
-      "changeHidden": "whether your landlord has sent you written terms of the occupation contract"
+      "changeHidden": "Has your landlord sent you written terms of the occupation contract?"
     },
     "tenancyTypeCorrect": {
       "label": "Is the tenancy, occupation contract or licence agreement type correct?",
-      "changeHidden": "whether the tenancy type on the claim is correct"
+      "changeHidden": "Is the tenancy, occupation contract or licence agreement type correct?"
     },
     "tenancyTypeDetails": {
       "label": "Give the correct tenancy, occupation contract or licence type",
-      "changeHidden": "the correct tenancy, occupation contract or licence type"
+      "changeHidden": "Give the correct tenancy, occupation contract or licence type"
     },
     "tenancyStartDate": {
-      "label": "When did your tenancy start?",
-      "changeHidden": "your tenancy start date"
+      "labelConfirm": "Is the tenancy, licence or occupation contract start date correct?",
+      "labelEntered": "When did your tenancy, occupation contract or licence start?",
+      "changeHiddenConfirm": "Is the tenancy, licence or occupation contract start date correct?",
+      "changeHiddenEntered": "When did your tenancy, occupation contract or licence start?"
     },
     "possessionNoticeReceived": {
       "label": "Did {{claimantName}} give you notice of their intention to begin possession proceedings?",
-      "changeHidden": "whether you received a possession notice"
+      "changeHidden": "Did {{claimantName}} give you notice of their intention to begin possession proceedings?"
     },
     "noticeReceivedDate": {
       "label": "When did you receive notice from {{claimantName}}?",
-      "changeHidden": "the date you received the notice"
+      "changeHidden": "When did you receive notice from {{claimantName}}?"
     },
     "rentArrearsAmountConfirmation": {
       "label": "Do you owe this amount in rent arrears?",
-      "changeHidden": "whether you agree with the rent arrears amount"
+      "changeHidden": "Do you owe this amount in rent arrears?"
     },
     "rentArrearsAmountDetails": {
       "label": "How much do you believe you owe in rent arrears?",
-      "changeHidden": "how much you believe you owe in rent arrears"
+      "changeHidden": "How much do you believe you owe in rent arrears?"
     },
     "disputeClaim": {
       "label": "Do you want to dispute any other parts of the claim?",
-      "changeHidden": "whether you want to dispute any other parts of the claim"
+      "changeHidden": "Do you want to dispute any other parts of the claim?"
     },
     "disputeClaimDetails": {
       "label": "Explain which parts of the claim you do not agree with",
-      "changeHidden": "why you are disputing this claim"
+      "changeHidden": "Explain which parts of the claim you do not agree with"
     },
     "makeCounterClaim": {
       "label": "Do you want to make a counterclaim?",
-      "changeHidden": "whether you want to make a counterclaim"
+      "changeHidden": "Do you want to make a counterclaim?"
     },
     "counterClaimType": {
       "label": "What are you claiming for?",
-      "changeHidden": "what you are counterclaiming for",
+      "changeHidden": "What are you claiming for?",
       "options": {
         "PAYMENT_OR_COMPENSATION": "A sum of money or compensation",
         "SOMETHING_ELSE": "Something else",
@@ -70,19 +72,19 @@
     },
     "isClaimAmountKnown": {
       "label": "Are you claiming for a specific sum of money?",
-      "changeHidden": "whether you are claiming for a specific sum of money"
+      "changeHidden": "Are you claiming for a specific sum of money?"
     },
     "claimAmount": {
       "label": "How much are you claiming?",
-      "changeHidden": "how much you are claiming"
+      "changeHidden": "How much are you claiming?"
     },
     "estimatedMaxClaimAmount": {
       "label": "What’s the maximum value of your claim?",
-      "changeHidden": "the maximum value of your claim"
+      "changeHidden": "What’s the maximum value of your claim?"
     },
     "counterClaimNeedHelpWithFees": {
       "label": "Do you need help paying the counterclaim fee?",
-      "changeHidden": "whether you need help paying the counterclaim fee",
+      "changeHidden": "Do you need help paying the counterclaim fee?",
       "options": {
         "YES": "I need help paying the fee",
         "NO": "I do not need help paying the fee"
@@ -90,11 +92,19 @@
     },
     "counterClaimAppliedForHwf": {
       "label": "Have you already applied for help with your counterclaim fee?",
-      "changeHidden": "whether you have already applied for help with the counterclaim fee"
+      "changeHidden": "Have you already applied for help with your counterclaim fee?"
     },
     "counterClaimHwfReference": {
       "label": "Help with Fees reference number",
-      "changeHidden": "your Help with Fees reference number"
+      "changeHidden": "Help with Fees reference number"
+    },
+    "counterClaimFor": {
+      "label": "What is your counterclaim for?",
+      "changeHidden": "What is your counterclaim for?"
+    },
+    "counterClaimReasons": {
+      "label": "What are your reasons for making the counterclaim?",
+      "changeHidden": "What are your reasons for making the counterclaim?"
     }
   }
 }

@@ -204,7 +204,7 @@ function addRegularExpensesRow({ rows, hc, t, change }: RowContext): void {
     }
     const label = t(`rows.regularExpenses.options.${key}`);
     const detail = amountWithFrequency(details.amount, details.frequency, t);
-    items.push(detail ? `${escapeHtml(label)}: ${escapeHtml(detail)}` : escapeHtml(label));
+    items.push(detail ? `${escapeHtml(label)} ${escapeHtml(detail)}` : escapeHtml(label));
   }
   rows.push({
     key: { text: t('rows.regularExpenses.label') },

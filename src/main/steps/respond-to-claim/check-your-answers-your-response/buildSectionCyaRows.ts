@@ -115,25 +115,26 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
   const confirmation = responses.tenancyStartDateConfirmation;
 
   if (isTenancyStartDateKnown(req)) {
-    // tenancy-date-details branch — the confirmation answer is mandatory; a date is written
-    // only when the citizen corrects it. Drop the row only if the step is unreached.
+    // tenancy-date-details branch — confirmation Y/N is mandatory; a date is written only
+    // when the citizen corrects it. Use the confirmation-style label so the CYA row echoes
+    // the step page question and the Change link reads identically.
     if (!date && !confirmation) {
       return;
     }
     rows.push({
-      key: { text: t('rows.tenancyStartDate.label') },
+      key: { text: t('rows.tenancyStartDate.labelConfirm') },
       value: { text: date ? formatIsoDate(date) : yesNoNotSure(confirmation as string) },
-      actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.changeHidden')] },
+      actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.changeHiddenConfirm')] },
     });
     return;
   }
 
-  // tenancy-date-unknown branch — the start date is optional. Always render the row;
-  // "No answer provided" when blank.
+  // tenancy-date-unknown branch — start date is optional. Use the open-entry label so the
+  // CYA row echoes the step page question.
   rows.push({
-    key: { text: t('rows.tenancyStartDate.label') },
+    key: { text: t('rows.tenancyStartDate.labelEntered') },
     value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
-    actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHidden')] },
+    actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHiddenEntered')] },
   });
 }
 
@@ -246,6 +247,26 @@ function addCounterClaimDetailsRows(ctx: RowContext): void {
   addCounterClaimAmountRow(ctx, cc);
   addCounterClaimNeedHelpWithFeesRow(ctx, cc);
   addCounterClaimAppliedForHwfRow(ctx, cc);
+  addCounterClaimAboutRows(ctx, cc);
+}
+
+function addCounterClaimAboutRows({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
+  const counterClaimFor = cc.counterClaimFor?.trim();
+  if (counterClaimFor) {
+    rows.push({
+      key: { text: t('rows.counterClaimFor.label') },
+      value: { html: escapeWithLineBreaks(counterClaimFor) },
+      actions: { items: [change('counter-claim-about', 'rows.counterClaimFor.changeHidden')] },
+    });
+  }
+  const counterClaimReasons = cc.counterClaimReasons?.trim();
+  if (counterClaimReasons) {
+    rows.push({
+      key: { text: t('rows.counterClaimReasons.label') },
+      value: { html: escapeWithLineBreaks(counterClaimReasons) },
+      actions: { items: [change('counter-claim-about', 'rows.counterClaimReasons.changeHidden')] },
+    });
+  }
 }
 
 function addCounterClaimNeedHelpWithFeesRow({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
