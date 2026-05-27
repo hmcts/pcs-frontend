@@ -114,7 +114,7 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
     rows: section.rows.map(row => ({
       ...row,
       actions: {
-        items: row.actions.items.map(item => ({ ...item, href: `${item.href}&cyaReturn=1` })),
+        items: (row.actions?.items ?? []).map(item => ({ ...item, href: `${item.href}&cyaReturn=1` })),
       },
     })),
   }));

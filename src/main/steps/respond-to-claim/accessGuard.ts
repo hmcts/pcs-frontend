@@ -36,7 +36,7 @@ export function respondToClaimAccessGuard(): RequestHandler {
     }
 
     if (req.query.cyaReturn) {
-      req.session.returnToCya = `/case/${caseId}/respond-to-claim/end-of-journey-cya`;
+      req.session.returnToCya = `/case/${caseId}/respond-to-claim/end-of-journey-cya?nav=1`;
     }
 
     const hubUrl = getStepUrl(hubStepName, flowConfig, caseId);
