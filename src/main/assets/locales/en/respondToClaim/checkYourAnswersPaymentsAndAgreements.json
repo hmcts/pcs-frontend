@@ -4,32 +4,36 @@
   "rows": {
     "anyPaymentsMade": {
       "label": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
-      "changeHidden": "whether you have paid any money since the claim was issued"
+      "changeHidden": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?"
     },
     "paymentDetails": {
       "label": "Give details about how much you paid and when",
-      "changeHidden": "the repayments you have made"
+      "changeHidden": "Give details about how much you paid and when"
     },
     "repaymentPlanAgreed": {
       "label": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
-      "changeHidden": "whether you have come to a repayment agreement since the claim was issued"
+      "changeHidden": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?"
     },
     "repaymentAgreedDetails": {
       "label": "What repayment plan have you agreed?",
-      "changeHidden": "the repayment plan you have agreed"
+      "changeHidden": "What repayment plan have you agreed?"
     },
     "repayArrearsInstalments": {
       "label": "Would you like to offer to pay your arrears in instalments?",
-      "changeHidden": "whether you would like to offer to pay your arrears in instalments"
+      "changeHidden": "Would you like to offer to pay your arrears in instalments?"
     },
-    "affordToPay": {
-      "label": "How much can you afford to pay towards arrears?",
-      "changeHidden": "how much you can afford to pay",
+    "installmentAmount": {
+      "label": "How much could you afford to pay in addition to the current rent?",
+      "changeHidden": "How much could you afford to pay in addition to the current rent?"
+    },
+    "installmentFrequency": {
+      "label": "How frequently could you afford to pay this amount?",
+      "changeHidden": "How frequently could you afford to pay this amount?",
       "frequencies": {
-        "weekly": "every week",
-        "every2Weeks": "every 2 weeks",
-        "every4Weeks": "every 4 weeks",
-        "monthly": "every month"
+        "weekly": "Weekly",
+        "every2Weeks": "Every 2 weeks",
+        "every4Weeks": "Every 4 weeks",
+        "monthly": "Monthly"
       }
     }
   }
