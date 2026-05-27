@@ -37,8 +37,8 @@ import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import { CaseState, GenAppType } from '@services/ccdCase.interface';
-import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
+import { GenAppType } from '@services/ccdCase.interface';
+import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type { DashboardNotification, DashboardTaskGroup } from '@services/dashboard.interface';
 import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
 
