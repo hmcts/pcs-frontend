@@ -241,20 +241,6 @@ export interface StatementOfTruth {
   fullName?: string;
 }
 
-/** Counter-claim data captured across the counterclaim journey screens. */
-export interface CcdCounterClaim {
-  needHelpWithFees?: YesNoValue;
-  claimType?: string;
-  isClaimAmountKnown?: string;
-  claimAmount?: PenceAmount;
-  estimatedMaxClaimAmount?: PenceAmount;
-  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
-  counterClaimFor?: string;
-  counterClaimReasons?: string;
-  otherOrderRequestDetails?: string;
-  otherOrderRequestFacts?: string;
-}
-
 export interface PossessionClaimResponse {
   claimantOrganisations?: CcdClaimantOrganisation[];
   defendantContactDetails?: {
