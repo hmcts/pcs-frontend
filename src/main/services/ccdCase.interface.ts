@@ -160,6 +160,22 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
+/** Counter-claim data captured across the counterclaim journey screens. */
+export interface CcdCounterClaim {
+  needHelpWithFees?: YesNoValue;
+  appliedForHwf?: YesNoValue;
+  hwfReferenceNumber?: string;
+  claimType?: string;
+  isClaimAmountKnown?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
+  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
+  counterClaimFor?: string;
+  counterClaimReasons?: string;
+  otherOrderRequestDetails?: string;
+  otherOrderRequestFacts?: string;
+}
+
 /** CCD SDK Document type -- flat reference with URLs. */
 export interface CcdDocumentReference {
   document_url: string;
@@ -202,9 +218,9 @@ export interface CcdDefendantResponses {
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
   disputeClaimDetails?: string;
+  counterClaim?: CcdCounterClaim;
   paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
-  counterClaim?: CcdCounterClaim;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
   defendantDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
@@ -215,20 +231,6 @@ export interface CcdDefendantResponses {
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
   hasSolicitor?: YesNoValue;
-}
-
-/** Counter-claim data captured across the counterclaim journey screens. */
-export interface CcdCounterClaim {
-  needHelpWithFees?: YesNoValue;
-  claimType?: string;
-  isClaimAmountKnown?: string;
-  claimAmount?: PenceAmount;
-  estimatedMaxClaimAmount?: PenceAmount;
-  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
-  counterClaimFor?: string;
-  counterClaimReasons?: string;
-  otherOrderRequestDetails?: string;
-  otherOrderRequestFacts?: string;
 }
 
 export interface PossessionClaimResponse {
