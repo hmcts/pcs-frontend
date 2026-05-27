@@ -846,7 +846,7 @@ export class RespondToClaimAction implements IAction {
   private async readReasonableAdjustmentsTriage(): Promise<void> {
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
   }
-  
+
   private async selectClaimAgainstWhom(claimAgainstWhom: actionRecord): Promise<void> {
     if (Array.isArray(claimAgainstWhom.options)) {
       for (const option of claimAgainstWhom.options) {
