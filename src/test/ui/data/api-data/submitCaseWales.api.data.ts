@@ -140,8 +140,8 @@ export const submitCaseApiDataWales = {
 
     statementOfTruth: {
       completedBy: 'CLAIMANT',
-      fullNameClaimant: 'sf',
-      positionClaimant: 'dsf',
+      fullNameParty: 'fg',
+      positionParty: 'fg',
       agreementClaimant: ['BELIEVE_TRUE'],
     },
   },
@@ -231,8 +231,8 @@ export const submitCaseApiDataWales = {
     endButtonLabel: 'Submit claim',
     statementOfTruth: {
       completedBy: 'CLAIMANT',
-      fullNameClaimant: 'Test',
-      positionClaimant: 'Manager',
+      fullNameParty: 'fg',
+      positionParty: 'fg',
       agreementClaimant: ['BELIEVE_TRUE'],
     },
   },
@@ -409,8 +409,8 @@ export const submitCaseApiDataWales = {
     endButtonLabel: 'Submit claim',
     statementOfTruth: {
       completedBy: 'CLAIMANT',
-      fullNameClaimant: 'test',
-      positionClaimant: 'manager',
+      fullNameParty: 'fg',
+      positionParty: 'fg',
       agreementClaimant: ['BELIEVE_TRUE'],
     },
   },

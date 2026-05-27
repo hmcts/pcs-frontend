@@ -1578,11 +1578,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     const pin2User = await getPinUserAt(1);
-    let firstName, lastName;
-    if (pin2User.firstName === undefined) {
-      firstName = submitCaseApiData.submitCasePayloadDefault.defendant1.firstName;
-      lastName = submitCaseApiData.submitCasePayloadDefault.defendant1.lastName;
-    }
+    const firstName = pin2User.firstName ?? submitCaseApiData.submitCasePayloadDefault.defendant1.firstName;
+    const lastName = pin2User.lastName ?? submitCaseApiData.submitCasePayloadDefault.defendant1.lastName;
     await performAction('selectClaimAgainstWhom', {
       question: counterClaimAgainstWhom.mainHeader,
       options: [claimantName, `${firstName} ${lastName}`],
