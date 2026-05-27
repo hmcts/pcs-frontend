@@ -34,7 +34,7 @@
       "changeHidden": "cy whether you have applied for Universal Credit"
     },
     "universalCreditApplicationDate": {
-      "label": "cy When did you apply?",
+      "label": "cy When did you apply for Universal Credit?",
       "changeHidden": "cy when you applied for Universal Credit"
     },
     "priorityDebts": {
