@@ -54,6 +54,15 @@ export function respondToClaimAccessGuard(): RequestHandler {
         }
       }
 
+      // Direct entry is allowed only to a section's first visible step.
+      if (sectionId && shouldRedirectToFirstVisibleStep(sectionId, stepName, req)) {
+        const section = sectionById.get(sectionId);
+        const firstVisibleStep = section && getFirstVisibleStep(section, flowConfig, req);
+        if (firstVisibleStep) {
+          return res.redirect(303, getStepUrl(firstVisibleStep, flowConfig, caseId));
+        }
+      }
+
       return next();
     } catch (err) {
       logger.warn(`accessGuard predicate threw for ${stepName}, failing closed to hub`, err);
@@ -68,6 +77,21 @@ function shouldSkipGuard(req: Request): boolean {
 
 function isCyaStep(stepName: string): boolean {
   return stepName.startsWith(CYA_STEP_PREFIX);
+}
+
+// A citizen may directly open only a section's first visible step. Any other
+// step requires an internal-navigation marker: ?nav=1 (Back / Save and
+// continue) or ?edit= (CYA "Change" links).
+function shouldRedirectToFirstVisibleStep(sectionId: RespondToClaimSectionId, stepName: string, req: Request): boolean {
+  if (req.query.edit !== undefined || req.query.nav !== undefined) {
+    return false;
+  }
+  const section = sectionById.get(sectionId);
+  if (!section) {
+    return false;
+  }
+  const firstVisibleStep = getFirstVisibleStep(section, flowConfig, req);
+  return firstVisibleStep !== undefined && stepName !== firstVisibleStep;
 }
 
 async function isSectionUnavailable(sectionId: RespondToClaimSectionId, req: Request): Promise<boolean> {

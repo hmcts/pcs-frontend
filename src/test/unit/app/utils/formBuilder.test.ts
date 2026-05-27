@@ -965,7 +965,7 @@ describe('formBuilder', () => {
         expect(res.redirect).toHaveBeenCalledWith(303, '/');
       });
 
-      it('should show validation errors when saveForLater is clicked with invalid data', async () => {
+      it('bypasses validation on saveForLater and redirects', async () => {
         mockValidateForm.mockReturnValueOnce({ testField: 'This field is required' });
 
         const step = createFormStep(baseConfig);
@@ -996,22 +996,9 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.render).toHaveBeenCalledWith(
-          'formBuilder.njk',
-          expect.objectContaining({
-            errorSummary: expect.objectContaining({
-              errorList: expect.arrayContaining([
-                expect.objectContaining({
-                  href: '#testField',
-                  text: 'This field is required',
-                }),
-              ]),
-            }),
-            ccdId: '1765881343803991',
-          })
-        );
-        expect(res.redirect).not.toHaveBeenCalled();
+        expect(res.status).not.toHaveBeenCalledWith(400);
+        expect(res.render).not.toHaveBeenCalled();
+        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
       });
 
       it('should normalize checkbox field for saveForLater', async () => {

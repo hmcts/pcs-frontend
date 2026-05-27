@@ -11,7 +11,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   beforeRedirect: async req => {
     const selection = req.body?.havePriorityDebts as string | undefined;
     if (selection !== 'yes' && selection !== 'no') {
-      throw new Error('Missing or invalid priority debts selection submitted');
+      return;
     }
 
     const response = buildDraftDefendantResponse(req);
@@ -21,15 +21,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
-    const priorityDebts = getValidatedCaseHouseholdCircumstances(req)?.priorityDebts;
-
-    if (fromYesNoEnum(priorityDebts) === 'yes') {
-      return { havePriorityDebts: 'yes' };
-    }
-    if (fromYesNoEnum(priorityDebts) === 'no') {
-      return { havePriorityDebts: 'no' };
-    }
-    return {};
+    const selection = fromYesNoEnum(getValidatedCaseHouseholdCircumstances(req)?.priorityDebts);
+    return selection ? { havePriorityDebts: selection } : {};
   },
   translationKeys: {
     pageTitle: 'pageTitle',
