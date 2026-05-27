@@ -17,10 +17,10 @@
       <h1 class="govuk-heading-l">{{ t('viewTheResponse:heading') }}</h1>
 
       {% if propertyAddress %}
-        <p class="govuk-body">{{ propertyAddress }}</p>
+        <p class="govuk-body-l"> {{ t('viewTheResponse:propertyAddressLabel') }} {{ propertyAddress }}</p>
       {% endif %}
       {% if caseReferenceDisplay %}
-        <p class="govuk-body">
+        <p class="govuk-body-l">
           {{ t('viewTheResponse:caseReferenceLabel') }} {{ caseReferenceDisplay }}
         </p>
       {% endif %}
