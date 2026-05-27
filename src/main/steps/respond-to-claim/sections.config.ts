@@ -104,7 +104,7 @@ const sectionDefs = [
     id: 'checkYourAnswersAndSubmit',
     titleKey: 'taskList.checkYourAnswersAndSubmit',
     steps: [
-      'support-needs',
+      'reasonable-adjustments-triage',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',

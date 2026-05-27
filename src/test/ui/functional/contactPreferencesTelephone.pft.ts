@@ -1,4 +1,4 @@
-import { contactPreferenceEmailOrPost, contactPreferencesTelephone, dashboard, feedback } from '../data/page-data';
+import { contactPreferencesTelephone } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferencesTelephoneErrorValidation(): Promise<void> {
@@ -45,6 +45,8 @@ export async function contactPreferencesTelephoneErrorValidation(): Promise<void
   });
 }
 
+// Needs to be enabled after counterclaim journey is implemented
+/*
 export async function contactPreferencesTelephoneNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', contactPreferencesTelephone.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
@@ -58,3 +60,4 @@ export async function contactPreferencesTelephoneNavigationTests(): Promise<void
   await performAction('clickRadioButton', contactPreferencesTelephone.noRadioOption);
   await performValidation('pageNavigation', contactPreferencesTelephone.saveForLaterButton, dashboard.mainHeader);
 }
+ */
