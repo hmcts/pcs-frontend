@@ -47,7 +47,12 @@ interface CollectionRecord {
   value: UnknownRecord;
 }
 
-const PERSONS_UNKNOWN = 'Persons unknown';
+interface ViewTheClaimCopy {
+  section: (key: string, options?: Record<string, unknown>) => string;
+  label: (key: string, options?: Record<string, unknown>) => string;
+  text: (key: string, options?: Record<string, unknown>) => string;
+  personsUnknown: string;
+}
 
 const YES_NO_LABELS: Record<string, string> = {
   YES: 'Yes',
@@ -168,81 +173,84 @@ const GROUND_COLLECTION_PATHS = [
 ];
 
 const REASON_FIELDS = [
-  { path: 'absoluteGrounds', label: 'Absolute grounds' },
-  { path: 'antiSocialBehaviourGround', label: 'Antisocial behaviour' },
-  { path: 'antiSocialGround', label: 'Antisocial behaviour' },
-  { path: 'breachOfTheTenancyGround', label: 'Breach of the tenancy' },
-  { path: 'breachOfTenancyGround', label: 'Breach of the tenancy (ground 1)' },
-  { path: 'breachOfTenancyConditionsReason', label: 'Breach of tenancy conditions (ground 12)' },
-  { path: 'domesticViolenceGround', label: 'Domestic violence (ground 2A)' },
-  { path: 'domesticViolenceReason', label: 'Domestic violence (ground 14A)' },
-  { path: 'ownerOccupierReason', label: 'Owner occupier (ground 1)' },
-  { path: 'studentLetReason', label: 'Student let (ground 4)' },
-  { path: 'suitableAltAccommodationReason', label: 'Suitable alternative accommodation (ground 9)' },
-  { path: 'assuredNoArrearsReasons_AntisocialBehaviour', label: 'Antisocial behaviour (ground 7A)' },
-  { path: 'assuredNoArrearsReasons_BreachOfTenancyConditions', label: 'Breach of tenancy conditions (ground 12)' },
-  { path: 'assuredNoArrearsReasons_DeathOfTenant', label: 'Death of the tenant (ground 7)' },
-  { path: 'assuredNoArrearsReasons_DomesticViolence', label: 'Domestic violence (ground 14A)' },
-  { path: 'assuredNoArrearsReasons_FalseStatement', label: 'Tenancy obtained by false statement (ground 17)' },
-  { path: 'assuredNoArrearsReasons_FurnitureDeterioration', label: 'Deterioration of furniture (ground 15)' },
-  { path: 'assuredNoArrearsReasons_HolidayLet', label: 'Holiday let (ground 3)' },
-  { path: 'assuredNoArrearsReasons_LandlordEmployee', label: 'Employee of the landlord (ground 16)' },
+  { path: 'absoluteGrounds', label: 'absoluteGrounds' },
+  { path: 'antiSocialBehaviourGround', label: 'antiSocialBehaviourGround' },
+  { path: 'antiSocialGround', label: 'antiSocialGround' },
+  { path: 'breachOfTheTenancyGround', label: 'breachOfTheTenancyGround' },
+  { path: 'breachOfTenancyGround', label: 'breachOfTenancyGround' },
+  { path: 'breachOfTenancyConditionsReason', label: 'breachOfTenancyConditionsReason' },
+  { path: 'domesticViolenceGround', label: 'domesticViolenceGround' },
+  { path: 'domesticViolenceReason', label: 'domesticViolenceReason' },
+  { path: 'ownerOccupierReason', label: 'ownerOccupierReason' },
+  { path: 'studentLetReason', label: 'studentLetReason' },
+  { path: 'suitableAltAccommodationReason', label: 'suitableAltAccommodationReason' },
+  { path: 'assuredNoArrearsReasons_AntisocialBehaviour', label: 'assuredNoArrearsReasonsAntisocialBehaviour' },
+  {
+    path: 'assuredNoArrearsReasons_BreachOfTenancyConditions',
+    label: 'assuredNoArrearsReasonsBreachOfTenancyConditions',
+  },
+  { path: 'assuredNoArrearsReasons_DeathOfTenant', label: 'assuredNoArrearsReasonsDeathOfTenant' },
+  { path: 'assuredNoArrearsReasons_DomesticViolence', label: 'assuredNoArrearsReasonsDomesticViolence' },
+  { path: 'assuredNoArrearsReasons_FalseStatement', label: 'assuredNoArrearsReasonsFalseStatement' },
+  { path: 'assuredNoArrearsReasons_FurnitureDeterioration', label: 'assuredNoArrearsReasonsFurnitureDeterioration' },
+  { path: 'assuredNoArrearsReasons_HolidayLet', label: 'assuredNoArrearsReasonsHolidayLet' },
+  { path: 'assuredNoArrearsReasons_LandlordEmployee', label: 'assuredNoArrearsReasonsLandlordEmployee' },
   {
     path: 'assuredNoArrearsReasons_MinisterOfReligion',
-    label: 'Property required for minister of religion (ground 5)',
+    label: 'assuredNoArrearsReasonsMinisterOfReligion',
   },
-  { path: 'assuredNoArrearsReasons_NoRightToRent', label: 'Tenant does not have a right to rent (ground 7B)' },
+  { path: 'assuredNoArrearsReasons_NoRightToRent', label: 'assuredNoArrearsReasonsNoRightToRent' },
   {
     path: 'assuredNoArrearsReasons_NuisanceOrIllegalUse',
-    label: 'Nuisance, annoyance, illegal or immoral use of the property (ground 14)',
+    label: 'assuredNoArrearsReasonsNuisanceOrIllegalUse',
   },
-  { path: 'assuredNoArrearsReasons_OffenceDuringRiot', label: 'Offence during a riot (ground 14ZA)' },
-  { path: 'assuredNoArrearsReasons_OwnerOccupier', label: 'Owner occupier (ground 1)' },
+  { path: 'assuredNoArrearsReasons_OffenceDuringRiot', label: 'assuredNoArrearsReasonsOffenceDuringRiot' },
+  { path: 'assuredNoArrearsReasons_OwnerOccupier', label: 'assuredNoArrearsReasonsOwnerOccupier' },
   {
     path: 'assuredNoArrearsReasons_PropertyDeterioration',
-    label: 'Deterioration in the condition of the property (ground 13)',
+    label: 'assuredNoArrearsReasonsPropertyDeterioration',
   },
-  { path: 'assuredNoArrearsReasons_Redevelopment', label: 'Property required for redevelopment (ground 6)' },
+  { path: 'assuredNoArrearsReasons_Redevelopment', label: 'assuredNoArrearsReasonsRedevelopment' },
   {
     path: 'assuredNoArrearsReasons_RepossessionByLender',
-    label: "Repossession by the landlord's mortgage lender (ground 2)",
+    label: 'assuredNoArrearsReasonsRepossessionByLender',
   },
-  { path: 'assuredNoArrearsReasons_StudentLet', label: 'Student let (ground 4)' },
+  { path: 'assuredNoArrearsReasons_StudentLet', label: 'assuredNoArrearsReasonsStudentLet' },
   {
     path: 'assuredNoArrearsReasons_SuitableAlternativeAccomodation',
-    label: 'Suitable alternative accommodation (ground 9)',
+    label: 'assuredNoArrearsReasonsSuitableAlternativeAccomodation',
   },
   {
     path: 'walesFailToGiveUpS170Reason',
-    label: "Failure to give up possession on date specified in contract-holder's notice (section 170)",
+    label: 'walesFailToGiveUpS170Reason',
   },
   {
     path: 'walesFailToGiveUpBreakNoticeS191Reason',
-    label: "Failure to give up possession on date specified in contract-holder's break clause notice (section 191)",
+    label: 'walesFailToGiveUpBreakNoticeS191Reason',
   },
   {
     path: 'walesLandlordNoticeFtEndS186Reason',
-    label: "Landlord's notice in connection with end of fixed term given (section 186)",
+    label: 'walesLandlordNoticeFtEndS186Reason',
   },
-  { path: 'walesLandlordBreakClauseS199Reason', label: "Notice given under a landlord's break clause (section 199)" },
-  { path: 'walesOtherBreachSection157Reason', label: 'Other breach of contract (section 157)' },
+  { path: 'walesLandlordBreakClauseS199Reason', label: 'walesLandlordBreakClauseS199Reason' },
+  { path: 'walesOtherBreachSection157Reason', label: 'walesOtherBreachSection157Reason' },
   {
     path: 'walesSecureFailureToGiveUpPossessionSection170Reason',
-    label: "Failure to give up possession on date specified in contract-holder's notice (section 170)",
+    label: 'walesSecureFailureToGiveUpPossessionSection170Reason',
   },
   {
     path: 'walesSecureFailureToGiveUpPossessionSection191Reason',
-    label: "Failure to give up possession on date specified in contract-holder's break clause notice (section 191)",
+    label: 'walesSecureFailureToGiveUpPossessionSection191Reason',
   },
   {
     path: 'walesSecureLandlordNoticeSection186Reason',
-    label: "Landlord's notice in connection with end of fixed term given (section 186)",
+    label: 'walesSecureLandlordNoticeSection186Reason',
   },
   {
     path: 'walesSecureLandlordNoticeSection199Reason',
-    label: "Notice given under a landlord's break clause (section 199)",
+    label: 'walesSecureLandlordNoticeSection199Reason',
   },
-  { path: 'walesSecureOtherBreachOfContractReason', label: 'Other breach of contract (section 157)' },
+  { path: 'walesSecureOtherBreachOfContractReason', label: 'walesSecureOtherBreachOfContractReason' },
 ];
 
 export function buildViewTheClaimPageData(
@@ -250,43 +258,44 @@ export function buildViewTheClaimPageData(
   caseData: CcdCaseData,
   t: TFunction
 ): ViewTheClaimPageData {
+  const copy = createViewTheClaimCopy(t);
   const data = caseData as UnknownRecord;
   const documents = extractCaseDocuments(data);
   const propertyAddress = data.propertyAddress;
   const propertyAddressHtml = addressHtml(propertyAddress);
   const propertyAddressText = addressText(propertyAddress);
-  const claimant = claimantName(data);
+  const claimant = claimantName(data, copy);
   const claimIssueDateText = formatDate(getValue(data, 'claimIssueDate'));
   const claimSubmittedDateText = formatDate(getFirstValue(data, ['submittedOn', 'claimSubmittedDate']));
   const pageMetadataRows = sectionRows([
     claimIssueDateText
-      ? summaryRow(t('viewTheClaim:dateIssued', { defaultValue: 'Date issued' }), { text: claimIssueDateText })
+      ? summaryRow(t('viewTheClaim:dateIssued'), { text: claimIssueDateText })
       : undefined,
     claimSubmittedDateText
-      ? summaryRow(t('viewTheClaim:dateSubmitted', { defaultValue: 'Date submitted' }), { text: claimSubmittedDateText })
+      ? summaryRow(t('viewTheClaim:dateSubmitted'), { text: claimSubmittedDateText })
       : undefined,
   ]);
 
   const sections = [
-    buildClaimantSection(data),
-    buildDefendantSection(data, propertyAddress),
-    ...buildAdditionalDefendantSections(data, propertyAddress),
-    buildClaimDetailsSection(data, propertyAddress),
-    buildWelshAsbSection(data),
-    buildRentArrearsSection(data, documents, caseReference),
-    buildActionTakenSection(data),
-    buildNoticeDetailsSection(data, documents, caseReference),
-    buildTenancySection(data, documents, caseReference),
-    buildClaimantCircumstancesSection(data),
-    buildDefendantCircumstancesSection(data),
-    buildUnderlesseeTriageSection(data),
-    buildUnderlesseeSection(data, propertyAddress),
-    ...buildAdditionalUnderlesseeSections(data, propertyAddress),
-    buildDemotionSection(data),
-    buildSuspensionSection(data),
-    buildProhibitedConductSection(data),
-    buildRequiredDocumentsSection(data, documents, caseReference),
-    buildStatementOfTruthSection(data),
+    buildClaimantSection(data, copy),
+    buildDefendantSection(data, propertyAddress, copy),
+    ...buildAdditionalDefendantSections(data, propertyAddress, copy),
+    buildClaimDetailsSection(data, propertyAddress, copy),
+    buildWelshAsbSection(data, copy),
+    buildRentArrearsSection(data, documents, caseReference, copy),
+    buildActionTakenSection(data, copy),
+    buildNoticeDetailsSection(data, documents, caseReference, copy),
+    buildTenancySection(data, documents, caseReference, copy),
+    buildClaimantCircumstancesSection(data, copy),
+    buildDefendantCircumstancesSection(data, copy),
+    buildUnderlesseeTriageSection(data, copy),
+    buildUnderlesseeSection(data, propertyAddress, copy),
+    ...buildAdditionalUnderlesseeSections(data, propertyAddress, copy),
+    buildDemotionSection(data, copy),
+    buildSuspensionSection(data, copy),
+    buildProhibitedConductSection(data, copy),
+    buildRequiredDocumentsSection(data, documents, caseReference, copy),
+    buildStatementOfTruthSection(data, copy),
   ].filter((item): item is ViewTheClaimSection => !!item && item.rows.length > 0);
 
   return {
@@ -295,16 +304,11 @@ export function buildViewTheClaimPageData(
     propertyAddressText,
     introText: claimant
       ? t('viewTheClaim:introText', {
-          defaultValue:
-            '{{claimantName}} has made a property possession claim against you. These are their answers to the questions they were asked when making their claim.',
           claimantName: claimant,
         })
-      : t('viewTheClaim:introTextFallback', {
-          defaultValue:
-            "A property possession claim has been made against you. These are the claimant's answers to the questions they were asked when making their claim.",
-        }),
+      : t('viewTheClaim:introTextFallback'),
     pageMetadataRows,
-    claimPdfSection: buildClaimPdfSection(documents, caseReference, t),
+    claimPdfSection: buildClaimPdfSection(documents, caseReference, copy),
     sections,
     documentsUrl: `/case/${caseReference}/view-documents`,
   };
@@ -313,7 +317,7 @@ export function buildViewTheClaimPageData(
 function buildClaimPdfSection(
   documents: CaseDocumentLookupItem[],
   caseReference: string,
-  t: TFunction
+  copy: ViewTheClaimCopy
 ): ViewTheClaimDownloadSection {
   const claimDocument = documents.find(
     document =>
@@ -322,161 +326,163 @@ function buildClaimPdfSection(
   );
 
   return {
-    title: t('viewTheClaim:claimPdfSectionTitle', { defaultValue: 'Download a PDF copy of the claim' }),
+    title: copy.text('claimPdfSectionTitle'),
     rows: [
       summaryRow(
-        t('viewTheClaim:claimPdfLabel', { defaultValue: 'Claim (PDF)' }),
+        copy.text('claimPdfLabel'),
         claimDocument
-          ? { html: linkHtml(t('viewTheClaim:claimPdfLabel', { defaultValue: 'Claim (PDF)' }), `/case/${caseReference}/view-documents/${claimDocument.id}`) }
-          : { text: t('viewTheClaim:claimPdfLabel', { defaultValue: 'Claim (PDF)' }) }
+          ? { html: linkHtml(copy.text('claimPdfLabel'), `/case/${caseReference}/view-documents/${claimDocument.id}`) }
+          : { text: copy.text('claimPdfLabel') }
       ),
     ],
   };
 }
 
-function buildClaimantSection(data: UnknownRecord): ViewTheClaimSection | undefined {
+function buildClaimantSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
-    textRow('Name', claimantName(data)),
-    htmlRow('Address for service', claimantAddressHtml(data)),
+    textRow(copy.label('claimantName'), claimantName(data, copy)),
+    htmlRow(copy.label('addressForService'), claimantAddressHtml(data)),
     textRow(
-      'Is the claimant an exempt landlord under Part 1 of the Housing (Wales) Act 2014?',
+      copy.label('isExemptLandlord'),
       yesNoText(getValue(data, 'isExemptLandlord'))
     ),
   ];
 
-  return section('Claimant details', rows);
+  return section(copy.section('claimantDetails'), rows);
 }
 
-function buildDefendantSection(data: UnknownRecord, propertyAddress: unknown): ViewTheClaimSection | undefined {
+function buildDefendantSection(
+  data: UnknownRecord,
+  propertyAddress: unknown,
+  copy: ViewTheClaimCopy
+): ViewTheClaimSection | undefined {
   const defendant = firstDefendantParty(data);
 
   const rows = [
-    textRow('Name', partyName(defendant)),
-    htmlRow('Address for service', partyAddressHtml(defendant, propertyAddress)),
+    textRow(copy.label('defendantName'), partyName(defendant, copy)),
+    htmlRow(copy.label('addressForService'), partyAddressHtml(defendant, propertyAddress)),
   ];
 
-  return section('Defendant 1 details', rows);
+  return section(copy.section('defendantDetails'), rows);
 }
 
-function buildAdditionalDefendantSections(data: UnknownRecord, propertyAddress: unknown): ViewTheClaimSection[] {
+function buildAdditionalDefendantSections(
+  data: UnknownRecord,
+  propertyAddress: unknown,
+  copy: ViewTheClaimCopy
+): ViewTheClaimSection[] {
   const defendants = additionalDefendantParties(data);
 
   return defendants
     .map((defendant, index) =>
-      section(`Additional defendant ${index + 1} details`, [
-        textRow('Name', partyName(defendant)),
-        htmlRow('Address for service', partyAddressHtml(defendant, propertyAddress)),
+      section(copy.section('additionalDefendantDetails', { number: index + 1 }), [
+        textRow(copy.label('defendantName'), partyName(defendant, copy)),
+        htmlRow(copy.label('addressForService'), partyAddressHtml(defendant, propertyAddress)),
       ])
     )
     .filter((sectionItem): sectionItem is ViewTheClaimSection => !!sectionItem);
 }
 
-function buildClaimDetailsSection(data: UnknownRecord, propertyAddress: unknown): ViewTheClaimSection | undefined {
+function buildClaimDetailsSection(
+  data: UnknownRecord,
+  propertyAddress: unknown,
+  copy: ViewTheClaimCopy
+): ViewTheClaimSection | undefined {
   const rows = [
-    htmlRow('Address of the property the claimant is seeking possession of', addressHtml(propertyAddress)),
+    htmlRow(copy.label('propertyAddress'), addressHtml(propertyAddress)),
     textRow(
-      'Does the claimant have grounds for possession?',
+      copy.label('hasGrounds'),
       yesNoText(getFirstValue(data, ['introGrounds_HasIntroductoryDemotedOtherGroundsForPossession']))
     ),
-    htmlRow('Grounds for possession', listHtml(groundLabels(data))),
-    htmlRow('Description of grounds', listHtml(otherGroundDescriptions(data))),
-    ...groundReasonRows(data),
-    textRow('Why is the claimant claiming possession?', getFirstString(data, ['noGrounds', 'absoluteGrounds'])),
+    htmlRow(copy.label('groundsForPossession'), listHtml(groundLabels(data))),
+    htmlRow(copy.label('descriptionOfGrounds'), listHtml(otherGroundDescriptions(data))),
+    ...groundReasonRows(data, copy),
+    textRow(copy.label('whyClaimingPossession'), getFirstString(data, ['noGrounds', 'absoluteGrounds'])),
     textRow(
-      'Is there any other information the claimant wants to provide about their reasons for possession?',
+      copy.label('otherInfoAboutReasons'),
       yesNoText(getValue(data, 'additionalReasonsForPossession.hasReasons'))
     ),
-    textRow('Additional reasons for possession', getString(data, 'additionalReasonsForPossession.reasons')),
+    textRow(copy.label('additionalReasons'), getString(data, 'additionalReasonsForPossession.reasons')),
   ];
 
-  return section('Claim details', rows);
+  return section(copy.section('claimDetails'), rows);
 }
 
-function buildWelshAsbSection(data: UnknownRecord): ViewTheClaimSection | undefined {
+function buildWelshAsbSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
     textRow(
-      'Is it alleged that there is actual or threatened antisocial behaviour?',
+      copy.label('isASB'),
       yesNoText(getValue(data, 'walesAntisocialBehaviour'))
     ),
+    textRow(copy.label('asbDetails'), getString(data, 'walesAntisocialBehaviourDetails')),
     textRow(
-      'Details of alleged actual or threatened antisocial behaviour',
-      getString(data, 'walesAntisocialBehaviourDetails')
-    ),
-    textRow(
-      'Is it alleged that there is actual or threatened use of the premises for illegal purposes?',
+      copy.label('isIllegalPurposes'),
       yesNoText(getValue(data, 'walesIllegalPurposesUse'))
     ),
-    textRow(
-      'Details of alleged actual or threatened use of the premises for illegal purposes',
-      getString(data, 'walesIllegalPurposesUseDetails')
-    ),
-    textRow(
-      'Is it is alleged that there has been other prohibited conduct?',
-      yesNoText(getValue(data, 'walesOtherProhibitedConduct'))
-    ),
-    textRow('Details of other alleged prohibited conduct', getString(data, 'walesOtherProhibitedConductDetails')),
+    textRow(copy.label('illegalPurposesDetails'), getString(data, 'walesIllegalPurposesUseDetails')),
+    textRow(copy.label('isOtherProhibitedConduct'), yesNoText(getValue(data, 'walesOtherProhibitedConduct'))),
+    textRow(copy.label('otherProhibitedConductDetails'), getString(data, 'walesOtherProhibitedConductDetails')),
   ];
 
-  return section('Alleged antisocial behaviour and illegal or prohibited conduct - WALES ONLY', rows);
+  return section(copy.section('asb'), rows);
 }
 
 function buildRentArrearsSection(
   data: UnknownRecord,
   documents: CaseDocumentLookupItem[],
-  caseReference: string
+  caseReference: string,
+  copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
   const rows = [
-    textRow('Rent amount', formatMoney(getValue(data, 'rentDetails_CurrentRent'))),
-    textRow('How is rent calculated?', enumText(getValue(data, 'rentDetails_Frequency'), FREQUENCY_LABELS)),
-    textRow('Total rent arrears at time of issue', formatMoney(getValue(data, 'rentArrears_Total'))),
+    textRow(copy.label('rentAmount'), formatMoney(getValue(data, 'rentDetails_CurrentRent'))),
+    textRow(copy.label('howIsRentCalculated'), enumText(getValue(data, 'rentDetails_Frequency'), FREQUENCY_LABELS)),
+    textRow(copy.label('totalRentArrears'), formatMoney(getValue(data, 'rentArrears_Total'))),
     textRow(
-      'Have there been previous steps taken to recover rent arrears?',
+      copy.label('previousSteps'),
       yesNoText(getValue(data, 'rentArrears_RecoveryAttempted'))
     ),
-    textRow(
-      'Details of previous steps taken to recover rent arrears',
-      getString(data, 'rentArrears_RecoveryAttemptDetails')
-    ),
-    textRow('Judgment requested for the outstanding arrears?', yesNoText(getValue(data, 'arrearsJudgmentWanted'))),
+    textRow(copy.label('previousStepsDetails'), getString(data, 'rentArrears_RecoveryAttemptDetails')),
+    textRow(copy.label('judgmentRequested'), yesNoText(getValue(data, 'arrearsJudgmentWanted'))),
     htmlRow(
-      'Rent statement',
+      copy.label('rentStatement'),
       documentLinksHtml(documents, caseReference, {
         documentTypes: ['RENT_STATEMENT'],
       })
     ),
   ];
 
-  return section('Details of rent arrears - RENT ARREARS CLAIMS ONLY', rows);
+  return section(copy.section('rentArrears'), rows);
 }
 
-function buildActionTakenSection(data: UnknownRecord): ViewTheClaimSection | undefined {
+function buildActionTakenSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
-    textRow('Has the pre-action protocol been followed?', yesNoText(getValue(data, 'preActionProtocolCompleted'))),
+    textRow(copy.label('preActionProtocol'), yesNoText(getValue(data, 'preActionProtocolCompleted'))),
     textRow(
-      'Why has the pre-action protocol not been followed?',
+      copy.label('preActionProtocolReason'),
       getFirstString(data, [
         'preActionProtocolIncompleteExplanation',
         'preActionProtocolNotCompletedReason',
         'preActionProtocolReason',
       ])
     ),
-    textRow('Has mediation been attempted?', yesNoText(getValue(data, 'mediationAttempted'))),
-    textRow('Has a settlement tried to be reached?', yesNoText(getValue(data, 'settlementAttempted'))),
+    textRow(copy.label('mediationAttempted'), yesNoText(getValue(data, 'mediationAttempted'))),
+    textRow(copy.label('settlementAttempted'), yesNoText(getValue(data, 'settlementAttempted'))),
   ];
 
-  return section('Action already taken by the claimant', rows);
+  return section(copy.section('actionTaken'), rows);
 }
 
 function buildNoticeDetailsSection(
   data: UnknownRecord,
   documents: CaseDocumentLookupItem[],
-  caseReference: string
+  caseReference: string,
+  copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
   const noticeDateTime = noticeDateTimeValue(data);
   const rows = [
-    textRow('Has notice been served?', yesNoText(getFirstValue(data, ['noticeServed', 'walesNoticeServed']))),
+    textRow(copy.label('noticeServed'), yesNoText(getFirstValue(data, ['noticeServed', 'walesNoticeServed']))),
     textRow(
-      'Statement of why notice has not been served',
+      copy.label('noticeNotServedReason'),
       getFirstString(data, [
         'notice_NoticeNotServedReason',
         'notice_NoNoticeStatement',
@@ -484,261 +490,260 @@ function buildNoticeDetailsSection(
         'noticeStatement',
       ])
     ),
-    textRow('Notice type', getString(data, 'walesTypeOfNoticeServed')),
-    textRow('Method of service', enumText(getValue(data, 'notice_NoticeServiceMethod'), NOTICE_SERVICE_METHOD_LABELS)),
-    textRow('Date notice was served', formatDate(noticeDateTime)),
-    textRow('Time notice was served', formatTime(noticeDateTime)),
-    textRow('Name of person the notice was left with', getString(data, 'notice_NoticePersonName')),
-    textRow('Email address the notice was served to', getString(data, 'notice_NoticeEmailAddress')),
+    textRow(copy.label('noticeType'), getString(data, 'walesTypeOfNoticeServed')),
+    textRow(copy.label('noticeServiceMethod'), enumText(getValue(data, 'notice_NoticeServiceMethod'), NOTICE_SERVICE_METHOD_LABELS)),
+    textRow(copy.label('noticeDate'), formatDate(noticeDateTime)),
+    textRow(copy.label('noticeTime'), formatTime(noticeDateTime)),
+    textRow(copy.label('noticePersonName'), getString(data, 'notice_NoticePersonName')),
+    textRow(copy.label('noticeEmailAddress'), getString(data, 'notice_NoticeEmailAddress')),
+    textRow(copy.label('noticeOtherElectronic'), getString(data, 'notice_NoticeOtherElectronicMethodExplanation')),
+    textRow(copy.label('noticeOtherMeans'), getString(data, 'notice_NoticeOtherExplanation')),
     textRow(
-      'Details of how the notice was served by other electronic method',
-      getString(data, 'notice_NoticeOtherElectronicMethodExplanation')
-    ),
-    textRow('Details of how the notice was served by other means', getString(data, 'notice_NoticeOtherExplanation')),
-    textRow(
-      'Can the claimant upload a copy of the notice served?',
+      copy.label('canUploadNotice'),
       yesNoText(getFirstValue(data, ['notice_CanUploadNotice', 'notice_HasNoticeDocuments']))
     ),
     textRow(
-      'Why can the claimant not upload a copy of the notice served?',
+      copy.label('cannotUploadNoticeReason'),
       getFirstString(data, ['notice_UnableToUploadNoticeReason', 'notice_NoNoticeDocumentsReason'])
     ),
     htmlRow(
-      'Notice or certificate of service',
+      copy.label('noticeDocument'),
       documentLinksHtml(documents, caseReference, {
         documentTypes: ['NOTICE_FOR_SERVICE_OUT_OF_JURISDICTION', 'NOTICE', 'CERTIFICATE_OF_SERVICE'],
       })
     ),
   ];
 
-  return section('Notice details', rows);
+  return section(copy.section('noticeDetails'), rows);
 }
 
 function buildTenancySection(
   data: UnknownRecord,
   documents: CaseDocumentLookupItem[],
-  caseReference: string
+  caseReference: string,
+  copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
   const rows = [
     textRow(
-      'What type of tenancy, occupation contract or licence is in place, or was in place?',
+      copy.label('tenancyType'),
       enumText(getFirstValue(data, ['tenancy_TypeOfTenancyLicence', 'occupationLicenceTypeWales']), TENANCY_TYPE_LABELS)
     ),
+    textRow(copy.label('tenancyStartDate'), formatDate(getFirstValue(data, ['tenancy_TenancyLicenceDate', 'licenceStartDate']))),
     textRow(
-      'Tenancy, occupation contract or licence start date',
-      formatDate(getFirstValue(data, ['tenancy_TenancyLicenceDate', 'licenceStartDate']))
-    ),
-    textRow(
-      'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?',
+      copy.label('tenancyCopy'),
       yesNoText(getValue(data, 'tenancy_HasCopyOfTenancyLicence'))
     ),
     textRow(
-      'Why does the claimant not have a copy of the tenancy, occupation contract or licence agreement?',
+      copy.label('tenancyNoCopyReason'),
       getString(data, 'tenancy_ReasonsForNoTenancyLicenceDocuments')
     ),
     htmlRow(
-      'Tenancy, occupation contract or licence',
+      copy.label('tenancyDocument'),
       documentLinksHtml(documents, caseReference, {
         filenameIncludes: ['tenancy', 'licence', 'license', 'occupation'],
       })
     ),
   ];
 
-  return section('Tenancy, occupation contract or licence details', rows);
+  return section(copy.section('tenancyDetails'), rows);
 }
 
-function buildClaimantCircumstancesSection(data: UnknownRecord): ViewTheClaimSection | undefined {
+function buildClaimantCircumstancesSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
     textRow(
-      'Is there any information the claimant wants to provide about their circumstances?',
+      copy.label('claimantCircumstancesQuestion'),
       yesNoText(getValue(data, 'claimantCircumstancesSelect'))
     ),
-    textRow('Details of claimant circumstances', getString(data, 'claimantCircumstancesDetails')),
+    textRow(copy.label('claimantCircumstancesDetails'), getString(data, 'claimantCircumstancesDetails')),
   ];
 
-  return section('Claimant circumstances', rows);
+  return section(copy.section('claimantCircumstances'), rows);
 }
 
-function buildDefendantCircumstancesSection(data: UnknownRecord): ViewTheClaimSection | undefined {
+function buildDefendantCircumstancesSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
     textRow(
-      'Is there any information the claimant is required to provide, or wants to provide about the defendants circumstances?',
+      copy.label('defendantCircumstancesQuestion'),
       yesNoText(getValue(data, 'hasDefendantCircumstancesInfo'))
     ),
-    textRow('Details of defendants circumstances', getString(data, 'defendantCircumstancesInfo')),
+    textRow(copy.label('defendantCircumstancesDetails'), getString(data, 'defendantCircumstancesInfo')),
   ];
 
-  return section('Defendants circumstances', rows);
+  return section(copy.section('defendantCircumstances'), rows);
 }
 
-function buildUnderlesseeTriageSection(data: UnknownRecord): ViewTheClaimSection | undefined {
-  return section('Underlessees or mortgagees entitled to claim relief against forfeiture', [
+function buildUnderlesseeTriageSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
+  return section(copy.section('underlesseeTriage'), [
     textRow(
-      'Is there an underlessee or mortgagee entitled to claim relief against forfeiture?',
+      copy.label('hasUnderlesseeOrMortgagee'),
       yesNoText(getValue(data, 'hasUnderlesseeOrMortgagee'))
     ),
   ]);
 }
 
-function buildUnderlesseeSection(data: UnknownRecord, propertyAddress: unknown): ViewTheClaimSection | undefined {
+function buildUnderlesseeSection(
+  data: UnknownRecord,
+  propertyAddress: unknown,
+  copy: ViewTheClaimCopy
+): ViewTheClaimSection | undefined {
   const party = firstUnderlesseeParty(data);
 
-  return section('Underlessee or mortgagee 1 details', [
-    textRow('Name', underlesseeName(party)),
-    htmlRow('Address for service', partyAddressHtml(party, propertyAddress)),
+  return section(copy.section('underlesseeDetails'), [
+    textRow(copy.label('underlesseeName'), underlesseeName(party, copy)),
+    htmlRow(copy.label('underlesseeAddress'), partyAddressHtml(party, propertyAddress)),
   ]);
 }
 
-function buildAdditionalUnderlesseeSections(data: UnknownRecord, propertyAddress: unknown): ViewTheClaimSection[] {
+function buildAdditionalUnderlesseeSections(
+  data: UnknownRecord,
+  propertyAddress: unknown,
+  copy: ViewTheClaimCopy
+): ViewTheClaimSection[] {
   const parties = additionalUnderlesseeParties(data);
 
   return parties
     .map((party, index) =>
-      section(`Additional underlessee or mortgagee ${index + 1} details`, [
-        textRow('Name', underlesseeName(party)),
-        htmlRow('Address for service', partyAddressHtml(party, propertyAddress)),
+      section(copy.section('additionalUnderlesseeDetails', { number: index + 1 }), [
+        textRow(copy.label('underlesseeName'), underlesseeName(party, copy)),
+        htmlRow(copy.label('underlesseeAddress'), partyAddressHtml(party, propertyAddress)),
       ])
     )
     .filter((sectionItem): sectionItem is ViewTheClaimSection => !!sectionItem);
 }
 
-function buildDemotionSection(data: UnknownRecord): ViewTheClaimSection | undefined {
+function buildDemotionSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
     textRow(
-      'In the alternative to possession, is the claimant asking the court to order demotion of tenancy?',
+      copy.label('demotionQuestion'),
       selectedAlternative(data, 'DEMOTION_OF_TENANCY')
     ),
     textRow(
-      'Which section of the Housing Act is the demotion of tenancy claim made under?',
+      copy.label('demotionHousingAct'),
       enumText(getFirstValue(data, ['demotionOfTenancy_HousingAct', 'demotionOfTenancyActs']), {
         SECTION_6A_2: 'Section 6A(2) of the Housing Act 1988',
         SECTION_82A_2: 'Section 82A(2) of the Housing Act 1985',
       })
     ),
     textRow(
-      'Has the claimant served a statement of express terms on the defendants which will apply to the demoted tenancy?',
+      copy.label('demotionStatement'),
       yesNoText(getValue(data, 'demotionOfTenancy_StatementOfExpressTermsServed'))
     ),
-    textRow('Details of terms', getString(data, 'demotionOfTenancy_StatementOfExpressTermsDetails')),
-    textRow(
-      'Reasons for requesting demotion of tenancy',
-      getFirstString(data, ['demotionOfTenancy_Reason', 'demotionOrderReason'])
-    ),
+    textRow(copy.label('demotionDetails'), getString(data, 'demotionOfTenancy_StatementOfExpressTermsDetails')),
+    textRow(copy.label('demotionReason'), getFirstString(data, ['demotionOfTenancy_Reason', 'demotionOrderReason'])),
   ];
 
-  return section('Demotion of tenancy', rows);
+  return section(copy.section('demotion'), rows);
 }
 
-function buildSuspensionSection(data: UnknownRecord): ViewTheClaimSection | undefined {
+function buildSuspensionSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
     textRow(
-      'In the alternative to possession, is the claimant asking the court to order suspension of right to buy?',
+      copy.label('suspensionQuestion'),
       selectedAlternative(data, 'SUSPENSION_OF_RIGHT_TO_BUY')
     ),
     textRow(
-      'Which section of the Housing Act is the suspension of right to buy claim made under?',
+      copy.label('suspensionHousingAct'),
       enumText(getFirstValue(data, ['suspensionOfRTB_HousingAct', 'suspensionOfRightToBuyActs']), {
         SECTION_121A: 'Section 121A of the Housing Act 1985',
         SECTION_6A_2: 'Section 6A(2) of the Housing Act 1988',
         SECTION_82A_2: 'Section 82A(2) of the Housing Act 1985',
       })
     ),
-    textRow(
-      'Reasons for requesting a suspension of right to buy',
-      getFirstString(data, ['suspensionOfRTB_Reason', 'suspensionOrderReason'])
-    ),
+    textRow(copy.label('suspensionReason'), getFirstString(data, ['suspensionOfRTB_Reason', 'suspensionOrderReason'])),
   ];
 
-  return section('Suspension of right to buy', rows);
+  return section(copy.section('suspension'), rows);
 }
 
-function buildProhibitedConductSection(data: UnknownRecord): ViewTheClaimSection | undefined {
+function buildProhibitedConductSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
     textRow(
-      'Is the claimant seeking an order imposing a prohibited standard contract?',
+      copy.label('prohibitedConductQuestion'),
       yesNoText(getValue(data, 'prohibitedConductWalesClaim'))
     ),
     textRow(
-      'Has the claimant and the contract holder agreed terms of the periodic standard contract in addition to those incorporated by statute?',
+      copy.label('prohibitedConductAgreement'),
       yesNoText(getValue(data, 'agreedTermsOfPeriodicContract'))
     ),
-    textRow('Details of terms', getString(data, 'detailsOfTerms')),
-    textRow('Why is the claimant making this claim?', getString(data, 'prohibitedConductWalesClaimDetails')),
+    textRow(copy.label('prohibitedConductDetails'), getString(data, 'detailsOfTerms')),
+    textRow(copy.label('prohibitedConductReason'), getString(data, 'prohibitedConductWalesClaimDetails')),
   ];
 
-  return section('Prohibited conduct standard contract', rows);
+  return section(copy.section('prohibitedConduct'), rows);
 }
 
 function buildRequiredDocumentsSection(
   data: UnknownRecord,
   documents: CaseDocumentLookupItem[],
-  caseReference: string
+  caseReference: string,
+  copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
   const rows = [
     textRow(
-      'Can the claimant upload a copy of the energy performance certificate?',
+      copy.label('epcQuestion'),
       yesNoText(getValue(data, 'energyPerformanceCertificateProvided'))
     ),
     textRow(
-      'Why can the claimant not upload a copy of the energy performance certificate?',
+      copy.label('epcReason'),
       getString(data, 'noEnergyPerformanceCertificateReason')
     ),
     htmlRow(
-      'Energy performance certificate',
+      copy.label('epcDocument'),
       documentLinksHtml(documents, caseReference, {
         documentTypes: ['ENERGY_PERFORMANCE_CERTIFICATE'],
       })
     ),
     textRow(
-      'Can the claimant upload a copy of the current gas safety report?',
+      copy.label('gasQuestion'),
       yesNoText(getValue(data, 'gasSafetyReportProvided'))
     ),
     textRow(
-      'Why can the claimant not upload a copy of the current gas safety report?',
+      copy.label('gasReason'),
       getString(data, 'noGasSafetyReportReason')
     ),
-    htmlRow(
-      'Current gas safety report',
-      documentLinksHtml(documents, caseReference, {
-        documentTypes: ['GAS_SAFETY_REPORT'],
-      })
-    ),
+    htmlRow(copy.label('gasDocument'), documentLinksHtml(documents, caseReference, { documentTypes: ['GAS_SAFETY_REPORT'] })),
     textRow(
-      'Can the claimant upload a copy of the current Electrical Installation Condition Report (EICR)?',
+      copy.label('eicrQuestion'),
       yesNoText(getValue(data, 'electricalInstallationConditionProvided'))
     ),
     textRow(
-      'Why can the claimant not upload a copy of the Electrical Installation Condition Report (EICR)?',
+      copy.label('eicrReason'),
       getString(data, 'noElectricalInstallationConditionReason')
     ),
     htmlRow(
-      'Electrical Installation Condition Report (EICR)',
+      copy.label('eicrDocument'),
       documentLinksHtml(documents, caseReference, {
         documentTypes: ['ELECTRICAL_INSTALLATION_CONDITION_REPORT'],
       })
     ),
   ];
 
-  return section('Required documents', rows);
+  return section(copy.section('requiredDocuments'), rows);
 }
 
-function buildStatementOfTruthSection(data: UnknownRecord): ViewTheClaimSection | undefined {
+function buildStatementOfTruthSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const statementOfTruth = asRecord(getValue(data, 'statementOfTruth'));
   if (!statementOfTruth) {
     return undefined;
   }
 
   const rows = [
-    textRow('Completed by', enumText(statementOfTruth?.completedBy, STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS)),
-    textRow('Name', getFirstString(statementOfTruth ?? {}, ['fullNameLegalRep', 'fullNameClaimant'])),
-    textRow('Name of firm', getFirstString(statementOfTruth ?? {}, ['firmNameLegalRep']) ?? claimantName(data)),
-    textRow(
-      'Position or office held',
-      getFirstString(statementOfTruth ?? {}, ['positionLegalRep', 'positionClaimant'])
-    ),
+    textRow(copy.label('statementOfTruthCompletedBy'), enumText(statementOfTruth?.completedBy, STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS)),
+    textRow(copy.label('statementOfTruthName'), getFirstString(statementOfTruth ?? {}, ['fullNameLegalRep', 'fullNameClaimant'])),
+    textRow(copy.label('statementOfTruthFirmName'), getFirstString(statementOfTruth ?? {}, ['firmNameLegalRep']) ?? claimantName(data, copy)),
+    textRow(copy.label('statementOfTruthPosition'), getFirstString(statementOfTruth ?? {}, ['positionLegalRep', 'positionClaimant'])),
   ];
 
-  return section('Statement of truth', rows);
+  return section(copy.section('statementOfTruth'), rows);
+}
+
+function createViewTheClaimCopy(t: TFunction): ViewTheClaimCopy {
+  return {
+    section: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:sections.${key}`, options),
+    label: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:labels.${key}`, options),
+    text: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:${key}`, options),
+    personsUnknown: t('viewTheClaim:personsUnknown'),
+  };
 }
 
 function section(title: string, rows: (ViewTheClaimSummaryRow | undefined)[]): ViewTheClaimSection | undefined {
@@ -766,13 +771,13 @@ function htmlRow(label: string, value: string | undefined): ViewTheClaimSummaryR
   return value ? summaryRow(label, { html: value }) : undefined;
 }
 
-function claimantName(data: UnknownRecord): string | undefined {
+function claimantName(data: UnknownRecord, copy: ViewTheClaimCopy): string | undefined {
   if (normaliseYesNo(getValue(data, 'isClaimantNameCorrect')) === 'NO') {
     return getFirstString(data, ['overriddenClaimantName', 'fallbackClaimantName', 'claimantName']);
   }
 
   return (
-    listText(partyNames(collectionRecords(getValue(data, 'allClaimants')))) ??
+    listText(partyNames(collectionRecords(getValue(data, 'allClaimants')), copy)) ??
     getFirstString(data, [
       'claimantName',
       'fallbackClaimantName',
@@ -862,13 +867,13 @@ function underlesseeParties(data: UnknownRecord): UnknownRecord[] {
   return [asRecord(getValue(data, 'underlesseeOrMortgagee1'))].filter((party): party is UnknownRecord => !!party);
 }
 
-function partyName(party: UnknownRecord | undefined): string | undefined {
+function partyName(party: UnknownRecord | undefined, copy: ViewTheClaimCopy): string | undefined {
   if (!party) {
     return undefined;
   }
 
   if (normaliseYesNo(party.nameKnown) === 'NO') {
-    return PERSONS_UNKNOWN;
+    return copy.personsUnknown;
   }
 
   return (
@@ -877,16 +882,16 @@ function partyName(party: UnknownRecord | undefined): string | undefined {
   );
 }
 
-function underlesseeName(party: UnknownRecord | undefined): string | undefined {
+function underlesseeName(party: UnknownRecord | undefined, copy: ViewTheClaimCopy): string | undefined {
   if (!party) {
     return undefined;
   }
 
   if (normaliseYesNo(party.nameKnown) === 'NO') {
-    return PERSONS_UNKNOWN;
+    return copy.personsUnknown;
   }
 
-  return getStringFromValue(party.name) ?? partyName(party);
+  return getStringFromValue(party.name) ?? partyName(party, copy);
 }
 
 function partyAddressHtml(party: UnknownRecord | undefined, propertyAddress: unknown): string | undefined {
@@ -923,14 +928,16 @@ function groundLabels(data: UnknownRecord): string[] {
   return unique(labels);
 }
 
-function groundReasonRows(data: UnknownRecord): (ViewTheClaimSummaryRow | undefined)[] {
+function groundReasonRows(data: UnknownRecord, copy: ViewTheClaimCopy): (ViewTheClaimSummaryRow | undefined)[] {
   const summaryRows = getArray(getValue(data, 'claimGroundSummaries'))
     .map(item => asRecord(item))
     .map(item => asRecord(item?.value))
     .filter((value): value is UnknownRecord => !!value)
     .map(value =>
       textRow(
-        `Reason for claiming possession under ground ${getStringFromValue(value.label) ?? enumText(value.code, GROUND_LABELS) ?? ''}`.trim(),
+        copy.label('reasonForGround', {
+          ground: getStringFromValue(value.label) ?? enumText(value.code, GROUND_LABELS) ?? '',
+        }),
         getStringFromValue(value.reason)
       )
     )
@@ -941,7 +948,7 @@ function groundReasonRows(data: UnknownRecord): (ViewTheClaimSummaryRow | undefi
   }
 
   return REASON_FIELDS.map(({ path, label }) =>
-    textRow(`Reason for claiming possession under ground ${label}`, getString(data, path))
+    textRow(copy.label('reasonForGround', { ground: copy.label(label) }), getString(data, path))
   );
 }
 
@@ -1224,8 +1231,8 @@ function unique(values: string[]): string[] {
   return [...new Set(values)];
 }
 
-function partyNames(parties: UnknownRecord[]): string[] {
-  return parties.map(party => partyName(party)).filter((name): name is string => !!name);
+function partyNames(parties: UnknownRecord[], copy: ViewTheClaimCopy): string[] {
+  return parties.map(party => partyName(party, copy)).filter((name): name is string => !!name);
 }
 
 function listText(values: string[]): string | undefined {

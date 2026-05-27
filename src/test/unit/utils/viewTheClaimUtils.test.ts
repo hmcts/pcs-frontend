@@ -2,7 +2,50 @@ import type { TFunction } from 'i18next';
 
 import { ViewTheClaimSection, buildViewTheClaimPageData } from '@utils/viewTheClaimUtils';
 
-const t = ((key: string, options?: { defaultValue?: string }) => options?.defaultValue ?? key) as TFunction;
+const translations: Record<string, string> = {
+  'viewTheClaim:claimPdfLabel': 'Claim (PDF)',
+  'viewTheClaim:sections.claimantDetails': 'Claimant details',
+  'viewTheClaim:sections.defendantDetails': 'Defendant 1 details',
+  'viewTheClaim:sections.additionalDefendantDetails': 'Additional defendant 1 details',
+  'viewTheClaim:sections.claimDetails': 'Claim details',
+  'viewTheClaim:sections.rentArrears': 'Details of rent arrears - RENT ARREARS CLAIMS ONLY',
+  'viewTheClaim:sections.underlesseeTriage': 'Underlessees or mortgagees entitled to claim relief against forfeiture',
+  'viewTheClaim:sections.underlesseeDetails': 'Underlessee or mortgagee 1 details',
+  'viewTheClaim:sections.additionalUnderlesseeDetails': 'Additional underlessee or mortgagee 1 details',
+  'viewTheClaim:labels.claimantName': 'Name',
+  'viewTheClaim:labels.addressForService': 'Address for service',
+  'viewTheClaim:labels.defendantName': 'Name',
+  'viewTheClaim:labels.propertyAddress': 'Address of the property the claimant is seeking possession of',
+  'viewTheClaim:labels.hasGrounds': 'Does the claimant have grounds for possession?',
+  'viewTheClaim:labels.groundsForPossession': 'Grounds for possession',
+  'viewTheClaim:labels.descriptionOfGrounds': 'Description of grounds',
+  'viewTheClaim:labels.reasonForGround': 'Reason for claiming possession under ground Rent arrears',
+  'viewTheClaim:labels.whyClaimingPossession': 'Why is the claimant claiming possession?',
+  'viewTheClaim:labels.otherInfoAboutReasons': 'Is there any other information the claimant wants to provide about their reasons for possession?',
+  'viewTheClaim:labels.additionalReasons': 'Additional reasons for possession',
+  'viewTheClaim:labels.rentAmount': 'Rent amount',
+  'viewTheClaim:labels.howIsRentCalculated': 'How is rent calculated?',
+  'viewTheClaim:labels.rentStatement': 'Rent statement',
+  'viewTheClaim:labels.underlesseeName': 'Name',
+  'viewTheClaim:labels.underlesseeAddress': 'Address for service',
+  'viewTheClaim:personsUnknown': 'Persons unknown',
+};
+
+const t = ((key: string, options?: Record<string, unknown>) => {
+  if (key === 'viewTheClaim:sections.additionalDefendantDetails') {
+    return `Additional defendant ${options?.number} details`;
+  }
+
+  if (key === 'viewTheClaim:sections.additionalUnderlesseeDetails') {
+    return `Additional underlessee or mortgagee ${options?.number} details`;
+  }
+
+  if (key === 'viewTheClaim:labels.reasonForGround') {
+    return `Reason for claiming possession under ground ${options?.ground}`;
+  }
+
+  return options?.defaultValue ?? translations[key] ?? key;
+}) as TFunction;
 
 function sectionByTitle(page: ReturnType<typeof buildViewTheClaimPageData>, title: string): ViewTheClaimSection {
   const section = page.sections.find(item => item.title === title);
