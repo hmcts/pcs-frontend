@@ -9,6 +9,7 @@ import {
   counterClaimAbout,
   counterClaimAgainstWhom,
   counterClaimFee,
+  counterClaimHaveYouAppliedForHelp,
   counterClaimSpecificSumOfMoney,
   counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
@@ -33,14 +34,12 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
-  supportNeeds,
   tenancyDateDetails,
   tenancyTypeDetails,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-import { haveYouAlreadyAppliedForHelp } from '../data/page-data/genApps-page-data/haveYouAlreadyAppliedForHelp.page.data';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
@@ -49,6 +48,7 @@ import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
 import { counterClaimAboutErrorValidation } from '../functional/counterClaimAbout.pft';
 import { counterClaimAgainstWhomErrorValidation } from '../functional/counterClaimAgainstWhom.pft';
 import { counterClaimFeeErrorValidation } from '../functional/counterClaimFee.pft';
+import { counterClaimHaveYouAppliedForHelpErrorValidation } from '../functional/counterClaimHaveYouAppliedForHelp.pft';
 import { counterClaimSpecificSumErrorValidation } from '../functional/counterClaimSpecificSumOfMoney.pft';
 import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/counterClaimWhatAreYouClaimingFor.pft';
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
@@ -297,7 +297,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
     });
-
     await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
     await performAction('selectWhatAreYouClaimingFor', {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
@@ -441,8 +440,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
-    await performAction('clickButton', supportNeeds.continueButton);
-    await softErrorMessageValidation('supportNeeds', NO_EMV_PLACEHOLDER_PAGE);
+    await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
+    await performAction('readReasonableAdjustmentsTriage');
 
     await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -461,7 +460,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     assertAllErrorMessageValidations();
   });
 
-  test('Non-RentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
+  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
 
@@ -541,10 +540,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
     await performAction('selectWhatAreYouClaimingFor', {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
-      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
 
-    await await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
+    await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
     await performAction('counterClaimSpecificSumOfMoney', {
       question: counterClaimSpecificSumOfMoney.mainHeader,
       option: counterClaimSpecificSumOfMoney.noRadioOption,
@@ -558,14 +557,19 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
 
-    await softErrorMessageValidation('haveYouAlreadyAppliedForHelp', NO_EMV_READ_ONLY);
-    await performAction('clickButton', haveYouAlreadyAppliedForHelp.continueButton);
-    // Following steps need to be enabled and update routing once HDPI-5193 is merged
-    /* await softErrorMessageValidation('counterClaimAbout', counterClaimAboutErrorValidation);
+    await softErrorMessageValidation(
+      'counterClaimHaveYouAppliedForHelp',
+      counterClaimHaveYouAppliedForHelpErrorValidation
+    );
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
+    });
+    await softErrorMessageValidation('counterClaimAbout', counterClaimAboutErrorValidation);
     await performAction('counterClaimAbout', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
-    });*/
+    });
     await softErrorMessageValidation('counterClaimUploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
 
@@ -648,8 +652,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
-    await performAction('clickButton', supportNeeds.continueButton);
-    await softErrorMessageValidation('supportNeeds', NO_EMV_PLACEHOLDER_PAGE);
+    await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
+    await performAction('readReasonableAdjustmentsTriage');
 
     await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
