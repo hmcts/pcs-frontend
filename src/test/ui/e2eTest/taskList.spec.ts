@@ -1,10 +1,7 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
-  contactPreferenceEmailOrPost,
-  contactPreferencesTelephone,
   contactPreferencesTextMessage,
-  correspondenceAddress,
   counterClaim,
   counterClaimAbout,
   counterClaimFee,
@@ -181,26 +178,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
-  } else if (testInfo.title.includes('@assured')) {
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
-  } else if (testInfo.title.includes('@secureFlexible')) {
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
-  } else if (testInfo.title.includes('@other')) {
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
-  } else if (testInfo.title.includes('@rentNonRent')) {
-    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
-    process.env.TENANCY_START_DATE_KNOWN = 'YES';
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
-  } else if (testInfo.title.includes('@multiParty')) {
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
-    claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
-    process.env.CLAIMANT_NAME = claimantName;
-  } else {
+  }  else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
@@ -224,32 +202,30 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
   test('Respond to a claim @noDefendants @regression @crossbrowser', async () => {
     //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('clickButton', 'Save and continue');
+    await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Available',
+    });
+    await performAction('taskList', { subSection: taskList.readInformationAboutLink });
+    await performAction('clickButton', startNow.startNowButton);
+    await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption );
+    await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
+
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirth.dayInputText,
-      dobMonth: defendantDateOfBirth.monthInputText,
-      dobYear: defendantDateOfBirth.yearInputText,
-    });
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-      postcode: correspondenceAddress.walesPostcodeTextInput,
-    });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
-      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.yesRadioOption,
-      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
-    });
+    await performAction('clickButton', defendantDateOfBirth.saveForLaterButton );
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
     await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });

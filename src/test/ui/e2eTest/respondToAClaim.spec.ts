@@ -374,6 +374,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('clickButton', 'Save and continue');
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitLink });
+    await performAction('clickButton', supportNeeds.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('clickButton', 'Save and continue');
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -384,15 +395,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    // await performAction('clickButton', supportNeeds.continueButton);
-    // await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    // await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    // await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    // await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-    // await performAction('languageUsed', {
-    //   question: languageUsed.mainHeader,
-    //   radioOption: languageUsed.englishRadioOption,
-    // });
   });
 
   test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @regression @PR', async () => {

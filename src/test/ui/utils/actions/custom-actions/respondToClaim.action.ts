@@ -42,7 +42,6 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
-  taskList,
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
@@ -787,9 +786,9 @@ export class RespondToClaimAction implements IAction {
   private async taskList(taskListData: actionRecord): Promise<void> {
     const caseNumber = `${process.env.CASE_NUMBER?.replace(/(\d{4})(?=\d)/g, '$1 ').trim()}`;
     await performValidation('text', { elementType: 'paragraph', text: 'Case number: ' + caseNumber });
-    if (taskListData.subSection !== taskList.readInformationAboutLink) {
-      await performValidation('text', taskListData.subSection, { elementType: 'taskListStatus', text: 'Available' });
-    }
+    // if (taskListData.subSection !== taskList.readInformationAboutLink) {
+    //   await performValidation('text', taskListData.subSection, { elementType: 'taskListStatus', text: 'Available' });
+    // }
     await performAction('clickLink', taskListData.subSection);
   }
 

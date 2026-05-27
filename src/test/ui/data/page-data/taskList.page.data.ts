@@ -12,4 +12,5 @@ export const taskList = {
   householdAndCircumstancesLink: `Give details about your household and circumstances`,
   incomeAndExpensesLink: `Give details about your income and expenses`,
   uploadDocumentsLink: `Upload documents`,
+  checkYourAnswersAndSubmitLink: `Check your answers and submit`,
 };
