@@ -18,7 +18,7 @@ export const respondToClaimSections: SectionConfig[] = [
   {
     id: 'startNowAndDetails',
     titleKey: 'taskList.startNowAndDetails',
-    steps: ['start-now', 'free-legal-advice'],
+    steps: ['start-now', 'free-legal-advice', 'solicitor', 'ask-your-solicitor-to-respond-to-the-claim'],
   },
   {
     id: 'personalDetails',
@@ -54,8 +54,11 @@ export const respondToClaimSections: SectionConfig[] = [
       'counter-claim-specific-sum',
       'counter-claim-fee',
       'counter-claim-have-you-applied-for-help',
+      'counter-claim-you-need-to-apply-for-help-with-your-fees',
       'counter-claim-against-whom',
       'counter-claim-about',
+      'counter-claim-order-other-than-sum',
+      'counter-claim-upload-documents',
     ],
   },
   {

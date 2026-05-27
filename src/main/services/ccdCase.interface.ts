@@ -1,8 +1,3 @@
-export enum CaseState {
-  DRAFT = 'Draft',
-  SUBMITTED = 'Submitted',
-}
-
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export enum YesNoEnum {
@@ -82,20 +77,6 @@ export type PaymentAgreement = {
   additionalContributionFrequency?: string;
 };
 
-export interface CcdUserCase {
-  id: string;
-  state: CaseState;
-  jurisdiction: string;
-  case_type_id: string;
-  case_data: Record<string, unknown>;
-}
-
-export interface CcdUserCases {
-  total: number;
-  cases: CcdUserCase[];
-}
-
-/** Address shape used in CCD case data (property, defendant, etc.). */
 export interface CcdCaseAddress {
   AddressLine1?: string;
   AddressLine2?: string;
@@ -120,6 +101,30 @@ export interface CcdClaimGroundSummaryItem {
   id: string;
 }
 
+export interface Party {
+  id: string;
+  idamId: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Document {
+  document_url: string;
+  document_filename: string;
+  document_binary_url: string;
+}
+
+export interface DocumentWithId {
+  id: string;
+  document: Document;
+}
+
+export interface GenApp {
+  applicationType: GenAppType;
+  party: Party;
+  submittedOn: string;
+  submissionDocument: DocumentWithId;
+}
 /** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
 export interface CcdClaimantOrganisation {
   value: string;
@@ -155,6 +160,22 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
+/** Counter-claim data captured across the counterclaim journey screens. */
+export interface CcdCounterClaim {
+  needHelpWithFees?: YesNoValue;
+  appliedForHwf?: YesNoValue;
+  hwfReferenceNumber?: string;
+  claimType?: string;
+  isClaimAmountKnown?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
+  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
+  counterClaimFor?: string;
+  counterClaimReasons?: string;
+  otherOrderRequestDetails?: string;
+  otherOrderRequestFacts?: string;
+}
+
 /** CCD SDK Document type -- flat reference with URLs. */
 export interface CcdDocumentReference {
   document_url: string;
@@ -162,6 +183,7 @@ export interface CcdDocumentReference {
   document_filename: string;
   document_hash?: string;
   category_id?: string;
+  upload_timestamp?: string;
 }
 
 /** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
@@ -196,9 +218,9 @@ export interface CcdDefendantResponses {
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
   disputeClaimDetails?: string;
+  counterClaim?: CcdCounterClaim;
   paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
-  counterClaim?: CcdCounterClaim;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
   defendantDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
@@ -208,15 +230,7 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
-}
-
-/** Counter-claim data captured across the counterclaim journey screens. */
-export interface CcdCounterClaim {
-  needHelpWithFees?: YesNoValue;
-  claimType?: string;
-  isClaimAmountKnown?: string;
-  claimAmount?: PenceAmount;
-  estimatedMaxClaimAmount?: PenceAmount;
+  hasSolicitor?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
@@ -262,6 +276,7 @@ export interface CcdCaseData {
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
+  genApps?: CcdCollectionItem<GenApp>[];
   allClaimants?: CcdCollectionItem<CcdParty>[];
   allDefendants?: CcdCollectionItem<CcdParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
@@ -348,7 +363,6 @@ export interface CcdDashboardData {
 }
 
 export enum GenAppType {
-  SUSPEND = 'SUSPEND',
   ADJOURN = 'ADJOURN',
   SET_ASIDE = 'SET_ASIDE',
   SOMETHING_ELSE = 'SOMETHING_ELSE',
