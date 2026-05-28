@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
+  accessYourCase,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -57,6 +58,8 @@ import {
 import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
+
+import { getSelectedPinUser, pins, selectPinUserByDefendantDetails } from './fetchPINsAndValidateAccessCodeAPI.action';
 export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -122,6 +125,7 @@ export class RespondToClaimAction implements IAction {
       ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
+      ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
       ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
       ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
       ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
@@ -142,8 +146,14 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {
-    await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantData.fName);
-    await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantData.lName);
+    const selectedPinUser = getSelectedPinUser();
+    const firstNameValue = defendantData.fName ?? selectedPinUser?.firstName;
+    const lastNameValue = defendantData.lName ?? selectedPinUser?.lastName;
+
+    await performValidation('mainHeader', defendantNameCapture.mainHeader);
+
+    await performAction('inputText', defendantNameCapture.firstNameTextLabel, firstNameValue);
+    await performAction('inputText', defendantNameCapture.lastNameTextLabel, lastNameValue);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
@@ -160,15 +170,16 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async confirmDefendantDetails(defendantData: actionRecord) {
+    await performValidation('mainHeader', defendantData.question);
     await performAction('clickRadioButton', {
       question: defendantData.question,
       option: defendantData.option,
     });
     if (defendantData.option === defendantNameConfirmation.noRadioOption) {
-      await this.inputDefendantDetails(defendantData);
-    } else {
-      await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+      await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
+      await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
     }
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
@@ -387,7 +398,6 @@ export class RespondToClaimAction implements IAction {
         continue;
       }
 
-      // Normal validation
       if (!value || !frequency) {
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
@@ -843,6 +853,28 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   }
 
+  private async accessYourCase(accessCode: actionRecord): Promise<void> {
+    const explicitDefendantDetailsKnown =
+      typeof accessCode.defendantDetailsKnown === 'boolean' ? accessCode.defendantDetailsKnown : undefined;
+
+    const explicitDefendantTypeKnown =
+      typeof accessCode.defendantType === 'string' ? accessCode.defendantType === 'known' : undefined;
+
+    const defendantDetailsKnown = explicitDefendantDetailsKnown ?? explicitDefendantTypeKnown;
+
+    const pin =
+      typeof defendantDetailsKnown === 'boolean'
+        ? selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin
+        : (getSelectedPinUser()?.pin ?? pins[0]);
+
+    if (!pin) {
+      throw new Error('PIN is not available. Ensure fetchPINsAPI is called before accessYourCase');
+    }
+
+    await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
+    await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
+    await performAction('clickButton', accessYourCase.continueButton);
+  }
   private async readReasonableAdjustmentsTriage(): Promise<void> {
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
   }
