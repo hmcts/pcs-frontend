@@ -9,7 +9,9 @@ import {
   RecordAnswers,
   RespondToClaimAction,
   TriggerPageFunctionalTestsAction,
+  respondPossessionClaimAPIAction,
 } from '../actions/custom-actions';
+import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -43,6 +45,10 @@ export class ActionRegistry {
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
+    ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
+    ['citizenDashboard', new CitizenDashboardAction()],
+    ['verifyRespondToClaimNotificationAndTag', new CitizenDashboardAction()],
+    ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
@@ -120,8 +126,7 @@ export class ActionRegistry {
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
     ['otherConsiderations', new RespondToClaimAction()],
-    ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
-    ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['accessYourCase', new RespondToClaimAction()],
     ['selectClaimAgainstWhom', new RespondToClaimAction()],
     ['counterClaimAbout', new RespondToClaimAction()],
     ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],

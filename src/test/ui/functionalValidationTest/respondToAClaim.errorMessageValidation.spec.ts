@@ -40,6 +40,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { accessYourCaseErrorValidation } from '../functional/accessYourCase.pft';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
@@ -148,7 +149,7 @@ test.beforeEach(async ({ page }, testInfo) => {
       break;
   }
 
-  //Check if No or Im not sure is selected on NoticeDetails page - for back link navigation
+  //Check if No, or I'm not sure is selected on NoticeDetails page - for back link navigation
   if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
     process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
   }
@@ -219,9 +220,11 @@ test.beforeEach(async ({ page }, testInfo) => {
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await softErrorMessageValidation('accessYourCase', accessYourCaseErrorValidation);
+  await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await softErrorMessageValidation('startNow', NO_EMV_READ_ONLY);
   await performAction('clickButton', startNow.startNowButton);

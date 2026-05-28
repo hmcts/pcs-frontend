@@ -50,6 +50,7 @@ export * from './uploadDocuments.page.data';
 export * from './whatAreYouClaimingFor.page.data';
 export * from './otherConsiderations.page.data';
 export * from './uploadFiles.page.data';
+export * from './accessYourCase.page.data';
 export * from './counterClaimHaveYouAppliedForHelp.page.data';
 export * from './counterclaimYouNeedToApplyForHelpWithYourFees.page.data';
 export * from './reasonableAdjustmentsTriage.page.data';

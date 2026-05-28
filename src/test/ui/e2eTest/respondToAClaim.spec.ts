@@ -221,6 +221,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
     claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
     process.env.CLAIMANT_NAME = claimantName;
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
@@ -230,9 +231,10 @@ test.beforeEach(async ({ page }, testInfo) => {
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
@@ -998,7 +1000,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @regression', async () => {
-    //universal credit with all other options - priority debts - No - Multiple namedParties - sumofmoney - iNeedHelp
+    //universal credit with all other options - priority debts - No - Multiple namedParties - sumOfMoney - iNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -1594,11 +1596,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     const pin2User = await getPinUserAt(1);
-    let firstName, lastName;
-    if (pin2User.firstName === undefined) {
-      firstName = submitCaseApiData.submitCasePayloadDefault.defendant1.firstName;
-      lastName = submitCaseApiData.submitCasePayloadDefault.defendant1.lastName;
-    }
+    const firstName = pin2User.firstName ?? submitCaseApiData.submitCasePayloadDefault.defendant1.firstName;
+    const lastName = pin2User.lastName ?? submitCaseApiData.submitCasePayloadDefault.defendant1.lastName;
     await performAction('selectClaimAgainstWhom', {
       question: counterClaimAgainstWhom.mainHeader,
       options: [claimantName, `${firstName} ${lastName}`],
