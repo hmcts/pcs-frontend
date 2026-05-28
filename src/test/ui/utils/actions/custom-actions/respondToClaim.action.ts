@@ -354,7 +354,6 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
-    this.recordAnswer(correspondenceAddress.correspondenceAddressConfirmHintText(), addressData.radioOption);
     await performAction('clickRadioButton', {
       question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
