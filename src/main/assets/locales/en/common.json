@@ -158,7 +158,6 @@
       "paragraph5": "0300 123 7050",
       "paragraph6": "Monday to Friday, 8.30am to 5pm.",
       "paragraph7": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
-
     },
     "technicalError": {
       "title": "Sorry, there is a problem with the service",
@@ -172,7 +171,6 @@
       "paragraph6": "0300 123 7050",
       "paragraph7": "Monday to Friday, 8.30am to 5pm.",
       "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
-
     },
     "accessDenied": {
       "title": "You do not have access to this page",
