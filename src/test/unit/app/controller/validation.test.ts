@@ -125,5 +125,26 @@ describe('validateForm', () => {
         'Test field must only include letters a to z, and special characters such as hyphens, spaces and apostrophes'
       );
     });
+
+    it('should reject attribute-injection XSS payload with defaultSpecialCharacter error', () => {
+      const req = { body: { testField: '" onfocus="alert(1)' }, session: {} } as Partial<Request>;
+      const translations = {
+        defaultSpecialCharacter: '{fieldName} must only include letters a to z',
+      };
+
+      const errors = validateForm(req as Request, emojiFields, translations);
+
+      expect(errors.testField).toBe('Test field must only include letters a to z');
+    });
+
+    it('should reject markdown javascript link payload with defaultSpecialCharacter error', () => {
+      const req = { body: { testField: '[click](javascript:alert(1))' }, session: {} } as Partial<Request>;
+
+      const errors = validateForm(req as Request, emojiFields, {});
+
+      expect(errors.testField).toBe(
+        'Test field must only include letters a to z, and special characters such as hyphens, spaces and apostrophes'
+      );
+    });
   });
 });

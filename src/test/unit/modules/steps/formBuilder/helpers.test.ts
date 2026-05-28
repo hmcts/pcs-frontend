@@ -1517,6 +1517,40 @@ describe('formBuilder helpers', () => {
         const errors = validateForm(req, fields, translations);
         expect(errors['contactMethod.emailAddress']).toBe('Email address is required');
       });
+
+      it('should reject unsafe text in nested radio subField (tenancyTypeConfirm.correctType)', () => {
+        const req = createMockRequest({
+          tenancyTypeConfirm: 'no',
+          'tenancyTypeConfirm.correctType': '" onfocus="alert(1)',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'tenancyTypeConfirm',
+            type: 'radio',
+            required: true,
+            options: [
+              { value: 'yes' },
+              {
+                value: 'no',
+                subFields: {
+                  correctType: {
+                    name: 'correctType',
+                    type: 'text',
+                    required: true,
+                  },
+                },
+              },
+              { value: 'notSure' },
+            ],
+          },
+        ];
+
+        const errors = validateForm(req, fields, {});
+
+        expect(errors['tenancyTypeConfirm.correctType']).toBe(
+          'Correct type must only include letters a to z, and special characters such as hyphens, spaces and apostrophes'
+        );
+      });
     });
 
     describe('nested date subField validation', () => {
