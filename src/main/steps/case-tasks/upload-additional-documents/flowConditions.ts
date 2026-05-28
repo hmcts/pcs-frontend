@@ -8,7 +8,7 @@ const logger = Logger.getLogger('uploadAdditionalDocumentsFlowConditions');
 
 const UPLOAD_DOCUMENTS_EVENT_ID = 'uploadDocuments';
 
-// Calls the uploadDocuments START handler which populates showExistingApplicationPage
+// Calls the uploadDocuments START handler which populates showRelatedApplicationsPage
 // based on the gen-apps on this case. Returns true iff the BE flagged the case as
 // having existing applications, in which case the confirm-…-application page is shown.
 export const isViewAllApplicationsAvailable: StepCondition = async (req: Request) => {
