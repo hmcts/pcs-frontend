@@ -2,6 +2,8 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 import _ from 'lodash';
 
+import { hasUnsafeTextContent } from '../../../steps/utils/fieldValidators';
+
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
 import type { FormError } from './errorUtils';
@@ -470,53 +472,40 @@ export function validateForm(
           return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1).toLowerCase();
         };
 
+        const setDefaultSpecialCharacterError = (): void => {
+          if (errors[fieldName]) {
+            return;
+          }
+
+          const translationLabelKey =
+            typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
+
+          const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
+
+          const displayName = resolvedLabel ?? toSentenceCase(fieldName);
+
+          const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace('{fieldName}', displayName);
+          errors[fieldName] =
+            defaultSpecialCharacterMsg ||
+            `${displayName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`;
+        };
+
         //emoji validation
         if (field.type === 'character-count' || field.type === 'text' || (field.type === 'textarea' && value)) {
           const text = (value as string)?.trim();
           const allowedCharsRegex = /^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u;
 
           if (!allowedCharsRegex.test(text)) {
-            if (!errors[fieldName]) {
-              const translationLabelKey =
-                typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
-
-              const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
-
-              const displayName = resolvedLabel ?? toSentenceCase(fieldName);
-
-              const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
-                '{fieldName}',
-                displayName
-              );
-              errors[fieldName] =
-                defaultSpecialCharacterMsg ||
-                `${displayName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`;
-            }
+            setDefaultSpecialCharacterError();
           }
         }
 
-        // HTML/script tag validation - prevent stored XSS
+        // Unsafe text validation - prevent stored XSS
         if (field.type === 'character-count' || field.type === 'text' || (field.type === 'textarea' && value)) {
           const text = (value as string)?.trim();
-          const containsHtmlTag = !!text && text.includes('<') && text.includes('>');
 
-          if (containsHtmlTag) {
-            if (!errors[fieldName]) {
-              const translationLabelKey =
-                typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
-
-              const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
-
-              const displayName = resolvedLabel ?? toSentenceCase(fieldName);
-
-              const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
-                '{fieldName}',
-                displayName
-              );
-              errors[fieldName] =
-                defaultSpecialCharacterMsg ||
-                `${displayName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`;
-            }
+          if (text && hasUnsafeTextContent(text)) {
+            setDefaultSpecialCharacterError();
           }
         }
 
