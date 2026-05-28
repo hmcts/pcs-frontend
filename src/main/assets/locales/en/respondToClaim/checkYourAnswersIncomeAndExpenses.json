@@ -1,0 +1,76 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Income and expenses",
+  "frequencies": {
+    "WEEKLY": "every week",
+    "MONTHLY": "every month"
+  },
+  "incomeFrequencies": {
+    "WEEKLY": "received every week",
+    "MONTHLY": "received every month"
+  },
+  "paymentFrequencies": {
+    "WEEKLY": "paid every week",
+    "MONTHLY": "paid every month"
+  },
+  "rows": {
+    "shareIncomeExpenseDetails": {
+      "label": "Do you want to provide details of your income and expenses?",
+      "changeHidden": "Do you want to provide details of your income and expenses?"
+    },
+    "regularIncome": {
+      "label": "What regular income do you receive?",
+      "changeHidden": "What regular income do you receive?",
+      "options": {
+        "incomeFromJobs": "Income from all jobs you do",
+        "pension": "Pension – state and private",
+        "universalCredit": "Universal Credit",
+        "otherBenefits": "Other benefits and credits",
+        "moneyFromElsewhere": "Money from somewhere else"
+      }
+    },
+    "hasAppliedForUniversalCredit": {
+      "label": "Have you applied for Universal Credit?",
+      "changeHidden": "Have you applied for Universal Credit?"
+    },
+    "universalCreditApplicationDate": {
+      "label": "When did you apply for Universal Credit?",
+      "changeHidden": "When did you apply for Universal Credit?"
+    },
+    "priorityDebts": {
+      "label": "Do you have any priority debts?",
+      "changeHidden": "Do you have any priority debts?"
+    },
+    "priorityDebtTotal": {
+      "label": "What is the total amount you owe for all your priority debts?",
+      "changeHidden": "What is the total amount you owe for all your priority debts?"
+    },
+    "priorityDebtContribution": {
+      "label": "How much do you pay towards your priority debts each week or month?",
+      "changeHidden": "How much do you pay towards your priority debts each week or month?"
+    },
+    "regularExpenses": {
+      "label": "What other regular expenses do you have?",
+      "changeHidden": "What other regular expenses do you have?",
+      "options": {
+        "householdBills": "Household bills",
+        "loanPayments": "Loan payments",
+        "childSpousalMaintenance": "Child or spousal maintenance",
+        "mobilePhone": "Mobile phone",
+        "groceryShopping": "Grocery shopping",
+        "fuelParkingTransport": "Fuel, parking and transport",
+        "schoolCosts": "School costs",
+        "clothing": "Clothing",
+        "otherExpenses": "Other expenses"
+      }
+    },
+    "otherConsiderations": {
+      "label": "Is there anything else you want to tell the court?",
+      "changeHidden": "Is there anything else you want to tell the court?"
+    },
+    "otherConsiderationsDetails": {
+      "label": "Give details about what else you want to tell the court",
+      "changeHidden": "Give details about what else you want to tell the court"
+    }
+  }
+}

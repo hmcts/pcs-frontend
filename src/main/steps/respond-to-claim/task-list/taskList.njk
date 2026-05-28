@@ -1,0 +1,64 @@
+{% extends "stepsTemplate.njk" %}
+
+{% from "govuk/components/task-list/macro.njk" import govukTaskList %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% block pageTitle %}{{ t('pageTitle') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ propertyAddress }}</h1>
+      <p class="govuk-body">{{ t('caseNumberLabel') }} {{ caseNumber }}</p>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds pcs-task-list">
+      <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible pcs-task-list__divider">
+
+      {% for group in groups %}
+        <h2 class="govuk-heading-m">{{ group.number }}. {{ group.title }}</h2>
+        {{ govukTaskList({
+          idPrefix: 'tasklist-' + group.id,
+          items: group.items
+        }) }}
+      {% endfor %}
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible pcs-task-list__divider">
+      <aside class="app-related-items" aria-label="{{ t('sidebarLabel') }}">
+        <h2 class="govuk-heading-m">{{ t('iWantTo.heading') }}</h2>
+        <ul class="govuk-list">
+          {% for link in iWantToLinks %}
+            {% set isExternal = link.href.startsWith('http') %}
+            <li>
+              <a class="govuk-link" href="{{ link.href }}"{% if isExternal %} target="_blank" rel="noopener noreferrer"{% endif %}>
+                {{ t(link.key) }}{% if isExternal %}<span class="govuk-visually-hidden"> ({{ t('opensInNewTab') }})</span>{% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+
+        <h2 class="govuk-heading-m">{{ t('helpSupport.heading') }}</h2>
+        <ul class="govuk-list">
+          {% for link in helpSupportLinks %}
+            <li>
+              <a class="govuk-link" href="{{ link.href }}" target="_blank" rel="noopener noreferrer">
+                {{ t(link.key) }}<span class="govuk-visually-hidden"> ({{ t('opensInNewTab') }})</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+
+        {{ govukDetails({
+          summaryText: t('contactUsForHelp'),
+          html: '<p class="govuk-body">' + t('contactUsDetailsTelephoneHeading') + ': ' + t('contactUsDetailsTelephoneNumber') + '</p>' +
+                '<p class="govuk-body">' + t('contactUsDetailsTelephoneHours') + '</p>' +
+                '<p class="govuk-body"><a class="govuk-link" href="https://www.gov.uk/call-charges" target="_blank" rel="noopener noreferrer">' + t('contactUsDetailsCallChargesLinkText') + '<span class="govuk-visually-hidden"> (' + t('opensInNewTab') + ')</span></a></p>'
+        }) }}
+      </aside>
+    </div>
+  </div>
+{% endblock %}
