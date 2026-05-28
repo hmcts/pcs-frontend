@@ -425,17 +425,7 @@ export const submitCaseApiData = {
         nameKnown: 'YES',
         firstName: 'Test',
         lastName: 'John',
-        addressKnown: 'YES',
-        addressSameAsPossession: 'NO',
-        correspondenceAddress: {
-          AddressLine1: '10 Second Avenue',
-          AddressLine2: '',
-          AddressLine3: '',
-          PostTown: 'London',
-          County: '',
-          Country: '',
-          PostCode: 'W3 7RX',
-        },
+        addressKnown: 'NO',
       },
       addAnotherDefendant: 'YES',
       additionalDefendants: [
