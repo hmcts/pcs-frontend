@@ -5,7 +5,6 @@
   "accommodationQuestion": "Would the defendant have somewhere else to live if they had to leave their home?",
   "dateLabel": "When would they be able to move in? (Optional)",
   "options": {
-    "or": "",
     "notSure": "Defendant is not sure"
   },
   "errors": {

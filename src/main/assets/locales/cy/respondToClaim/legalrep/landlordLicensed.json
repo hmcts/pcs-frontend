@@ -4,7 +4,6 @@
   "paragraph": "cyYou can check if the landlord is licensed by searching the <a href=\"https://rentsmart.gov.wales/en/check-register/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Public Register (opens in new tab)</a>.",
   "question": "cyIs the landlord licensed?",
   "options": {
-    "or": "",
     "imNotSure": "cyDefendant is not sure"
   },
   "errors": {
