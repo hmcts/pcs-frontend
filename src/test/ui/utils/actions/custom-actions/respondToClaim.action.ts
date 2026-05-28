@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
+  accessYourCase,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -39,6 +40,7 @@ import {
   paymentInterstitial,
   priorityDebtDetails,
   priorityDebts,
+  reasonableAdjustmentsTriage,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
@@ -115,6 +117,7 @@ const rtcSectionByAction = new Map<string, string>([
   ['languageUsed', 'checkYourAnswersAndSubmit'],
 ]);
 
+import { getSelectedPinUser, pins, selectPinUserByDefendantDetails } from './fetchPINsAndValidateAccessCodeAPI.action';
 export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
@@ -169,6 +172,7 @@ export class RespondToClaimAction implements IAction {
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
       ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
       ['readYourHouseholdAndCircumstances', () => this.readYourHouseholdAndCircumstances()],
+      ['readReasonableAdjustmentsTriage', () => this.readReasonableAdjustmentsTriage()],
       ['doYouHaveAnyDependantChildren', () => this.doYouHaveAnyDependantChildren(fieldName as actionRecord)],
       ['doYouHaveAnyOtherDependants', () => this.doYouHaveAnyOtherDependants(fieldName as actionRecord)],
       ['selectUniversalCredit', () => this.selectUniversalCredit(fieldName as actionRecord)],
@@ -183,6 +187,7 @@ export class RespondToClaimAction implements IAction {
       ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page)],
       ['validateCYARTC', () => this.validateCYARTC()],
       ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
+      ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
       ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
       ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
       ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
@@ -311,6 +316,14 @@ export class RespondToClaimAction implements IAction {
     this.recordAnswer(defendantNameCapture.lastNameTextLabel, defendantData.lName);
     await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantData.fName);
     await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantData.lName);
+    const selectedPinUser = getSelectedPinUser();
+    const firstNameValue = defendantData.fName ?? selectedPinUser?.firstName;
+    const lastNameValue = defendantData.lName ?? selectedPinUser?.lastName;
+
+    await performValidation('mainHeader', defendantNameCapture.mainHeader);
+
+    await performAction('inputText', defendantNameCapture.firstNameTextLabel, firstNameValue);
+    await performAction('inputText', defendantNameCapture.lastNameTextLabel, lastNameValue);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
@@ -328,15 +341,16 @@ export class RespondToClaimAction implements IAction {
 
   private async confirmDefendantDetails(defendantData: actionRecord) {
     this.recordAnswer(String(defendantData.question), String(defendantData.option));
+    await performValidation('mainHeader', defendantData.question);
     await performAction('clickRadioButton', {
       question: defendantData.question,
       option: defendantData.option,
     });
     if (defendantData.option === defendantNameConfirmation.noRadioOption) {
-      await this.inputDefendantDetails(defendantData);
-    } else {
-      await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+      await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
+      await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
     }
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
@@ -1257,6 +1271,30 @@ export class RespondToClaimAction implements IAction {
     if (mismatches.length > 0) {
       throw new Error(`RTC ${sectionName} section CYA validation failed:\n${mismatches.join('\n')}`);
     }
+  private async accessYourCase(accessCode: actionRecord): Promise<void> {
+    const explicitDefendantDetailsKnown =
+      typeof accessCode.defendantDetailsKnown === 'boolean' ? accessCode.defendantDetailsKnown : undefined;
+
+    const explicitDefendantTypeKnown =
+      typeof accessCode.defendantType === 'string' ? accessCode.defendantType === 'known' : undefined;
+
+    const defendantDetailsKnown = explicitDefendantDetailsKnown ?? explicitDefendantTypeKnown;
+
+    const pin =
+      typeof defendantDetailsKnown === 'boolean'
+        ? selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin
+        : (getSelectedPinUser()?.pin ?? pins[0]);
+
+    if (!pin) {
+      throw new Error('PIN is not available. Ensure fetchPINsAPI is called before accessYourCase');
+    }
+
+    await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
+    await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
+    await performAction('clickButton', accessYourCase.continueButton);
+  }
+  private async readReasonableAdjustmentsTriage(): Promise<void> {
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
   }
 
   private async selectClaimAgainstWhom(claimAgainstWhom: actionRecord): Promise<void> {

@@ -43,16 +43,17 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return counterClaimNeedHelpWithFees ? { counterClaimNeedHelpWithFees } : {};
   },
   beforeRedirect: async req => {
-    const counterClaimNeedHelpWithFees: YesNoValue = req.body?.counterClaimNeedHelpWithFees;
-
-    if (!counterClaimNeedHelpWithFees) {
-      return;
-    }
-
+    const selection = req.body?.counterClaimNeedHelpWithFees as YesNoValue | undefined;
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
-    response.defendantResponses.counterClaim.needHelpWithFees = counterClaimNeedHelpWithFees;
 
+    if (selection === 'YES' || selection === 'NO') {
+      response.defendantResponses.counterClaim.needHelpWithFees = selection;
+    } else {
+      delete response.defendantResponses.counterClaim.needHelpWithFees;
+    }
+    // Downstream cleanup (appliedForHwf, hwfReferenceNumber, counterClaimAgainst/For/Reasons)
+    // is the normaliser's job — see normaliseCounterClaim.
     await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async req => {

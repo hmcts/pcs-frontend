@@ -4,24 +4,24 @@
   "rows": {
     "defendantNameConfirmation": {
       "label": "cy Is your name {{name}}?",
-      "changeHidden": "cy your name"
+      "changeHidden": "cy Is your name {{name}}?"
     },
     "defendantName": {
       "label": "cy Your name",
-      "changeHidden": "cy your name"
+      "changeHidden": "cy Your name"
     },
     "dateOfBirth": {
       "label": "cy What is your date of birth?",
-      "changeHidden": "cy your date of birth"
+      "changeHidden": "cy What is your date of birth?"
     },
     "correspondenceAddressConfirmation": {
       "label": "cy Is your correspondence address {{address}}?",
       "fallbackLabel": "cy Correspondence address",
-      "changeHidden": "cy your correspondence address"
+      "changeHidden": "cy Is your correspondence address {{address}}?"
     },
     "contactByEmailOrPost": {
       "label": "cy How do you want to receive updates?",
-      "changeHidden": "cy how you want to receive updates",
+      "changeHidden": "cy How do you want to receive updates?",
       "options": {
         "email": "cy By email",
         "post": "cy By post",
@@ -30,19 +30,19 @@
     },
     "contactByEmailAddress": {
       "label": "cy Email",
-      "changeHidden": "cy your email address"
+      "changeHidden": "cy Email"
     },
     "contactByPhone": {
       "label": "cy Are you happy to be contacted by telephone?",
-      "changeHidden": "cy whether you are happy to be contacted by telephone"
+      "changeHidden": "cy Are you happy to be contacted by telephone?"
     },
     "contactByText": {
       "label": "cy Are you happy to be contacted by text message?",
-      "changeHidden": "cy whether you want to receive text messages"
+      "changeHidden": "cy Are you happy to be contacted by text message?"
     },
     "contactDetails": {
       "label": "cy Contact details",
-      "changeHidden": "cy your contact details"
+      "changeHidden": "cy Contact details"
     }
   }
 }
