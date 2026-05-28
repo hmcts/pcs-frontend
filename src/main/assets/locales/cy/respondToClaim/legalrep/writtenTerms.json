@@ -6,7 +6,7 @@
   "termsQuestion": "cyHas the landlord sent the defendant written terms of the occupation contract?",
   "options": {
     "imNotSure": "cyDefendant is not sure",
-    "or": " "
+    "or": ""
   },
   "errors": {
     "writtenTerms": "cySelect if the landlord has sent you written terms of the occupation contract"

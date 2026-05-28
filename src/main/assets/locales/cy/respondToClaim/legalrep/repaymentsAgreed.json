@@ -1,9 +1,9 @@
 {
   "heading": "cyRepayment agreement",
-  "question": " ",
+  "question": "",
   "repaymentsAgreedQuestion": "cyHas the defendant come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
   "options": {
-    "or": " ",
+    "or": "",
     "imNotSure": "cyDefendant is not sure"
   },
   "textAreaLabel": "cyGive details about how much they’ve agreed to pay and when",

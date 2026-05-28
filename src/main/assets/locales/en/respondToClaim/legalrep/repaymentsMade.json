@@ -1,6 +1,6 @@
 {
   "heading": "Previous payments",
-  "question": " ",
+  "question": "",
   "repaymentsMadeQuestion": "Has the defendant paid any money to {{claimantName}} since {{claimIssueDate}}?",
   "textAreaLabel": "Give details about how much the defendant paid and when",
   "errors": {
