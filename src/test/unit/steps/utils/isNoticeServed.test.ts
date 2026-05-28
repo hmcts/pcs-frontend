@@ -63,6 +63,65 @@ describe('isNoticeServed', () => {
     });
   });
 
+  describe('Wales journey (walesNoticeServed, legislativeCountry = "Wales")', () => {
+    it('should return true when walesNoticeServed is "YES"', async () => {
+      const mockReq = {
+        res: {
+          locals: {
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { legislativeCountry: 'Wales', walesNoticeServed: 'YES' },
+            }),
+          },
+        },
+      } as unknown as Request;
+
+      expect(await isNoticeServed(mockReq)).toBe(true);
+    });
+
+    it('should return true when walesNoticeServed is "Yes" (Pascal case echo)', async () => {
+      const mockReq = {
+        res: {
+          locals: {
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { legislativeCountry: 'Wales', walesNoticeServed: 'Yes' },
+            }),
+          },
+        },
+      } as unknown as Request;
+
+      expect(await isNoticeServed(mockReq)).toBe(true);
+    });
+
+    it('should return false when walesNoticeServed is "No"', async () => {
+      const mockReq = {
+        res: {
+          locals: {
+            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'Wales', walesNoticeServed: 'No' } }),
+          },
+        },
+      } as unknown as Request;
+
+      expect(await isNoticeServed(mockReq)).toBe(false);
+    });
+
+    it('should ignore walesNoticeServed for an England claim', async () => {
+      const mockReq = {
+        res: {
+          locals: {
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { legislativeCountry: 'England', walesNoticeServed: 'YES' },
+            }),
+          },
+        },
+      } as unknown as Request;
+
+      expect(await isNoticeServed(mockReq)).toBe(false);
+    });
+  });
+
   describe('when notice was not served (noticeServed = "No")', () => {
     it('should return false when noticeServed is "No"', async () => {
       const mockReq = {
