@@ -170,7 +170,7 @@ export function createPostHandler(
           if (caseDetailsBaseUrl) {
             const caseDetailsUrl = `${caseDetailsBaseUrl}/${caseId}`;
             return res.redirect(caseDetailsUrl);
-            }
+          }
         }
 
         const dashboardUrl = getDashboardUrl(caseId);
