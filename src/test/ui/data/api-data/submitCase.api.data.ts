@@ -120,8 +120,8 @@ export const submitCaseApiData = {
       wantToUploadDocuments: 'NO',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameParty: 'fg',
-        positionParty: 'fg',
+        fullNameParty: 'Test',
+        positionParty: 'Leah',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -195,8 +195,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameParty: 'fg',
-        positionParty: 'fg',
+        fullNameParty: 'Test',
+        positionParty: 'Leah',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
