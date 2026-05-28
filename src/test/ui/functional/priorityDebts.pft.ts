@@ -1,10 +1,4 @@
-import {
-  dashboard,
-  feedback,
-  haveYouAppliedForUniversalCredit,
-  priorityDebts,
-  whatRegularIncomeDoYouReceive,
-} from '../data/page-data';
+import { priorityDebts } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function priorityDebtsErrorValidation(): Promise<void> {
@@ -14,7 +8,8 @@ export async function priorityDebtsErrorValidation(): Promise<void> {
     message: priorityDebts.selectIfYouHaveErrorMessage,
   });
 }
-
+// Needs to be enabled after counterclaim journey is implemented
+/*
 export async function priorityDebtsNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', priorityDebts.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
@@ -28,3 +23,4 @@ export async function priorityDebtsNavigationTests(): Promise<void> {
   await performAction('clickRadioButton', priorityDebts.noRadioOption);
   await performValidation('pageNavigation', priorityDebts.saveForLaterButton, dashboard.mainHeader);
 }
+ */
