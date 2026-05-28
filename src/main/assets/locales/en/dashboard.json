@@ -20,7 +20,7 @@
     "JUDGEMENT": "Judgement from the court",
     "NOTICE": "Orders and notices from the court",
     "DOCUMENTS": "Documents",
-    "RESPONSE": "The response",
+    "RESPONSE": "Your response",
     "APPLICATIONS": "Applications"
   },
 
@@ -33,6 +33,22 @@
       "ResponseToClaim": {
         "title": "Response to claim",
         "body": "<a class=\"govuk-link\" href=\"{{respondToClaimUrl}}\">{{ctaLabel}}</a>"
+      },
+      "ResponseNotStarted": {
+        "title": "Your response",
+        "body": "You should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Start your response</a>"
+      },
+      "ResponseInProgress": {
+        "title": "Your response",
+        "body": "You should complete your response before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Continue with your response</a>"
+      },
+      "ResponseSubmitted": {
+        "title": "Your response",
+        "body": "You have responded to the claim."
+      },
+      "NoHearingArranged": {
+        "title": "A property possession claim has been made against you",
+        "body": "The court will arrange the hearing and contact you with details."
       }
     }
   },
@@ -46,6 +62,7 @@
     },
     "ViewClaim": { "title": "View the claim" },
     "RespondToClaim": { "title": "Respond to the claim" },
+    "ViewResponse": { "title": "View the response" },
     "ViewDocuments": { "title": "View documents" },
     "ViewHearingDocuments": { "title": "View hearing documents" },
     "ViewOrdersAndNotices": { "title": "View orders and notices" },

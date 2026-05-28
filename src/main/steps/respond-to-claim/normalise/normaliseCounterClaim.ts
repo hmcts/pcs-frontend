@@ -1,6 +1,6 @@
 import { normalizeYesNoValue } from '../../utils';
 
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
+import type { CcdCounterClaim, PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export function normaliseCounterClaim(response: PossessionClaimResponse): void {
   const dr = response.defendantResponses;
@@ -36,6 +36,9 @@ export function normaliseCounterClaim(response: PossessionClaimResponse): void {
     delete cc.hwfReferenceNumber;
   }
 
+  // Citizen routed to apply for HWF → against-whom + about skipped; drop stale values from prior walk-throughs.
+  dropAgainstAndAboutWhenAwaitingHwfApplication(cc);
+
   // Counterclaim isn't a money/payment claim → counter-claim-specific-sum is skipped
   if (cc.claimType !== 'PAYMENT_OR_COMPENSATION' && cc.claimType !== 'BOTH') {
     delete cc.isClaimAmountKnown;
@@ -51,4 +54,13 @@ export function normaliseCounterClaim(response: PossessionClaimResponse): void {
   } else if (amountKnown === 'NO') {
     delete cc.claimAmount;
   }
+}
+
+function dropAgainstAndAboutWhenAwaitingHwfApplication(cc: CcdCounterClaim): void {
+  if (normalizeYesNoValue(cc.needHelpWithFees) !== 'YES' || normalizeYesNoValue(cc.appliedForHwf) === 'YES') {
+    return;
+  }
+  delete cc.counterClaimAgainst;
+  delete cc.counterClaimFor;
+  delete cc.counterClaimReasons;
 }
