@@ -516,6 +516,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
 
   test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - No @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateRTCSectionCYA', 'startNowAndDetails');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -540,6 +543,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateRTCSectionCYA', 'personalDetails');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiDataWales.submitCaseNonRentStandard.isClaimantNameCorrect
@@ -570,6 +576,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.noRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -663,9 +672,5 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
   });
 });
