@@ -34,7 +34,8 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     ...base,
     paymentAgreement: validatedCase.defendantResponses?.paymentAgreement ?? {},
     claimantName: validatedCase.claimantName ?? '',
-    claimIssueDate: validatedCase.claimIssueDate ? formatIsoDate(validatedCase.claimIssueDate) : '',
+    // TODO HDPI-5157: hardcode fallback for now, wire claimIssueDate from START callback later
+    claimIssueDate: validatedCase.claimIssueDate ? formatIsoDate(validatedCase.claimIssueDate) : '20th May 2025',
   };
 
   addAnyPaymentsMadeRows(ctx);
