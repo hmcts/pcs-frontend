@@ -5,6 +5,8 @@
     "or": " ",
     "notSure": "Defendant is not sure"
   },
+  "insetIntroText": "",
+  "insetDetailsText": "",
   "rentArrearsAmountCorrection": {
     "label": "How much does the defendant believe they owe in rent arrears?",
     "hint": ""
