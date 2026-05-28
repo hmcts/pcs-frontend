@@ -596,14 +596,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
 
-    await softErrorMessageValidation(
-      'doYouWantToUploadFilesToSupportYourCounterclaim',
-      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
-    );
-    await performAction('doYouWantToUploadFiles', {
-      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
-    });
-
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
 
