@@ -1,6 +1,6 @@
 {
   "heading": "cyPrevious payments",
-  "question": " ",
+  "question": "",
   "repaymentsMadeQuestion": "Has the defendant paid any money to {{claimantName}} since {{claimIssueDate}}?",
   "textAreaLabel": "cyGive details about how much the defendant paid and when",
   "errors": {

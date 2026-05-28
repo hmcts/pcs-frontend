@@ -20,7 +20,9 @@
   {% endif %}
 
   <p class="govuk-body">{{ introParagraph1 }}</p>
-  <p class="govuk-body">{{ introParagraph2 }}</p>
+  {% if introParagraph2 %}
+    <p class="govuk-body">{{ introParagraph2 }}</p>
+  {% endif %}
   
   {% if introParagraph3 %}
     <p class="govuk-body">{{ introParagraph3 }}</p>

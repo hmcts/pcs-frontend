@@ -3,7 +3,7 @@
   "options": {
     "yes": "cyYes",
     "no": "cyNo",
-    "or": " ",
+    "or": "",
     "imNotSure": "cyDefendant is not sure"
   },
   "noticeDateLabel": "cyWhen did the defendant receive notice from {{claimantName}}? (Optional)",

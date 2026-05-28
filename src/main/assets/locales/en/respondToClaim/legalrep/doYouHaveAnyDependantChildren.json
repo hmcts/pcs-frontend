@@ -3,10 +3,10 @@
   "dependantHeading": "Dependant Children",
   "dependantQuestion": "Does the defendant have any dependant children?",
   "dependantChildrenParagraph": "",
-  "dependantChildrenDetailsLabel": "Give details about their dependant children",
-  "dependantChildrenDetailsHint": "",
+  "dependentChildrenDetailsLabel": "Give details about their dependant children",
+  "dependentChildrenDetailsHint": "",
   "errors": {
-    "dependantChildren": "Select if they have any dependant children",
-    "dependantChildrenDetails": "Give details about their dependant children"
+    "dependentChildren": "Select if they have any dependant children",
+    "dependentChildrenDetails": "Give details about their dependant children"
   }
 }
