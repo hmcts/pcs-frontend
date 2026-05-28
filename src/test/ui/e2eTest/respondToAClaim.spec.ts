@@ -960,7 +960,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //Counterclaim - both - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.readInformationAboutLink });
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -983,7 +983,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
       'disputeClaimInterstitial', //
       submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
@@ -995,8 +995,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
-    await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -1053,11 +1051,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
+    await performAction('clickButton', 'Save and continue');
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
     await performAction('selectWhatRegularIncomeDoYouReceive');
     await performAction('selectUniversalCredit', {
       question: haveYouAppliedForUniversalCredit.mainHeader,
