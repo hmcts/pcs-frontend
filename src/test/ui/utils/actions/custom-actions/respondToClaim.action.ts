@@ -59,6 +59,7 @@ import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../com
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
+import { getSelectedPinUser, pins, selectPinUserByDefendantDetails } from './fetchPINsAndValidateAccessCodeAPI.action';
 import { FieldsStore } from './recordAnsweredFields.action';
 
 const rtcCyaMap = new Map<string, string>();
@@ -117,7 +118,6 @@ const rtcSectionByAction = new Map<string, string>([
   ['languageUsed', 'checkYourAnswersAndSubmit'],
 ]);
 
-import { getSelectedPinUser, pins, selectPinUserByDefendantDetails } from './fetchPINsAndValidateAccessCodeAPI.action';
 export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
@@ -244,6 +244,7 @@ export class RespondToClaimAction implements IAction {
   private normalizeRtcCyaComparisonPart(value: string): string {
     return value
       .replace(/\s*\([^)]*\)\s*/g, ' ')
+      .replace(/:/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
   }
@@ -312,16 +313,13 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {
-    this.recordAnswer(defendantNameCapture.firstNameTextLabel, defendantData.fName);
-    this.recordAnswer(defendantNameCapture.lastNameTextLabel, defendantData.lName);
-    await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantData.fName);
-    await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantData.lName);
     const selectedPinUser = getSelectedPinUser();
     const firstNameValue = defendantData.fName ?? selectedPinUser?.firstName;
     const lastNameValue = defendantData.lName ?? selectedPinUser?.lastName;
 
+    this.recordAnswer(defendantNameCapture.firstNameTextLabel, String(firstNameValue ?? ''));
+    this.recordAnswer(defendantNameCapture.lastNameTextLabel, String(lastNameValue ?? ''));
     await performValidation('mainHeader', defendantNameCapture.mainHeader);
-
     await performAction('inputText', defendantNameCapture.firstNameTextLabel, firstNameValue);
     await performAction('inputText', defendantNameCapture.lastNameTextLabel, lastNameValue);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
@@ -347,6 +345,8 @@ export class RespondToClaimAction implements IAction {
       option: defendantData.option,
     });
     if (defendantData.option === defendantNameConfirmation.noRadioOption) {
+      this.recordAnswer(defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
+      this.recordAnswer(defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
       await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
       await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
     }
@@ -1271,6 +1271,8 @@ export class RespondToClaimAction implements IAction {
     if (mismatches.length > 0) {
       throw new Error(`RTC ${sectionName} section CYA validation failed:\n${mismatches.join('\n')}`);
     }
+  }
+
   private async accessYourCase(accessCode: actionRecord): Promise<void> {
     const explicitDefendantDetailsKnown =
       typeof accessCode.defendantDetailsKnown === 'boolean' ? accessCode.defendantDetailsKnown : undefined;
@@ -1294,6 +1296,7 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', accessYourCase.continueButton);
   }
   private async readReasonableAdjustmentsTriage(): Promise<void> {
+    this.recordAnswer(reasonableAdjustmentsTriage.mainHeader, reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
   }
 

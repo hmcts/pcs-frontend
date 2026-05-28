@@ -453,7 +453,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    
+
     await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
     await performAction('readReasonableAdjustmentsTriage');
 
@@ -673,7 +673,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-   
+
     await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
     await performAction('readReasonableAdjustmentsTriage');
 
