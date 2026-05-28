@@ -10,7 +10,7 @@ describe('hasUnsafeTextContent', () => {
       ['javascript:alert(1)', 'javascript URL scheme'],
       ['onclick=alert(1)', 'event handler without quotes'],
       ['vbscript:msgbox(1)', 'vbscript URL scheme'],
-    ])('returns true for %s (%s)', (input) => {
+    ])('returns true for %s (%s)', input => {
       expect(hasUnsafeTextContent(input)).toBe(true);
     });
   });
@@ -23,7 +23,7 @@ describe('hasUnsafeTextContent', () => {
       ['user@example.com', 'email address'],
       ['1234.56', 'currency amount'],
       ['SW1A 1AA', 'postcode'],
-    ])('returns false for %s (%s)', (input) => {
+    ])('returns false for %s (%s)', input => {
       expect(hasUnsafeTextContent(input)).toBe(false);
     });
   });

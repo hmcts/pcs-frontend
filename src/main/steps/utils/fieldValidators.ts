@@ -10,7 +10,7 @@ export const UNSAFE_TEXT_PATTERNS: RegExp[] = [
 ];
 
 export function hasUnsafeTextContent(text: string): boolean {
-  return UNSAFE_TEXT_PATTERNS.some((pattern) => pattern.test(text));
+  return UNSAFE_TEXT_PATTERNS.some(pattern => pattern.test(text));
 }
 
 export const noEmojiValidator =
