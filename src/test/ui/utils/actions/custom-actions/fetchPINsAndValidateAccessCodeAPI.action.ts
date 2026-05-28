@@ -8,6 +8,7 @@ import { IAction } from '../../interfaces';
 
 export type PinUser = {
   pin: string;
+  nameKnown?: boolean;
   firstName: string;
   lastName: string;
   address: string;
@@ -19,6 +20,33 @@ export let firstName: string = '';
 export let lastName: string = '';
 export let address: string = '';
 export let pinUsers: PinUser[] = [];
+export let selectedPinUser: PinUser | undefined;
+
+function hasKnownDefendantDetails(pinUser: PinUser): boolean {
+  return pinUser.nameKnown ?? Boolean(pinUser.firstName || pinUser.lastName);
+}
+
+function setSelectedPinUser(pinUser: PinUser | undefined): PinUser | undefined {
+  selectedPinUser = pinUser;
+  firstName = pinUser?.firstName ?? '';
+  lastName = pinUser?.lastName ?? '';
+  address = pinUser?.address ?? '';
+  return selectedPinUser;
+}
+
+export function getSelectedPinUser(): PinUser | undefined {
+  return selectedPinUser;
+}
+
+export function selectPinUserByDefendantDetails(detailsKnown: boolean): PinUser | undefined {
+  const matchingPinUser = pinUsers.find(pinUser => hasKnownDefendantDetails(pinUser) === detailsKnown) ?? pinUsers[0];
+  return setSelectedPinUser(matchingPinUser);
+}
+
+function getDefaultPinUser(): PinUser | undefined {
+  const hasUnknownDefendant = pinUsers.some(pinUser => !hasKnownDefendantDetails(pinUser));
+  return hasUnknownDefendant ? selectPinUserByDefendantDetails(false) : setSelectedPinUser(pinUsers[0]);
+}
 
 export async function getPinUserAt(index: number, timeoutMs = 5000): Promise<PinUser> {
   const pollInterval = 200;
@@ -66,21 +94,16 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
           }
           return {
             pin,
+            nameKnown:
+              typeof pinData.nameKnown === 'string'
+                ? pinData.nameKnown === 'YES'
+                : Boolean(pinData.firstName || pinData.lastName),
             firstName: pinData.firstName,
             lastName: pinData.lastName,
             address: formattedAddress,
           };
         });
-        const pinData = response.data[pins[0]];
-        firstName = pinData.firstName;
-        lastName = pinData.lastName;
-        const addressObj = pinData.address;
-        if (pinData.address) {
-          const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country } = addressObj;
-          address = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country]
-            .filter(value => value && typeof value === 'string' && value.trim() !== '')
-            .join(', ');
-        }
+        getDefaultPinUser();
         return;
       }
       await new Promise(res => setTimeout(res, delayMs));

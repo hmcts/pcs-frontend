@@ -102,12 +102,13 @@ export const respondToClaimSections: SectionConfig[] = [
   {
     id: 'uploadFiles',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document', 'support-needs'],
+    steps: ['upload-document'],
   },
   {
     id: 'checkYourAnswersAndSubmit',
     titleKey: 'taskList.checkYourAnswersAndSubmit',
     steps: [
+      'reasonable-adjustments-triage',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',
