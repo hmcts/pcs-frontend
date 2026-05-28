@@ -34,8 +34,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     ...base,
     paymentAgreement: validatedCase.defendantResponses?.paymentAgreement ?? {},
     claimantName: validatedCase.claimantName ?? '',
-    // TODO HDPI-5157: hardcode fallback for now, wire claimIssueDate from START callback later
-    claimIssueDate: validatedCase.claimIssueDate ? formatIsoDate(validatedCase.claimIssueDate) : '20th May 2025',
+    claimIssueDate: validatedCase.claimIssueDate ? formatIsoDate(validatedCase.claimIssueDate) : '',
   };
 
   addAnyPaymentsMadeRows(ctx);
@@ -58,8 +57,10 @@ function addAnyPaymentsMadeRows({
   if (!paymentAgreement.anyPaymentsMade) {
     return;
   }
+  // TODO HDPI-5157: hardcode fallback matching the repayments-made step until claimIssueDate is wired from START callback
+  const issueDate = claimIssueDate || '16th June 2025';
   const questionRow: SummaryListRow = {
-    key: { text: t('rows.anyPaymentsMade.label', { claimantName, claimIssueDate }) },
+    key: { text: t('rows.anyPaymentsMade.label', { claimantName, claimIssueDate: issueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
     actions: { items: [change('repayments-made', 'rows.anyPaymentsMade.changeHidden')] },
   };
@@ -90,8 +91,10 @@ function addRepaymentPlanAgreedRows({
   if (!paymentAgreement.repaymentPlanAgreed) {
     return;
   }
+  // TODO HDPI-5157: hardcode fallback matching the repayments-agreed step until claimIssueDate is wired from START callback
+  const issueDate = claimIssueDate || '20th May 2025';
   const questionRow: SummaryListRow = {
-    key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, claimIssueDate }) },
+    key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, claimIssueDate: issueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
     actions: { items: [change('repayments-agreed', 'rows.repaymentPlanAgreed.changeHidden')] },
   };
