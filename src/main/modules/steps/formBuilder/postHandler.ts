@@ -169,7 +169,7 @@ export function createPostHandler(
             : null;
           if (caseDetailsBaseUrl) {
             const caseDetailsUrl = `${caseDetailsBaseUrl}/${caseId}`;
-            return safeRedirect303(res, caseDetailsUrl, '/', ['/cases/case-details']);
+            return res.redirect(caseDetailsUrl);
           }
         }
 

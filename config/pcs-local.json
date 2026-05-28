@@ -16,5 +16,8 @@
   },
   "xui": {
     "uri": "http://localhost:3000"
+  },
+  "redirects": {
+    "manageCaseReturnURL": "http://localhost:3000/cases/case-details/PCS/PCS"
   }
 }
