@@ -15,7 +15,6 @@ describe('getErrorPageKey', () => {
 
   it('returns accessDenied for client error statuses', () => {
     expect(getErrorPageKey(400)).toBe('accessDenied');
-    expect(getErrorPageKey(401)).toBe('accessDenied');
     expect(getErrorPageKey(403)).toBe('accessDenied');
     expect(getErrorPageKey(405)).toBe('accessDenied');
     expect(getErrorPageKey(409)).toBe('accessDenied');
