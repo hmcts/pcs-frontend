@@ -1,10 +1,14 @@
 import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { citizenCreateGenAppApiDataSetAside } from '../data/api-data/citizenCreateGenAppSetAside.api.data';
+import { citizenCreateGenAppApiDataSomethingElse } from '../data/api-data/citizenCreateGenAppSomethingElse.api.data copy';
 import {
   confirmIfTheseDocumentsRelateToAnApplication,
   startEvidenceUpload,
   uploadYourDocuments,
   viewDocuments,
 } from '../data/page-data/documents-page-data';
+import { confirmDocumentsRelateToApplicationErrorValidation } from '../functional/documents-functional/confirmIfTheseDocumentsRelateToAnApplication.pft';
+import { softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -40,6 +44,12 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
+    await softErrorMessageValidation('confirmIfTheseDocumentsRelateToAnApplication', confirmDocumentsRelateToApplicationErrorValidation);
+    await performAction('verifyDocumentRelatesToApplication', {
+      question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
+      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden
+    });
+    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
   });
 
   test('Upload documents when GenApps not submitted @regression', async () => {
@@ -78,5 +88,36 @@ test.describe('Documents - e2e Journey @nightly', async () => {
         },
       ],
     });
+  });
+
+  test('Verify confirm document options based on GenApp type @regression', async () => {
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiDataSetAside.citizenCreateGenAppPayload });
+    await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
+    await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
+    await softErrorMessageValidation('confirmIfTheseDocumentsRelateToAnApplication', confirmDocumentsRelateToApplicationErrorValidation);
+    await performAction('verifyDocumentRelatesToApplication', {
+      question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
+      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden
+    });
+    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiDataSomethingElse.citizenCreateGenAppPayload });
+    await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
+    await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
+    await performAction('verifyDocumentRelatesToApplication', {
+      question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
+      previousApplicationOption: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden,
+      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToApplicationRadioOptionHidden
+    });
+    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+
   });
 });

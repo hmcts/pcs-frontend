@@ -72,4 +72,5 @@ export default {
   'counter-claim-fee': 'counterClaimFee',
   'start-evidence-upload': 'startEvidenceUpload',
   'reasonable-adjustments-triage': 'reasonableAdjustmentsTriage',
+  'confirm-if-these-documents-relate-to-an-application': 'confirmIfTheseDocumentsRelateToAnApplication'
 };
