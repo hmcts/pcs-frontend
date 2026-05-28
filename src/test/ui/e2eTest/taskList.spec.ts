@@ -1,7 +1,10 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
+  contactPreferenceEmailOrPost,
+  contactPreferencesTelephone,
   contactPreferencesTextMessage,
+  correspondenceAddress,
   counterClaim,
   counterClaimAbout,
   counterClaimFee,
@@ -13,9 +16,13 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  endNow,
+  equalityAndDiversityEnd,
+  equalityAndDiversityStart,
   exceptionalHardship,
   freeLegalAdvice,
   incomeAndExpenses,
+  languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
   priorityDebtDetails,
@@ -23,6 +30,7 @@ import {
   startNow,
   taskList,
   tenancyTypeDetails,
+  uploadFiles,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -31,7 +39,7 @@ import {
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';
+import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
 let claimantName: string;
@@ -46,130 +54,12 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
 
-  //paymentInterstitial back navigation
-  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
-    process.env.I_NEED_HELP = 'YES';
-  } else {
-    process.env.I_NEED_HELP = 'NO';
-  }
-
-  if (testInfo.title.includes('@rentNonRent')) {
-    process.env.TENANCY_START_DATE_KNOWN = 'YES';
-    process.env.RENT_NON_RENT = 'YES';
-  } else {
-    process.env.RENT_NON_RENT = 'NO';
-  }
-
-  if (testInfo.title.includes('SelectCounterClaim - No')) {
-    process.env.SELECT_COUNTER_CLAIM = 'NO';
-  } else {
-    process.env.SELECT_COUNTER_CLAIM = 'YES';
-  }
-
   const isRentArrearsOnly =
     testInfo.title.includes('RentArrears') &&
     !testInfo.title.includes('NonRentArrears') &&
     !testInfo.title.includes('Respond to a claim');
 
   process.env.RENT_ARREARS = isRentArrearsOnly ? 'YES' : 'NO';
-
-  // Notice date provided
-  if (testInfo.title.includes('NoticeDateProvided - No')) {
-    process.env.NOTICE_DATE_PROVIDED = 'NO';
-  } else if (testInfo.title.includes('NoticeDateProvided - Yes')) {
-    process.env.NOTICE_DATE_PROVIDED = 'YES';
-  }
-
-  // Assign the tenancy type & grounds in the payload
-  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
-    testInfo.title.includes(type)
-  );
-
-  switch (tenancyKey) {
-    case 'Introductory':
-      process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
-      process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
-      break;
-
-    case 'Demoted':
-      process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
-      process.env.GROUNDS = 'RENT_ARREARS';
-      break;
-
-    case 'Assured':
-      process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
-      break;
-
-    case 'Secure':
-      process.env.TENANCY_TYPE = 'SECURE_TENANCY';
-      break;
-
-    case 'Flexible':
-      process.env.TENANCY_TYPE = 'FLEXIBLE_TENANCY';
-      break;
-  }
-
-  //Check if No or Im not sure is selected on NoticeDetails page - for back link navigation
-  if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
-    process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
-  }
-
-  // Tenancy start date logic for noDefendantTest and rentNonRent test
-  if (testInfo.title.includes('NoticeServed - No')) {
-    process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('Respond to a claim') ? 'NO' : 'YES';
-    process.env.RENT_NON_RENT = 'NO';
-  }
-
-  // Check notice date provided for back link navigation
-  if (testInfo.title.includes('NoticeDateProvided - No')) {
-    process.env.NOTICE_DATE_PROVIDED = 'NO';
-  } else if (testInfo.title.includes('NoticeDateProvided - Yes')) {
-    process.env.NOTICE_DATE_PROVIDED = 'YES';
-  }
-
-  //Check if No or Im not sure is selected on NoticeDetails page - for back link navigation
-  if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
-    process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
-  } else {
-    process.env.NOTICE_DETAILS_NO_NOTSURE = 'NO';
-  }
-
-  //Check if No is selected on RepaymentAgreed page(Rent Arrears) - for back link navigation
-  if (testInfo.title.includes('RentArrears - Demoted')) {
-    process.env.REPAYMENT_AGREED = 'NO';
-  }
-  //Check if No is selected on Installment Payment page(Rent Arrears) - for back link navigation
-  if (testInfo.title.includes('InstallmentPayment - No')) {
-    process.env.INSTALLMENT_PAYMENT = 'NO';
-  }
-
-  // Tenancy start date logic for noDefendantTest
-  if (testInfo.title.includes('NoticeServed - No')) {
-    process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
-  }
-
-  //other considrations back link navigation
-  if (testInfo.title.includes('Income - no')) {
-    process.env.INCOME_AND_EXPENSES = 'NO';
-  } else {
-    process.env.INCOME_AND_EXPENSES = 'YES';
-  }
-
-  //counterClaimFee back link navigation
-  if (testInfo.title.includes('SomethingElse')) {
-    process.env.SOMETHING_ELSE = 'YES';
-  } else {
-    process.env.SOMETHING_ELSE = 'NO';
-  }
-
-  //Check if Yes is selected on Priority debts page - for back link navigation of Priority debt details page
-  if (testInfo.title.includes('PriorityDebts - Yes')) {
-    process.env.PRIORITY_DEBTS = 'YES';
-  }
-  //Check if Universal Credit is selected on Regular income page - for back link navigation of Priority Debts page
-  if (testInfo.title.includes('RegularIncome - Universal Credit')) {
-    process.env.REGULAR_INCOME = 'UNIVERSAL_CREDIT';
-  }
 
   if (testInfo.title.includes('@noDefendants')) {
     claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
@@ -178,7 +68,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
-  }  else {
+  } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
@@ -215,7 +105,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('taskList', { subSection: taskList.readInformationAboutLink });
     await performAction('clickButton', startNow.startNowButton);
-    await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption );
+    await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
 
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
@@ -223,9 +113,61 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
-    await performAction('clickButton', defendantDateOfBirth.saveForLaterButton );
-    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction('clickButton', defendantDateOfBirth.saveForLaterButton);
 
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+    );
+    await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
+    await performAction('clickButton', tenancyTypeDetails.saveForLaterButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('clickRadioButton', doYouHaveAnyDependantChildren.noRadioOption);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.saveForLaterButton);
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performAction('clickRadioButton', incomeAndExpenses.noRadioOption);
+    await performAction('clickButton', incomeAndExpenses.saveForLaterButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('clickButton', uploadFiles.saveForLaterButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'In progress',
+    });
+    await performAction('taskList', { subSection: taskList.readInformationAboutLink });
+    await performAction('clickButton', startNow.startNowButton);
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('clickButton', 'Save and continue');
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
     await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
@@ -345,14 +287,46 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('uploadFiles');
     await performAction('clickButton', 'Save and continue');
     await performAction('taskListStatus', {
+      subSecArray: [taskList.checkYourAnswersAndSubmitLink],
+      status: 'Available',
+    });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitLink });
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('clickButton', 'Save and continue');
+    await performAction('clickButton', endNow.continueButton);
+    await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
         taskList.respondToSpecificPartsOfClaimantsClaimLink,
         taskList.incomeAndExpensesLink,
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
+        taskList.checkYourAnswersAndSubmitLink,
       ],
       status: 'Done',
+    });
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+    );
+    await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
+    await performAction('clickButton', tenancyTypeDetails.saveForLaterButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('clickRadioButton', doYouHaveAnyDependantChildren.noRadioOption);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.saveForLaterButton);
+    await performAction('taskListStatus', {
+      subSecArray: [taskList.householdAndCircumstancesLink, taskList.respondToSpecificPartsOfClaimantsClaimLink],
+      status: 'In progress',
     });
   });
 });
