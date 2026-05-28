@@ -4,7 +4,7 @@
   "question": "Has the landlord sent the defendant written terms of the occupation contract?",
   "options": {
     "imNotSure": "Defendant is not sure",
-    "or": " "
+    "or": ""
   },
   "errors": {
     "writtenTerms": "Select if the landlord has sent you written terms of the occupation contract"
