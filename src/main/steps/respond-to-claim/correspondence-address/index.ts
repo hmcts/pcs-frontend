@@ -100,11 +100,12 @@ const fieldsConfig: FormFieldConfig[] = [
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'correspondence-address',
-  isAnswered: req =>
-    Boolean(
-      req.res?.locals.validatedCase?.defendantResponses?.correspondenceAddressConfirmation ||
-      req.res?.locals.validatedCase?.defendantContactDetailsPartyAddress?.AddressLine1
-    ),
+  // Answeredness is the citizen's own confirmation only. The party address is pre-populated
+  // from the claim (addressKnown=YES), so reading it here wrongly marks the step answered
+  // before the citizen acts, flipping personalDetails to In progress instead of Available.
+  // Both modes set correspondenceAddressConfirmation on submit (the address-not-known mode
+  // posts a hidden correspondenceAddressConfirm="no").
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.correspondenceAddressConfirmation),
   stepDir: __dirname,
   customTemplate: 'respond-to-claim/correspondence-address/correspondenceAddress.njk',
   beforeRedirect: async req => {
