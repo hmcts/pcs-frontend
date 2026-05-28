@@ -464,7 +464,9 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getViewDefendantResponse(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getViewDefendantResponse(accessToken, caseId)).rejects.toThrow('CCD case service error');
+      await expect(ccdCaseService.getViewDefendantResponse(accessToken, caseId)).rejects.toThrow(
+        'CCD case service error'
+      );
     });
   });
 });

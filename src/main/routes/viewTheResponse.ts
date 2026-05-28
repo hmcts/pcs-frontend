@@ -53,6 +53,7 @@ function formatGdsDate(value: string | undefined | null): string | null {
     try {
       return format(parseISO(candidate), GDS_DATE_FORMAT);
     } catch {
+      continue;
     }
   }
   return null;
@@ -126,11 +127,7 @@ function pushRow(rows: SummaryRow[], label: string, value: string | null | undef
   }
 }
 
-function buildCaseDatesSummary(
-  t: TFunction,
-  dateSubmitted: string | null,
-  dateIssued: string | null
-): SummarySection {
+function buildCaseDatesSummary(t: TFunction, dateSubmitted: string | null, dateIssued: string | null): SummarySection {
   return {
     rows: [
       { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } },

@@ -2,9 +2,9 @@ import type { Application, NextFunction, Request, RequestHandler, Response } fro
 
 import { VIEW_RESPONSE_ROUTE } from '../../../main/constants/caseRoutes';
 import { oidcMiddleware } from '../../../main/middleware';
-import type { CcdCaseData } from '@services/ccdCase.interface';
 
 import viewTheResponseRoute from '@routes/viewTheResponse';
+import type { CcdCaseData } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('../../../main/middleware', () => ({
@@ -21,8 +21,7 @@ const translationStrings: Record<string, string> = {
 
 jest.mock('@modules/i18n', () => ({
   getTranslationFunction: jest.fn(
-    () =>
-      ((key: string) => translationStrings[key] ?? key) as import('i18next').TFunction
+    () => ((key: string) => translationStrings[key] ?? key) as import('i18next').TFunction
   ),
 }));
 
