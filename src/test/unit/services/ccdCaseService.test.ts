@@ -399,6 +399,74 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
     });
   });
+
+  describe('getViewDefendantResponse', () => {
+    it('GETs viewDefendantResponse event trigger and returns case data', async () => {
+      const mockCaseData = {
+        possessionClaimResponse: {
+          defendantResponses: { responseSubmittedDate: '2026-02-01' },
+        },
+      };
+
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: mockCaseData,
+          },
+        },
+      });
+
+      const result = await ccdCaseService.getViewDefendantResponse(accessToken, caseId);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/viewDefendantResponse?ignore-warning=false`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+      expect(result).toEqual(mockCaseData);
+    });
+
+    it('returns empty object when case_details is missing', async () => {
+      mockGet.mockResolvedValue({ data: {} });
+
+      const result = await ccdCaseService.getViewDefendantResponse(accessToken, caseId);
+
+      expect(result).toEqual({});
+    });
+
+    it('maps 404 from CCD to Case not found HTTPError', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 404, data: {} },
+        message: 'Not found',
+      });
+
+      await expect(ccdCaseService.getViewDefendantResponse(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getViewDefendantResponse(accessToken, caseId)).rejects.toThrow('Case not found');
+    });
+
+    it('maps 400 from CCD to Case not found HTTPError', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 400, data: {} },
+        message: 'Bad request',
+      });
+
+      await expect(ccdCaseService.getViewDefendantResponse(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getViewDefendantResponse(accessToken, caseId)).rejects.toThrow('Case not found');
+    });
+
+    it('maps other HTTP errors to CCD case service HTTPError', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 500, data: {} },
+        message: 'Server error',
+      });
+
+      await expect(ccdCaseService.getViewDefendantResponse(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getViewDefendantResponse(accessToken, caseId)).rejects.toThrow('CCD case service error');
+    });
+  });
 });
 
 describe('updateCase', () => {

@@ -244,6 +244,7 @@ export interface PossessionClaimResponse {
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
+  claimIssuedDate?: string;
 }
 
 export type CaseData = CcdCaseData;

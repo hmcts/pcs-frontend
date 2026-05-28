@@ -53,7 +53,6 @@ function formatGdsDate(value: string | undefined | null): string | null {
     try {
       return format(parseISO(candidate), GDS_DATE_FORMAT);
     } catch {
-      // try next candidate (e.g. ISO datetime → date-only)
     }
   }
   return null;
@@ -127,9 +126,16 @@ function pushRow(rows: SummaryRow[], label: string, value: string | null | undef
   }
 }
 
-function buildCaseDatesSummary(t: TFunction, dateSubmitted: string | null): SummarySection {
+function buildCaseDatesSummary(
+  t: TFunction,
+  dateSubmitted: string | null,
+  dateIssued: string | null
+): SummarySection {
   return {
-    rows: [{ key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } }],
+    rows: [
+      { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } },
+      { key: summaryKey(t('viewTheResponse:summary.dateIssued')), value: { text: dateIssued ?? '' } },
+    ],
   };
 }
 
@@ -457,6 +463,7 @@ export default function viewTheResponseRoutes(app: Application): void {
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
 
       const dateSubmitted = formatGdsDate(responses?.responseSubmittedDate);
+      const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
       const completedBy = responses?.statementOfTruthCompletedBy;
 
       const sections = {
@@ -476,7 +483,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         t,
         propertyAddress: formatAddress(caseData.propertyAddress),
         caseReferenceDisplay: caseReference.replace(/(\d{4})(?=\d)/g, '$1 '),
-        caseDates: buildCaseDatesSummary(t, dateSubmitted),
+        caseDates: buildCaseDatesSummary(t, dateSubmitted, dateIssued),
         statementOfTruth: buildStatementOfTruthSummary(t, completedBy),
         dateSubmitted,
         ...sections,
