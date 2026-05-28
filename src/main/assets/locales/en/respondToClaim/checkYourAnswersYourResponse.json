@@ -28,9 +28,15 @@
       "changeHidden": "Give the correct tenancy, occupation contract or licence type"
     },
     "tenancyStartDate": {
-      "labelConfirm": "Is the tenancy, licence or occupation contract start date correct?",
+      "confirm": {
+        "label": "Is the tenancy, licence or occupation contract start date correct?",
+        "changeHidden": "Is the tenancy, licence or occupation contract start date correct?"
+      },
+      "correctDate": {
+        "label": "What is the correct start date?",
+        "changeHidden": "What is the correct start date?"
+      },
       "labelEntered": "When did your tenancy, occupation contract or licence start?",
-      "changeHiddenConfirm": "Is the tenancy, licence or occupation contract start date correct?",
       "changeHiddenEntered": "When did your tenancy, occupation contract or licence start?"
     },
     "possessionNoticeReceived": {
