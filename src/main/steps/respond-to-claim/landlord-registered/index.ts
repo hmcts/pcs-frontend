@@ -12,6 +12,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
   isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.landlordRegistered),
   stepDir: __dirname,
+  getInitialFormData: async (req: Request) => {
+    // Pre-populate from the saved draft (CCD + draft merge). Option values are the
+    // backend enum (YES/NO/NOT_SURE), so the stored value maps to the radio directly.
+    const landlordRegistered = req.res?.locals.validatedCase?.defendantResponses?.landlordRegistered;
+    return landlordRegistered ? { landlordRegistered } : {};
+  },
   customTemplate: `${__dirname}/landlordRegistered.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
