@@ -170,8 +170,8 @@ export const submitCaseApiData = {
       ],
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'Test',
-        positionClaimant: 'Leah',
+        fullNameParty: 'Test',
+        positionParty: 'Leah',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -245,8 +245,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'Test',
-        positionClaimant: 'Leah',
+        fullNameParty: 'Test',
+        positionParty: 'Leah',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -369,8 +369,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -425,17 +425,7 @@ export const submitCaseApiData = {
         nameKnown: 'YES',
         firstName: 'Test',
         lastName: 'John',
-        addressKnown: 'YES',
-        addressSameAsPossession: 'NO',
-        correspondenceAddress: {
-          AddressLine1: '10 Second Avenue',
-          AddressLine2: '',
-          AddressLine3: '',
-          PostTown: 'London',
-          County: '',
-          Country: '',
-          PostCode: 'W3 7RX',
-        },
+        addressKnown: 'NO',
       },
       addAnotherDefendant: 'YES',
       additionalDefendants: [
@@ -574,8 +564,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -660,8 +650,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -770,8 +760,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
