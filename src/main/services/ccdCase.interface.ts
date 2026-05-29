@@ -126,6 +126,7 @@ export interface GenApp {
   party: Party;
   submittedOn: string;
   submissionDocument: DocumentWithId;
+  supportingDocuments: CcdCollectionItem<Document>[];
 }
 /** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
 export interface CcdClaimantOrganisation {
