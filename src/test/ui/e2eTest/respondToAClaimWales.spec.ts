@@ -668,9 +668,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: counterClaimFee.iNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
-    await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
