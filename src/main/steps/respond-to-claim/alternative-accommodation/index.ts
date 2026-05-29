@@ -84,6 +84,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         const isoDate = formatDatePartsToISODate(day, month, year);
         if (isoDate) {
           response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate = isoDate;
+        } else {
+          // Optional date cleared on edit - drop it from the cloned draft so it isn't re-sent.
+          delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
         }
       } else {
         delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
