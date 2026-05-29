@@ -1,0 +1,8 @@
+{
+  "heading": "cyWho is the defendant making a counterclaim against?",
+  "errors": {
+    "counterClaimAgainst": {
+      "required": "cySelect who the defendant is making a counterclaim against"
+    }
+  }
+}
