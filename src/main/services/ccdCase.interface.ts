@@ -384,3 +384,10 @@ export interface CitizenGenAppRequest {
   sotFullName?: string;
   clientReference?: string;
 }
+
+/** Claim summary returned by GET /cases/defendant-claims on pcs-api. */
+export interface ClaimSummary {
+  caseRef?: string;
+  claimantName?: string;
+  propertyPostcode?: string;
+}
