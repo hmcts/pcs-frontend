@@ -7,4 +7,5 @@ export const step = createSectionCyaStep({
   cardTitleKey: 'cardTitle',
   stepDir: __dirname,
   buildRows: buildSectionCyaRows,
+  renderRowsAsPresentation: true,
 });

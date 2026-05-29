@@ -15,8 +15,7 @@ import { getFlowConfigForJourney } from '@steps';
 
 const journeyName = 'respondToClaim';
 
-// One shared template for every section-CYA page — the card title and rows come
-// from the step's config, the page <title> reads summaryData.card.title.text.
+// Every section-CYA page renders through this one template.
 const VIEW = 'respond-to-claim/section-cya/sectionCya.njk';
 
 export interface SectionCyaStepConfig {
@@ -24,10 +23,12 @@ export interface SectionCyaStepConfig {
   stepName: string;
   /** Translation key for the summary-card title (and the page <title>). */
   cardTitleKey: string;
-  /** The owning folder's __dirname — kept for parity with the StepDefinition shape. */
+  /** The owning folder's __dirname. */
   stepDir: string;
   /** Section-specific row builder. */
   buildRows: (req: Request, t: TFunction) => SummaryListRow[];
+  /** Render rows with GOV.UK classes on presentation divs, avoiding dl/dt/dd announcements. */
+  renderRowsAsPresentation?: boolean;
 }
 
 /**
@@ -40,6 +41,7 @@ export function createSectionCyaStep({
   cardTitleKey,
   stepDir,
   buildRows,
+  renderRowsAsPresentation = false,
 }: SectionCyaStepConfig): StepDefinition {
   const resolveFlow = (req: Request) => getFlowConfigForJourney(journeyName, req) || flowConfig;
   const stepNavigation = createStepNavigation(resolveFlow);
@@ -53,11 +55,14 @@ export function createSectionCyaStep({
       createGetController(VIEW, stepName, stepNavigation, async (req: Request) => {
         const caseRef = req.res?.locals.validatedCase?.id;
         const t: TFunction = getTranslationFunction(req);
+        const cardTitle = t(cardTitleKey);
+        const rows = buildRows(req, t);
 
         return {
           summaryData: {
-            card: { title: { text: t(cardTitleKey) } },
-            rows: buildRows(req, t),
+            cardTitle,
+            renderRowsAsPresentation,
+            rows,
           },
           formAction: `/case/${caseRef}/respond-to-claim/${stepName}`,
           backUrl: await stepNavigation.getBackUrl(req, stepName),

@@ -15,12 +15,10 @@
   },
   "rows": {
     "shareIncomeExpenseDetails": {
-      "label": "Do you want to provide details of your income and expenses?",
-      "changeHidden": "Do you want to provide details of your income and expenses?"
+      "label": "Do you want to provide details of your income and expenses?"
     },
     "regularIncome": {
       "label": "What regular income do you receive?",
-      "changeHidden": "What regular income do you receive?",
       "options": {
         "incomeFromJobs": "Income from all jobs you do",
         "pension": "Pension – state and private",
@@ -30,28 +28,22 @@
       }
     },
     "hasAppliedForUniversalCredit": {
-      "label": "Have you applied for Universal Credit?",
-      "changeHidden": "Have you applied for Universal Credit?"
+      "label": "Have you applied for Universal Credit?"
     },
     "universalCreditApplicationDate": {
-      "label": "When did you apply for Universal Credit?",
-      "changeHidden": "When did you apply for Universal Credit?"
+      "label": "When did you apply for Universal Credit?"
     },
     "priorityDebts": {
-      "label": "Do you have any priority debts?",
-      "changeHidden": "Do you have any priority debts?"
+      "label": "Do you have any priority debts?"
     },
     "priorityDebtTotal": {
-      "label": "What is the total amount you owe for all your priority debts?",
-      "changeHidden": "What is the total amount you owe for all your priority debts?"
+      "label": "What is the total amount you owe for all your priority debts?"
     },
     "priorityDebtContribution": {
-      "label": "How much do you pay towards your priority debts each week or month?",
-      "changeHidden": "How much do you pay towards your priority debts each week or month?"
+      "label": "How much do you pay towards your priority debts each week or month?"
     },
     "regularExpenses": {
       "label": "What other regular expenses do you have?",
-      "changeHidden": "What other regular expenses do you have?",
       "options": {
         "householdBills": "Household bills",
         "loanPayments": "Loan payments",
@@ -65,12 +57,10 @@
       }
     },
     "otherConsiderations": {
-      "label": "Is there anything else you want to tell the court?",
-      "changeHidden": "Is there anything else you want to tell the court?"
+      "label": "Is there anything else you want to tell the court?"
     },
     "otherConsiderationsDetails": {
-      "label": "Give details about what else you want to tell the court",
-      "changeHidden": "Give details about what else you want to tell the court"
+      "label": "Give details about what else you want to tell the court"
     }
   }
 }
