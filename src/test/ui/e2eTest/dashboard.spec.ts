@@ -138,7 +138,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       fieldName: dashboard.askTheCourtToMakeAnOrderLink,
       header: chooseAnApplication.mainHeader,
     });
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload,});
     await performAction('reloadPage');
     await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.applicationsSubHeader,
