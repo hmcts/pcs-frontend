@@ -12,10 +12,10 @@ export type { SectionStatus, SectionConfig, JourneyFlowConfig } from '../modules
 export type { StepDefinition } from '../modules/steps/stepFormData.interface';
 
 const STATUS_TAG_CLASSES: Partial<Record<SectionStatus, string>> = {
-  AVAILABLE: 'govuk-tag govuk-tag--turquoise',
-  IN_PROGRESS: 'govuk-tag govuk-tag--blue',
+  AVAILABLE: 'govuk-tag govuk-tag--blue',
+  IN_PROGRESS: 'govuk-tag govuk-tag--yellow',
   DONE: 'govuk-tag govuk-tag--green',
-  NOT_AVAILABLE_YET: 'govuk-tag govuk-tag--red',
+  NOT_AVAILABLE_YET: 'govuk-tag govuk-tag--grey',
 };
 
 export const getStatusTagClasses = (status: SectionStatus): string | undefined => STATUS_TAG_CLASSES[status];
