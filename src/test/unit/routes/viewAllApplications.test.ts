@@ -93,6 +93,7 @@ describe('View All Application Route', () => {
             documentId: 'bf112cdf-76d7-4d15-bb92-cd7c34830001',
             filename: 'General Application GA1 - Defendant 1.pdf',
           },
+          supportingDocuments: [],
           submittedOn: '2026-05-06T17:29:33.301528',
         },
       ],
@@ -125,6 +126,12 @@ describe('View All Application Route', () => {
               documentId: 'bf112cdf-76d7-4d15-bb92-cd7c34830001',
               filename: 'General Application GA1 - Defendant 3.pdf',
             },
+            supportingDocuments: [
+              {
+                documentId: 'a9b92e15-c46e-474a-a1a0-27873ac6e771',
+                filename: 'rent_statement2 GA3 - Defendant 2.txt',
+              },
+            ],
             submittedOn: '2026-05-03T17:29:33.301528',
           },
           {
@@ -139,6 +146,7 @@ describe('View All Application Route', () => {
               documentId: 'bf112cdf-76d7-4d15-bb92-cd7c34830002',
               filename: 'General Application GA2 - Defendant 3.pdf',
             },
+            supportingDocuments: [],
             submittedOn: '2026-05-04T17:29:33.301528',
           },
         ],
@@ -218,6 +226,16 @@ function getTestGenApps() {
             document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a7ef/binary',
           },
         },
+        supportingDocuments: [
+          {
+            id: 'a9b92e15-c46e-474a-a1a0-27873ac6e771',
+            value: {
+              document_url: 'http://localhost:4506/documents/88a3402a-035b-4dcf-95c2-011e5f2099d9',
+              document_filename: 'rent_statement2 GA3 - Defendant 2.txt',
+              document_binary_url: 'http://localhost:4506/documents/88a3402a-035b-4dcf-95c2-011e5f2099d9/binary',
+            },
+          },
+        ],
       },
     },
     {
