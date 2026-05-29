@@ -32,7 +32,7 @@ export async function caseReferenceParamMiddleware(
       return next(new HTTPError('Authentication required', 401));
     }
 
-    const validatedCase = await ccdCaseService.getCaseById(
+    const validatedCase = await ccdCaseService.getCaseByIdForEvent(
       accessToken,
       sanitisedCaseReference,
       'respondPossessionClaim',

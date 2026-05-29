@@ -22,8 +22,6 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'tenancy-date-details',
   'tenancy-date-unknown',
   'confirmation-of-notice-given',
-  'confirmation-of-notice-date-when-provided',
-  'confirmation-of-notice-date-when-not-provided',
   'rent-arrears-dispute',
   'non-rent-arrears-dispute',
   'counter-claim',
@@ -70,7 +68,7 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     },
 
     'defendant-name-confirmation': {
-      showCondition: (req: Request) => hasSingleLinkedDefendant(req),
+      showCondition: () => true,
     },
   },
 };

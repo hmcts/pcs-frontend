@@ -461,6 +461,56 @@ describe('documentProxyRoutes', () => {
 
       expect(res.status).toHaveBeenCalledWith(502);
     });
+
+    it('returns 400 when total upload size exceeds 1024MB, deletes orphan CDAM doc', async () => {
+      const oneGbMinusOneByte = 1024 * 1024 * 1024 - 1;
+      const hugeExistingDoc = {
+        value: {
+          document: {
+            document_url: 'http://dm/doc/huge-uuid',
+            document_binary_url: 'http://dm/doc/huge-uuid/binary',
+            document_filename: 'huge.pdf',
+          },
+          contentType: 'application/pdf',
+          sizeInBytes: oneGbMinusOneByte,
+        },
+      };
+
+      const newCdamDoc = {
+        document_url: 'http://dm/doc/new-after-cap',
+        document_binary_url: 'http://dm/doc/new-after-cap/binary',
+        document_filename: 'small.pdf',
+        content_type: 'application/pdf',
+        size: 10,
+      };
+      mockUploadDocument.mockResolvedValue(newCdamDoc);
+      mockDeleteDocument.mockResolvedValue(undefined);
+
+      const mockReadFresh = jest.fn().mockResolvedValue([hugeExistingDoc]);
+      const mockSave = jest.fn().mockResolvedValue(undefined);
+
+      const req = makeReqWithDocs(
+        { file: { originalname: 'small.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 10 } },
+        [hugeExistingDoc]
+      );
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: {
+          read: jest.fn().mockResolvedValue([hugeExistingDoc]),
+          readFresh: mockReadFresh,
+          save: mockSave,
+        },
+      });
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(mockUploadDocument).toHaveBeenCalled();
+      expect(mockReadFresh).toHaveBeenCalled();
+      expect(mockDeleteDocument).toHaveBeenCalledWith('http://dm/doc/new-after-cap', 'token');
+      expect(mockSave).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
   });
 
   describe('delete handler', () => {
@@ -768,6 +818,50 @@ describe('documentProxyRoutes', () => {
       expect(persisted).toHaveLength(1);
       const remaining = persisted[0] as { value: { document: { document_filename: string } } };
       expect(['existing.pdf', 'new.pdf']).toContain(remaining.value.document.document_filename);
+    });
+
+    it('parallel uploads are capped using fresh total — second saves fails and deletes orphan CDAM doc', async () => {
+      const sixHundredMb = 600 * 1024 * 1024;
+      const persisted: unknown[] = [];
+      const { findStep } = require('../../../main/steps/index');
+
+      const readFresh = jest.fn().mockImplementation(async () => [...persisted]);
+      const save = jest.fn().mockImplementation(async (_req: unknown, docs: unknown[]) => {
+        persisted.length = 0;
+        persisted.push(...docs);
+      });
+
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: { read: jest.fn().mockResolvedValue([]), readFresh, save },
+      });
+
+      mockUploadDocument
+        .mockResolvedValueOnce(makeCdamDoc('first', 'first.pdf', sixHundredMb))
+        .mockResolvedValueOnce(makeCdamDoc('second', 'second.pdf', sixHundredMb));
+      mockDeleteDocument.mockResolvedValue(undefined);
+
+      const baseReq = {
+        session: { user: { accessToken: 'token' } },
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
+        t: mockT,
+        res: { locals: {} },
+      };
+
+      const resA = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const resB = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+      await Promise.all([
+        uploadHandler({ ...baseReq, file: makeFile('first.pdf', sixHundredMb) } as unknown as Request, resA),
+        uploadHandler({ ...baseReq, file: makeFile('second.pdf', sixHundredMb) } as unknown as Request, resB),
+      ]);
+
+      expect(persisted).toHaveLength(1);
+      expect((persisted[0] as { value: { sizeInBytes?: number } }).value.sizeInBytes).toBe(sixHundredMb);
+      expect(mockDeleteDocument).toHaveBeenCalledTimes(1);
+      const rejected = [resA, resB].filter(r =>
+        (r.status as jest.Mock).mock.calls.some(([code]: [number]) => code === 400)
+      );
+      expect(rejected).toHaveLength(1);
     });
 
     it('readFresh is called inside the lock — fresh state used, not stale read', async () => {

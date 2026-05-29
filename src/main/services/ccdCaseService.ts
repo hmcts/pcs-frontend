@@ -38,8 +38,7 @@ import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import { CaseState } from '@services/ccdCase.interface';
-import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
+import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type { DashboardNotification, DashboardTaskGroup } from '@services/dashboard.interface';
 import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
 
@@ -185,7 +184,7 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseById(
+  async getCaseByIdForEvent(
     accessToken: string,
     caseId: string,
     eventId: string = 'respondPossessionClaim',
@@ -194,7 +193,7 @@ export const ccdCaseService = {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
-      logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
+      logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
       const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
 
       if (clientContextHeaders) {
@@ -202,15 +201,16 @@ export const ccdCaseService = {
       }
 
       const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
-      logger.info(`[ccdCaseService] Case access validated successfully for caseId: ${caseId}`);
+      logger.info(`Case access validated successfully for caseId: ${caseId}`);
 
       const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
+
       return {
         id: caseId,
         data: caseData,
       };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
+      const httpError = convertAxiosErrorToHttpError(error, 'getCaseByIdForEvent');
 
       // coerce 400 and 404 to 404 so we can return a 404 error to the client
       if (httpError.status === 400 || httpError.status === 404) {
@@ -220,46 +220,26 @@ export const ccdCaseService = {
     }
   },
 
-  async getCase(accessToken: string | undefined): Promise<CcdCase | null> {
-    const url = `${getBaseUrl()}/searchCases?ctid=${getCaseTypeId()}`;
-    const headersConfig = getCaseHeaders(accessToken || '');
-
-    const requestBody = {
-      query: { match_all: {} },
-      sort: [{ created_date: { order: 'desc' } }],
-    };
-
-    logger.info(`Calling ccdCaseService search with URL: ${url}`);
-    logger.info(`Request body: ${JSON.stringify(requestBody, null, 2)}`);
+  async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
+    const caseUrl = `${getBaseUrl()}/cases/${caseId}`;
 
     try {
-      const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
-      const allCases = response?.data?.cases;
-      logger.info(`Response data: ${JSON.stringify(response?.data?.cases, null, 2)}`);
-      const draftCase = allCases?.find(c => c.state === CaseState.DRAFT);
+      logger.debug(`Fetching case by id for read view: ${caseId}`);
+      const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
+      logger.debug(`Read case response for ${caseId}: ${JSON.stringify(response.data, null, 2)}`);
+      const caseData = response.data.data ?? {};
 
-      if (draftCase) {
-        logger.info(`Draft case found: ${JSON.stringify(draftCase, null, 2)}`);
-        return {
-          id: draftCase.id,
-          data: draftCase.case_data as CcdCaseData,
-        };
-      }
-
-      return null;
+      return {
+        id: String(response.data.id ?? caseId),
+        data: caseData,
+      };
     } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 404) {
-        logger.warn('No case found, returning null.');
-        return null;
+      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
+
+      if (httpError.status === 400 || httpError.status === 404) {
+        throw new HTTPError('Case not found', 404);
       }
-      if (axiosError.response?.status === 400) {
-        logger.warn(
-          `Bad request (400) when searching for cases. Response: ${JSON.stringify(axiosError.response?.data, null, 2)}`
-        );
-        return null;
-      }
-      throw convertAxiosErrorToHttpError(error, 'getCase');
+      throw httpError;
     }
   },
 
@@ -322,7 +302,7 @@ export const ccdCaseService = {
       throw new HTTPError('Cannot submit general application, case ID not specified', 500);
     }
 
-    const eventId = 'citizenCreateGenApp';
+    const eventId = 'makeAnApplication';
     const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;

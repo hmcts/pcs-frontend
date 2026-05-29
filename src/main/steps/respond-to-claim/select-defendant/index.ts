@@ -40,11 +40,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'selectDefendant',
       type: 'radio',
       required: true,
+      legendClasses: 'govuk-!-font-weight-bold govuk-!-font-size-24',
       translationKey: {
         label: 'selectDefendantLabel',
       },
       isPageHeading: true,
-      legendClasses: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
       options: [],
     },
   ],

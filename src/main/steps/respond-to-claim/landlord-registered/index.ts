@@ -17,7 +17,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     question: 'question',
     publicRegisterLinkText: 'publicRegisterLinkText',
     introText: 'introText',
-    heading: 'heading',
   },
   fields: [
     {

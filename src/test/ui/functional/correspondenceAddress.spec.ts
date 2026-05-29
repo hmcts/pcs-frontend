@@ -31,9 +31,13 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', {
+    caseNumber: process.env.CASE_NUMBER,
+    defendantDetailsKnown: !testInfo.title.includes('@noDefendants'),
+  });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   console.log('caseId', process.env.CASE_NUMBER);
   await performAction('clickButton', startNow.startNowButton);

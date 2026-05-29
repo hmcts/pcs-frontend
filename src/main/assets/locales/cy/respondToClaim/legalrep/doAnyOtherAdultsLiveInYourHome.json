@@ -1,10 +1,10 @@
 {
-  "question": " ",
+  "question": "",
   "heading": "cyDependants and other adults",
   "dependantHeading": "cyOther adults",
   "dependantQuestion": "cyDo any other adults live in the defendant's home?",
   "textAreaLabel": "cyGive details about the other adults living in the defendant’s home",
-  "textAreaHintText": " ",
+  "textAreaHintText": "",
   "errors": {
     "confirmOtherAdults": "cySelect if any other adults live in the defendant's home",
     "otherAdultsDetails": "cyGive details about the other adults living in their home",

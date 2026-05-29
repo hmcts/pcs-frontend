@@ -2,9 +2,10 @@
   "amountOwedHeading": "cyAmount the defendant owes in rent arrears given by {{claimantName}}:",
   "rentArrearsQuestion": "cyDoes the defendant owe this amount in rent arrears?",
   "rentArrearsOptions": {
-    "or": " ",
     "notSure": "cyDefendant is not sure"
   },
+  "insetIntroText": "",
+  "insetDetailsText": "",
   "rentArrearsAmountCorrection": {
     "label": "cyHow much does the defendant believe they owe in rent arrears?",
     "hint": ""

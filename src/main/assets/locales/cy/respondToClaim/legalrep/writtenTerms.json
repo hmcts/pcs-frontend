@@ -1,11 +1,11 @@
 {
-  "pageTitle": "cyLandlord licensing, registration and written terms",
+  "pageTitle": "cyWritten terms",
   "introText": "cyIt is required under the Renting Homes Wales Act 2016 for a landlord to send the defendant written terms of the occupation contract.",
-  "question": " ",
+  "question": "cyHas the landlord sent the defendant written terms of the occupation contract?",
   "heading": "cyWritten terms",
   "termsQuestion": "cyHas the landlord sent the defendant written terms of the occupation contract?",
   "options": {
-    "imNotSure": "cyDefendant not sure"
+    "imNotSure": "cyDefendant is not sure"
   },
   "errors": {
     "writtenTerms": "cySelect if the landlord has sent you written terms of the occupation contract"

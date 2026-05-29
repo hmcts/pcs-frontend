@@ -19,7 +19,7 @@ export const submitCaseApiDataWales = {
     },
 
     claimAgainstTrespassers: 'NO',
-
+    isExemptLandlord: 'YES',
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
     claimantNamePossessiveForm: "Possession Claims Solicitor Org's",
@@ -68,9 +68,9 @@ export const submitCaseApiDataWales = {
     licenceStartDate: '2020-05-20',
     licenceDocuments: [],
 
-    walesLicensed: 'NO',
-    walesLicensedAgentAppointed: 'NO',
-    walesRegistered: 'NO',
+    // walesLicensed: 'NO',
+    // walesLicensedAgentAppointed: 'NO',
+    // walesRegistered: 'NO',
 
     showReasonsForGroundsPageWales: 'YES',
 
@@ -125,7 +125,6 @@ export const submitCaseApiDataWales = {
 
     //  CORRECTED: Disable payments to avoid 422 error
     // If you need payments, add: paymentResponsibleParty, paymentAccountReference, etc.
-    claimingCostsWanted: 'NO',
     applicationWithClaim: 'NO',
 
     additionalReasonsForPossession: {
@@ -141,8 +140,8 @@ export const submitCaseApiDataWales = {
 
     statementOfTruth: {
       completedBy: 'CLAIMANT',
-      fullNameClaimant: 'sf',
-      positionClaimant: 'dsf',
+      fullNameParty: 'sf',
+      positionParty: 'dsf',
       agreementClaimant: ['BELIEVE_TRUE'],
     },
   },
@@ -175,12 +174,13 @@ export const submitCaseApiDataWales = {
       valueCode: 'COMMUNITY_LANDLORD',
     },
     claimAgainstTrespassers: 'NO',
+    isExemptLandlord: 'YES',
     orgNameFound: 'Yes',
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
-    walesRegistered: 'NO',
-    walesLicensed: 'NO',
-    walesLicensedAgentAppointed: 'NO',
+    // walesRegistered: 'NO',
+    // walesLicensed: 'NO',
+    // walesLicensedAgentAppointed: 'NO',
     claimantContactEmail: 'pcs-solicitor-automation@test.com',
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'Yes',
@@ -220,7 +220,6 @@ export const submitCaseApiDataWales = {
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
     prohibitedConductWalesClaim: 'NO',
-    claimingCostsWanted: 'YES',
     hasUnderlesseeOrMortgagee: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
@@ -232,8 +231,8 @@ export const submitCaseApiDataWales = {
     endButtonLabel: 'Submit claim',
     statementOfTruth: {
       completedBy: 'CLAIMANT',
-      fullNameClaimant: 'Test',
-      positionClaimant: 'Manager',
+      fullNameParty: 'Test',
+      positionParty: 'Manager',
       agreementClaimant: ['BELIEVE_TRUE'],
     },
   },
@@ -266,12 +265,13 @@ export const submitCaseApiDataWales = {
       valueCode: 'COMMUNITY_LANDLORD',
     },
     claimAgainstTrespassers: 'NO',
+    isExemptLandlord: 'YES',
     orgNameFound: 'YES',
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
-    walesRegistered: 'NOT_APPLICABLE',
-    walesLicensed: 'NOT_APPLICABLE',
-    walesLicensedAgentAppointed: 'NOT_APPLICABLE',
+    // walesRegistered: 'NOT_APPLICABLE',
+    // walesLicensed: 'NOT_APPLICABLE',
+    // walesLicensedAgentAppointed: 'NOT_APPLICABLE',
     claimantContactEmail: 'pcs-solicitor-automation@test.com',
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'YES',
@@ -314,7 +314,6 @@ export const submitCaseApiDataWales = {
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
     prohibitedConductWalesClaim: 'NO',
-    claimingCostsWanted: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
     },
@@ -353,12 +352,13 @@ export const submitCaseApiDataWales = {
       valueCode: 'COMMUNITY_LANDLORD',
     },
     claimAgainstTrespassers: 'NO',
+    isExemptLandlord: 'YES',
     orgNameFound: 'Yes',
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
-    walesRegistered: 'NO',
-    walesLicensed: 'NO',
-    walesLicensedAgentAppointed: 'NO',
+    // walesRegistered: 'NO',
+    // walesLicensed: 'NO',
+    // walesLicensedAgentAppointed: 'NO',
     claimantContactEmail: 'pcs-solicitor-automation@test.com',
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'Yes',
@@ -398,7 +398,6 @@ export const submitCaseApiDataWales = {
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
     prohibitedConductWalesClaim: 'NO',
-    claimingCostsWanted: 'NO',
     additionalReasonsForPossession: {
       hasReasons: 'NO',
     },
@@ -410,8 +409,8 @@ export const submitCaseApiDataWales = {
     endButtonLabel: 'Submit claim',
     statementOfTruth: {
       completedBy: 'CLAIMANT',
-      fullNameClaimant: 'test',
-      positionClaimant: 'manager',
+      fullNameParty: 'test',
+      positionParty: 'manager',
       agreementClaimant: ['BELIEVE_TRUE'],
     },
   },

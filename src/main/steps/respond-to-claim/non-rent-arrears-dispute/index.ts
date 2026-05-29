@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { getTranslationFunction } from '../../../modules/steps';
+import { getTranslation, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -77,16 +77,22 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseReference = req.params.caseReference;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
 
-    const t = getTranslationFunction(req, 'non-rent-arrears-dispute', ['common']);
+    const t = getTranslationFunction(req);
+
+    const introParagraph = getTranslation(t, 'introParagraph', '', { caseReference }) ?? '';
+    const includesHeading = getTranslation(t, 'includesHeading', '') ?? '';
+    const includesBullet1 = getTranslation(t, 'includesBullet1', '', { claimantName }) ?? '';
+    const includesBullet2 = getTranslation(t, 'includesBullet2', '', { claimantName }) ?? '';
+    const includesBullet3 = getTranslation(t, 'includesBullet3', '', { claimantName }) ?? '';
 
     // Pre-translate content with interpolation (following rent-arrears pattern)
     return {
       heading: t('heading', { claimantName }),
-      introParagraph: t('introParagraph', { caseReference }),
-      includesHeading: t('includesHeading'),
-      includesBullet1: t('includesBullet1', { claimantName }),
-      includesBullet2: t('includesBullet2'),
-      includesBullet3: t('includesBullet3'),
+      introParagraph,
+      includesHeading,
+      includesBullet1,
+      includesBullet2,
+      includesBullet3,
     };
   },
   fields: [

@@ -4,7 +4,7 @@ import {
   checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
-  doYouWantToUploadDocumentToSupportYourApplication,
+  doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   uploadDocumentsToSupportYourApplication,
@@ -25,9 +25,13 @@ test.beforeEach(async ({ page }) => {
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', {
+    caseNumber: process.env.CASE_NUMBER,
+    defendantDetailsKnown: false,
+  });
   await performAction(
     'navigateToUrl',
     home_url + `/case/${process.env.CASE_NUMBER}/make-an-application/choose-an-application`
@@ -39,7 +43,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('Select an Application - Ask to Set aside @regression', async () => {
+  test('Select an Application - Ask to Set aside', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
@@ -61,17 +65,16 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
       option: haveTheOtherPartiesAgreedToThisApplication.yesRadioOption,
     });
-    await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
     await performAction('confirmOrderDoYouWant', {
       label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
       input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
     });
-    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
-    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performAction('confirmDocumentToUpload', {
+      question: doYouWantToUploadDocumentsToSupportYourApplication.doYouWantToUploadDocumentQuestion,
+      option: doYouWantToUploadDocumentsToSupportYourApplication.yesRadioOption,
+    });
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
-    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
+    await performAction('uploadFilesGenApps', { files: ['genApps.docx'] });
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,

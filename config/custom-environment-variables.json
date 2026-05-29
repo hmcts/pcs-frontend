@@ -79,6 +79,10 @@
     "url": "CDAM_URL"
   },
   "documentUpload": {
-    "maxFileSizeMB": "DOCUMENT_UPLOAD_MAX_FILE_SIZE_MB"
+    "maxFileSizePerFileMB": "DOCUMENT_UPLOAD_MAX_FILE_SIZE_PER_FILE_MB",
+    "maxTotalFileSizeMB": "DOCUMENT_UPLOAD_MAX_TOTAL_FILE_SIZE_MB"
+  },
+  "redirects": {
+    "manageCaseReturnURL": "REDIRECTS_MANAGE_CASE_RETURN_URL"
   }
 }

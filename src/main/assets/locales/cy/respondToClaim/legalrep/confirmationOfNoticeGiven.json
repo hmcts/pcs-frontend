@@ -3,11 +3,12 @@
   "options": {
     "yes": "cyYes",
     "no": "cyNo",
-    "or": " ",
     "imNotSure": "cyDefendant is not sure"
   },
-  "noticeDateLabel": "cyWhen did the defendant receive notice from {{claimantName}} ? (Optional)",
+  "noticeDateLabel": "cyWhen did the defendant receive notice from {{claimantName}}? (Optional)",
+  "noticeDateHint": "cyFor example, 16 4 2021",
   "errors": {
+    "possessionNoticeReceived": "cySelect if {{claimantName}} gave the defendant notice of their intention to begin possession proceedings",
     "date": {
       "day": "cyDay",
       "month": "cyMonth",

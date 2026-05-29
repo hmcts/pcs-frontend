@@ -4,7 +4,7 @@ const randomString = (length: number): string =>
     .substring(2, 2 + length);
 
 export const citizenCreateGenAppApiData = {
-  citizenCreateGenAppEventName: 'citizenCreateGenApp',
+  citizenCreateGenAppEventName: 'makeAnApplication',
   citizenCreateGenAppPayload: {
     citizenGenAppRequest: {
       applicationType: 'ADJOURN',
@@ -20,21 +20,6 @@ export const citizenCreateGenAppApiData = {
       sotAccepted: 'YES',
       sotFullName: 'Thomas Tester',
       hasSupportingDocuments: 'YES',
-      uploadedDocuments: [
-        {
-          value: {
-            document: {
-              document_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/45ee6086-9166-4104-9bb2-8efd78d089e7',
-              document_filename: 'rent_statement2.txt',
-              document_binary_url:
-                'http://dm-store-aat.service.core-compute-aat.internal/documents/45ee6086-9166-4104-9bb2-8efd78d089e7/binary',
-            },
-            contentType: 'some content type',
-            size: 10000,
-          },
-        },
-      ],
       clientReference: randomString(8),
     },
   },

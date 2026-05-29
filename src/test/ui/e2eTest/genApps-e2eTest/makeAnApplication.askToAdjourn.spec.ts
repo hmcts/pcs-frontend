@@ -5,7 +5,7 @@ import {
   checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
-  doYouWantToUploadDocumentToSupportYourApplication,
+  doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
@@ -26,9 +26,13 @@ test.beforeEach(async ({ page }) => {
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', {
+    caseNumber: process.env.CASE_NUMBER,
+    defendantDetailsKnown: false,
+  });
   await performAction(
     'navigateToUrl',
     home_url + `/case/${process.env.CASE_NUMBER}/make-an-application/choose-an-application`
@@ -73,12 +77,12 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
       input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
     });
-    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
-    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performAction('confirmDocumentToUpload', {
+      question: doYouWantToUploadDocumentsToSupportYourApplication.doYouWantToUploadDocumentQuestion,
+      option: doYouWantToUploadDocumentsToSupportYourApplication.yesRadioOption,
+    });
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
-    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
+    await performAction('uploadFilesGenApps', { files: ['genApps.ppt'] });
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
@@ -101,7 +105,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression', async () => {
+  test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No]', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.adjournTheHearingRadioOption,
@@ -129,10 +133,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
       input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
     });
-    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.noRadioOption);
-    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
+    await performAction('confirmDocumentToUpload', {
+      question: doYouWantToUploadDocumentsToSupportYourApplication.doYouWantToUploadDocumentQuestion,
+      option: doYouWantToUploadDocumentsToSupportYourApplication.noRadioOption,
+    });
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
