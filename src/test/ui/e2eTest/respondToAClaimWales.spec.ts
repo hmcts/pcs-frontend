@@ -307,8 +307,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
 
   test('Respond to a claim - Wales - Standard contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('retrieveCYATableDataRTC', 'uploadFiles');
-    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
+    await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -427,8 +427,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
 
   test('Respond to a claim - Wales - Other contract - @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
-    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
+    await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -454,8 +454,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
-    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
-    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('retrieveCYATableDataRTC', 'personalDetails');
+    await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction(
       'disputeClaimInterstitial',
@@ -516,8 +516,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
 
   test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - No @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
-    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
+    await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -543,8 +543,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
-    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
-    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('retrieveCYATableDataRTC', 'personalDetails');
+    await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction(
       'disputeClaimInterstitial',
@@ -600,8 +600,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp - SomethingElse @noDefendants @regression', async () => {
     //Single named party - Something else - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
-    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
+    await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -627,8 +627,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
-    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
-    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('retrieveCYATableDataRTC', 'personalDetails');
+    await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction(
       'disputeClaimInterstitial',
@@ -668,6 +668,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: counterClaimFee.iNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
+    await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
