@@ -22,7 +22,8 @@
   <h2 class="govuk-heading-s">{{ responseAndCounterClaimSubmittedHeading2 }}</h2>
   <p class="govuk-body">{{ responseAndCounterClaimSubmittedParagraph5 | safe }}</p>
   {{ govukButton({
-    text: "Close and return to task list",
+    text: "Close and return to case overview",
+    href: dashboardUrl,
     classes: "govuk-!-margin-top-6"
   }) }}
 {% endblock %}
