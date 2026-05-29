@@ -15,12 +15,10 @@
   },
   "rows": {
     "shareIncomeExpenseDetails": {
-      "label": "cy Do you want to provide details of your income and expenses?",
-      "changeHidden": "cy Do you want to provide details of your income and expenses?"
+      "label": "cy Do you want to provide details of your income and expenses?"
     },
     "regularIncome": {
       "label": "cy What regular income do you receive?",
-      "changeHidden": "cy What regular income do you receive?",
       "options": {
         "incomeFromJobs": "cy Income from all jobs you do",
         "pension": "cy Pension – state and private",
@@ -30,28 +28,22 @@
       }
     },
     "hasAppliedForUniversalCredit": {
-      "label": "cy Have you applied for Universal Credit?",
-      "changeHidden": "cy Have you applied for Universal Credit?"
+      "label": "cy Have you applied for Universal Credit?"
     },
     "universalCreditApplicationDate": {
-      "label": "cy When did you apply for Universal Credit?",
-      "changeHidden": "cy When did you apply for Universal Credit?"
+      "label": "cy When did you apply for Universal Credit?"
     },
     "priorityDebts": {
-      "label": "cy Do you have any priority debts?",
-      "changeHidden": "cy Do you have any priority debts?"
+      "label": "cy Do you have any priority debts?"
     },
     "priorityDebtTotal": {
-      "label": "cy What is the total amount you owe for all your priority debts?",
-      "changeHidden": "cy What is the total amount you owe for all your priority debts?"
+      "label": "cy What is the total amount you owe for all your priority debts?"
     },
     "priorityDebtContribution": {
-      "label": "cy How much do you pay towards your priority debts each week or month?",
-      "changeHidden": "cy How much do you pay towards your priority debts each week or month?"
+      "label": "cy How much do you pay towards your priority debts each week or month?"
     },
     "regularExpenses": {
       "label": "cy What other regular expenses do you have?",
-      "changeHidden": "cy What other regular expenses do you have?",
       "options": {
         "householdBills": "cy Household bills",
         "loanPayments": "cy Loan payments",
@@ -65,12 +57,10 @@
       }
     },
     "otherConsiderations": {
-      "label": "cy Is there anything else you want to tell the court?",
-      "changeHidden": "cy Is there anything else you want to tell the court?"
+      "label": "cy Is there anything else you want to tell the court?"
     },
     "otherConsiderationsDetails": {
-      "label": "cy Give details about what else you want to tell the court",
-      "changeHidden": "cy Give details about what else you want to tell the court"
+      "label": "cy Give details about what else you want to tell the court"
     }
   }
 }

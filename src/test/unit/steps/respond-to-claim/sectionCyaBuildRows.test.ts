@@ -84,7 +84,6 @@ describe('section-CYA row builders — characterisation', () => {
       expect(contactDetailsRow?.actions?.items[0].href).toContain(
         '/contact-preferences-telephone?edit=personalDetails'
       );
-      expect(contactDetailsRow?.actions?.items[0].visuallyHiddenText).toBe('rows.contactDetails.changeHidden');
     });
 
     it('contact-by-email: preference row stands alone; email lives in the Contact details row', () => {

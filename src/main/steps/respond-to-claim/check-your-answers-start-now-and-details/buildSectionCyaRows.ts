@@ -19,7 +19,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
       key: { text: t('rows.freeLegalAdvice.label') },
       value: { text: t(`rows.freeLegalAdvice.options.${value}`) },
       actions: {
-        items: [change('free-legal-advice', 'rows.freeLegalAdvice.changeHidden')],
+        items: [change('free-legal-advice')],
       },
     });
   }
