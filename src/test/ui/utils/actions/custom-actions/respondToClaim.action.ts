@@ -184,7 +184,7 @@ export class RespondToClaimAction implements IAction {
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
-      ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page)],
+      ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page, fieldName as actionData)],
       ['validateCYARTC', () => this.validateCYARTC()],
       ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
       ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
@@ -1167,7 +1167,8 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   }
 
-  private async retrieveCYATableDataRTC(page: Page): Promise<void> {
+  private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
+    const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
     rtcCyaMap.clear();
     const tables = page.locator('//dl');
     const tableCount = await tables.count();
@@ -1200,6 +1201,8 @@ export class RespondToClaimAction implements IAction {
         }
       }
     }
+
+    console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);
   }
 
   private async validateCYARTC(): Promise<void> {
