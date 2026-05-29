@@ -75,10 +75,10 @@ describe('requireEventAccess', () => {
       const mockCase = { id: validCaseRef, data: {} };
       mockGetCaseByIdForEvent.mockResolvedValue(mockCase);
 
-      const middleware = requireEventAccess('citizenCreateGenApp');
+      const middleware = requireEventAccess('makeAnApplication');
       await middleware(mockReq as Request, mockRes as Response, next);
 
-      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, 'citizenCreateGenApp');
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, 'makeAnApplication');
     });
   });
 
