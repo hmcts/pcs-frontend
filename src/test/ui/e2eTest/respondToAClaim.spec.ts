@@ -408,7 +408,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @regression @PR', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
@@ -869,7 +869,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - SelectCounterClaim - Yes @secureFlexible', async () => {
     //Counterclaim - both - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
