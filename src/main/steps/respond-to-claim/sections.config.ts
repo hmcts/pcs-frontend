@@ -54,6 +54,7 @@ export const respondToClaimSections: SectionConfig[] = [
       'counter-claim-specific-sum',
       'counter-claim-fee',
       'counter-claim-have-you-applied-for-help',
+      'counter-claim-you-need-to-apply-for-help-with-your-fees',
       'counter-claim-against-whom',
       'counter-claim-about',
       'counter-claim-order-other-than-sum',
@@ -101,11 +102,17 @@ export const respondToClaimSections: SectionConfig[] = [
   {
     id: 'uploadFiles',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document', 'support-needs'],
+    steps: ['upload-document'],
   },
   {
     id: 'checkYourAnswersAndSubmit',
     titleKey: 'taskList.checkYourAnswersAndSubmit',
-    steps: ['equality-and-diversity-start', 'equality-and-diversity-end', 'language-used', 'check-your-answers'],
+    steps: [
+      'reasonable-adjustments-triage',
+      'equality-and-diversity-start',
+      'equality-and-diversity-end',
+      'language-used',
+      'check-your-answers',
+    ],
   },
 ];
