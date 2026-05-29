@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Your Possession Claims account",
+  "heading": "Your Possession Claims account",
+  "accessYourCase": "If a claim you want to view is not listed below, you must first <a href=\"/access-your-case\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">provide some details to access it (opens in new tab)</a>.",
+  "claimsMadeAgainstYou": "Claims made against you",
+  "table": {
+    "claimNumber": "Claim number",
+    "claimantsName": "Claimant's name",
+    "propertyPostcode": "Property postcode",
+    "actions": "Actions",
+    "viewClaim": "View claim"
+  },
+  "noClaimsFound": "There are no claims against you."
+}

@@ -22,10 +22,16 @@ export default function claimSummaryRoutes(app: Application): void {
 
     try {
       const claimsAgainst = await getCitizenClaims(accessToken);
-      return res.render('claim-summary', { claimsAgainst, t });
+      const tableRows = claimsAgainst.map(claim => [
+        { text: claim.caseRef },
+        { text: claim.claimantName },
+        { text: claim.propertyPostcode },
+        { html: `<a href="/dashboard/${claim.caseRef}" class="govuk-link">${t('claimSummary:table.viewClaim')}</a>` },
+      ]);
+      return res.render('claim-summary', { tableRows, t });
     } catch (error) {
       logger.error('Failed to fetch citizen claims', error);
-      return res.render('claim-summary', { claimsAgainst: [], t });
+      return res.render('claim-summary', { tableRows: [], t });
     }
   });
 }
