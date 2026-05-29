@@ -79,11 +79,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const t = getTranslationFunction(req);
 
-    const introParagraph = getTranslation(t, 'introParagraph', '',{ caseReference }) ?? '';
+    const introParagraph = getTranslation(t, 'introParagraph', '', { caseReference }) ?? '';
     const includesHeading = getTranslation(t, 'includesHeading', '') ?? '';
     const includesBullet1 = getTranslation(t, 'includesBullet1', '', { claimantName }) ?? '';
     const includesBullet2 = getTranslation(t, 'includesBullet2', '', { claimantName }) ?? '';
-    const includesBullet3= getTranslation(t, 'includesBullet3', '', { claimantName }) ?? '';
+    const includesBullet3 = getTranslation(t, 'includesBullet3', '', { claimantName }) ?? '';
 
     // Pre-translate content with interpolation (following rent-arrears pattern)
     return {
