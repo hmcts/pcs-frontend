@@ -44,10 +44,13 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
-    await softErrorMessageValidation('confirmIfTheseDocumentsRelateToAnApplication', confirmDocumentsRelateToApplicationErrorValidation);
+    await softErrorMessageValidation(
+      'confirmIfTheseDocumentsRelateToAnApplication',
+      confirmDocumentsRelateToApplicationErrorValidation
+    );
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
-      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden
+      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden,
     });
   });
 
@@ -94,22 +97,29 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiDataSetAside.citizenCreateGenAppPayload });
+    await performAction('citizenCreateGenAppAPI', {
+      data: citizenCreateGenAppApiDataSetAside.citizenCreateGenAppPayload,
+    });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
-    await softErrorMessageValidation('confirmIfTheseDocumentsRelateToAnApplication', confirmDocumentsRelateToApplicationErrorValidation);
+    await softErrorMessageValidation(
+      'confirmIfTheseDocumentsRelateToAnApplication',
+      confirmDocumentsRelateToApplicationErrorValidation
+    );
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
-      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden
+      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden,
     });
     await performValidation('mainHeader', startEvidenceUpload.mainHeader);
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiDataSomethingElse.citizenCreateGenAppPayload });
+    await performAction('citizenCreateGenAppAPI', {
+      data: citizenCreateGenAppApiDataSomethingElse.citizenCreateGenAppPayload,
+    });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       previousApplicationOption: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden,
-      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToApplicationRadioOptionHidden
+      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToApplicationRadioOptionHidden,
     });
     await performValidation('mainHeader', startEvidenceUpload.mainHeader);
   });
