@@ -157,7 +157,7 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', doYouHaveASolicitor.saveAndContinueButton);
   }
 
-  private async askYourSolicitorToRespond(askYourSolicitorData: actionData) {
+  private async askYourSolicitorToRespond(_askYourSolicitorData: actionData) {
     await performAction('clickButton', {
       question: askYourSolicitorToRespond.mainHeader,
       button: askYourSolicitorToRespond.closeAndReturnToTaskListButton,
