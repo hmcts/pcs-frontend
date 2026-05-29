@@ -10,6 +10,10 @@
       "label": "Name",
       "changeHidden": "Name"
     },
+    "defendantNameCapture": {
+      "label": "What’s your name?",
+      "changeHidden": "What’s your name?"
+    },
     "dateOfBirth": {
       "label": "What’s your date of birth?",
       "changeHidden": "What’s your date of birth?"

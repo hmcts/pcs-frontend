@@ -67,14 +67,17 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
     return;
   }
   // Branch 2: name captured via defendant-name-capture (shown when nameKnown !== 'YES').
+  // The row stands alone with no confirmation question above it, so it mirrors the
+  // capture page's own question ("What's your name?") rather than the bare "Name" noun
+  // label used for the corrected-name row in branch 1.
   const partyName = validatedCase.defendantContactDetailsPartyName?.trim();
   if (!partyName) {
     return;
   }
   rows.push({
-    key: { text: t('rows.defendantName.label') },
+    key: { text: t('rows.defendantNameCapture.label') },
     value: { html: escapeHtml(partyName) },
-    actions: { items: [change('defendant-name-capture', 'rows.defendantName.changeHidden')] },
+    actions: { items: [change('defendant-name-capture', 'rows.defendantNameCapture.changeHidden')] },
   });
 }
 
