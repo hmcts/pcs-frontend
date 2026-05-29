@@ -258,7 +258,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
-
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
