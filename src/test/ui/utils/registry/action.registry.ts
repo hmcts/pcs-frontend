@@ -107,6 +107,8 @@ export class ActionRegistry {
     ['resetRTCAnswerStore', new RespondToClaimAction()],
     ['retrieveCYATableDataRTC', new RespondToClaimAction()],
     ['validateCYARTC', new RespondToClaimAction()],
+    ['changeAnswerOnFinalCYA', new RespondToClaimAction()],
+    ['selectStatementOfTruthRTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line

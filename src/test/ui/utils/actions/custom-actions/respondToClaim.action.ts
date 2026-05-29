@@ -4,6 +4,7 @@ import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
   accessYourCase,
+  checkYourAnswersRTC,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -186,6 +187,8 @@ export class RespondToClaimAction implements IAction {
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
       ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page)],
       ['validateCYARTC', () => this.validateCYARTC()],
+      ['changeAnswerOnFinalCYA', () => this.changeAnswerOnFinalCYA(page, fieldName as actionData)],
+      ['selectStatementOfTruthRTC', () => this.selectStatementOfTruthRTC(fieldName as actionRecord)],
       ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
       ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
       ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
@@ -1101,6 +1104,51 @@ export class RespondToClaimAction implements IAction {
       option: languageScreenData.radioOption,
     });
     await performAction('clickButton', languageUsed.saveAndContinueButton);
+  }
+
+  private async selectStatementOfTruthRTC(sot: actionRecord): Promise<void> {
+    await performValidation('mainHeader', checkYourAnswersRTC.mainHeader);
+    await performValidation('text', { elementType: 'subHeader', text: checkYourAnswersRTC.statementOfTruthHeader });
+    await performValidation('text', { elementType: 'paragraph', text: checkYourAnswersRTC.statementOfTruthParagraph });
+    await performValidation('elementToBeVisible', checkYourAnswersRTC.contemptOfCourtCheckboxLabel);
+    const options = Array.isArray(sot.options) ? sot.options : [sot.option];
+    for (const option of options) {
+      await performAction('check', {
+        question: sot.question,
+        option,
+      });
+    }
+    await performAction('inputText', checkYourAnswersRTC.yourFullNameTextLabel, sot.input);
+    await performAction('clickButton', checkYourAnswersRTC.submitButton);
+  }
+
+  private async changeAnswerOnFinalCYA(page: Page, question: actionData): Promise<void> {
+    await performValidation('mainHeader', checkYourAnswersRTC.mainHeader);
+    const questionText = String(question);
+    const rows = page.locator('.govuk-summary-list__row');
+    const rowCount = await rows.count();
+
+    for (let i = 0; i < rowCount; i++) {
+      const row = rows.nth(i);
+      if (!(await row.isVisible())) {
+        continue;
+      }
+      const keyText = (await row.locator('dt.govuk-summary-list__key').first().innerText()).trim();
+      if (keyText !== questionText) {
+        continue;
+      }
+
+      const changeLink = row.getByRole('link', { name: 'Change' });
+      const href = await changeLink.getAttribute('href');
+      if (!href) {
+        throw new Error(`Missing Change link href for RTC final CYA question "${questionText}"`);
+      }
+
+      await Promise.all([page.waitForURL(new RegExp(href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))), changeLink.click()]);
+      return;
+    }
+
+    throw new Error(`RTC final CYA question "${questionText}" was not found`);
   }
 
   private async otherConsiderations(otherConsiderationsData: actionRecord): Promise<void> {
