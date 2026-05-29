@@ -169,6 +169,7 @@ export class RespondToClaimAction implements IAction {
         'selectIfAnyOtherAdultsLiveInYourHouse',
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
       ],
+      ['taskList', () => this.taskList(fieldName as actionRecord)],
       ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
       ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
@@ -587,13 +588,31 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectWhatRegularIncomeDoYouReceive(regularIncome?: actionRecord): Promise<void> {
+    const regularIncomeQuestionLabel = 'What regular income do you receive?';
+    const jobsIncomeRowLabel = 'Income from all jobs you do';
+    const pensionIncomeRowLabel = 'Pension - state and private';
+    const universalCreditIncomeRowLabel = 'Universal Credit';
+    const otherBenefitsIncomeRowLabel = 'Other benefits and credits';
+    const otherIncomeRowLabel =
+      'Money from somewhere else (for example, child maintenance payments or someone in your household gives you money)';
+
+    const clearRegularIncomeAnswers = (): void => {
+      this.deleteAnswer(jobsIncomeRowLabel);
+      this.deleteAnswer(pensionIncomeRowLabel);
+      this.deleteAnswer(universalCreditIncomeRowLabel);
+      this.deleteAnswer(otherBenefitsIncomeRowLabel);
+      this.deleteAnswer(otherIncomeRowLabel);
+      this.deleteAnswer(regularIncomeQuestionLabel);
+    };
+
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
-      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader));
+      clearRegularIncomeAnswers();
+      this.recordAnswer(regularIncomeQuestionLabel, 'No answer provided');
       await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
       return;
     }
 
-    const selectedRegularIncomeValues: string[] = [];
+    clearRegularIncomeAnswers();
 
     for (const income of regularIncome.regularIncomeOptions) {
       const [option, value, frequency] = income;
@@ -609,7 +628,7 @@ export class RespondToClaimAction implements IAction {
           whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
           value
         );
-        selectedRegularIncomeValues.push(`${this.getRtcCyaChoiceLabel(option)}: ${String(value)}`);
+        this.recordAnswer(otherIncomeRowLabel, value);
         continue;
       }
 
@@ -620,18 +639,22 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
       await performAction('clickRadioButton', frequency);
 
-      selectedRegularIncomeValues.push(
-        `${this.getRtcCyaChoiceLabel(option)} ${this.buildRtcCyaAmountAndFrequencyValue(value, frequency, 'received every')}`
-      );
+      const mappedCyaLabel =
+        option === whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph
+          ? jobsIncomeRowLabel
+          : option === whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph
+            ? pensionIncomeRowLabel
+            : option === whatRegularIncomeDoYouReceive.universalCreditParagraph
+              ? universalCreditIncomeRowLabel
+              : otherBenefitsIncomeRowLabel;
+
+      this.recordAnswer(mappedCyaLabel, this.buildRtcCyaAmountAndFrequencyValue(value, frequency, 'received every'));
     }
 
-    if (selectedRegularIncomeValues.length > 0) {
-      this.recordAnswer(
-        this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader),
-        selectedRegularIncomeValues.join(', ')
-      );
+    if (regularIncome.regularIncomeOptions.length === 0) {
+      this.recordAnswer(regularIncomeQuestionLabel, 'No answer provided');
     } else {
-      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader));
+      this.deleteAnswer(regularIncomeQuestionLabel);
     }
 
     await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
@@ -1057,13 +1080,34 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
   }
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
+    const regularExpensesQuestionLabel = this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader);
+    const expenseRowLabels = new Map<string, string>([
+      [whatOtherRegularExpensesDoYouHave.householdBillsParagraph, 'Household bills'],
+      [whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph, 'Loan payments'],
+      [whatOtherRegularExpensesDoYouHave.childSpousalMaintenanceParagraph, 'Child or spousal maintenance'],
+      [whatOtherRegularExpensesDoYouHave.mobilePhoneParagraph, 'Mobile phone'],
+      [whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph, 'Grocery shopping'],
+      [whatOtherRegularExpensesDoYouHave.fuelParkingTransportParagraph, 'Fuel, parking and transport'],
+      [whatOtherRegularExpensesDoYouHave.schoolCostsParagraph, 'School costs'],
+      [whatOtherRegularExpensesDoYouHave.clothingParagraph, 'Clothing'],
+      [whatOtherRegularExpensesDoYouHave.otherExpensesParagraph, 'Other expenses'],
+    ]);
+
+    const clearRegularExpenseAnswers = (): void => {
+      this.deleteAnswer(regularExpensesQuestionLabel);
+      for (const expenseLabel of Array.from(expenseRowLabels.values())) {
+        this.deleteAnswer(expenseLabel);
+      }
+    };
+
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
-      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader));
+      clearRegularExpenseAnswers();
+      this.recordAnswer(regularExpensesQuestionLabel, 'No answer provided');
       await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
       return;
     }
 
-    const selectedRegularExpenseValues: string[] = [];
+    clearRegularExpenseAnswers();
 
     for (const income of regularIncome.regularIncomeOptions) {
       const [option, value, frequency] = income;
@@ -1080,18 +1124,12 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
       await performAction('clickRadioButton', frequency);
 
-      selectedRegularExpenseValues.push(
-        `${this.getRtcCyaChoiceLabel(option)}: ${this.buildRtcCyaAmountAndFrequencyValue(value, frequency)}`
-      );
+      const mappedCyaLabel = expenseRowLabels.get(String(option)) ?? this.getRtcCyaChoiceLabel(option);
+      this.recordAnswer(mappedCyaLabel, this.buildRtcCyaAmountAndFrequencyValue(value, frequency));
     }
 
-    if (selectedRegularExpenseValues.length > 0) {
-      this.recordAnswer(
-        this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader),
-        selectedRegularExpenseValues.join(', ')
-      );
-    } else {
-      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader));
+    if (regularIncome.regularIncomeOptions.length === 0) {
+      this.recordAnswer(regularExpensesQuestionLabel, 'No answer provided');
     }
 
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
@@ -1215,6 +1253,15 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   }
 
+  private async taskList(taskListData: actionRecord): Promise<void> {
+    await performValidation('elementToBeVisible', taskListData.subSection);
+
+    const caseNumber = `${process.env.CASE_NUMBER?.replace(/(\d{4})(?=\d)/g, '$1 ').trim()}`;
+    await performValidation('text', { elementType: 'paragraph', text: 'Case number: ' + caseNumber });
+
+    await performAction('clickLink', taskListData.subSection);
+  }
+
   private async retrieveCYATableDataRTC(page: Page): Promise<void> {
     rtcCyaMap.clear();
     const tables = page.locator('//dl');
@@ -1255,11 +1302,12 @@ export class RespondToClaimAction implements IAction {
     const rtcValues = Array.from(rtcCyaMap.values());
 
     for (const [expectedKey, expectedValue] of Array.from(FieldsStore.getAll().entries())) {
+      const sectionName = this.getRtcSectionNameForKey(expectedKey);
       const actualValue = rtcCyaMap.get(expectedKey);
       if (actualValue !== undefined) {
         if (!this.areRtcCyaValuesEquivalent(String(expectedValue), actualValue)) {
           mismatches.push(
-            `key: "${expectedKey}" -> Expected value containing "${expectedValue}" | Actual: "${actualValue}"`
+            `[${sectionName}] key: "${expectedKey}" -> Expected value containing "${expectedValue}" | Actual: "${actualValue}"`
           );
         }
         continue;
@@ -1268,7 +1316,7 @@ export class RespondToClaimAction implements IAction {
       const matchedByValue = rtcValues.some(value => value.includes(String(expectedValue)));
       if (!matchedByValue) {
         mismatches.push(
-          `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but no matching CYA row was found`
+          `[${sectionName}] key: "${expectedKey}" -> Expected value containing "${expectedValue}" but no matching CYA row was found`
         );
       }
     }
@@ -1279,7 +1327,7 @@ export class RespondToClaimAction implements IAction {
         console.log('============================================================');
         console.log(`• ${mismatch}`);
       }
-      throw new Error(`RTC CYA validation failed for ${mismatches.length} item(s)`);
+      throw new Error(`RTC CYA validation failed for ${mismatches.length} item(s):\n${mismatches.join('\n')}`);
     }
 
     console.log('\n✅ RTC CHECK YOUR ANSWERS VALIDATION PASSED!\n');
@@ -1318,6 +1366,15 @@ export class RespondToClaimAction implements IAction {
     if (mismatches.length > 0) {
       throw new Error(`RTC ${sectionName} section CYA validation failed:\n${mismatches.join('\n')}`);
     }
+  }
+
+  private getRtcSectionNameForKey(expectedKey: string): string {
+    for (const [sectionName, sectionAnswers] of Array.from(rtcSectionAnswers.entries())) {
+      if (sectionAnswers.has(expectedKey)) {
+        return sectionName;
+      }
+    }
+    return 'unknownSection';
   }
 
   private async accessYourCase(accessCode: actionRecord): Promise<void> {

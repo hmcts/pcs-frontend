@@ -19,6 +19,7 @@ import {
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
+  disputeClaimInterstitial,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
@@ -39,12 +40,13 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
+  taskList,
   tenancyDateDetails,
   tenancyTypeDetails,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  yourCircumstances,
+  yourCircumstances, yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
@@ -254,6 +256,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performValidation('mainHeader', defendantNameCapture.mainHeader);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -281,6 +285,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
@@ -326,6 +331,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -353,6 +360,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -397,10 +406,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    //await performValidation('mainHeader', taskList.mainHeader);
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
