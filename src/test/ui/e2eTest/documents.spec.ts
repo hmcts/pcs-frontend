@@ -39,7 +39,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload,});
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
     await softErrorMessageValidation(
@@ -96,7 +96,9 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
     // SET_ASIDE
-    await performAction('citizenCreateGenAppAPI', {data: citizenCreateGenAppApiData('SET_ASIDE').citizenCreateGenAppPayload,});
+    await performAction('citizenCreateGenAppAPI', {
+      data: citizenCreateGenAppApiData('SET_ASIDE').citizenCreateGenAppPayload,
+    });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
     await softErrorMessageValidation(
@@ -109,7 +111,9 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', startEvidenceUpload.mainHeader);
     // SOMETHING_ELSE + default YES
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,});
+    await performAction('citizenCreateGenAppAPI', {
+      data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
+    });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
     await performAction('verifyDocumentRelatesToApplication', {

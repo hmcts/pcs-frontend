@@ -3,24 +3,15 @@ const randomString = (length: number): string =>
     .toString(36)
     .substring(2, 2 + length);
 
-type ApplicationType =
-  | 'ADJOURN'
-  | 'SET_ASIDE'
-  | 'SOMETHING_ELSE';
+type ApplicationType = 'ADJOURN' | 'SET_ASIDE' | 'SOMETHING_ELSE';
 
 type YesNo = 'YES' | 'NO';
 
-export const citizenCreateGenAppApiData = (
-  applicationType: ApplicationType = 'ADJOURN'
-) => {
-  const withoutNotice: YesNo =
-    applicationType === 'SOMETHING_ELSE'
-      ? 'NO'
-      : 'YES';
+export const citizenCreateGenAppApiData = (applicationType: ApplicationType = 'ADJOURN') => {
+  const withoutNotice: YesNo = applicationType === 'SOMETHING_ELSE' ? 'NO' : 'YES';
 
   return {
-    citizenCreateGenAppEventName:
-      'makeAnApplication',
+    citizenCreateGenAppEventName: 'makeAnApplication',
 
     citizenCreateGenAppPayload: {
       citizenGenAppRequest: {
@@ -37,12 +28,10 @@ export const citizenCreateGenAppApiData = (
 
         withoutNotice,
 
-        withoutNoticeReason:
-          'This is the reason for not sharing with the other parties.',
+        withoutNoticeReason: 'This is the reason for not sharing with the other parties.',
 
         languageUsed: 'ENGLISH',
-        whatOrderWanted:
-          'This is the order that is wanted.',
+        whatOrderWanted: 'This is the order that is wanted.',
         sotAccepted: 'YES',
         sotFullName: 'Thomas Tester',
         hasSupportingDocuments: 'YES',
@@ -50,7 +39,6 @@ export const citizenCreateGenAppApiData = (
       },
     },
 
-    citizenCreateGenAppApiEndPoint: (): string =>
-      `/cases/${process.env.CASE_NUMBER}/events`,
+    citizenCreateGenAppApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
   };
 };

@@ -24,19 +24,17 @@ export class CitizenCreateGenAppAPIAction implements IAction {
     ).data.token;
     const citizenCreateGenAppPayloadData =
       typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
-       // create config instance (defaults to ADJOURN if nothing passed)
+    // create config instance (defaults to ADJOURN if nothing passed)
 
-  const genAppApiConfig =citizenCreateGenAppApiData();
+    const genAppApiConfig = citizenCreateGenAppApiData();
 
-  try {
-    await citizenCreateGenAppApi.post(genAppApiConfig.citizenCreateGenAppApiEndPoint(),{
+    try {
+      await citizenCreateGenAppApi.post(genAppApiConfig.citizenCreateGenAppApiEndPoint(), {
         data: citizenCreateGenAppPayloadData,
-        event: { id: genAppApiConfig.citizenCreateGenAppEventName},
+        event: { id: genAppApiConfig.citizenCreateGenAppEventName },
         event_token: GENAPP_EVENT_TOKEN,
-      }
-    );
-  }
-   catch (error: unknown) {
+      });
+    } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 404) {
