@@ -49,7 +49,6 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden
     });
-    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
   });
 
   test('Upload documents when GenApps not submitted @regression', async () => {
@@ -103,12 +102,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden
     });
-    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
-
-    await performAction(
-      'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
-    );
+    await performValidation('mainHeader', startEvidenceUpload.mainHeader);
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiDataSomethingElse.citizenCreateGenAppPayload });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
@@ -117,7 +111,6 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       previousApplicationOption: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToApplicationRadioOptionHidden
     });
-    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
-
+    await performValidation('mainHeader', startEvidenceUpload.mainHeader);
   });
 });

@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 import { confirmIfTheseDocumentsRelateToAnApplication } from '../../../data/page-data/documents-page-data/confirmIfTheseDocumentsRelateToAnApplication.page.data';
+import { uploadYourDocuments } from '../../../data/page-data/documents-page-data/uploadYourDocuments.page.data';
 
 export class DocumentsAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionRecord): Promise<void> {
@@ -34,6 +35,7 @@ export class DocumentsAction implements IAction {
       }
     }
   }
+
   private async verifyDocumentRelatesToApplication(page: Page, confirmDocumentData: actionRecord) {
     await performValidation('text', { elementType: 'paragraph', text: confirmIfTheseDocumentsRelateToAnApplication.weUsuallyParagraph });
     await performValidation('text', { elementType: 'paragraph', text: confirmIfTheseDocumentsRelateToAnApplication.ifYourApplicationParagraph });
@@ -44,45 +46,57 @@ export class DocumentsAction implements IAction {
       year: 'numeric',
     }).format(new Date()).replace(',', '');
 
-     // 1st option (main)
-  const selectOption = confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noRadioOption
-    ? confirmDocumentData.option
-    : `${confirmDocumentData.option} ${formattedDate}`;
+    const expectedOptions: string[] = [];
+    // 1st radio -> option
+    const optionText = `${confirmDocumentData.option} ${formattedDate}`;
+    expectedOptions.push(optionText);
 
-  // 2nd option (previous application)
-  const previousOption = confirmDocumentData.previousApplicationOption
-    ? `${confirmDocumentData.previousApplicationOption} ${formattedDate}`
-    : undefined;
+    // 2nd radio -> previousApplicationOption (if passed)
+    if (confirmDocumentData.previousApplicationOption) {
+      expectedOptions.push(`${confirmDocumentData.previousApplicationOption} ${formattedDate}`);
+    }
 
-  // last option (always no option)
-  const noOption = confirmIfTheseDocumentsRelateToAnApplication.noRadioOption;
+    // 3rd radio -> noOption (always visible)
+    expectedOptions.push(confirmIfTheseDocumentsRelateToAnApplication.noRadioOption);
 
-  // Build expected order
-  const expectedOptions: string[] = [selectOption];
+    console.log('Expected radio order:', expectedOptions);
 
-  if (previousOption) expectedOptions.push(previousOption);
+    // Verify UI order
+    const radioLabels = page.locator('.govuk-radios__label');
+    for (let i = 0; i < expectedOptions.length; i++) {
+      const actualText =
+        ((await radioLabels.nth(i).textContent()) ?? '')
+          .replace(/\s+/g, ' ')
+          .trim();
 
-  expectedOptions.push(noOption);
+      const expectedText =
+        expectedOptions[i]
+          .replace(/\s+/g, ' ')
+          .trim();
 
-  // ✅ VERIFY ORDER ON UI
-  await performValidation('optionList', {
-    fieldName: confirmDocumentData.question,
-    options: expectedOptions,
-  });
+      console.log(`Radio ${i}:`, actualText);
+      console.log(`Expected ${i}:`, expectedText);
 
-    /*
-    
+      if (!actualText.includes(expectedText)) {
+        throw new Error(
+          `Radio order mismatch at index ${i}.
+Expected: "${expectedText}"
+Actual: "${actualText}"`
+        );
+      }
+    }
+
     const selectOption = confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noRadioOption ? confirmDocumentData.option : `${confirmDocumentData.option} ${formattedDate}`;
-    
-// ✅ VERIFY option is visible on UI BEFORE clicking
 
-  await performValidation('elementToBeVisible', {elementType: 'radio', text: selectOption,});
-
+    // VERIFY option is visible on UI BEFORE clicking
+    await performValidation('elementToBeVisible', { elementType: 'radio', text: selectOption, });
     await performAction('clickRadioButton', {
       question: confirmDocumentData.question,
       option: selectOption,
     });
     await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
-    */
+    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+    await page.getByRole('link', { name: 'Back', exact: true }).click();
+    await page.getByRole('link', { name: 'Back', exact: true }).click();
   }
 }

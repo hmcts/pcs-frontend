@@ -12,7 +12,7 @@ export const citizenCreateGenAppApiDataSomethingElse = {
       appliedForHwf: 'YES',
       hwfReference: 'HWF-123-456',
       otherPartiesAgreed: 'NO',
-      withoutNotice: 'YES',
+      withoutNotice: 'NO',
       withoutNoticeReason: 'This is the reason for not sharing with the other parties.',
       languageUsed: 'ENGLISH',
       whatOrderWanted: 'This is the order that is wanted.',
