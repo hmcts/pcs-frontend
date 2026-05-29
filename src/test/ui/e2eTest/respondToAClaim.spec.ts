@@ -230,7 +230,7 @@ test.afterEach(async () => {
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt, < 2 named parties - CounterClaimAppliedForHelp - Yes - about your counterclaim
   //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
-  test('Respond to a claim - SelectCounterClaim - Yes @noDefendants @crossbrowser', async () => {
+  test('Respond to a claim - SelectCounterClaim - Yes @noDefendants @crossbrowser @PR', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
@@ -1098,7 +1098,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @regression', async () => {
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @regression @PR', async () => {
     //universal credit with all other options - priority debts - No - Multiple namedParties - sumOfMoney - iNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('clickButton', 'Save and continue');
@@ -1744,7 +1744,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - @multiParty', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - @multiParty @PR', async () => {
     // Multiparty - Unknown defendant details - somethingElse - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', 'Save and continue');
