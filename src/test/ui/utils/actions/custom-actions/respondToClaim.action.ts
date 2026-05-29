@@ -23,9 +23,9 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   doAnyOtherAdultsLiveInYourHome,
+  doYouHaveASolicitor,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
-  doYouHaveASolicitor,
   exceptionalHardship,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
@@ -163,7 +163,7 @@ export class RespondToClaimAction implements IAction {
       button: askYourSolicitorToRespond.closeAndReturnToTaskListButton,
     });
   }
-  
+
   private async inputDefendantDetails(defendantData: actionRecord) {
     const selectedPinUser = getSelectedPinUser();
     const firstNameValue = defendantData.fName ?? selectedPinUser?.firstName;
