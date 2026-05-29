@@ -1,7 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 
 {% from "govuk/components/task-list/macro.njk" import govukTaskList %}
-{% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% block pageTitle %}{{ t('pageTitle') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
@@ -52,12 +51,7 @@
           {% endfor %}
         </ul>
 
-        {{ govukDetails({
-          summaryText: t('contactUsForHelp'),
-          html: '<p class="govuk-body">' + t('contactUsDetailsTelephoneHeading') + ': ' + t('contactUsDetailsTelephoneNumber') + '</p>' +
-                '<p class="govuk-body">' + t('contactUsDetailsTelephoneHours') + '</p>' +
-                '<p class="govuk-body"><a class="govuk-link" href="https://www.gov.uk/call-charges" target="_blank" rel="noopener noreferrer">' + t('contactUsDetailsCallChargesLinkText') + '<span class="govuk-visually-hidden"> (' + t('opensInNewTab') + ')</span></a></p>'
-        }) }}
+        {% include "components/contact-us-details.njk" %}
       </aside>
     </div>
   </div>
