@@ -131,12 +131,13 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
       yesNoNotSure,
       change
     );
-    if (normalizeYesNoValue(confirmation) !== 'NO' || !date) {
+    if (normalizeYesNoValue(confirmation) !== 'NO') {
       return;
     }
+    // Corrected date is optional - show "No answer provided" if they said No but left it blank.
     const detailRow: SummaryListRow = {
       key: { text: t('rows.tenancyStartDate.correctDate.label') },
-      value: { text: formatIsoDate(date) },
+      value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
       actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.correctDate.changeHidden')] },
     };
     groupQuestionAndDetail(questionRow, detailRow);
