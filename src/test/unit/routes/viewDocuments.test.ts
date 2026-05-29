@@ -3,19 +3,12 @@ import { PassThrough } from 'stream';
 import type { Application, Request, Response } from 'express';
 
 import viewDocumentsRoute from '@routes/viewDocuments';
-import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void>;
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
-}));
-
-jest.mock('../../../main/services/ccdCaseService', () => ({
-  ccdCaseService: {
-    getCaseById: jest.fn(),
-  },
 }));
 
 jest.mock('@services/cdamService', () => ({
@@ -35,12 +28,12 @@ describe('viewDocuments route', () => {
     jest.clearAllMocks();
   });
 
-  it('should register GET /case/:caseId/view-documents with oidc middleware', () => {
+  it('should register GET /case/:caseReference/view-documents with oidc middleware', () => {
     viewDocumentsRoute(app);
 
-    expect(app.get).toHaveBeenCalledWith('/case/:caseId/view-documents', expect.anything(), expect.anything());
+    expect(app.get).toHaveBeenCalledWith('/case/:caseReference/view-documents', expect.anything(), expect.anything());
     expect(app.get).toHaveBeenCalledWith(
-      '/case/:caseId/view-documents/:documentId',
+      '/case/:caseReference/view-documents/:documentId',
       expect.anything(),
       expect.anything()
     );
@@ -49,33 +42,34 @@ describe('viewDocuments route', () => {
   it('should render the view-documents template with extracted folders', async () => {
     viewDocumentsRoute(app);
 
-    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
-      id: '1777570813792018',
-      data: {
-        allDocuments: [
-          {
-            id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
-            value: {
-              document_filename: 'claim-form.pdf',
-              document_binary_url: 'http://doc-store/claim-form/binary',
-              upload_timestamp: '2026-06-24',
-              category_id: 'statementsOfCase',
-            },
-          },
-        ],
-      },
-    });
-
     const handler = (app.get as jest.Mock).mock.calls.find(
-      call => call[0] === '/case/:caseId/view-documents'
+      call => call[0] === '/case/:caseReference/view-documents'
     )?.[2] as RouteHandler;
     const res = {
+      locals: {
+        validatedCase: {
+          id: '1777570813792018',
+          data: {
+            allDocuments: [
+              {
+                id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+                value: {
+                  document_filename: 'claim-form.pdf',
+                  document_binary_url: 'http://doc-store/claim-form/binary',
+                  upload_timestamp: '2026-06-24',
+                  category_id: 'statementsOfCase',
+                },
+              },
+            ],
+          },
+        },
+      },
       render: jest.fn(),
     } as unknown as Response;
 
     await handler(
       {
-        params: { caseId: '1777570813792018' },
+        params: { caseReference: '1777570813792018' },
         language: 'en',
         session: { user: { accessToken: 'token' } },
         t: (key: string) =>
@@ -124,34 +118,34 @@ describe('viewDocuments route', () => {
       contentLength: '1234',
     });
 
-    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
-      id: '1777570813792018',
-      data: {
-        allDocuments: [
-          {
-            id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
-            value: {
-              document_filename: 'claim-form.pdf',
-              document_binary_url: 'http://dm-store/documents/abc-123/binary',
-            },
-          },
-        ],
-      },
-    });
-
     const handler = (app.get as jest.Mock).mock.calls.find(
-      call => call[0] === '/case/:caseId/view-documents/:documentId'
+      call => call[0] === '/case/:caseReference/view-documents/:documentId'
     )?.[2] as RouteHandler;
     const res = {
+      locals: {
+        validatedCase: {
+          id: '1777570813792018',
+          data: {
+            allDocuments: [
+              {
+                id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+                value: {
+                  document_filename: 'claim-form.pdf',
+                  document_binary_url: 'http://dm-store/documents/abc-123/binary',
+                },
+              },
+            ],
+          },
+        },
+      },
       setHeader: jest.fn(),
     } as unknown as Response;
-
     const next = jest.fn();
 
     await handler(
       {
         params: {
-          caseId: '1777570813792018',
+          caseReference: '1777570813792018',
           documentId: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
         },
         session: { user: { accessToken: 'token' } },
@@ -163,7 +157,10 @@ describe('viewDocuments route', () => {
     expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/abc-123/binary', 'token');
     expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
     expect(res.setHeader).toHaveBeenCalledWith('Content-Length', '1234');
-    expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', 'inline; filename="claim-form.pdf"');
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Content-Disposition',
+      'inline; filename="claim-form.pdf"; filename*=UTF-8\'\'claim-form.pdf'
+    );
     expect(pipeSpy).toHaveBeenCalledWith(res);
     expect(next).not.toHaveBeenCalled();
   });
@@ -172,7 +169,7 @@ describe('viewDocuments route', () => {
     viewDocumentsRoute(app);
 
     const handler = (app.get as jest.Mock).mock.calls.find(
-      call => call[0] === '/case/:caseId/view-documents/:documentId'
+      call => call[0] === '/case/:caseReference/view-documents/:documentId'
     )?.[2] as RouteHandler;
     const res = {
       locals: {
@@ -188,7 +185,7 @@ describe('viewDocuments route', () => {
     await handler(
       {
         params: {
-          caseId: '1777570813792018',
+          caseReference: '1777570813792018',
           documentId: 'not-a-uuid',
         },
         session: { user: { accessToken: 'token' } },
@@ -199,5 +196,136 @@ describe('viewDocuments route', () => {
 
     expect(getDocumentBinary).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Document not found', status: 404 }));
+  });
+
+  it('should return 404 when validated case is missing on view-documents page', async () => {
+    viewDocumentsRoute(app);
+    const handler = (app.get as jest.Mock).mock.calls.find(
+      call => call[0] === '/case/:caseReference/view-documents'
+    )?.[2] as RouteHandler;
+    const next = jest.fn();
+
+    await handler(
+      {
+        params: { caseReference: '1777570813792018' },
+        session: { user: { accessToken: 'token' } },
+      } as unknown as Request,
+      { locals: {}, render: jest.fn() } as unknown as Response,
+      next
+    );
+
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Invalid case reference format', status: 404 })
+    );
+  });
+
+  it('should return 401 when access token is missing', async () => {
+    viewDocumentsRoute(app);
+    const handler = (app.get as jest.Mock).mock.calls.find(
+      call => call[0] === '/case/:caseReference/view-documents'
+    )?.[2] as RouteHandler;
+    const next = jest.fn();
+
+    await handler(
+      {
+        params: { caseReference: '1777570813792018' },
+        session: {},
+      } as unknown as Request,
+      {
+        locals: { validatedCase: { id: '1777570813792018', data: {} } },
+        render: jest.fn(),
+      } as unknown as Response,
+      next
+    );
+
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Authentication required', status: 401 }));
+  });
+
+  it('should return 404 when document binary URL is missing', async () => {
+    viewDocumentsRoute(app);
+    const handler = (app.get as jest.Mock).mock.calls.find(
+      call => call[0] === '/case/:caseReference/view-documents/:documentId'
+    )?.[2] as RouteHandler;
+    const next = jest.fn();
+
+    await handler(
+      {
+        params: {
+          caseReference: '1777570813792018',
+          documentId: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+        },
+        session: { user: { accessToken: 'token' } },
+      } as unknown as Request,
+      {
+        locals: {
+          validatedCase: {
+            id: '1777570813792018',
+            data: {
+              allDocuments: [
+                {
+                  id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+                  value: { document_filename: 'claim-form.pdf', document_binary_url: '   ' },
+                },
+              ],
+            },
+          },
+        },
+        setHeader: jest.fn(),
+      } as unknown as Response,
+      next
+    );
+
+    expect(getDocumentBinary).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Document not found', status: 404 }));
+  });
+
+  it('should call next with 502 when stream emits error before headers sent', async () => {
+    viewDocumentsRoute(app);
+
+    const stream = new PassThrough();
+    (getDocumentBinary as jest.Mock).mockResolvedValue({
+      stream,
+      contentType: 'application/pdf',
+    });
+
+    const handler = (app.get as jest.Mock).mock.calls.find(
+      call => call[0] === '/case/:caseReference/view-documents/:documentId'
+    )?.[2] as RouteHandler;
+    const next = jest.fn();
+    const res = {
+      locals: {
+        validatedCase: {
+          id: '1777570813792018',
+          data: {
+            allDocuments: [
+              {
+                id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+                value: {
+                  document_filename: 'claim-form.pdf',
+                  document_binary_url: 'http://dm-store/documents/abc-123/binary',
+                },
+              },
+            ],
+          },
+        },
+      },
+      headersSent: false,
+      setHeader: jest.fn(),
+    } as unknown as Response;
+
+    await handler(
+      {
+        params: {
+          caseReference: '1777570813792018',
+          documentId: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+        },
+        session: { user: { accessToken: 'token' } },
+      } as unknown as Request,
+      res,
+      next
+    );
+
+    stream.emit('error', new Error('stream failed'));
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Failed to stream document', status: 502 }));
   });
 });

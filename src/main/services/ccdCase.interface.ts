@@ -124,7 +124,9 @@ export interface GenApp {
   party: Party;
   submittedOn: string;
   submissionDocument: DocumentWithId;
+  supportingDocuments: CcdCollectionItem<Document>[];
 }
+
 /** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
 export interface CcdClaimantOrganisation {
   value: string;
@@ -158,6 +160,22 @@ export interface CcdDefendantParty {
   addressSameAsProperty?: string;
   phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
+}
+
+/** Counter-claim data captured across the counterclaim journey screens. */
+export interface CcdCounterClaim {
+  needHelpWithFees?: YesNoValue;
+  appliedForHwf?: YesNoValue;
+  hwfReferenceNumber?: string;
+  claimType?: string;
+  isClaimAmountKnown?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
+  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
+  counterClaimFor?: string;
+  counterClaimReasons?: string;
+  otherOrderRequestDetails?: string;
+  otherOrderRequestFacts?: string;
 }
 
 /** CCD SDK Document type -- flat reference with URLs. */
@@ -202,9 +220,9 @@ export interface CcdDefendantResponses {
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
   disputeClaimDetails?: string;
+  counterClaim?: CcdCounterClaim;
   paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
-  counterClaim?: CcdCounterClaim;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
   defendantDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
@@ -214,15 +232,6 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
-}
-
-/** Counter-claim data captured across the counterclaim journey screens. */
-export interface CcdCounterClaim {
-  needHelpWithFees?: YesNoValue;
-  claimType?: string;
-  isClaimAmountKnown?: string;
-  claimAmount?: PenceAmount;
-  estimatedMaxClaimAmount?: PenceAmount;
 }
 
 export interface PossessionClaimResponse {

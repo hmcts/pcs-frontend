@@ -13,8 +13,11 @@ import { step as counterClaimAbout } from './counter-claim-about';
 import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
 import { step as counterClaimFee } from './counter-claim-fee';
 import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
+import { step as counterClaimOrderOtherThanSum } from './counter-claim-order-other-than-sum';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
+import { step as counterClaimUploadDocuments } from './counter-claim-upload-documents';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
+import { step as counterClaimYouNeedToApplyForHelpWithYourFees } from './counter-claim-you-need-to-apply-for-help-with-your-fees';
 import { step as yourCircumstances } from './current-circumstances';
 import { step as defendantDateOfBirth } from './defendant-date-of-birth';
 import { step as defendantNameCapture } from './defendant-name-capture';
@@ -38,6 +41,7 @@ import { step as otherConsiderations } from './other-considerations';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
+import { step as reasonableAdjustmentsTriage } from './reasonable-adjustments-triage';
 import { step as regularExpenses } from './regular-expenses';
 import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
@@ -45,7 +49,6 @@ import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as startNow } from './start-now';
-import { step as supportNeeds } from './support-needs';
 import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
@@ -79,14 +82,16 @@ export const stepRegistry = {
   'rent-arrears-dispute': rentArrearsDispute,
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'upload-document': uploadDocument,
-  'support-needs': supportNeeds,
   'counter-claim': counterClaim,
   'counter-claim-what-are-you-claiming-for': counterClaimWhatAreYouClaimingFor,
   'counter-claim-specific-sum': counterClaimSpecificSum,
   'counter-claim-fee': counterClaimFee,
-  'counter-claim-about': counterClaimAbout,
-  'counter-claim-against-whom': counterClaimAgainstWhom,
   'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
+  'counter-claim-you-need-to-apply-for-help-with-your-fees': counterClaimYouNeedToApplyForHelpWithYourFees,
+  'counter-claim-against-whom': counterClaimAgainstWhom,
+  'counter-claim-about': counterClaimAbout,
+  'counter-claim-order-other-than-sum': counterClaimOrderOtherThanSum,
+  'counter-claim-upload-documents': counterClaimUploadDocuments,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
@@ -107,6 +112,7 @@ export const stepRegistry = {
   'priority-debt-details': priorityDebtDetails,
   'what-other-regular-expenses-do-you-have': regularExpenses,
   'other-considerations': otherConsiderations,
+  'reasonable-adjustments-triage': reasonableAdjustmentsTriage,
   'equality-and-diversity-start': equalityAndDiversityStart,
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,

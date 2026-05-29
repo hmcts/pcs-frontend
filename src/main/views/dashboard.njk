@@ -42,6 +42,7 @@
               {% for notification in notifications %}
                 {{ govukNotificationBanner({
                   titleText: notification.title,
+                  titleId: 'dashboard-notification-' ~ loop.index,
                   html: '<p class="govuk-body">' + notification.body + '</p>'
                 }) }}
               {% endfor %}
