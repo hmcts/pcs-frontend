@@ -27,6 +27,14 @@ interface CustomSessionData extends SessionData {
     applicationId?: string;
     showDuplicateSubmissionPage?: boolean;
   };
+  payment?: {
+    caseReference?: string;
+    serviceRequestReference?: string;
+    paymentReference?: string;
+    successRedirectUrl?: string;
+    failureRedirectUrl?: string;
+    pendingRedirectUrl?: string;
+  };
   destroy(callback: (err?: Error) => void): void;
 }
 
