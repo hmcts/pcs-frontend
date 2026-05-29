@@ -7,6 +7,7 @@ import {
   VIEW_DOCUMENTS_ROUTE,
   VIEW_HEARING_DOCUMENTS_ROUTE,
   VIEW_ORDERS_AND_NOTICES_ROUTE,
+  VIEW_RESPONSE_ROUTE,
   VIEW_THE_CLAIM_ROUTE,
 } from '../constants/caseRoutes';
 
@@ -15,6 +16,7 @@ export const DASHBOARD_TASK_PATH_PATTERNS: Readonly<Record<string, string>> = {
   ViewDocuments: VIEW_DOCUMENTS_ROUTE,
   ViewClaim: VIEW_THE_CLAIM_ROUTE,
   RespondToClaim: RESPOND_TO_CLAIM_START_ROUTE,
+  ViewResponse: VIEW_RESPONSE_ROUTE,
   ViewHearingDocuments: VIEW_HEARING_DOCUMENTS_ROUTE,
   ViewOrdersAndNotices: VIEW_ORDERS_AND_NOTICES_ROUTE,
   ViewAllApplications: VIEW_ALL_APPLICATIONS_ROUTE,

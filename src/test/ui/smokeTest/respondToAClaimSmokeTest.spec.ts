@@ -18,9 +18,10 @@ test.beforeEach(async ({ page }, testInfo) => {
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
@@ -32,7 +33,7 @@ test.describe('Respond to a claim - smoke test @health', async () => {
 
   test('Respond to a claim E2E Journey @regression @crossbrowser @sanity', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    // Below steps will be unskipped once HDPI-5407 and HDPI-5350
+    // Below steps will be unskipped once HDPI-5407 and HDPI-5350 are done
     /*await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
