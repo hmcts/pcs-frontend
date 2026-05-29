@@ -114,7 +114,6 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('clickButton', defendantDateOfBirth.saveForLaterButton);
-
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
       'disputeClaimInterstitial',

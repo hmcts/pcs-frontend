@@ -60,13 +60,6 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
   }
 
-  //Page navigation for paymentInterstitial
-  if (testInfo.title.includes('SelectCounterClaim - Yes')) {
-    process.env.SELECT_COUNTER_CLAIM = 'YES';
-  } else {
-    process.env.SELECT_COUNTER_CLAIM = 'NO';
-  }
-
   submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
   claimantName = process.env.CLAIMANT_NAME;
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
@@ -94,19 +87,6 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.SOMETHING_ELSE = 'YES';
   } else {
     process.env.SOMETHING_ELSE = 'NO';
-  }
-
-  //paymentInterstitial back navigation
-  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
-    process.env.I_NEED_HELP = 'YES';
-  } else {
-    process.env.I_NEED_HELP = 'NO';
-  }
-
-  if (testInfo.title.includes('SelectCounterClaim - No')) {
-    process.env.SELECT_COUNTER_CLAIM = 'NO';
-  } else {
-    process.env.SELECT_COUNTER_CLAIM = 'YES';
   }
 
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);

@@ -363,7 +363,6 @@ export class RespondToClaimAction implements IAction {
       option: counterClaimOption.option,
     });
 
-    process.env.SELECT_COUNTER_CLAIM = String(counterClaimOption.option).toUpperCase();
     await performAction('clickButton', counterClaim.saveAndContinueButton);
   }
 

@@ -65,24 +65,11 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
 
-  //paymentInterstitial back navigation
-  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
-    process.env.I_NEED_HELP = 'YES';
-  } else {
-    process.env.I_NEED_HELP = 'NO';
-  }
-
   if (testInfo.title.includes('@rentNonRent')) {
     process.env.TENANCY_START_DATE_KNOWN = 'YES';
     process.env.RENT_NON_RENT = 'YES';
   } else {
     process.env.RENT_NON_RENT = 'NO';
-  }
-
-  if (testInfo.title.includes('SelectCounterClaim - No')) {
-    process.env.SELECT_COUNTER_CLAIM = 'NO';
-  } else {
-    process.env.SELECT_COUNTER_CLAIM = 'YES';
   }
 
   const isRentArrearsOnly =
@@ -165,13 +152,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   // Tenancy start date logic for noDefendantTest
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
-  }
-
-  //Page navigation for paymentInterstitial
-  if (testInfo.title.includes('SelectCounterClaim - Yes')) {
-    process.env.SELECT_COUNTER_CLAIM = 'YES';
-  } else {
-    process.env.SELECT_COUNTER_CLAIM = 'NO';
   }
 
   //other considrations back link navigation

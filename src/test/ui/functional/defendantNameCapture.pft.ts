@@ -1,4 +1,4 @@
-import { dashboard, defendantNameCapture, feedback, freeLegalAdvice } from '../data/page-data';
+import { defendantNameCapture, feedback, taskList } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(61);
@@ -52,14 +52,14 @@ export async function defendantNameCaptureNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: defendantNameCapture.pageSlug,
   });
-  await performValidation('pageNavigation', defendantNameCapture.backLink, freeLegalAdvice.mainHeader);
+  await performValidation('pageNavigation', defendantNameCapture.backLink, taskList.mainHeader);
   await defendantNameCaptureInputValuesPrePopulated();
 }
 
 export async function defendantNameCaptureInputValuesPrePopulated(): Promise<void> {
   await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantNameCapture.firstNameTextInput);
   await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantNameCapture.lastNameTextInput);
-  await performValidation('pageNavigation', freeLegalAdvice.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', defendantNameCapture.backLink, taskList.mainHeader);
   await performValidation(
     'inputTextValue',
     defendantNameCapture.firstNameTextLabel,
