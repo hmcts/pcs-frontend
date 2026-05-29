@@ -4,11 +4,13 @@
   "options": {
     "yes": "Yes",
     "no": "No",
-    "or": " ",
     "imNotSure": "Defendant is not sure"
   },
-  "noticeDateLabel": "When did the defendant receive notice from {{claimantName}} ? (Optional)",
+
+  "noticeDateLabel": "When did the defendant receive notice from {{claimantName}}? (Optional)",
+  "noticeDateHint": "For example, 16 4 2021",
   "errors": {
+    "possessionNoticeReceived": "Select if {{claimantName}} gave the defendant notice of their intention to begin possession proceedings",
     "date": {
       "day": "Day",
       "month": "Month",

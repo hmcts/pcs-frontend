@@ -1,12 +1,12 @@
 {
   "heading": "cyDependants and other adults",
   "dependantHeading": "cyDependant Children",
-  "dependantChildrenParagraph": "",
-  "dependantQuestion": "cyDoes the defendant have any dependant children?",
-  "dependantChildrenDetailsLabel": "cyGive details about their dependant children",
-  "dependantChildrenDetailsHint": "",
+  "dependentChildrenParagraph": "",
+  "dependentQuestion": "cyDoes the defendant have any dependant children?",
+  "dependentChildrenDetailsLabel": "cyGive details about their dependant children",
+  "dependentChildrenDetailsHint": "",
   "errors": {
-    "dependantChildren": "cySelect if they have any dependant children",
-    "dependantChildrenDetails": "cyGive details about their dependant children"
+    "dependentChildren": "cySelect if they have any dependant children",
+    "dependentChildrenDetails": "cyGive details about their dependant children"
   }
 }

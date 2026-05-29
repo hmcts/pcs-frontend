@@ -1,10 +1,16 @@
 {
-  "heading": "{{claimantName}}'s claim",
+  "heading": "{{claimantName}}s claim",
   "disputeOtherPartsQuestion": "Does the defendant dispute any other parts of the claim?",
   "disputeDetails": {
     "label": "Explain which parts of the claim the defendant disputes"
   },
+  "introParagraph": "",
+  "includesHeading": "",
+  "includesBullet1": "",
+  "includesBullet2": "",
+  "includesBullet3": "",
   "errors": {
+    "disputeOtherParts": "Select if the defendant wants to dispute any other parts of the claim",
     "disputeDetails": {
       "required": "Enter the parts of the claim the defendant does not agree with"
     }

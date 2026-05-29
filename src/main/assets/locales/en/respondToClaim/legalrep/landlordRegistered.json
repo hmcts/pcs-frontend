@@ -4,7 +4,6 @@
   "introText": "You can check if the landlord is registered by searching the",
   "question": "Is the landlord registered?",
   "options": {
-    "or": " ",
     "imNotSure": "Defendant is not sure"
   },
   "errors": {

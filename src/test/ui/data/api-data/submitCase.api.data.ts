@@ -170,8 +170,8 @@ export const submitCaseApiData = {
       ],
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'Test',
-        positionClaimant: 'Leah',
+        fullNameParty: 'Test',
+        positionParty: 'Leah',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -245,8 +245,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'Test',
-        positionClaimant: 'Leah',
+        fullNameParty: 'Test',
+        positionParty: 'Leah',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -369,8 +369,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -422,10 +422,30 @@ export const submitCaseApiData = {
       isCorrectClaimantContactAddress: 'YES',
       claimantProvidePhoneNumber: 'NO',
       defendant1: {
-        nameKnown: 'NO',
+        nameKnown: 'YES',
+        firstName: 'Test',
+        lastName: 'John',
         addressKnown: 'NO',
       },
-      addAnotherDefendant: 'NO',
+      addAnotherDefendant: 'YES',
+      additionalDefendants: [
+        {
+          value: {
+            nameKnown: 'YES',
+            firstName: 'Jeremiah',
+            lastName: 'Fisher',
+            addressKnown: 'NO',
+          },
+        },
+        {
+          value: {
+            nameKnown: 'YES',
+            firstName: 'Conrad',
+            lastName: 'Fisher',
+            addressKnown: 'NO',
+          },
+        },
+      ],
       tenancy_TypeOfTenancyLicence: process.env.TENANCY_TYPE,
       tenancy_TenancyLicenceDate: null,
       tenancy_HasCopyOfTenancyLicence: 'NO',
@@ -544,8 +564,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -630,8 +650,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };
@@ -740,8 +760,8 @@ export const submitCaseApiData = {
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       statementOfTruth: {
         completedBy: 'CLAIMANT',
-        fullNameClaimant: 'fg',
-        positionClaimant: 'fg',
+        fullNameParty: 'fg',
+        positionParty: 'fg',
         agreementClaimant: ['BELIEVE_TRUE'],
       },
     };

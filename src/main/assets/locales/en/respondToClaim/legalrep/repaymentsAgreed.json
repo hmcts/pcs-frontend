@@ -1,8 +1,8 @@
 {
   "heading": "Repayment agreement",
-  "question": "Has the defendant come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+  "question": "",
+  "repaymentsAgreedQuestion": "Has the defendant come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
   "options": {
-    "or": " ",
     "imNotSure": "Defendant is not sure"
   },
   "textAreaLabel": "Give details about how much they’ve agreed to pay and when",
