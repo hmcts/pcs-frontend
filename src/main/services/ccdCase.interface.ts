@@ -126,6 +126,7 @@ export interface GenApp {
   party: Party;
   submittedOn: string;
   submissionDocument: DocumentWithId;
+  supportingDocuments: CcdCollectionItem<Document>[];
 }
 /** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
 export interface CcdClaimantOrganisation {
@@ -265,6 +266,7 @@ export interface CcdCaseData {
   introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
   secureGroundsWales_DiscretionaryGrounds?: string[];
   noticeServed?: string;
+  walesNoticeServed?: string;
   propertyAddress?: CcdCaseAddress;
   claimGroundSummaries?: CcdClaimGroundSummaryItem[];
   userPcqId?: string;

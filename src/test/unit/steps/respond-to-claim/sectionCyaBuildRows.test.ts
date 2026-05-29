@@ -273,7 +273,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(keys).toContain('rows.makeCounterClaim.label');
     });
 
-    it('tenancy-date row: "known" branch links to tenancy-date-details and uses the confirm label', () => {
+    it('tenancy-date row: "known" branch renders the confirmation row plus a grouped corrected-date row when answered No', () => {
       const rows = buildDisputeRows(
         reqWith(
           model(
@@ -283,8 +283,13 @@ describe('section-CYA row builders — characterisation', () => {
         ),
         t
       );
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelConfirm');
-      expect(row?.actions?.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
+      const confirmRow = rows.find(r => r.key.text === 'rows.tenancyStartDate.confirm.label');
+      const dateRow = rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label');
+      expect(confirmRow?.value).toEqual({ text: 'options.no' });
+      expect(confirmRow?.actions?.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
+      expect(confirmRow?.classes).toContain('govuk-summary-list__row--no-border');
+      expect(dateRow?.value).toEqual({ text: '1 January 2023' });
+      expect(dateRow?.actions?.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
     });
 
     it('tenancy-date row: "unknown" branch links to tenancy-date-unknown and uses the entered label', () => {
@@ -293,13 +298,35 @@ describe('section-CYA row builders — characterisation', () => {
       expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
     });
 
-    it('tenancy-date row: shows the confirmation answer when no date entered', () => {
+    it('tenancy-date row: shows only the confirmation answer (Yes) with no corrected-date row', () => {
       const rows = buildDisputeRows(
         reqWith(model({ tenancyStartDateConfirmation: 'YES' }, { tenancy_TenancyLicenceDate: '2023-01-01' })),
         t
       );
-      const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelConfirm');
-      expect(row?.value).toEqual({ text: 'options.yes' });
+      const confirmRow = rows.find(r => r.key.text === 'rows.tenancyStartDate.confirm.label');
+      expect(confirmRow?.value).toEqual({ text: 'options.yes' });
+      expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label')).toBeUndefined();
+    });
+
+    it('tenancy-date row: shows "I\'m not sure" with no corrected-date row', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ tenancyStartDateConfirmation: 'NOT_SURE' }, { tenancy_TenancyLicenceDate: '2023-01-01' })),
+        t
+      );
+      const confirmRow = rows.find(r => r.key.text === 'rows.tenancyStartDate.confirm.label');
+      expect(confirmRow?.value).toEqual({ text: 'options.imNotSure' });
+      expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label')).toBeUndefined();
+    });
+
+    it('tenancy-date row: "No" without a corrected date shows only the confirmation row', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ tenancyStartDateConfirmation: 'NO' }, { tenancy_TenancyLicenceDate: '2023-01-01' })),
+        t
+      );
+      expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.confirm.label')?.value).toEqual({
+        text: 'options.no',
+      });
+      expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label')).toBeUndefined();
     });
 
     it('notice-date row: links to "not-provided" step when the claim has no notice date', () => {

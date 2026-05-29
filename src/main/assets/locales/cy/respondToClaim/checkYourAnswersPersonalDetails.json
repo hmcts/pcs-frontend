@@ -7,8 +7,8 @@
       "changeHidden": "cy Is your name {{name}}?"
     },
     "defendantName": {
-      "label": "cy Your name",
-      "changeHidden": "cy Your name"
+      "label": "cy Name",
+      "changeHidden": "cy Name"
     },
     "dateOfBirth": {
       "label": "cy What is your date of birth?",

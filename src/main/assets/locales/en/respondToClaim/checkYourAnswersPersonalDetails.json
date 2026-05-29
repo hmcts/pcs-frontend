@@ -7,8 +7,8 @@
       "changeHidden": "Is your name {{name}}?"
     },
     "defendantName": {
-      "label": "What’s your name?",
-      "changeHidden": "What’s your name?"
+      "label": "Name",
+      "changeHidden": "Name"
     },
     "dateOfBirth": {
       "label": "What’s your date of birth?",

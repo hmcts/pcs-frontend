@@ -116,17 +116,31 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
   const confirmation = responses.tenancyStartDateConfirmation;
 
   if (isTenancyStartDateKnown(req)) {
-    // tenancy-date-details branch — confirmation Y/N is mandatory; a date is written only
-    // when the citizen corrects it. Use the confirmation-style label so the CYA row echoes
-    // the step page question and the Change link reads identically.
-    if (!date && !confirmation) {
+    // tenancy-date-details branch — mirror the tenancy-type "confirm + correct" standard:
+    // a Yes/No/Not-sure question row, then a second grouped row with the corrected date
+    // when the citizen answered No and entered one.
+    if (!confirmation) {
       return;
     }
-    rows.push({
-      key: { text: t('rows.tenancyStartDate.labelConfirm') },
-      value: { text: date ? formatIsoDate(date) : yesNoNotSure(confirmation as string) },
-      actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.changeHiddenConfirm')] },
-    });
+    const questionRow = pushYesNoRow(
+      rows,
+      'rows.tenancyStartDate.confirm',
+      confirmation,
+      'tenancy-date-details',
+      t,
+      yesNoNotSure,
+      change
+    );
+    if (normalizeYesNoValue(confirmation) !== 'NO' || !date) {
+      return;
+    }
+    const detailRow: SummaryListRow = {
+      key: { text: t('rows.tenancyStartDate.correctDate.label') },
+      value: { text: formatIsoDate(date) },
+      actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.correctDate.changeHidden')] },
+    };
+    groupQuestionAndDetail(questionRow, detailRow);
+    rows.push(detailRow);
     return;
   }
 
