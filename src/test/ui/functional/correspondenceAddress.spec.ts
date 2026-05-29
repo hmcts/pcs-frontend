@@ -1,7 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   correspondenceAddress,
-  dashboard,
   defendantDateOfBirth,
   defendantNameConfirmation,
   freeLegalAdvice,
@@ -127,6 +126,6 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
     });
     await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
     await performAction('clickButton', correspondenceAddress.saveForLaterButton);
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('mainHeader', taskList.mainHeader);
   });
 });

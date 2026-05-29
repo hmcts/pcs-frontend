@@ -2,7 +2,7 @@ import { address } from '../../utils/actions/custom-actions/fetchPINsAndValidate
 
 export const taskList = {
   get mainHeader(): string {
-    return `${address}?`;
+    return `${address}`;
   },
   backLink: `Back`,
   checkBeforeYouStartHeading: `1. Check before you start`,
