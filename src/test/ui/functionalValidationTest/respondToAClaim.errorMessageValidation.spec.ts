@@ -56,6 +56,7 @@ import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/
 import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
 import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
 import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
+import { doYouHaveASolicitorErrorValidation } from '../functional/doYouHaveASolicitor.pft';
 import { doYouHaveAnyDependantChildrenErrorValidation } from '../functional/doYouHaveAnyDependantChildren.pft';
 import { doYouHaveAnyOtherDependantsErrorValidation } from '../functional/doYouHaveAnyOtherDependants.pft';
 import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
@@ -468,6 +469,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
   test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await softErrorMessageValidation('doYouHaveASolicitor', doYouHaveASolicitorErrorValidation);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
 
     await softErrorMessageValidation('defendantNameCapture', defendantNameCaptureErrorValidation);

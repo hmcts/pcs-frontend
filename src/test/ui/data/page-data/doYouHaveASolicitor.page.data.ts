@@ -7,4 +7,6 @@ export const doYouHaveASolicitor = {
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `do-you-have-a-solicitor`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  doYouHaveASolicitorErrorValidation: `Select if you have a solicitor`,
 };
