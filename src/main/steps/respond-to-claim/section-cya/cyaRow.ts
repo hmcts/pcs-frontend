@@ -6,9 +6,7 @@ import type { RespondToClaimSectionId } from '../sections.config';
 
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
-// Shared primitives for every respond-to-claim section-CYA row builder.
-// Each builder keeps its own section-specific row logic but imports these
-// instead of redefining them — one source of truth, no drift.
+// Shared helpers for the respond-to-claim section-CYA row builders.
 
 export type SummaryListRow = {
   classes?: string;
@@ -28,7 +26,7 @@ export function groupQuestionAndDetail(questionRow: SummaryListRow, detailRow: S
   detailRow.key.classes = 'govuk-!-font-weight-regular';
 }
 
-/** The typed read of the validated case off the request — one cast, in one place. */
+/** Reads the validated case off the request. */
 export const getValidatedCase = (req: Request): CcdCaseModel | undefined =>
   req.res?.locals.validatedCase as CcdCaseModel | undefined;
 

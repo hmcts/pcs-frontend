@@ -12,8 +12,7 @@ import { getFlowConfigForJourney } from '@steps';
 
 const journeyName = 'respondToClaim';
 
-// One shared template for every section-CYA page: the card title is still used
-// for the page <title>, while row action text stays controlled by each row.
+// Every section-CYA page renders through this one template.
 const VIEW = 'respond-to-claim/section-cya/sectionCya.njk';
 
 export interface SectionCyaStepConfig {
@@ -21,7 +20,7 @@ export interface SectionCyaStepConfig {
   stepName: string;
   /** Translation key for the summary-card title (and the page <title>). */
   cardTitleKey: string;
-  /** The owning folder's __dirname — kept for parity with the StepDefinition shape. */
+  /** The owning folder's __dirname. */
   stepDir: string;
   /** Section-specific row builder. */
   buildRows: (req: Request, t: TFunction) => SummaryListRow[];
