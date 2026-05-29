@@ -6017,7 +6017,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:5.0.0":
+"chokidar@npm:5.0.0, chokidar@npm:^5.0.0":
   version: 5.0.0
   resolution: "chokidar@npm:5.0.0"
   dependencies:
@@ -6042,15 +6042,6 @@ __metadata:
     fsevents:
       optional: true
   checksum: 10/c327fb07704443f8d15f7b4a7ce93b2f0bc0e6cea07ec28a7570aa22cd51fcf0379df589403976ea956c369f25aa82d84561947e227cd925902e1751371658df
-  languageName: node
-  linkType: hard
-
-"chokidar@npm:^4.0.0":
-  version: 4.0.3
-  resolution: "chokidar@npm:4.0.3"
-  dependencies:
-    readdirp: "npm:^4.0.1"
-  checksum: 10/bf2a575ea5596000e88f5db95461a9d59ad2047e939d5a4aac59dd472d126be8f1c1ff3c7654b477cf532d18f42a97279ef80ee847972fd2a25410bf00b80b59
   languageName: node
   linkType: hard
 
@@ -11872,7 +11863,7 @@ __metadata:
     playwright-core: "npm:1.60.0"
     postcss: "npm:8.5.15"
     prettier: "npm:3.8.3"
-    sass: "npm:1.99.0"
+    sass: "npm:1.100.0"
     sass-loader: "npm:17.0.0"
     saucectl: "npm:^0.205.0"
     serve-favicon: "npm:2.5.1"
@@ -12540,13 +12531,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"readdirp@npm:^4.0.1":
-  version: 4.1.2
-  resolution: "readdirp@npm:4.1.2"
-  checksum: 10/7b817c265940dba90bb9c94d82920d76c3a35ea2d67f9f9d8bd936adcfe02d50c802b14be3dd2e725e002dddbe2cc1c7a0edfb1bc3a365c9dfd5a61e612eea1e
-  languageName: node
-  linkType: hard
-
 "readdirp@npm:^5.0.0":
   version: 5.0.0
   resolution: "readdirp@npm:5.0.0"
@@ -12909,12 +12893,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:1.99.0":
-  version: 1.99.0
-  resolution: "sass@npm:1.99.0"
+"sass@npm:1.100.0":
+  version: 1.100.0
+  resolution: "sass@npm:1.100.0"
   dependencies:
     "@parcel/watcher": "npm:^2.4.1"
-    chokidar: "npm:^4.0.0"
+    chokidar: "npm:^5.0.0"
     immutable: "npm:^5.1.5"
     source-map-js: "npm:>=0.6.2 <2.0.0"
   dependenciesMeta:
@@ -12922,7 +12906,7 @@ __metadata:
       optional: true
   bin:
     sass: sass.js
-  checksum: 10/93f9d5c3b3e4659fb68a8e90d9637818581b0152dfb543ac159d57bb1e384f6b2009b7ac35ef88883f441cddfabd248fdcbba3fe814f4f23e3bfe58c917787a6
+  checksum: 10/165d5ba502d747f3090e58d02e507b05a48f7856f542d3bb1ee74931fc47680b11b22e7fd4e90559738f7c295653db98b1d15b16ff6ec5447f6566654cc5c71e
   languageName: node
   linkType: hard
 
