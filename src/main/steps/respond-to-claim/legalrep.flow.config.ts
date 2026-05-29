@@ -22,7 +22,6 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'tenancy-date-details',
   'tenancy-date-unknown',
   'confirmation-of-notice-given',
-  'confirmation-of-notice-date-when-not-provided',
   'rent-arrears-dispute',
   'non-rent-arrears-dispute',
   'counter-claim',
