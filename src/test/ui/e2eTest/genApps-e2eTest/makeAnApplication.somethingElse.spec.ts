@@ -1,4 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
+import { dashboard } from '../../data/page-data';
 import {
   askTheCourtToMakeAnOrder,
   checkYourAnswersGenApps,
@@ -29,10 +30,9 @@ test.beforeEach(async ({ page }) => {
     caseNumber: process.env.CASE_NUMBER,
     defendantDetailsKnown: false,
   });
-  await performAction(
-    'navigateToUrl',
-    home_url + `/case/${process.env.CASE_NUMBER}/make-an-application/choose-an-application`
-  );
+  await performValidation('mainHeader', dashboard.mainHeader);
+  await performAction('clickLink', dashboard.askTheCourtToMakeAnOrderLink);
+  await performValidation('mainHeader', chooseAnApplication.mainHeader);
 });
 
 test.afterEach(async () => {

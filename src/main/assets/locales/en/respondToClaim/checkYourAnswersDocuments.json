@@ -4,7 +4,7 @@
   "rows": {
     "uploadedDocuments": {
       "label": "Upload files",
-      "none": "No documents uploaded"
+      "none": "No files uploaded"
     }
   }
 }
