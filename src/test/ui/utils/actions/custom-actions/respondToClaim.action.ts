@@ -493,10 +493,8 @@ export class RespondToClaimAction implements IAction {
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
       await this.selectCorrespondenceAddressUnKnown(addressData);
     } else {
-      const confirmedAddress = String(submitCaseApiData.submitCasePayload.formattedClaimantContactAddress)
-        .replace(/<br\s*\/?>/gi, ', ')
-        .trim();
-      this.recordAnswer(correspondenceAddress.correspondenceAddressUnKnownMainHeader, confirmedAddress);
+      const selectedPinUser = getSelectedPinUser();
+      this.recordAnswer(correspondenceAddress.correspondenceAddressUnKnownMainHeader, selectedPinUser?.address ?? '');
       await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     }
   }
