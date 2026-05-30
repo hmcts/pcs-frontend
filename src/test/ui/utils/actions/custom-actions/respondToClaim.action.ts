@@ -17,6 +17,7 @@ import {
   counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
+  counterclaimYouNeedToApplyForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -67,6 +68,28 @@ const rtcSectionAnswers = new Map<string, Map<string, string>>();
 let activeRtcSection = '';
 const rtcUploadedDocumentsQuestion = 'Documents you have uploaded';
 const rtcNoDocumentsUploadedValue = 'No documents uploaded';
+const rtcNoAnswerProvidedValue = 'No answer provided';
+
+const rtcCyaLabels = {
+  contactDetails: 'Contact details',
+  otherConsiderations: 'Is there anything else you want to tell the court?',
+  universalCreditApplicationDate: 'When did you apply for Universal Credit?',
+} as const;
+
+const monthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
 
 const rtcSectionByAction = new Map<string, string>([
   ['selectLegalAdvice', 'startNowAndDetails'],
@@ -224,7 +247,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private getRtcCyaQuestionLabel(question: string): string {
-    return question.replace(/\s*\(Optional\)\s*$/, '').trim();
+    return question.replace(/\s*\(optional\)(\?)?\s*$/i, '$1').trim();
   }
 
   private getRtcCyaChoiceLabel(choice: actionData): string {
@@ -239,6 +262,108 @@ export class RespondToClaimAction implements IAction {
     descriptor: string = 'every'
   ): string {
     return `${this.formatRtcCyaCurrency(amount)} ${descriptor} ${this.formatRtcCyaFrequency(frequency)}`;
+  }
+
+  private buildRtcCyaDateValue(
+    day?: actionData,
+    month?: actionData,
+    year?: actionData,
+    emptyValue: string = rtcNoAnswerProvidedValue
+  ): string {
+    const formattedDate = this.formatRtcCyaDateParts(day, month, year);
+    return formattedDate ?? emptyValue;
+  }
+
+  private buildRtcCyaAddressValue(...lines: (actionData | undefined)[]): string {
+    return lines
+      .map(line => String(line ?? '').trim())
+      .filter(Boolean)
+      .join(', ');
+  }
+
+  private buildRtcCyaFullName(firstName?: actionData, lastName?: actionData): string {
+    return `${String(firstName ?? '').trim()} ${String(lastName ?? '').trim()}`.trim();
+  }
+
+  private formatRtcCyaDateParts(day?: actionData, month?: actionData, year?: actionData): string | undefined {
+    const dayNumber = Number(String(day ?? '').trim());
+    const monthNumber = Number(String(month ?? '').trim());
+    const yearNumber = Number(String(year ?? '').trim());
+
+    if (!Number.isInteger(dayNumber) || !Number.isInteger(monthNumber) || !Number.isInteger(yearNumber)) {
+      return undefined;
+    }
+
+    if (monthNumber < 1 || monthNumber > 12 || dayNumber < 1 || yearNumber < 1) {
+      return undefined;
+    }
+
+    const date = new Date(Date.UTC(yearNumber, monthNumber - 1, dayNumber));
+    if (
+      date.getUTCFullYear() !== yearNumber ||
+      date.getUTCMonth() !== monthNumber - 1 ||
+      date.getUTCDate() !== dayNumber
+    ) {
+      return undefined;
+    }
+
+    return `${dayNumber} ${monthNames[monthNumber - 1]} ${yearNumber}`;
+  }
+
+  private formatRtcCyaAddressLines(address: Record<string, unknown> | undefined): string[] {
+    if (!address) {
+      return [];
+    }
+
+    return [
+      address.AddressLine1,
+      address.AddressLine2,
+      address.AddressLine3,
+      address.PostTown,
+      address.County,
+      address.Country,
+      address.PostCode,
+    ]
+      .map(line => String(line ?? '').trim())
+      .filter(Boolean);
+  }
+
+  private recordRtcCyaName(label: string, firstName?: actionData, lastName?: actionData): void {
+    this.recordAnswer(label, this.buildRtcCyaFullName(firstName, lastName));
+  }
+
+  private recordRtcCyaDateFromParts(label: string, day?: actionData, month?: actionData, year?: actionData): void {
+    this.recordAnswer(label, this.buildRtcCyaDateValue(day, month, year));
+  }
+
+  private deleteRtcCyaDate(label: string): void {
+    this.deleteAnswer(label);
+  }
+
+  private updateRtcCyaContactDetails(phoneNumber?: actionData, emailAddress?: actionData): void {
+    const contactDetails = this.buildRtcCyaAddressValue(phoneNumber, emailAddress);
+    if (contactDetails) {
+      this.recordAnswer(rtcCyaLabels.contactDetails, contactDetails);
+    } else {
+      this.deleteAnswer(rtcCyaLabels.contactDetails);
+    }
+  }
+
+  private recordRtcCyaSummaryRow(label: string, values: string[]): void {
+    this.recordAnswer(label, values.length > 0 ? values.join(', ') : rtcNoAnswerProvidedValue);
+  }
+
+  private recordRtcCyaHeadingWithItems(headingLabel: string, itemEntries: [string, string][]): void {
+    this.deleteAnswer(headingLabel);
+
+    if (itemEntries.length === 0) {
+      this.recordAnswer(headingLabel, rtcNoAnswerProvidedValue);
+      return;
+    }
+
+    for (const [label, value] of itemEntries) {
+      this.recordAnswer(label, value);
+    }
   }
 
   private normalizeRtcCyaComparisonPart(value: string): string {
@@ -317,8 +442,7 @@ export class RespondToClaimAction implements IAction {
     const firstNameValue = defendantData.fName ?? selectedPinUser?.firstName;
     const lastNameValue = defendantData.lName ?? selectedPinUser?.lastName;
 
-    this.recordAnswer(defendantNameCapture.firstNameTextLabel, String(firstNameValue ?? ''));
-    this.recordAnswer(defendantNameCapture.lastNameTextLabel, String(lastNameValue ?? ''));
+    this.recordRtcCyaName(this.getRtcCyaQuestionLabel(defendantNameCapture.mainHeader), firstNameValue, lastNameValue);
     await performValidation('mainHeader', defendantNameCapture.mainHeader);
     await performAction('inputText', defendantNameCapture.firstNameTextLabel, firstNameValue);
     await performAction('inputText', defendantNameCapture.lastNameTextLabel, lastNameValue);
@@ -326,6 +450,12 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterDateOfBirthDetails(defendantData: actionRecord) {
+    this.recordRtcCyaDateFromParts(
+      this.getRtcCyaQuestionLabel(defendantDateOfBirth.mainHeader),
+      defendantData?.dobDay,
+      defendantData?.dobMonth,
+      defendantData?.dobYear
+    );
     if (defendantData?.dobDay && defendantData?.dobMonth && defendantData?.dobYear) {
       await performActions(
         'Defendant Date of Birth Entry',
@@ -338,15 +468,17 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async confirmDefendantDetails(defendantData: actionRecord) {
-    this.recordAnswer(String(defendantData.question), String(defendantData.option));
     await performValidation('mainHeader', defendantData.question);
     await performAction('clickRadioButton', {
       question: defendantData.question,
       option: defendantData.option,
     });
-    if (defendantData.option === defendantNameConfirmation.noRadioOption) {
-      this.recordAnswer(defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
-      this.recordAnswer(defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
+    if (defendantData.option === defendantNameConfirmation.yesRadioOption) {
+      this.recordAnswer(String(defendantData.question), String(defendantData.option));
+      this.deleteAnswer('Name');
+    } else if (defendantData.option === defendantNameConfirmation.noRadioOption) {
+      this.deleteAnswer(String(defendantData.question));
+      this.recordRtcCyaName('Name', defendantData.fName, defendantData.lName);
       await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
       await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
     }
@@ -361,6 +493,10 @@ export class RespondToClaimAction implements IAction {
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
       await this.selectCorrespondenceAddressUnKnown(addressData);
     } else {
+      const defaultAddressLines = this.formatRtcCyaAddressLines(
+        submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress
+      );
+      this.recordAnswer(correspondenceAddress.correspondenceAddressUnKnownMainHeader, defaultAddressLines.join(', '));
       await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     }
   }
@@ -374,9 +510,10 @@ export class RespondToClaimAction implements IAction {
         ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
       );
     } else if (addressData.addressLine1) {
-      this.recordAnswer('Address line 1', addressData.addressLine1);
-      this.recordAnswer('Town or city', addressData.townOrCity);
-      this.recordAnswer('Postcode', addressData.postcode);
+      this.recordAnswer(
+        correspondenceAddress.correspondenceAddressUnKnownMainHeader,
+        this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
+      );
       await performActions(
         'Enter Address Manually',
         ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
@@ -397,19 +534,12 @@ export class RespondToClaimAction implements IAction {
           option,
         });
         if (option === contactPreferenceEmailOrPost.byEmailCheckbox && contactPreferenceData.emailAddress) {
-          this.recordAnswer(
-            contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-            contactPreferenceData.emailAddress
-          );
           await performAction(
             'inputText',
             contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
             contactPreferenceData.emailAddress
           );
         }
-      }
-      if (!contactPreferenceData.options.includes(contactPreferenceEmailOrPost.byEmailCheckbox)) {
-        this.deleteAnswer(contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel);
       }
     }
     // Handle single selection
@@ -421,37 +551,46 @@ export class RespondToClaimAction implements IAction {
       });
 
       if (contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailCheckbox) {
-        this.recordAnswer(
-          contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-          contactPreferenceData.emailAddress
-        );
         await performAction(
           'inputText',
           contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
           contactPreferenceData.emailAddress
         );
-      } else {
-        this.deleteAnswer(contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel);
       }
     }
+    const emailAddress = Array.isArray(contactPreferenceData.options)
+      ? this.buildRtcCyaAddressValue(
+          contactPreferenceData.options.includes(contactPreferenceEmailOrPost.byEmailCheckbox)
+            ? contactPreferenceData.emailAddress
+            : undefined
+        )
+      : contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailCheckbox
+        ? this.buildRtcCyaAddressValue(contactPreferenceData.emailAddress)
+        : '';
+    this.updateRtcCyaContactDetails(undefined, emailAddress);
     await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   }
+
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
+    const existingContactDetails = FieldsStore.get(rtcCyaLabels.contactDetails);
     this.recordAnswer(contactPreferencesTelephone.areYouHappyToContactQuestion, contactByPhoneData.radioOption);
     await performAction('clickRadioButton', {
       question: contactPreferencesTelephone.areYouHappyToContactQuestion,
       option: contactByPhoneData.radioOption,
     });
+
     if (contactByPhoneData.radioOption === contactPreferencesTelephone.yesRadioOption) {
       process.env.CONTACT_PREFERENCES_TELEPHONE = 'YES';
-      this.recordAnswer(contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel, contactByPhoneData.phoneNumber);
+      this.updateRtcCyaContactDetails(contactByPhoneData.phoneNumber, existingContactDetails);
       await performAction(
         'inputText',
         contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
         contactByPhoneData.phoneNumber
       );
+    } else if (existingContactDetails?.includes('@')) {
+      this.updateRtcCyaContactDetails(undefined, existingContactDetails);
     } else {
-      this.deleteAnswer(contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel);
+      this.updateRtcCyaContactDetails();
     }
     await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
   }
@@ -539,6 +678,7 @@ export class RespondToClaimAction implements IAction {
     }
     await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
   }
+
   private async installmentPayments(installmentData: actionRecord): Promise<void> {
     this.recordAnswer(String(installmentData.question), installmentData.radioOption);
     await performAction('clickRadioButton', {
@@ -584,13 +724,14 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectWhatRegularIncomeDoYouReceive(regularIncome?: actionRecord): Promise<void> {
+    const regularIncomeQuestionLabel = this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader);
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
-      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader));
+      this.recordAnswer(regularIncomeQuestionLabel, rtcNoAnswerProvidedValue);
       await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
       return;
     }
 
-    const selectedRegularIncomeValues: string[] = [];
+    const selectedRegularIncomeEntries: [string, string][] = [];
 
     for (const income of regularIncome.regularIncomeOptions) {
       const [option, value, frequency] = income;
@@ -606,7 +747,7 @@ export class RespondToClaimAction implements IAction {
           whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
           value
         );
-        selectedRegularIncomeValues.push(`${this.getRtcCyaChoiceLabel(option)}: ${String(value)}`);
+        selectedRegularIncomeEntries.push([this.getRtcCyaChoiceLabel(option), String(value)]);
         continue;
       }
 
@@ -617,19 +758,13 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
       await performAction('clickRadioButton', frequency);
 
-      selectedRegularIncomeValues.push(
-        `${this.getRtcCyaChoiceLabel(option)} ${this.buildRtcCyaAmountAndFrequencyValue(value, frequency, 'received every')}`
-      );
+      selectedRegularIncomeEntries.push([
+        this.getRtcCyaChoiceLabel(option),
+        this.buildRtcCyaAmountAndFrequencyValue(value, frequency, 'received every'),
+      ]);
     }
 
-    if (selectedRegularIncomeValues.length > 0) {
-      this.recordAnswer(
-        this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader),
-        selectedRegularIncomeValues.join(', ')
-      );
-    } else {
-      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader));
-    }
+    this.recordRtcCyaHeadingWithItems(regularIncomeQuestionLabel, selectedRegularIncomeEntries);
 
     await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   }
@@ -643,6 +778,12 @@ export class RespondToClaimAction implements IAction {
       option: tenancyStartDateData.option,
     });
     if (tenancyStartDateData?.day && tenancyStartDateData?.month && tenancyStartDateData?.year) {
+      this.recordRtcCyaDateFromParts(
+        this.getRtcCyaQuestionLabel(tenancyDateDetails.whatIsTheCorrectStartDateHiddenQuestion),
+        tenancyStartDateData.day,
+        tenancyStartDateData.month,
+        tenancyStartDateData.year
+      );
       await performActions(
         'Enter Date',
         ['inputText', tenancyDateDetails.dayHiddenTextLabel, tenancyStartDateData.day],
@@ -663,6 +804,12 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
+    this.recordRtcCyaDateFromParts(
+      `When did you receive notice from ${claimantsName}?`,
+      noticeData?.day,
+      noticeData?.month,
+      noticeData?.year
+    );
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
@@ -675,6 +822,12 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
+    this.recordRtcCyaDateFromParts(
+      `When did you receive notice from ${claimantsName}?`,
+      noticeData?.day,
+      noticeData?.month,
+      noticeData?.year
+    );
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
@@ -689,6 +842,12 @@ export class RespondToClaimAction implements IAction {
   private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {
     const getDidNotProvideParagraph = tenancyDateUnknown.getDidNotProvideParagraph(claimantsName);
     await performValidation('text', { elementType: 'paragraph', text: getDidNotProvideParagraph });
+    this.recordRtcCyaDateFromParts(
+      this.getRtcCyaQuestionLabel(tenancyDateUnknown.whenDidYourTenancyQuestion),
+      tenancyStartData?.tsDay,
+      tenancyStartData?.tsMonth,
+      tenancyStartData?.tsYear
+    );
     if (tenancyStartData?.tsDay && tenancyStartData?.tsMonth && tenancyStartData?.tsYear) {
       await performActions(
         'Enter Date',
@@ -724,6 +883,9 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectAlternativeAccommodation(moveInDetails: actionRecord) {
+    const moveInDateLabel = this.getRtcCyaQuestionLabel(
+      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.whenWouldYouBeableToMoveHiddenTextLabel
+    );
     this.recordAnswer(wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader, moveInDetails.radioOption);
     await performAction('clickRadioButton', {
       question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader,
@@ -731,12 +893,18 @@ export class RespondToClaimAction implements IAction {
     });
 
     if (moveInDetails.radioOption === 'Yes' && moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
+      this.recordRtcCyaDateFromParts(moveInDateLabel, moveInDetails.day, moveInDetails.month, moveInDetails.year);
       await performActions(
         'Enter Date',
         ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, moveInDetails.day],
         ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, moveInDetails.month],
         ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, moveInDetails.year]
       );
+    } else if (moveInDetails.radioOption === 'Yes') {
+      this.recordRtcCyaSummaryRow(moveInDateLabel, []);
+    }
+    if (moveInDetails.radioOption !== 'Yes') {
+      this.deleteRtcCyaDate(moveInDateLabel);
     }
     await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
   }
@@ -762,17 +930,24 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
+    this.recordAnswer(
+      counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
+      helpWithFee.helpWithFeeOption
+    );
     await performAction('clickRadioButton', {
       question: counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
       option: helpWithFee.helpWithFeeOption,
     });
 
     if (helpWithFee.helpWithFeeOption === 'Yes') {
+      this.recordAnswer(counterclaimYouNeedToApplyForHelpWithYourFees.helpWithFeesLink, helpWithFee.feeReference);
       await performAction(
         'inputText',
         counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
         helpWithFee.feeReference
       );
+    } else {
+      this.deleteAnswer(counterclaimYouNeedToApplyForHelpWithYourFees.helpWithFeesLink);
     }
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
   }
@@ -928,7 +1103,10 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {
-    this.recordAnswer(String(exceptionalHardshipData.question), exceptionalHardshipData.exceptionalHardshipOption);
+    this.recordAnswer(
+      exceptionalHardship.wouldYouExperienceExceptionalHardshipParagraph,
+      exceptionalHardshipData.exceptionalHardshipOption
+    );
     await performAction('clickRadioButton', {
       question: exceptionalHardshipData.question,
       option: exceptionalHardshipData.exceptionalHardshipOption,
@@ -1008,12 +1186,21 @@ export class RespondToClaimAction implements IAction {
       universalCreditDateData?.month &&
       universalCreditDateData?.year
     ) {
+      this.recordRtcCyaDateFromParts(
+        rtcCyaLabels.universalCreditApplicationDate,
+        universalCreditDateData.day,
+        universalCreditDateData.month,
+        universalCreditDateData.year
+      );
       await performActions(
         'Enter Date',
         ['inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, universalCreditDateData.day],
         ['inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, universalCreditDateData.month],
         ['inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, universalCreditDateData.year]
       );
+    }
+    if (universalCreditDateData.creditRadioOption !== 'Yes') {
+      this.deleteRtcCyaDate(rtcCyaLabels.universalCreditApplicationDate);
     }
     await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   }
@@ -1054,13 +1241,21 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
   }
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
+    const regularExpensesQuestionLabel = this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader);
+
+    const clearRegularExpenseAnswers = (): void => {
+      this.deleteAnswer(regularExpensesQuestionLabel);
+    };
+
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
-      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader));
+      clearRegularExpenseAnswers();
+      this.recordRtcCyaSummaryRow(regularExpensesQuestionLabel, []);
       await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
       return;
     }
 
-    const selectedRegularExpenseValues: string[] = [];
+    clearRegularExpenseAnswers();
+    const selectedRegularExpenseEntries: [string, string][] = [];
 
     for (const income of regularIncome.regularIncomeOptions) {
       const [option, value, frequency] = income;
@@ -1077,19 +1272,14 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
       await performAction('clickRadioButton', frequency);
 
-      selectedRegularExpenseValues.push(
-        `${this.getRtcCyaChoiceLabel(option)}: ${this.buildRtcCyaAmountAndFrequencyValue(value, frequency)}`
-      );
+      const mappedCyaLabel =
+        option === whatOtherRegularExpensesDoYouHave.otherExpensesParagraph
+          ? 'Other expenses'
+          : this.getRtcCyaChoiceLabel(option);
+      selectedRegularExpenseEntries.push([mappedCyaLabel, this.buildRtcCyaAmountAndFrequencyValue(value, frequency)]);
     }
 
-    if (selectedRegularExpenseValues.length > 0) {
-      this.recordAnswer(
-        this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader),
-        selectedRegularExpenseValues.join(', ')
-      );
-    } else {
-      this.deleteAnswer(this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader));
-    }
+    this.recordRtcCyaHeadingWithItems(regularExpensesQuestionLabel, selectedRegularExpenseEntries);
 
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   }
@@ -1104,7 +1294,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async otherConsiderations(otherConsiderationsData: actionRecord): Promise<void> {
-    this.recordAnswer(String(otherConsiderationsData.question), otherConsiderationsData.option);
+    this.recordAnswer(rtcCyaLabels.otherConsiderations, otherConsiderationsData.option);
     await performAction('clickRadioButton', {
       question: otherConsiderationsData.question,
       option: otherConsiderationsData.option,
@@ -1170,35 +1360,30 @@ export class RespondToClaimAction implements IAction {
   private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
     const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
     rtcCyaMap.clear();
-    const tables = page.locator('//dl');
-    const tableCount = await tables.count();
+    const summaryList = page.locator('.govuk-summary-list').first();
+    await summaryList.waitFor({ state: 'visible' });
 
-    if (tableCount === 0) {
+    const rows = summaryList.locator('.govuk-summary-list__row');
+    const rowCount = await rows.count();
+
+    if (rowCount === 0) {
       throw new Error('RTC CYA table not found. Exiting...');
     }
 
-    for (let i = 0; i < tableCount; i++) {
-      const currentTable = tables.nth(i);
-      if (!(await currentTable.isVisible())) {
+    for (let j = 0; j < rowCount; j++) {
+      const row = rows.nth(j);
+      if (!(await row.isVisible())) {
         continue;
       }
 
-      const rows = currentTable.locator('.govuk-summary-list__row');
-      const rowCount = await rows.count();
-      for (let j = 0; j < rowCount; j++) {
-        const row = rows.nth(j);
-        if (!(await row.isVisible())) {
-          continue;
-        }
+      const keyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
+      const valueCell = row.locator('.govuk-summary-list__value').first();
+      const innerText = (await valueCell.innerText()).trim();
+      const textContent = ((await valueCell.textContent()) ?? '').trim();
+      const valueText = (innerText || textContent).replace(/\r?\n+/g, ', ').replace(/\s{2,}/g, ' ');
 
-        const keyText = (await row.locator('dt.govuk-summary-list__key').first().innerText()).trim();
-        const valueText = (await row.locator('dd.govuk-summary-list__value').first().innerText())
-          .trim()
-          .replace(/\r?\n+/g, ', ');
-
-        if (keyText) {
-          rtcCyaMap.set(keyText, valueText);
-        }
+      if (keyText) {
+        rtcCyaMap.set(keyText, valueText);
       }
     }
 
@@ -1207,7 +1392,6 @@ export class RespondToClaimAction implements IAction {
 
   private async validateCYARTC(): Promise<void> {
     const mismatches: string[] = [];
-    const rtcValues = Array.from(rtcCyaMap.values());
 
     for (const [expectedKey, expectedValue] of Array.from(FieldsStore.getAll().entries())) {
       const actualValue = rtcCyaMap.get(expectedKey);
@@ -1220,12 +1404,9 @@ export class RespondToClaimAction implements IAction {
         continue;
       }
 
-      const matchedByValue = rtcValues.some(value => value.includes(String(expectedValue)));
-      if (!matchedByValue) {
-        mismatches.push(
-          `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but no matching CYA row was found`
-        );
-      }
+      mismatches.push(
+        `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but the CYA row key was not found`
+      );
     }
 
     if (mismatches.length > 0) {
@@ -1249,7 +1430,6 @@ export class RespondToClaimAction implements IAction {
     }
 
     const mismatches: string[] = [];
-    const rtcValues = Array.from(rtcCyaMap.values());
 
     for (const [expectedKey, expectedValue] of Array.from(expectedSectionAnswers.entries())) {
       const actualValue = rtcCyaMap.get(expectedKey);
@@ -1262,12 +1442,9 @@ export class RespondToClaimAction implements IAction {
         continue;
       }
 
-      const matchedByValue = rtcValues.some(value => value.includes(String(expectedValue)));
-      if (!matchedByValue) {
-        mismatches.push(
-          `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but no matching CYA row was found`
-        );
-      }
+      mismatches.push(
+        `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but the CYA row key was not found`
+      );
     }
 
     if (mismatches.length > 0) {
