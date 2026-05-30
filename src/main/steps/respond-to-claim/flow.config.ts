@@ -150,6 +150,14 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) =>
         shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
     },
+    'counter-claim-application-fee-amount': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'counter-claim-payment-successful': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
     'response-and-counter-claim-submitted': {
       showCondition: (req: Request) =>
         shouldShowResponseAndCounterClaimSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),

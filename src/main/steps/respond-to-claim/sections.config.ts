@@ -115,6 +115,8 @@ export const respondToClaimSections: SectionConfig[] = [
       'check-your-answers',
       'response-submitted',
       'response-submitted-counter-claim-fee-payment-needed',
+      'counter-claim-application-fee-amount',
+      'counter-claim-payment-successful',
       'response-and-counter-claim-submitted',
     ],
   },

@@ -1,5 +1,6 @@
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
@@ -15,6 +16,22 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     responseSubmittedCounterClaimFeePaymentNeededListItem3: 'responseSubmittedCounterClaimFeePaymentNeededListItem3',
     responseSubmittedCounterClaimFeePaymentNeededHeading2: 'responseSubmittedCounterClaimFeePaymentNeededHeading2',
     responseSubmittedCounterClaimFeePaymentNeededParagraph2: 'responseSubmittedCounterClaimFeePaymentNeededParagraph2',
+  },
+  extendGetContent: req => {
+    const caseReference = req.params.caseReference;
+    const counterClaimApplicationFeeAmountUrl = caseReference
+      ? `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount`
+      : '#';
+    const t = getTranslationFunction(req);
+
+    return {
+      responseSubmittedCounterClaimFeePaymentNeededListItem1: t(
+        'responseSubmittedCounterClaimFeePaymentNeededListItem1',
+        {
+          counterClaimApplicationFeeAmountUrl,
+        }
+      ),
+    };
   },
   customTemplate: `${__dirname}/responseSubmittedCounterClaimFeePaymentNeeded.njk`,
 });
