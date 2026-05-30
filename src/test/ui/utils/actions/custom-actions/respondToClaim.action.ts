@@ -493,10 +493,8 @@ export class RespondToClaimAction implements IAction {
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
       await this.selectCorrespondenceAddressUnKnown(addressData);
     } else {
-      const defaultAddressLines = this.formatRtcCyaAddressLines(
-        submitCaseApiData.submitCasePayload.defendant1.correspondenceAddress
-      );
-      this.recordAnswer(correspondenceAddress.correspondenceAddressUnKnownMainHeader, defaultAddressLines.join(', '));
+      const selectedPinUser = getSelectedPinUser();
+      this.recordAnswer(correspondenceAddress.correspondenceAddressUnKnownMainHeader, selectedPinUser?.address ?? '');
       await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     }
   }
@@ -646,9 +644,10 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
-    this.recordAnswer(String(repaymentsData.question), repaymentsData.repaymentOption);
+    const repaymentsMadeQuestion = repaymentsMade.getmainHeader(claimantsName);
+    this.recordAnswer(repaymentsMadeQuestion, repaymentsData.repaymentOption);
     await performAction('clickRadioButton', {
-      question: repaymentsData.question,
+      question: repaymentsMadeQuestion,
       option: repaymentsData.repaymentOption,
     });
     if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
@@ -661,9 +660,10 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
-    this.recordAnswer(String(repaymentsAgreedData.question), repaymentsAgreedData.repaymentAgreedOption);
+    const repaymentsAgreedQuestion = repaymentsAgreed.getMainHeader(claimantsName);
+    this.recordAnswer(repaymentsAgreedQuestion, repaymentsAgreedData.repaymentAgreedOption);
     await performAction('clickRadioButton', {
-      question: repaymentsAgreedData.question,
+      question: repaymentsAgreedQuestion,
       option: repaymentsAgreedData.repaymentAgreedOption,
     });
     if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {
@@ -1041,7 +1041,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
-    this.recordAnswer(String(yourCircumstancesData.question), yourCircumstancesData.yourCircumstancesOption);
+    this.recordAnswer(yourCircumstances.wouldYouLikeToShareHeader, yourCircumstancesData.yourCircumstancesOption);
     await performAction('clickRadioButton', {
       question: yourCircumstancesData.question,
       option: yourCircumstancesData.yourCircumstancesOption,
