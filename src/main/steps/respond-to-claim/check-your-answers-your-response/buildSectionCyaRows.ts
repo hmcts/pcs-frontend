@@ -105,7 +105,7 @@ function addTenancyTypeRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   const detailRow: SummaryListRow = {
     key: { text: t('rows.tenancyTypeDetails.label') },
     value: { text: correctedType },
-    actions: { items: [change('tenancy-type-details', 'rows.tenancyTypeDetails.changeHidden')] },
+    actions: { items: [change('tenancy-type-details')] },
   };
   groupQuestionAndDetail(questionRow, detailRow);
   rows.push(detailRow);
@@ -131,13 +131,14 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
       yesNoNotSure,
       change
     );
-    if (normalizeYesNoValue(confirmation) !== 'NO' || !date) {
+    if (normalizeYesNoValue(confirmation) !== 'NO') {
       return;
     }
+    // Corrected date is optional - show "No answer provided" if they said No but left it blank.
     const detailRow: SummaryListRow = {
       key: { text: t('rows.tenancyStartDate.correctDate.label') },
-      value: { text: formatIsoDate(date) },
-      actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.correctDate.changeHidden')] },
+      value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
+      actions: { items: [change('tenancy-date-details')] },
     };
     groupQuestionAndDetail(questionRow, detailRow);
     rows.push(detailRow);
@@ -149,7 +150,7 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
   rows.push({
     key: { text: t('rows.tenancyStartDate.labelEntered') },
     value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
-    actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHiddenEntered')] },
+    actions: { items: [change('tenancy-date-unknown')] },
   });
 }
 
@@ -161,7 +162,7 @@ function addPossessionNoticeReceivedRow({ rows, validatedCase, t, change }: RowC
   rows.push({
     key: { text: t('rows.possessionNoticeReceived.label', { claimantName: validatedCase.claimantName }) },
     value: { text: t(`options.${value}`) },
-    actions: { items: [change('confirmation-of-notice-given', 'rows.possessionNoticeReceived.changeHidden')] },
+    actions: { items: [change('confirmation-of-notice-given')] },
   });
 }
 
@@ -181,7 +182,7 @@ function addNoticeReceivedDateRow({ rows, validatedCase, responses, req, t, chan
     value: {
       text: responses.noticeReceivedDate ? formatIsoDate(responses.noticeReceivedDate) : t('noAnswerProvided'),
     },
-    actions: { items: [change(editStep, 'rows.noticeReceivedDate.changeHidden')] },
+    actions: { items: [change(editStep)] },
   });
 }
 
@@ -210,7 +211,7 @@ function addRentArrearsRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   const detailRow: SummaryListRow = {
     key: { text: t('rows.rentArrearsAmountDetails.label') },
     value: { text: `£${disputedAmount}` },
-    actions: { items: [change('rent-arrears-dispute', 'rows.rentArrearsAmountDetails.changeHidden')] },
+    actions: { items: [change('rent-arrears-dispute')] },
   };
   groupQuestionAndDetail(questionRow, detailRow);
   rows.push(detailRow);
@@ -240,7 +241,7 @@ function addDisputeClaimRows({ rows, responses, t, change, yesNoNotSure }: RowCo
   const detailRow: SummaryListRow = {
     key: { text: t('rows.disputeClaimDetails.label') },
     value: { html: escapeWithLineBreaks(details) },
-    actions: { items: [change('non-rent-arrears-dispute', 'rows.disputeClaimDetails.changeHidden')] },
+    actions: { items: [change('non-rent-arrears-dispute')] },
   };
   groupQuestionAndDetail(questionRow, detailRow);
   rows.push(detailRow);
@@ -281,7 +282,7 @@ function addCounterClaimAgainstRow({ rows, t, change }: RowContext, cc: CcdCount
   rows.push({
     key: { text: t('rows.counterClaimAgainst.label') },
     value: multiSelectValue(names, new Set(names)),
-    actions: { items: [change('counter-claim-against-whom', 'rows.counterClaimAgainst.changeHidden')] },
+    actions: { items: [change('counter-claim-against-whom')] },
   });
 }
 
@@ -292,7 +293,7 @@ function addCounterClaimOrderOtherThanSumRows({ rows, t, change }: RowContext, c
       key: { text: t('rows.otherOrderRequestDetails.label') },
       value: { html: escapeWithLineBreaks(details) },
       actions: {
-        items: [change('counter-claim-order-other-than-sum', 'rows.otherOrderRequestDetails.changeHidden')],
+        items: [change('counter-claim-order-other-than-sum')],
       },
     });
   }
@@ -302,7 +303,7 @@ function addCounterClaimOrderOtherThanSumRows({ rows, t, change }: RowContext, c
       key: { text: t('rows.otherOrderRequestFacts.label') },
       value: { html: escapeWithLineBreaks(facts) },
       actions: {
-        items: [change('counter-claim-order-other-than-sum', 'rows.otherOrderRequestFacts.changeHidden')],
+        items: [change('counter-claim-order-other-than-sum')],
       },
     });
   }
@@ -314,7 +315,7 @@ function addCounterClaimAboutRows({ rows, t, change }: RowContext, cc: CcdCounte
     rows.push({
       key: { text: t('rows.counterClaimFor.label') },
       value: { html: escapeWithLineBreaks(counterClaimFor) },
-      actions: { items: [change('counter-claim-about', 'rows.counterClaimFor.changeHidden')] },
+      actions: { items: [change('counter-claim-about')] },
     });
   }
   const counterClaimReasons = cc.counterClaimReasons?.trim();
@@ -322,7 +323,7 @@ function addCounterClaimAboutRows({ rows, t, change }: RowContext, cc: CcdCounte
     rows.push({
       key: { text: t('rows.counterClaimReasons.label') },
       value: { html: escapeWithLineBreaks(counterClaimReasons) },
-      actions: { items: [change('counter-claim-about', 'rows.counterClaimReasons.changeHidden')] },
+      actions: { items: [change('counter-claim-about')] },
     });
   }
 }
@@ -334,7 +335,7 @@ function addCounterClaimNeedHelpWithFeesRow({ rows, t, change }: RowContext, cc:
   rows.push({
     key: { text: t('rows.counterClaimNeedHelpWithFees.label') },
     value: { text: t(`rows.counterClaimNeedHelpWithFees.options.${cc.needHelpWithFees}`) },
-    actions: { items: [change('counter-claim-fee', 'rows.counterClaimNeedHelpWithFees.changeHidden')] },
+    actions: { items: [change('counter-claim-fee')] },
   });
 }
 
@@ -365,7 +366,7 @@ function addCounterClaimAppliedForHwfRow({ rows, t, change, yesNoNotSure }: RowC
     key: { text: t('rows.counterClaimHwfReference.label') },
     value: { text: reference },
     actions: {
-      items: [change('counter-claim-have-you-applied-for-help', 'rows.counterClaimHwfReference.changeHidden')],
+      items: [change('counter-claim-have-you-applied-for-help')],
     },
   };
   groupQuestionAndDetail(questionRow, detailRow);
@@ -379,7 +380,7 @@ function addCounterClaimTypeRow({ rows, t, change }: RowContext, cc: CcdCounterC
   rows.push({
     key: { text: t('rows.counterClaimType.label') },
     value: { text: t(`rows.counterClaimType.options.${cc.claimType}`) },
-    actions: { items: [change('counter-claim-what-are-you-claiming-for', 'rows.counterClaimType.changeHidden')] },
+    actions: { items: [change('counter-claim-what-are-you-claiming-for')] },
   });
 }
 
@@ -407,7 +408,7 @@ function addCounterClaimAmountRow({ rows, t, change, yesNoNotSure }: RowContext,
       const detailRow: SummaryListRow = {
         key: { text: t('rows.claimAmount.label') },
         value: { text: `£${pounds}` },
-        actions: { items: [change('counter-claim-specific-sum', 'rows.claimAmount.changeHidden')] },
+        actions: { items: [change('counter-claim-specific-sum')] },
       };
       groupQuestionAndDetail(questionRow, detailRow);
       rows.push(detailRow);
@@ -418,7 +419,7 @@ function addCounterClaimAmountRow({ rows, t, change, yesNoNotSure }: RowContext,
       const detailRow: SummaryListRow = {
         key: { text: t('rows.estimatedMaxClaimAmount.label') },
         value: { text: `£${pounds}` },
-        actions: { items: [change('counter-claim-specific-sum', 'rows.estimatedMaxClaimAmount.changeHidden')] },
+        actions: { items: [change('counter-claim-specific-sum')] },
       };
       groupQuestionAndDetail(questionRow, detailRow);
       rows.push(detailRow);

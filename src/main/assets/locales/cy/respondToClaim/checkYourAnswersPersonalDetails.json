@@ -3,25 +3,23 @@
   "cardTitle": "cy Personal details",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "cy Is your name {{name}}?",
-      "changeHidden": "cy Is your name {{name}}?"
+      "label": "cy Is your name {{name}}?"
     },
     "defendantName": {
-      "label": "cy Name",
-      "changeHidden": "cy Name"
+      "label": "cy Name"
+    },
+    "defendantNameCapture": {
+      "label": "cy What’s your name?"
     },
     "dateOfBirth": {
-      "label": "cy What is your date of birth?",
-      "changeHidden": "cy What is your date of birth?"
+      "label": "cy What is your date of birth?"
     },
     "correspondenceAddressConfirmation": {
       "label": "cy Is your correspondence address {{address}}?",
-      "fallbackLabel": "cy Correspondence address",
-      "changeHidden": "cy Is your correspondence address {{address}}?"
+      "fallbackLabel": "cy Correspondence address"
     },
     "contactByEmailOrPost": {
       "label": "cy How do you want to receive updates?",
-      "changeHidden": "cy How do you want to receive updates?",
       "options": {
         "email": "cy By email",
         "post": "cy By post",
@@ -29,20 +27,16 @@
       }
     },
     "contactByEmailAddress": {
-      "label": "cy Email",
-      "changeHidden": "cy Email"
+      "label": "cy Email"
     },
     "contactByPhone": {
-      "label": "cy Are you happy to be contacted by telephone?",
-      "changeHidden": "cy Are you happy to be contacted by telephone?"
+      "label": "cy Are you happy to be contacted by telephone?"
     },
     "contactByText": {
-      "label": "cy Are you happy to be contacted by text message?",
-      "changeHidden": "cy Are you happy to be contacted by text message?"
+      "label": "cy Are you happy to be contacted by text message?"
     },
     "contactDetails": {
-      "label": "cy Contact details",
-      "changeHidden": "cy Contact details"
+      "label": "cy Contact details"
     }
   }
 }
