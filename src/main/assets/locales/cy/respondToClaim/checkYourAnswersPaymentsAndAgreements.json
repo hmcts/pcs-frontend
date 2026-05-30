@@ -12,7 +12,7 @@
       "label": "cy Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?"
     },
     "repaymentAgreedDetails": {
-      "label": "cy What repayment plan have you agreed?"
+      "label": "cy Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made"
     },
     "repayArrearsInstalments": {
       "label": "cy Would you like to offer to pay your arrears in instalments?"
