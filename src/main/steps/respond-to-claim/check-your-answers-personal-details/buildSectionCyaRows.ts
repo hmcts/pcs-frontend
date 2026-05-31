@@ -91,20 +91,38 @@ function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void
   });
 }
 
-function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowContext): void {
+function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   // On a confirmed "Yes" the step clears party.address, so show the claimant-recorded
   // address; on "No" or a typed-in one, show the defendant party's.
-  const addressConfirmed =
-    normalizeYesNoValue(validatedCase.defendantResponses?.correspondenceAddressConfirmation) === 'YES';
+  const confirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
+  const addressConfirmed = !!confirmation && normalizeYesNoValue(confirmation) === 'YES';
 
-  const address = addressConfirmed
+  const sourceAddress = addressConfirmed
     ? validatedCase.claimantEnteredDefendantDetails?.address
     : validatedCase.defendantContactDetailsPartyAddress;
+
+  // Drop Country for the CYA row (UK address; matches the step legend and the task-list heading).
+  const address = sourceAddress ? { ...sourceAddress, Country: undefined } : undefined;
 
   const lines = formatCcdAddressLines(address);
   if (lines.length === 0) {
     return;
   }
+
+  if (addressConfirmed && confirmation) {
+    // YES branch: address is interpolated into the question ("Is your correspondence
+    // address X?"), so the value carries the Yes/No answer — same shape as the name
+    // confirmation row above.
+    rows.push({
+      key: { text: t('rows.correspondenceAddressConfirmation.label', { address: lines.join(', ') }) },
+      value: { text: yesNoNotSure(confirmation) },
+      actions: { items: [change('correspondence-address')] },
+    });
+    return;
+  }
+
+  // NO / no-confirmation branch: the citizen typed an address, so the question is
+  // "What's your correspondence address?" and the value is the address itself.
   rows.push({
     key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
     value: { html: lines.map(escapeHtml).join('<br>') },
