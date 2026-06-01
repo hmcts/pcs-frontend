@@ -1,8 +1,10 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
+import { purgeCounterClaimDocumentsFromCdam } from '../utils';
 
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { YesNoEnum } from '@services/ccdCase.interface';
 import type { CaseData, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createFormStep({
@@ -41,6 +43,12 @@ export const step: StepDefinition = createFormStep({
       response.defendantResponses.counterClaimWantToUploadFiles = counterClaimWantToUploadFiles;
     } else {
       delete response.defendantResponses.counterClaimWantToUploadFiles;
+    }
+
+    // User has flipped away from YES → purge any uploaded counter-claim documents from CDAM.
+    // The normaliser will then strip counterClaimDocuments from the saved draft.
+    if (counterClaimWantToUploadFiles !== YesNoEnum.YES) {
+      await purgeCounterClaimDocumentsFromCdam(req);
     }
 
     await saveDraftDefendantResponse(req, response);
