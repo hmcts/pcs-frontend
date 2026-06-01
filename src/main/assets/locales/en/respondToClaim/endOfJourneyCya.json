@@ -1,0 +1,53 @@
+{
+  "pageTitle": "Check your answers",
+  "heading": "Check your answers",
+  "sections": {
+    "legalAdvice": "Legal advice",
+    "personalDetails": "Personal details",
+    "claimantsClaim": "{{claimantName, pluralPossessive}} claim",
+    "dependantsAndOtherResidents": "Dependants and other residents",
+    "yourCircumstances": "Your circumstances",
+    "incomeAndExpenses": "Income and expenses",
+    "regularIncome": "Regular income",
+    "universalCredit": "Universal credit",
+    "priorityDebts": "Priority debts",
+    "regularExpenses": "Regular expenses",
+    "uploadFiles": "Upload files",
+    "otherConsiderations": "Other considerations",
+    "languageUsed": "Language used"
+  },
+  "rows": {
+    "otherConsiderations": {
+      "label": "Is there anything else you want the court to consider?",
+      "changeHidden": "whether there is anything else you want the court to consider"
+    },
+    "otherConsiderationsDetails": {
+      "label": "Give details about what else you want the court to consider",
+      "changeHidden": "the details about what else you want the court to consider"
+    },
+    "languageUsed": {
+      "label": "Which language did you use to complete this service?",
+      "changeHidden": "which language you used to complete this service",
+      "options": {
+        "ENGLISH": "English",
+        "WELSH": "Welsh",
+        "ENGLISH_AND_WELSH": "English and Welsh"
+      }
+    }
+  },
+  "statementOfTruth": {
+    "heading": "Statement of truth",
+    "hint": "Please check all the details you have entered for accuracy.",
+    "contemptFieldLabel": "Statement of truth",
+    "contemptOption": "I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
+    "beliefFieldLabel": "Statement of truth",
+    "beliefOption": "I believe that the facts stated in this defence form are true.",
+    "fullNameLabel": "Your full name"
+  },
+  "errors": {
+    "statementOfTruthContempt": "Select if you understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth",
+    "statementOfTruthBelief": "Select if you believe that the facts stated in this defence form are true",
+    "fullName": "Enter your full name",
+    "fullNameMaxLength": "Your full name must be 100 characters or fewer"
+  }
+}

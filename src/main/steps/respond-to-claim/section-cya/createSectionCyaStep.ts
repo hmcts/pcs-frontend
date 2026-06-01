@@ -1,11 +1,14 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
+import { findSectionIdForStep, sectionIdToBackendEnum } from '../sections.config';
 
 import type { SummaryListRow } from './cyaRow';
 
 import { createGetController, createStepNavigation, getTranslationFunction } from '@modules/steps';
+import { getStepUrl } from '@modules/steps/flow';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
@@ -66,11 +69,47 @@ export function createSectionCyaStep({
         };
       }),
     postController: {
-      post: async (req: Request, res: Response) => {
+      post: async (req: Request, res: Response, next: NextFunction) => {
         const action = req.body?.action;
         const isSaveForLater = action === 'saveForLater';
         const caseId = req.res?.locals.validatedCase?.id;
+        const sectionId = findSectionIdForStep(stepName);
 
+        if (sectionId) {
+          try {
+            const draft = buildDraftDefendantResponse(req);
+            const enumValue = sectionIdToBackendEnum(sectionId);
+            const current = draft.defendantResponses.completedSections ?? [];
+            draft.defendantResponses.completedSections = isSaveForLater
+              ? current.filter(s => s !== enumValue)
+              : current.includes(enumValue)
+                ? current
+                : [...current, enumValue];
+            await saveDraftDefendantResponse(req, draft);
+          } catch (error) {
+            return next(error);
+          }
+        }
+
+        // Redirect the user if they arrived here via the end-of-journey CYA change link.
+        // Clear the flag so that future edits from the task-list won't redirect back to the  end-of-journey CYA.
+        if (req.session.returnToCya) {
+          const returnUrl = req.session.returnToCya;
+          delete req.session.returnToCya;
+          if (!isSaveForLater) {
+            return res.redirect(303, returnUrl);
+          }
+        }
+
+        // Hub-first: both S&C and SFL land on the task-list for the citizen variant.
+        // Status differs (Done vs In progress) via the completedSections write above.
+        const activeFlow = resolveFlow(req);
+        const hub = activeFlow.hubStepName;
+        if (hub) {
+          return res.redirect(303, getStepUrl(hub, activeFlow, caseId));
+        }
+
+        // Legalrep / no-hub fallback — preserves existing behaviour for variants without a task-list.
         if (isSaveForLater) {
           const dashboardUrl = getDashboardUrl(caseId);
           return res.redirect(303, dashboardUrl ?? '/');

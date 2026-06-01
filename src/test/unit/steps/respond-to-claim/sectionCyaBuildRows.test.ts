@@ -3,7 +3,11 @@ import type { TFunction } from 'i18next';
 
 import { CcdCaseModel } from '../../../../main/services/ccdCaseData.model';
 import { buildSectionCyaRows as buildUploadRows } from '../../../../main/steps/respond-to-claim/check-your-answers-documents/buildSectionCyaRows';
-import { buildSectionCyaRows as buildIncomeRows } from '../../../../main/steps/respond-to-claim/check-your-answers-income-and-expenses/buildSectionCyaRows';
+import {
+  buildEOJRegularExpensesRows,
+  buildEOJRegularIncomeRows,
+  buildSectionCyaRows as buildIncomeRows,
+} from '../../../../main/steps/respond-to-claim/check-your-answers-income-and-expenses/buildSectionCyaRows';
 import { buildSectionCyaRows as buildPaymentsRows } from '../../../../main/steps/respond-to-claim/check-your-answers-payments-and-agreements/buildSectionCyaRows';
 import { buildSectionCyaRows as buildPersonalRows } from '../../../../main/steps/respond-to-claim/check-your-answers-personal-details/buildSectionCyaRows';
 import { buildSectionCyaRows as buildStartNowRows } from '../../../../main/steps/respond-to-claim/check-your-answers-start-now-and-details/buildSectionCyaRows';
@@ -189,7 +193,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(row?.actions?.items[0].visuallyHiddenText).toBe('rows.defendantNameConfirmation.changeHidden');
     });
 
-    it('correspondence-address: shows the confirmed claimant address as one row when the citizen answered Yes', () => {
+    it('correspondence-address: shows Yes against the interpolated question when the citizen confirmed the claim-recorded address', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -203,10 +207,11 @@ describe('section-CYA row builders — characterisation', () => {
         },
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
-      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
-      // The confirmed address shows as one multi-line row — no "is it correct?" Y/N row.
-      expect(addressRow?.value).toEqual({ html: '1 Claim Street<br>AB1 2CD' });
-      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
+      // YES branch uses the interpolated `label` ("Is your correspondence address X?") with a Y/N value —
+      // same shape as the defendant-name-confirmation row above.
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.label');
+      expect(addressRow?.value).toEqual({ text: 'options.yes' });
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel')).toBe(false);
     });
 
     it('correspondence-address: shows the corrected address as one row when the citizen answered No', () => {
@@ -647,7 +652,10 @@ describe('section-CYA row builders — characterisation', () => {
     it('shows "none" when no documents are uploaded', () => {
       const rows = buildUploadRows(reqWith(model({})), t);
       expect(rows).toHaveLength(1);
+      expect(rows[0].key.text).toBe('rows.uploadedDocuments.label');
       expect(rows[0].value).toEqual({ text: 'rows.uploadedDocuments.none' });
+      // Screen reader needs context on every state.
+      expect(rows[0].actions?.items[0].visuallyHiddenText).toBeTruthy();
     });
 
     it('lists uploaded document filenames', () => {
@@ -662,8 +670,116 @@ describe('section-CYA row builders — characterisation', () => {
         ),
         t
       );
+      expect(rows[0].key.text).toBe('rows.uploadedDocuments.label');
       expect(rows[0].value.html).toContain('evidence.pdf');
       expect(rows[0].value.html).toContain('letter.docx');
+      expect(rows[0].actions?.items[0].visuallyHiddenText).toBeTruthy();
+    });
+  });
+
+  describe('EOJ — buildEOJRegularIncomeRows', () => {
+    it('returns no rows when validatedCase is missing', () => {
+      expect(buildEOJRegularIncomeRows(reqWith(undefined), t)).toEqual([]);
+    });
+
+    it('returns no rows when shareIncomeExpenseDetails is not YES', () => {
+      expect(
+        buildEOJRegularIncomeRows(reqWith(model({ householdCircumstances: { shareIncomeExpenseDetails: 'NO' } })), t)
+      ).toEqual([]);
+    });
+
+    it('shows header with noAnswerProvided when opted in but no income selected', () => {
+      const rows = buildEOJRegularIncomeRows(
+        reqWith(model({ householdCircumstances: { shareIncomeExpenseDetails: 'YES' } })),
+        t
+      );
+      expect(rows).toHaveLength(1);
+      expect(rows[0].key.text).toBe('rows.regularIncome.label');
+      expect(rows[0].value).toEqual({ text: 'noAnswerProvided' });
+      expect(rows[0].classes).toBe('govuk-summary-list__row--no-border');
+    });
+
+    it('shows header and a sub-row per selected income source, all without borders', () => {
+      const rows = buildEOJRegularIncomeRows(
+        reqWith(
+          model({
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+              incomeFromJobs: 'YES',
+              incomeFromJobsAmount: '150000',
+              incomeFromJobsFrequency: 'MONTHLY',
+              pension: 'YES',
+              pensionAmount: '50000',
+              pensionFrequency: 'WEEKLY',
+            },
+          })
+        ),
+        t
+      );
+      expect(rows).toHaveLength(3);
+      expect(rows[0].value).toEqual({});
+      expect(rows.every(r => r.classes === 'govuk-summary-list__row--no-border')).toBe(true);
+      expect(rows.slice(1).every(r => r.key.classes === 'govuk-!-font-weight-regular')).toBe(true);
+    });
+
+    it('includes moneyFromElsewhere as a sub-row when details provided', () => {
+      const rows = buildEOJRegularIncomeRows(
+        reqWith(
+          model({
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+              moneyFromElsewhere: 'YES',
+              moneyFromElsewhereDetails: 'Child maintenance',
+            },
+          })
+        ),
+        t
+      );
+      expect(rows).toHaveLength(2);
+      expect(rows[1].key.text).toBe('rows.regularIncome.options.moneyFromElsewhere');
+      expect(rows[1].value).toEqual({ html: 'Child maintenance' });
+    });
+  });
+
+  describe('EOJ — buildEOJRegularExpensesRows', () => {
+    it('returns no rows when validatedCase is missing', () => {
+      expect(buildEOJRegularExpensesRows(reqWith(undefined), t)).toEqual([]);
+    });
+
+    it('returns no rows when shareIncomeExpenseDetails is not YES', () => {
+      expect(
+        buildEOJRegularExpensesRows(reqWith(model({ householdCircumstances: { shareIncomeExpenseDetails: 'NO' } })), t)
+      ).toEqual([]);
+    });
+
+    it('shows header with noAnswerProvided when opted in but no expenses selected', () => {
+      const rows = buildEOJRegularExpensesRows(
+        reqWith(model({ householdCircumstances: { shareIncomeExpenseDetails: 'YES' } })),
+        t
+      );
+      expect(rows).toHaveLength(1);
+      expect(rows[0].key.text).toBe('rows.regularExpenses.label');
+      expect(rows[0].value).toEqual({ text: 'noAnswerProvided' });
+      expect(rows[0].classes).toBe('govuk-summary-list__row--no-border');
+    });
+
+    it('shows header and a sub-row per selected expense, all without borders', () => {
+      const rows = buildEOJRegularExpensesRows(
+        reqWith(
+          model({
+            householdCircumstances: {
+              shareIncomeExpenseDetails: 'YES',
+              loanPayments: { applies: 'YES', amount: '110000', frequency: 'WEEKLY' },
+              mobilePhone: { applies: 'YES', amount: '2000', frequency: 'MONTHLY' },
+            },
+          })
+        ),
+        t
+      );
+      expect(rows).toHaveLength(3);
+      expect(rows[0].value).toEqual({});
+      expect(rows.every(r => r.classes === 'govuk-summary-list__row--no-border')).toBe(true);
+      expect(rows.slice(1).every(r => r.key.classes === 'govuk-!-font-weight-regular')).toBe(true);
     });
   });
 });

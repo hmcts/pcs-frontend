@@ -73,7 +73,8 @@
     },
     "documentUpload": {
       "wrongFileTypeDocStore": "The selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
-      "fileTooLargeDocStore": "The selected file must be smaller than 1GB",
+      "fileTooLargeDocStore": "The selected file must be smaller than {{maxSize}}MB",
+      "fileTotalTooLargeDocStore": "The total size of all uploaded files must be smaller than {{maxSize}}MB",
       "noFileSelected": "Select a file to upload",
       "uploadFailed": "The file could not be uploaded – try again",
       "fileDeleteFailed": "The file could not be removed – try again",
@@ -156,9 +157,13 @@
     }
   },
   "taskList": {
-    "startNowAndDetails": "Free Legal Advice",
+    "startNowAndDetails": "Read information about responding and free legal advice",
     "personalDetails": "Confirm your details and contact preferences",
-    "disputeAndTenancy": "Response",
-    "situationAndCircumstances": "Your circumstances"
+    "disputeAndTenancy": "Respond to specific parts of the claimant’s claim",
+    "situationAndCircumstances": "Give details about your household and circumstances",
+    "payments": "Declare recent payments or agreements made",
+    "incomeAndExpenditure": "Give details about your income and expenses",
+    "uploadFiles": "Upload documents",
+    "checkYourAnswersAndSubmit": "Check your answers and submit"
   }
 }
