@@ -79,7 +79,7 @@ describe('PostHandler - Save for Later Fix', () => {
 
     // Mock getDashboardUrl
     (dashboardModule.getDashboardUrl as jest.Mock) = jest.fn(caseId => {
-      return `/dashboard/${caseId || '1234567890123456'}`;
+      return `/case/${caseId || '1234567890123456'}/dashboard`;
     });
 
     (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
@@ -215,7 +215,7 @@ describe('PostHandler - Save for Later Fix', () => {
       expect(mockBeforeRedirect).toHaveBeenCalled();
 
       // Should redirect to dashboard
-      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/dashboard/1771325608502536');
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/case/1771325608502536/dashboard');
     });
 
     it('should use case ID from res.locals.validatedCase', async () => {
@@ -235,7 +235,7 @@ describe('PostHandler - Save for Later Fix', () => {
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       expect(dashboardModule.getDashboardUrl).toHaveBeenCalledWith('9876543210987654');
-      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/dashboard/9876543210987654');
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/case/9876543210987654/dashboard');
     });
 
     it('should handle missing case ID gracefully', async () => {

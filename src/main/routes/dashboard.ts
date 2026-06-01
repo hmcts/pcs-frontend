@@ -30,8 +30,6 @@ interface MappedTaskGroup {
   tasks: MappedTask[];
 }
 
-export const DASHBOARD_ROUTE = '/case/:caseReference/dashboard';
-
 const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'helpWithFees', href: 'https://www.gov.uk/get-help-with-court-fees' },
   {
