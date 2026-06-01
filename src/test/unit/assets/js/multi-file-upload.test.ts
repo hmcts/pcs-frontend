@@ -271,6 +271,66 @@ describe('multi-file-upload', () => {
       expect(value.index).toBe(0);
     });
 
+    it('rebuilds hidden inputs for server-rendered rows without __filename', () => {
+      const container = getContainer();
+      const row = document.createElement('div');
+      row.className = 'moj-multi-file-upload__row';
+      const message = document.createElement('div');
+      message.className = 'moj-multi-file-upload__message';
+      message.textContent = 'remaining.pdf';
+      row.appendChild(message);
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'moj-multi-file-upload__delete';
+      deleteBtn.value = 'ccd-doc-id';
+      deleteBtn.textContent = 'Remove ';
+      const hiddenSpan = document.createElement('span');
+      hiddenSpan.className = 'govuk-visually-hidden';
+      hiddenSpan.textContent = 'remaining.pdf';
+      deleteBtn.appendChild(hiddenSpan);
+      row.appendChild(deleteBtn);
+      container.appendChild(row);
+
+      const xhr = makeXhr(200, { success: true });
+      capturedHooks.deleteHook(null, undefined, xhr);
+
+      const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
+      expect(inputs).toHaveLength(1);
+      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      expect(value.document_filename).toBe('remaining.pdf');
+      expect(value.id).toBe('ccd-doc-id');
+      expect(value.index).toBeUndefined();
+    });
+
+    it('rebuilds hidden inputs for success rows using visually-hidden filename', () => {
+      const container = getContainer();
+      const row = document.createElement('div');
+      row.className = 'moj-multi-file-upload__row';
+      const message = document.createElement('div');
+      message.className = 'moj-multi-file-upload__message';
+      message.innerHTML =
+        '<span class="moj-multi-file-upload__success"><svg></svg>uploaded.pdf</span>';
+      row.appendChild(message);
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'moj-multi-file-upload__delete';
+      deleteBtn.value = 'ccd-doc-id-2';
+      deleteBtn.textContent = 'Remove ';
+      const hiddenSpan = document.createElement('span');
+      hiddenSpan.className = 'govuk-visually-hidden';
+      hiddenSpan.textContent = 'uploaded.pdf';
+      deleteBtn.appendChild(hiddenSpan);
+      row.appendChild(deleteBtn);
+      container.appendChild(row);
+
+      const xhr = makeXhr(200, { success: true });
+      capturedHooks.deleteHook(null, undefined, xhr);
+
+      const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
+      expect(inputs).toHaveLength(1);
+      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      expect(value.document_filename).toBe('uploaded.pdf');
+      expect(value.id).toBe('ccd-doc-id-2');
+    });
+
     it('shows error summary on failed delete', () => {
       const xhr = makeXhr(500, { error: { message: 'fail' } });
       capturedHooks.deleteHook(null, undefined, xhr);

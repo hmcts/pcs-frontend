@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 
 import {
+  hydrateUploadedDocumentsFromBody,
   parseUploadedDocumentsFromBody,
   wireFileUploadOnPostError,
   wireFileUploadUrls,
@@ -41,6 +42,11 @@ function makeRequest(partial: Partial<Request>): Request {
 }
 
 describe('fileUploadUtils', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (stubStorage.read as jest.Mock).mockResolvedValue([]);
+  });
+
   describe('parseUploadedDocumentsFromBody', () => {
     it('returns empty array when key is missing', () => {
       expect(parseUploadedDocumentsFromBody({})).toEqual([]);
@@ -109,28 +115,100 @@ describe('fileUploadUtils', () => {
     });
   });
 
+  describe('hydrateUploadedDocumentsFromBody', () => {
+    it('does nothing when body already has uploadedDocuments[]', async () => {
+      const req = makeRequest({
+        body: {
+          'uploadedDocuments[]': JSON.stringify({ index: 0, document_filename: 'from-body.pdf' }),
+        },
+      });
+      await hydrateUploadedDocumentsFromBody(req, stubStorage);
+      expect(stubStorage.read).not.toHaveBeenCalled();
+      expect(req.body['uploadedDocuments[]']).toBe(JSON.stringify({ index: 0, document_filename: 'from-body.pdf' }));
+    });
+
+    it('injects JSON hidden values from CCD when body is empty', async () => {
+      const ccdDoc = {
+        id: 'ccd-1',
+        value: {
+          document: { document_filename: 'stored.pdf' },
+          contentType: 'application/pdf',
+          sizeInBytes: 100,
+        },
+      };
+      (stubStorage.read as jest.Mock).mockResolvedValueOnce([ccdDoc]);
+      const req = makeRequest({ body: {} });
+
+      await hydrateUploadedDocumentsFromBody(req, stubStorage);
+
+      expect(stubStorage.read).toHaveBeenCalledWith(req);
+      const injected = req.body['uploadedDocuments[]'] as string[];
+      expect(injected).toHaveLength(1);
+      expect(JSON.parse(injected[0])).toEqual({
+        index: 0,
+        id: 'ccd-1',
+        document_filename: 'stored.pdf',
+        content_type: 'application/pdf',
+        sizeInBytes: 100,
+      });
+    });
+
+    it('does nothing without documentStorage', async () => {
+      const req = makeRequest({ body: {} });
+      await hydrateUploadedDocumentsFromBody(req, undefined);
+      expect(stubStorage.read).not.toHaveBeenCalled();
+      expect(req.body['uploadedDocuments[]']).toBeUndefined();
+    });
+  });
+
   describe('wireFileUploadOnPostError', () => {
-    it('runs wireFileUploadUrls then overwrites component.value from body', () => {
+    it('runs wireFileUploadUrls then overwrites component.value from body', async () => {
       const form = makeFileUploadForm({ value: ['stale'] });
       const req = makeRequest({
         body: {
           'uploadedDocuments[]': JSON.stringify({ index: 0, document_filename: 'new.pdf' }),
         },
       });
-      wireFileUploadOnPostError(form, req, stubStorage);
+      await wireFileUploadOnPostError(form, req, stubStorage);
       expect(form.fields[0].component?.uploadUrl).toContain('/upload');
       expect(form.fields[0].component?.deleteUrl).toContain('/delete');
       expect(form.fields[0].component?.value).toEqual([{ index: 0, document_filename: 'new.pdf' }]);
+      expect(stubStorage.read).not.toHaveBeenCalled();
     });
 
-    it('does not mutate URLs or value without documentStorage', () => {
+    it('falls back to CCD documents when body has no uploadedDocuments[]', async () => {
+      const ccdDoc = {
+        id: 'ccd-2',
+        value: {
+          document: { document_filename: 'ccd-only.pdf' },
+          contentType: 'application/pdf',
+        },
+      };
+      (stubStorage.read as jest.Mock).mockResolvedValueOnce([ccdDoc]);
+      const form = makeFileUploadForm({ value: [] });
+      const req = makeRequest({ body: {} });
+
+      await wireFileUploadOnPostError(form, req, stubStorage);
+
+      expect(stubStorage.read).toHaveBeenCalledWith(req);
+      expect(form.fields[0].component?.value).toEqual([
+        {
+          index: 0,
+          id: 'ccd-2',
+          document_filename: 'ccd-only.pdf',
+          content_type: 'application/pdf',
+        },
+      ]);
+    });
+
+    it('does not mutate URLs or value without documentStorage', async () => {
       const form = makeFileUploadForm();
       const req = makeRequest({
         body: {
           'uploadedDocuments[]': JSON.stringify({ index: 0, document_filename: 'only.pdf' }),
         },
       });
-      wireFileUploadOnPostError(form, req, undefined);
+      await wireFileUploadOnPostError(form, req, undefined);
       expect(form.fields[0].component?.uploadUrl).toBe('');
       expect(form.fields[0].component?.value).toEqual([]);
     });

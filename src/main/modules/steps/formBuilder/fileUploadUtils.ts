@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import type { DocumentStorage } from '@modules/documents/storage';
+import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/storage';
 import type { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 /**
@@ -56,14 +56,38 @@ export function wireFileUploadUrls(
 }
 
 /**
- * POST validation error path only: wire URLs and restore previously uploaded documents
- * from hidden inputs so the MOJ multi-file-upload client can enhance the page.
+ * When POST has no parsed uploadedDocuments[] but CCD still has documents (e.g. after
+ * client rebuildHiddenInputs missed server-rendered rows), inject hidden-field values
+ * into req.body so validation sees the same list as the draft.
  */
-export function wireFileUploadOnPostError(
+export async function hydrateUploadedDocumentsFromBody(
+  req: Request,
+  documentStorage: DocumentStorage | undefined
+): Promise<void> {
+  if (!documentStorage) {
+    return;
+  }
+  const body = req.body as Record<string, unknown>;
+  if (parseUploadedDocumentsFromBody(body).length > 0) {
+    return;
+  }
+  const displayDocs = toDisplayDocuments(await documentStorage.read(req));
+  if (displayDocs.length === 0) {
+    return;
+  }
+  body['uploadedDocuments[]'] = displayDocs.map(doc => JSON.stringify(doc));
+}
+
+/**
+ * POST validation error path only: wire URLs and restore previously uploaded documents
+ * from hidden inputs (or CCD when the body is empty) so the MOJ multi-file-upload
+ * client can enhance the page.
+ */
+export async function wireFileUploadOnPostError(
   formContent: BuiltFormContent,
   req: Request,
   documentStorage: DocumentStorage | undefined
-): void {
+): Promise<void> {
   wireFileUploadUrls(formContent, req, documentStorage);
   if (!documentStorage) {
     return;
@@ -73,5 +97,6 @@ export function wireFileUploadOnPostError(
     return;
   }
   const body = req.body as Record<string, unknown>;
-  fileField.component.value = parseUploadedDocumentsFromBody(body);
+  const parsed = parseUploadedDocumentsFromBody(body);
+  fileField.component.value = parsed.length > 0 ? parsed : toDisplayDocuments(await documentStorage.read(req));
 }

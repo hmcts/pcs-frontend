@@ -6,7 +6,7 @@ import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
-import { wireFileUploadOnPostError } from './fileUploadUtils';
+import { hydrateUploadedDocumentsFromBody, wireFileUploadOnPostError } from './fileUploadUtils';
 import { type FormBuilderFlowConfig, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import {
@@ -84,6 +84,8 @@ export function createPostHandler(
       // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
       normalizeCheckboxFields(req, fields);
 
+      await hydrateUploadedDocumentsFromBody(req, documentStorage);
+
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
       const emptyFormContent = { fields: [] } as BuiltFormContent;
       const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
@@ -119,7 +121,7 @@ export function createPostHandler(
           interpolationValues,
           showCancelButton
         );
-        wireFileUploadOnPostError(formContent, req, documentStorage);
+        await wireFileUploadOnPostError(formContent, req, documentStorage);
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };

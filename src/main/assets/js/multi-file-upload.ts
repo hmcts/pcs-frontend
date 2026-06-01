@@ -341,6 +341,20 @@ function initContainer(container: HTMLElement): void {
   });
 }
 
+function getRowDocumentFilename(row: Element, deleteButton: HTMLButtonElement | null): string {
+  const fromFilenameEl = row.querySelector('.moj-multi-file-upload__filename')?.textContent?.trim();
+  if (fromFilenameEl) {
+    return fromFilenameEl;
+  }
+
+  const fromVisuallyHidden = deleteButton?.querySelector('.govuk-visually-hidden')?.textContent?.trim();
+  if (fromVisuallyHidden) {
+    return fromVisuallyHidden;
+  }
+
+  return row.querySelector('.moj-multi-file-upload__message')?.textContent?.trim() || '';
+}
+
 function rebuildHiddenInputs(hiddenContainer: HTMLElement, uploadContainer: HTMLElement): void {
   // Remove all existing hidden inputs
   hiddenContainer.querySelectorAll<HTMLInputElement>('input[name="uploadedDocuments[]"]').forEach(input => {
@@ -350,20 +364,23 @@ function rebuildHiddenInputs(hiddenContainer: HTMLElement, uploadContainer: HTML
   // Rebuild from remaining file rows in the MOJ component
   const rows = uploadContainer.querySelectorAll('.moj-multi-file-upload__row:not(.moj-multi-file-upload__row--error)');
   rows.forEach((row, index) => {
-    const filenameEl = row.querySelector('.moj-multi-file-upload__filename');
     const deleteButton = row.querySelector<HTMLButtonElement>('.moj-multi-file-upload__delete');
     const documentId = deleteButton?.value?.trim();
-    if (filenameEl) {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'uploadedDocuments[]';
-      input.value = JSON.stringify({
-        ...(documentId ? { id: documentId } : { index }),
-        document_filename: filenameEl.textContent?.trim() || '',
-      });
-      input.dataset.documentIndex = String(index);
-      hiddenContainer.appendChild(input);
+    const document_filename = getRowDocumentFilename(row, deleteButton);
+
+    if (!document_filename && !documentId) {
+      return;
     }
+
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'uploadedDocuments[]';
+    input.value = JSON.stringify({
+      ...(documentId ? { id: documentId } : { index }),
+      document_filename,
+    });
+    input.dataset.documentIndex = String(index);
+    hiddenContainer.appendChild(input);
   });
 }
 
