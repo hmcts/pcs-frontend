@@ -23,10 +23,12 @@ jest.mock('../../../main/middleware/caseReference', () => ({
   caseReferenceParamMiddleware: mockCaseReferenceParamMiddleware,
 }));
 
-const mockSubmitResponseToClaim = jest.fn();
-jest.mock('../../../main/services/ccdCaseService', () => ({
-  ccdCaseService: {
-    submitResponseToClaim: mockSubmitResponseToClaim,
+const mockHttpGet = jest.fn();
+const mockHttpPost = jest.fn();
+jest.mock('../../../main/modules/http', () => ({
+  http: {
+    get: mockHttpGet,
+    post: mockHttpPost,
   },
 }));
 
@@ -122,10 +124,14 @@ describe('finalSubmit routes', () => {
       expect(res.render).toHaveBeenCalledWith('error', { error: 'Authentication required' });
     });
 
-    it('should submit via ccdCaseService and redirect to response-submitted confirmation', async () => {
+    it('should submit to CCD and redirect to response-submitted confirmation', async () => {
       const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
-      mockSubmitResponseToClaim.mockResolvedValue({});
+      mockHttpGet.mockResolvedValue({
+        data: { token: 'mock-event-token' },
+      });
+
+      mockHttpPost.mockResolvedValue({});
 
       const validatedCase = {
         id: '1234567890123456',
@@ -150,14 +156,16 @@ describe('finalSubmit routes', () => {
 
       await handler(req, res);
 
-      expect(mockSubmitResponseToClaim).toHaveBeenCalledWith('mock-token', validatedCase);
+      expect(mockHttpGet).toHaveBeenCalled();
+      expect(mockHttpPost).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
     });
 
     it('should redirect to check-your-answers with error when submission fails', async () => {
       const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
-      mockSubmitResponseToClaim.mockRejectedValue(new Error('CCD connection failed'));
+      mockHttpGet.mockResolvedValue({ data: { token: 'mock-event-token' } });
+      mockHttpPost.mockRejectedValue(new Error('CCD connection failed'));
 
       const req = {
         params: { caseReference: '1234567890123456' },
