@@ -65,6 +65,8 @@ export default function viewAllApplicationsRoutes(app: Application): void {
 }
 
 function toGenAppSummary(genApp: GenApp): GenAppSummary {
+  const supportingDocuments = mapSupportingDocuments(genApp);
+
   return {
     applicationType: genApp.applicationType,
     party: genApp.party,
@@ -73,7 +75,19 @@ function toGenAppSummary(genApp: GenApp): GenAppSummary {
       filename: genApp.submissionDocument.document.document_filename,
       documentId: genApp.submissionDocument.id,
     },
+    supportingDocuments,
   };
+}
+
+function mapSupportingDocuments(genApp: GenApp) {
+  if (!genApp.supportingDocuments) {
+    return [];
+  }
+
+  return genApp.supportingDocuments.map(listValue => ({
+    filename: listValue.value.document_filename,
+    documentId: listValue.id,
+  }));
 }
 
 function isForApplicant(genApp: GenApp, currentUserIdamId: string) {
