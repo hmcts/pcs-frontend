@@ -396,7 +396,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Respond to a claim - Solicitor journey redirects to Dashboardwhen Yes is selected for Do you have a solicitor? @noDefendants @crossbrowser', async () => {
+  test('Respond to a claim - Solicitor journey redirects to Dashboardwhen Yes is selected for Do you have a solicitor? @noDefendants @crossbrowser @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.yesRadioOption);
     await performValidation('mainHeader', askYourSolicitorToRespond.mainHeader);
