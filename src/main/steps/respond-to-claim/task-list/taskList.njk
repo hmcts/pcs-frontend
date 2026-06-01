@@ -1,7 +1,5 @@
 {% extends "stepsTemplate.njk" %}
 
-{% from "govuk/components/task-list/macro.njk" import govukTaskList %}
-
 {% block pageTitle %}{{ t('pageTitle') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block content %}
@@ -16,12 +14,27 @@
     <div class="govuk-grid-column-two-thirds pcs-task-list">
       <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible pcs-task-list__divider">
 
+      {# Status sits inside the link (visually-hidden) so it isn't read twice with the visible tag. #}
       {% for group in groups %}
         <h2 class="govuk-heading-m">{{ group.number }}. {{ group.title }}</h2>
-        {{ govukTaskList({
-          idPrefix: 'tasklist-' + group.id,
-          items: group.items
-        }) }}
+        <ul class="govuk-task-list">
+          {% for item in group.items %}
+            <li class="govuk-task-list__item{% if item.href %} govuk-task-list__item--with-link{% endif %}">
+              <div class="govuk-task-list__name-and-hint">
+                {% if item.href %}
+                  <a class="govuk-link govuk-task-list__link" href="{{ item.href }}">
+                    {{ item.title.text }}<span class="govuk-visually-hidden"> &ndash; {{ item.status.tag.text }}</span>
+                  </a>
+                {% else %}
+                  <div>{{ item.title.text }}<span class="govuk-visually-hidden"> &ndash; {{ item.status.tag.text }}</span></div>
+                {% endif %}
+              </div>
+              <div class="govuk-task-list__status" aria-hidden="true">
+                <strong class="govuk-tag{% if item.status.tag.classes %} {{ item.status.tag.classes }}{% endif %}">{{ item.status.tag.text }}</strong>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
       {% endfor %}
     </div>
 
