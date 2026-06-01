@@ -55,9 +55,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       labelClasses: 'govuk-label--s',
       translationKey: { label: 'uploadLabel' },
       validate: (_value, formData) => {
-        if (formData['action'] === 'saveForLater') {
-          return undefined;
-        }
         const uploaded = formData['uploadedDocuments[]'];
         const hasFiles =
           uploaded !== undefined && uploaded !== null && !(Array.isArray(uploaded) && uploaded.length === 0);
