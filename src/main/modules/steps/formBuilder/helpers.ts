@@ -18,7 +18,7 @@ export function getTranslation(
   fallback?: string,
   interpolation?: Record<string, unknown>
 ): string | undefined {
-  const options = { returnObjects: true, ...interpolation };
+  const options = { returnObjects: true, returnEmptyString: true, ...interpolation };
   const result = t(key, options) as unknown;
   if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
     return result;
