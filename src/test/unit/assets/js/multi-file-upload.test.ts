@@ -446,4 +446,91 @@ describe('multi-file-upload', () => {
       expect(originalSpy).not.toHaveBeenCalled();
     });
   });
+
+  describe('error summary dropzone highlight', () => {
+    function setupErrorHighlightDOM() {
+      document.body.innerHTML = `
+        <div class="govuk-grid-column-two-thirds">
+          <div class="govuk-error-summary" role="alert">
+            <div class="govuk-error-summary__body">
+              <ul class="govuk-list govuk-error-summary__list">
+                <li><a href="#documents">Select a document to upload</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <form>
+          <div id="uploaded-documents-container"></div>
+          <div class="govuk-form-group govuk-form-group--error">
+            <div id="upload-container"
+                 data-module="moj-multi-file-upload"
+                 data-upload-url="/upload"
+                 data-delete-url="/delete">
+              <div class="moj-multi-file-upload__dropzone">
+                <input id="documents" class="moj-multi-file-upload__input" type="file" />
+              </div>
+            </div>
+          </div>
+        </form>
+      `;
+    }
+
+    function getDropzone(): HTMLElement {
+      return document.querySelector('.moj-multi-file-upload__dropzone')!;
+    }
+
+    it('highlights dropzone when error-summary link is clicked', () => {
+      setupErrorHighlightDOM();
+      initMultiFileUpload();
+
+      const dropzone = getDropzone();
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
+
+      document.querySelector<HTMLAnchorElement>('.govuk-error-summary a[href="#documents"]')!.click();
+
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(true);
+    });
+
+    it('highlights dropzone on file input focus when form group is in error', () => {
+      setupErrorHighlightDOM();
+      initMultiFileUpload();
+
+      const dropzone = getDropzone();
+      const fileInput = document.getElementById('documents') as HTMLInputElement;
+
+      fileInput.focus();
+
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(true);
+    });
+
+    it('clears dropzone highlight on file input blur', () => {
+      setupErrorHighlightDOM();
+      initMultiFileUpload();
+
+      const dropzone = getDropzone();
+      const fileInput = document.getElementById('documents') as HTMLInputElement;
+
+      fileInput.focus();
+      fileInput.blur();
+
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
+    });
+
+    it('clears dropzone highlight when inline field error is cleared', () => {
+      setupErrorHighlightDOM();
+      initMultiFileUpload();
+
+      const dropzone = getDropzone();
+      document.querySelector<HTMLAnchorElement>('.govuk-error-summary a[href="#documents"]')!.click();
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(true);
+
+      try {
+        capturedHooks.entryHook(null, { name: 'doc.pdf', size: 1024 });
+      } catch {
+        /* not expected */
+      }
+
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
+    });
+  });
 });

@@ -32,6 +32,20 @@ function getFileInput(container: HTMLElement): HTMLInputElement | null {
   return container.querySelector<HTMLInputElement>('.moj-multi-file-upload__input');
 }
 
+const DROPZONE_ERROR_HIGHLIGHT_CLASS = 'moj-multi-file-upload__dropzone--error-summary-target';
+
+function getDropzone(container: HTMLElement): HTMLElement | null {
+  return container.querySelector<HTMLElement>('.moj-multi-file-upload__dropzone');
+}
+
+function highlightDropzone(container: HTMLElement): void {
+  getDropzone(container)?.classList.add(DROPZONE_ERROR_HIGHLIGHT_CLASS);
+}
+
+function clearDropzoneHighlight(container: HTMLElement): void {
+  getDropzone(container)?.classList.remove(DROPZONE_ERROR_HIGHLIGHT_CLASS);
+}
+
 function getOrCreateErrorSummary(title: string): HTMLDivElement {
   const anchor = getPageAnchor();
   let summary = anchor.querySelector<HTMLDivElement>(':scope > .govuk-error-summary');
@@ -91,6 +105,7 @@ function setInlineFieldError(container: HTMLElement, message: string): void {
 }
 
 function clearInlineFieldError(container: HTMLElement): void {
+  clearDropzoneHighlight(container);
   const fileInput = getFileInput(container);
   if (!fileInput) {
     return;
@@ -330,6 +345,32 @@ function initContainer(container: HTMLElement): void {
     });
     duplicateLabel.replaceWith(chooseFilesButton);
   }
+
+  const wireDropzoneErrorHighlight = (): void => {
+    const fileInput = getFileInput(container);
+    if (!fileInput) {
+      return;
+    }
+
+    const onFileInputFocus = (): void => {
+      highlightDropzone(container);
+    };
+    const onFileInputBlur = (): void => {
+      clearDropzoneHighlight(container);
+    };
+
+    fileInput.addEventListener('focus', onFileInputFocus);
+    fileInput.addEventListener('blur', onFileInputBlur);
+
+    const summaryLinkSelector = `.govuk-error-summary a[href="#${fileInput.id}"]`;
+    document.querySelectorAll<HTMLAnchorElement>(summaryLinkSelector).forEach(link => {
+      link.addEventListener('click', () => {
+        highlightDropzone(container);
+      });
+    });
+  };
+
+  wireDropzoneErrorHighlight();
 
   form.addEventListener('submit', event => {
     if (!hasVisibleError(container)) {
