@@ -13,7 +13,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     heading: 'heading',
     paragraph: 'dependantChildrenParagraph',
-    dependantHeading: 'dependantHeading',
     dependantQuestion: 'dependantQuestion',
   },
   beforeRedirect: async req => {
