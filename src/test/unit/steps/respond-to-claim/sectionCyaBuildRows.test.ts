@@ -647,7 +647,10 @@ describe('section-CYA row builders — characterisation', () => {
     it('shows "none" when no documents are uploaded', () => {
       const rows = buildUploadRows(reqWith(model({})), t);
       expect(rows).toHaveLength(1);
+      expect(rows[0].key.text).toBe('rows.uploadedDocuments.label');
       expect(rows[0].value).toEqual({ text: 'rows.uploadedDocuments.none' });
+      // Screen reader needs context on every state.
+      expect(rows[0].actions?.items[0].visuallyHiddenText).toBeTruthy();
     });
 
     it('lists uploaded document filenames', () => {
@@ -662,8 +665,10 @@ describe('section-CYA row builders — characterisation', () => {
         ),
         t
       );
+      expect(rows[0].key.text).toBe('rows.uploadedDocuments.label');
       expect(rows[0].value.html).toContain('evidence.pdf');
       expect(rows[0].value.html).toContain('letter.docx');
+      expect(rows[0].actions?.items[0].visuallyHiddenText).toBeTruthy();
     });
   });
 });
