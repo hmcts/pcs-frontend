@@ -18,6 +18,7 @@ export type SummaryListRow = {
 export type ChangeAction = {
   href: string;
   text: string;
+  visuallyHiddenText: string;
 };
 
 /** Group a question row with its revealed detail: no divider, regular-weight detail key. */
@@ -65,16 +66,13 @@ export const makeYesNoNotSure =
   (value: string): string =>
     t(`options.${toOptionKey(value)}`);
 
-/**
- * Section-scoped "Change" link factory. `stepSlug` is the edit-target step.
- * The link announces just "Change" — every CYA row sits under its own question key,
- * so a per-link visually-hidden label only made screen readers re-announce the question.
- */
+// Hidden text is a short noun so screen readers announce "Change name", not the full question.
 export const makeChange =
   (caseRef: string, sectionId: RespondToClaimSectionId, t: TFunction) =>
-  (stepSlug: string): ChangeAction => ({
+  (stepSlug: string, hiddenKey: string): ChangeAction => ({
     href: `/case/${caseRef}/respond-to-claim/${stepSlug}?edit=${sectionId}`,
     text: t('change'),
+    visuallyHiddenText: t(hiddenKey),
   });
 
 export interface BaseRowContext {
@@ -113,7 +111,7 @@ export function pushYesNoRow(
   const row: SummaryListRow = {
     key: { text: t(`${labelKey}.label`) },
     value: { text: yesNoNotSure(answer) },
-    actions: { items: [change(step)] },
+    actions: { items: [change(step, `${labelKey}.changeHidden`)] },
   };
   rows.push(row);
   return row;
@@ -132,7 +130,7 @@ export function pushDetailRow(
   const detailRow: SummaryListRow = {
     key: { text: t(`${labelKey}.label`) },
     value: { html: escapeWithLineBreaks(detail) },
-    actions: { items: [change(step)] },
+    actions: { items: [change(step, `${labelKey}.changeHidden`)] },
   };
   groupQuestionAndDetail(questionRow, detailRow);
   rows.push(detailRow);

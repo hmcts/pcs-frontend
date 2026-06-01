@@ -46,7 +46,7 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
     const questionRow: SummaryListRow = {
       key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
       value: { text: yesNoNotSure(nameConfirmation) },
-      actions: { items: [change('defendant-name-confirmation')] },
+      actions: { items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')] },
     };
     rows.push(questionRow);
 
@@ -60,7 +60,7 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
     const detailRow: SummaryListRow = {
       key: { text: t('rows.defendantName.label') },
       value: { html: escapeHtml(correctedName) },
-      actions: { items: [change('defendant-name-confirmation')] },
+      actions: { items: [change('defendant-name-confirmation', 'rows.defendantName.changeHidden')] },
     };
     groupQuestionAndDetail(questionRow, detailRow);
     rows.push(detailRow);
@@ -77,7 +77,7 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
   rows.push({
     key: { text: t('rows.defendantNameCapture.label') },
     value: { html: escapeHtml(partyName) },
-    actions: { items: [change('defendant-name-capture')] },
+    actions: { items: [change('defendant-name-capture', 'rows.defendantNameCapture.changeHidden')] },
   });
 }
 
@@ -87,7 +87,7 @@ function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void
   rows.push({
     key: { text: t('rows.dateOfBirth.label') },
     value: { text: dateOfBirth ? formatIsoDate(dateOfBirth) : t('noAnswerProvided') },
-    actions: { items: [change('defendant-date-of-birth')] },
+    actions: { items: [change('defendant-date-of-birth', 'rows.dateOfBirth.changeHidden')] },
   });
 }
 
@@ -108,7 +108,7 @@ function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowCont
   rows.push({
     key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
     value: { html: lines.map(escapeHtml).join('<br>') },
-    actions: { items: [change('correspondence-address')] },
+    actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
   });
 }
 
@@ -129,7 +129,7 @@ function addContactByEmailOrPostRow({ rows, validatedCase, t, change }: RowConte
   rows.push({
     key: { text: t('rows.contactByEmailOrPost.label') },
     value: items.length === 0 ? { text: t('rows.contactByEmailOrPost.options.none') } : multiSelectValue(items),
-    actions: { items: [change('contact-preferences-email-or-post')] },
+    actions: { items: [change('contact-preferences-email-or-post', 'rows.contactByEmailOrPost.changeHidden')] },
   });
 }
 
@@ -179,6 +179,6 @@ function addContactDetailsRow({ rows, validatedCase, t, change }: RowContext): v
   rows.push({
     key: { text: t('rows.contactDetails.label') },
     value: { html: lines.map(line => `<p class="govuk-body">${escapeHtml(line)}</p>`).join('') },
-    actions: { items: [change(changeStep)] },
+    actions: { items: [change(changeStep, 'rows.contactDetails.changeHidden')] },
   });
 }

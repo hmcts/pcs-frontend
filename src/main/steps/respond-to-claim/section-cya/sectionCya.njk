@@ -38,14 +38,14 @@
                 <div class="govuk-summary-list__actions{% if row.actions.classes %} {{ row.actions.classes }}{% endif %}">
                   {% if row.actions.items.length == 1 %}
                     <a class="govuk-link{% if row.actions.items[0].classes %} {{ row.actions.items[0].classes }}{% endif %}" href="{{ row.actions.items[0].href }}">
-                      {{ row.actions.items[0].text }}
+                      {{ row.actions.items[0].text }}{% if row.actions.items[0].visuallyHiddenText %}<span class="govuk-visually-hidden"> {{ row.actions.items[0].visuallyHiddenText }}</span>{% endif %}
                     </a>
                   {% else %}
                     <ul class="govuk-summary-list__actions-list">
                       {% for action in row.actions.items %}
                         <li class="govuk-summary-list__actions-list-item">
                           <a class="govuk-link{% if action.classes %} {{ action.classes }}{% endif %}" href="{{ action.href }}">
-                            {{ action.text }}
+                            {{ action.text }}{% if action.visuallyHiddenText %}<span class="govuk-visually-hidden"> {{ action.visuallyHiddenText }}</span>{% endif %}
                           </a>
                         </li>
                       {% endfor %}

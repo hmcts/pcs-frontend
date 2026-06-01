@@ -185,6 +185,8 @@ describe('section-CYA row builders — characterisation', () => {
         r => r.key.text === 'rows.defendantNameConfirmation.label'
       );
       expect(row?.value).toEqual({ text: 'options.yes' });
+      // Change link carries a short subject for screen-reader link-nav (e.g. "Change name").
+      expect(row?.actions?.items[0].visuallyHiddenText).toBe('rows.defendantNameConfirmation.changeHidden');
     });
 
     it('correspondence-address: shows the confirmed claimant address as one row when the citizen answered Yes', () => {

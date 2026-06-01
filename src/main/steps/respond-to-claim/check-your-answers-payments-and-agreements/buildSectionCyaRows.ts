@@ -62,7 +62,7 @@ function addAnyPaymentsMadeRows({
   const questionRow: SummaryListRow = {
     key: { text: t('rows.anyPaymentsMade.label', { claimantName, claimIssueDate: issueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
-    actions: { items: [change('repayments-made')] },
+    actions: { items: [change('repayments-made', 'rows.anyPaymentsMade.changeHidden')] },
   };
   rows.push(questionRow);
 
@@ -73,7 +73,7 @@ function addAnyPaymentsMadeRows({
   const detailRow: SummaryListRow = {
     key: { text: t('rows.paymentDetails.label') },
     value: { html: escapeWithLineBreaks(details) },
-    actions: { items: [change('repayments-made')] },
+    actions: { items: [change('repayments-made', 'rows.paymentDetails.changeHidden')] },
   };
   groupQuestionAndDetail(questionRow, detailRow);
   rows.push(detailRow);
@@ -96,7 +96,7 @@ function addRepaymentPlanAgreedRows({
   const questionRow: SummaryListRow = {
     key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, claimIssueDate: issueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
-    actions: { items: [change('repayments-agreed')] },
+    actions: { items: [change('repayments-agreed', 'rows.repaymentPlanAgreed.changeHidden')] },
   };
   rows.push(questionRow);
 
@@ -107,7 +107,7 @@ function addRepaymentPlanAgreedRows({
   const detailRow: SummaryListRow = {
     key: { text: t('rows.repaymentAgreedDetails.label') },
     value: { html: escapeWithLineBreaks(details) },
-    actions: { items: [change('repayments-agreed')] },
+    actions: { items: [change('repayments-agreed', 'rows.repaymentAgreedDetails.changeHidden')] },
   };
   groupQuestionAndDetail(questionRow, detailRow);
   rows.push(detailRow);
@@ -140,7 +140,7 @@ function addInstallmentRows({ rows, paymentAgreement, t, change }: RowContext): 
     rows.push({
       key: { text: t('rows.installmentAmount.label') },
       value: { text: `£${pounds}` },
-      actions: { items: [change('how-much-afford-to-pay')] },
+      actions: { items: [change('how-much-afford-to-pay', 'rows.installmentAmount.changeHidden')] },
     });
   }
   const frequency = paymentAgreement.additionalContributionFrequency;
@@ -148,7 +148,7 @@ function addInstallmentRows({ rows, paymentAgreement, t, change }: RowContext): 
     rows.push({
       key: { text: t('rows.installmentFrequency.label') },
       value: { text: t(`rows.installmentFrequency.frequencies.${frequency}`) },
-      actions: { items: [change('how-much-afford-to-pay')] },
+      actions: { items: [change('how-much-afford-to-pay', 'rows.installmentFrequency.changeHidden')] },
     });
   }
 }

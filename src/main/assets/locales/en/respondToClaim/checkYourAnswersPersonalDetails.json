@@ -3,23 +3,29 @@
   "cardTitle": "Personal details",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "Is your name {{name}}?"
+      "label": "Is your name {{name}}?",
+      "changeHidden": "name"
     },
     "defendantName": {
-      "label": "Name"
+      "label": "Name",
+      "changeHidden": "corrected name"
     },
     "defendantNameCapture": {
-      "label": "What’s your name?"
+      "label": "What’s your name?",
+      "changeHidden": "name"
     },
     "dateOfBirth": {
-      "label": "What’s your date of birth?"
+      "label": "What’s your date of birth?",
+      "changeHidden": "date of birth"
     },
     "correspondenceAddressConfirmation": {
       "label": "Is your correspondence address {{address}}?",
-      "fallbackLabel": "What’s your correspondence address?"
+      "fallbackLabel": "What’s your correspondence address?",
+      "changeHidden": "correspondence address"
     },
     "contactByEmailOrPost": {
       "label": "How do you want to receive updates?",
+      "changeHidden": "how you receive updates",
       "options": {
         "email": "By email",
         "post": "By post",
@@ -30,13 +36,16 @@
       "label": "Email"
     },
     "contactByPhone": {
-      "label": "Are you happy to be contacted by telephone?"
+      "label": "Are you happy to be contacted by telephone?",
+      "changeHidden": "contact by phone"
     },
     "contactByText": {
-      "label": "Are you happy to be contacted by text message?"
+      "label": "Are you happy to be contacted by text message?",
+      "changeHidden": "contact by text message"
     },
     "contactDetails": {
-      "label": "Contact details"
+      "label": "Contact details",
+      "changeHidden": "contact details"
     }
   }
 }
