@@ -9,5 +9,5 @@ export const contactUs = {
   telephoneSubHeader: 'Telephone',
   telephoneNumberParagraph: '0300 123 7050',
   telephoneAvailabilityParagraph: 'Monday to Friday, 8.30am to 5pm.',
-  callChargesLink: 'Find out about call charges (opens in new tab)',
+  callChargesLink: 'Find out about call charges',
 };

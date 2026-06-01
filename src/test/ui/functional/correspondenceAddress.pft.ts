@@ -1,4 +1,4 @@
-import { correspondenceAddress, dashboard, defendantDateOfBirth } from '../data/page-data';
+import { correspondenceAddress, defendantDateOfBirth, taskList } from '../data/page-data';
 import { performAction, performValidation, performValidations } from '../utils/controller';
 
 export async function correspondenceAddressErrorValidation(): Promise<void> {
@@ -84,5 +84,5 @@ export async function correspondenceAddressErrorValidation(): Promise<void> {
 export async function correspondenceAddressNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', correspondenceAddress.backLink, defendantDateOfBirth.mainHeader);
   await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
-  await performValidation('pageNavigation', correspondenceAddress.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', correspondenceAddress.saveForLaterButton, taskList.mainHeader);
 }

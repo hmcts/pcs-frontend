@@ -1,8 +1,11 @@
-import { address } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { createCaseApiData } from '../api-data';
+import { createCaseApiWalesData } from '../api-data/createCaseWales.api.data';
 
 export const taskList = {
-  get mainHeader(): string {
-    return `${address}`;
+  get mainHeader() {
+    return process.env.WALES_POSTCODE === 'YES'
+      ? `${createCaseApiWalesData.createCasePayload.propertyAddress.AddressLine1}, ${createCaseApiWalesData.createCasePayload.propertyAddress.PostTown}, ${createCaseApiWalesData.createCasePayload.propertyAddress.PostCode}`
+      : `${createCaseApiData.createCasePayload.propertyAddress.AddressLine1}, ${createCaseApiData.createCasePayload.propertyAddress.PostTown}, ${createCaseApiData.createCasePayload.propertyAddress.PostCode}`;
   },
   caseNumberParagraph: (): string => `Case number: ${process.env.CASE_FID}`,
   iWantToHeader: 'I want to...',

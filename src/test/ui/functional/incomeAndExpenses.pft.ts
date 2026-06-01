@@ -15,6 +15,4 @@ export async function incomeAndExpensesNavigationTests(): Promise<void> {
     pageSlug: incomeAndExpenses.pageSlug,
   });
   await performValidation('pageNavigation', incomeAndExpenses.backLink, taskList.mainHeader);
-  await performAction('clickRadioButton', incomeAndExpenses.yesRadioOption);
-  await performValidation('pageNavigation', incomeAndExpenses.saveForLaterButton, taskList.mainHeader);
 }

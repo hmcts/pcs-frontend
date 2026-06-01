@@ -3,8 +3,6 @@ import { performAction, performValidation } from '../utils/controller';
 
 import { defendantNameCaptureInputValuesPrePopulated } from './defendantNameCapture.pft';
 
-// import { defendantNameCaptureInputValuesPrePopulated } from './defendantNameCapture.pft';
-
 const overMaxLengthString = 'A'.repeat(61);
 export async function defendantNameConfirmationErrorValidation(): Promise<void> {
   // Test: Error message validation for mandatory radio button selection
