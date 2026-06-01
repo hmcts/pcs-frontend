@@ -101,7 +101,7 @@
       "changeHidden": "cy applied for help with fees"
     },
     "counterClaimHwfReference": {
-      "label": "cy Help with Fees reference number",
+      "label": "cy Enter your Help with Fees reference number",
       "changeHidden": "cy Help with Fees reference number"
     },
     "counterClaimFor": {
