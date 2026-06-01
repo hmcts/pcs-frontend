@@ -37,10 +37,11 @@
   },
   "statementOfTruth": {
     "heading": "cy Statement of truth",
+    "hint": "cy Please check all the details you have entered for accuracy.",
     "contemptFieldLabel": "cy Statement of truth",
-    "contemptOption": "cy I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth",
+    "contemptOption": "cy I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
     "beliefFieldLabel": "cy Statement of truth",
-    "beliefOption": "cy I believe that the facts stated in this defence form are true",
+    "beliefOption": "cy I believe that the facts stated in this defence form are true.",
     "fullNameLabel": "cy Your full name"
   },
   "errors": {

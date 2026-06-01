@@ -20,6 +20,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     heading: 'heading',
     statementOfTruthHeading: 'statementOfTruth.heading',
+    statementOfTruthHint: 'statementOfTruth.hint',
   },
   fields: [
     {

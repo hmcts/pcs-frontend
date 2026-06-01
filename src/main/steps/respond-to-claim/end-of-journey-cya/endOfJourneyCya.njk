@@ -28,6 +28,7 @@
     {{ csrfProtection(csrfToken) }}
 
     <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>
+    <p class="govuk-body">{{ statementOfTruthHint }}</p>
 
     {% for field in fields %}
       {% if field.componentType == 'checkboxes' %}
