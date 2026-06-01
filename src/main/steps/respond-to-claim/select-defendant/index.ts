@@ -58,7 +58,7 @@ function addRadioButtonForAllLinkedDefendants(
       radio.component.items.push({
         value: defendant.id,
         text: defendant.value.firstName + ' ' + defendant.value.lastName,
-        checked: partyId !== null && defendant.id === partyId
+        checked: partyId !== null && defendant.id === partyId,
       });
     });
   }
