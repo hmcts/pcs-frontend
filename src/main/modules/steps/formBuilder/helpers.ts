@@ -392,6 +392,20 @@ export function validateForm(
         }
       }
     } else {
+      // Sanitise text fields before required/validator checks so that input that
+      // reduces to empty after stripping (e.g. '<script>...</script>') is correctly
+      // treated as missing rather than silently accepted.
+      if (
+        typeof value === 'string' &&
+        (field.type === 'character-count' || field.type === 'text' || field.type === 'textarea')
+      ) {
+        const sanitizedText = stripHtmlTags(value.trim());
+        if (sanitizedText !== value.trim()) {
+          value = sanitizedText;
+          req.body[fieldName] = sanitizedText;
+        }
+      }
+
       const isMissing =
         field.type === 'checkbox'
           ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())
@@ -497,15 +511,6 @@ export function validateForm(
 
           if (!allowedCharsRegex.test(text)) {
             setDefaultSpecialCharacterError();
-          }
-        }
-
-        // HTML tag stripping (xss spike) — silently mutates req.body when tags are removed
-        if (field.type === 'character-count' || field.type === 'text' || (field.type === 'textarea' && value)) {
-          const text = (value as string)?.trim();
-          const sanitizedText = stripHtmlTags(text);
-          if (sanitizedText !== text) {
-            req.body[fieldName] = sanitizedText;
           }
         }
 

@@ -1517,40 +1517,7 @@ describe('formBuilder helpers', () => {
         const errors = validateForm(req, fields, translations);
         expect(errors['contactMethod.emailAddress']).toBe('Email address is required');
       });
-
-      // --- Denylist (HDPI-5371) — commented out for xss spike; restore if denylist preferred ---
-      // it('should reject unsafe text in nested radio subField (tenancyTypeConfirm.correctType)', () => {
-      //   const req = createMockRequest({
-      //     tenancyTypeConfirm: 'no',
-      //     'tenancyTypeConfirm.correctType': '" onfocus="alert(1)',
-      //   });
-      //   const fields: FormFieldConfig[] = [
-      //     {
-      //       name: 'tenancyTypeConfirm',
-      //       type: 'radio',
-      //       required: true,
-      //       options: [
-      //         { value: 'yes' },
-      //         {
-      //           value: 'no',
-      //           subFields: {
-      //             correctType: {
-      //               name: 'correctType',
-      //               type: 'text',
-      //               required: true,
-      //             },
-      //           },
-      //         },
-      //         { value: 'notSure' },
-      //       ],
-      //     },
-      //   ];
-      //   const errors = validateForm(req, fields, {});
-      //   expect(errors['tenancyTypeConfirm.correctType']).toBe(
-      //     'Correct type must only include letters a to z, and special characters such as hyphens, spaces and apostrophes'
-      //   );
-      // });
-
+      
       it('should pass plain-text XSS-style payload unchanged in nested radio subField (xss spike gap)', () => {
         const req = createMockRequest({
           tenancyTypeConfirm: 'no',
@@ -1615,6 +1582,39 @@ describe('formBuilder helpers', () => {
 
         expect(errors['tenancyTypeConfirm.correctType']).toBeUndefined();
         expect(req.body['tenancyTypeConfirm.correctType']).toBe('hello');
+      });
+
+      it('should fail validation if required field becomes empty after stripping HTML tags', () => {
+        const req = createMockRequest({
+          tenancyTypeConfirm: 'no',
+          'tenancyTypeConfirm.correctType': '<script>alert(1)</script>',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'tenancyTypeConfirm',
+            type: 'radio',
+            required: true,
+            options: [
+              { value: 'yes' },
+              {
+                value: 'no',
+                subFields: {
+                  correctType: {
+                    name: 'correctType',
+                    type: 'text',
+                    required: true,
+                  },
+                },
+              },
+              { value: 'notSure' },
+            ],
+          },
+        ];
+
+        const errors = validateForm(req, fields, {});
+
+        expect(errors['tenancyTypeConfirm.correctType']).toBeDefined();
+        expect(req.body['tenancyTypeConfirm.correctType']).toBe('');
       });
     });
 
