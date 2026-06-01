@@ -21,8 +21,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
-    contactUs: 'contactUs',
+    heading: 'heading',
     detailsHeading: 'detailsHeading',
   },
   extendGetContent: async (req, formContent) => {
