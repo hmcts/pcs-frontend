@@ -131,12 +131,13 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
       yesNoNotSure,
       change
     );
-    if (normalizeYesNoValue(confirmation) !== 'NO' || !date) {
+    if (normalizeYesNoValue(confirmation) !== 'NO') {
       return;
     }
+    // Corrected date is optional - show "No answer provided" if they said No but left it blank.
     const detailRow: SummaryListRow = {
       key: { text: t('rows.tenancyStartDate.correctDate.label') },
-      value: { text: formatIsoDate(date) },
+      value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
       actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.correctDate.changeHidden')] },
     };
     groupQuestionAndDetail(questionRow, detailRow);
@@ -149,7 +150,7 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
   rows.push({
     key: { text: t('rows.tenancyStartDate.labelEntered') },
     value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
-    actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHiddenEntered')] },
+    actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHidden')] },
   });
 }
 

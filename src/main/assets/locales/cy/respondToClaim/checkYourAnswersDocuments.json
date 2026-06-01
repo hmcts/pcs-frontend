@@ -1,11 +1,11 @@
 {
   "pageTitle": "cy Check your answers",
-  "cardTitle": "cy Documents",
+  "cardTitle": "cy Upload files",
   "rows": {
     "uploadedDocuments": {
-      "label": "cy Upload files",
-      "none": "cy No documents uploaded",
-      "changeHidden": "cy Upload files"
+      "label": "cy Uploaded files",
+      "changeHidden": "cy uploaded files",
+      "none": "cy No files uploaded"
     }
   }
 }

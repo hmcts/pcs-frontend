@@ -4,31 +4,31 @@
   "rows": {
     "anyPaymentsMade": {
       "label": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
-      "changeHidden": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?"
+      "changeHidden": "payments made"
     },
     "paymentDetails": {
       "label": "Give details about how much you paid and when",
-      "changeHidden": "Give details about how much you paid and when"
+      "changeHidden": "payment details"
     },
     "repaymentPlanAgreed": {
       "label": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
-      "changeHidden": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?"
+      "changeHidden": "repayment agreement"
     },
     "repaymentAgreedDetails": {
-      "label": "What repayment plan have you agreed?",
-      "changeHidden": "What repayment plan have you agreed?"
+      "label": "Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
+      "changeHidden": "repayment details"
     },
     "repayArrearsInstalments": {
       "label": "Would you like to offer to pay your arrears in instalments?",
-      "changeHidden": "Would you like to offer to pay your arrears in instalments?"
+      "changeHidden": "offer to pay in instalments"
     },
     "installmentAmount": {
       "label": "How much could you afford to pay in addition to the current rent?",
-      "changeHidden": "How much could you afford to pay in addition to the current rent?"
+      "changeHidden": "instalment amount"
     },
     "installmentFrequency": {
       "label": "How frequently could you afford to pay this amount?",
-      "changeHidden": "How frequently could you afford to pay this amount?",
+      "changeHidden": "instalment frequency",
       "frequencies": {
         "weekly": "Weekly",
         "every2Weeks": "Every 2 weeks",

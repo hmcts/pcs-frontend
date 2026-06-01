@@ -1,11 +1,11 @@
 {
   "pageTitle": "Check your answers",
-  "cardTitle": "Documents",
+  "cardTitle": "Upload files",
   "rows": {
     "uploadedDocuments": {
-      "label": "Upload files",
-      "none": "No documents uploaded",
-      "changeHidden": "Upload files"
+      "label": "Uploaded files",
+      "changeHidden": "uploaded files",
+      "none": "No files uploaded"
     }
   }
 }

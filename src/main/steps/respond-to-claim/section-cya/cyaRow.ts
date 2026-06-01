@@ -6,9 +6,7 @@ import type { RespondToClaimSectionId } from '../sections.config';
 
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
-// Shared primitives for every respond-to-claim section-CYA row builder.
-// Each builder keeps its own section-specific row logic but imports these
-// instead of redefining them — one source of truth, no drift.
+// Shared helpers for the respond-to-claim section-CYA row builders.
 
 export type SummaryListRow = {
   classes?: string;
@@ -29,7 +27,7 @@ export function groupQuestionAndDetail(questionRow: SummaryListRow, detailRow: S
   detailRow.key.classes = 'govuk-!-font-weight-regular';
 }
 
-/** The typed read of the validated case off the request — one cast, in one place. */
+/** Reads the validated case off the request. */
 export const getValidatedCase = (req: Request): CcdCaseModel | undefined =>
   req.res?.locals.validatedCase as CcdCaseModel | undefined;
 
@@ -68,10 +66,7 @@ export const makeYesNoNotSure =
   (value: string): string =>
     t(`options.${toOptionKey(value)}`);
 
-/**
- * Section-scoped "Change" link factory. `stepSlug` is the edit-target step;
- * `hiddenKey` is the translation key for the visually-hidden link text.
- */
+// Hidden text is a short noun so screen readers announce "Change name", not the full question.
 export const makeChange =
   (caseRef: string, sectionId: RespondToClaimSectionId, t: TFunction) =>
   (stepSlug: string, hiddenKey: string): ChangeAction => ({
@@ -103,7 +98,7 @@ export function createRowContext(
   return { rows: [], validatedCase, t, change: makeChange(caseRef, sectionId, t), yesNoNotSure: makeYesNoNotSure(t) };
 }
 
-/** Push a yes/no/not-sure summary row, deriving `.label`/`.changeHidden` from `labelKey`. */
+/** Push a yes/no/not-sure summary row, deriving `.label` from `labelKey`. */
 export function pushYesNoRow(
   rows: SummaryListRow[],
   labelKey: string,

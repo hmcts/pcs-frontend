@@ -67,14 +67,17 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
     return;
   }
   // Branch 2: name captured via defendant-name-capture (shown when nameKnown !== 'YES').
+  // The row stands alone with no confirmation question above it, so it mirrors the
+  // capture page's own question ("What's your name?") rather than the bare "Name" noun
+  // label used for the corrected-name row in branch 1.
   const partyName = validatedCase.defendantContactDetailsPartyName?.trim();
   if (!partyName) {
     return;
   }
   rows.push({
-    key: { text: t('rows.defendantName.label') },
+    key: { text: t('rows.defendantNameCapture.label') },
     value: { html: escapeHtml(partyName) },
-    actions: { items: [change('defendant-name-capture', 'rows.defendantName.changeHidden')] },
+    actions: { items: [change('defendant-name-capture', 'rows.defendantNameCapture.changeHidden')] },
   });
 }
 
@@ -88,20 +91,35 @@ function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void
   });
 }
 
-function addCorrespondenceAddressRow({ rows, validatedCase, t, change }: RowContext): void {
+function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   // On a confirmed "Yes" the step clears party.address, so show the claimant-recorded
   // address; on "No" or a typed-in one, show the defendant party's.
-  const addressConfirmed =
-    normalizeYesNoValue(validatedCase.defendantResponses?.correspondenceAddressConfirmation) === 'YES';
+  const confirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
+  const addressConfirmed = !!confirmation && normalizeYesNoValue(confirmation) === 'YES';
 
-  const address = addressConfirmed
+  const sourceAddress = addressConfirmed
     ? validatedCase.claimantEnteredDefendantDetails?.address
     : validatedCase.defendantContactDetailsPartyAddress;
+
+  // Drop Country for the CYA row (UK address; matches the step legend and the task-list heading).
+  const address = sourceAddress ? { ...sourceAddress, Country: undefined } : undefined;
 
   const lines = formatCcdAddressLines(address);
   if (lines.length === 0) {
     return;
   }
+
+  if (addressConfirmed && confirmation) {
+    // YES: question carries the address, value is just "Yes" (same shape as the name row).
+    rows.push({
+      key: { text: t('rows.correspondenceAddressConfirmation.label', { address: lines.join(', ') }) },
+      value: { text: yesNoNotSure(confirmation) },
+      actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
+    });
+    return;
+  }
+
+  // NO: open question, the typed-in address is the value.
   rows.push({
     key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
     value: { html: lines.map(escapeHtml).join('<br>') },
