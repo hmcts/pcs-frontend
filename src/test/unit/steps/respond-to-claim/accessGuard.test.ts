@@ -219,6 +219,32 @@ describe('respondToClaimAccessGuard', () => {
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
+  it('passes through a CYA reached via the language toggle (?lang=cy)', async () => {
+    mockGetAllSectionStatuses.mockResolvedValue(new Map([['disputeAndTenancy', 'IN_PROGRESS']]));
+    mockSafeIsAnswered.mockReturnValue(true);
+    mockGetFirstVisibleStep.mockReturnValue('landlord-registered');
+    const req = makeReq({
+      path: '/case/123/respond-to-claim/check-your-answers-your-response',
+      query: { lang: 'cy' },
+    });
+    const res = makeRes();
+    await respondToClaimAccessGuard()(req, res, next);
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
+  it('passes through a mid-section step reached via the language toggle (?lang=cy)', async () => {
+    mockGetFirstVisibleStep.mockReturnValue('dispute-claim-interstitial');
+    const req = makeReq({
+      path: '/case/123/respond-to-claim/landlord-registered',
+      query: { lang: 'cy' },
+    });
+    const res = makeRes();
+    await respondToClaimAccessGuard()(req, res, next);
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
   it('fails closed to hub when a predicate throws', async () => {
     mockGetAllSectionStatuses.mockRejectedValue(new Error('predicate exploded'));
     const req = makeReq();

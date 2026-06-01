@@ -8,68 +8,52 @@
   },
   "rows": {
     "landlordRegistered": {
-      "label": "cy Is your landlord registered?",
-      "changeHidden": "cy Is your landlord registered?"
+      "label": "cy Is your landlord registered?"
     },
     "landlordLicensed": {
-      "label": "cy Is your landlord licensed?",
-      "changeHidden": "cy Is your landlord licensed?"
+      "label": "cy Is your landlord licensed?"
     },
     "writtenTerms": {
-      "label": "cy Has your landlord sent you written terms of the occupation contract?",
-      "changeHidden": "cy Has your landlord sent you written terms of the occupation contract?"
+      "label": "cy Has your landlord sent you written terms of the occupation contract?"
     },
     "tenancyTypeCorrect": {
-      "label": "cy Is the tenancy, occupation contract or licence agreement type correct?",
-      "changeHidden": "cy Is the tenancy, occupation contract or licence agreement type correct?"
+      "label": "cy Is the tenancy, occupation contract or licence agreement type correct?"
     },
     "tenancyTypeDetails": {
-      "label": "cy Give the correct tenancy, occupation contract or licence type",
-      "changeHidden": "cy Give the correct tenancy, occupation contract or licence type"
+      "label": "cy Give the correct tenancy, occupation contract or licence type"
     },
     "tenancyStartDate": {
       "confirm": {
-        "label": "cy Is the tenancy, licence or occupation contract start date correct?",
-        "changeHidden": "cy Is the tenancy, licence or occupation contract start date correct?"
+        "label": "cy Is the tenancy, licence or occupation contract start date correct?"
       },
       "correctDate": {
-        "label": "cy What is the correct start date?",
-        "changeHidden": "cy What is the correct start date?"
+        "label": "cy What is the correct start date?"
       },
-      "labelEntered": "cy When did your tenancy, occupation contract or licence start?",
-      "changeHiddenEntered": "cy When did your tenancy, occupation contract or licence start?"
+      "labelEntered": "cy When did your tenancy, occupation contract or licence start?"
     },
     "possessionNoticeReceived": {
-      "label": "cy Did {{claimantName}} give you notice of their intention to begin possession proceedings?",
-      "changeHidden": "cy Did {{claimantName}} give you notice of their intention to begin possession proceedings?"
+      "label": "cy Did {{claimantName}} give you notice of their intention to begin possession proceedings?"
     },
     "noticeReceivedDate": {
-      "label": "cy When did you receive notice from {{claimantName}}?",
-      "changeHidden": "cy When did you receive notice from {{claimantName}}?"
+      "label": "cy When did you receive notice from {{claimantName}}?"
     },
     "rentArrearsAmountConfirmation": {
-      "label": "cy Do you owe this amount in rent arrears?",
-      "changeHidden": "cy Do you owe this amount in rent arrears?"
+      "label": "cy Do you owe this amount in rent arrears?"
     },
     "rentArrearsAmountDetails": {
-      "label": "cy How much do you believe you owe in rent arrears?",
-      "changeHidden": "cy How much do you believe you owe in rent arrears?"
+      "label": "cy How much do you believe you owe in rent arrears?"
     },
     "disputeClaim": {
-      "label": "cy Do you want to dispute any other parts of the claim?",
-      "changeHidden": "cy Do you want to dispute any other parts of the claim?"
+      "label": "cy Do you want to dispute any other parts of the claim?"
     },
     "disputeClaimDetails": {
-      "label": "cy Explain which parts of the claim you do not agree with",
-      "changeHidden": "cy Explain which parts of the claim you do not agree with"
+      "label": "cy Explain which parts of the claim you do not agree with"
     },
     "makeCounterClaim": {
-      "label": "cy Do you want to make a counterclaim?",
-      "changeHidden": "cy Do you want to make a counterclaim?"
+      "label": "cy Do you want to make a counterclaim?"
     },
     "counterClaimType": {
       "label": "cy What are you claiming for?",
-      "changeHidden": "cy What are you claiming for?",
       "options": {
         "PAYMENT_OR_COMPENSATION": "cy A sum of money or compensation",
         "SOMETHING_ELSE": "cy Something else",
@@ -77,52 +61,41 @@
       }
     },
     "isClaimAmountKnown": {
-      "label": "cy Are you claiming for a specific sum of money?",
-      "changeHidden": "cy Are you claiming for a specific sum of money?"
+      "label": "cy Are you claiming for a specific sum of money?"
     },
     "claimAmount": {
-      "label": "cy How much are you claiming?",
-      "changeHidden": "cy How much are you claiming?"
+      "label": "cy How much are you claiming?"
     },
     "estimatedMaxClaimAmount": {
-      "label": "cy What’s the maximum value of your claim?",
-      "changeHidden": "cy What’s the maximum value of your claim?"
+      "label": "cy What’s the maximum value of your claim?"
     },
     "counterClaimNeedHelpWithFees": {
       "label": "cy Do you need help paying the counterclaim fee?",
-      "changeHidden": "cy Do you need help paying the counterclaim fee?",
       "options": {
         "YES": "cy I need help paying the fee",
         "NO": "cy I do not need help paying the fee"
       }
     },
     "counterClaimAppliedForHwf": {
-      "label": "cy Have you already applied for help with your counterclaim fee?",
-      "changeHidden": "cy Have you already applied for help with your counterclaim fee?"
+      "label": "cy Have you already applied for help with your counterclaim fee?"
     },
     "counterClaimHwfReference": {
-      "label": "cy Help with Fees reference number",
-      "changeHidden": "cy Help with Fees reference number"
+      "label": "cy Help with Fees reference number"
     },
     "counterClaimFor": {
-      "label": "cy What is your counterclaim for?",
-      "changeHidden": "cy What is your counterclaim for?"
+      "label": "cy What is your counterclaim for?"
     },
     "counterClaimReasons": {
-      "label": "cy What are your reasons for making the counterclaim?",
-      "changeHidden": "cy What are your reasons for making the counterclaim?"
+      "label": "cy What are your reasons for making the counterclaim?"
     },
     "counterClaimAgainst": {
-      "label": "cy Who are you making the counterclaim against?",
-      "changeHidden": "cy Who are you making the counterclaim against?"
+      "label": "cy Who are you making the counterclaim against?"
     },
     "otherOrderRequestDetails": {
-      "label": "cy What orders are you asking the court to make?",
-      "changeHidden": "cy What orders are you asking the court to make?"
+      "label": "cy What orders are you asking the court to make?"
     },
     "otherOrderRequestFacts": {
-      "label": "cy What facts would you like the court to consider when deciding the claim?",
-      "changeHidden": "cy What facts would you like the court to consider when deciding the claim?"
+      "label": "cy What facts would you like the court to consider when deciding the claim?"
     }
   }
 }

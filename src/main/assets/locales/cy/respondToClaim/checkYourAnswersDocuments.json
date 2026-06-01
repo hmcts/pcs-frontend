@@ -4,8 +4,7 @@
   "rows": {
     "uploadedDocuments": {
       "label": "cy Upload files",
-      "none": "cy No documents uploaded",
-      "changeHidden": "cy Upload files"
+      "none": "cy No files uploaded"
     }
   }
 }

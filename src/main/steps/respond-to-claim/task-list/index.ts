@@ -30,6 +30,16 @@ const redirectLegalrepToDashboard: RequestHandler = (req: Request, res: Response
   next();
 };
 
+// Per Figma decision #10 — the task-list heading shows AddressLine1, PostTown,
+// County if present, Postcode. No country line.
+function formatPropertyAddress(validatedCase: CcdCaseModel | undefined): string {
+  const address = validatedCase?.propertyAddress;
+  if (!address) {
+    return '';
+  }
+  return formatCcdAddress({ ...address, Country: undefined });
+}
+
 interface TaskListItem {
   title: { text: string };
   href?: string;
@@ -61,7 +71,7 @@ export const step: StepDefinition = {
       const caseId = validatedCase?.id;
       return {
         backUrl: getDashboardUrl(caseId) ?? '/',
-        propertyAddress: formatCcdAddress(validatedCase?.propertyAddress),
+        propertyAddress: formatPropertyAddress(validatedCase),
         caseNumber: formatCaseNumber(caseId),
         groups,
         iWantToLinks: [

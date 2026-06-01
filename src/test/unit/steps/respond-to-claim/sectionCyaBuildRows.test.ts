@@ -84,7 +84,6 @@ describe('section-CYA row builders — characterisation', () => {
       expect(contactDetailsRow?.actions?.items[0].href).toContain(
         '/contact-preferences-telephone?edit=personalDetails'
       );
-      expect(contactDetailsRow?.actions?.items[0].visuallyHiddenText).toBe('rows.contactDetails.changeHidden');
     });
 
     it('contact-by-email: preference row stands alone; email lives in the Contact details row', () => {
@@ -188,7 +187,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(row?.value).toEqual({ text: 'options.yes' });
     });
 
-    it('correspondence-address: shows the confirmed claimant address as one row when the citizen answered Yes', () => {
+    it('correspondence-address: shows Yes against the interpolated question when the citizen confirmed the claim-recorded address', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -202,10 +201,11 @@ describe('section-CYA row builders — characterisation', () => {
         },
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
-      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
-      // The confirmed address shows as one multi-line row — no "is it correct?" Y/N row.
-      expect(addressRow?.value).toEqual({ html: '1 Claim Street<br>AB1 2CD' });
-      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
+      // YES branch uses the interpolated `label` ("Is your correspondence address X?") with a Y/N value —
+      // same shape as the defendant-name-confirmation row above.
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.label');
+      expect(addressRow?.value).toEqual({ text: 'options.yes' });
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel')).toBe(false);
     });
 
     it('correspondence-address: shows the corrected address as one row when the citizen answered No', () => {
@@ -314,7 +314,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label')).toBeUndefined();
     });
 
-    it('tenancy-date row: "No" without a corrected date shows only the confirmation row', () => {
+    it('tenancy-date row: "No" with the optional corrected date left blank shows "No answer provided"', () => {
       const rows = buildDisputeRows(
         reqWith(model({ tenancyStartDateConfirmation: 'NO' }, { tenancy_TenancyLicenceDate: '2023-01-01' })),
         t
@@ -322,7 +322,9 @@ describe('section-CYA row builders — characterisation', () => {
       expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.confirm.label')?.value).toEqual({
         text: 'options.no',
       });
-      expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label')).toBeUndefined();
+      expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label')?.value).toEqual({
+        text: 'noAnswerProvided',
+      });
     });
 
     it('notice-date row: links to "not-provided" step when the claim has no notice date', () => {

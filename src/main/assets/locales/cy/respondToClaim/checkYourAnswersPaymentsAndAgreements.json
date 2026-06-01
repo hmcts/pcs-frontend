@@ -3,32 +3,25 @@
   "cardTitle": "cy Payments and agreements",
   "rows": {
     "anyPaymentsMade": {
-      "label": "cy Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
-      "changeHidden": "cy Have you paid any money to {{claimantName}} since {{claimIssueDate}}?"
+      "label": "cy Have you paid any money to {{claimantName}} since {{claimIssueDate}}?"
     },
     "paymentDetails": {
-      "label": "cy Give details about how much you paid and when",
-      "changeHidden": "cy Give details about how much you paid and when"
+      "label": "cy Give details about how much you paid and when"
     },
     "repaymentPlanAgreed": {
-      "label": "cy Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
-      "changeHidden": "cy Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?"
+      "label": "cy Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?"
     },
     "repaymentAgreedDetails": {
-      "label": "cy What repayment plan have you agreed?",
-      "changeHidden": "cy What repayment plan have you agreed?"
+      "label": "cy Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made"
     },
     "repayArrearsInstalments": {
-      "label": "cy Would you like to offer to pay your arrears in instalments?",
-      "changeHidden": "cy Would you like to offer to pay your arrears in instalments?"
+      "label": "cy Would you like to offer to pay your arrears in instalments?"
     },
     "installmentAmount": {
-      "label": "cy How much could you afford to pay in addition to the current rent?",
-      "changeHidden": "cy How much could you afford to pay in addition to the current rent?"
+      "label": "cy How much could you afford to pay in addition to the current rent?"
     },
     "installmentFrequency": {
       "label": "cy How frequently could you afford to pay this amount?",
-      "changeHidden": "cy How frequently could you afford to pay this amount?",
       "frequencies": {
         "weekly": "cy Weekly",
         "every2Weeks": "cy Every 2 weeks",

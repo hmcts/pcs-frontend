@@ -37,7 +37,7 @@ function addUploadedDocumentsRow({ rows, responses, t, change }: RowContext): vo
       filenames.length === 0
         ? { text: t('rows.uploadedDocuments.none') }
         : { html: listHtml(filenames.map(escapeHtml)) },
-    actions: { items: [change('upload-document', 'rows.uploadedDocuments.changeHidden')] },
+    actions: { items: [change('upload-document')] },
   });
 }
 

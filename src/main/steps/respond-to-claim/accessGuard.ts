@@ -81,9 +81,10 @@ function isCyaStep(stepName: string): boolean {
 
 // A citizen may directly open only a section's first visible step. Any other
 // step requires an internal-navigation marker: ?nav=1 (Back / Save and
-// continue) or ?edit= (CYA "Change" links).
+// continue), ?edit= (CYA "Change" links), or ?lang= (the in-page Cymraeg /
+// English toggle, which reloads the current page in the other language).
 function shouldRedirectToFirstVisibleStep(sectionId: RespondToClaimSectionId, stepName: string, req: Request): boolean {
-  if (req.query.edit !== undefined || req.query.nav !== undefined) {
+  if (req.query.edit !== undefined || req.query.nav !== undefined || req.query.lang !== undefined) {
     return false;
   }
   const section = sectionById.get(sectionId);
