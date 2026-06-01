@@ -4,6 +4,7 @@
   "rows": {
     "uploadedDocuments": {
       "label": "Upload files",
+      "changeHidden": "uploaded files",
       "none": "No files uploaded"
     }
   }

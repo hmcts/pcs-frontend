@@ -97,7 +97,7 @@ function pushHeadingWithItems(
     rows.push({
       key: { text: t(`${labelKey}.label`) },
       value: { text: t('noAnswerProvided') },
-      actions: { items: [change(step)] },
+      actions: { items: [change(step, `${labelKey}.changeHidden`)] },
     });
     return;
   }
@@ -147,7 +147,7 @@ function addRegularIncomeRows({ rows, hc, t, change }: RowContext): void {
     itemRows.push({
       key: { text: t(optionKey), classes: 'govuk-!-font-weight-regular' },
       value: { text: detail },
-      actions: { items: [change(step)] },
+      actions: { items: [change(step, 'rows.regularIncome.changeHidden')] },
     });
   }
 
@@ -157,7 +157,7 @@ function addRegularIncomeRows({ rows, hc, t, change }: RowContext): void {
     itemRows.push({
       key: { text: t(optionKey), classes: 'govuk-!-font-weight-regular' },
       value: detail ? { html: escapeWithLineBreaks(detail) } : { text: '' },
-      actions: { items: [change(step)] },
+      actions: { items: [change(step, 'rows.regularIncome.changeHidden')] },
     });
   }
 
@@ -187,7 +187,7 @@ function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
     key: { text: t('rows.universalCreditApplicationDate.label') },
     value: { text: formatIsoDate(hc.ucApplicationDate) },
     actions: {
-      items: [change('have-you-applied-for-universal-credit')],
+      items: [change('have-you-applied-for-universal-credit', 'rows.universalCreditApplicationDate.changeHidden')],
     },
   };
   groupQuestionAndDetail(questionRow, detailRow);
@@ -210,7 +210,7 @@ function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
     rows.push({
       key: { text: t('rows.priorityDebtTotal.label') },
       value: { text: `£${totalPounds}` },
-      actions: { items: [change('priority-debt-details')] },
+      actions: { items: [change('priority-debt-details', 'rows.priorityDebtTotal.changeHidden')] },
     });
   }
   const contribution = amountWithFrequency(hc.debtContribution, hc.debtContributionFrequency, t, 'paymentFrequencies');
@@ -218,7 +218,7 @@ function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
     rows.push({
       key: { text: t('rows.priorityDebtContribution.label') },
       value: { text: contribution },
-      actions: { items: [change('priority-debt-details')] },
+      actions: { items: [change('priority-debt-details', 'rows.priorityDebtContribution.changeHidden')] },
     });
   }
 }
@@ -240,7 +240,7 @@ function addRegularExpensesRows({ rows, hc, t, change }: RowContext): void {
     itemRows.push({
       key: { text: t(optionKey), classes: 'govuk-!-font-weight-regular' },
       value: { text: detail },
-      actions: { items: [change(step)] },
+      actions: { items: [change(step, 'rows.regularExpenses.changeHidden')] },
     });
   }
   pushHeadingWithItems(rows, 'rows.regularExpenses', step, itemRows, t, change);

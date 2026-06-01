@@ -144,7 +144,12 @@ function addAlternativeAccommodationRow({ rows, hc, t, change, yesNoNotSure }: R
       key: { text: t('rows.alternativeAccommodationDate.label') },
       value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
       actions: {
-        items: [change('would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home')],
+        items: [
+          change(
+            'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
+            'rows.alternativeAccommodationDate.changeHidden'
+          ),
+        ],
       },
     };
     groupQuestionAndDetail(questionRow, detailRow);
