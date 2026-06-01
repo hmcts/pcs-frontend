@@ -15,10 +15,6 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {% if circumstanceHeading %}
-    <h2 class="govuk-heading-m">{{ circumstanceHeading }}</h2>
-  {% endif %}
-
   <p class="govuk-body">{{ introParagraph }}</p>
 
   <p class="govuk-body"> {{ forExample }}</p>
@@ -30,7 +26,7 @@
   </ul>
 
   {% if circumstanceQuestion %}
-    <h2 class="govuk-heading-s">{{ circumstanceQuestion }}</h2>
+    <h2 class="govuk-heading-m">{{ circumstanceQuestion }}</h2>
   {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
