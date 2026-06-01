@@ -1517,7 +1517,7 @@ describe('formBuilder helpers', () => {
         const errors = validateForm(req, fields, translations);
         expect(errors['contactMethod.emailAddress']).toBe('Email address is required');
       });
-      
+
       it('should pass plain-text XSS-style payload unchanged in nested radio subField (xss spike gap)', () => {
         const req = createMockRequest({
           tenancyTypeConfirm: 'no',
