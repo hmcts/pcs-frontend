@@ -59,15 +59,15 @@ export async function defendantNameCaptureNavigationTests(): Promise<void> {
 export async function defendantNameCaptureInputValuesPrePopulated(): Promise<void> {
   await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantNameCapture.firstNameTextInput);
   await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantNameCapture.lastNameTextInput);
-  await performValidation('pageNavigation', defendantNameCapture.backLink, taskList.mainHeader);
-  // await performValidation(
-  //   'inputTextValue',
-  //   defendantNameCapture.firstNameTextLabel,
-  //   defendantNameCapture.firstNameTextInput
-  // );
-  // await performValidation(
-  //   'inputTextValue',
-  //   defendantNameCapture.lastNameTextLabel,
-  //   defendantNameCapture.lastNameTextInput
-  // );
+  await performValidation('pageNavigation', defendantNameCapture.saveForLaterButton, taskList.mainHeader);
+  await performValidation(
+    'inputTextValue',
+    defendantNameCapture.firstNameTextLabel,
+    defendantNameCapture.firstNameTextInput
+  );
+  await performValidation(
+    'inputTextValue',
+    defendantNameCapture.lastNameTextLabel,
+    defendantNameCapture.lastNameTextInput
+  );
 }
