@@ -60,14 +60,14 @@ export async function defendantNameCaptureInputValuesPrePopulated(): Promise<voi
   await performAction('inputText', defendantNameCapture.firstNameTextLabel, defendantNameCapture.firstNameTextInput);
   await performAction('inputText', defendantNameCapture.lastNameTextLabel, defendantNameCapture.lastNameTextInput);
   await performValidation('pageNavigation', defendantNameCapture.backLink, taskList.mainHeader);
-  // await performValidation(
-  //   'inputTextValue',
-  //   defendantNameCapture.firstNameTextLabel,
-  //   defendantNameCapture.firstNameTextInput
-  // );
-  // await performValidation(
-  //   'inputTextValue',
-  //   defendantNameCapture.lastNameTextLabel,
-  //   defendantNameCapture.lastNameTextInput
-  // );
+  await performValidation(
+    'inputTextValue',
+    defendantNameCapture.firstNameTextLabel,
+    defendantNameCapture.firstNameTextInput
+  );
+  await performValidation(
+    'inputTextValue',
+    defendantNameCapture.lastNameTextLabel,
+    defendantNameCapture.lastNameTextInput
+  );
 }
