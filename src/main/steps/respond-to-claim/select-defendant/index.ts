@@ -31,7 +31,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const radio = formContent.fields.find(f => f.name === 'selectDefendant') as RadioItems | undefined;
 
-    addRadioButtonForAllLinkedDefendants(allLinkedDefendants, radio);
+    addRadioButtonForAllLinkedDefendants(allLinkedDefendants, radio, req.session.clientContext?.selectedPartyId);
 
     return formContent;
   },
@@ -45,20 +45,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         label: 'selectDefendantLabel',
       },
       isPageHeading: true,
-      options: [],
     },
   ],
 });
 
 function addRadioButtonForAllLinkedDefendants(
   allLinkedDefendants: CcdCollectionItem<CcdDefendantParty>[] | undefined,
-  radio: RadioItems | undefined
+  radio: RadioItems | undefined,
+  partyId?: string
 ) {
   if (radio?.component) {
     allLinkedDefendants?.forEach(defendant => {
       radio.component.items.push({
         value: defendant.id,
         text: defendant.value.firstName + ' ' + defendant.value.lastName,
+        checked: partyId !== null && defendant.id === partyId
       });
     });
   }
