@@ -68,6 +68,7 @@ const rtcSectionAnswers = new Map<string, Map<string, string>>();
 let activeRtcSection = '';
 const rtcUploadedDocumentsQuestion = 'Documents you have uploaded';
 const rtcNoDocumentsUploadedValue = 'No documents uploaded';
+const rtcNoAnswerProvidedValue = 'No answer provided';
 
 const rtcSectionByAction = new Map<string, string>([
   ['selectLegalAdvice', 'startNowAndDetails'],
@@ -186,7 +187,7 @@ export class RespondToClaimAction implements IAction {
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
-      ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page)],
+      ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page, fieldName as actionData)],
       ['validateCYARTC', () => this.validateCYARTC()],
       ['changeAnswerOnFinalCYA', () => this.changeAnswerOnFinalCYA(page, fieldName as actionData)],
       ['selectStatementOfTruthRTC', () => this.selectStatementOfTruthRTC(fieldName as actionRecord)],
@@ -365,6 +366,10 @@ export class RespondToClaimAction implements IAction {
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
       await this.selectCorrespondenceAddressUnKnown(addressData);
     } else {
+      const confirmedAddress = String(submitCaseApiData.submitCasePayload.formattedClaimantContactAddress)
+        .replace(/<br\s*\/?>/gi, ', ')
+        .trim();
+      this.recordAnswer(correspondenceAddress.correspondenceAddressUnKnownMainHeader, confirmedAddress);
       await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     }
   }
@@ -607,7 +612,7 @@ export class RespondToClaimAction implements IAction {
 
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
       clearRegularIncomeAnswers();
-      this.recordAnswer(regularIncomeQuestionLabel, 'No answer provided');
+      this.recordAnswer(regularIncomeQuestionLabel, rtcNoAnswerProvidedValue);
       await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
       return;
     }
@@ -652,7 +657,7 @@ export class RespondToClaimAction implements IAction {
     }
 
     if (regularIncome.regularIncomeOptions.length === 0) {
-      this.recordAnswer(regularIncomeQuestionLabel, 'No answer provided');
+      this.recordAnswer(regularIncomeQuestionLabel, rtcNoAnswerProvidedValue);
     } else {
       this.deleteAnswer(regularIncomeQuestionLabel);
     }
@@ -1102,7 +1107,7 @@ export class RespondToClaimAction implements IAction {
 
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
       clearRegularExpenseAnswers();
-      this.recordAnswer(regularExpensesQuestionLabel, 'No answer provided');
+      this.recordAnswer(regularExpensesQuestionLabel, rtcNoAnswerProvidedValue);
       await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
       return;
     }
@@ -1129,7 +1134,7 @@ export class RespondToClaimAction implements IAction {
     }
 
     if (regularIncome.regularIncomeOptions.length === 0) {
-      this.recordAnswer(regularExpensesQuestionLabel, 'No answer provided');
+      this.recordAnswer(regularExpensesQuestionLabel, rtcNoAnswerProvidedValue);
     }
 
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
@@ -1261,39 +1266,37 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickLink', taskListData.subSection);
   }
 
-  private async retrieveCYATableDataRTC(page: Page): Promise<void> {
+  private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
+    const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
     rtcCyaMap.clear();
-    const tables = page.locator('//dl');
-    const tableCount = await tables.count();
+    const summaryList = page.locator('.govuk-summary-list').first();
+    await summaryList.waitFor({ state: 'visible' });
 
-    if (tableCount === 0) {
+    const rows = summaryList.locator('.govuk-summary-list__row');
+    const rowCount = await rows.count();
+
+    if (rowCount === 0) {
       throw new Error('RTC CYA table not found. Exiting...');
     }
 
-    for (let i = 0; i < tableCount; i++) {
-      const currentTable = tables.nth(i);
-      if (!(await currentTable.isVisible())) {
+    for (let j = 0; j < rowCount; j++) {
+      const row = rows.nth(j);
+      if (!(await row.isVisible())) {
         continue;
       }
 
-      const rows = currentTable.locator('.govuk-summary-list__row');
-      const rowCount = await rows.count();
-      for (let j = 0; j < rowCount; j++) {
-        const row = rows.nth(j);
-        if (!(await row.isVisible())) {
-          continue;
-        }
+      const keyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
+      const valueCell = row.locator('.govuk-summary-list__value').first();
+      const innerText = (await valueCell.innerText()).trim();
+      const textContent = ((await valueCell.textContent()) ?? '').trim();
+      const valueText = (innerText || textContent).replace(/\r?\n+/g, ', ').replace(/\s{2,}/g, ' ');
 
-        const keyText = (await row.locator('dt.govuk-summary-list__key').first().innerText()).trim();
-        const valueText = (await row.locator('dd.govuk-summary-list__value').first().innerText())
-          .trim()
-          .replace(/\r?\n+/g, ', ');
-
-        if (keyText) {
-          rtcCyaMap.set(keyText, valueText);
-        }
+      if (keyText) {
+        rtcCyaMap.set(keyText, valueText);
       }
     }
+
+    console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);
   }
 
   private async validateCYARTC(): Promise<void> {

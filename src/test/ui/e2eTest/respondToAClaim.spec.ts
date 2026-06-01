@@ -252,7 +252,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
   test('Respond to a claim - SelectCounterClaim - Yes @noDefendants @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('retrieveCYATableDataRTC');
+    await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
@@ -281,7 +281,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
-    await performAction('retrieveCYATableDataRTC');
+    await performAction('retrieveCYATableDataRTC','personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
@@ -327,7 +327,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
-    await performAction('retrieveCYATableDataRTC');
+    await performAction('retrieveCYATableDataRTC','disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
@@ -356,7 +356,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
+    await performAction('retrieveCYATableDataRTC','situationAndCircumstances');
     await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
@@ -402,13 +402,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('retrieveCYATableDataRTC');
+    await performAction('retrieveCYATableDataRTC','incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     //await performValidation('mainHeader', taskList.mainHeader);
     await performAction('uploadFiles');
-    await performAction('retrieveCYATableDataRTC');
+    await performAction('retrieveCYATableDataRTC','uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitLink });
