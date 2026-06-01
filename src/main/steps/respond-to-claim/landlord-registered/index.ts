@@ -1,10 +1,10 @@
 import type { Request } from 'express';
 
+import { fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { YesNoNotSureValue } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'landlord-registered';
 
@@ -37,18 +37,22 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   beforeRedirect: async (req: Request) => {
     const response = buildDraftDefendantResponse(req);
-    const landlordRegistered: YesNoNotSureValue | undefined = req.body?.landlordRegistered;
+    const enumValue = toYesNoNotSureEnum(req.body?.landlordRegistered);
 
-    if (landlordRegistered) {
-      response.defendantResponses.landlordRegistered = landlordRegistered;
+    if (enumValue) {
+      response.defendantResponses.landlordRegistered = enumValue;
     } else {
       delete response.defendantResponses.landlordRegistered;
     }
 
-    await saveDraftDefendantResponse(
-      req,
+    await saveDraftDefendantResponse(req, response);
+  },
+  getInitialFormData: async req => {
+    const caseData = req.res?.locals?.validatedCase?.data;
+    const landlordRegistered = caseData?.possessionClaimResponse?.defendantResponses?.landlordRegistered;
 
-      response
-    );
+    return {
+      landlordRegistered: fromYesNoNotSureEnum(landlordRegistered),
+    };
   },
 });
