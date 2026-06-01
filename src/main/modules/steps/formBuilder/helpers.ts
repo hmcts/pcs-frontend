@@ -2,7 +2,7 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 import _ from 'lodash';
 
-import { hasUnsafeTextContent } from '../../../steps/utils/fieldValidators';
+import { stripHtmlTags } from '../../../steps/utils/fieldValidators';
 
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
@@ -500,12 +500,12 @@ export function validateForm(
           }
         }
 
-        // Unsafe text validation - prevent stored XSS
+        // HTML tag stripping (xss spike) — silently mutates req.body when tags are removed
         if (field.type === 'character-count' || field.type === 'text' || (field.type === 'textarea' && value)) {
           const text = (value as string)?.trim();
-
-          if (text && hasUnsafeTextContent(text)) {
-            setDefaultSpecialCharacterError();
+          const sanitizedText = stripHtmlTags(text);
+          if (sanitizedText !== text) {
+            req.body[fieldName] = sanitizedText;
           }
         }
 
