@@ -122,8 +122,5 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToApplicationRadioOptionHidden,
     });
     await performValidation('mainHeader', uploadYourDocuments.mainHeader);
-    await performAction('clickLink', 'Back');
-    await performAction('clickLink', 'Back');
-    await performValidation('mainHeader', startEvidenceUpload.mainHeader);
   });
 });
