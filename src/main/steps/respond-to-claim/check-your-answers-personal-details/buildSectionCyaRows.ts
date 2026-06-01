@@ -110,9 +110,7 @@ function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotS
   }
 
   if (addressConfirmed && confirmation) {
-    // YES branch: address is interpolated into the question ("Is your correspondence
-    // address X?"), so the value carries the Yes/No answer — same shape as the name
-    // confirmation row above.
+    // YES: question carries the address, value is just "Yes" (same shape as the name row).
     rows.push({
       key: { text: t('rows.correspondenceAddressConfirmation.label', { address: lines.join(', ') }) },
       value: { text: yesNoNotSure(confirmation) },
@@ -121,8 +119,7 @@ function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotS
     return;
   }
 
-  // NO / no-confirmation branch: the citizen typed an address, so the question is
-  // "What's your correspondence address?" and the value is the address itself.
+  // NO: open question, the typed-in address is the value.
   rows.push({
     key: { text: t('rows.correspondenceAddressConfirmation.fallbackLabel') },
     value: { html: lines.map(escapeHtml).join('<br>') },
