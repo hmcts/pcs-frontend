@@ -23,6 +23,21 @@
                 {% endif %}
               </p>
               <p class="govuk-body-s">{{ t('viewAllApplications:submittedOn') }} {{ genApp.submittedOn | date}}</p>
+              {% set supportingDocuments = genApp.supportingDocuments %}
+              {% if supportingDocuments.length > 0 %}
+                <div class="govuk-inset-text govuk-!-margin-top-1">
+                <p class="govuk-body-s govuk-!-margin-bottom-2">{{ t('viewAllApplications:followingDocumentsAlsoIncluded') }}:</p>
+                  <ul class="govuk-list govuk-!-padding-bottom-1">
+                  {% for supportingDocument in supportingDocuments %}
+                  <li class="govuk-body-s">
+                    <a href="/case/{{ caseReference }}/view-documents/{{ supportingDocument.documentId }}" rel="noreferrer noopener" target="_blank">
+                      {{ supportingDocument.filename }}
+                    </a>
+                  </li>
+                  {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
             </dd>
           </div>
          {% endfor %}
