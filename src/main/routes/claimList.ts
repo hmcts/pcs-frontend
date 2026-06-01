@@ -5,20 +5,20 @@ import { getTranslationFunction } from '@modules/i18n';
 import { getCitizenClaims } from '@services/pcsApi/pcsApiService';
 import { Logger } from '@modules/logger';
 
-const logger = Logger.getLogger('claimSummary');
+const logger = Logger.getLogger('claimList');
 
-export const CLAIM_SUMMARY_ROUTE = '/claims';
+export const CLAIM_LIST_ROUTE = '/claims';
 
-export default function claimSummaryRoutes(app: Application): void {
-  app.get(CLAIM_SUMMARY_ROUTE, oidcMiddleware, async (req: Request, res: Response) => {
+export default function claimListRoutes(app: Application): void {
+  app.get(CLAIM_LIST_ROUTE, oidcMiddleware, async (req: Request, res: Response) => {
     const accessToken = req.session.user?.accessToken;
 
     if (!accessToken) {
       return res.redirect('/login');
     }
 
-    await req.i18n?.loadNamespaces(['claimSummary']);
-    const t = getTranslationFunction(req, ['claimSummary', 'common']);
+    await req.i18n?.loadNamespaces(['claimList']);
+    const t = getTranslationFunction(req, ['claimList', 'common']);
 
     try {
       const claimsAgainst = await getCitizenClaims(accessToken);
@@ -26,12 +26,12 @@ export default function claimSummaryRoutes(app: Application): void {
         { text: claim.caseRef },
         { text: claim.claimantName },
         { text: claim.propertyPostcode },
-        { html: `<a href="/case/${claim.caseRef}/dashboard" class="govuk-link">${t('claimSummary:table.viewClaim')}</a>` },
+        { html: `<a href="/case/${claim.caseRef}/dashboard" class="govuk-link">${t('claimList:table.viewClaim')}</a>` },
       ]);
-      return res.render('claim-summary', { tableRows, t });
+      return res.render('claimList', { tableRows, t });
     } catch (error) {
       logger.error('Failed to fetch citizen claims', error);
-      return res.render('claim-summary', { tableRows: [], t });
+      return res.render('claimList', { tableRows: [], t });
     }
   });
 }
