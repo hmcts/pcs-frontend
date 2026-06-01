@@ -14,11 +14,13 @@ export function applyPlaywrightServiceUrls(): void {
     process.env.IDAM_WEB_URL ||= `https://idam-api.${normalizedCnpEnvironment}.platform.hmcts.net`;
     process.env.IDAM_TESTING_SUPPORT_URL ||= `https://idam-testing-support-api.${normalizedCnpEnvironment}.platform.hmcts.net`;
     process.env.S2S_URL ||= `http://rpe-service-auth-provider-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal/testing-support/lease`;
+    process.env.DM_STORE_URL ||= `http://dm-store-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal`;
   } else {
     process.env.IDAM_WEB_URL ||= 'https://idam-api.aat.platform.hmcts.net';
     process.env.IDAM_TESTING_SUPPORT_URL ||= 'https://idam-testing-support-api.aat.platform.hmcts.net';
     process.env.S2S_URL ||=
       'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease';
+    process.env.DM_STORE_URL ||= 'http://dm-store-aat.service.core-compute-aat.internal';
   }
 }
 

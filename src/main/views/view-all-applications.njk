@@ -1,5 +1,59 @@
 {% extends "template.njk" %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% macro partyGenAppCard(title, genApps, noGenAppsMessage) %}
+  <div class="govuk-summary-card">
+    <div class="govuk-summary-card__title-wrapper">
+      <h2 class="govuk-summary-card__title">{{ title }}</h2>
+    </div>
+
+    <div class="govuk-summary-card__content">
+      <dl class="govuk-summary-list">
+       {% if genApps.length > 0 %}
+         {% for genApp in genApps %}
+          <div class="govuk-summary-list__row">
+            <dd class="govuk-summary-list__value">
+              <p class="govuk-body govuk-!-margin-bottom-1">
+                {% set submissionDocument = genApp.submissionDocument %}
+                {% if submissionDocument.documentId %}
+                  <a href="/case/{{ caseReference }}/view-documents/{{ submissionDocument.documentId }}" rel="noreferrer noopener" target="_blank">{{ submissionDocument.filename }}</a>
+                {% else %}
+                  {{ submissionDocument.filename }}
+                {% endif %}
+              </p>
+              <p class="govuk-body-s">{{ t('viewAllApplications:submittedOn') }} {{ genApp.submittedOn | date}}</p>
+              {% set supportingDocuments = genApp.supportingDocuments %}
+              {% if supportingDocuments.length > 0 %}
+                <div class="govuk-inset-text govuk-!-margin-top-1">
+                <p class="govuk-body-s govuk-!-margin-bottom-2">{{ t('viewAllApplications:followingDocumentsAlsoIncluded') }}:</p>
+                  <ul class="govuk-list govuk-!-padding-bottom-1">
+                  {% for supportingDocument in supportingDocuments %}
+                  <li class="govuk-body-s">
+                    <a href="/case/{{ caseReference }}/view-documents/{{ supportingDocument.documentId }}" rel="noreferrer noopener" target="_blank">
+                      {{ supportingDocument.filename }}
+                    </a>
+                  </li>
+                  {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            </dd>
+          </div>
+         {% endfor %}
+       {% elif noGenAppsMessage != null %}
+         <div class="govuk-summary-list__row">
+           <dd class="govuk-summary-list__value">
+             <p class="govuk-body">
+              {{ noGenAppsMessage }}
+             </p>
+           </dd>
+         </div>
+       {% endif %}
+      </dl>
+    </div>
+  </div>
+{% endmacro %}
 
 {% block serviceNavigation %}
   {{ govukServiceNavigation({
@@ -16,11 +70,26 @@
   }) }}
 {% endblock %}
 
+{% set backUrl = dashboardUrl %}
+
 {% block pageTitle %}
-{{ t('dashboard:tasks.ViewAllApplications.title') }}
+{{ t('viewAllApplications:title') }}
 {% endblock %}
 
 {% block content %}
-  <h1 class="govuk-heading-l">{{ t('dashboard:tasks.ViewAllApplications.title') }}</h1>
-  <p class="govuk-body">Placeholder screen</p>
+  <h1 class="govuk-heading-l">{{ t('viewAllApplications:heading') }}</h1>
+
+  <p class="govuk-body">
+    {{ t('viewAllApplications:caseReferenceLabel') }} {{ formattedCaseReference }}
+  </p>
+
+  {{ partyGenAppCard(t('viewAllApplications:yourApplications'), userGenApps, t('viewAllApplications:youDoNotHaveAnyApplicationsYet')) }}
+
+  {% for partyId, partyGenApps in otherPartyGenAppsMap %}
+    {% set partyName = partyGenApps.party.firstName + ' ' + partyGenApps.party.lastName %}
+    {% set cardTitle = t('viewAllApplications:applicationsMadeBy') + ' ' + partyName %}
+    {{ partyGenAppCard(cardTitle, partyGenApps.genApps) }}
+  {% endfor %}
+
+
 {% endblock %}

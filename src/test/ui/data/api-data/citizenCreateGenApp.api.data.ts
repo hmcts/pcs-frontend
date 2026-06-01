@@ -4,7 +4,7 @@ const randomString = (length: number): string =>
     .substring(2, 2 + length);
 
 export const citizenCreateGenAppApiData = {
-  citizenCreateGenAppEventName: 'citizenCreateGenApp',
+  citizenCreateGenAppEventName: 'makeAnApplication',
   citizenCreateGenAppPayload: {
     citizenGenAppRequest: {
       applicationType: 'ADJOURN',
