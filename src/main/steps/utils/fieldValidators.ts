@@ -28,10 +28,14 @@ const htmlStripFilter = new FilterXSS(STRIP_HTML_OPTIONS);
 export function looksLikeHtml(text: string): boolean {
   for (let i = 0; (i = text.indexOf('<', i)) !== -1; i++) {
     let j = i + 1;
-    while (j < text.length && ' \t\n\r'.includes(text[j])) {j++;}
+    while (j < text.length && ' \t\n\r'.includes(text[j])) {
+      j++;
+    }
     if (text[j] === '/') {
       j++;
-      while (j < text.length && ' \t\n\r'.includes(text[j])) {j++;}
+      while (j < text.length && ' \t\n\r'.includes(text[j])) {
+        j++;
+      }
     }
     const c = text[j];
     if (c && ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c === '!' || c === '/')) {
