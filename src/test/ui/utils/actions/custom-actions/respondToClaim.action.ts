@@ -66,8 +66,8 @@ import { FieldsStore } from './recordAnsweredFields.action';
 const rtcCyaMap = new Map<string, string>();
 const rtcSectionAnswers = new Map<string, Map<string, string>>();
 let activeRtcSection = '';
-const rtcUploadedDocumentsQuestion = 'Documents you have uploaded';
-const rtcNoDocumentsUploadedValue = 'No documents uploaded';
+const rtcUploadedDocumentsQuestion = 'Upload files';
+const rtcNoDocumentsUploadedValue = 'No files uploaded';
 const rtcNoAnswerProvidedValue = 'No answer provided';
 
 const rtcCyaLabels = {
@@ -308,24 +308,6 @@ export class RespondToClaimAction implements IAction {
     }
 
     return `${dayNumber} ${monthNames[monthNumber - 1]} ${yearNumber}`;
-  }
-
-  private formatRtcCyaAddressLines(address: Record<string, unknown> | undefined): string[] {
-    if (!address) {
-      return [];
-    }
-
-    return [
-      address.AddressLine1,
-      address.AddressLine2,
-      address.AddressLine3,
-      address.PostTown,
-      address.County,
-      address.Country,
-      address.PostCode,
-    ]
-      .map(line => String(line ?? '').trim())
-      .filter(Boolean);
   }
 
   private recordRtcCyaName(label: string, firstName?: actionData, lastName?: actionData): void {
