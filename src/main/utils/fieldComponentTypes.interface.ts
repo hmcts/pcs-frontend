@@ -3,6 +3,7 @@ export type RadioItems = {
     items: {
       text: string;
       value?: string;
+      checked: boolean;
     }[];
   };
 };
