@@ -8,10 +8,17 @@ export function normaliseCounterClaim(response: PossessionClaimResponse): void {
     return;
   }
 
-  // No counterclaim → all downstream counter-claim screens are skipped
+  // No counterclaim → all downstream counter-claim screens (including upload) are skipped
   if (normalizeYesNoValue(dr.makeCounterClaim) !== 'YES') {
     delete dr.counterClaim;
+    delete dr.counterClaimWantToUploadFiles;
+    delete dr.counterClaimDocuments;
     return;
+  }
+
+  // User said they don't want to upload files → any previously uploaded doc metadata is stale
+  if (normalizeYesNoValue(dr.counterClaimWantToUploadFiles) !== 'YES') {
+    delete dr.counterClaimDocuments;
   }
 
   const cc = dr.counterClaim;
