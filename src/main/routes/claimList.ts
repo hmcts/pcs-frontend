@@ -1,9 +1,10 @@
 import type { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware/oidc';
+
 import { getTranslationFunction } from '@modules/i18n';
-import { getCitizenClaims } from '@services/pcsApi/pcsApiService';
 import { Logger } from '@modules/logger';
+import { getCitizenClaims } from '@services/pcsApi/pcsApiService';
 
 const logger = Logger.getLogger('claimList');
 
