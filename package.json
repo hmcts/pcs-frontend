@@ -54,7 +54,7 @@
     "@router": "dist/main/router"
   },
   "dependencies": {
-    "@azure/monitor-opentelemetry": "1.18.0",
+    "@azure/monitor-opentelemetry": "1.18.1",
     "@hmcts-cft/cft-ui-component-lib": "0.1.0-alpha.4",
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
@@ -104,7 +104,7 @@
     "@eslint/compat": "2.1.0",
     "@eslint/eslintrc": "3.3.5",
     "@eslint/js": "9.39.4",
-    "@eslint/plugin-kit": "0.7.1",
+    "@eslint/plugin-kit": "0.7.2",
     "@hmcts/playwright-common": "1.1.2",
     "@pact-foundation/pact": "15.0.1",
     "@pact-foundation/pact-cli": "18.0.0",
@@ -174,7 +174,7 @@
     "webpack-hot-middleware": "2.26.1"
   },
   "resolutions": {
-    "@eslint/plugin-kit": "^0.7.0",
+    "@eslint/plugin-kit": "0.7.2",
     "@opentelemetry/exporter-prometheus": "0.218.0",
     "@opentelemetry/instrumentation": "0.218.0",
     "@opentelemetry/instrumentation-redis-4": "npm:@opentelemetry/instrumentation-redis@^0.66.0",
