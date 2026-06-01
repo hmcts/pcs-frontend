@@ -1,7 +1,6 @@
 {
   "question": "",
-  "heading": "cyThe defendant’s situation",
-  "accommodationHeading": "cyAlternative accommodation",
+  "heading": "cyAlternative accommodation",
   "accommodationQuestion": "cyWould the defendant have somewhere else to live if they had to leave their home?",
   "dateLabel": "cyWhen would they be able to move in? (Optional)",
   "options": {

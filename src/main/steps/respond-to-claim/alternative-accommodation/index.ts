@@ -13,7 +13,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     heading: 'heading',
     accommodationQuestion: 'accommodationQuestion',
-    accommodationHeading: 'accommodationHeading',
   },
   fields: [
     {
