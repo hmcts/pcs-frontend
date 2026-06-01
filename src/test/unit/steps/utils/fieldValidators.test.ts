@@ -1,4 +1,4 @@
-import { stripHtmlTags } from '../../../../main/steps/utils/fieldValidators';
+import { looksLikeHtml, stripHtmlTags } from '../../../../main/steps/utils/fieldValidators';
 
 // --- Denylist approach (HDPI-5371) — commented out for xss spike; restore if denylist preferred ---
 // import { hasUnsafeTextContent } from '../../../../main/steps/utils/fieldValidators';
@@ -31,6 +31,16 @@ import { stripHtmlTags } from '../../../../main/steps/utils/fieldValidators';
 //     });
 //   });
 // });
+
+describe('looksLikeHtml', () => {
+  it('returns false for comparison text with many spaces after <', () => {
+    expect(looksLikeHtml(`1 bedroom is <${' '.repeat(5000)}2 bedrooms`)).toBe(false);
+  });
+
+  it('returns true for spaced tag-like markup', () => {
+    expect(looksLikeHtml('< script>alert(1)</script>')).toBe(true);
+  });
+});
 
 describe('stripHtmlTags', () => {
   it('strips tags per jsxss no-tag example', () => {

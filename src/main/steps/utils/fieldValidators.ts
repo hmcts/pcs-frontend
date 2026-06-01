@@ -24,11 +24,21 @@ const STRIP_HTML_OPTIONS = {
 
 const htmlStripFilter = new FilterXSS(STRIP_HTML_OPTIONS);
 
-// Only run xss when input looks like HTML; plain `<` / `>` (e.g. comparisons) must not be stripped or escaped.
-const LOOKS_LIKE_HTML = /<\s*\/?\s*[a-zA-Z!/]/;
-
+// Only run xss when input looks like HTML; linear scan avoids CodeQL ReDoS on /\s*<.../ patterns.
 export function looksLikeHtml(text: string): boolean {
-  return LOOKS_LIKE_HTML.test(text);
+  for (let i = 0; (i = text.indexOf('<', i)) !== -1; i++) {
+    let j = i + 1;
+    while (j < text.length && ' \t\n\r'.includes(text[j])) {j++;}
+    if (text[j] === '/') {
+      j++;
+      while (j < text.length && ' \t\n\r'.includes(text[j])) {j++;}
+    }
+    const c = text[j];
+    if (c && ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c === '!' || c === '/')) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export function stripHtmlTags(text: string): string {
