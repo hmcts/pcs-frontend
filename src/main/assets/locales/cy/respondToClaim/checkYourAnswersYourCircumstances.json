@@ -4,51 +4,51 @@
   "rows": {
     "dependantChildren": {
       "label": "cy Do you have any dependent children?",
-      "changeHidden": "cy Do you have any dependent children?"
+      "changeHidden": "cy dependent children"
     },
     "dependantChildrenDetails": {
       "label": "cy Give details about your dependent children",
-      "changeHidden": "cy Give details about your dependent children"
+      "changeHidden": "cy dependent children details"
     },
     "otherDependants": {
       "label": "cy Do you have any other dependants?",
-      "changeHidden": "cy Do you have any other dependants?"
+      "changeHidden": "cy other dependants"
     },
     "otherDependantsDetails": {
       "label": "cy Give details about your other dependants",
-      "changeHidden": "cy Give details about your other dependants"
+      "changeHidden": "cy other dependants details"
     },
     "otherTenants": {
       "label": "cy Do any other adults live in your home?",
-      "changeHidden": "cy Do any other adults live in your home?"
+      "changeHidden": "cy other adults in your home"
     },
     "otherTenantsDetails": {
       "label": "cy Give details about the other adults living in your home",
-      "changeHidden": "cy Give details about the other adults living in your home"
+      "changeHidden": "cy other adults details"
     },
     "alternativeAccommodation": {
       "label": "cy Would you have somewhere else to live if you had to leave your home?",
-      "changeHidden": "cy Would you have somewhere else to live if you had to leave your home?"
+      "changeHidden": "cy alternative accommodation"
     },
     "alternativeAccommodationDate": {
       "label": "cy When would you be able to move in?",
-      "changeHidden": "cy When would you be able to move in?"
+      "changeHidden": "cy alternative accommodation move-in date"
     },
     "shareAdditionalCircumstances": {
       "label": "cy Would you like to share anything about your circumstances?",
-      "changeHidden": "cy Would you like to share anything about your circumstances?"
+      "changeHidden": "cy additional circumstances"
     },
     "shareAdditionalCircumstancesDetails": {
       "label": "cy Give details about your circumstances",
-      "changeHidden": "cy Give details about your circumstances"
+      "changeHidden": "cy additional circumstances details"
     },
     "exceptionalHardship": {
       "label": "cy Would you experience exceptional hardship if you were asked to leave your home?",
-      "changeHidden": "cy Would you experience exceptional hardship if you were asked to leave your home?"
+      "changeHidden": "cy exceptional hardship"
     },
     "exceptionalHardshipDetails": {
       "label": "cy Give details about the exceptional hardship you’d experience",
-      "changeHidden": "cy Give details about the exceptional hardship you’d experience"
+      "changeHidden": "cy exceptional hardship details"
     }
   }
 }

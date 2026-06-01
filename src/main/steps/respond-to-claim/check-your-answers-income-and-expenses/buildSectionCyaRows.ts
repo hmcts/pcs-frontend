@@ -1,4 +1,3 @@
-import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -10,7 +9,6 @@ import {
   escapeWithLineBreaks,
   groupQuestionAndDetail,
   isYes,
-  listHtml,
   pushDetailRow,
   pushYesNoRow,
 } from '../section-cya/cyaRow';
@@ -62,11 +60,11 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   };
 
   addShareIncomeExpenseDetailsRow(ctx);
-  addRegularIncomeRow(ctx);
+  addRegularIncomeRows(ctx);
   addAppliedForUcRow(ctx);
   addPriorityDebtsRow(ctx);
   addPriorityDebtDetailsRow(ctx);
-  addRegularExpensesRow(ctx);
+  addRegularExpensesRows(ctx);
   addOtherConsiderationsRow(ctx);
 
   return ctx.rows;
@@ -83,6 +81,36 @@ function amountWithFrequency(
   const money = pounds ? `£${pounds}` : '';
   const freq = frequency ? t(`${frequencyNamespace}.${String(frequency).trim().toUpperCase()}`) : '';
   return [money, freq].filter(Boolean).join(' ');
+}
+
+// Heading row, then one row per selected item. If nothing's selected, the heading row
+// itself shows "No answer provided" so there's still a Change link back to the page.
+function pushHeadingWithItems(
+  rows: SummaryListRow[],
+  labelKey: string,
+  step: string,
+  itemRows: SummaryListRow[],
+  t: TFunction,
+  change: BaseRowContext['change']
+): void {
+  if (itemRows.length === 0) {
+    rows.push({
+      key: { text: t(`${labelKey}.label`) },
+      value: { text: t('noAnswerProvided') },
+      actions: { items: [change(step, `${labelKey}.changeHidden`)] },
+    });
+    return;
+  }
+  rows.push({
+    classes: 'govuk-summary-list__row--no-border',
+    key: { text: t(`${labelKey}.label`) },
+    value: { text: '' },
+  });
+  // Strip borders so the group reads as one block; the last item keeps its line.
+  itemRows.slice(0, -1).forEach(row => {
+    row.classes = 'govuk-summary-list__row--no-border';
+  });
+  rows.push(...itemRows);
 }
 
 function addShareIncomeExpenseDetailsRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
@@ -102,33 +130,38 @@ function addShareIncomeExpenseDetailsRow({ rows, hc, t, change, yesNoNotSure }: 
   );
 }
 
-function addRegularIncomeRow({ rows, hc, t, change }: RowContext): void {
-  // Shown whenever the user opted into finance details (shareIncomeExpenseDetails === YES
-  // is the showCondition for this step). The page is optional, so an empty selection is
-  // still an answer — render "No answer provided" rather than dropping the row, keeping
-  // the question and its Change link visible on the CYA.
+function addRegularIncomeRows({ rows, hc, t, change }: RowContext): void {
+  // Only when the user opted into finance details. One row per source they picked.
   if (!isYes(hc.shareIncomeExpenseDetails)) {
     return;
   }
-  const items: string[] = [];
+  const step = 'what-regular-income-do-you-receive';
+  const itemRows: SummaryListRow[] = [];
+
   for (const source of INCOME_SOURCES) {
     if (!isYes(hc[source.key])) {
       continue;
     }
-    const label = t(`rows.regularIncome.options.${source.key}`);
+    const optionKey = `rows.regularIncome.options.${source.key}`;
     const detail = amountWithFrequency(hc[source.amount], hc[source.frequency], t, 'incomeFrequencies');
-    items.push(detail ? `${escapeHtml(label)} ${escapeHtml(detail)}` : escapeHtml(label));
+    itemRows.push({
+      key: { text: t(optionKey), classes: 'govuk-!-font-weight-regular' },
+      value: { text: detail },
+      actions: { items: [change(step, 'rows.regularIncome.changeHidden')] },
+    });
   }
+
   if (isYes(hc.moneyFromElsewhere)) {
-    const label = t('rows.regularIncome.options.moneyFromElsewhere');
+    const optionKey = 'rows.regularIncome.options.moneyFromElsewhere';
     const detail = hc.moneyFromElsewhereDetails?.trim();
-    items.push(detail ? `${escapeHtml(label)}: ${escapeWithLineBreaks(detail)}` : escapeHtml(label));
+    itemRows.push({
+      key: { text: t(optionKey), classes: 'govuk-!-font-weight-regular' },
+      value: detail ? { html: escapeWithLineBreaks(detail) } : { text: '' },
+      actions: { items: [change(step, 'rows.regularIncome.changeHidden')] },
+    });
   }
-  rows.push({
-    key: { text: t('rows.regularIncome.label') },
-    value: items.length > 0 ? { html: listHtml(items) } : { text: t('noAnswerProvided') },
-    actions: { items: [change('what-regular-income-do-you-receive', 'rows.regularIncome.changeHidden')] },
-  });
+
+  pushHeadingWithItems(rows, 'rows.regularIncome', step, itemRows, t, change);
 }
 
 function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
@@ -190,29 +223,27 @@ function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
   }
 }
 
-function addRegularExpensesRow({ rows, hc, t, change }: RowContext): void {
-  // Same optional-multi-select handling as regular income: shown whenever finance
-  // details were opted into, "No answer provided" when the (optional) page was empty.
+function addRegularExpensesRows({ rows, hc, t, change }: RowContext): void {
+  // Same as regular income: one row per expense the user picked.
   if (!isYes(hc.shareIncomeExpenseDetails)) {
     return;
   }
-  const items: string[] = [];
+  const step = 'what-other-regular-expenses-do-you-have';
+  const itemRows: SummaryListRow[] = [];
   for (const key of EXPENSE_KEYS) {
     const details = hc[key];
     if (!details || !isYes(details.applies)) {
       continue;
     }
-    const label = t(`rows.regularExpenses.options.${key}`);
+    const optionKey = `rows.regularExpenses.options.${key}`;
     const detail = amountWithFrequency(details.amount, details.frequency, t);
-    items.push(detail ? `${escapeHtml(label)} ${escapeHtml(detail)}` : escapeHtml(label));
+    itemRows.push({
+      key: { text: t(optionKey), classes: 'govuk-!-font-weight-regular' },
+      value: { text: detail },
+      actions: { items: [change(step, 'rows.regularExpenses.changeHidden')] },
+    });
   }
-  rows.push({
-    key: { text: t('rows.regularExpenses.label') },
-    value: items.length > 0 ? { html: listHtml(items) } : { text: t('noAnswerProvided') },
-    actions: {
-      items: [change('what-other-regular-expenses-do-you-have', 'rows.regularExpenses.changeHidden')],
-    },
-  });
+  pushHeadingWithItems(rows, 'rows.regularExpenses', step, itemRows, t, change);
 }
 
 function addOtherConsiderationsRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {

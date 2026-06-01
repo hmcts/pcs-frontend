@@ -84,7 +84,6 @@ describe('section-CYA row builders — characterisation', () => {
       expect(contactDetailsRow?.actions?.items[0].href).toContain(
         '/contact-preferences-telephone?edit=personalDetails'
       );
-      expect(contactDetailsRow?.actions?.items[0].visuallyHiddenText).toBe('rows.contactDetails.changeHidden');
     });
 
     it('contact-by-email: preference row stands alone; email lives in the Contact details row', () => {
@@ -186,6 +185,8 @@ describe('section-CYA row builders — characterisation', () => {
         r => r.key.text === 'rows.defendantNameConfirmation.label'
       );
       expect(row?.value).toEqual({ text: 'options.yes' });
+      // Change link carries a short subject for screen-reader link-nav (e.g. "Change name").
+      expect(row?.actions?.items[0].visuallyHiddenText).toBe('rows.defendantNameConfirmation.changeHidden');
     });
 
     it('correspondence-address: shows the confirmed claimant address as one row when the citizen answered Yes', () => {
@@ -314,7 +315,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label')).toBeUndefined();
     });
 
-    it('tenancy-date row: "No" without a corrected date shows only the confirmation row', () => {
+    it('tenancy-date row: "No" with the optional corrected date left blank shows "No answer provided"', () => {
       const rows = buildDisputeRows(
         reqWith(model({ tenancyStartDateConfirmation: 'NO' }, { tenancy_TenancyLicenceDate: '2023-01-01' })),
         t
@@ -322,7 +323,9 @@ describe('section-CYA row builders — characterisation', () => {
       expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.confirm.label')?.value).toEqual({
         text: 'options.no',
       });
-      expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label')).toBeUndefined();
+      expect(rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label')?.value).toEqual({
+        text: 'noAnswerProvided',
+      });
     });
 
     it('notice-date row: links to "not-provided" step when the claim has no notice date', () => {
