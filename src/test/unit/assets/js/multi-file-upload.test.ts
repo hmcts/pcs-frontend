@@ -307,8 +307,7 @@ describe('multi-file-upload', () => {
       row.className = 'moj-multi-file-upload__row';
       const message = document.createElement('div');
       message.className = 'moj-multi-file-upload__message';
-      message.innerHTML =
-        '<span class="moj-multi-file-upload__success"><svg></svg>uploaded.pdf</span>';
+      message.innerHTML = '<span class="moj-multi-file-upload__success"><svg></svg>uploaded.pdf</span>';
       row.appendChild(message);
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'moj-multi-file-upload__delete';
