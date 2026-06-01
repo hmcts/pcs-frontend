@@ -45,7 +45,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       type: 'text',
       required: true,
       maxLength: 100,
-      labelClasses: 'govuk-label--s',
       errorMessage: 'errors.fullName',
       translationKey: { label: 'statementOfTruth.fullNameLabel' },
     },
