@@ -286,10 +286,10 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('uploadFiles');
     await performAction('clickButton', 'Save and continue');
     await performAction('taskListStatus', {
-      subSecArray: [taskList.checkYourAnswersAndSubmitLink],
+      subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
       status: 'Available',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitLink });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -308,7 +308,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
         taskList.incomeAndExpensesLink,
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitLink,
+        taskList.checkYourAnswersAndSubmitHiddenLink,
       ],
       status: 'Done',
     });

@@ -466,7 +466,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('uploadFiles');
 
     await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitLink });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
     await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
     await performAction('readReasonableAdjustmentsTriage');
@@ -494,7 +494,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
         taskList.incomeAndExpensesLink,
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitLink,
+        taskList.checkYourAnswersAndSubmitHiddenLink,
       ],
       status: 'Done',
     });
@@ -711,7 +711,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('uploadFiles');
 
     await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitLink });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
     await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
     await performAction('readReasonableAdjustmentsTriage');
