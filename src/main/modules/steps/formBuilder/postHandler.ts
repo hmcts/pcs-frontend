@@ -162,7 +162,7 @@ export function createPostHandler(
           return safeRedirect303(res, '/', '/', ['/']);
         }
 
-        return safeRedirect303(res, dashboardUrl, '/', ['/dashboard']);
+        return safeRedirect303(res, dashboardUrl, '/', ['/case']);
       }
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);

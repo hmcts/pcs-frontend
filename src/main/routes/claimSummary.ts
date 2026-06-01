@@ -7,7 +7,7 @@ import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('claimSummary');
 
-export const CLAIM_SUMMARY_ROUTE = '/claim-summary';
+export const CLAIM_SUMMARY_ROUTE = '/claims';
 
 export default function claimSummaryRoutes(app: Application): void {
   app.get(CLAIM_SUMMARY_ROUTE, oidcMiddleware, async (req: Request, res: Response) => {
@@ -26,7 +26,7 @@ export default function claimSummaryRoutes(app: Application): void {
         { text: claim.caseRef },
         { text: claim.claimantName },
         { text: claim.propertyPostcode },
-        { html: `<a href="/dashboard/${claim.caseRef}" class="govuk-link">${t('claimSummary:table.viewClaim')}</a>` },
+        { html: `<a href="/case/${claim.caseRef}/dashboard" class="govuk-link">${t('claimSummary:table.viewClaim')}</a>` },
       ]);
       return res.render('claim-summary', { tableRows, t });
     } catch (error) {

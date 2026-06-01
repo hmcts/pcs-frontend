@@ -30,7 +30,7 @@ interface MappedTaskGroup {
   tasks: MappedTask[];
 }
 
-export const DASHBOARD_ROUTE = '/dashboard';
+export const DASHBOARD_ROUTE = '/case/:caseReference/dashboard';
 
 const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'helpWithFees', href: 'https://www.gov.uk/get-help-with-court-fees' },
@@ -79,7 +79,7 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
     return null;
   }
 
-  return `${DASHBOARD_ROUTE}/${sanitised}`;
+  return `/case/${sanitised}/dashboard`;
 };
 
 export default function dashboardRoutes(app: Application): void {
@@ -129,8 +129,8 @@ export default function dashboardRoutes(app: Application): void {
     return safeRedirect303(res, '/', '/', ['/']);
   });
 
-  // Route: /dashboard/:caseReference (main dashboard page)
-  dashboardRouter.get('/:caseReference', async (req: Request, res: Response, next) => {
+  // Route: /case/:caseReference/dashboard
+  dashboardRouter.get('/:caseReference/dashboard', async (req: Request, res: Response, next) => {
     const rawCaseReference = req.params.caseReference;
     const caseReference =
       typeof rawCaseReference === 'string' || typeof rawCaseReference === 'number'
@@ -188,6 +188,6 @@ export default function dashboardRoutes(app: Application): void {
     }
   });
 
-  // Mount the dashboard router at /dashboard
-  app.use('/dashboard', dashboardRouter);
+  // Mount the dashboard router at /case
+  app.use('/case', dashboardRouter);
 }

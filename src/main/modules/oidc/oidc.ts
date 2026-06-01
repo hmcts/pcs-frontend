@@ -217,7 +217,7 @@ export class OIDCModule {
           delete req.session.codeVerifier;
           delete req.session.nonce;
 
-          const returnTo = req.session.returnTo || '/claim-summary';
+          const returnTo = req.session.returnTo || '/claims';
           delete req.session.returnTo;
           res.redirect(returnTo);
         });
