@@ -66,8 +66,7 @@ export const makeYesNoNotSure =
   (value: string): string =>
     t(`options.${toOptionKey(value)}`);
 
-// Section-scoped "Change" link factory. The hidden text is a short noun (e.g. "name")
-// so Tab/Rotor announces "Change name" without echoing the full row question.
+// Hidden text is a short noun so screen readers announce "Change name", not the full question.
 export const makeChange =
   (caseRef: string, sectionId: RespondToClaimSectionId, t: TFunction) =>
   (stepSlug: string, hiddenKey: string): ChangeAction => ({
