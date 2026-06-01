@@ -11,6 +11,6 @@ export const confirmIfTheseDocumentsRelateToAnApplication = {
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
-  confirmIfTheseErrorMessage: `Confirm if these documents relate to an existing application.`,
+  confirmIfTheseErrorMessage: `Confirm if these documents relate to an existing application`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
 };

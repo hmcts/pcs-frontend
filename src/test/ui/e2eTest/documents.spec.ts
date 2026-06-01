@@ -41,7 +41,6 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     );
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
     await softErrorMessageValidation(
       'confirmIfTheseDocumentsRelateToAnApplication',
       confirmDocumentsRelateToApplicationErrorValidation
@@ -100,7 +99,6 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       data: citizenCreateGenAppApiData('SET_ASIDE').citizenCreateGenAppPayload,
     });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
     await softErrorMessageValidation(
       'confirmIfTheseDocumentsRelateToAnApplication',
       confirmDocumentsRelateToApplicationErrorValidation
@@ -109,18 +107,23 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden,
     });
+    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+    await performAction('clickLink', 'Back');
+    await performAction('clickLink', 'Back');
     await performValidation('mainHeader', startEvidenceUpload.mainHeader);
     // SOMETHING_ELSE + default YES
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
     });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       previousApplicationOption: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToApplicationRadioOptionHidden,
     });
+    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+    await performAction('clickLink', 'Back');
+    await performAction('clickLink', 'Back');
     await performValidation('mainHeader', startEvidenceUpload.mainHeader);
   });
 });

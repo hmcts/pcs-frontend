@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { confirmIfTheseDocumentsRelateToAnApplication } from '../../../data/page-data/documents-page-data/confirmIfTheseDocumentsRelateToAnApplication.page.data';
-import { uploadYourDocuments } from '../../../data/page-data/documents-page-data/uploadYourDocuments.page.data';
+import { confirmIfTheseDocumentsRelateToAnApplication } from '../../../data/page-data/documents-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -103,8 +102,5 @@ Actual: "${actualText}"`
       option: selectOption,
     });
     await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
-    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
-    await page.getByRole('link', { name: 'Back', exact: true }).click();
-    await page.getByRole('link', { name: 'Back', exact: true }).click();
   }
 }
