@@ -1,13 +1,14 @@
 import type { Request } from 'express';
 
-import { sessionDocs } from '@modules/documents/storage';
-import { getFormData } from '@modules/steps';
-import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
-import { toCaseReference16 } from '@utils/caseReference';
 import {
   confirmIfTheseDocumentsRelateToAnApplicationStep,
   uploadYourDocumentsStep,
 } from '../../../steps/case-tasks/upload-additional-documents/flow.config';
+
+import { sessionDocs } from '@modules/documents/storage';
+import { getFormData } from '@modules/steps';
+import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
+import { toCaseReference16 } from '@utils/caseReference';
 
 const CLAIM_OR_COUNTERCLAIM_OPTION = 'claim-or-counterclaim';
 

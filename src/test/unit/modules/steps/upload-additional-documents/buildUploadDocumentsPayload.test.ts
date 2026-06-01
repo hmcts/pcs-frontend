@@ -1,12 +1,11 @@
 import type { Request } from 'express';
-import type { SessionData } from 'express-session';
 
-import {
-  buildUploadDocumentsPayload } from '../../../../../main/modules/steps/upload-additional-documents/buildUploadDocumentsPayload';
+import { buildUploadDocumentsPayload } from '../../../../../main/modules/steps/upload-additional-documents/buildUploadDocumentsPayload';
 import {
   confirmIfTheseDocumentsRelateToAnApplicationStep,
   uploadYourDocumentsStep,
 } from '../../../../../main/steps/case-tasks/upload-additional-documents/flow.config';
+
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 
 const CASE_REF = '1234567890123456';
@@ -24,10 +23,12 @@ const doc: CcdCollectionItem<CcdUploadedDocument> = {
   },
 };
 
-function makeReq(overrides: {
-  uploadedDocs?: CcdCollectionItem<CcdUploadedDocument>[];
-  relatedApplicationId?: string;
-} = {}): Request {
+function makeReq(
+  overrides: {
+    uploadedDocs?: CcdCollectionItem<CcdUploadedDocument>[];
+    relatedApplicationId?: string;
+  } = {}
+): Request {
   const session: Record<string, unknown> = { formData: {} };
   if (overrides.uploadedDocs) {
     session.uploadedDocs = { [CASE_REF]: { [uploadYourDocumentsStep]: overrides.uploadedDocs } };
@@ -56,9 +57,7 @@ describe('buildUploadDocumentsPayload', () => {
 
   it('includes selectedRelatedApplicationId when a gen app is chosen', async () => {
     const genAppId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
-    const result = await buildUploadDocumentsPayload(
-      makeReq({ uploadedDocs: [doc], relatedApplicationId: genAppId })
-    );
+    const result = await buildUploadDocumentsPayload(makeReq({ uploadedDocs: [doc], relatedApplicationId: genAppId }));
 
     expect(result.documentUploadDetails).toEqual({ selectedRelatedApplicationId: genAppId });
   });
@@ -77,4 +76,3 @@ describe('buildUploadDocumentsPayload', () => {
     expect(result.uploadedAdditionalDocuments).toEqual([]);
   });
 });
-

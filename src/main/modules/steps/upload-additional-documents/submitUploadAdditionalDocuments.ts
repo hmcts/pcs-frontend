@@ -1,8 +1,8 @@
 import config from 'config';
 
-import { http } from '@modules/http';
-
 import type { UploadDocumentsSubmitPayload } from './buildUploadDocumentsPayload';
+
+import { http } from '@modules/http';
 
 function getCcdBaseUrl(): string {
   return config.get<string>('ccd.url');

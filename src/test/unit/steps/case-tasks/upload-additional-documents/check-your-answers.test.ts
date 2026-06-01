@@ -23,9 +23,7 @@ type NavMocks = { getBackUrl: jest.Mock; getNextStepUrl: jest.Mock };
 jest.mock('../../../../../main/modules/steps/flow', () => {
   const navigation: NavMocks = {
     getBackUrl: jest.fn(async () => '/back'),
-    getNextStepUrl: jest.fn(
-      async () => '/case/1234567890123456/upload-additional-documents/documents-uploaded'
-    ),
+    getNextStepUrl: jest.fn(async () => '/case/1234567890123456/upload-additional-documents/documents-uploaded'),
   };
 
   const globalCtx = globalThis as typeof globalThis & { __uploadCyaNavMocks?: NavMocks };

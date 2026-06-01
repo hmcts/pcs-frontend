@@ -5,13 +5,13 @@ import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/
 import { flowConfig, uploadYourDocumentsStep } from '../flow.config';
 
 import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
+import { createGetController, createStepNavigation, getFormData } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import {
   buildUploadDocumentsPayload,
   clearUploadAdditionalDocumentsSession,
 } from '@modules/steps/upload-additional-documents/buildUploadDocumentsPayload';
 import { submitUploadAdditionalDocuments } from '@modules/steps/upload-additional-documents/submitUploadAdditionalDocuments';
-import { createGetController, createStepNavigation, getFormData } from '@modules/steps';
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
 
