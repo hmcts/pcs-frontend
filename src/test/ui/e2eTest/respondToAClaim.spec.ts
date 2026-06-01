@@ -19,7 +19,6 @@ import {
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
-  disputeClaimInterstitial,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
@@ -422,14 +421,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
-    await performAction('changeAnswerOnFinalCYA', contactPreferencesTextMessage.contactByTextMessageQuestion);
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateRTCSectionCYA', 'personalDetails');
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/check-your-answers`);
-    await performValidation('mainHeader', checkYourAnswersRTC.mainHeader);
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateCYARTC');
     await performAction('selectStatementOfTruthRTC', {

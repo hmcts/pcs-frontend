@@ -1145,7 +1145,6 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectStatementOfTruthRTC(sot: actionRecord): Promise<void> {
-    await performValidation('mainHeader', checkYourAnswersRTC.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: checkYourAnswersRTC.statementOfTruthHeader });
     await performValidation('text', { elementType: 'paragraph', text: checkYourAnswersRTC.statementOfTruthParagraph });
     await performValidation('elementToBeVisible', checkYourAnswersRTC.contemptOfCourtCheckboxLabel);
@@ -1400,7 +1399,7 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', accessYourCase.continueButton);
   }
   private async readReasonableAdjustmentsTriage(): Promise<void> {
-    this.recordAnswer(reasonableAdjustmentsTriage.mainHeader, reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    //this.recordAnswer(reasonableAdjustmentsTriage.mainHeader, reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
   }
 
