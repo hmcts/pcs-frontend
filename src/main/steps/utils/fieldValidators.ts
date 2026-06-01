@@ -24,7 +24,17 @@ const STRIP_HTML_OPTIONS = {
 
 const htmlStripFilter = new FilterXSS(STRIP_HTML_OPTIONS);
 
+// Only run xss when input looks like HTML; plain `<` / `>` (e.g. comparisons) must not be stripped or escaped.
+const LOOKS_LIKE_HTML = /<\s*\/?\s*[a-zA-Z!/]/;
+
+export function looksLikeHtml(text: string): boolean {
+  return LOOKS_LIKE_HTML.test(text);
+}
+
 export function stripHtmlTags(text: string): string {
+  if (!looksLikeHtml(text)) {
+    return text;
+  }
   return htmlStripFilter.process(text);
 }
 

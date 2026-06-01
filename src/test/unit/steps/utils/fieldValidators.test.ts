@@ -46,9 +46,21 @@ describe('stripHtmlTags', () => {
       ['user@example.com', 'email address'],
       ['1234.56', 'currency amount'],
       ['SW1A 1AA', 'postcode'],
+      ['1 bedroom is < 2 bedrooms', 'less-than comparison'],
+      ['1 bedroom > 2 bedrooms', 'greater-than comparison'],
+      ['Bedroom 1 < 2 (smaller room)', 'comparison with parenthetical'],
     ])('returns %s unchanged (%s)', input => {
       expect(stripHtmlTags(input)).toBe(input);
     });
+  });
+
+  it('strips script tags when input looks like HTML', () => {
+    const input = '<script>alert(1)</script>hello';
+    expect(stripHtmlTags(input)).toBe('hello');
+  });
+
+  it('strips non-script HTML tags', () => {
+    expect(stripHtmlTags('<strong>x</strong>')).toBe('x');
   });
 
   it('leaves plain-text XSS-style attribute injection unchanged (spike gap)', () => {
