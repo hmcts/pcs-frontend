@@ -147,7 +147,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Validate notification and response status @regression @crossbrowse', async () => {
+  test('Validate notification and response status @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
     await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
@@ -190,7 +190,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
       viewResponseHeader: dashboard.viewTheResponseSubHeader,
       tag: dashboard.completedTag,
-      viewResponsetag: dashboard.availableTag,
+      viewResponseTag: dashboard.availableTag,
     });
   });
 });

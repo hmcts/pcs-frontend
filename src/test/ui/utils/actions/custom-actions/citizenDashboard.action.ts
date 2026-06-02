@@ -57,7 +57,7 @@ export class CitizenDashboardAction implements IAction {
         hasText: String(notificationData.viewResponseHeader),
       });
       await expect(vireResponseTask.locator('.govuk-task-list__status')).toHaveText(
-        String(notificationData.viewResponsetag)
+        String(notificationData.viewResponseTag)
       );
     } else {
       // Verify link is deactivated (not rendered as a link)
