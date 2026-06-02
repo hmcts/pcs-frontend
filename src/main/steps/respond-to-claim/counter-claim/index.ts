@@ -9,6 +9,7 @@ import { FeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.makeCounterClaim),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaim.njk`,
   translationKeys: {
@@ -54,16 +55,20 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const makeCounterClaim = req.body?.makeCounterClaim as YesNoValue | undefined;
     const response = buildDraftDefendantResponse(req);
 
-    if (makeCounterClaim) {
-      response.defendantResponses.makeCounterClaim = makeCounterClaim;
+    if (makeCounterClaim === 'YES') {
+      response.defendantResponses.makeCounterClaim = 'YES';
+    } else if (makeCounterClaim === 'NO') {
+      response.defendantResponses.makeCounterClaim = 'NO';
+      delete response.defendantResponses.counterClaim;
     } else {
       delete response.defendantResponses.makeCounterClaim;
+      delete response.defendantResponses.counterClaim;
     }
 
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const makeCounterClaim: YesNoValue | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.makeCounterClaim;
 
@@ -71,7 +76,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: async (req: Request) => {
     const counterClaimFlatFeeFEE0450 = await getFee(FeeType.counterClaimFlatFeeFEE0450);
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
     return { counterClaimFlatFeeFEE0450, claimantName };
   },

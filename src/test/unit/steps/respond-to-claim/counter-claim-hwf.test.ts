@@ -3,7 +3,13 @@ jest.mock('../../../../main/modules/steps', () => ({
 }));
 
 const mockSaveDraftDefendantResponse = jest.fn();
-const mockBuildDraftDefendantResponse = jest.fn(() => ({ defendantResponses: { makeCounterClaim: 'YES' } }));
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockBuildDraftDefendantResponse = jest.fn<any, any>(() => ({
+  defendantResponses: {
+    makeCounterClaim: 'YES' as const,
+    counterClaim: undefined as Record<string, unknown> | undefined,
+  },
+}));
 jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
   buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
@@ -82,20 +88,45 @@ describe('respond-to-claim counter-claim-have-you-applied-for-help', () => {
       });
     });
 
-    it('does not persist when selection is missing', async () => {
+    it('clears appliedForHwf + hwfReferenceNumber and saves when selection is missing', async () => {
       const req = { body: {} };
 
       await testedStep.beforeRedirect(req);
 
-      expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
+      // Holistic-save rule 5: always save. Rule 3: DELETE the field when cleared.
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledTimes(1);
+      const saved = mockSaveDraftDefendantResponse.mock.calls[0][1];
+      expect(saved.defendantResponses.counterClaim.appliedForHwf).toBeUndefined();
+      expect(saved.defendantResponses.counterClaim.hwfReferenceNumber).toBeUndefined();
     });
 
-    it('does not persist when body is undefined', async () => {
+    it('clears appliedForHwf + hwfReferenceNumber and saves when body is undefined', async () => {
       const req = { body: undefined };
 
       await testedStep.beforeRedirect(req);
 
-      expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledTimes(1);
+      const saved = mockSaveDraftDefendantResponse.mock.calls[0][1];
+      expect(saved.defendantResponses.counterClaim.appliedForHwf).toBeUndefined();
+      expect(saved.defendantResponses.counterClaim.hwfReferenceNumber).toBeUndefined();
+    });
+
+    it('clears hwfReferenceNumber when transitioning from YES to NO', async () => {
+      // Mock returns a draft that already has appliedForHwf=YES + a stored reference number
+      mockBuildDraftDefendantResponse.mockReturnValueOnce({
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: { appliedForHwf: 'YES', hwfReferenceNumber: 'HWF-OLD-123' },
+        },
+      });
+      const req = { body: { alreadyAppliedForHelp: 'no' } };
+
+      await testedStep.beforeRedirect(req);
+
+      const saved = mockSaveDraftDefendantResponse.mock.calls[0][1];
+      expect(saved.defendantResponses.counterClaim.appliedForHwf).toBe('NO');
+      // Rule 4: subfield cleared when parent option changes
+      expect(saved.defendantResponses.counterClaim.hwfReferenceNumber).toBeUndefined();
     });
   });
 

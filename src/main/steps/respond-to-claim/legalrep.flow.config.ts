@@ -1,8 +1,9 @@
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig as citizenFlowConfig } from './flow.config';
+import type { RespondToClaimStepName } from './stepRegistry';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
-const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
+const legalrepStepOrder = [
   'start-now',
   'defendant-name-confirmation',
   'defendant-name-capture',
@@ -50,7 +51,7 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'language-used',
   'check-your-answers',
   'end-now',
-];
+] as const satisfies readonly RespondToClaimStepName[];
 
 // Legal-rep journey is a flat, linear stepOrder. It is intentionally NOT sectionalised
 // (citizen is). Construct explicitly instead of spreading citizenFlowConfig so we don't

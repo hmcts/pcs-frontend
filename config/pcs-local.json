@@ -16,5 +16,8 @@
   },
   "xui": {
     "uri": "http://localhost:3000"
+  },
+  "feeService": {
+    "url": "http://localhost:8180"
   }
 }
