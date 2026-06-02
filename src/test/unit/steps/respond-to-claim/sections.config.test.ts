@@ -6,13 +6,13 @@ import {
   respondToClaimSections,
 } from '../../../../main/steps/respond-to-claim/sections.config';
 import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegistry';
-import { getSectionCoverage, getSectionForStep } from '../../../../main/steps/utils/sections';
+import { getSectionCoverage, getSectionForStep } from '../../../../main/steps/utils';
 
 const findSection = (id: string) => respondToClaimSections.find(section => section.id === id);
 
 describe('respond-to-claim sections config', () => {
   it('maps every sectioned flow step to exactly one section', () => {
-    const nonSectionStepSlugs = new Set(['end-now']);
+    const nonSectionStepSlugs = new Set(['end-now', 'reasonable-adjustments-confirmation']);
     const flowStepSlugs = Object.keys(stepRegistry).filter(stepSlug => !nonSectionStepSlugs.has(stepSlug));
     const coverage = getSectionCoverage(flowStepSlugs, respondToClaimSections);
 

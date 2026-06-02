@@ -9,6 +9,7 @@ const CITIZEN_ONLY_STEPS = [
   'free-legal-advice',
   'other-considerations',
   'reasonable-adjustments-triage',
+  'reasonable-adjustments-confirmation',
   'upload-document',
 ];
 
