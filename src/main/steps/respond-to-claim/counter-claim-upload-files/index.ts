@@ -76,4 +76,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     deleteButton: 'deleteButton',
   },
   getInitialFormData: async req => ({ documents: toDisplayDocuments(await storage.read(req)) }),
+  beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    await saveDraftDefendantResponse(req, response);
+  },
 });
