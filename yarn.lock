@@ -6630,10 +6630,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:4.3.0":
-  version: 4.3.0
-  resolution: "date-fns@npm:4.3.0"
-  checksum: 10/be129ab084a43cb06d2f598008fc3816b9c3767f0e9b7f08c19981b99f361cdee623c63d89e8eb305ebb488778027358127284a2f2aca6da258b3cd33d7366fe
+"date-fns@npm:4.4.0":
+  version: 4.4.0
+  resolution: "date-fns@npm:4.4.0"
+  checksum: 10/ae702acea42fb8452abe74f6d133c2360de9a14f00985645684b0df9c12280276649e95b52298a4fd7dabcc3b38799eb111107da99320d1cd94ba1d8a3d1c174
   languageName: node
   linkType: hard
 
@@ -11809,7 +11809,7 @@ __metadata:
     copy-webpack-plugin: "npm:13.0.1"
     csrf-sync: "npm:4.2.1"
     css-loader: "npm:7.1.4"
-    date-fns: "npm:4.3.0"
+    date-fns: "npm:4.4.0"
     dotenv: "npm:17.4.2"
     escape-html: "npm:1.0.3"
     eslint: "npm:9.39.4"
