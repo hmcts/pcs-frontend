@@ -26,7 +26,7 @@
         "pension": "Pension – state and private",
         "universalCredit": "Universal Credit",
         "otherBenefits": "Other benefits and credits",
-        "moneyFromElsewhere": "Money from somewhere else"
+        "moneyFromElsewhere": "Money from somewhere else (for example, child maintenance payments or someone in your household gives you money)"
       }
     },
     "hasAppliedForUniversalCredit": {
@@ -53,15 +53,15 @@
       "label": "What other regular expenses do you have?",
       "changeHidden": "regular expenses",
       "options": {
-        "householdBills": "Household bills",
+        "householdBills": "Household bills (for example, council tax, gas, electricity, water, internet)",
         "loanPayments": "Loan payments",
         "childSpousalMaintenance": "Child or spousal maintenance",
         "mobilePhone": "Mobile phone",
         "groceryShopping": "Grocery shopping",
         "fuelParkingTransport": "Fuel, parking and transport",
-        "schoolCosts": "School costs",
+        "schoolCosts": "School costs (for example, uniform and school dinners)",
         "clothing": "Clothing",
-        "otherExpenses": "Other expenses"
+        "otherExpenses": "Other"
       }
     },
     "otherConsiderations": {
