@@ -150,4 +150,184 @@ describe('normaliseCounterClaim', () => {
 
     expect(response.defendantResponses?.counterClaim).toEqual({ claimType: 'OTHER' });
   });
+
+  it('drops other-order fields when claimType is PAYMENT_OR_COMPENSATION (other-order step is skipped)', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'YES',
+        counterClaim: {
+          claimType: 'PAYMENT_OR_COMPENSATION',
+          isClaimAmountKnown: 'YES',
+          claimAmount: '50000',
+          otherOrderRequestDetails: 'Stale detail from when SOMETHING_ELSE was selected',
+          otherOrderRequestFacts: 'Stale facts',
+        },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaim).toEqual({
+      claimType: 'PAYMENT_OR_COMPENSATION',
+      isClaimAmountKnown: 'YES',
+      claimAmount: '50000',
+    });
+  });
+
+  describe('HWF fields when needHelpWithFees is not YES', () => {
+    it('deletes appliedForHwf and hwfReferenceNumber when needHelpWithFees is NO', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'NO',
+            appliedForHwf: 'NO',
+            hwfReferenceNumber: 'HWF-123',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+        needHelpWithFees: 'NO',
+      });
+    });
+
+    it('deletes appliedForHwf and hwfReferenceNumber when needHelpWithFees is undefined', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            appliedForHwf: 'YES',
+            hwfReferenceNumber: 'HWF-456',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+      });
+    });
+
+    it('preserves appliedForHwf and hwfReferenceNumber when needHelpWithFees is YES', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'YES',
+            appliedForHwf: 'YES',
+            hwfReferenceNumber: 'HWF-789',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+        needHelpWithFees: 'YES',
+        appliedForHwf: 'YES',
+        hwfReferenceNumber: 'HWF-789',
+      });
+    });
+  });
+
+  describe('counter-claim-against-whom and counter-claim-about become unreachable when needsHelp=YES + applied !== YES', () => {
+    it('drops counterClaimAgainst, counterClaimFor and counterClaimReasons when applied is NO', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'YES',
+            appliedForHwf: 'NO',
+            counterClaimAgainst: [{ id: 'p1', value: { firstName: 'Jane', lastName: 'Doe' } }],
+            counterClaimFor: 'Stale "for" answer from a previous walk-through',
+            counterClaimReasons: 'Stale reasons',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+        needHelpWithFees: 'YES',
+        appliedForHwf: 'NO',
+      });
+    });
+
+    it('drops counterClaimAgainst, counterClaimFor and counterClaimReasons when appliedForHwf is undefined', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'YES',
+            counterClaimAgainst: [{ id: 'p1', value: { firstName: 'Jane', lastName: 'Doe' } }],
+            counterClaimFor: 'Stale',
+            counterClaimReasons: 'Stale',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim).toEqual({
+        claimType: 'OTHER',
+        needHelpWithFees: 'YES',
+      });
+    });
+
+    it('preserves counterClaimAgainst, counterClaimFor and counterClaimReasons when applied is YES', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'YES',
+            appliedForHwf: 'YES',
+            hwfReferenceNumber: 'HWF-123',
+            counterClaimAgainst: [{ id: 'p1', value: { firstName: 'Jane', lastName: 'Doe' } }],
+            counterClaimFor: 'Real for',
+            counterClaimReasons: 'Real reasons',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim?.counterClaimAgainst).toBeDefined();
+      expect(response.defendantResponses?.counterClaim?.counterClaimFor).toBe('Real for');
+      expect(response.defendantResponses?.counterClaim?.counterClaimReasons).toBe('Real reasons');
+    });
+
+    it('preserves counterClaimAgainst, counterClaimFor and counterClaimReasons when needsHelp is NO', () => {
+      const response: PossessionClaimResponse = {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'OTHER',
+            needHelpWithFees: 'NO',
+            counterClaimAgainst: [{ id: 'p1', value: { firstName: 'Jane', lastName: 'Doe' } }],
+            counterClaimFor: 'Real for',
+            counterClaimReasons: 'Real reasons',
+          },
+        },
+      };
+
+      normaliseCounterClaim(response);
+
+      expect(response.defendantResponses?.counterClaim?.counterClaimAgainst).toBeDefined();
+      expect(response.defendantResponses?.counterClaim?.counterClaimFor).toBe('Real for');
+      expect(response.defendantResponses?.counterClaim?.counterClaimReasons).toBe('Real reasons');
+    });
+  });
 });

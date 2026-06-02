@@ -35,7 +35,9 @@ export class ClickLinkAction implements IAction {
   }
 
   private async clickLink(page: Page, fieldName: string): Promise<void> {
-    const locator = page.locator(`a:text-is("${fieldName}"), .govuk-details__summary-text:text-is("${fieldName}")`);
+    const locator = page
+      .locator(`a:text-is("${fieldName}"), .govuk-details__summary-text:text-is("${fieldName}")`)
+      .first();
     await locator.click();
   }
 

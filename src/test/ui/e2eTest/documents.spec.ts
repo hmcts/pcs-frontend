@@ -5,6 +5,8 @@ import {
   uploadYourDocuments,
   viewDocuments,
 } from '../data/page-data/documents-page-data';
+import { confirmDocumentsRelateToApplicationErrorValidation } from '../functional/documents-functional/confirmIfTheseDocumentsRelateToAnApplication.pft';
+import { softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -21,9 +23,10 @@ test.beforeEach(async ({ page }, testInfo) => {
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
 });
 
 test.afterEach(async () => {
@@ -36,9 +39,16 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
+    await softErrorMessageValidation(
+      'confirmIfTheseDocumentsRelateToAnApplication',
+      confirmDocumentsRelateToApplicationErrorValidation
+    );
+    await performAction('verifyDocumentRelatesToApplication', {
+      question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
+      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden,
+    });
   });
 
   test('Upload documents when GenApps not submitted @regression', async () => {
@@ -77,5 +87,40 @@ test.describe('Documents - e2e Journey @nightly', async () => {
         },
       ],
     });
+  });
+
+  test('Verify confirm document options based on GenApp type @regression', async () => {
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
+    // SET_ASIDE
+    await performAction('citizenCreateGenAppAPI', {
+      data: citizenCreateGenAppApiData('SET_ASIDE').citizenCreateGenAppPayload,
+    });
+    await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
+    await softErrorMessageValidation(
+      'confirmIfTheseDocumentsRelateToAnApplication',
+      confirmDocumentsRelateToApplicationErrorValidation
+    );
+    await performAction('verifyDocumentRelatesToApplication', {
+      question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
+      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden,
+    });
+    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+    await performAction('clickLink', 'Back');
+    await performAction('clickLink', 'Back');
+    await performValidation('mainHeader', startEvidenceUpload.mainHeader);
+    // SOMETHING_ELSE + default YES
+    await performAction('citizenCreateGenAppAPI', {
+      data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
+    });
+    await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
+    await performAction('verifyDocumentRelatesToApplication', {
+      question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
+      previousApplicationOption: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden,
+      option: confirmIfTheseDocumentsRelateToAnApplication.relatedToApplicationRadioOptionHidden,
+    });
+    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
   });
 });

@@ -7,6 +7,7 @@ import {
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
   isNoticeServed,
+  isSomethingElseCounterClaim,
   isTenancyStartDateKnown,
   isWalesProperty,
 } from '../utils';
@@ -19,14 +20,16 @@ import {
   shouldShowCounterClaimAboutStep,
   shouldShowCounterClaimAgainstWhoStep,
   shouldShowCounterClaimHelpWithFeesStep,
+  shouldShowCounterClaimNeedToApplyStep,
   shouldShowInstallmentPaymentsStep,
   shouldShowPriorityDebtDetailsStep,
   shouldShowUniversalCreditStep,
 } from './flowConditions';
 import { respondToClaimSections } from './sections.config';
+import type { RespondToClaimStepName } from './stepRegistry';
 import { isMoneyCounterClaim } from './utils';
 
-import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
+import type { JourneyFlowConfig, StepConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -45,7 +48,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => !isDefendantNameKnown(req),
     },
     'contact-preferences-text-message': {
-      showCondition: (req: Request) => req.res?.locals?.validatedCase?.isDefendantContactByPhone === true,
+      showCondition: (req: Request) => req.res?.locals.validatedCase?.isDefendantContactByPhone === true,
     },
     'landlord-registered': {
       showCondition: (req: Request) => isWalesProperty(req),
@@ -89,11 +92,20 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-have-you-applied-for-help': {
       showCondition: (req: Request) => shouldShowCounterClaimHelpWithFeesStep(req),
     },
+    'counter-claim-you-need-to-apply-for-help-with-your-fees': {
+      showCondition: (req: Request) => shouldShowCounterClaimNeedToApplyStep(req),
+    },
     'counter-claim-against-whom': {
       showCondition: (req: Request) => shouldShowCounterClaimAgainstWhoStep(req),
     },
     'counter-claim-about': {
       showCondition: (req: Request) => shouldShowCounterClaimAboutStep(req),
+    },
+    'counter-claim-order-other-than-sum': {
+      showCondition: (req: Request) => isSomethingElseCounterClaim(req),
+    },
+    'counter-claim-upload-documents': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
@@ -128,5 +140,5 @@ export const flowConfig: JourneyFlowConfig = {
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
     },
-  },
+  } satisfies Partial<Record<RespondToClaimStepName, StepConfig>>,
 };
