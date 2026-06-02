@@ -166,7 +166,7 @@ export function registerSteps(router: IRouter, specificJourney?: string): void {
 export function registerAllJourneys(app: Application): void {
   logger.info('Auto-registering all journeys from registry');
 
-  for (const [journeyName] of Object.entries(journeyRegistry)) {
+  for (const journeyName of Object.keys(journeyRegistry)) {
     // Create a dedicated router for this journey with param merging enabled
     const journeyRouter = Router({ mergeParams: true });
 
