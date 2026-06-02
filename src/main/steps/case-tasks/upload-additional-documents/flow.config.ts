@@ -38,8 +38,8 @@ export const flowConfig: JourneyFlowConfig = {
         }
         return 'start-evidence-upload';
       },
-      nextStep: checkYourAnswersStep
+      nextStep: checkYourAnswersStep,
     },
-    [checkYourAnswersStep]: {}
+    [checkYourAnswersStep]: {},
   },
 };
