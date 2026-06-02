@@ -495,12 +495,11 @@ export function validateForm(
             if (!errors[fieldName]) {
               const translationLabelKey =
                 typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
-              const resolvedLabel =
-                translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
+              const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
               const displayName = resolvedLabel ?? toSentenceCase(fieldName);
               const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
                 '{fieldName}',
-                displayName,
+                displayName
               );
               errors[fieldName] =
                 defaultSpecialCharacterMsg ||
