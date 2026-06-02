@@ -54,6 +54,7 @@ export class ActionRegistry {
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['startEvidenceUpload', new DocumentsAction()],
     ['validateViewDocuments', new DocumentsAction()],
+    ['verifyDocumentRelatesToApplication', new DocumentsAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
