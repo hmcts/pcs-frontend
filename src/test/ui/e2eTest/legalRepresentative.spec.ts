@@ -19,8 +19,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('getCaseAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login', user.defendantSolicitor.email);
-  /*await performAction('navigateToUrl', home_url + `/access-your-case`);
-  await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });*/
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
@@ -30,8 +28,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('LR Automation @noDefendants @smoke @regression', async () => {
-    //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
+  test('Respond to claim - LR  @noDefendants @smoke @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
