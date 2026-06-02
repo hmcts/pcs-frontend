@@ -38,7 +38,7 @@ export const flowConfig: JourneyFlowConfig = {
         }
         return 'start-evidence-upload';
       },
-      nextStep: checkYourAnswersStep,
+      defaultNext: checkYourAnswersStep,
     },
     [checkYourAnswersStep]: {},
   },
