@@ -2,13 +2,13 @@ import type { Request } from 'express';
 
 import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 
-type Sections = SectionConfig[];
+type Sections = readonly SectionConfig[];
 
 export function getSectionForStep(stepSlug: string, sections: Sections): string | null {
   return sections.find(section => section.steps.includes(stepSlug))?.id ?? null;
 }
 
-export function getStepsInSection(sectionId: string, sections: Sections): string[] {
+export function getStepsInSection(sectionId: string, sections: Sections): readonly string[] {
   return sections.find(section => section.id === sectionId)?.steps ?? [];
 }
 
