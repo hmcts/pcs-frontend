@@ -6,6 +6,8 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'how-much-afford-to-pay',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.additionalRentContribution),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -37,7 +39,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   getInitialFormData: req => {
     const paymentAgreement =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
     const amountInPounds = penceToPounds(paymentAgreement?.additionalRentContribution as string | number | undefined);
     const installmentFrequency = paymentAgreement?.additionalContributionFrequency;
 

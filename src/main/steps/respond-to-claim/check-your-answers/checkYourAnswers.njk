@@ -9,6 +9,7 @@
   <h1 class="govuk-heading-l">Check your answers (placeholder)</h1>
   <p class="govuk-body">This is a placeholder for Check your answers step.</p>
   <form method="post" action="{{ url }}">
+    {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
