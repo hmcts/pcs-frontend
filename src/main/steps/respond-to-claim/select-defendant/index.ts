@@ -21,8 +21,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
-    contactUs: 'contactUs',
+    heading: 'heading',
     detailsHeading: 'detailsHeading',
   },
   extendGetContent: async (req, formContent) => {
@@ -59,7 +58,7 @@ function addRadioButtonForAllLinkedDefendants(
       radio.component.items.push({
         value: defendant.id,
         text: defendant.value.firstName + ' ' + defendant.value.lastName,
-        checked: partyId !== null && defendant.id === partyId
+        checked: partyId !== null && defendant.id === partyId,
       });
     });
   }
