@@ -486,31 +486,26 @@ export function validateForm(
           return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1).toLowerCase();
         };
 
-        const setDefaultSpecialCharacterError = (): void => {
-          if (errors[fieldName]) {
-            return;
-          }
-
-          const translationLabelKey =
-            typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
-
-          const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
-
-          const displayName = resolvedLabel ?? toSentenceCase(fieldName);
-
-          const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace('{fieldName}', displayName);
-          errors[fieldName] =
-            defaultSpecialCharacterMsg ||
-            `${displayName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`;
-        };
-
         //emoji validation
         if (field.type === 'character-count' || field.type === 'text' || (field.type === 'textarea' && value)) {
           const text = (value as string)?.trim();
           const allowedCharsRegex = /^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u;
 
           if (!allowedCharsRegex.test(text)) {
-            setDefaultSpecialCharacterError();
+            if (!errors[fieldName]) {
+              const translationLabelKey =
+                typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
+              const resolvedLabel =
+                translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
+              const displayName = resolvedLabel ?? toSentenceCase(fieldName);
+              const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
+                '{fieldName}',
+                displayName,
+              );
+              errors[fieldName] =
+                defaultSpecialCharacterMsg ||
+                `${displayName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`;
+            }
           }
         }
 
