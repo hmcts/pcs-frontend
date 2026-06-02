@@ -1,5 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  checkYourAnswersRTC,
   correspondenceAddress,
   dashboard,
   defendantDateOfBirth,
@@ -47,6 +48,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 test.describe('Correspondence Address - functional test @nightly', async () => {
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
