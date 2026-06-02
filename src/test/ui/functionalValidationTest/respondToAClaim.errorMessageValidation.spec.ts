@@ -242,7 +242,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
 
     await softErrorMessageValidation('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
@@ -513,7 +512,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
 
     await softErrorMessageValidation('defendantNameCapture', defendantNameCaptureErrorValidation);
