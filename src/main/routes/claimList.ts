@@ -23,14 +23,16 @@ export default function claimListRoutes(app: Application): void {
 
     try {
       const claimsAgainst = await getCitizenClaims(accessToken);
-      const tableRows = claimsAgainst.filter(claim => claim.caseReference).map(claim => [
-        { text: claim.caseReference },
-        { text: claim.claimantName },
-        { text: claim.propertyPostcode },
-        {
-          html: `<a href="/case/${claim.caseReference}/dashboard" class="govuk-link">${t('claimList:table.viewClaim')}</a>`,
-        },
-      ]);
+      const tableRows = claimsAgainst
+        .filter(claim => claim.caseReference)
+        .map(claim => [
+          { text: claim.caseReference },
+          { text: claim.claimantName },
+          { text: claim.propertyPostcode },
+          {
+            html: `<a href="/case/${claim.caseReference}/dashboard" class="govuk-link">${t('claimList:table.viewClaim')}</a>`,
+          },
+        ]);
       return res.render('claimList', { tableRows, t });
     } catch (error) {
       logger.error('Failed to fetch citizen claims', error);

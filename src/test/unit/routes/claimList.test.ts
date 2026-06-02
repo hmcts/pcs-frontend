@@ -142,7 +142,9 @@ describe('claimList route', () => {
 
     expect(res.render).toHaveBeenCalledWith(
       'claimList',
-      expect.objectContaining({ tableRows: expect.arrayContaining([expect.arrayContaining([{ text: '1234567890123456' }])]) })
+      expect.objectContaining({
+        tableRows: expect.arrayContaining([expect.arrayContaining([{ text: '1234567890123456' }])]),
+      })
     );
     const tableRows = (res.render as jest.Mock).mock.calls[0][1].tableRows;
     expect(tableRows).toHaveLength(1);
