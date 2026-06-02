@@ -46,8 +46,18 @@ export default function finalSubmitRoutes(app: Application): void {
   finalSubmitRouter.param('caseReference', caseReferenceParamMiddleware);
 
   // Check user has access to the case via the respondPossessionClaim event and
-  // hydrate res.locals.validatedCase for downstream handlers
-  finalSubmitRouter.use(requireEventAccess('respondPossessionClaim'));
+  // hydrate res.locals.validatedCase for downstream handlers.
+  //
+  // IMPORTANT: scope this to the specific paths this router serves. The router
+  // is mounted at '/case', so a router-level `use(...)` would run for every
+  // /case/* URL — including journey + documentProxy URLs that fall through to
+  // here — and req.params.caseReference is NOT populated at the mount-path
+  // level (the mount is '/case', not '/case/:caseReference'), causing a
+  // spurious "Missing case reference" 404.
+  finalSubmitRouter.use(
+    ['/:caseReference/final-submit', '/:caseReference/confirmation'],
+    requireEventAccess('respondPossessionClaim')
+  );
 
   // GET: Display final submit page
   finalSubmitRouter.get('/:caseReference/final-submit', oidcMiddleware, (req: Request, res: Response) => {

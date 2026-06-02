@@ -82,9 +82,12 @@ describe('finalSubmit routes', () => {
       expect(mockRouterParam).toHaveBeenCalledWith('caseReference', mockCaseReferenceParamMiddleware);
     });
 
-    it('should apply requireEventAccess(respondPossessionClaim) at router level', () => {
+    it('should apply requireEventAccess(respondPossessionClaim) only on final-submit and confirmation paths', () => {
       expect(mockRequireEventAccess).toHaveBeenCalledWith('respondPossessionClaim');
-      expect(mockRouterUse).toHaveBeenCalledWith(mockRequireEventAccessHandler);
+      expect(mockRouterUse).toHaveBeenCalledWith(
+        ['/:caseReference/final-submit', '/:caseReference/confirmation'],
+        mockRequireEventAccessHandler
+      );
     });
 
     it('should mount router under /case path', () => {
