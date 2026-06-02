@@ -412,7 +412,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'payments');
     await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     //Below code is disabled due to bug https://tools.hmcts.net/jira/browse/HDPI-6339
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
