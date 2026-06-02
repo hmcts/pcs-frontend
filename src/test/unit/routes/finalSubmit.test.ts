@@ -32,7 +32,7 @@ jest.mock('../../../main/modules/http', () => ({
   },
 }));
 
-const mockClientContextClearer = jest.fn((req) => req);
+const mockClientContextClearer = jest.fn(req => req);
 jest.mock('@utils/clientContextSessionClearer', () => ({
   clientContextSessionClearer: mockClientContextClearer,
 }));
