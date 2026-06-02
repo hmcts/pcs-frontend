@@ -251,9 +251,13 @@ export class RespondToClaimAction implements IAction {
   }
 
   private getRtcCyaChoiceLabel(choice: actionData): string {
-    return String(choice)
-      .replace(/\s*\([^)]*\)\s*$/, '')
-      .trim();
+    const normalizedChoice = String(choice).trim();
+
+    if (normalizedChoice === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim()) {
+      return normalizedChoice;
+    }
+
+    return normalizedChoice.replace(/\s*\([^)]*\)\s*$/, '').trim();
   }
 
   private buildRtcCyaAmountAndFrequencyValue(
