@@ -111,8 +111,9 @@ describe('claimList route', () => {
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
-  it('renders claimList with empty table rows when getCitizenClaims throws', async () => {
-    (getCitizenClaims as jest.Mock).mockRejectedValue(new Error('API failure'));
+  it('propagates error to next when getCitizenClaims throws', async () => {
+    const error = new Error('API failure');
+    (getCitizenClaims as jest.Mock).mockRejectedValue(error);
 
     const app = buildApp();
     claimListRoutes(app);
@@ -122,7 +123,8 @@ describe('claimList route', () => {
 
     await getHandler(app)(req, res, next);
 
-    expect(res.render).toHaveBeenCalledWith('claimList', expect.objectContaining({ tableRows: [] }));
+    expect(next).toHaveBeenCalledWith(error);
+    expect(res.render).not.toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 });

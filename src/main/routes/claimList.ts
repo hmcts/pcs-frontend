@@ -1,4 +1,4 @@
-import type { Application, Request, Response } from 'express';
+import type { Application, NextFunction, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware/oidc';
 
@@ -11,7 +11,7 @@ const logger = Logger.getLogger('claimList');
 export const CLAIM_LIST_ROUTE = '/claims';
 
 export default function claimListRoutes(app: Application): void {
-  app.get(CLAIM_LIST_ROUTE, oidcMiddleware, async (req: Request, res: Response) => {
+  app.get(CLAIM_LIST_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     const accessToken = req.session.user?.accessToken;
 
     if (!accessToken) {
@@ -32,7 +32,7 @@ export default function claimListRoutes(app: Application): void {
       return res.render('claimList', { tableRows, t });
     } catch (error) {
       logger.error('Failed to fetch citizen claims', error);
-      return res.render('claimList', { tableRows: [], t });
+      return next(error);
     }
   });
 }

@@ -66,5 +66,8 @@ export const getCitizenClaims = async (accessToken: string): Promise<ClaimSummar
   const response = await http.get<ClaimSummary[]>(`${getBaseUrl()}/cases/citizen-claims`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
+  if (!Array.isArray(response.data)) {
+    throw new Error('Unexpected response from citizen-claims endpoint');
+  }
   return response.data;
 };
