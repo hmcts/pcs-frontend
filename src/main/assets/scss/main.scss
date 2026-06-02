@@ -81,3 +81,17 @@
     padding-bottom: 4px;
   }
 }
+
+// Hub task-list: keep each row on one line at tablet+ to match the Figma. On
+// mobile we let the default GDS wrapping take over so long titles stay readable.
+@include govuk-media-query($from: tablet) {
+  .pcs-task-list .govuk-task-list__link {
+    white-space: nowrap;
+  }
+}
+
+// Hub task-list dividers: Figma uses GOV.UK link blue for the rules above each
+// column instead of the default grey border colour, and a slightly thicker line.
+.pcs-task-list__divider {
+  border-bottom: 3px solid govuk-colour('blue');
+}

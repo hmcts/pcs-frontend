@@ -1,4 +1,4 @@
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
@@ -10,6 +10,7 @@ import {
   createStepNavigation,
   getFormData,
   getTranslationFunction,
+  loadStepNamespace,
   setFormData,
 } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -74,7 +75,6 @@ export const step: StepDefinition = {
         ];
       }
       return {
-        backUrl: getDashboardUrl(caseId) ?? '/dashboard',
         dashboardUrl: getDashboardUrl(caseId),
         url: req.originalUrl || '',
         applications,
@@ -83,6 +83,31 @@ export const step: StepDefinition = {
   postController: {
     post: async (req, res) => {
       const relatedApplicationId = req.body.relatedApplicationId as string | undefined;
+
+      if (!relatedApplicationId) {
+        await loadStepNamespace(req);
+        const getController = typeof step.getController === 'function' ? step.getController() : step.getController;
+        let pageContent: Record<string, unknown> = {};
+        const captureRes = {
+          render: (_view: string, content: Record<string, unknown>) => {
+            pageContent = content;
+          },
+        } as Response;
+
+        await getController.get(req, captureRes);
+
+        const t = pageContent.t as TFunction;
+        const errorMessage = t('errors.relatedApplicationId.required');
+
+        return res.status(400).render(templatePath, {
+          ...pageContent,
+          errorSummary: {
+            titleText: t('errors.title'),
+            errorList: [{ text: errorMessage, href: '#relatedApplicationId' }],
+          },
+          radioErrorMessage: { text: errorMessage },
+        });
+      }
 
       setFormData(req, stepName, {
         relatedApplicationId,
