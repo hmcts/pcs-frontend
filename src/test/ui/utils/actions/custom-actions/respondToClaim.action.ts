@@ -17,6 +17,7 @@ import {
   counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
+  counterclaimYouNeedToApplyForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -60,11 +61,91 @@ import { performAction, performActions, performValidation } from '../../controll
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { getSelectedPinUser, pins, selectPinUserByDefendantDetails } from './fetchPINsAndValidateAccessCodeAPI.action';
+import { FieldsStore } from './recordAnsweredFields.action';
+
+const rtcCyaMap = new Map<string, string>();
+const rtcSectionAnswers = new Map<string, Map<string, string>>();
+let activeRtcSection = '';
+const rtcUploadedDocumentsQuestion = 'Uploaded files';
+const rtcNoDocumentsUploadedValue = 'No files uploaded';
+const rtcNoAnswerProvidedValue = 'No answer provided';
+
+const rtcCyaLabels = {
+  contactDetails: 'Contact details',
+  otherConsiderations: 'Is there anything else you want to tell the court?',
+  universalCreditApplicationDate: 'When did you apply for Universal Credit?',
+} as const;
+
+const monthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
+
+const rtcSectionByAction = new Map<string, string>([
+  ['selectLegalAdvice', 'startNowAndDetails'],
+  ['inputDefendantDetails', 'personalDetails'],
+  ['enterDateOfBirthDetails', 'personalDetails'],
+  ['confirmDefendantDetails', 'personalDetails'],
+  ['selectCorrespondenceAddressKnown', 'personalDetails'],
+  ['selectCorrespondenceAddressUnKnown', 'personalDetails'],
+  ['selectContactPreferenceEmailOrPost', 'personalDetails'],
+  ['selectContactByTelephone', 'personalDetails'],
+  ['selectContactByTextMessage', 'personalDetails'],
+  ['disputeClaimInterstitial', 'disputeAndTenancy'],
+  ['selectLandlordRegistered', 'disputeAndTenancy'],
+  ['selectLandlordLicensed', 'disputeAndTenancy'],
+  ['selectWrittenTerms', 'disputeAndTenancy'],
+  ['enterTenancyStartDetailsUnKnown', 'disputeAndTenancy'],
+  ['selectTenancyStartDateKnown', 'disputeAndTenancy'],
+  ['selectNoticeDetails', 'disputeAndTenancy'],
+  ['enterNoticeDateKnown', 'disputeAndTenancy'],
+  ['enterNoticeDateUnknown', 'disputeAndTenancy'],
+  ['tenancyOrContractTypeDetails', 'disputeAndTenancy'],
+  ['rentArrears', 'disputeAndTenancy'],
+  ['disputingOtherPartsOfTheClaim', 'disputeAndTenancy'],
+  ['selectCounterClaim', 'disputeAndTenancy'],
+  ['selectWhatAreYouClaimingFor', 'disputeAndTenancy'],
+  ['counterClaimSpecificSumOfMoney', 'disputeAndTenancy'],
+  ['selectCounterClaimFee', 'disputeAndTenancy'],
+  ['selectClaimAgainstWhom', 'disputeAndTenancy'],
+  ['counterClaimAbout', 'disputeAndTenancy'],
+  ['counterClaimOrderOtherThanSum', 'disputeAndTenancy'],
+  ['repaymentsMade', 'payments'],
+  ['repaymentsAgreed', 'payments'],
+  ['installmentPayments', 'payments'],
+  ['selectHowMuchAffordToPay', 'payments'],
+  ['doYouHaveAnyDependantChildren', 'situationAndCircumstances'],
+  ['doYouHaveAnyOtherDependants', 'situationAndCircumstances'],
+  ['selectIfAnyOtherAdultsLiveInYourHouse', 'situationAndCircumstances'],
+  ['selectAlternativeAccommodation', 'situationAndCircumstances'],
+  ['yourCircumstances', 'situationAndCircumstances'],
+  ['exceptionalHardship', 'situationAndCircumstances'],
+  ['selectIncomeAndExpenses', 'incomeAndExpenditure'],
+  ['selectWhatRegularIncomeDoYouReceive', 'incomeAndExpenditure'],
+  ['selectUniversalCredit', 'incomeAndExpenditure'],
+  ['selectPriorityDebts', 'incomeAndExpenditure'],
+  ['enterPriorityDebtDetails', 'incomeAndExpenditure'],
+  ['selectWhatOtherRegularExpensesDoYouHave', 'incomeAndExpenditure'],
+  ['otherConsiderations', 'incomeAndExpenditure'],
+  ['uploadFiles', 'uploadFiles'],
+  ['languageUsed', 'checkYourAnswersAndSubmit'],
+]);
+
 export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
-  async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
+  async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName)],
+      ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName as actionRecord)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
@@ -127,6 +208,10 @@ export class RespondToClaimAction implements IAction {
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
       ['taskListStatus', () => this.taskListStatus(fieldName as actionRecord)],
+      ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
+      ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page, fieldName as actionData)],
+      ['validateCYARTC', () => this.validateCYARTC()],
+      ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
       ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
       ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
       ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
@@ -136,10 +221,203 @@ export class RespondToClaimAction implements IAction {
     if (!actionToPerform) {
       throw new Error(`No action found for '${action}'`);
     }
+    activeRtcSection = rtcSectionByAction.get(action) ?? '';
     await actionToPerform();
   }
 
+  private normalizeValueData(value: actionData): string {
+    if (Array.isArray(value)) {
+      return value.map(val => String(val)).join(', ');
+    }
+    if (typeof value === 'object' && value !== null) {
+      return JSON.stringify(value);
+    }
+    return String(value);
+  }
+
+  private formatRtcCyaCurrency(value: actionData): string {
+    const numericValue = Number(value);
+    if (Number.isNaN(numericValue)) {
+      return String(value);
+    }
+    return `£${numericValue.toFixed(2)}`;
+  }
+
+  private formatRtcCyaFrequency(value: actionData): string {
+    const normalizedFrequency = String(value).trim().toLowerCase();
+    return normalizedFrequency;
+  }
+
+  private getRtcCyaQuestionLabel(question: string): string {
+    return question.replace(/\s*\(optional\)(\?)?\s*$/i, '$1').trim();
+  }
+
+  private getRtcCyaChoiceLabel(choice: actionData): string {
+    const normalizedChoice = String(choice).trim();
+
+    if (normalizedChoice === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim()) {
+      return normalizedChoice;
+    }
+
+    return normalizedChoice.replace(/\s*\([^)]*\)\s*$/, '').trim();
+  }
+
+  private buildRtcCyaAmountAndFrequencyValue(
+    amount: actionData,
+    frequency: actionData,
+    descriptor: string = 'every'
+  ): string {
+    return `${this.formatRtcCyaCurrency(amount)} ${descriptor} ${this.formatRtcCyaFrequency(frequency)}`;
+  }
+
+  private buildRtcCyaDateValue(
+    day?: actionData,
+    month?: actionData,
+    year?: actionData,
+    emptyValue: string = rtcNoAnswerProvidedValue
+  ): string {
+    const formattedDate = this.formatRtcCyaDateParts(day, month, year);
+    return formattedDate ?? emptyValue;
+  }
+
+  private buildRtcCyaAddressValue(...lines: (actionData | undefined)[]): string {
+    return lines
+      .map(line => String(line ?? '').trim())
+      .filter(Boolean)
+      .join(', ');
+  }
+
+  private buildRtcCyaFullName(firstName?: actionData, lastName?: actionData): string {
+    return `${String(firstName ?? '').trim()} ${String(lastName ?? '').trim()}`.trim();
+  }
+
+  private formatRtcCyaDateParts(day?: actionData, month?: actionData, year?: actionData): string | undefined {
+    const dayNumber = Number(String(day ?? '').trim());
+    const monthNumber = Number(String(month ?? '').trim());
+    const yearNumber = Number(String(year ?? '').trim());
+
+    if (!Number.isInteger(dayNumber) || !Number.isInteger(monthNumber) || !Number.isInteger(yearNumber)) {
+      return undefined;
+    }
+
+    if (monthNumber < 1 || monthNumber > 12 || dayNumber < 1 || yearNumber < 1) {
+      return undefined;
+    }
+
+    const date = new Date(Date.UTC(yearNumber, monthNumber - 1, dayNumber));
+    if (
+      date.getUTCFullYear() !== yearNumber ||
+      date.getUTCMonth() !== monthNumber - 1 ||
+      date.getUTCDate() !== dayNumber
+    ) {
+      return undefined;
+    }
+
+    return `${dayNumber} ${monthNames[monthNumber - 1]} ${yearNumber}`;
+  }
+
+  private recordRtcCyaName(label: string, firstName?: actionData, lastName?: actionData): void {
+    this.recordAnswer(label, this.buildRtcCyaFullName(firstName, lastName));
+  }
+
+  private recordRtcCyaDateFromParts(label: string, day?: actionData, month?: actionData, year?: actionData): void {
+    this.recordAnswer(label, this.buildRtcCyaDateValue(day, month, year));
+  }
+
+  private deleteRtcCyaDate(label: string): void {
+    this.deleteAnswer(label);
+  }
+
+  private updateRtcCyaContactDetails(phoneNumber?: actionData, emailAddress?: actionData): void {
+    const contactDetails = this.buildRtcCyaAddressValue(phoneNumber, emailAddress);
+    if (contactDetails) {
+      this.recordAnswer(rtcCyaLabels.contactDetails, contactDetails);
+    } else {
+      this.deleteAnswer(rtcCyaLabels.contactDetails);
+    }
+  }
+
+  private recordRtcCyaSummaryRow(label: string, values: string[]): void {
+    this.recordAnswer(label, values.length > 0 ? values.join(', ') : rtcNoAnswerProvidedValue);
+  }
+
+  private recordRtcCyaHeadingWithItems(headingLabel: string, itemEntries: [string, string][]): void {
+    this.deleteAnswer(headingLabel);
+
+    if (itemEntries.length === 0) {
+      this.recordAnswer(headingLabel, rtcNoAnswerProvidedValue);
+      return;
+    }
+
+    for (const [label, value] of itemEntries) {
+      this.recordAnswer(label, value);
+    }
+  }
+
+  private normalizeRtcCyaComparisonPart(value: string): string {
+    return value
+      .replace(/\s*\([^)]*\)\s*/g, ' ')
+      .replace(/:/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private areRtcCyaValuesEquivalent(expectedValue: string, actualValue: string): boolean {
+    if (actualValue.includes(expectedValue)) {
+      return true;
+    }
+
+    const normalizedExpectedValue = this.normalizeRtcCyaComparisonPart(expectedValue);
+    const normalizedActualValue = this.normalizeRtcCyaComparisonPart(actualValue);
+
+    if (normalizedActualValue.includes(normalizedExpectedValue)) {
+      return true;
+    }
+
+    const expectedParts = expectedValue
+      .split(',')
+      .map(part => this.normalizeRtcCyaComparisonPart(part))
+      .filter(Boolean);
+    const actualParts = actualValue
+      .split(',')
+      .map(part => this.normalizeRtcCyaComparisonPart(part))
+      .filter(Boolean);
+
+    if (expectedParts.length <= 1 || expectedParts.length !== actualParts.length) {
+      return false;
+    }
+
+    const normalizedExpected = [...expectedParts].sort();
+    const normalizedActual = [...actualParts].sort();
+
+    return normalizedExpected.every((part, index) => part === normalizedActual[index]);
+  }
+
+  private recordAnswer(key: string, value: actionData): void {
+    const normalizedValue = this.normalizeValueData(value);
+    FieldsStore.set(key, normalizedValue);
+    if (!activeRtcSection) {
+      return;
+    }
+    const sectionAnswers = rtcSectionAnswers.get(activeRtcSection) ?? new Map<string, string>();
+    sectionAnswers.set(key, normalizedValue);
+    rtcSectionAnswers.set(activeRtcSection, sectionAnswers);
+  }
+
+  private deleteAnswer(key: string): void {
+    FieldsStore.delete(key);
+    rtcSectionAnswers.forEach(sectionAnswers => sectionAnswers.delete(key));
+  }
+
+  private async resetRTCAnswerStore(): Promise<void> {
+    FieldsStore.clear();
+    rtcCyaMap.clear();
+    rtcSectionAnswers.clear();
+    activeRtcSection = '';
+  }
+
   private async selectLegalAdvice(legalAdviceData: actionData) {
+    this.recordAnswer(freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion, legalAdviceData);
     await performAction('clickRadioButton', {
       question: freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion,
       option: legalAdviceData,
@@ -152,14 +430,20 @@ export class RespondToClaimAction implements IAction {
     const firstNameValue = defendantData.fName ?? selectedPinUser?.firstName;
     const lastNameValue = defendantData.lName ?? selectedPinUser?.lastName;
 
+    this.recordRtcCyaName(this.getRtcCyaQuestionLabel(defendantNameCapture.mainHeader), firstNameValue, lastNameValue);
     await performValidation('mainHeader', defendantNameCapture.mainHeader);
-
     await performAction('inputText', defendantNameCapture.firstNameTextLabel, firstNameValue);
     await performAction('inputText', defendantNameCapture.lastNameTextLabel, lastNameValue);
     await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
   }
 
   private async enterDateOfBirthDetails(defendantData: actionRecord) {
+    this.recordRtcCyaDateFromParts(
+      this.getRtcCyaQuestionLabel(defendantDateOfBirth.mainHeader),
+      defendantData?.dobDay,
+      defendantData?.dobMonth,
+      defendantData?.dobYear
+    );
     if (defendantData?.dobDay && defendantData?.dobMonth && defendantData?.dobYear) {
       await performActions(
         'Defendant Date of Birth Entry',
@@ -177,7 +461,12 @@ export class RespondToClaimAction implements IAction {
       question: defendantData.question,
       option: defendantData.option,
     });
-    if (defendantData.option === defendantNameConfirmation.noRadioOption) {
+    if (defendantData.option === defendantNameConfirmation.yesRadioOption) {
+      this.recordAnswer(String(defendantData.question), String(defendantData.option));
+      this.deleteAnswer('Name');
+    } else if (defendantData.option === defendantNameConfirmation.noRadioOption) {
+      this.deleteAnswer(String(defendantData.question));
+      this.recordRtcCyaName('Name', defendantData.fName, defendantData.lName);
       await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
       await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
     }
@@ -192,6 +481,8 @@ export class RespondToClaimAction implements IAction {
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
       await this.selectCorrespondenceAddressUnKnown(addressData);
     } else {
+      const selectedPinUser = getSelectedPinUser();
+      this.recordAnswer(correspondenceAddress.correspondenceAddressUnKnownMainHeader, selectedPinUser?.address ?? '');
       await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     }
   }
@@ -205,6 +496,10 @@ export class RespondToClaimAction implements IAction {
         ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
       );
     } else if (addressData.addressLine1) {
+      this.recordAnswer(
+        correspondenceAddress.correspondenceAddressUnKnownMainHeader,
+        this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
+      );
       await performActions(
         'Enter Address Manually',
         ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
@@ -218,6 +513,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord) {
     if (Array.isArray(contactPreferenceData.options)) {
+      this.recordAnswer(contactPreferenceData.question as string, contactPreferenceData.options);
       for (const option of contactPreferenceData.options) {
         await performAction('check', {
           question: contactPreferenceData.question,
@@ -234,6 +530,7 @@ export class RespondToClaimAction implements IAction {
     }
     // Handle single selection
     else if (contactPreferenceData.radioOption) {
+      this.recordAnswer(contactPreferenceData.question as string, contactPreferenceData.radioOption);
       await performAction('check', {
         question: contactPreferenceData.question,
         option: contactPreferenceData.radioOption,
@@ -247,25 +544,45 @@ export class RespondToClaimAction implements IAction {
         );
       }
     }
+    const emailAddress = Array.isArray(contactPreferenceData.options)
+      ? this.buildRtcCyaAddressValue(
+          contactPreferenceData.options.includes(contactPreferenceEmailOrPost.byEmailCheckbox)
+            ? contactPreferenceData.emailAddress
+            : undefined
+        )
+      : contactPreferenceData.radioOption === contactPreferenceEmailOrPost.byEmailCheckbox
+        ? this.buildRtcCyaAddressValue(contactPreferenceData.emailAddress)
+        : '';
+    this.updateRtcCyaContactDetails(undefined, emailAddress);
     await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   }
+
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
+    const existingContactDetails = FieldsStore.get(rtcCyaLabels.contactDetails);
+    this.recordAnswer(contactPreferencesTelephone.areYouHappyToContactQuestion, contactByPhoneData.radioOption);
     await performAction('clickRadioButton', {
       question: contactPreferencesTelephone.areYouHappyToContactQuestion,
       option: contactByPhoneData.radioOption,
     });
+
     if (contactByPhoneData.radioOption === contactPreferencesTelephone.yesRadioOption) {
       process.env.CONTACT_PREFERENCES_TELEPHONE = 'YES';
+      this.updateRtcCyaContactDetails(contactByPhoneData.phoneNumber, existingContactDetails);
       await performAction(
         'inputText',
         contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
         contactByPhoneData.phoneNumber
       );
+    } else if (existingContactDetails?.includes('@')) {
+      this.updateRtcCyaContactDetails(undefined, existingContactDetails);
+    } else {
+      this.updateRtcCyaContactDetails();
     }
     await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
   }
 
   private async selectContactByTextMessage(contactData: actionData): Promise<void> {
+    this.recordAnswer(contactPreferencesTextMessage.contactByTextMessageQuestion, contactData);
     await performAction('clickRadioButton', {
       question: contactPreferencesTextMessage.contactByTextMessageQuestion,
       option: contactData,
@@ -285,6 +602,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectLandlordRegistered(registeredData: actionData): Promise<void> {
+    this.recordAnswer(landlordRegistered.isYourLandlordRegisteredQuestion, registeredData);
     await performAction('clickRadioButton', {
       question: landlordRegistered.isYourLandlordRegisteredQuestion,
       option: registeredData,
@@ -293,6 +611,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectLandlordLicensed(licensedLandlordData: actionRecord): Promise<void> {
+    this.recordAnswer(String(licensedLandlordData.question), licensedLandlordData.radioOption);
     await performAction('clickRadioButton', {
       question: licensedLandlordData.question,
       option: licensedLandlordData.radioOption,
@@ -301,6 +620,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectWrittenTerms(writtenTermsData: actionRecord): Promise<void> {
+    this.recordAnswer(String(writtenTermsData.question), writtenTermsData.radioOption);
     await performAction('clickRadioButton', {
       question: writtenTermsData.question,
       option: writtenTermsData.radioOption,
@@ -312,31 +632,43 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
+    const repaymentsMadeQuestion = repaymentsMade.getmainHeader(claimantsName);
+    this.recordAnswer(repaymentsMadeQuestion, repaymentsData.repaymentOption);
     await performAction('clickRadioButton', {
-      question: repaymentsData.question,
+      question: repaymentsMadeQuestion,
       option: repaymentsData.repaymentOption,
     });
     if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
+      this.recordAnswer(repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
       await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
+    } else {
+      this.deleteAnswer(repaymentsMade.giveDetailsHiddenTextLabel);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   }
 
   private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
+    const repaymentsAgreedQuestion = repaymentsAgreed.getMainHeader(claimantsName);
+    this.recordAnswer(repaymentsAgreedQuestion, repaymentsAgreedData.repaymentAgreedOption);
     await performAction('clickRadioButton', {
-      question: repaymentsAgreedData.question,
+      question: repaymentsAgreedQuestion,
       option: repaymentsAgreedData.repaymentAgreedOption,
     });
     if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {
+      this.recordAnswer(repaymentsAgreed.giveDetailsHiddenTextLabel, repaymentsAgreedData.repaymentAgreedInfo);
       await performAction(
         'inputText',
         repaymentsAgreed.giveDetailsHiddenTextLabel,
         repaymentsAgreedData.repaymentAgreedInfo
       );
+    } else {
+      this.deleteAnswer(repaymentsAgreed.giveDetailsHiddenTextLabel);
     }
     await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
   }
+
   private async installmentPayments(installmentData: actionRecord): Promise<void> {
+    this.recordAnswer(String(installmentData.question), installmentData.radioOption);
     await performAction('clickRadioButton', {
       question: installmentData.question,
       option: installmentData.radioOption,
@@ -345,6 +677,8 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectHowMuchAffordToPay(howMuchToPayData: actionRecord): Promise<void> {
+    this.recordAnswer(howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel, howMuchToPayData.affordToPay);
+    this.recordAnswer(String(howMuchToPayData.question), howMuchToPayData.radioOption);
     await performAction(
       'inputText',
       howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
@@ -358,6 +692,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectCounterClaim(counterClaimOption: actionRecord): Promise<void> {
+    this.recordAnswer(counterClaim.doYouWantToMakeACounterclaim, counterClaimOption.option);
     await performAction('clickRadioButton', {
       question: counterClaim.doYouWantToMakeACounterclaim,
       option: counterClaimOption.option,
@@ -367,6 +702,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectIncomeAndExpenses(incomeAndExpenseData: actionRecord): Promise<void> {
+    this.recordAnswer(incomeAndExpenses.doYouWantToProvideDetailsHeader, incomeAndExpenseData.incomeAndExpensesOption);
     await performAction('clickRadioButton', {
       question: incomeAndExpenses.doYouWantToProvideDetailsHeader,
       option: incomeAndExpenseData.incomeAndExpensesOption,
@@ -375,27 +711,30 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectWhatRegularIncomeDoYouReceive(regularIncome?: actionRecord): Promise<void> {
+    const regularIncomeQuestionLabel = this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader);
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      this.recordAnswer(regularIncomeQuestionLabel, rtcNoAnswerProvidedValue);
       await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
       return;
     }
 
+    const selectedRegularIncomeEntries: [string, string][] = [];
+
     for (const income of regularIncome.regularIncomeOptions) {
       const [option, value, frequency] = income;
 
-      // Select checkbox
       await performAction('check', {
         question: whatRegularIncomeDoYouReceive.mainHeader,
         option,
       });
 
-      // Special case: "moneyFromSomewhereElse"
       if (option === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph) {
         await performAction(
           'inputText',
           whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
           value
         );
+        selectedRegularIncomeEntries.push([this.getRtcCyaChoiceLabel(option), String(value)]);
         continue;
       }
 
@@ -403,12 +742,16 @@ export class RespondToClaimAction implements IAction {
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
 
-      // Enter amount
       await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
-
-      // Select frequency
       await performAction('clickRadioButton', frequency);
+
+      selectedRegularIncomeEntries.push([
+        this.getRtcCyaChoiceLabel(option),
+        this.buildRtcCyaAmountAndFrequencyValue(value, frequency, 'received every'),
+      ]);
     }
+
+    this.recordRtcCyaHeadingWithItems(regularIncomeQuestionLabel, selectedRegularIncomeEntries);
 
     await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   }
@@ -416,11 +759,18 @@ export class RespondToClaimAction implements IAction {
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
     const getDetailsGivenByParagraph = tenancyDateDetails.getDetailsGivenByParagraph(claimantsName);
     await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
+    this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);
     await performAction('clickRadioButton', {
       question: tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion,
       option: tenancyStartDateData.option,
     });
     if (tenancyStartDateData?.day && tenancyStartDateData?.month && tenancyStartDateData?.year) {
+      this.recordRtcCyaDateFromParts(
+        this.getRtcCyaQuestionLabel(tenancyDateDetails.whatIsTheCorrectStartDateHiddenQuestion),
+        tenancyStartDateData.day,
+        tenancyStartDateData.month,
+        tenancyStartDateData.year
+      );
       await performActions(
         'Enter Date',
         ['inputText', tenancyDateDetails.dayHiddenTextLabel, tenancyStartDateData.day],
@@ -432,6 +782,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
+    this.recordAnswer(confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(claimantsName), noticeGivenData.option);
     await performAction('clickRadioButton', {
       question: confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(claimantsName),
       option: noticeGivenData.option,
@@ -440,6 +791,12 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
+    this.recordRtcCyaDateFromParts(
+      `When did you receive notice from ${claimantsName}?`,
+      noticeData?.day,
+      noticeData?.month,
+      noticeData?.year
+    );
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
@@ -452,6 +809,12 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
+    this.recordRtcCyaDateFromParts(
+      `When did you receive notice from ${claimantsName}?`,
+      noticeData?.day,
+      noticeData?.month,
+      noticeData?.year
+    );
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
@@ -466,6 +829,12 @@ export class RespondToClaimAction implements IAction {
   private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {
     const getDidNotProvideParagraph = tenancyDateUnknown.getDidNotProvideParagraph(claimantsName);
     await performValidation('text', { elementType: 'paragraph', text: getDidNotProvideParagraph });
+    this.recordRtcCyaDateFromParts(
+      this.getRtcCyaQuestionLabel(tenancyDateUnknown.whenDidYourTenancyQuestion),
+      tenancyStartData?.tsDay,
+      tenancyStartData?.tsMonth,
+      tenancyStartData?.tsYear
+    );
     if (tenancyStartData?.tsDay && tenancyStartData?.tsMonth && tenancyStartData?.tsYear) {
       await performActions(
         'Enter Date',
@@ -478,66 +847,97 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectIfAnyOtherAdultsLiveInYourHouse(adultsInHouseDetails: actionRecord) {
+    this.recordAnswer(doAnyOtherAdultsLiveInYourHome.mainHeader, adultsInHouseDetails.radioOption);
     await performAction('clickRadioButton', {
       question: doAnyOtherAdultsLiveInYourHome.mainHeader,
       option: adultsInHouseDetails.radioOption,
     });
 
     if (adultsInHouseDetails.radioOption === 'Yes' && adultsInHouseDetails.details) {
+      this.recordAnswer(
+        doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
+        adultsInHouseDetails.details
+      );
       await performAction(
         'inputText',
         doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
         adultsInHouseDetails.details
       );
+    } else {
+      this.deleteAnswer(doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel);
     }
     await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   }
 
   private async selectAlternativeAccommodation(moveInDetails: actionRecord) {
+    const moveInDateLabel = this.getRtcCyaQuestionLabel(
+      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.whenWouldYouBeableToMoveHiddenTextLabel
+    );
+    this.recordAnswer(wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader, moveInDetails.radioOption);
     await performAction('clickRadioButton', {
       question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader,
       option: moveInDetails.radioOption,
     });
 
     if (moveInDetails.radioOption === 'Yes' && moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
+      this.recordRtcCyaDateFromParts(moveInDateLabel, moveInDetails.day, moveInDetails.month, moveInDetails.year);
       await performActions(
         'Enter Date',
         ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, moveInDetails.day],
         ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, moveInDetails.month],
         ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, moveInDetails.year]
       );
+    } else if (moveInDetails.radioOption === 'Yes') {
+      this.recordRtcCyaSummaryRow(moveInDateLabel, []);
+    }
+    if (moveInDetails.radioOption !== 'Yes') {
+      this.deleteRtcCyaDate(moveInDateLabel);
     }
     await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
   }
 
   private async disputingOtherPartsOfTheClaim(doYouWantToDisputeOption: actionRecord): Promise<void> {
+    this.recordAnswer(nonRentArrearsDispute.doYouWantToDisputeQuestion, doYouWantToDisputeOption.disputeOption);
     await performAction('clickRadioButton', {
       question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
       option: doYouWantToDisputeOption.disputeOption,
     });
 
     if (doYouWantToDisputeOption.disputeOption === 'Yes') {
+      this.recordAnswer(nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel, doYouWantToDisputeOption.disputeInfo);
       await performAction(
         'inputText',
         nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
         doYouWantToDisputeOption.disputeInfo
       );
+    } else {
+      this.deleteAnswer(nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel);
     }
     await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
   }
 
   private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
+    this.recordAnswer(
+      counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
+      helpWithFee.helpWithFeeOption
+    );
     await performAction('clickRadioButton', {
       question: counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
       option: helpWithFee.helpWithFeeOption,
     });
 
     if (helpWithFee.helpWithFeeOption === 'Yes') {
+      this.recordAnswer(
+        counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
+        helpWithFee.feeReference
+      );
       await performAction(
         'inputText',
         counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
         helpWithFee.feeReference
       );
+    } else {
+      this.deleteAnswer(counterclaimYouNeedToApplyForHelpWithYourFees.helpWithFeesLink);
     }
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
   }
@@ -556,12 +956,16 @@ export class RespondToClaimAction implements IAction {
       elementType: 'paragraph',
       text: `${rentArrearsAmount}`,
     });
+    this.recordAnswer(rentArrears.doYouOweThisQuestion, rentArrearsInfo.option);
     await performAction('clickRadioButton', {
       question: rentArrears.doYouOweThisQuestion,
       option: rentArrearsInfo.option,
     });
     if (rentArrearsInfo.option === 'No') {
+      this.recordAnswer(rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
       await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
+    } else {
+      this.deleteAnswer(rentArrears.howMuchDoYouBelieveHiddenTextLabel);
     }
     await performAction('clickButton', rentArrears.saveAndContinueButton);
   }
@@ -605,31 +1009,42 @@ export class RespondToClaimAction implements IAction {
         });
       }
     }
+    this.recordAnswer(tenancyTypeDetails.isTenancyTypeCorrectQuestion, tenancyTypeDetailsInfo.tenancyOption);
     await performAction('clickRadioButton', {
       question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
       option: tenancyTypeDetailsInfo.tenancyOption,
     });
     if (tenancyTypeDetailsInfo.tenancyOption === 'No' && tenancyTypeDetailsInfo.tenancyTypeInfo) {
+      this.recordAnswer(
+        tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+        tenancyTypeDetailsInfo.tenancyTypeInfo
+      );
       await performAction(
         'inputText',
         tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
         tenancyTypeDetailsInfo.tenancyTypeInfo
       );
+    } else {
+      this.deleteAnswer(tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel);
     }
     await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
   }
 
   private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
+    this.recordAnswer(yourCircumstances.wouldYouLikeToShareHeader, yourCircumstancesData.yourCircumstancesOption);
     await performAction('clickRadioButton', {
       question: yourCircumstancesData.question,
       option: yourCircumstancesData.yourCircumstancesOption,
     });
     if (yourCircumstancesData.yourCircumstancesOption === yourCircumstances.yesRadioOption) {
+      this.recordAnswer(yourCircumstances.giveDetailsHiddenTextLabel, yourCircumstances.detailsTextInput);
       await performAction(
         'inputText',
         yourCircumstances.giveDetailsHiddenTextLabel,
         yourCircumstances.detailsTextInput
       );
+    } else {
+      this.deleteAnswer(yourCircumstances.giveDetailsHiddenTextLabel);
     }
     await performAction('clickButton', yourCircumstances.saveAndContinueButton);
   }
@@ -669,6 +1084,7 @@ export class RespondToClaimAction implements IAction {
     const basedOnInformationParagraph = `Based on the information provided, it will cost £${counterClaimFeeValue} to make your counterclaim.`;
     await performValidation('text', { elementType: 'paragraph', text: basedOnInformationParagraph });
 
+    this.recordAnswer(counterClaimFee.doYouNeedHelpPayingCounterClaimQuestion, counterClaimFeeOption.radioOption);
     await performAction('clickRadioButton', {
       question: counterClaimFee.doYouNeedHelpPayingCounterClaimQuestion,
       option: counterClaimFeeOption.radioOption,
@@ -677,16 +1093,23 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {
+    this.recordAnswer(
+      exceptionalHardship.wouldYouExperienceExceptionalHardshipParagraph,
+      exceptionalHardshipData.exceptionalHardshipOption
+    );
     await performAction('clickRadioButton', {
       question: exceptionalHardshipData.question,
       option: exceptionalHardshipData.exceptionalHardshipOption,
     });
     if (exceptionalHardshipData.exceptionalHardshipOption === exceptionalHardship.yesRadioOption) {
+      this.recordAnswer(exceptionalHardship.giveDetailsHiddenTextLabel, exceptionalHardship.detailsTextInput);
       await performAction(
         'inputText',
         exceptionalHardship.giveDetailsHiddenTextLabel,
         exceptionalHardship.detailsTextInput
       );
+    } else {
+      this.deleteAnswer(exceptionalHardship.giveDetailsHiddenTextLabel);
     }
     await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
   }
@@ -696,38 +1119,53 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async doYouHaveAnyOtherDependants(otherDependantsData: actionRecord): Promise<void> {
+    this.recordAnswer(doYouHaveAnyOtherDependants.mainHeader, otherDependantsData.otherDependantsOption);
     await performAction('clickRadioButton', {
       question: doYouHaveAnyOtherDependants.mainHeader,
       option: otherDependantsData.otherDependantsOption,
     });
 
     if (otherDependantsData.otherDependantsOption === doYouHaveAnyOtherDependants.yesRadioOption) {
+      this.recordAnswer(
+        doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
+        otherDependantsData.otherDependantsInfo
+      );
       await performAction(
         'inputText',
         doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
         otherDependantsData.otherDependantsInfo
       );
+    } else {
+      this.deleteAnswer(doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel);
     }
     await performAction('clickButton', doYouHaveAnyOtherDependants.saveAndContinueButton);
   }
 
   private async doYouHaveAnyDependantChildren(dependantChildrenData: actionRecord): Promise<void> {
+    this.recordAnswer(doYouHaveAnyDependantChildren.mainHeader, dependantChildrenData.dependantChildrenOption);
     await performAction('clickRadioButton', {
       question: doYouHaveAnyDependantChildren.mainHeader,
       option: dependantChildrenData.dependantChildrenOption,
     });
 
     if (dependantChildrenData.dependantChildrenOption === doYouHaveAnyDependantChildren.yesRadioOption) {
+      this.recordAnswer(
+        doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
+        dependantChildrenData.dependantChildrenInfo
+      );
       await performAction(
         'inputText',
         doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
         dependantChildrenData.dependantChildrenInfo
       );
+    } else {
+      this.deleteAnswer(doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel);
     }
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
   private async selectUniversalCredit(universalCreditDateData: actionRecord): Promise<void> {
+    this.recordAnswer(haveYouAppliedForUniversalCredit.mainHeader, universalCreditDateData.creditRadioOption);
     await performAction('clickRadioButton', {
       question: haveYouAppliedForUniversalCredit.mainHeader,
       option: universalCreditDateData.creditRadioOption,
@@ -738,6 +1176,12 @@ export class RespondToClaimAction implements IAction {
       universalCreditDateData?.month &&
       universalCreditDateData?.year
     ) {
+      this.recordRtcCyaDateFromParts(
+        rtcCyaLabels.universalCreditApplicationDate,
+        universalCreditDateData.day,
+        universalCreditDateData.month,
+        universalCreditDateData.year
+      );
       await performActions(
         'Enter Date',
         ['inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, universalCreditDateData.day],
@@ -745,10 +1189,14 @@ export class RespondToClaimAction implements IAction {
         ['inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, universalCreditDateData.year]
       );
     }
+    if (universalCreditDateData.creditRadioOption !== 'Yes') {
+      this.deleteRtcCyaDate(rtcCyaLabels.universalCreditApplicationDate);
+    }
     await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   }
 
   private async selectPriorityDebts(priorityDebtsData: actionRecord): Promise<void> {
+    this.recordAnswer(priorityDebts.doYouHaveAnyPriorityDebtsQuestion, priorityDebtsData.option);
     await performAction('clickRadioButton', {
       question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebtsData.option,
@@ -757,6 +1205,19 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
+    this.recordAnswer(
+      priorityDebtDetails.whatIsTheTotalAmountQuestion,
+      this.formatRtcCyaCurrency(priorityDebtDetailsData.totalAmount)
+    );
+    this.recordAnswer(
+      priorityDebtDetails.howMuchDoYouPayQuestion,
+      this.buildRtcCyaAmountAndFrequencyValue(
+        priorityDebtDetailsData.payAmount,
+        priorityDebtDetailsData.option,
+        'paid every'
+      )
+    );
+    this.deleteAnswer(priorityDebtDetails.paidEveryParagraph);
     await performAction(
       'inputText',
       priorityDebtDetails.whatIsTheTotalAmountQuestion,
@@ -770,10 +1231,21 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
   }
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
+    const regularExpensesQuestionLabel = this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader);
+
+    const clearRegularExpenseAnswers = (): void => {
+      this.deleteAnswer(regularExpensesQuestionLabel);
+    };
+
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      clearRegularExpenseAnswers();
+      this.recordRtcCyaSummaryRow(regularExpensesQuestionLabel, []);
       await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
       return;
     }
+
+    clearRegularExpenseAnswers();
+    const selectedRegularExpenseEntries: [string, string][] = [];
 
     for (const income of regularIncome.regularIncomeOptions) {
       const [option, value, frequency] = income;
@@ -782,15 +1254,23 @@ export class RespondToClaimAction implements IAction {
         question: whatOtherRegularExpensesDoYouHave.mainHeader,
         option,
       });
-      console.log('option' + option);
+
       if (!value || !frequency) {
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
+
       await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
-      console.log('input' + value);
       await performAction('clickRadioButton', frequency);
-      console.log('frequency' + frequency);
+
+      const mappedCyaLabel =
+        option === whatOtherRegularExpensesDoYouHave.otherExpensesParagraph
+          ? 'Other expenses'
+          : this.getRtcCyaChoiceLabel(option);
+      selectedRegularExpenseEntries.push([mappedCyaLabel, this.buildRtcCyaAmountAndFrequencyValue(value, frequency)]);
     }
+
+    this.recordRtcCyaHeadingWithItems(regularExpensesQuestionLabel, selectedRegularExpenseEntries);
+
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   }
 
@@ -815,6 +1295,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async languageUsed(languageScreenData: actionRecord): Promise<void> {
+    this.recordAnswer(String(languageScreenData.question), languageScreenData.radioOption);
     await performAction('clickRadioButton', {
       question: languageScreenData.question,
       option: languageScreenData.radioOption,
@@ -823,28 +1304,37 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async otherConsiderations(otherConsiderationsData: actionRecord): Promise<void> {
+    this.recordAnswer(rtcCyaLabels.otherConsiderations, otherConsiderationsData.option);
     await performAction('clickRadioButton', {
       question: otherConsiderationsData.question,
       option: otherConsiderationsData.option,
     });
     if (otherConsiderationsData.option === otherConsiderations.yesRadioOption) {
+      this.recordAnswer(otherConsiderations.giveDetailsHiddenTextLabel, otherConsiderationsData.courtInfo);
       await performAction(
         'inputText',
         otherConsiderations.giveDetailsHiddenTextLabel,
         otherConsiderationsData.courtInfo
       );
+    } else {
+      this.deleteAnswer(otherConsiderations.giveDetailsHiddenTextLabel);
     }
     await performAction('clickButton', otherConsiderations.saveAndContinueButton);
   }
 
   private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
     if (uploadDocs?.files) {
+      const uploadedFiles = Array.isArray(uploadDocs.files) ? uploadDocs.files.join(', ') : String(uploadDocs.files);
+      this.recordAnswer(rtcUploadedDocumentsQuestion, uploadedFiles);
       await performAction('uploadFile', uploadDocs.files);
+    } else {
+      this.recordAnswer(rtcUploadedDocumentsQuestion, rtcNoDocumentsUploadedValue);
     }
     await performAction('clickButton', uploadFiles.saveAndContinueButton);
   }
 
   private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {
+    this.recordAnswer(String(claim.question), claim.option);
     await performAction('clickRadioButton', {
       question: claim.question,
       option: claim.option,
@@ -853,18 +1343,21 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async counterClaimSpecificSumOfMoney(sumOfMoney: actionRecord): Promise<void> {
+    this.recordAnswer(String(sumOfMoney.question), sumOfMoney.option);
     await performAction('clickRadioButton', {
       question: sumOfMoney.question,
       option: sumOfMoney.option,
     });
 
     if (sumOfMoney.option === counterClaimSpecificSumOfMoney.yesRadioOption) {
+      this.recordAnswer(counterClaimSpecificSumOfMoney.howMuchAreYouClaimingHiddenQuestion, sumOfMoney.amount);
       await performAction(
         'inputText',
         counterClaimSpecificSumOfMoney.howMuchAreYouClaimingHiddenQuestion,
         sumOfMoney.amount
       );
     } else {
+      this.recordAnswer(counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion, sumOfMoney.amount);
       await performAction(
         'inputText',
         counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,
@@ -872,6 +1365,101 @@ export class RespondToClaimAction implements IAction {
       );
     }
     await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
+  }
+
+  private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
+    const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
+    rtcCyaMap.clear();
+    const summaryList = page.locator('.govuk-summary-list').first();
+    await summaryList.waitFor({ state: 'visible' });
+
+    const rows = summaryList.locator('.govuk-summary-list__row');
+    const rowCount = await rows.count();
+
+    if (rowCount === 0) {
+      throw new Error('RTC CYA table not found. Exiting...');
+    }
+
+    for (let j = 0; j < rowCount; j++) {
+      const row = rows.nth(j);
+      if (!(await row.isVisible())) {
+        continue;
+      }
+
+      const keyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
+      const valueCell = row.locator('.govuk-summary-list__value').first();
+      const innerText = (await valueCell.innerText()).trim();
+      const textContent = ((await valueCell.textContent()) ?? '').trim();
+      const valueText = (innerText || textContent).replace(/\r?\n+/g, ', ').replace(/\s{2,}/g, ' ');
+
+      if (keyText) {
+        rtcCyaMap.set(keyText, valueText);
+      }
+    }
+
+    console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);
+  }
+
+  private async validateCYARTC(): Promise<void> {
+    const mismatches: string[] = [];
+
+    for (const [expectedKey, expectedValue] of Array.from(FieldsStore.getAll().entries())) {
+      const actualValue = rtcCyaMap.get(expectedKey);
+      if (actualValue !== undefined) {
+        if (!this.areRtcCyaValuesEquivalent(String(expectedValue), actualValue)) {
+          mismatches.push(
+            `key: "${expectedKey}" -> Expected value containing "${expectedValue}" | Actual: "${actualValue}"`
+          );
+        }
+        continue;
+      }
+
+      mismatches.push(
+        `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but the CYA row key was not found`
+      );
+    }
+
+    if (mismatches.length > 0) {
+      console.log(`\n❌ RTC CYA differences found: ${mismatches.length}`);
+      for (const mismatch of mismatches) {
+        console.log('============================================================');
+        console.log(`• ${mismatch}`);
+      }
+      throw new Error(`RTC CYA validation failed for ${mismatches.length} item(s)`);
+    }
+
+    console.log('\n✅ RTC CHECK YOUR ANSWERS VALIDATION PASSED!\n');
+  }
+
+  private async validateRTCSectionCYA(sectionData: actionData): Promise<void> {
+    const sectionName = String(sectionData);
+    const expectedSectionAnswers = rtcSectionAnswers.get(sectionName);
+
+    if (!expectedSectionAnswers || expectedSectionAnswers.size === 0) {
+      throw new Error(`user selection is empty for ${sectionName}`);
+    }
+
+    const mismatches: string[] = [];
+
+    for (const [expectedKey, expectedValue] of Array.from(expectedSectionAnswers.entries())) {
+      const actualValue = rtcCyaMap.get(expectedKey);
+      if (actualValue !== undefined) {
+        if (!this.areRtcCyaValuesEquivalent(String(expectedValue), actualValue)) {
+          mismatches.push(
+            `key: "${expectedKey}" -> Expected value containing "${expectedValue}" | Actual: "${actualValue}"`
+          );
+        }
+        continue;
+      }
+
+      mismatches.push(
+        `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but the CYA row key was not found`
+      );
+    }
+
+    if (mismatches.length > 0) {
+      throw new Error(`RTC ${sectionName} section CYA validation failed:\n${mismatches.join('\n')}`);
+    }
   }
 
   private async accessYourCase(accessCode: actionRecord): Promise<void> {
@@ -897,11 +1485,13 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', accessYourCase.continueButton);
   }
   private async readReasonableAdjustmentsTriage(): Promise<void> {
+    this.recordAnswer(reasonableAdjustmentsTriage.mainHeader, reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
   }
 
   private async selectClaimAgainstWhom(claimAgainstWhom: actionRecord): Promise<void> {
     if (Array.isArray(claimAgainstWhom.options)) {
+      this.recordAnswer(String(claimAgainstWhom.question), claimAgainstWhom.options);
       for (const option of claimAgainstWhom.options) {
         await performAction('check', {
           question: claimAgainstWhom.question,
@@ -909,6 +1499,7 @@ export class RespondToClaimAction implements IAction {
         });
       }
     } else if (claimAgainstWhom.radioOption) {
+      this.recordAnswer(String(claimAgainstWhom.question), claimAgainstWhom.radioOption);
       await performAction('check', {
         question: claimAgainstWhom.question,
         option: claimAgainstWhom.radioOption,
@@ -918,12 +1509,16 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async counterClaimAbout(claimAbout: actionRecord): Promise<void> {
+    this.recordAnswer(counterClaimAbout.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
+    this.recordAnswer(counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('inputText', counterClaimAbout.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
     await performAction('inputText', counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
   }
 
   private async counterClaimOrderOtherThanSum(cliamOtherThanSum: actionRecord): Promise<void> {
+    this.recordAnswer(counterClaimOrderOtherThanSum.whatOrdersAreYouAskingLabelText, cliamOtherThanSum.ordersInput);
+    this.recordAnswer(counterClaimOrderOtherThanSum.whatFactsWouldYouLikeLabelText, cliamOtherThanSum.factsInput);
     await performAction(
       'inputText',
       counterClaimOrderOtherThanSum.whatOrdersAreYouAskingLabelText,
