@@ -276,7 +276,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
 
     await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
@@ -364,7 +363,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
@@ -408,7 +406,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
 
     await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
@@ -464,7 +461,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
@@ -547,7 +543,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
 
     await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
@@ -671,7 +666,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
 
     await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
@@ -712,7 +706,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
