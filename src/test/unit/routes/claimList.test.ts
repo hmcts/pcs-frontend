@@ -76,8 +76,8 @@ describe('claimList route', () => {
 
   it('renders claimList with mapped table rows on successful fetch', async () => {
     (getCitizenClaims as jest.Mock).mockResolvedValue([
-      { caseRef: '1234567890123456', claimantName: 'John Doe', propertyPostcode: 'SW1A 1AA' },
-      { caseRef: '9876543210987654', claimantName: 'Jane Smith', propertyPostcode: 'EC1A 1BB' },
+      { caseReference: '1234567890123456', claimantName: 'John Doe', propertyPostcode: 'SW1A 1AA' },
+      { caseReference: '9876543210987654', claimantName: 'Jane Smith', propertyPostcode: 'EC1A 1BB' },
     ]);
 
     const app = buildApp();
@@ -109,6 +109,69 @@ describe('claimList route', () => {
       })
     );
     expect(res.redirect).not.toHaveBeenCalled();
+  });
+
+  it('renders claimList with empty table rows when no claims are returned', async () => {
+    (getCitizenClaims as jest.Mock).mockResolvedValue([]);
+
+    const app = buildApp();
+    claimListRoutes(app);
+
+    const req = buildReq();
+    const res = buildRes();
+
+    await getHandler(app)(req, res, next);
+
+    expect(res.render).toHaveBeenCalledWith('claimList', expect.objectContaining({ tableRows: [] }));
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
+  it('filters out claims with no caseReference', async () => {
+    (getCitizenClaims as jest.Mock).mockResolvedValue([
+      { caseReference: '1234567890123456', claimantName: 'John Doe', propertyPostcode: 'SW1A 1AA' },
+      { claimantName: 'No Ref', propertyPostcode: 'EC1A 1BB' },
+    ]);
+
+    const app = buildApp();
+    claimListRoutes(app);
+
+    const req = buildReq();
+    const res = buildRes();
+
+    await getHandler(app)(req, res, next);
+
+    expect(res.render).toHaveBeenCalledWith(
+      'claimList',
+      expect.objectContaining({ tableRows: expect.arrayContaining([expect.arrayContaining([{ text: '1234567890123456' }])]) })
+    );
+    const tableRows = (res.render as jest.Mock).mock.calls[0][1].tableRows;
+    expect(tableRows).toHaveLength(1);
+  });
+
+  it('renders claimList with partial claim data', async () => {
+    (getCitizenClaims as jest.Mock).mockResolvedValue([{ caseReference: '1234567890123456' }]);
+
+    const app = buildApp();
+    claimListRoutes(app);
+
+    const req = buildReq();
+    const res = buildRes();
+
+    await getHandler(app)(req, res, next);
+
+    expect(res.render).toHaveBeenCalledWith(
+      'claimList',
+      expect.objectContaining({
+        tableRows: [
+          [
+            { text: '1234567890123456' },
+            { text: undefined },
+            { text: undefined },
+            { html: '<a href="/case/1234567890123456/dashboard" class="govuk-link">claimList:table.viewClaim</a>' },
+          ],
+        ],
+      })
+    );
   });
 
   it('propagates error to next when getCitizenClaims throws', async () => {

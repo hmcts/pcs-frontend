@@ -23,11 +23,13 @@ export default function claimListRoutes(app: Application): void {
 
     try {
       const claimsAgainst = await getCitizenClaims(accessToken);
-      const tableRows = claimsAgainst.map(claim => [
-        { text: claim.caseRef },
+      const tableRows = claimsAgainst.filter(claim => claim.caseReference).map(claim => [
+        { text: claim.caseReference },
         { text: claim.claimantName },
         { text: claim.propertyPostcode },
-        { html: `<a href="/case/${claim.caseRef}/dashboard" class="govuk-link">${t('claimList:table.viewClaim')}</a>` },
+        {
+          html: `<a href="/case/${claim.caseReference}/dashboard" class="govuk-link">${t('claimList:table.viewClaim')}</a>`,
+        },
       ]);
       return res.render('claimList', { tableRows, t });
     } catch (error) {

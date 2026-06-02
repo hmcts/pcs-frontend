@@ -103,7 +103,7 @@ describe('pcsApiService', () => {
     const accessToken = 'test-access-token';
 
     test('returns array of claims on success', async () => {
-      const claims = [{ caseRef: '1234567890123456', claimantName: 'John Doe', propertyPostcode: 'SW1A 1AA' }];
+      const claims = [{ caseReference: '1234567890123456', claimantName: 'John Doe', propertyPostcode: 'SW1A 1AA' }];
       mockHttp.get.mockResolvedValue({ data: claims });
 
       const result = await getCitizenClaims(accessToken);
