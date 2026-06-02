@@ -926,7 +926,10 @@ export class RespondToClaimAction implements IAction {
     });
 
     if (helpWithFee.helpWithFeeOption === 'Yes') {
-      this.recordAnswer(counterclaimYouNeedToApplyForHelpWithYourFees.helpWithFeesLink, helpWithFee.feeReference);
+      this.recordAnswer(
+        counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
+        helpWithFee.feeReference
+      );
       await performAction(
         'inputText',
         counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
