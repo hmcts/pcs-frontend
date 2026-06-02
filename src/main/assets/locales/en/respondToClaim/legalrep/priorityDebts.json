@@ -1,5 +1,5 @@
 {
-  "paragraph1": "Priority debts are debts which could lead to serious consequences if the defendant do not pay them.",
+  "paragraph1": "Priority debts are debts which could lead to serious consequences if the defendant does not pay them.",
   "question": "Does the defendant have any priority debts?",
   "errors": {
     "havePriorityDebts": "Select if the defendant has any priority debts"
