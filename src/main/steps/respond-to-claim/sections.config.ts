@@ -1,5 +1,6 @@
-import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 import { hasAnyRentArrearsGround } from '../utils';
+
+import type { SectionConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_SECTION_IDS = [
   'startNowAndDetails',
@@ -107,12 +108,13 @@ export const respondToClaimSections: SectionConfig[] = [
   {
     id: 'checkYourAnswersAndSubmit',
     titleKey: 'taskList.checkYourAnswersAndSubmit',
-    steps: [
-      'reasonable-adjustments-triage',
-      'equality-and-diversity-start',
-      'equality-and-diversity-end',
-      'language-used',
-      'check-your-answers',
-    ],
+    // HDPI-6929: 'reasonable-adjustments-triage', 'equality-and-diversity-start' and
+    // 'equality-and-diversity-end' are intentionally parked out of the live citizen
+    // journey while RA / Your Support and PCQ integrations are still in progress.
+    // Their step folders, registry entries and locale files are retained so re-
+    // enablement is a one-line restore here. See HDPI-3793 (RA triage), HDPI-6649
+    // (RA confirmation, parked on a custom branch) and the PCQ tie-in tracked in
+    // config/default.json (`pcq.enabled`).
+    steps: ['language-used', 'check-your-answers'],
   },
 ];
