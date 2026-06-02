@@ -66,7 +66,7 @@ import { FieldsStore } from './recordAnsweredFields.action';
 const rtcCyaMap = new Map<string, string>();
 const rtcSectionAnswers = new Map<string, Map<string, string>>();
 let activeRtcSection = '';
-const rtcUploadedDocumentsQuestion = 'Upload files';
+const rtcUploadedDocumentsQuestion = 'Uploaded files';
 const rtcNoDocumentsUploadedValue = 'No files uploaded';
 const rtcNoAnswerProvidedValue = 'No answer provided';
 
