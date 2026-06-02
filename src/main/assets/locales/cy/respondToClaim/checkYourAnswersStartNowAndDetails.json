@@ -1,0 +1,15 @@
+{
+  "pageTitle": "cy Check your answers",
+  "cardTitle": "cy Free legal advice",
+  "rows": {
+    "freeLegalAdvice": {
+      "label": "cy Have you had any free legal advice?",
+      "changeHidden": "cy free legal advice",
+      "options": {
+        "YES": "cy Yes",
+        "NO": "cy No",
+        "PREFER_NOT_TO_SAY": "cy Prefer not to say"
+      }
+    }
+  }
+}

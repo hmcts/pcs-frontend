@@ -47,6 +47,10 @@ export class CcdCaseModel {
     return this.data.noticeServed;
   }
 
+  get walesNoticeServed(): string | undefined {
+    return this.data.walesNoticeServed;
+  }
+
   get propertyAddress(): CcdCaseAddress | undefined {
     return this.data.propertyAddress;
   }
