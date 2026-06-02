@@ -44,6 +44,25 @@ jest.mock('../../../../main/steps/utils/getClaimantName', () => ({
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/correspondence-address';
 
+describe('correspondence-address isAnswered', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const reqWith = (validatedCase: Record<string, unknown>): any => ({ res: { locals: { validatedCase } } });
+
+  it('is answered once the citizen confirms (correspondenceAddressConfirmation set)', () => {
+    expect(step.isAnswered?.(reqWith({ defendantResponses: { correspondenceAddressConfirmation: 'YES' } }))).toBe(true);
+  });
+
+  it('is NOT answered when only the claim-prefilled party address is present (no confirmation)', () => {
+    expect(
+      step.isAnswered?.(reqWith({ defendantContactDetailsPartyAddress: { AddressLine1: '2 Second Avenue' } }))
+    ).toBe(false);
+  });
+
+  it('is NOT answered when nothing is set', () => {
+    expect(step.isAnswered?.(reqWith({}))).toBe(false);
+  });
+});
+
 describe('correspondence-address beforeRedirect', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (body: Record<string, unknown> = {}): any => ({

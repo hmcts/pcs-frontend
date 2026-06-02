@@ -104,6 +104,10 @@ export class ActionRegistry {
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['resetRTCAnswerStore', new RespondToClaimAction()],
+    ['retrieveCYATableDataRTC', new RespondToClaimAction()],
+    ['validateCYARTC', new RespondToClaimAction()],
+    ['validateRTCSectionCYA', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
