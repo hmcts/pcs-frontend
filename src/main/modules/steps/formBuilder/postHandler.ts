@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
-import { createStepNavigation } from '../flow';
+import { createStepNavigation, getStepUrl } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
@@ -30,6 +30,14 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 
 function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
   return flowConfig?.useSessionFormData !== false;
+}
+
+function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig | undefined): string {
+  const caseId = req.res?.locals.validatedCase?.id;
+  if (flowConfig?.hubStepName && caseId) {
+    return getStepUrl(flowConfig.hubStepName, flowConfig, caseId);
+  }
+  return (caseId && getDashboardUrl(caseId)) || '/';
 }
 
 export function createPostHandler(
@@ -97,10 +105,12 @@ export function createPostHandler(
         interpolationValues
       );
       const stepSpecificErrors = getCustomErrorTranslations(t, fieldsWithLabels);
+      const isSaveForLater = action === 'saveForLater';
+
       const fieldErrors = getTranslationErrors(t, fields, undefined, interpolationValues);
       const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
 
-      if (Object.keys(errors).length > 0) {
+      if (!isSaveForLater && Object.keys(errors).length > 0) {
         const formContent = buildFormContent(
           fields,
 
@@ -153,16 +163,8 @@ export function createPostHandler(
         }
       }
 
-      if (action === 'saveForLater') {
-        const caseId = req.res?.locals.validatedCase?.id;
-        const dashboardUrl = caseId ? getDashboardUrl(caseId) : null;
-
-        if (!dashboardUrl) {
-          // No valid case reference - redirect to home
-          return safeRedirect303(res, '/', '/', ['/']);
-        }
-
-        return safeRedirect303(res, dashboardUrl, '/', ['/case']);
+      if (isSaveForLater) {
+        return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
       }
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);

@@ -172,17 +172,14 @@ describe('PostHandler - Save for Later Fix', () => {
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/next-step');
     });
 
-    it('should validate form before saving for later', async () => {
+    it('bypasses validation on saveForLater and redirects', async () => {
       const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
-
-      // Empty form + save for later
       mockRequest.body = { action: 'saveForLater' };
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
-      // Should show validation errors (NOT redirect)
-      expect(mockResponse.redirect).not.toHaveBeenCalled();
-      expect(mockResponse.render).toHaveBeenCalled();
+      expect(mockResponse.render).not.toHaveBeenCalled();
+      expect(mockResponse.redirect).toHaveBeenCalled();
     });
 
     it('should save valid data and redirect to dashboard', async () => {
