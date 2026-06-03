@@ -20,6 +20,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  endNow,
   equalityAndDiversityEnd,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -35,6 +36,7 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
+  taskList,
   tenancyDateDetails,
   tenancyTypeDetails,
   whatRegularIncomeDoYouReceive,
@@ -240,6 +242,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+
     await softErrorMessageValidation('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
@@ -271,6 +275,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
 
     await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
@@ -338,6 +344,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
 
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
 
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
@@ -355,6 +362,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
@@ -396,6 +405,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
 
     await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
     await performAction('selectIncomeAndExpenses', {
@@ -450,9 +461,13 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
+
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
     await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
     await performAction('readReasonableAdjustmentsTriage');
@@ -471,6 +486,20 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: languageUsed.englishRadioOption,
     });
 
+    await performAction('clickButton', 'Save and continue');
+    await performAction('clickButton', endNow.continueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+        taskList.checkYourAnswersAndSubmitHiddenLink,
+      ],
+      status: 'Done',
+    });
+
     assertAllErrorMessageValidations();
   });
 
@@ -478,6 +507,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
 
     await softErrorMessageValidation('defendantNameCapture', defendantNameCaptureErrorValidation);
     await performAction('inputDefendantDetails', {
@@ -511,6 +542,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('contactPreferencesTextMessage', contactPreferencesTextMessageErrorValidation);
     await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
 
     await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
     await performAction(
@@ -590,6 +623,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', counterClaimUploadDocuments.continueButton);
 
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
@@ -632,6 +666,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+
     await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
@@ -670,9 +706,13 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
+
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
     await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
     await performAction('readReasonableAdjustmentsTriage');
@@ -690,6 +730,9 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+
+    await performAction('clickButton', 'Save and continue');
+    await performAction('clickButton', endNow.continueButton);
     assertAllErrorMessageValidations();
   });
 });

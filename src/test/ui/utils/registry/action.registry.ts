@@ -108,6 +108,8 @@ export class ActionRegistry {
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
     ['getCaseAPI', new CreateCaseAPIAction()],
     ['linkSolicitorAPI', new LinkSolicitorAPIAction()],
+    ['taskList', new RespondToClaimAction()],
+    ['taskListStatus', new RespondToClaimAction()],
     ['resetRTCAnswerStore', new RespondToClaimAction()],
     ['retrieveCYATableDataRTC', new RespondToClaimAction()],
     ['validateCYARTC', new RespondToClaimAction()],
