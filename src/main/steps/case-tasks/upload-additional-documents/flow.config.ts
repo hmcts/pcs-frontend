@@ -1,3 +1,5 @@
+import type { Request } from 'express';
+
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../constants/caseRoutes';
 
 import { isViewAllApplicationsAvailable } from './flowConditions';
@@ -31,7 +33,15 @@ export const flowConfig: JourneyFlowConfig = {
       ],
     },
     [confirmIfTheseDocumentsRelateToAnApplicationStep]: { routes: [{ nextStep: uploadYourDocumentsStep }] },
-    [uploadYourDocumentsStep]: { routes: [{ nextStep: checkYourAnswersStep }] },
+    [uploadYourDocumentsStep]: {
+      routes: [{ nextStep: checkYourAnswersStep }],
+      previousStep: async (req: Request) => {
+        if (await isViewAllApplicationsAvailable(req, {}, {})) {
+          return confirmIfTheseDocumentsRelateToAnApplicationStep;
+        }
+        return 'start-evidence-upload';
+      },
+    },
     [checkYourAnswersStep]: { routes: [{ nextStep: documentsUploadedStep }] },
     [documentsUploadedStep]: {},
   },

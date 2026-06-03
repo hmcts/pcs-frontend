@@ -1,10 +1,19 @@
 jest.mock('@modules/steps', () => ({
-  createGetController: jest.fn((_view, _step, _nav, fn) => fn),
+  createGetController: jest.fn((_view, _step, _nav, fn) => ({
+    get: async (req: Request, res?: Response) => {
+      const content = await fn(req);
+      if (res?.render) {
+        res.render(_view, content);
+      }
+      return content;
+    },
+  })),
   createStepNavigation: jest.fn(() => ({
     getNextStepUrl: jest.fn().mockResolvedValue('/next'),
   })),
   getFormData: jest.fn(),
   getTranslationFunction: jest.fn(),
+  loadStepNamespace: jest.fn(),
   setFormData: jest.fn(),
 }));
 
@@ -85,14 +94,26 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockGetTranslationFunction.mockReturnValue(t);
   mockGetFormData.mockReturnValue({});
-  (createGetController as jest.Mock).mockImplementation((_view, _step, _nav, fn) => fn);
+  (createGetController as jest.Mock).mockImplementation((_view, _step, _nav, fn) => ({
+    get: async (req: Request, res?: Response) => {
+      const content = { ...(await fn(req)), t: mockGetTranslationFunction() };
+      if (res?.render) {
+        res.render(_view, content);
+      }
+      return content;
+    },
+  }));
   (date as jest.Mock).mockImplementation((input: string) => `formatted(${input})`);
 });
 
 describe('confirm-if-these-documents-relate-to-an-application GET', () => {
   const invokeGet = async () => {
-    const getController = step.getController as unknown as () => (req: Request) => Promise<Record<string, unknown>>;
-    return getController()(buildReq());
+    const getController = (
+      step.getController as unknown as () => {
+        get: (req: Request, res?: Response) => Promise<Record<string, unknown>>;
+      }
+    )();
+    return getController.get(buildReq());
   };
 
   it('renders one option per gen-app keyed by genAppId, plus the sentinel last', async () => {
@@ -227,5 +248,38 @@ describe('confirm-if-these-documents-relate-to-an-application POST', () => {
         relatedApplicationText: '',
       }
     );
+  });
+
+  it('returns validation errors when no option is selected', async () => {
+    mockGetTranslationFunction.mockReturnValue((key: string) => {
+      if (key === 'errors.relatedApplicationId.required') {
+        return 'Confirm if these documents relate to an existing application';
+      }
+      if (key === 'errors.title') {
+        return 'There is a problem';
+      }
+      return key;
+    });
+    mockGetCaseByIdForEvent.mockResolvedValue(startResponseWithOptions([]));
+
+    const { res } = await invokePost({});
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.render).toHaveBeenCalledWith(
+      'case-tasks/upload-additional-documents/confirm-if-these-documents-relate-to-an-application/confirmIfTheseDocumentsRelateToAnApplication.njk',
+      expect.objectContaining({
+        errorSummary: {
+          titleText: 'There is a problem',
+          errorList: [
+            {
+              text: 'Confirm if these documents relate to an existing application',
+              href: '#relatedApplicationId',
+            },
+          ],
+        },
+        radioErrorMessage: { text: 'Confirm if these documents relate to an existing application' },
+      })
+    );
+    expect(mockSetFormData).not.toHaveBeenCalled();
   });
 });

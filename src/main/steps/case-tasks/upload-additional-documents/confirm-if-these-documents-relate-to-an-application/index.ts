@@ -10,6 +10,7 @@ import {
   createStepNavigation,
   getFormData,
   getTranslationFunction,
+  loadStepNamespace,
   setFormData,
 } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -93,6 +94,31 @@ export const step: StepDefinition = {
   postController: {
     post: async (req: Request, res: Response) => {
       const relatedApplicationId = req.body.relatedApplicationId as string | undefined;
+
+      if (!relatedApplicationId) {
+        await loadStepNamespace(req);
+        const getController = typeof step.getController === 'function' ? step.getController() : step.getController;
+        let pageContent: Record<string, unknown> = {};
+        const captureRes = {
+          render: (_view: string, content: Record<string, unknown>) => {
+            pageContent = content;
+          },
+        } as Response;
+
+        await getController.get(req, captureRes);
+
+        const t = pageContent.t as TFunction;
+        const errorMessage = t('errors.relatedApplicationId.required');
+
+        return res.status(400).render(templatePath, {
+          ...pageContent,
+          errorSummary: {
+            titleText: t('errors.title'),
+            errorList: [{ text: errorMessage, href: '#relatedApplicationId' }],
+          },
+          radioErrorMessage: { text: errorMessage },
+        });
+      }
 
       const t = getTranslationFunction(req);
       let relatedApplicationCategory: string | undefined;
