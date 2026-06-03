@@ -38,11 +38,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-year'] as string | undefined) ?? ''
       ).trim();
       if (!day || !month || !year) {
-        throw new Error('Missing universal credit application date submitted');
+        return;
       }
       const isoDate = formatDatePartsToISODate(day, month, year);
       if (!isoDate) {
-        throw new Error('Invalid universal credit application date submitted');
+        return;
       }
       hc.hasAppliedForUniversalCredit = toYesNoEnum('yes');
       hc.ucApplicationDate = isoDate;

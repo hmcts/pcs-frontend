@@ -1,4 +1,4 @@
-import { dashboard, feedback, howMuchAffordToPay, installmentPayments } from '../data/page-data';
+import { feedback, howMuchAffordToPay, installmentPayments, taskList } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function howMuchAffordToPayErrorValidation(): Promise<void> {
@@ -58,5 +58,5 @@ export async function howMuchAffordToPayNavigationTests(): Promise<void> {
     howMuchAffordToPay.affordToPayTextInput
   );
   await performAction('clickRadioButton', howMuchAffordToPay.monthlyRadioOption);
-  await performValidation('pageNavigation', howMuchAffordToPay.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', howMuchAffordToPay.saveForLaterButton, taskList.mainHeader);
 }
