@@ -18,16 +18,16 @@
   },
   "rows": {
     "otherConsiderations": {
-      "label": "Is there anything else you want the court to consider?",
-      "changeHidden": "whether there is anything else you want the court to consider"
+      "label": "Is there anything else you want to tell the court as part of your response?",
+      "changeHidden": "whether there is anything else you want to tell the court as part of your response"
     },
     "otherConsiderationsDetails": {
-      "label": "Give details about what else you want the court to consider",
-      "changeHidden": "the details about what else you want the court to consider"
+      "label": "Give details about what else you want to tell the court",
+      "changeHidden": "the details about what else you want to tell the court"
     },
     "languageUsed": {
-      "label": "Which language did you use to complete this service?",
-      "changeHidden": "which language you used to complete this service",
+      "label": "Which language did you use to complete your response?",
+      "changeHidden": "which language you used to complete your response",
       "options": {
         "ENGLISH": "English",
         "WELSH": "Welsh",
