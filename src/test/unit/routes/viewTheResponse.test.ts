@@ -27,7 +27,7 @@ jest.mock('@modules/i18n', () => ({
 
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
-    getViewDefendantResponse: jest.fn(),
+    getCaseById: jest.fn(),
   },
 }));
 
@@ -194,6 +194,13 @@ describe('viewTheResponse route', () => {
 
   const caseReference = '1234567890123456';
 
+  function mockCaseById(data: CcdCaseData) {
+    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+      id: caseReference,
+      data,
+    });
+  }
+
   function viewTheResponseRequest(options: {
     caseReference?: string | number;
     sessionUser?: { accessToken?: string };
@@ -228,8 +235,8 @@ describe('viewTheResponse route', () => {
     expect(app.get).toHaveBeenCalledWith(VIEW_RESPONSE_ROUTE, oidcMiddleware, expect.any(Function));
   });
 
-  it('should render the view-the-response template with case data from getViewDefendantResponse', async () => {
-    (ccdCaseService.getViewDefendantResponse as jest.Mock).mockResolvedValue({
+  it('should render the view-the-response template with case data from getCaseById', async () => {
+    mockCaseById({
       propertyAddress: {
         AddressLine1: '10 Second Avenue',
         PostTown: 'London',
@@ -259,7 +266,7 @@ describe('viewTheResponse route', () => {
       next
     );
 
-    expect(ccdCaseService.getViewDefendantResponse).toHaveBeenCalledWith('access-token-1', caseReference);
+    expect(ccdCaseService.getCaseById).toHaveBeenCalledWith('access-token-1', caseReference);
     expect(next).not.toHaveBeenCalled();
     expect(res.render).toHaveBeenCalledWith(
       'view-the-response',
@@ -284,7 +291,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should render all summary sections when case data is comprehensive', async () => {
-    (ccdCaseService.getViewDefendantResponse as jest.Mock).mockResolvedValue(buildComprehensiveCaseData());
+    mockCaseById(buildComprehensiveCaseData());
 
     viewTheResponseRoute(app);
     const handler = getHandler();
@@ -325,7 +332,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should show universal credit as no when not receiving or applying', async () => {
-    (ccdCaseService.getViewDefendantResponse as jest.Mock).mockResolvedValue({
+    mockCaseById({
       possessionClaimResponse: {
         defendantResponses: {
           householdCircumstances: {
@@ -361,7 +368,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should handle alternate yes/no branches and invalid dates', async () => {
-    (ccdCaseService.getViewDefendantResponse as jest.Mock).mockResolvedValue(buildAlternateBranchesCaseData());
+    mockCaseById(buildAlternateBranchesCaseData());
 
     viewTheResponseRoute(app);
     const handler = getHandler();
@@ -392,7 +399,11 @@ describe('viewTheResponse route', () => {
   });
 
   it('should accept numeric case reference params', async () => {
-    (ccdCaseService.getViewDefendantResponse as jest.Mock).mockResolvedValue({});
+    mockCaseById({
+      possessionClaimResponse: {
+        defendantResponses: { responseSubmittedDate: '2026-02-01' },
+      },
+    });
 
     viewTheResponseRoute(app);
     const handler = getHandler();
@@ -407,8 +418,27 @@ describe('viewTheResponse route', () => {
       next
     );
 
-    expect(ccdCaseService.getViewDefendantResponse).toHaveBeenCalledWith('access-token-1', caseReference);
+    expect(ccdCaseService.getCaseById).toHaveBeenCalledWith('access-token-1', caseReference);
     expect(next).not.toHaveBeenCalled();
+  });
+
+  it('should return 404 when defendant response is not on case data', async () => {
+    mockCaseById({});
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const next: NextFunction = jest.fn();
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      { render: jest.fn() } as unknown as Response,
+      next
+    );
+
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Defendant response not found' }));
   });
 
   it('should return 404 when case reference is invalid', async () => {
@@ -427,7 +457,7 @@ describe('viewTheResponse route', () => {
     );
 
     expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Invalid case reference format' }));
-    expect(ccdCaseService.getViewDefendantResponse).not.toHaveBeenCalled();
+    expect(ccdCaseService.getCaseById).not.toHaveBeenCalled();
   });
 
   it('should return 401 when access token is missing', async () => {
@@ -446,12 +476,12 @@ describe('viewTheResponse route', () => {
     );
 
     expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Authentication required' }));
-    expect(ccdCaseService.getViewDefendantResponse).not.toHaveBeenCalled();
+    expect(ccdCaseService.getCaseById).not.toHaveBeenCalled();
   });
 
-  it('should forward errors from getViewDefendantResponse', async () => {
+  it('should forward errors from getCaseById', async () => {
     const serviceError = new Error('CCD unavailable');
-    (ccdCaseService.getViewDefendantResponse as jest.Mock).mockRejectedValue(serviceError);
+    (ccdCaseService.getCaseById as jest.Mock).mockRejectedValue(serviceError);
 
     viewTheResponseRoute(app);
     const handler = getHandler();

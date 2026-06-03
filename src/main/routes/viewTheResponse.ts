@@ -454,8 +454,13 @@ export default function viewTheResponseRoutes(app: Application): void {
     }
 
     try {
-      const caseData = await ccdCaseService.getViewDefendantResponse(accessToken, caseReference);
+      const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
+      const caseData = ccdCase.data;
       const responses = caseData.possessionClaimResponse?.defendantResponses;
+
+      if (!responses) {
+        return next(new HTTPError('Defendant response not found', 404));
+      }
 
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
 
