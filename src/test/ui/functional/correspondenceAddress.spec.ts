@@ -2,11 +2,11 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   checkYourAnswersRTC,
   correspondenceAddress,
-  dashboard,
   defendantDateOfBirth,
   defendantNameConfirmation,
   freeLegalAdvice,
   startNow,
+  taskList,
 } from '../data/page-data';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -49,6 +49,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
@@ -126,6 +127,6 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
     });
     await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
     await performAction('clickButton', correspondenceAddress.saveForLaterButton);
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('mainHeader', taskList.mainHeader);
   });
 });
