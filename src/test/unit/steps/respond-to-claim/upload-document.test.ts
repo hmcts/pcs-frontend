@@ -61,6 +61,21 @@ describe('upload-document step', () => {
       expect(typeof testedStep.beforeRedirect).toBe('function');
     });
 
+    it('has an isAnswered that returns true once defendantDocuments has been touched (undefined → [])', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const isAnswered = (step as any).isAnswered as (req: unknown) => boolean;
+      const makeReq = (defendantDocuments: unknown) => ({
+        res: { locals: { validatedCase: { defendantResponses: { defendantDocuments } } } },
+      });
+
+      // Fresh case — field absent: not answered.
+      expect(isAnswered(makeReq(undefined))).toBe(false);
+      // Citizen submitted without uploading: empty array is the "touched" marker.
+      expect(isAnswered(makeReq([]))).toBe(true);
+      // Citizen has uploaded at least one document.
+      expect(isAnswered(makeReq([{ id: 'doc-1' }]))).toBe(true);
+    });
+
     it('carries a documentStorage adapter with read, readFresh, save', () => {
       expect(typeof testedStep.documentStorage?.read).toBe('function');
       expect(typeof testedStep.documentStorage?.readFresh).toBe('function');
