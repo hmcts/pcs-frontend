@@ -80,67 +80,52 @@ export const step: StepDefinition = {
         applications,
       };
     }),
-    postController: {
-      post: async (req: Request, res: Response) => {
-        const relatedApplicationId = req.body.relatedApplicationId as string | undefined;
+  postController: {
+    post: async (req: Request, res: Response) => {
+      const relatedApplicationId = req.body.relatedApplicationId as string | undefined;
 
-        if (!relatedApplicationId) {
-          await loadStepNamespace(req);
-          const getController = typeof step.getController === 'function' ? step.getController() : step.getController;
-          let pageContent: Record<string, unknown> = {};
-          const captureRes = {
-            render: (_view: string, content: Record<string, unknown>) => {
-              pageContent = content;
-            },
-          } as Response;
+      if (!relatedApplicationId) {
+        await loadStepNamespace(req);
+        const getController = typeof step.getController === 'function' ? step.getController() : step.getController;
+        let pageContent: Record<string, unknown> = {};
+        const captureRes = {
+          render: (_view: string, content: Record<string, unknown>) => {
+            pageContent = content;
+          },
+        } as Response;
 
-          await getController.get(req, captureRes);
-          const t = pageContent.t as TFunction;
-          const errorMessage = t('errors.relatedApplicationId.required');
+        await getController.get(req, captureRes);
+        const t = pageContent.t as TFunction;
+        const errorMessage = t('errors.relatedApplicationId.required');
 
-          return res.status(400).render(templatePath, {
-            ...pageContent,
-            errorSummary: {
-              titleText: t('errors.title'),
-              errorList: [{ text: errorMessage, href: '#relatedApplicationId' }],
-            },
-            radioErrorMessage: { text: errorMessage },
-          });
+        return res.status(400).render(templatePath, {
+          ...pageContent,
+          errorSummary: {
+            titleText: t('errors.title'),
+            errorList: [{ text: errorMessage, href: '#relatedApplicationId' }],
+          },
+          radioErrorMessage: { text: errorMessage },
+        });
+      }
+
+      const t = getTranslationFunction(req);
+      let relatedApplicationText = '';
+
+      if (relatedApplicationId === 'claim-or-counterclaim') {
+        relatedApplicationText = t('optionClaimOrCounterclaim');
+      } else {
+        const caseId = req.res?.locals.validatedCase?.id;
+        const accessToken = req.session?.user?.accessToken;
+        if (caseId && accessToken) {
+          const dashboardView = await ccdCaseService.getDashboardView(accessToken, caseId);
+          const app = dashboardView.relatedApplications.find(a => a.id === relatedApplicationId);
+          relatedApplicationText = buildApplicationText(t, app?.type, app?.applicationSubmittedDate);
         }
+      }
 
-        const t = getTranslationFunction(req);
-        let relatedApplicationText = '';
-
-        if (relatedApplicationId === 'claim-or-counterclaim') {
-          relatedApplicationText = t('optionClaimOrCounterclaim');
-        } else {
-          const caseId = req.res?.locals.validatedCase?.id;
-          const accessToken = req.session?.user?.accessToken;
-          if (caseId && accessToken) {
-            const dashboardView = await ccdCaseService.getDashboardView(accessToken, caseId);
-            const app = dashboardView.relatedApplications.find(a => a.id === relatedApplicationId);
-            relatedApplicationText = buildApplicationText(t, app?.type, app?.applicationSubmittedDate);
-          }
-        }
-
-        setFormData(req, stepName, { relatedApplicationId, relatedApplicationText });
-
-        const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
-        if (!redirectPath) {
-          return res.status(404).render('not-found');
-        }
-
-        return res.redirect(303, redirectPath);
-      },
-    },
-
-      setFormData(req, stepName, {
-        relatedApplicationId,
-        relatedApplicationText,
-      });
+      setFormData(req, stepName, { relatedApplicationId, relatedApplicationText });
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
-
       if (!redirectPath) {
         return res.status(404).render('not-found');
       }
