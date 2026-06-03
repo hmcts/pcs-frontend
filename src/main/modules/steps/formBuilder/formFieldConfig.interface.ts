@@ -149,6 +149,7 @@ export interface FormBuilderConfig {
   // Storage adapter for upload steps. When set, formBuilder auto-wires uploadUrl/deleteUrl
   // onto the fileUpload field component from req.originalUrl.
   documentStorage?: DocumentStorage;
+  isAnswered?: (req: Request) => boolean;
 }
 
 export interface ComponentConfig {

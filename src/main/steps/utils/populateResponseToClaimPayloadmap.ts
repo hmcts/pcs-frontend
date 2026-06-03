@@ -33,7 +33,7 @@ export const buildCcdCaseForPossessionClaimResponse = async (
   req: Request,
   possessionClaimResponse: PossessionClaimResponse
 ): Promise<CcdCase> => {
-  const existingValidatedCase = req.res?.locals?.validatedCase;
+  const existingValidatedCase = req.res?.locals.validatedCase;
   const { id: caseId } = existingValidatedCase ?? { id: '' };
   const ccdCase: CcdCase = {
     id: caseId,

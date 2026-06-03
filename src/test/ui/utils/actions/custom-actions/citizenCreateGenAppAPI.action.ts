@@ -24,17 +24,22 @@ export class CitizenCreateGenAppAPIAction implements IAction {
     ).data.token;
     const citizenCreateGenAppPayloadData =
       typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
+    // create config instance (defaults to ADJOURN if nothing passed)
+
+    const genAppApiConfig = citizenCreateGenAppApiData();
+
     try {
-      await citizenCreateGenAppApi.post(citizenCreateGenAppApiData.citizenCreateGenAppApiEndPoint(), {
+      await citizenCreateGenAppApi.post(genAppApiConfig.citizenCreateGenAppApiEndPoint(), {
         data: citizenCreateGenAppPayloadData,
-        event: { id: citizenCreateGenAppApiData.citizenCreateGenAppEventName },
+        event: { id: genAppApiConfig.citizenCreateGenAppEventName },
         event_token: GENAPP_EVENT_TOKEN,
       });
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 404) {
-          console.error(citizenCreateGenAppApiData.citizenCreateGenAppPayload);
+          console.error(citizenCreateGenAppPayloadData);
+          //console.error(citizenCreateGenAppApiData.citizenCreateGenAppPayload);
 
           throw new Error(
             `GenApp submission failed: endpoint not found (404). Please check the payload above.\n${error.message}`
