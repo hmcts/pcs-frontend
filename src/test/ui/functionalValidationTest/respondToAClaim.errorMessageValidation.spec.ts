@@ -350,7 +350,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       uploadFilesToSupportYourCounterclaimErrorValidation
     );
     await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
-    
+
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
