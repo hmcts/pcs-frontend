@@ -39,7 +39,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       'contact-preferences-text-message'
     );
     await expect(getNextStep(optedOutReq, 'contact-preferences-telephone', flowConfig, {})).resolves.toBe(
-      'dispute-claim-interstitial'
+      'check-your-answers-personal-details'
     );
   });
 
@@ -85,6 +85,8 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const englishReq = createReq({ legislativeCountry: 'England' });
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
+    // dispute-claim-interstitial is now the first step of disputeAndTenancy; the
+    // non-Wales back-walk lands on it after the hidden landlord-* steps are skipped.
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
       'dispute-claim-interstitial'
     );
@@ -106,21 +108,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
   };
 
-  it('routes back from your-household-and-circumstances to counter-claim when no counter-claim data in CCD', async () => {
-    const req = createReq({});
-    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'counter-claim'
-    );
-  });
-
-  it('uses valid static previous step for household interstitial path', async () => {
-    const req = createReq({ data: rentArrearsData });
-    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'repayments-agreed'
-    );
-  });
-
-  it('routes counter-claim forward to your-household-and-circumstances when makeCounterClaim is NO (non-rent-arrears-only)', async () => {
+  it('routes counter-claim NO to section CYA for non-rent-arrears-only claims', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
@@ -132,10 +120,12 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('your-household-and-circumstances');
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
+      'check-your-answers-your-response'
+    );
   });
 
-  it('routes counter-claim forward to payment-interstitial when makeCounterClaim is NO (rent-arrears)', async () => {
+  it('routes counter-claim NO to section CYA for rent-arrears claims', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }, { value: { isRentArrears: 'NO' } }],
@@ -147,7 +137,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {})).resolves.toBe('payment-interstitial');
+    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
+      'check-your-answers-your-response'
+    );
   });
 
   it('routes counter-claim YES to what-are-you-claiming-for', async () => {

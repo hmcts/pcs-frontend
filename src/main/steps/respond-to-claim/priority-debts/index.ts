@@ -8,6 +8,7 @@ const STEP_NAME = 'priority-debts';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.priorityDebts),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const selection = req.body?.havePriorityDebts as string | undefined;

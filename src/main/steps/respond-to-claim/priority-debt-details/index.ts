@@ -43,6 +43,11 @@ const validateMoney =
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'priority-debt-details',
+  isAnswered: req =>
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.debtTotal ||
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.debtContribution
+    ),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const total = req.body?.priorityDebtTotal as string | undefined;

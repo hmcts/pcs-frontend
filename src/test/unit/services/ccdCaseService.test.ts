@@ -384,6 +384,7 @@ describe('ccdCaseService', () => {
           },
         ],
         propertyAddress: '1 Test Street, London, SW1A 1AA',
+        relatedApplications: [],
       });
     });
 
@@ -402,6 +403,7 @@ describe('ccdCaseService', () => {
         notifications: [],
         taskGroups: [],
         propertyAddress: undefined,
+        relatedApplications: [],
       });
     });
 

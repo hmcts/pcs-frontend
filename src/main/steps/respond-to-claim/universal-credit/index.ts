@@ -15,6 +15,8 @@ const STEP_NAME = 'have-you-applied-for-universal-credit';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.hasAppliedForUniversalCredit),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const selection = req.body?.haveAppliedForUniversalCredit as string | undefined;

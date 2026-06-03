@@ -8,3 +8,5 @@ export const legalRepStepRegistry = {
 
   'select-defendant': selectDefendant,
 } satisfies Record<string, StepDefinition>;
+
+export type LegalRepRespondToClaimStepName = keyof typeof legalRepStepRegistry;

@@ -34,3 +34,21 @@ export function formatCcdAddress(address: CcdCaseAddress | undefined | null): st
     address.Country,
   ]);
 }
+
+/** The non-empty address parts, in display order — one per line for CYA rendering. */
+export function formatCcdAddressLines(address: CcdCaseAddress | undefined | null): string[] {
+  if (!address) {
+    return [];
+  }
+  return [
+    address.AddressLine1,
+    address.AddressLine2,
+    address.AddressLine3,
+    address.PostTown,
+    address.County,
+    address.PostCode,
+    address.Country,
+  ]
+    .map(part => part?.trim())
+    .filter((part): part is string => !!part);
+}

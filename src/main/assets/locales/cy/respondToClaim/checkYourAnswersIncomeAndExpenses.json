@@ -1,0 +1,76 @@
+{
+  "pageTitle": "cy Check your answers",
+  "cardTitle": "cy Income and expenses",
+  "frequencies": {
+    "WEEKLY": "cy every week",
+    "MONTHLY": "cy every month"
+  },
+  "incomeFrequencies": {
+    "WEEKLY": "cy received every week",
+    "MONTHLY": "cy received every month"
+  },
+  "paymentFrequencies": {
+    "WEEKLY": "cy paid every week",
+    "MONTHLY": "cy paid every month"
+  },
+  "rows": {
+    "shareIncomeExpenseDetails": {
+      "label": "cy Do you want to provide details of your income and expenses?",
+      "changeHidden": "cy share income and expense details"
+    },
+    "regularIncome": {
+      "label": "cy What regular income do you receive?",
+      "changeHidden": "cy regular income",
+      "options": {
+        "incomeFromJobs": "cy Income from all jobs you do",
+        "pension": "cy Pension – state and private",
+        "universalCredit": "cy Universal Credit",
+        "otherBenefits": "cy Other benefits and credits",
+        "moneyFromElsewhere": "cy Money from somewhere else (for example, child maintenance payments or someone in your household gives you money)"
+      }
+    },
+    "hasAppliedForUniversalCredit": {
+      "label": "cy Have you applied for Universal Credit?",
+      "changeHidden": "cy applied for Universal Credit"
+    },
+    "universalCreditApplicationDate": {
+      "label": "cy When did you apply for Universal Credit?",
+      "changeHidden": "cy Universal Credit application date"
+    },
+    "priorityDebts": {
+      "label": "cy Do you have any priority debts?",
+      "changeHidden": "cy priority debts"
+    },
+    "priorityDebtTotal": {
+      "label": "cy What is the total amount you owe for all your priority debts?",
+      "changeHidden": "cy priority debt total"
+    },
+    "priorityDebtContribution": {
+      "label": "cy How much do you pay towards your priority debts each week or month?",
+      "changeHidden": "cy priority debt contribution"
+    },
+    "regularExpenses": {
+      "label": "cy What other regular expenses do you have?",
+      "changeHidden": "cy regular expenses",
+      "options": {
+        "householdBills": "cy Household bills (for example, council tax, gas, electricity, water, internet)",
+        "loanPayments": "cy Loan payments",
+        "childSpousalMaintenance": "cy Child or spousal maintenance",
+        "mobilePhone": "cy Mobile phone",
+        "groceryShopping": "cy Grocery shopping",
+        "fuelParkingTransport": "cy Fuel, parking and transport",
+        "schoolCosts": "cy School costs (for example, uniform and school dinners)",
+        "clothing": "cy Clothing",
+        "otherExpenses": "cy Other"
+      }
+    },
+    "otherConsiderations": {
+      "label": "cy Is there anything else you want to tell the court?",
+      "changeHidden": "cy other considerations"
+    },
+    "otherConsiderationsDetails": {
+      "label": "cy Give details about what else you want to tell the court",
+      "changeHidden": "cy other considerations details"
+    }
+  }
+}

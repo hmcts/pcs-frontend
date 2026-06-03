@@ -6,6 +6,8 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.alternativeAccommodation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/alternativeAccommodation.njk`,
   translationKeys: {
@@ -48,7 +50,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: req => {
     const caseData =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     const existing = caseData?.alternativeAccommodation;
     const existingDate = caseData?.alternativeAccommodationTransferDate;
 
@@ -84,6 +86,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         const isoDate = formatDatePartsToISODate(day, month, year);
         if (isoDate) {
           response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate = isoDate;
+        } else {
+          // Optional date cleared on edit - drop it from the cloned draft so it isn't re-sent.
+          delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
         }
       } else {
         delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
