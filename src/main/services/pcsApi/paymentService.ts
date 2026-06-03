@@ -5,16 +5,6 @@ import { http } from '@modules/http';
 export type PaymentLanguage = 'English' | 'Welsh';
 export type PaymentOutcome = 'success' | 'failure' | 'pending';
 
-export interface CreateServiceRequestPayload {
-  caseReference: string | number;
-  feeType: string;
-}
-
-export interface CreateServiceRequestResponse {
-  serviceRequestReference: string;
-  feeAmount: number;
-}
-
 export interface CreateCardPaymentRequest {
   amount: number;
   language: PaymentLanguage;
@@ -33,15 +23,13 @@ export interface CardPaymentStatusResponse {
 
 export interface StartCardPaymentJourneyInput {
   accessToken: string;
-  caseReference: string | number;
-  feeType: string;
+  serviceRequestReference: string;
   amount: number;
   requestLanguage?: string;
   returnUrl: string;
 }
 
 export interface StartCardPaymentJourneyResult {
-  serviceRequestReference: string;
   paymentReference: string;
   paymentStatus: string;
   nextUrl: string;
@@ -81,19 +69,6 @@ export function getPaymentOutcome(status?: string): PaymentOutcome {
 }
 
 export const paymentService = {
-  async createServiceRequest(
-    accessToken: string,
-    payload: CreateServiceRequestPayload
-  ): Promise<CreateServiceRequestResponse> {
-    const pcsApiURL = getBaseUrl();
-    const response = await http.post<CreateServiceRequestResponse>(
-      `${pcsApiURL}/payment/service-request`,
-      payload,
-      getUserAuthHeaders(accessToken)
-    );
-    return response.data;
-  },
-
   async createCardPaymentRequest(
     accessToken: string,
     serviceRequestReference: string,
@@ -118,23 +93,13 @@ export const paymentService = {
   },
 
   async startCardPaymentJourney(input: StartCardPaymentJourneyInput): Promise<StartCardPaymentJourneyResult> {
-    const serviceRequestResponse = await this.createServiceRequest(input.accessToken, {
-      caseReference: input.caseReference,
-      feeType: input.feeType,
+    const paymentResponse = await this.createCardPaymentRequest(input.accessToken, input.serviceRequestReference, {
+      amount: input.amount,
+      language: mapRequestLanguageToPaymentLanguage(input.requestLanguage),
+      returnUrl: input.returnUrl,
     });
 
-    const paymentResponse = await this.createCardPaymentRequest(
-      input.accessToken,
-      serviceRequestResponse.serviceRequestReference,
-      {
-        amount: input.amount,
-        language: mapRequestLanguageToPaymentLanguage(input.requestLanguage),
-        returnUrl: input.returnUrl,
-      }
-    );
-
     return {
-      serviceRequestReference: serviceRequestResponse.serviceRequestReference,
       paymentReference: paymentResponse.paymentReference,
       paymentStatus: paymentResponse.status,
       nextUrl: paymentResponse.nextUrl,

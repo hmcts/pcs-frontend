@@ -26,28 +26,6 @@ describe('paymentService', () => {
     jest.clearAllMocks();
   });
 
-  it('creates a service request with user auth headers', async () => {
-    const responsePayload = { serviceRequestReference: 'SR-123', feeAmount: 10.99 };
-    mockHttp.post.mockResolvedValue({ data: responsePayload });
-
-    const response = await paymentService.createServiceRequest('token-123', {
-      caseReference: '9315681809157729',
-      feeType: 'genAppStandardFee',
-    });
-
-    expect(response).toEqual(responsePayload);
-    expect(mockHttp.post).toHaveBeenCalledWith(
-      `${testApiBase}/payment/service-request`,
-      { caseReference: '9315681809157729', feeType: 'genAppStandardFee' },
-      {
-        headers: {
-          Authorization: 'Bearer token-123',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-  });
-
   it('creates a card payment request with encoded service request reference', async () => {
     const responsePayload = { paymentReference: 'RC-123', status: 'Created', nextUrl: 'https://next.url' };
     mockHttp.post.mockResolvedValue({ data: responsePayload });
@@ -90,43 +68,26 @@ describe('paymentService', () => {
     });
   });
 
-  it('starts card payment journey by chaining service request and card payment request', async () => {
-    mockHttp.post
-      .mockResolvedValueOnce({ data: { serviceRequestReference: 'SR-123', feeAmount: 10.99 } })
-      .mockResolvedValueOnce({
-        data: { paymentReference: 'RC-123', status: 'Created', nextUrl: 'https://gov.pay/url' },
-      });
+  it('starts card payment journey from an existing service request reference', async () => {
+    mockHttp.post.mockResolvedValue({
+      data: { paymentReference: 'RC-123', status: 'Created', nextUrl: 'https://gov.pay/url' },
+    });
 
     const response = await paymentService.startCardPaymentJourney({
       accessToken: 'token-123',
-      caseReference: '9315681809157729',
-      feeType: 'genAppStandardFee',
+      serviceRequestReference: 'SR-123',
       amount: 10.99,
       requestLanguage: 'cy',
       returnUrl: 'https://frontend/payment/return',
     });
 
     expect(response).toEqual({
-      serviceRequestReference: 'SR-123',
       paymentReference: 'RC-123',
       paymentStatus: 'Created',
       nextUrl: 'https://gov.pay/url',
     });
 
-    expect(mockHttp.post).toHaveBeenNthCalledWith(
-      1,
-      `${testApiBase}/payment/service-request`,
-      { caseReference: '9315681809157729', feeType: 'genAppStandardFee' },
-      {
-        headers: {
-          Authorization: 'Bearer token-123',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    expect(mockHttp.post).toHaveBeenNthCalledWith(
-      2,
+    expect(mockHttp.post).toHaveBeenCalledWith(
       `${testApiBase}/payment/service-request/SR-123/card-payment`,
       { amount: 10.99, language: 'Welsh', returnUrl: 'https://frontend/payment/return' },
       {

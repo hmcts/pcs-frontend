@@ -3,7 +3,8 @@ import type { Request } from 'express';
 export interface PaymentSessionState {
   caseReference?: string;
   serviceRequestReference?: string;
-  paymentReference: string;
+  paymentReference?: string;
+  feeAmount?: number;
   successRedirectUrl?: string;
   failureRedirectUrl?: string;
   pendingRedirectUrl?: string;

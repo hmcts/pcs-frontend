@@ -31,6 +31,7 @@ interface CustomSessionData extends SessionData {
     caseReference?: string;
     serviceRequestReference?: string;
     paymentReference?: string;
+    feeAmount?: number;
     successRedirectUrl?: string;
     failureRedirectUrl?: string;
     pendingRedirectUrl?: string;
