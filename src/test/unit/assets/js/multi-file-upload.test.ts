@@ -40,6 +40,8 @@ function setupDOM() {
            data-max-file-size-mb="1024"
            data-error-wrong-type="Wrong file type"
            data-error-file-too-large="File too large"
+           data-error-file-name-too-long="File name too long"
+           data-max-filename-length="255"
            data-error-delete="Delete failed"
            data-error-summary-title="There is a problem"
            data-delete-button-text="Remove">
@@ -139,6 +141,20 @@ describe('multi-file-upload', () => {
 
     it('allows valid files without error', () => {
       expect(() => capturedHooks.entryHook(null, { name: 'doc.pdf', size: 1024 })).not.toThrow();
+    });
+
+    it('throws for filenames exceeding max length', () => {
+      const longName = `${'a'.repeat(252)}.pdf`;
+      expect(longName.length).toBe(256);
+      expect(() => capturedHooks.entryHook(null, { name: longName, size: 1024 })).toThrow('file_name_too_long');
+      const summary = document.querySelector('.govuk-error-summary');
+      expect(summary!.textContent).toContain('File name too long');
+    });
+
+    it('allows filenames at max length', () => {
+      const maxName = `${'a'.repeat(251)}.pdf`;
+      expect(maxName.length).toBe(255);
+      expect(() => capturedHooks.entryHook(null, { name: maxName, size: 1024 })).not.toThrow();
     });
 
     it('clears previous error summary', () => {
