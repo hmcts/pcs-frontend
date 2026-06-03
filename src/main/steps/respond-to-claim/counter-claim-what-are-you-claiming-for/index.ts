@@ -5,6 +5,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-what-are-you-claiming-for',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.counterClaim?.claimType),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimWhatAreYouClaimingFor.njk`,
   translationKeys: {
@@ -30,7 +31,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: req => {
     const claimType =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim?.claimType;
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim?.claimType;
 
     if (!claimType) {
       return {};
@@ -45,8 +46,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     if (claimType) {
       response.defendantResponses.counterClaim.claimType = claimType;
+      if (claimType === 'SOMETHING_ELSE') {
+        delete response.defendantResponses.counterClaim.isClaimAmountKnown;
+        delete response.defendantResponses.counterClaim.claimAmount;
+        delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
+      }
     } else {
       delete response.defendantResponses.counterClaim.claimType;
+      delete response.defendantResponses.counterClaim.isClaimAmountKnown;
+      delete response.defendantResponses.counterClaim.claimAmount;
+      delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
     }
 
     await saveDraftDefendantResponse(req, response);

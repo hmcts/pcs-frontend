@@ -17,7 +17,7 @@ export const isFinanceDetailsProvided = (req: Request): boolean => {
   }
 
   const ccdAnswer =
-    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances
+    req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances
       ?.shareIncomeExpenseDetails;
 
   return normalizeYesNoValue(ccdAnswer) === 'YES';

@@ -5,6 +5,9 @@
   "ccd": {
     "url": "http://localhost:4452"
   },
+  "cdam": {
+    "url": "http://localhost:4455"
+  },
   "s2s": {
     "url": "http://localhost:8489"
   },
@@ -13,5 +16,8 @@
   },
   "xui": {
     "uri": "http://localhost:3000"
+  },
+  "feeService": {
+    "url": "http://localhost:8180"
   }
 }

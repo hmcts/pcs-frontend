@@ -32,10 +32,11 @@
     "yes": "cyYes",
     "no": "cyNo",
     "or": "cyor",
-    "imNotSure": "cyI'm not sure"
+    "imNotSure": "cyI’m not sure"
   },
   "change": "cyChange",
   "back": "cyBack",
+  "noAnswerProvided": "cyNo answer provided",
   "date": {
     "day": "cyDay",
     "month": "cyMonth",
@@ -71,8 +72,7 @@
     },
     "documentUpload": {
       "wrongFileTypeDocStore": "cyThe selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
-      "fileTooLargeDocStore": "cyThe selected file must be smaller than {{maxSize}}MB",
-      "fileTotalTooLargeDocStore": "cyThe total size of all uploaded files must be smaller than {{maxSize}}MB",
+      "fileTooLargeDocStore": "cyThe selected file must be smaller than 1GB",
       "noFileSelected": "cySelect a file to upload",
       "uploadFailed": "cyThe file could not be uploaded – try again",
       "fileDeleteFailed": "cyThe file could not be removed – try again",
@@ -148,6 +148,16 @@
     "noApplicationIdInSession": {
       "title": "cyApplication not available",
       "paragraph": "cyThis application is not available. It may have already been submitted in a different window."
+    },
+    "documentNotAvailable": {
+      "title": "cyDocument not available",
+      "paragraph": "cyThe selected file could not be downloaded – try again."
     }
+  },
+  "taskList": {
+    "startNowAndDetails": "cy Free Legal Advice",
+    "personalDetails": "cy Confirm your details and contact preferences",
+    "disputeAndTenancy": "cy Response",
+    "situationAndCircumstances": "cy Your circumstances"
   }
 }

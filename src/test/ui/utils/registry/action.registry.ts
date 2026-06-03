@@ -9,7 +9,9 @@ import {
   RecordAnswers,
   RespondToClaimAction,
   TriggerPageFunctionalTestsAction,
+  respondPossessionClaimAPIAction,
 } from '../actions/custom-actions';
+import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -43,11 +45,16 @@ export class ActionRegistry {
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
+    ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
+    ['citizenDashboard', new CitizenDashboardAction()],
+    ['verifyRespondToClaimNotificationAndTag', new CitizenDashboardAction()],
+    ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['startEvidenceUpload', new DocumentsAction()],
     ['validateViewDocuments', new DocumentsAction()],
+    ['verifyDocumentRelatesToApplication', new DocumentsAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
@@ -91,11 +98,17 @@ export class ActionRegistry {
     ['enterPriorityDebtDetails', new RespondToClaimAction()],
     ['selectCounterClaim', new RespondToClaimAction()],
     ['selectWhatOtherRegularExpensesDoYouHave', new RespondToClaimAction()],
+    ['readReasonableAdjustmentsTriage', new RespondToClaimAction()],
+    ['counterClaimHaveYouAppliedForHelpWithFee', new RespondToClaimAction()],
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['resetRTCAnswerStore', new RespondToClaimAction()],
+    ['retrieveCYATableDataRTC', new RespondToClaimAction()],
+    ['validateCYARTC', new RespondToClaimAction()],
+    ['validateRTCSectionCYA', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
@@ -115,6 +128,11 @@ export class ActionRegistry {
     ['reviewCYA', new GenAppsAction()],
     ['selectStatementOfTruth', new GenAppsAction()],
     ['reviewAndUpdateCYA', new GenAppsAction()],
+    ['otherConsiderations', new RespondToClaimAction()],
+    ['accessYourCase', new RespondToClaimAction()],
+    ['selectClaimAgainstWhom', new RespondToClaimAction()],
+    ['counterClaimAbout', new RespondToClaimAction()],
+    ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
   ]);
 
