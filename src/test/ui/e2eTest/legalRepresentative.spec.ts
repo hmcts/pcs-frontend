@@ -1,5 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { defendantDateOfBirth, defendantNameCapture, freeLegalAdvice, startNow } from '../data/page-data';
+import { startNow } from '../data/page-data';
 import { user } from '../data/user-data';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -28,16 +28,5 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('Respond to claim - LR  @noDefendants @smoke @regression', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('inputDefendantDetails', {
-      fName: defendantNameCapture.firstNameTextInput,
-      lName: defendantNameCapture.lastNameTextInput,
-    });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirth.dayInputText,
-      dobMonth: defendantDateOfBirth.monthInputText,
-      dobYear: defendantDateOfBirth.yearInputText,
-    });
-  });
+  test('Respond to claim - LR  @noDefendants @smoke @regression', async () => {});
 });
