@@ -1,7 +1,7 @@
 import {
-  dashboard,
   doAnyOtherAdultsLiveInYourHome,
   feedback,
+  taskList,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
 } from '../data/page-data';
 import { getRelativeDate } from '../utils/common/string.utils';
@@ -93,6 +93,6 @@ export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeNavi
   await performValidation(
     'pageNavigation',
     wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveForLaterButton,
-    dashboard.mainHeader
+    taskList.mainHeader
   );
 }

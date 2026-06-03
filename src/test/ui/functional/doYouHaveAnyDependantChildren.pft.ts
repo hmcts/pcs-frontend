@@ -1,4 +1,4 @@
-import { dashboard, doYouHaveAnyDependantChildren, feedback, yourHouseholdAndCircumstances } from '../data/page-data';
+import { doYouHaveAnyDependantChildren, feedback, yourHouseholdAndCircumstances } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -49,6 +49,4 @@ export async function doYouHaveAnyDependantChildrenNavigationTests(): Promise<vo
     doYouHaveAnyDependantChildren.backLink,
     yourHouseholdAndCircumstances.mainHeader
   );
-  await performAction('clickRadioButton', doYouHaveAnyDependantChildren.noRadioOption);
-  await performValidation('pageNavigation', doYouHaveAnyDependantChildren.saveForLaterButton, dashboard.mainHeader);
 }

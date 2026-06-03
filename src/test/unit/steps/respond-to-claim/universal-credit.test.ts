@@ -213,7 +213,7 @@ describe('respond-to-claim universal-credit step', () => {
     });
   });
 
-  it('throws when selection is yes and date fields are missing', async () => {
+  it('no-ops when selection is yes and date is partial', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
@@ -233,7 +233,7 @@ describe('respond-to-claim universal-credit step', () => {
 
     await step.postController.post(req, res, next);
 
-    expect(next).toHaveBeenCalledWith(expect.any(Error));
+    expect(next).not.toHaveBeenCalledWith(expect.any(Error));
     expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
   });
 });

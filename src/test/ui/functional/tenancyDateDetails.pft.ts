@@ -1,4 +1,4 @@
-import { dashboard, feedback, tenancyDateDetails, tenancyTypeDetails } from '../data/page-data';
+import { feedback, taskList, tenancyDateDetails, tenancyTypeDetails } from '../data/page-data';
 import { performAction, performActions, performValidation } from '../utils/controller';
 
 export async function tenancyDateDetailsErrorValidation(): Promise<void> {
@@ -56,5 +56,5 @@ export async function tenancyDateDetailsNavigationTests(): Promise<void> {
   });
   await performValidation('pageNavigation', tenancyDateDetails.backLink, tenancyTypeDetails.mainHeader);
   await performAction('clickRadioButton', tenancyDateDetails.yesRadioOption);
-  await performValidation('pageNavigation', tenancyDateDetails.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', tenancyDateDetails.saveForLaterButton, taskList.mainHeader);
 }
