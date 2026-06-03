@@ -47,7 +47,7 @@ export function createCcdDraftStorage(opts: {
 }): DocumentStorage {
   return {
     async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-      const data = (req.res?.locals?.validatedCase?.data ?? {}) as CcdCaseData;
+      const data = (req.res?.locals.validatedCase?.data ?? {}) as CcdCaseData;
       return opts.getDocs(data) ?? [];
     },
 

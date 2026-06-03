@@ -54,6 +54,7 @@ export class ActionRegistry {
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['startEvidenceUpload', new DocumentsAction()],
     ['validateViewDocuments', new DocumentsAction()],
+    ['verifyDocumentRelatesToApplication', new DocumentsAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
@@ -106,6 +107,10 @@ export class ActionRegistry {
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['resetRTCAnswerStore', new RespondToClaimAction()],
+    ['retrieveCYATableDataRTC', new RespondToClaimAction()],
+    ['validateCYARTC', new RespondToClaimAction()],
+    ['validateRTCSectionCYA', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],

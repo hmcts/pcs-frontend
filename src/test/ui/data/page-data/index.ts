@@ -59,4 +59,5 @@ export * from './counterClaimSpecificSumOfMoney.page.data';
 export * from './counterClaimWhatAreYouClaimingFor.page.data';
 export * from './counterClaimAgainstWhom.page.data';
 export * from './uploadFilesToSupportYourCounterclaim.page.data';
+export * from './checkYourAnswersRTC.page.data';
 export * from './counterClaimOrderOtherThanSum.page.data';

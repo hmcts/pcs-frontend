@@ -5,6 +5,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'contact-preferences-text-message',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.contactByText),
   showCancelButton: false,
   stepDir: __dirname,
 
@@ -37,7 +38,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
 
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.possessionClaimResponse;
+    const caseData = req.res?.locals.validatedCase?.possessionClaimResponse;
     const contactByText = caseData?.defendantResponses?.contactByText as string | undefined;
 
     const result: Record<string, unknown> = {};

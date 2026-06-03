@@ -50,33 +50,26 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
-    const alreadyAppliedForHelp: string | undefined = req.body?.alreadyAppliedForHelp;
-
-    if (!alreadyAppliedForHelp) {
-      return;
-    }
-
-    const enumMapping: Record<string, YesNoValue> = {
-      yes: 'YES',
-      no: 'NO',
-    };
-
-    const appliedForHwf = enumMapping[alreadyAppliedForHelp];
-    if (!appliedForHwf) {
-      return;
-    }
-
-    const hwfReference: string | undefined =
-      alreadyAppliedForHelp === 'yes'
-        ? (req.body?.['alreadyAppliedForHelp.hwfReference'] as string | undefined)
-        : undefined;
-
+    const selection = req.body?.alreadyAppliedForHelp as string | undefined;
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.counterClaim = {
-      ...response.defendantResponses.counterClaim,
-      appliedForHwf,
-      ...(appliedForHwf === 'YES' && { hwfReferenceNumber: hwfReference ?? '' }),
-    };
+    response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
+    const cc = response.defendantResponses.counterClaim;
+
+    if (selection === 'yes') {
+      cc.appliedForHwf = 'YES';
+      const ref = (req.body?.['alreadyAppliedForHelp.hwfReference'] as string | undefined)?.trim();
+      if (ref) {
+        cc.hwfReferenceNumber = ref;
+      } else {
+        delete cc.hwfReferenceNumber;
+      }
+    } else if (selection === 'no') {
+      cc.appliedForHwf = 'NO';
+      delete cc.hwfReferenceNumber;
+    } else {
+      delete cc.appliedForHwf;
+      delete cc.hwfReferenceNumber;
+    }
 
     await saveDraftDefendantResponse(req, response);
   },

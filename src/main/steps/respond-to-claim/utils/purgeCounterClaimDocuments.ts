@@ -8,7 +8,7 @@ import { deleteDocument } from '@services/cdamService';
 
 const logger = Logger.getLogger('purgeCounterClaimDocuments');
 
-// Best-effort purge of any previously uploaded counter-claim documents from CDAM.
+// Purge of any previously uploaded counter-claim documents from CDAM.
 // Mirrors the per-document delete pattern used by documentProxy.removeDraftDocument.
 // CDAM failures are logged but never thrown — the normaliser will still strip the
 // metadata from the draft, so the user sees a consistent state.

@@ -57,8 +57,8 @@ describe('upload-document step', () => {
       );
     });
 
-    it('does not have beforeRedirect - documents saved on upload/delete', () => {
-      expect(testedStep.beforeRedirect).toBeUndefined();
+    it('has a beforeRedirect that triggers the section-completion clear on Continue', () => {
+      expect(typeof testedStep.beforeRedirect).toBe('function');
     });
 
     it('carries a documentStorage adapter with read, readFresh, save', () => {
