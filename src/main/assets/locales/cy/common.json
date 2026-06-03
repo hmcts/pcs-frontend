@@ -155,9 +155,13 @@
     }
   },
   "taskList": {
-    "startNowAndDetails": "cy Free Legal Advice",
-    "personalDetails": "cy Confirm your details and contact preferences",
-    "disputeAndTenancy": "cy Response",
-    "situationAndCircumstances": "cy Your circumstances"
+    "startNowAndDetails": "cyRead information about responding and free legal advice",
+    "personalDetails": "cyConfirm your details and contact preferences",
+    "disputeAndTenancy": "cyRespond to specific parts of the claimant’s claim",
+    "situationAndCircumstances": "cyGive details about your household and circumstances",
+    "payments": "cyDeclare recent payments or agreements made",
+    "incomeAndExpenditure": "cyGive details about your income and expenses",
+    "uploadFiles": "cyUpload documents",
+    "checkYourAnswersAndSubmit": "cyCheck your answers and submit"
   }
 }

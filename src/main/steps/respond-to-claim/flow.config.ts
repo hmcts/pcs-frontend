@@ -39,7 +39,9 @@ export const flowConfig: JourneyFlowConfig = {
   useShowConditions: true,
   useSessionFormData: false,
   sections: respondToClaimSections,
-  nonSectionStepOrder: ['end-now'],
+  nonSectionStepOrder: ['end-now', 'task-list'],
+  // First visible step of any section back-links to this hub step.
+  hubStepName: 'task-list',
   steps: {
     'ask-your-solicitor-to-respond-to-the-claim': {
       showCondition: (req: Request) =>

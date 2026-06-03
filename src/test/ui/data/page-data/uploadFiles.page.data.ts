@@ -6,6 +6,6 @@ export const uploadFiles = {
   uploadFileParagraph: `Upload a file`,
   chooseFileButton: `Choose files`,
   saveAndContinueButton: `Save and continue`,
-  saveAndForLaterButton: `Save for later`,
+  saveForLaterButton: `Save for later`,
   backLink: `Back`,
 };

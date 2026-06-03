@@ -20,6 +20,7 @@ import {
   doYouHaveASolicitor,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  endNow,
   equalityAndDiversityEnd,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -38,6 +39,7 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   startNow,
+  taskList,
   tenancyDateDetails,
   tenancyTypeDetails,
   whatOtherRegularExpensesDoYouHave,
@@ -58,13 +60,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
   if (testInfo.title.includes('Secure')) {
     process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
-  }
-
-  //Page navigation for paymentInterstitial
-  if (testInfo.title.includes('SelectCounterClaim - Yes')) {
-    process.env.SELECT_COUNTER_CLAIM = 'YES';
-  } else {
-    process.env.SELECT_COUNTER_CLAIM = 'NO';
   }
 
   submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
@@ -96,19 +91,6 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.SOMETHING_ELSE = 'NO';
   }
 
-  //paymentInterstitial back navigation
-  if (testInfo.title.includes('CounterClaimFee - INeedHelp')) {
-    process.env.I_NEED_HELP = 'YES';
-  } else {
-    process.env.I_NEED_HELP = 'NO';
-  }
-
-  if (testInfo.title.includes('SelectCounterClaim - No')) {
-    process.env.SELECT_COUNTER_CLAIM = 'NO';
-  } else {
-    process.env.SELECT_COUNTER_CLAIM = 'YES';
-  }
-
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
@@ -132,6 +114,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -159,6 +142,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
     await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
     await performAction('selectLandlordLicensed', {
@@ -215,6 +199,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -230,6 +215,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'payments');
     await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -256,6 +242,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
     await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -292,10 +279,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -305,6 +294,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+    await performAction('clickButton', 'Save and continue');
+    await performAction('clickButton', endNow.continueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+        taskList.checkYourAnswersAndSubmitHiddenLink,
+        taskList.declareRecentPaymentsHiddenLink,
+      ],
+      status: 'Done',
+    });
   });
 
   test('Respond to a claim - Wales - Standard contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes @noDefendants', async () => {
@@ -313,6 +316,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -340,6 +344,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiDataWales.submitCaseRentNonRentStandard.isClaimantNameCorrect
@@ -394,6 +399,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -409,6 +415,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'payments');
     await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     //Below code is disabled due to bug https://tools.hmcts.net/jira/browse/HDPI-6339
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
@@ -434,6 +441,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -461,6 +469,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiDataWales.submitCaseRentOtherTenancy.isClaimantNameCorrect
@@ -524,6 +533,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -551,6 +561,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiDataWales.submitCaseNonRentStandard.isClaimantNameCorrect
@@ -584,6 +595,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -609,6 +621,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -636,6 +649,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
       'disputeClaimInterstitial',
       submitCaseApiDataWales.submitCaseNonRentStandard.isClaimantNameCorrect

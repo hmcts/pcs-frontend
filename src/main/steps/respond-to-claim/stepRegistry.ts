@@ -58,6 +58,7 @@ import { step as repaymentsMade } from './repayments-made';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
 import { step as solicitor } from './solicitor';
 import { step as startNow } from './start-now';
+import { step as taskList } from './task-list';
 import { step as tenancyDateDetails } from './tenancy-date-details';
 import { step as tenancyDateUnknown } from './tenancy-date-unknown';
 import { step as tenancyTypeDetails } from './tenancy-type-details';
@@ -81,6 +82,7 @@ export const stepRegistry = {
   'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'end-now': endNow,
+  'task-list': taskList,
   'check-your-answers-start-now-and-details': checkYourAnswersStartNowAndDetails,
   'check-your-answers-personal-details': checkYourAnswersPersonalDetails,
   'check-your-answers-your-response': checkYourAnswersYourResponse,

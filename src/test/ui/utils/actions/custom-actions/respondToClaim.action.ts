@@ -195,6 +195,7 @@ export class RespondToClaimAction implements IAction {
         'selectIfAnyOtherAdultsLiveInYourHouse',
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
       ],
+      ['taskList', () => this.taskList(fieldName as actionRecord)],
       ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
       ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
@@ -210,6 +211,7 @@ export class RespondToClaimAction implements IAction {
       ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
+      ['taskListStatus', () => this.taskListStatus(fieldName as actionRecord)],
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
       ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page, fieldName as actionData)],
       ['validateCYARTC', () => this.validateCYARTC()],
@@ -498,8 +500,7 @@ export class RespondToClaimAction implements IAction {
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
       await this.selectCorrespondenceAddressUnKnown(addressData);
     } else {
-      const selectedPinUser = getSelectedPinUser();
-      this.recordAnswer(correspondenceAddress.correspondenceAddressUnKnownMainHeader, selectedPinUser?.address ?? '');
+      this.recordAnswer(correspondenceAddress.correspondenceAddressKnownMainHeader, addressData.radioOption);
       await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     }
   }
@@ -715,7 +716,6 @@ export class RespondToClaimAction implements IAction {
       option: counterClaimOption.option,
     });
 
-    process.env.SELECT_COUNTER_CLAIM = String(counterClaimOption.option).toUpperCase();
     await performAction('clickButton', counterClaim.saveAndContinueButton);
   }
 
@@ -1290,6 +1290,26 @@ export class RespondToClaimAction implements IAction {
     this.recordRtcCyaHeadingWithItems(regularExpensesQuestionLabel, selectedRegularExpenseEntries);
 
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+  }
+
+  private async taskList(taskListData: actionRecord): Promise<void> {
+    const caseNumber = `${process.env.CASE_NUMBER?.replace(/(\d{4})(?=\d)/g, '$1 ').trim()}`;
+    await performValidation('text', { elementType: 'paragraph', text: 'Case number: ' + caseNumber });
+    // if (taskListData.subSection !== taskList.readInformationAboutLink) {
+    //   await performValidation('text', taskListData.subSection, { elementType: 'taskListStatus', text: 'Available' });
+    // }
+    await performAction('clickLink', taskListData.subSection);
+  }
+
+  private async taskListStatus(subSection: actionRecord): Promise<void> {
+    const sections = Array.isArray(subSection.subSecArray) ? subSection.subSecArray : [subSection.subSecArray];
+
+    for (const section of sections) {
+      await performValidation('text', section, {
+        elementType: 'taskListStatus',
+        text: subSection.status,
+      });
+    }
   }
 
   private async languageUsed(languageScreenData: actionRecord): Promise<void> {
