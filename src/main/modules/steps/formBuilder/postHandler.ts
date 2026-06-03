@@ -166,7 +166,6 @@ export function createPostHandler(
       }
 
       if (isSaveForLater) {
-
         const caseId = req.res?.locals.validatedCase?.id;
 
         if (isLegalRepresentativeUser(req)) {
@@ -179,7 +178,6 @@ export function createPostHandler(
           }
         }
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
-
       }
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
