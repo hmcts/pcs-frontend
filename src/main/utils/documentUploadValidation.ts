@@ -10,6 +10,8 @@ export {
   isBlockedExtension,
 } from './fileExtensionValidation';
 
+export const MAX_FILENAME_LENGTH = 255;
+
 export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizePerFileMB');
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;
 export const UPLOAD_MAX_TOTAL_SIZE_MB: number = config.get('documentUpload.maxTotalFileSizeMB');

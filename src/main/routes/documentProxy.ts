@@ -14,6 +14,7 @@ import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.i
 import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 import type { CdamDocument } from '@services/documentUpload.interface';
 import {
+  MAX_FILENAME_LENGTH,
   UPLOAD_MAX_FILE_SIZE_BYTES,
   UPLOAD_MAX_FILE_SIZE_MB,
   UPLOAD_MAX_TOTAL_SIZE_BYTES,
@@ -27,6 +28,10 @@ const logger = Logger.getLogger('document-proxy');
 const DOCUMENT_TOTAL_SIZE_EXCEEDED = 'DOCUMENT_TOTAL_SIZE_EXCEEDED';
 
 export function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
+  if (file.originalname.length > MAX_FILENAME_LENGTH) {
+    cb(new Error('FILE_NAME_TOO_LONG'));
+    return;
+  }
   const result = validateFileType(file.mimetype, file.originalname);
   if (result === 'ok') {
     cb(null, true);
@@ -56,6 +61,9 @@ function getErrorTranslations(req: Request) {
     documentNotFound: t('errors.documentUpload.documentUrlRequired'),
     downloadFailed: t('errors.documentUpload.downloadFailed'),
     uploadSuccess: (filename: string) => t('errors.documentUpload.uploadSuccess', { filename }),
+    fileNameTooLong: t('errors.documentUpload.fileNameTooLong', {
+      maxLength: String(MAX_FILENAME_LENGTH),
+    }),
   };
 }
 
@@ -80,6 +88,10 @@ export function handleMulterError(
   }
   if (err.message === 'INVALID_FILE_TYPE' || err.message === 'BLOCKED_MEDIA') {
     res.status(400).json({ error: { message: errors.wrongType } });
+    return;
+  }
+  if (err.message === 'FILE_NAME_TOO_LONG') {
+    res.status(400).json({ error: { message: errors.fileNameTooLong } });
     return;
   }
   next(err);

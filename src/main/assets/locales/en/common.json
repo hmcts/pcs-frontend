@@ -79,6 +79,7 @@
       "fileDeleteFailed": "The file could not be removed – try again",
       "documentUrlRequired": "Select a file to remove",
       "uploadSuccess": "{{filename}} has been uploaded",
+      "fileNameTooLong": "The selected file name must be {{maxLength}} characters or fewer",
       "errorSummaryTitle": "There is a problem"
     }
   },
