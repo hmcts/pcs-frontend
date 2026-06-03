@@ -60,11 +60,12 @@ const validateOtherBenefitsAmount = createAmountValidator(
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-regular-income-do-you-receive',
+  isAnswered: () => true,
   stepDir: __dirname,
   showCancelButton: false,
 
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const hc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
 
     if (!hc) {

@@ -6,7 +6,7 @@ const formatCaseNumber = (value: string): string =>
 
 const formatSubmittedDate = (): string =>
   new Date().toLocaleDateString('en-GB', {
-    day: '2-digit',
+    day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
