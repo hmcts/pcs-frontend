@@ -1,3 +1,8 @@
+// Mocks reflect the framework boundary: i18n + flow + validateForm + draft-save are
+// what `postController.post` integrates with. ccdAddress and getClaimantName are NOT
+// exercised by isAnswered or the beforeRedirect path tested here — using the real
+// `buildCcdAddressFromFormParts` gives the NO-branch test a meaningful assertion on
+// the actual CCD save shape instead of a passthrough.
 jest.mock('../../../../main/modules/steps/i18n', () => ({
   loadStepNamespace: jest.fn(),
   getStepTranslations: jest.fn(() => ({})),
@@ -32,38 +37,38 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
-jest.mock('../../../../main/steps/utils/ccdAddress', () => ({
-  buildCcdAddressFromFormParts: jest.fn((parts: Record<string, unknown>) => ({ ...parts })),
-  formatCcdAddress: jest.fn(() => '1 Test Street, London, SW1A 1AA'),
-}));
-
-jest.mock('../../../../main/steps/utils/getClaimantName', () => ({
-  getClaimantName: jest.fn(() => 'Claimant Name'),
-}));
-
-import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
+import type { CcdCaseModel } from '../../../../main/services/ccdCaseData.model';
 import { step } from '../../../../main/steps/respond-to-claim/correspondence-address';
 
+import { withValidatedCase } from './__helpers';
+
 describe('correspondence-address isAnswered', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const reqWith = (validatedCase: Record<string, unknown>): any => ({ res: { locals: { validatedCase } } });
+  const reqWith = (validatedCase: Partial<CcdCaseModel>) => withValidatedCase(validatedCase as CcdCaseModel);
 
   it('is answered once the citizen confirms (correspondenceAddressConfirmation set)', () => {
-    expect(step.isAnswered?.(reqWith({ defendantResponses: { correspondenceAddressConfirmation: 'YES' } }))).toBe(true);
+    expect(
+      step.isAnswered?.(
+        reqWith({ defendantResponses: { correspondenceAddressConfirmation: 'YES' } } as Partial<CcdCaseModel>)
+      )
+    ).toBe(true);
   });
 
   it('is NOT answered when only the claim-prefilled party address is present (no confirmation)', () => {
     expect(
-      step.isAnswered?.(reqWith({ defendantContactDetailsPartyAddress: { AddressLine1: '2 Second Avenue' } }))
+      step.isAnswered?.(
+        reqWith({ defendantContactDetailsPartyAddress: { AddressLine1: '2 Second Avenue' } } as Partial<CcdCaseModel>)
+      )
     ).toBe(false);
   });
 
   it('is NOT answered when nothing is set', () => {
-    expect(step.isAnswered?.(reqWith({}))).toBe(false);
+    expect(step.isAnswered?.(reqWith({} as Partial<CcdCaseModel>))).toBe(false);
   });
 });
 
-describe('correspondence-address beforeRedirect', () => {
+describe('correspondence-address beforeRedirect (holistic draft-save contract)', () => {
+  // Asserts the mutated `response` is exactly what gets sent to the backend's full-replace
+  // draft save. See docs/HDPI-5164/HOLISTIC-DRAFT-SAVE.md for the contract.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (body: Record<string, unknown> = {}): any => ({
     body,
@@ -73,24 +78,15 @@ describe('correspondence-address beforeRedirect', () => {
     session: { formData: {}, ccdCase: { id: '1234567890123456' } },
     app: { locals: { nunjucksEnv: { render: jest.fn() } } },
     i18n: { getResourceBundle: jest.fn(() => ({})) },
-    res: {
-      locals: {
-        validatedCase: {
-          id: '1234567890123456',
-          data: { possessionClaimResponse: {} },
-          possessionClaimResponse: {},
-        },
-      },
-    },
+    res: { locals: { validatedCase: { id: '1234567890123456' } } },
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (validateForm as jest.Mock).mockReturnValue({});
     mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
   });
 
-  it('sets correspondenceAddressConfirmation to YES and clears stale party.address when user selects yes', async () => {
+  it('YES branch: sets confirmation to YES and clears stale party.address', async () => {
     const response = {
       defendantResponses: {} as Record<string, unknown>,
       defendantContactDetails: {
@@ -103,17 +99,14 @@ describe('correspondence-address beforeRedirect', () => {
     const res = { redirect: jest.fn() } as any;
     const req = createReq({ action: 'continue', correspondenceAddressConfirm: 'yes' });
 
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-    await step.postController.post(req, res, jest.fn());
+    await step.postController!.post(req, res, jest.fn());
 
-    expect(response.defendantResponses).toMatchObject({ correspondenceAddressConfirmation: 'YES' });
+    expect(response.defendantResponses).toEqual({ correspondenceAddressConfirmation: 'YES' });
     expect(response.defendantContactDetails.party.address).toBeUndefined();
     expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(req, response);
   });
 
-  it('sets correspondenceAddressConfirmation to NO and saves entered address when user selects no', async () => {
+  it('NO branch: sets confirmation to NO and persists the entered address in CCD shape', async () => {
     const response = {
       defendantResponses: {} as Record<string, unknown>,
       defendantContactDetails: { party: {} as Record<string, unknown> },
@@ -130,23 +123,18 @@ describe('correspondence-address beforeRedirect', () => {
       'correspondenceAddressConfirm.postcode': 'E1 1AA',
     });
 
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-    await step.postController.post(req, res, jest.fn());
+    await step.postController!.post(req, res, jest.fn());
 
-    expect(response.defendantResponses).toMatchObject({ correspondenceAddressConfirmation: 'NO' });
+    expect(response.defendantResponses).toEqual({ correspondenceAddressConfirmation: 'NO' });
     expect(response.defendantContactDetails.party.address).toEqual({
-      addressLine1: '1 New Street',
-      addressLine2: undefined,
-      townOrCity: 'London',
-      county: undefined,
-      postcode: 'E1 1AA',
+      AddressLine1: '1 New Street',
+      PostTown: 'London',
+      PostCode: 'E1 1AA',
     });
     expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(req, response);
   });
 
-  it('clears both correspondenceAddressConfirmation and party.address when answer is absent', async () => {
+  it('absent answer: clears both confirmation and party.address', async () => {
     const response = {
       defendantResponses: { correspondenceAddressConfirmation: 'YES' } as Record<string, unknown>,
       defendantContactDetails: {
