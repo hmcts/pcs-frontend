@@ -1044,7 +1044,7 @@ describe('formBuilder', () => {
 
         expect(res.status).not.toHaveBeenCalledWith(400);
         expect(res.render).not.toHaveBeenCalled();
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/case/1765881343803991/dashboard');
       });
 
       it('should normalize checkbox field for saveForLater', async () => {
