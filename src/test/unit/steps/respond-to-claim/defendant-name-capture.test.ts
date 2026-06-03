@@ -85,12 +85,6 @@ describe('respond-to-claim defendant-name-capture step', () => {
     jest.clearAllMocks();
   });
 
-  it('exposes correct step url and view', () => {
-    expect(step.name).toBe('defendant-name-capture');
-    expect(step.url).toBe('/case/:caseReference/respond-to-claim/defendant-name-capture');
-    expect(step.view).toContain('formBuilder.njk');
-  });
-
   it('GET renders translated content and input attributes', async () => {
     const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

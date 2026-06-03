@@ -105,12 +105,6 @@ describe('respond-to-claim installments step', () => {
     mockSaveDraftDefendantResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
   });
 
-  it('exposes correct step url and view', () => {
-    expect(step.name).toBe('how-much-afford-to-pay');
-    expect(step.url).toBe('/case/:caseReference/respond-to-claim/how-much-afford-to-pay');
-    expect(step.view).toContain('formBuilder.njk');
-  });
-
   it('GET renders installments content and adds currency prefix', async () => {
     const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

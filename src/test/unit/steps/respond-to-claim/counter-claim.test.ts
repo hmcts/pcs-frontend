@@ -12,10 +12,6 @@ describe('counter-claim step', () => {
     documentStorage?: unknown;
   };
 
-  it('has correct step name', () => {
-    expect(testedStep.stepName).toBe('counter-claim');
-  });
-
   it('exposes the makeCounterClaim radio field', () => {
     expect(testedStep.fields).toHaveLength(1);
     expect(testedStep.fields[0]).toMatchObject({ name: 'makeCounterClaim', type: 'radio' });

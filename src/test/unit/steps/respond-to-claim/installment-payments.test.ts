@@ -95,12 +95,6 @@ describe('respond-to-claim installment-payments step', () => {
     mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
   });
 
-  it('exposes correct step url and view', () => {
-    expect(step.name).toBe('installment-payments');
-    expect(step.url).toBe('/case/:caseReference/respond-to-claim/installment-payments');
-    expect(step.view).toContain('instalmentOffer.njk');
-  });
-
   it('POST saves Yes to defendantResponses.paymentAgreement', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
 

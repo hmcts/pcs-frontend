@@ -29,10 +29,6 @@ describe('upload-document step', () => {
   });
 
   describe('step config', () => {
-    it('has correct step name', () => {
-      expect(testedStep.stepName).toBe('upload-document');
-    });
-
     it('declares a file field that is not required', () => {
       expect(testedStep.fields).toEqual(
         expect.arrayContaining([

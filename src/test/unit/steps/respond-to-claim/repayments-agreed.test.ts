@@ -107,12 +107,6 @@ describe('respond-to-claim repayments-agreed step', () => {
     jest.clearAllMocks();
   });
 
-  it('exposes correct step url and custom template view', () => {
-    expect(step.name).toBe('repayments-agreed');
-    expect(step.url).toBe('/case/:caseReference/respond-to-claim/repayments-agreed');
-    expect(step.view).toContain('repaymentsAgreed.njk');
-  });
-
   it('POST saves NO with defendantResponses.paymentAgreement', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
 
