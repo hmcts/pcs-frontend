@@ -1,4 +1,4 @@
-import { feedback, reasonableAdjustmentsTriage, uploadFiles } from '../data/page-data';
+import { feedback, reasonableAdjustmentsTriage, taskList } from '../data/page-data';
 import { performValidation } from '../utils/controller';
 
 export async function reasonableAdjustmentsTriageNavigationTests(): Promise<void> {
@@ -6,5 +6,5 @@ export async function reasonableAdjustmentsTriageNavigationTests(): Promise<void
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: reasonableAdjustmentsTriage.pageSlug,
   });
-  await performValidation('pageNavigation', reasonableAdjustmentsTriage.backLink, uploadFiles.mainHeader);
+  await performValidation('pageNavigation', reasonableAdjustmentsTriage.backLink, taskList.mainHeader);
 }

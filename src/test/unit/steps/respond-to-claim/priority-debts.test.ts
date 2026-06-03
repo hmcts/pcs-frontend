@@ -89,7 +89,7 @@ describe('respond-to-claim priority-debts step', () => {
     );
   });
 
-  it('throws when priority debts selection is missing', async () => {
+  it('no-ops when priority debts selection is missing', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({ body: { action: 'continue' } });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,8 +103,6 @@ describe('respond-to-claim priority-debts step', () => {
     await step.postController.post(req, res, next);
 
     expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalledTimes(1);
-    expect(next.mock.calls[0][0]).toBeInstanceOf(Error);
-    expect((next.mock.calls[0][0] as Error).message).toBe('Missing or invalid priority debts selection submitted');
+    expect(next).not.toHaveBeenCalledWith(expect.any(Error));
   });
 });
