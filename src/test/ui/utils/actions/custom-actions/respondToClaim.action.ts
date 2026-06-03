@@ -430,6 +430,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectDoYouHaveASolicitor(solicitorData: actionData) {
+    this.recordAnswer(doYouHaveASolicitor.mainHeader, solicitorData);
     await performAction('clickRadioButton', {
       question: doYouHaveASolicitor.mainHeader,
       option: solicitorData,
