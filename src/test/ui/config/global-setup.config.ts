@@ -22,6 +22,7 @@ export function applyPlaywrightServiceUrls(): void {
     process.env.S2S_URL ||=
       'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease';
     process.env.DM_STORE_URL ||= 'http://dm-store-aat.service.core-compute-aat.internal';
+    process.env.CASE_API_URL ||= 'http://pcs-api-aat.service.core-compute-aat.internal';
   }
 }
 
