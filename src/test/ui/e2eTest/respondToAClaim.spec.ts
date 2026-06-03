@@ -22,6 +22,8 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  equalityAndDiversityEnd,
+  equalityAndDiversityStart,
   exceptionalHardship,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
@@ -44,7 +46,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
-import { getPinUserAt } from '../utils/actions/custom-actions';
+import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -399,7 +401,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -527,7 +533,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -740,7 +749,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -906,7 +919,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1057,7 +1074,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1230,7 +1251,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1386,7 +1411,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1537,7 +1566,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1660,7 +1693,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1799,7 +1836,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performValidation('mainHeader', languageUsed.mainHeader);
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
