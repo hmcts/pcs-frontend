@@ -40,6 +40,13 @@ describe('respond-to-claim priority-debts flow routing (showCondition paradigm)'
         'what-other-regular-expenses-do-you-have'
       );
     });
+
+    it('skips priority-debt-details and goes to regular-expenses when priorityDebts is absent', async () => {
+      const req = createReq({});
+      await expect(getNextStep(req, 'priority-debts', flowConfig, {})).resolves.toBe(
+        'what-other-regular-expenses-do-you-have'
+      );
+    });
   });
 
   describe('back navigation to priority-debts', () => {
