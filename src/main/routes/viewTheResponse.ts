@@ -149,12 +149,16 @@ function buildStatementOfTruthSummary(t: TFunction, completedByName: string | un
 
 function buildClaimantDetails(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
-  const response = caseData.possessionClaimResponse;
-  pushRow(rows, t('viewTheResponse:claimantDetails.name'), response?.claimantName);
+  const claimantName =
+    caseData.isClaimantNameCorrect === 'NO' && caseData.overriddenClaimantName?.trim()
+      ? caseData.overriddenClaimantName.trim()
+      : (caseData.claimantName?.trim() ?? '');
+  const serviceAddress = caseData.possessionClaimResponse?.claimantServiceAddress;
+  pushRow(rows, t('viewTheResponse:claimantDetails.name'), claimantName);
   pushRow(
     rows,
     t('viewTheResponse:claimantDetails.address'),
-    response?.claimantServiceAddress ? (formatAddress(response.claimantServiceAddress) ?? '') : ''
+    serviceAddress ? (formatAddress(serviceAddress) ?? '') : ''
   );
   return { rows };
 }

@@ -33,6 +33,7 @@ jest.mock('@services/ccdCaseService', () => ({
 
 function buildComprehensiveCaseData(): CcdCaseData {
   return {
+    claimantName: 'Example Claimant Ltd',
     propertyAddress: {
       AddressLine1: '10 Second Avenue',
       PostTown: 'London',
@@ -51,7 +52,6 @@ function buildComprehensiveCaseData(): CcdCaseData {
     ],
     possessionClaimResponse: {
       claimIssuedDate: '2026-02-05',
-      claimantName: 'Example Claimant Ltd',
       claimantServiceAddress: {
         AddressLine1: '1 Claimant Street',
         PostTown: 'London',
@@ -309,7 +309,18 @@ describe('viewTheResponse route', () => {
 
     expect(next).not.toHaveBeenCalled();
     const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderArgs.claimantDetails.rows.length).toBeGreaterThan(0);
+    expect(renderArgs.claimantDetails.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:claimantDetails.name' },
+          value: { text: 'Example Claimant Ltd' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:claimantDetails.address' },
+          value: { text: '1 Claimant Street, London, E1 1AA' },
+        }),
+      ])
+    );
     expect(renderArgs.defendant1Details.rows.length).toBeGreaterThan(0);
     expect(renderArgs.responseToClaim.rows.length).toBeGreaterThan(0);
     expect(renderArgs.paymentsOrAgreements.rows.length).toBeGreaterThan(0);
