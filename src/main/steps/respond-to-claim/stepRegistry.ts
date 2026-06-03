@@ -2,6 +2,13 @@ import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from '
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
 import { step as askYourSolicitorToRespondToTheClaim } from './ask-your-solicitor-to-respond-to-the-claim';
 import { step as checkYourAnswers } from './check-your-answers';
+import { step as checkYourAnswersDocuments } from './check-your-answers-documents';
+import { step as checkYourAnswersIncomeAndExpenses } from './check-your-answers-income-and-expenses';
+import { step as checkYourAnswersPaymentsAndAgreements } from './check-your-answers-payments-and-agreements';
+import { step as checkYourAnswersPersonalDetails } from './check-your-answers-personal-details';
+import { step as checkYourAnswersStartNowAndDetails } from './check-your-answers-start-now-and-details';
+import { step as checkYourAnswersYourCircumstances } from './check-your-answers-your-circumstances';
+import { step as checkYourAnswersYourResponse } from './check-your-answers-your-response';
 import { step as confirmationOfNoticeDateNotProvided } from './confirmation-of-notice-date-when-not-provided';
 import { step as confirmationOfNoticeDateProvided } from './confirmation-of-notice-date-when-provided';
 import { step as confirmationOfNoticeGiven } from './confirmation-of-notice-given';
@@ -74,6 +81,13 @@ export const stepRegistry = {
   'contact-preferences-text-message': contactPreferencesTextMessage,
   'dispute-claim-interstitial': disputeClaimInterstitial,
   'end-now': endNow,
+  'check-your-answers-start-now-and-details': checkYourAnswersStartNowAndDetails,
+  'check-your-answers-personal-details': checkYourAnswersPersonalDetails,
+  'check-your-answers-your-response': checkYourAnswersYourResponse,
+  'check-your-answers-payments-and-agreements': checkYourAnswersPaymentsAndAgreements,
+  'check-your-answers-your-circumstances': checkYourAnswersYourCircumstances,
+  'check-your-answers-income-and-expenses': checkYourAnswersIncomeAndExpenses,
+  'check-your-answers-documents': checkYourAnswersDocuments,
   'landlord-registered': landlordRegistered,
   'landlord-licensed': landlordLicensed,
   'written-terms': writtenTerms,
@@ -122,3 +136,5 @@ export const stepRegistry = {
   'language-used': languageUsed,
   'check-your-answers': checkYourAnswers,
 } satisfies Record<string, StepDefinition>;
+
+export type RespondToClaimStepName = keyof typeof stepRegistry;

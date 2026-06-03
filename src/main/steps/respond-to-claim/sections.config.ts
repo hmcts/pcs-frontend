@@ -1,24 +1,21 @@
+import type { Request } from 'express';
+
 import type { SectionConfig } from '../../modules/steps/stepFlow.interface';
 import { hasAnyRentArrearsGround } from '../utils';
 
-export const RESPOND_TO_CLAIM_SECTION_IDS = [
-  'startNowAndDetails',
-  'personalDetails',
-  'disputeAndTenancy',
-  'payments',
-  'situationAndCircumstances',
-  'incomeAndExpenditure',
-  'uploadFiles',
-  'checkYourAnswersAndSubmit',
-] as const;
+import type { RespondToClaimStepName } from './stepRegistry';
 
-export type RespondToClaimSectionId = (typeof RESPOND_TO_CLAIM_SECTION_IDS)[number];
-
-export const respondToClaimSections: SectionConfig[] = [
+const sectionDefs = [
   {
     id: 'startNowAndDetails',
     titleKey: 'taskList.startNowAndDetails',
-    steps: ['start-now', 'free-legal-advice', 'solicitor', 'ask-your-solicitor-to-respond-to-the-claim'],
+    steps: [
+      'start-now',
+      'free-legal-advice',
+      'solicitor',
+      'ask-your-solicitor-to-respond-to-the-claim',
+      'check-your-answers-start-now-and-details',
+    ],
   },
   {
     id: 'personalDetails',
@@ -31,6 +28,7 @@ export const respondToClaimSections: SectionConfig[] = [
       'contact-preferences-email-or-post',
       'contact-preferences-telephone',
       'contact-preferences-text-message',
+      'check-your-answers-personal-details',
     ],
   },
   {
@@ -59,6 +57,7 @@ export const respondToClaimSections: SectionConfig[] = [
       'counter-claim-about',
       'counter-claim-order-other-than-sum',
       'counter-claim-upload-documents',
+      'check-your-answers-your-response',
     ],
   },
   {
@@ -70,8 +69,9 @@ export const respondToClaimSections: SectionConfig[] = [
       'repayments-agreed',
       'installment-payments',
       'how-much-afford-to-pay',
+      'check-your-answers-payments-and-agreements',
     ],
-    isApplicable: async req => hasAnyRentArrearsGround(req),
+    isApplicable: async (req: Request) => hasAnyRentArrearsGround(req),
   },
   {
     id: 'situationAndCircumstances',
@@ -84,6 +84,7 @@ export const respondToClaimSections: SectionConfig[] = [
       'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
       'your-circumstances',
       'exceptional-hardship',
+      'check-your-answers-your-circumstances',
     ],
   },
   {
@@ -97,12 +98,13 @@ export const respondToClaimSections: SectionConfig[] = [
       'priority-debt-details',
       'what-other-regular-expenses-do-you-have',
       'other-considerations',
+      'check-your-answers-income-and-expenses',
     ],
   },
   {
     id: 'uploadFiles',
     titleKey: 'taskList.uploadFiles',
-    steps: ['upload-document'],
+    steps: ['upload-document', 'check-your-answers-documents'],
   },
   {
     id: 'checkYourAnswersAndSubmit',
@@ -115,4 +117,44 @@ export const respondToClaimSections: SectionConfig[] = [
       'check-your-answers',
     ],
   },
-];
+] as const satisfies readonly {
+  id: string;
+  titleKey: string;
+  steps: readonly RespondToClaimStepName[];
+  isApplicable?: (req: Request) => Promise<boolean>;
+}[];
+
+export type RespondToClaimSectionId = (typeof sectionDefs)[number]['id'];
+
+export const RESPOND_TO_CLAIM_SECTION_IDS: readonly RespondToClaimSectionId[] = sectionDefs.map(s => s.id);
+
+export const respondToClaimSections: readonly SectionConfig[] = sectionDefs;
+
+export const CYA_STEP_PREFIX = 'check-your-answers-' as const;
+
+export function sectionHasCya(section: SectionConfig): boolean {
+  return section.steps.some(stepName => stepName.startsWith(CYA_STEP_PREFIX));
+}
+
+const stepToSectionId = buildStepToSectionIdMap();
+
+export const sectionById: ReadonlyMap<RespondToClaimSectionId, SectionConfig> = new Map(
+  sectionDefs.map(section => [section.id, section as unknown as SectionConfig])
+);
+
+export function findSectionIdForStep(stepName: string): RespondToClaimSectionId | undefined {
+  return stepToSectionId.get(stepName);
+}
+
+function buildStepToSectionIdMap(): Map<string, RespondToClaimSectionId> {
+  const map = new Map<string, RespondToClaimSectionId>();
+  for (const section of sectionDefs) {
+    for (const stepName of section.steps) {
+      if (map.has(stepName)) {
+        throw new Error(`Step "${stepName}" appears in more than one respond-to-claim section`);
+      }
+      map.set(stepName, section.id);
+    }
+  }
+  return map;
+}
