@@ -166,13 +166,19 @@ export function registerSteps(router: IRouter, specificJourney?: string): void {
 export function registerAllJourneys(app: Application): void {
   logger.info('Auto-registering all journeys from registry');
 
-  for (const journeyName of Object.keys(journeyRegistry)) {
+  for (const [journeyName, journey] of Object.entries(journeyRegistry)) {
     // Create a dedicated router for this journey with param merging enabled
     const journeyRouter = Router({ mergeParams: true });
 
     // Apply journey-specific middleware
     // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
     journeyRouter.param('caseReference', caseReferenceParamMiddleware);
+
+    // Stacked onto the :caseReference param callback so handlers fire after
+    // validatedCase loads, before per-step middleware. Mounting via .use() would fire too early.
+    for (const handler of journey.routeMiddleware ?? []) {
+      journeyRouter.param('caseReference', (req, res, next) => handler(req, res, next));
+    }
 
     // Register all steps for this journey on the journey router
     registerSteps(journeyRouter, journeyName);

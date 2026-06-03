@@ -1,3 +1,5 @@
+import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
+
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export enum YesNoEnum {
@@ -146,6 +148,7 @@ export interface CcdClaimantEnteredDefendantDetails {
   lastName?: string;
   address?: CcdCaseAddress | Record<string, never>;
   addressKnown?: YesNoValue;
+  addressSameAsProperty?: YesNoValue;
 }
 
 /** Defendant party contact details (name/address known flags and values). */
@@ -233,6 +236,7 @@ export interface CcdDefendantResponses {
   makeCounterClaim?: YesNoValue;
   responseSubmittedDate?: string;
   statementOfTruthCompletedBy?: string;
+  completedSections?: RespondToClaimSectionEnum[];
 }
 
 export interface PossessionClaimResponse {

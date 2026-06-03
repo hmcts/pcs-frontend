@@ -95,3 +95,26 @@
 .pcs-task-list__divider {
   border-bottom: 3px solid govuk-colour('blue');
 }
+
+// Task-list status tags: pinned to the Figma palette, bold per the design.
+.pcs-task-list {
+  .govuk-tag {
+    font-weight: 700;
+  }
+  .govuk-tag--green {
+    color: #005a30;
+    background-color: #cce2d8;
+  }
+  .govuk-tag--blue {
+    color: #144e81;
+    background-color: #d2e2f1;
+  }
+  .govuk-tag--yellow {
+    color: #594d00;
+    background-color: #fff7bf;
+  }
+  .govuk-tag--grey {
+    color: #383f43;
+    background-color: #eeefef;
+  }
+}
