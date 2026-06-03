@@ -3,6 +3,7 @@ import { flowConfig } from '../flow.config';
 import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '@routes/cancelUploadAdditionalDocuments';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
 const stepName = 'upload-your-documents';
@@ -41,4 +42,10 @@ export const step: StepDefinition = createFormStep({
   getInitialFormData: async req => ({
     documents: toDisplayDocuments(await storage.read(req)),
   }),
+  extendGetContent: async req => {
+    const caseId = req.res?.locals.validatedCase?.id;
+    return {
+      cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
+    };
+  },
 });

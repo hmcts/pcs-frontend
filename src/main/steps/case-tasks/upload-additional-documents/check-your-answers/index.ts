@@ -7,6 +7,7 @@ import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
 import { createGetController, createStepNavigation, getFormData } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '@routes/cancelUploadAdditionalDocuments';
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getFlowConfigForJourney } from '@steps';
@@ -27,12 +28,14 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   getController: () =>
     createGetController(templatePath, stepName, stepNavigation, async (req: Request) => {
+      const caseId = req.res?.locals.validatedCase?.id;
       const documents = toDisplayDocuments(await uploadStorage.read(req));
       const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
       const relatedApplicationText = (confirmData?.relatedApplicationText as string) ?? '';
 
       return {
-        dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+        dashboardUrl: getDashboardUrl(caseId),
+        cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
         url: req.originalUrl || '',
         documents,
         relatedApplicationText,

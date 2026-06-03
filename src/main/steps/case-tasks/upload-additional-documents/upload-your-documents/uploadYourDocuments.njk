@@ -43,7 +43,7 @@
         attributes: { name: 'action', value: 'continue' }
       }) }}
       {% if showCancelButton is not defined or showCancelButton %}
-        <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+        <a href="{{ cancelUrl }}" class="govuk-link">{{ cancel }}</a>
       {% endif %}
     </div>
     {{ csrfProtection(csrfToken) }}
