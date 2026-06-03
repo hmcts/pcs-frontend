@@ -28,5 +28,5 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('Respond to claim - LR  @noDefendants @smoke @regression', async () => {});
+  test('Respond to claim - LR  @noDefendants @smoke @regression @PR', async () => {});
 });
