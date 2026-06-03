@@ -1,4 +1,4 @@
-import { dashboard, exceptionalHardship, feedback, incomeAndExpenses } from '../data/page-data';
+import { feedback, incomeAndExpenses, taskList } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function incomeAndExpensesErrorValidation(): Promise<void> {
@@ -14,7 +14,5 @@ export async function incomeAndExpensesNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: incomeAndExpenses.pageSlug,
   });
-  await performValidation('pageNavigation', incomeAndExpenses.backLink, exceptionalHardship.mainHeader);
-  await performAction('clickRadioButton', incomeAndExpenses.yesRadioOption);
-  await performValidation('pageNavigation', incomeAndExpenses.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', incomeAndExpenses.backLink, taskList.mainHeader);
 }

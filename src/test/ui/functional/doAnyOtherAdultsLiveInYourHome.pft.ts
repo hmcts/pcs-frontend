@@ -1,4 +1,4 @@
-import { dashboard, doAnyOtherAdultsLiveInYourHome, doYouHaveAnyOtherDependants, feedback } from '../data/page-data';
+import { doAnyOtherAdultsLiveInYourHome, doYouHaveAnyOtherDependants, feedback, taskList } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -57,5 +57,5 @@ export async function doAnyOtherAdultsLiveInYourHomeNavigationTests(): Promise<v
     question: doAnyOtherAdultsLiveInYourHome.mainHeader,
     option: doAnyOtherAdultsLiveInYourHome.noRadioOption,
   });
-  await performValidation('pageNavigation', doAnyOtherAdultsLiveInYourHome.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', doAnyOtherAdultsLiveInYourHome.saveForLaterButton, taskList.mainHeader);
 }
