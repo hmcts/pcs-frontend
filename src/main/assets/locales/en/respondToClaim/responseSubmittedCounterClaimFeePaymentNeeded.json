@@ -4,7 +4,7 @@
   "responseSubmittedCounterClaimFeePaymentNeededHeading1": "What to do next",
   "responseSubmittedCounterClaimFeePaymentNeededListItem1": "<a href='{{counterClaimApplicationFeeAmountUrl}}'>Pay your counterclaim fee.</a> If you do not, your counterclaim will not be considered.",
   "responseSubmittedCounterClaimFeePaymentNeededListItem2": "A hearing date will be scheduled. You’ll get a notification telling you when this has happened. At the hearing, a judge will listen to both sides and make a decision. You should come to the hearing.",
-  "responseSubmittedCounterClaimFeePaymentNeededListItem3": "Some people need support to use HMCTS services, like step-free access to a court for a hearing. If you have not already, you should <a href='#' target='_blank'>request support now (opens in new tab)</a>.",
+  "responseSubmittedCounterClaimFeePaymentNeededListItem3": "Some people need support to use HMCTS services, like step-free access to a court for a hearing. If you need support and have not already asked for it in your response, contact us. Use the ‘Contact us for help’ link on this page.",
   "responseSubmittedCounterClaimFeePaymentNeededHeading2": "We’d like to hear your thoughts",
   "responseSubmittedCounterClaimFeePaymentNeededParagraph2": "<a href='https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession' rel=\"noopener\" class=\"govuk-link\" target='_blank'>Complete this short survey to help us improve this service (opens in new tab)</a> (usually takes 5 minutes)."
 }

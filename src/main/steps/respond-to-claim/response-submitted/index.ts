@@ -16,4 +16,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     responseSubmittedParagraph2: 'responseSubmittedParagraph2',
   },
   customTemplate: `${__dirname}/responseSubmitted.njk`,
+  extendGetContent: () => ({
+    backUrl: '',
+  }),
 });
