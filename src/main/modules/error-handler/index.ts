@@ -68,10 +68,31 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
       res.locals.errorPageKey = errorPageKey;
 
       if (errorPageKey === 'serviceUnavailable' && httpError.retryAfter) {
-        const seconds = Number(httpError.retryAfter);
-        res.locals.serviceUnavailableParagraph = Number.isNaN(seconds)
-          ? t('errorPages.serviceUnavailable.paragraphDateAndTime', { dateAndTime: httpError.retryAfter })
-          : t('errorPages.serviceUnavailable.paragraphMinutes', { minutes: Math.ceil(seconds / 60) });
+        // Retry-After can be seconds or an HTTP date string.
+        const retryAfter = httpError.retryAfter;
+        const seconds = Number(retryAfter);
+
+        if (!Number.isNaN(seconds)) {
+          res.locals.serviceUnavailableParagraph = t('errorPages.serviceUnavailable.paragraphMinutes', {
+            minutes: Math.ceil(seconds / 60),
+          });
+        } else {
+          const retryAfterDate = new Date(retryAfter);
+          const time = retryAfterDate.toLocaleTimeString('en-GB', {
+            hour12: true,
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          const date = retryAfterDate.toLocaleDateString('en-GB', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          });
+          res.locals.serviceUnavailableParagraph = t('errorPages.serviceUnavailable.paragraphDateAndTime', {
+            date,
+            time,
+          });
+        }
       }
     }
 

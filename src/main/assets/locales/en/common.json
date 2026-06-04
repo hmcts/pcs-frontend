@@ -148,7 +148,7 @@
     "serviceUnavailable": {
       "title": "Sorry, the service is unavailable",
       "paragraphMinutes": "You will be able to use the service in {{minutes}} minutes.",
-      "paragraphDateAndTime": "You will be able to use the service from {{dateAndTime}}.",
+      "paragraphDateAndTime": "You will be able to use the service from {{time}} on {{date}}.",
       "paragraphFallback": "Try again later.",
       "paragraph2": "For help with your case, contact us by email or telephone.",
       "heading": "Email",

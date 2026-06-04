@@ -147,7 +147,7 @@
     "serviceUnavailable": {
       "title": "cySorry, the service is unavailable",
       "paragraphMinutes": "cyYou will be able to use the service in {{minutes}} minutes.",
-      "paragraphDateAndTime": "cyYou will be able to use the service from {{dateAndTime}}.",
+      "paragraphDateAndTime": "cyYou will be able to use the service from {{time}} on {{date}}.",
       "paragraphFallback": "cyTry again later.",
       "paragraph2": "cyFor help with your case, contact us by email or telephone.",
       "heading": "cyEmail",
