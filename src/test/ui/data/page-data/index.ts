@@ -61,3 +61,8 @@ export * from './counterClaimAgainstWhom.page.data';
 export * from './uploadFilesToSupportYourCounterclaim.page.data';
 export * from './checkYourAnswersRTC.page.data';
 export * from './counterClaimOrderOtherThanSum.page.data';
+export * from './taskList.page.data';
+export * from './checkYourAnswersRTC.page.data';
+export * from './counterClaimOrderOtherThanSum.page.data';
+export * from './counterClaimUploadDocuments.page.data';
+export * from './endNow.page.data';

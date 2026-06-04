@@ -1,0 +1,35 @@
+{
+  "pageTitle": "cyYour tasks",
+  "caseNumberLabel": "cyCase number:",
+  "sidebarLabel": "cySupport and additional actions",
+  "opensInNewTab": "cyopens in new tab",
+  "taskList": {
+    "status": {
+      "AVAILABLE": "cyAvailable",
+      "IN_PROGRESS": "cyIn progress",
+      "DONE": "cyDone",
+      "NOT_AVAILABLE_YET": "cyNot available yet"
+    },
+    "groups": {
+      "checkBeforeYouStart": "cyCheck before you start",
+      "yourResponse": "cyYour response",
+      "provideEvidence": "cyProvide evidence",
+      "reviewAndSubmit": "cyReview and submit"
+    }
+  },
+  "iWantTo": {
+    "heading": "cyI want to...",
+    "makeApplication": "cyMake a general application",
+    "breathingSpace": "cyInform the court of a breathing space debt respite",
+    "legalAdviser": "cyGet free help from a legal adviser"
+  },
+  "helpSupport": {
+    "heading": "cyHelp and support",
+    "fees": "cyHelp with fees",
+    "mediation": "cyFind out about mediation",
+    "hearing": "cyWhat to expect at a hearing",
+    "representYourself": "cyRepresent myself at a hearing",
+    "findLegalAdvice": "cyFind legal advice",
+    "findCourt": "cyFind information about my court"
+  }
+}
