@@ -264,12 +264,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         req.body?.['correspondenceAddressConfirm.addressLine1'] || addressSource?.AddressLine1 || '',
       correspondenceAddressLine2:
         req.body?.['correspondenceAddressConfirm.addressLine2'] || addressSource?.AddressLine2 || '',
-      correspondenceTownOrCity:
-        req.body?.['correspondenceAddressConfirm.townOrCity'] || addressSource?.PostTown || '',
-      correspondenceCounty:
-        req.body?.['correspondenceAddressConfirm.county'] || addressSource?.County || '',
-      correspondencePostcode:
-        req.body?.['correspondenceAddressConfirm.postcode'] || addressSource?.PostCode || '',
+      correspondenceTownOrCity: req.body?.['correspondenceAddressConfirm.townOrCity'] || addressSource?.PostTown || '',
+      correspondenceCounty: req.body?.['correspondenceAddressConfirm.county'] || addressSource?.County || '',
+      correspondencePostcode: req.body?.['correspondenceAddressConfirm.postcode'] || addressSource?.PostCode || '',
     };
   },
 
