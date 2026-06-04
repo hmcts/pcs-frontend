@@ -1,6 +1,7 @@
 {
-  "amountQuestion": "cyWould the defendant like to offer to pay off their arrears in instalments?",
+  "amountQuestion": "cyHow much could the defendant afford to pay in addition to the current rent?",
   "frequencyQuestion": "cyHow frequently could the defendant afford to pay this amount?",
+  "amountHint": "",
   "errors": {
     "installmentAmount": "cyEnter how much the defendant could afford to pay in addition to the current rent",
     "installmentAmountFormat": "cyEnter an amount in the correct format, for example 148.00 or 148.50",
