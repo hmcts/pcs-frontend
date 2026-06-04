@@ -864,26 +864,24 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
-    this.recordAnswer(
-      counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
-      helpWithFee.helpWithFeeOption
-    );
+    const helpWithFeesQuestion =
+      counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion;
     await performAction('clickRadioButton', {
-      question: counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
+      question: helpWithFeesQuestion,
       option: helpWithFee.helpWithFeeOption,
     });
 
     if (helpWithFee.helpWithFeeOption === 'Yes') {
-      this.recordAnswer(
-        counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
-        helpWithFee.feeReference
-      );
+      this.recordAnswer(helpWithFeesQuestion, `${helpWithFee.helpWithFeeOption}, ${helpWithFee.feeReference}`);
+      this.deleteAnswer(counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel);
       await performAction(
         'inputText',
         counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
         helpWithFee.feeReference
       );
     } else {
+      this.recordAnswer(helpWithFeesQuestion, helpWithFee.helpWithFeeOption);
+      this.deleteAnswer(counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel);
       this.deleteAnswer(counterclaimYouNeedToApplyForHelpWithYourFees.helpWithFeesLink);
     }
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
