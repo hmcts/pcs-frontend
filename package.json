@@ -41,7 +41,8 @@
     "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $(git rev-parse --short=7 HEAD) --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:openAllureReport": "yarn allure open allure-report",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
   },
   "_moduleAliases": {
     "@modules": "dist/main/modules",
@@ -63,7 +64,7 @@
     "@ministryofjustice/frontend": "^9.0.0",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/instrumentation-winston": "0.62.0",
-    "axios": "1.16.1",
+    "axios": "1.17.0",
     "body-parser": "2.2.2",
     "config": "4.4.1",
     "connect-redis": "7.1.1",
@@ -75,7 +76,7 @@
     "express": "5.2.1",
     "express-session": "1.19.0",
     "glob": "13.0.6",
-    "govuk-frontend": "6.1.0",
+    "govuk-frontend": "6.2.0",
     "helmet": "8.2.0",
     "http-terminator": "3.2.0",
     "i18next": "26.3.0",
