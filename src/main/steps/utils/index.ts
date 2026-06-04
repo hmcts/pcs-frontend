@@ -49,3 +49,4 @@ export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } 
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
 export { hasMultipleParties } from './hasMultipleParties';
+export { isSingleLinkedDefendant } from './isSingleLinkedDefendant';

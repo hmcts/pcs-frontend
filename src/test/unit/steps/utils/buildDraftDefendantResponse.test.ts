@@ -18,6 +18,7 @@ import {
   buildDraftDefendantResponse,
   saveDraftDefendantResponse,
 } from '../../../../main/steps/utils/buildDraftDefendantResponse';
+import { ClientContextHeaders } from '../../../../types/global';
 
 const makeReq = (): Request =>
   ({
@@ -45,7 +46,8 @@ describe('saveDraftDefendantResponse wrapper', () => {
       '123',
       {
         possessionClaimResponse: response, // Uses mocked normaliser return
-      }
+      },
+      undefined
     );
   });
 
@@ -69,7 +71,8 @@ describe('saveDraftDefendantResponse wrapper', () => {
       '123',
       {
         possessionClaimResponse: normalisedResponse, // Normalised version sent
-      }
+      },
+      undefined
     );
   });
 
@@ -86,7 +89,28 @@ describe('saveDraftDefendantResponse wrapper', () => {
       { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
       'custom-token',
       'custom-case-id',
-      expect.any(Object)
+      expect.any(Object),
+      undefined
+    );
+  });
+
+  it('extracts calls with client context headers correctly', async () => {
+    const clientContextHeaders: ClientContextHeaders = { selectedPartyId: 'abc' };
+
+    const req = {
+      session: { user: { accessToken: 'custom-token' }, clientContext: clientContextHeaders },
+      res: { locals: { validatedCase: { id: 'custom-case-id', data: {} } } },
+    } as unknown as Request;
+    const response = { defendantResponses: {} };
+
+    await saveDraftDefendantResponse(req, response);
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
+      'custom-token',
+      'custom-case-id',
+      expect.any(Object),
+      clientContextHeaders
     );
   });
 

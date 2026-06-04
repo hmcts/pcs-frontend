@@ -1,18 +1,21 @@
+import type { Request } from 'express';
+
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig as citizenFlowConfig } from './flow.config';
-import type { RespondToClaimStepName } from './stepRegistry';
+import { hasSingleLinkedDefendant } from './flowConditions';
+import { legalRepRespondToClaimSections } from './legalrep.sections.config';
+import { LegalRepRespondToClaimStepName } from './legalrep.stepRegistry';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
-const legalrepStepOrder = [
+const legalRepStepOrder = [
   'start-now',
+  'select-defendant',
   'defendant-name-confirmation',
-  'defendant-name-capture',
   'defendant-date-of-birth',
   'correspondence-address',
   'contact-preferences-email-or-post',
   'contact-preferences-telephone',
   'contact-preferences-text-message',
-  'dispute-claim-interstitial',
   'landlord-registered',
   'landlord-licensed',
   'written-terms',
@@ -20,20 +23,13 @@ const legalrepStepOrder = [
   'tenancy-date-details',
   'tenancy-date-unknown',
   'confirmation-of-notice-given',
-  'confirmation-of-notice-date-when-provided',
-  'confirmation-of-notice-date-when-not-provided',
   'rent-arrears-dispute',
   'non-rent-arrears-dispute',
   'counter-claim',
-  'counter-claim-what-are-you-claiming-for',
-  'counter-claim-specific-sum',
-  'counter-claim-fee',
-  'payment-interstitial',
   'repayments-made',
   'repayments-agreed',
   'installment-payments',
   'how-much-afford-to-pay',
-  'your-household-and-circumstances',
   'do-you-have-any-dependant-children',
   'do-you-have-any-other-dependants',
   'do-any-other-adults-live-in-your-home',
@@ -46,12 +42,13 @@ const legalrepStepOrder = [
   'priority-debts',
   'priority-debt-details',
   'what-other-regular-expenses-do-you-have',
+  'upload-document',
   'equality-and-diversity-start',
   'equality-and-diversity-end',
   'language-used',
   'check-your-answers',
   'end-now',
-] as const satisfies readonly RespondToClaimStepName[];
+] as const satisfies readonly LegalRepRespondToClaimStepName[];
 
 // Legal-rep journey is a flat, linear stepOrder. It is intentionally NOT sectionalised
 // (citizen is). Construct explicitly instead of spreading citizenFlowConfig so we don't
@@ -62,6 +59,16 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
   journeyName: 'respondToClaimLegalrep',
   useShowConditions: true,
   useSessionFormData: false,
-  stepOrder: legalrepStepOrder,
-  steps: citizenFlowConfig.steps,
+  stepOrder: legalRepStepOrder,
+  sections: legalRepRespondToClaimSections,
+  steps: {
+    ...citizenFlowConfig.steps,
+    'select-defendant': {
+      showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
+    },
+
+    'defendant-name-confirmation': {
+      showCondition: () => true,
+    },
+  },
 };

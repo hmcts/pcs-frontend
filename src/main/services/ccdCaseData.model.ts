@@ -4,6 +4,7 @@ import {
   CcdCaseData,
   CcdClaimGroundSummaryItem,
   CcdClaimantEnteredDefendantDetails,
+  CcdCollectionItem,
   CcdDefendantParty,
   CcdDefendantResponses,
   PossessionClaimResponse,
@@ -143,6 +144,10 @@ export class CcdCaseModel {
       return this.data.claimantName.trim();
     }
 
+    return this.orgName;
+  }
+
+  get orgName(): string {
     return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
   }
 
@@ -301,5 +306,9 @@ export class CcdCaseModel {
     ].find(Boolean);
 
     return populatedNoticeField?.slice(0, 10);
+  }
+
+  get allLinkedDefendants(): CcdCollectionItem<CcdDefendantParty>[] | undefined {
+    return this.data.allLinkedDefendants;
   }
 }

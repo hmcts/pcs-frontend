@@ -4,8 +4,10 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
+const STEP_NAME = 'priority-debts';
+
 export const step: StepDefinition = createRespondToClaimFormStep({
-  stepName: 'priority-debts',
+  stepName: STEP_NAME,
   isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.priorityDebts),
   stepDir: __dirname,
   beforeRedirect: async req => {
