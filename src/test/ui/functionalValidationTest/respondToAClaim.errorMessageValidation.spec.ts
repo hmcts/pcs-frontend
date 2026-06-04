@@ -44,6 +44,7 @@ import {
   yourCircumstances,
 } from '../data/page-data';
 import { accessYourCaseErrorValidation } from '../functional/accessYourCase.pft';
+import { checkYourAnswersRTCErrorValidation } from '../functional/checkYourAnswersRTC.pft';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
@@ -485,8 +486,14 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
 
-    await performAction('clickButton', 'Save and continue');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -730,8 +737,12 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-
-    await performAction('clickButton', 'Save and continue');
+    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     assertAllErrorMessageValidations();
   });
