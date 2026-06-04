@@ -9,6 +9,7 @@ export const flowConfig: JourneyFlowConfig = {
   basePath: MAKE_AN_APPLICATION_ROUTE,
   useShowConditions: true,
   journeyName: 'makeAnApplication',
+  eventId: 'makeAnApplication',
   stepOrder: [
     'choose-an-application',
     'ask-to-adjourn-the-court-hearing',

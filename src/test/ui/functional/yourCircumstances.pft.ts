@@ -1,6 +1,6 @@
 import {
-  dashboard,
   feedback,
+  taskList,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
@@ -42,5 +42,5 @@ export async function yourCircumstancesNavigationTests(): Promise<void> {
     wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader
   );
   await performAction('clickRadioButton', yourCircumstances.noRadioOption);
-  await performValidation('pageNavigation', yourCircumstances.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', yourCircumstances.saveForLaterButton, taskList.mainHeader);
 }

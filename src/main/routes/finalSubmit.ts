@@ -14,6 +14,7 @@ import { Router as createRouter } from 'express';
 
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
+import { requireEventAccess } from '../middleware/requireEventAccess';
 import { http } from '../modules/http';
 import { getRespondToClaimConfirmationPath } from '../steps/utils/postSubmissionRouting';
 
@@ -41,9 +42,18 @@ export default function finalSubmitRoutes(app: Application): void {
   // Create dedicated router for final submit routes
   const finalSubmitRouter: Router = createRouter({ mergeParams: true });
 
-  // Apply param middleware - validates format AND user access
-  // This ensures res.locals.validatedCase is set for routes with :caseReference
   finalSubmitRouter.param('caseReference', caseReferenceParamMiddleware);
+
+  // Check user has access to the case via the respondPossessionClaim event and
+  // hydrate res.locals.validatedCase for downstream handlers.
+  //
+  // IMPORTANT: scope this to the specific paths this router serves. The router
+  // is mounted at '/case', so a router-level `use(...)` would run for every
+  // /case/* URL — including journey + documentProxy URLs that fall through to
+  // here — and req.params.caseReference is NOT populated at the mount-path
+  // level (the mount is '/case', not '/case/:caseReference'), causing a
+  // spurious "Missing case reference" 404.
+  finalSubmitRouter.use(['/:caseReference/final-submit'], requireEventAccess('respondPossessionClaim'));
 
   // POST: Submit to CCD with minimal data
   finalSubmitRouter.post('/:caseReference/final-submit', oidcMiddleware, async (req: Request, res: Response) => {
