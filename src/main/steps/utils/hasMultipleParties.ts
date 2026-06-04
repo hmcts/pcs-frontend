@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 export const hasMultipleParties = (req: Request): boolean => {
-  const data = req.res?.locals?.validatedCase?.data;
+  const data = req.res?.locals.validatedCase?.data;
   const currentDefendantPartyId = data?.possessionClaimResponse?.currentDefendantPartyId;
 
   const allParties = [...(data?.allClaimants ?? []), ...(data?.allDefendants ?? [])];

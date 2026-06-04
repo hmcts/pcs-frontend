@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import { Request, RequestHandler } from 'express';
 
 import type { DocumentStorage } from '@modules/documents/storage';
 import { GetController, type SupportedLang } from '@modules/steps';
@@ -29,4 +29,6 @@ export interface StepDefinition {
   // Absent on every non-upload step. The upload handler refuses requests targeting
   // a step that does not declare this.
   documentStorage?: DocumentStorage;
+  // Truthy/falsy — consumers coerce. Lets `req => validatedCase?.foo` work without a Boolean(...) wrap.
+  isAnswered?: (req: Request) => unknown;
 }

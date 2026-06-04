@@ -15,13 +15,6 @@ export interface StepRoute {
   nextStep: string;
 }
 
-/**
- * Type for previousStep configuration.
- * Can be:
- * - A static string: the step name to navigate back to
- * - A function with Request only
- * - A function with Request and formData
- */
 export type PreviousStep =
   | string
   | ((req: Request) => string | Promise<string>)
@@ -39,11 +32,23 @@ export interface StepConfig {
 
 export type SectionApplicabilityCondition = (req: Request) => Promise<boolean>;
 
+export const SECTION_STATUS = {
+  NOT_APPLICABLE: 'NOT_APPLICABLE',
+  NOT_AVAILABLE_YET: 'NOT_AVAILABLE_YET',
+  AVAILABLE: 'AVAILABLE',
+  IN_PROGRESS: 'IN_PROGRESS',
+  DONE: 'DONE',
+} as const;
+
+export type SectionStatus = (typeof SECTION_STATUS)[keyof typeof SECTION_STATUS];
+
 export interface SectionConfig {
   id: string;
+  groupId?: string;
   titleKey: string;
-  steps: string[];
+  steps: readonly string[];
   isApplicable?: SectionApplicabilityCondition;
+  dependsOn?: readonly string[];
 }
 
 export interface JourneyFlowConfig {
@@ -51,9 +56,20 @@ export interface JourneyFlowConfig {
   journeyName?: string;
   useShowConditions?: boolean;
   useSessionFormData?: boolean;
+  /**
+   * CCD event ID started/resumed by this journey.
+   *
+   * Required when the journey is registered via `registerAllJourneys` (enforced at app boot).
+   * Optional on flow configs used only by the step/flow engine (e.g. tests, journey variants
+   * whose `eventId` is read from the default variant).
+   */
+  eventId?: string;
   entryStepIdAtBasePath?: string;
-  stepOrder?: string[];
-  nonSectionStepOrder?: string[];
+  stepOrder?: readonly string[];
+  nonSectionStepOrder?: readonly string[];
   steps: Record<string, StepConfig>;
-  sections?: SectionConfig[];
+  sections?: readonly SectionConfig[];
+  // When set, the back-link from the first visible step of any section returns
+  // here instead of walking back into the previous section.
+  hubStepName?: string;
 }

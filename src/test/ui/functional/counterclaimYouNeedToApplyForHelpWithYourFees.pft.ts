@@ -1,8 +1,8 @@
 import {
   counterClaimHaveYouAppliedForHelp,
   counterclaimYouNeedToApplyForHelpWithYourFees,
-  dashboard,
   feedback,
+  taskList,
 } from '../data/page-data';
 import { performValidation } from '../utils/controller';
 
@@ -20,6 +20,6 @@ export async function counterclaimYouNeedToApplyForHelpWithYourFeesNavigationTes
   await performValidation(
     'pageNavigation',
     counterclaimYouNeedToApplyForHelpWithYourFees.saveForLaterButton,
-    dashboard.mainHeader
+    taskList.mainHeader
   );
 }
