@@ -50,6 +50,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         },
       },
     ],
+    dateSubmitted: '2026-02-01',
     possessionClaimResponse: {
       claimIssuedDate: '2026-02-05',
       claimantServiceAddress: {
@@ -72,7 +73,6 @@ function buildComprehensiveCaseData(): CcdCaseData {
         },
       },
       defendantResponses: {
-        responseSubmittedDate: '2026-02-01',
         statementOfTruthCompletedBy: 'Jane Defendant',
         contactByText: 'YES',
         contactByPhone: 'YES',
@@ -158,6 +158,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
 
 function buildAlternateBranchesCaseData(): CcdCaseData {
   return {
+    dateSubmitted: 'also-invalid',
     possessionClaimResponse: {
       claimIssuedDate: 'not-a-valid-date',
       defendantContactDetails: {
@@ -169,7 +170,6 @@ function buildAlternateBranchesCaseData(): CcdCaseData {
         },
       },
       defendantResponses: {
-        responseSubmittedDate: 'also-invalid',
         tenancyStartDate: 'bad-date-value',
         disputeClaim: 'NO',
         tenancyTypeConfirmation: 'NO',
@@ -242,10 +242,10 @@ describe('viewTheResponse route', () => {
         PostTown: 'London',
         PostCode: 'W3 7RX',
       },
+      dateSubmitted: '2026-02-01',
       possessionClaimResponse: {
         claimIssuedDate: '2026-02-05',
         defendantResponses: {
-          responseSubmittedDate: '2026-02-01',
           statementOfTruthCompletedBy: 'DEFENDANT',
         },
       },
@@ -411,8 +411,9 @@ describe('viewTheResponse route', () => {
 
   it('should accept numeric case reference params', async () => {
     mockCaseById({
+      dateSubmitted: '2026-02-01',
       possessionClaimResponse: {
-        defendantResponses: { responseSubmittedDate: '2026-02-01' },
+        defendantResponses: {},
       },
     });
 

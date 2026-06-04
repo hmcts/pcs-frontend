@@ -234,7 +234,6 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
-  responseSubmittedDate?: string;
   statementOfTruthCompletedBy?: string;
   completedSections?: RespondToClaimSectionEnum[];
 }
@@ -257,6 +256,7 @@ export type CaseData = CcdCaseData;
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
   claimIssueDate?: string;
+  dateSubmitted?: string;
   claimantName?: string;
   isClaimantNameCorrect?: YesNoValue;
   overriddenClaimantName?: string;

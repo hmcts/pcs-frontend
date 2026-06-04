@@ -468,7 +468,7 @@ export default function viewTheResponseRoutes(app: Application): void {
 
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
 
-      const dateSubmitted = formatGdsDate(responses?.responseSubmittedDate);
+      const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
       const completedBy = responses?.statementOfTruthCompletedBy;
 
