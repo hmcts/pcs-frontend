@@ -10,6 +10,12 @@ export {
   isBlockedExtension,
 } from './fileExtensionValidation';
 
+export const MEDIA_EXTENSIONS = new Set<string>(['.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff']);
+
+export function isMediaExtension(filename: string): boolean {
+  return MEDIA_EXTENSIONS.has(getFileExtensionLower(filename));
+}
+
 export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizePerFileMB');
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;
 export const UPLOAD_MAX_TOTAL_SIZE_MB: number = config.get('documentUpload.maxTotalFileSizeMB');
@@ -79,4 +85,83 @@ export function validateFileType(mimetype: string, originalname: string): FileVa
   }
 
   return 'invalid_type';
+}
+
+export type UploadValidationOptions = {
+  maxFilenameLength?: number;
+  maxDocumentBytes?: number;
+  maxMediaBytes?: number;
+  maxPerFileBytes?: number;
+};
+
+export type UploadValidationError =
+  | { kind: 'blocked_media' }
+  | { kind: 'invalid_type' }
+  | { kind: 'filename_too_long'; maxLength: number }
+  | { kind: 'document_too_large'; maxBytes: number }
+  | { kind: 'media_too_large'; maxBytes: number }
+  | { kind: 'file_too_large'; maxBytes: number };
+
+export type ValidatableFile = {
+  originalname: string;
+  mimetype: string;
+  size: number;
+};
+
+export function validateUploadedFile(
+  file: ValidatableFile,
+  opts: UploadValidationOptions = {}
+): UploadValidationError | null {
+  const typeResult = validateFileType(file.mimetype, file.originalname);
+  if (typeResult === 'blocked_media') {
+    return { kind: 'blocked_media' };
+  }
+  if (typeResult === 'invalid_type') {
+    return { kind: 'invalid_type' };
+  }
+
+  if (opts.maxFilenameLength !== undefined && file.originalname.length > opts.maxFilenameLength) {
+    return { kind: 'filename_too_long', maxLength: opts.maxFilenameLength };
+  }
+
+  const isMedia = isMediaExtension(file.originalname);
+  if (isMedia && opts.maxMediaBytes !== undefined) {
+    if (file.size > opts.maxMediaBytes) {
+      return { kind: 'media_too_large', maxBytes: opts.maxMediaBytes };
+    }
+  } else if (!isMedia && opts.maxDocumentBytes !== undefined) {
+    if (file.size > opts.maxDocumentBytes) {
+      return { kind: 'document_too_large', maxBytes: opts.maxDocumentBytes };
+    }
+  } else if (opts.maxPerFileBytes !== undefined) {
+    if (file.size > opts.maxPerFileBytes) {
+      return { kind: 'file_too_large', maxBytes: opts.maxPerFileBytes };
+    }
+  }
+
+  return null;
+}
+
+export type UploadErrorTranslation = { key: string; params?: Record<string, string | number> };
+
+const LOCALE_PREFIX = 'errors.documentUpload';
+
+function bytesToMb(bytes: number): number {
+  return Math.round(bytes / (1024 * 1024));
+}
+
+export function getUploadErrorKey(error: UploadValidationError): UploadErrorTranslation {
+  switch (error.kind) {
+    case 'blocked_media':
+    case 'invalid_type':
+      return { key: `${LOCALE_PREFIX}.wrongFileTypeDocStore` };
+    case 'filename_too_long':
+      return { key: `${LOCALE_PREFIX}.filenameTooLong`, params: { maxLength: error.maxLength } };
+    case 'document_too_large':
+      return { key: `${LOCALE_PREFIX}.fileTooLargeDocument`, params: { maxSize: bytesToMb(error.maxBytes) } };
+    case 'media_too_large':
+      return { key: `${LOCALE_PREFIX}.fileTooLargeMedia`, params: { maxSize: bytesToMb(error.maxBytes) } };
+    case 'file_too_large':
+      return { key: `${LOCALE_PREFIX}.fileTooLargeDocStore`, params: { maxSize: bytesToMb(error.maxBytes) } };
+  }
 }
