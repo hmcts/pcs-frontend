@@ -24,4 +24,5 @@ export const accessYourCase = {
   accessCodeIncorrectFormatSpecialCharInput: 'invalid@code!',
   incorrectShortAccessCodeInput: 'short123',
   incorrectLongAccessCodeInput: 'toolongcode123456',
+  // Regression testing
 };
