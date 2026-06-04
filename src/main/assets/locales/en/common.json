@@ -143,7 +143,7 @@
       "heading2": "Telephone",
       "paragraph6": "0300 123 7050",
       "paragraph7": "Monday to Friday, 8.30am to 5pm.",
-      "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
+      "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "serviceUnavailable": {
       "title": "Sorry, the service is unavailable",
@@ -157,7 +157,7 @@
       "heading2": "Telephone",
       "paragraph5": "0300 123 7050",
       "paragraph6": "Monday to Friday, 8.30am to 5pm.",
-      "paragraph7": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
+      "paragraph7": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "technicalError": {
       "title": "Sorry, there is a problem with the service",
@@ -170,7 +170,7 @@
       "heading2": "Telephone",
       "paragraph6": "0300 123 7050",
       "paragraph7": "Monday to Friday, 8.30am to 5pm.",
-      "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
+      "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "accessDenied": {
       "title": "You do not have access to this page",
@@ -181,7 +181,7 @@
       "heading2": "Telephone",
       "paragraph4": "0300 123 7050",
       "paragraph5": "Monday to Friday, 8.30am to 5pm.",
-      "paragraph6": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
+      "paragraph6": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     }
   },
   "applicationErrors": {

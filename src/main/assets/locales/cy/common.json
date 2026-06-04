@@ -142,7 +142,7 @@
       "heading2": "cyTelephone",
       "paragraph6": "cy0300 123 7050",
       "paragraph7": "cyMonday to Friday, 8.30am to 5pm.",
-      "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
+      "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "serviceUnavailable": {
       "title": "cySorry, the service is unavailable",
@@ -156,7 +156,7 @@
       "heading2": "cyTelephone",
       "paragraph5": "cy0300 123 7050",
       "paragraph6": "cyMonday to Friday, 8.30am to 5pm.",
-      "paragraph7": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
+      "paragraph7": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "technicalError": {
       "title": "cySorry, there is a problem with the service",
@@ -169,7 +169,7 @@
       "heading2": "cyTelephone",
       "paragraph6": "cy0300 123 7050",
       "paragraph7": "cyMonday to Friday, 8.30am to 5pm.",
-      "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
+      "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "accessDenied": {
       "title": "cyYou do not have access to this page",
@@ -180,7 +180,7 @@
       "heading2": "cyTelephone",
       "paragraph4": "cy0300 123 7050",
       "paragraph5": "cyMonday to Friday, 8.30am to 5pm.",
-      "paragraph6": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>"
+      "paragraph6": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     }
   },
   "applicationErrors": {
