@@ -494,6 +494,7 @@ describe('registerAllJourneys', () => {
           slug: 'wiring-test',
           default: {
             flowConfig: {
+              eventId: 'wiringTest',
               basePath: '/case/:caseReference/wiring-test',
               eventId: 'wiringTest',
               stepOrder: ['step-a'],
