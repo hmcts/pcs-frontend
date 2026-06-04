@@ -81,13 +81,13 @@ import { whatOtherRegularExpensesDoYouHaveErrorValidation } from '../functional/
 import { whatRegularIncomeDoYouReceiveErrorValidation } from '../functional/whatRegularIncomeDoYouReceive.pft';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation } from '../functional/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.pft';
 import { yourCircumstancesErrorValidation } from '../functional/yourCircumstances.pft';
+import { getRelativeDate } from '../utils/common/date.utils';
 import {
   assertAllErrorMessageValidations,
   clearErrorMessageValidationFailures,
   softErrorMessageValidation,
 } from '../utils/common/error-message-validation-helper';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';

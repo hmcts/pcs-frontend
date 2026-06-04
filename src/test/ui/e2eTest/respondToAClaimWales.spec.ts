@@ -292,7 +292,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -302,17 +308,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
         taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
       ],
       status: 'Done',
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
-    await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
-  });
   });
 
   test('Respond to a claim - Wales - Standard contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes @noDefendants', async () => {

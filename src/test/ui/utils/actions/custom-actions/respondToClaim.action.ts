@@ -57,7 +57,18 @@ import {
   yourCircumstances,
   yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
-import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
+import { formatDateFromParts } from '../../common/date.utils';
+import {
+  buildFullName,
+  formatCurrency,
+  formatPoundsValue,
+  formatTextToLowercaseSeparatedBySpace,
+  joinNonEmptyValues,
+  normalizeLowercaseText,
+  normalizeValueData,
+  removeTrailingBracketedSuffix,
+  stripOptionalSuffix,
+} from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -76,21 +87,6 @@ const rtcCyaLabels = {
   contactDetails: 'Contact details',
   universalCreditApplicationDate: 'When did you apply for Universal Credit?',
 } as const;
-
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-] as const;
 
 const rtcSectionByAction = new Map<string, string>([
   ['selectLegalAdvice', 'startNowAndDetails'],
@@ -212,7 +208,7 @@ export class RespondToClaimAction implements IAction {
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
       ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page, fieldName as actionData)],
       ['validateCYARTC', () => this.validateCYARTC()],
-       ['changeAnswerOnFinalCYA', () => this.changeAnswerOnFinalCYA(page, fieldName as actionData)],
+      ['changeAnswerOnFinalCYA', () => this.changeAnswerOnFinalCYA(page, fieldName as actionData)],
       ['selectStatementOfTruthRTC', () => this.selectStatementOfTruthRTC(fieldName as actionRecord)],
       ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
       ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
@@ -228,31 +224,8 @@ export class RespondToClaimAction implements IAction {
     await actionToPerform();
   }
 
-  private normalizeValueData(value: actionData): string {
-    if (Array.isArray(value)) {
-      return value.map(val => String(val)).join(', ');
-    }
-    if (typeof value === 'object' && value !== null) {
-      return JSON.stringify(value);
-    }
-    return String(value);
-  }
-
-  private formatRtcCyaCurrency(value: actionData): string {
-    const numericValue = Number(value);
-    if (Number.isNaN(numericValue)) {
-      return String(value);
-    }
-    return `£${numericValue.toFixed(2)}`;
-  }
-
-  private formatRtcCyaFrequency(value: actionData): string {
-    const normalizedFrequency = String(value).trim().toLowerCase();
-    return normalizedFrequency;
-  }
-
   private getRtcCyaQuestionLabel(question: string): string {
-    return question.replace(/\s*\(optional\)(\?)?\s*$/i, '$1').trim();
+    return stripOptionalSuffix(question);
   }
 
   private getRtcCyaChoiceLabel(choice: actionData): string {
@@ -262,7 +235,7 @@ export class RespondToClaimAction implements IAction {
       return normalizedChoice;
     }
 
-    return normalizedChoice.replace(/\s*\([^)]*\)\s*$/, '').trim();
+    return removeTrailingBracketedSuffix(normalizedChoice);
   }
 
   private buildRtcCyaAmountAndFrequencyValue(
@@ -270,7 +243,7 @@ export class RespondToClaimAction implements IAction {
     frequency: actionData,
     descriptor: string = 'every'
   ): string {
-    return `${this.formatRtcCyaCurrency(amount)} ${descriptor} ${this.formatRtcCyaFrequency(frequency)}`;
+    return `${formatPoundsValue(String(amount))} ${descriptor} ${normalizeLowercaseText(frequency)}`;
   }
 
   private buildRtcCyaDateValue(
@@ -279,44 +252,16 @@ export class RespondToClaimAction implements IAction {
     year?: actionData,
     emptyValue: string = rtcNoAnswerProvidedValue
   ): string {
-    const formattedDate = this.formatRtcCyaDateParts(day, month, year);
+    const formattedDate = formatDateFromParts(day, month, year);
     return formattedDate ?? emptyValue;
   }
 
   private buildRtcCyaAddressValue(...lines: (actionData | undefined)[]): string {
-    return lines
-      .map(line => String(line ?? '').trim())
-      .filter(Boolean)
-      .join(', ');
+    return joinNonEmptyValues(...lines);
   }
 
   private buildRtcCyaFullName(firstName?: actionData, lastName?: actionData): string {
-    return `${String(firstName ?? '').trim()} ${String(lastName ?? '').trim()}`.trim();
-  }
-
-  private formatRtcCyaDateParts(day?: actionData, month?: actionData, year?: actionData): string | undefined {
-    const dayNumber = Number(String(day ?? '').trim());
-    const monthNumber = Number(String(month ?? '').trim());
-    const yearNumber = Number(String(year ?? '').trim());
-
-    if (!Number.isInteger(dayNumber) || !Number.isInteger(monthNumber) || !Number.isInteger(yearNumber)) {
-      return undefined;
-    }
-
-    if (monthNumber < 1 || monthNumber > 12 || dayNumber < 1 || yearNumber < 1) {
-      return undefined;
-    }
-
-    const date = new Date(Date.UTC(yearNumber, monthNumber - 1, dayNumber));
-    if (
-      date.getUTCFullYear() !== yearNumber ||
-      date.getUTCMonth() !== monthNumber - 1 ||
-      date.getUTCDate() !== dayNumber
-    ) {
-      return undefined;
-    }
-
-    return `${dayNumber} ${monthNames[monthNumber - 1]} ${yearNumber}`;
+    return buildFullName(firstName, lastName);
   }
 
   private recordRtcCyaName(label: string, firstName?: actionData, lastName?: actionData): void {
@@ -397,7 +342,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private recordAnswer(key: string, value: actionData): void {
-    const normalizedValue = this.normalizeValueData(value);
+    const normalizedValue = normalizeValueData(value);
     FieldsStore.set(key, normalizedValue);
     if (!activeRtcSection) {
       return;
@@ -1209,7 +1154,7 @@ export class RespondToClaimAction implements IAction {
   private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
     this.recordAnswer(
       priorityDebtDetails.whatIsTheTotalAmountQuestion,
-      this.formatRtcCyaCurrency(priorityDebtDetailsData.totalAmount)
+      formatPoundsValue(String(priorityDebtDetailsData.totalAmount))
     );
     this.recordAnswer(
       priorityDebtDetails.howMuchDoYouPayQuestion,
@@ -1491,9 +1436,8 @@ export class RespondToClaimAction implements IAction {
         .map((mismatch, index) => `${index + 1}. ${mismatch}`)
         .join('\n');
       const remainingMismatchCount = mismatches.length - rtcCyaFailurePreviewLimit;
-      const remainingMismatchSummary = remainingMismatchCount > 0
-        ? `\n...and ${remainingMismatchCount} more mismatch(es).`
-        : '';
+      const remainingMismatchSummary =
+        remainingMismatchCount > 0 ? `\n...and ${remainingMismatchCount} more mismatch(es).` : '';
 
       throw new Error(
         `RTC CYA validation failed for ${mismatches.length} item(s).\n${mismatchPreview}${remainingMismatchSummary}`

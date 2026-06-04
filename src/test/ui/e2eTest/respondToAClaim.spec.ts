@@ -46,11 +46,12 @@ import {
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  yourCircumstances, yourHouseholdAndCircumstances,
+  yourCircumstances,
+  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 const home_url = process.env.TEST_URL;
@@ -387,7 +388,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
-    //await performValidation('mainHeader', taskList.mainHeader);
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
@@ -409,7 +409,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', 'Submit');
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -560,7 +559,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -798,7 +803,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -987,7 +998,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -1161,7 +1178,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -1174,13 +1197,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
-    await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
-  });
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @regression', async () => {
@@ -1365,7 +1381,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -1375,17 +1397,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
         taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
       ],
       status: 'Done',
     });
-     await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
-    await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
-  });
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No - PriorityDebts - Yes - SelectCounterClaim - Yes @smoke @PR @regression', async () => {
@@ -1553,7 +1567,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -1563,17 +1583,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
         taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
       ],
       status: 'Done',
     });
-     await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
-    await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
-  });
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute - SomethingElse - SelectCounterClaim - Yes', async () => {
@@ -1736,7 +1748,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -1748,13 +1766,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         taskList.checkYourAnswersAndSubmitHiddenLink,
       ],
       status: 'Done',
-    });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
-    await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
     });
   });
 
@@ -1890,7 +1901,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -1900,16 +1917,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
         taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
       ],
       status: 'Done',
-    });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
-    await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
     });
   });
 
@@ -2061,7 +2070,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -2071,16 +2086,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
         taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
       ],
       status: 'Done',
-    });
-     await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
-    await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
     });
   });
 });
