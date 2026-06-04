@@ -41,7 +41,8 @@
     "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $(git rev-parse --short=7 HEAD) --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:openAllureReport": "yarn allure open allure-report",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
   },
   "_moduleAliases": {
     "@modules": "dist/main/modules",
@@ -106,7 +107,7 @@
     "@eslint/plugin-kit": "0.7.2",
     "@hmcts/playwright-common": "1.1.2",
     "@pact-foundation/pact": "15.0.1",
-    "@pact-foundation/pact-cli": "18.0.0",
+    "@pact-foundation/pact-cli": "18.1.0",
     "@playwright/test": "1.60.0",
     "@types/body-parser": "1.19.6",
     "@types/config": "4.4.0",
@@ -128,8 +129,8 @@
     "@types/uuid": "11.0.0",
     "@types/validator": "13.15.10",
     "@types/webpack-env": "1.18.8",
-    "@typescript-eslint/eslint-plugin": "8.60.0",
-    "@typescript-eslint/parser": "8.60.0",
+    "@typescript-eslint/eslint-plugin": "8.60.1",
+    "@typescript-eslint/parser": "8.60.1",
     "allure-commandline": "2.42.0",
     "allure-js-commons": "3.9.0",
     "allure-playwright": "3.9.0",

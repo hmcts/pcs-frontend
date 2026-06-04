@@ -189,7 +189,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(row?.actions?.items[0].visuallyHiddenText).toBe('rows.defendantNameConfirmation.changeHidden');
     });
 
-    it('correspondence-address: shows the confirmed claimant address as one row when the citizen answered Yes', () => {
+    it('correspondence-address: shows Yes against the interpolated question when the citizen confirmed the claim-recorded address', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -203,10 +203,11 @@ describe('section-CYA row builders — characterisation', () => {
         },
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
-      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
-      // The confirmed address shows as one multi-line row — no "is it correct?" Y/N row.
-      expect(addressRow?.value).toEqual({ html: '1 Claim Street<br>AB1 2CD' });
-      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
+      // YES branch uses the interpolated `label` ("Is your correspondence address X?") with a Y/N value —
+      // same shape as the defendant-name-confirmation row above.
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.label');
+      expect(addressRow?.value).toEqual({ text: 'options.yes' });
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel')).toBe(false);
     });
 
     it('correspondence-address: shows the corrected address as one row when the citizen answered No', () => {
@@ -522,6 +523,85 @@ describe('section-CYA row builders — characterisation', () => {
       );
       expect(rows.some(r => r.key.text === 'rows.otherOrderRequestDetails.label')).toBe(false);
       expect(rows.some(r => r.key.text === 'rows.otherOrderRequestFacts.label')).toBe(false);
+    });
+
+    it('counterclaim want-to-upload-files row: omitted when unanswered', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ makeCounterClaim: 'YES', counterClaim: { claimType: 'OTHER' } })),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.counterClaimWantToUploadFiles.label')).toBe(false);
+      expect(rows.some(r => r.key.text === 'rows.counterClaimDocuments.label')).toBe(false);
+    });
+
+    it('counterclaim want-to-upload-files row: renders Y/N and links to the upload question step', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: { claimType: 'OTHER' },
+            counterClaimWantToUploadFiles: 'YES',
+          })
+        ),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.counterClaimWantToUploadFiles.label');
+      expect(row?.value).toEqual({ text: 'options.yes' });
+      expect(row?.actions?.items[0].href).toContain('counter-claim-do-you-want-to-upload-files');
+    });
+
+    it('counterclaim documents row: omitted when upload was not wanted', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: { claimType: 'OTHER' },
+            counterClaimWantToUploadFiles: 'NO',
+          })
+        ),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.counterClaimDocuments.label')).toBe(false);
+    });
+
+    it('counterclaim documents row: shows "none" when upload was wanted but no files are present', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: { claimType: 'OTHER' },
+            counterClaimWantToUploadFiles: 'YES',
+            counterClaimDocuments: [],
+          })
+        ),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.counterClaimDocuments.label');
+      expect(row?.value).toEqual({ text: 'rows.counterClaimDocuments.none' });
+      expect(row?.actions?.items[0].href).toContain('counter-claim-upload-files');
+      expect(row?.actions?.items[0].visuallyHiddenText).toBeTruthy();
+    });
+
+    it('counterclaim documents row: lists uploaded document filenames', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model({
+            makeCounterClaim: 'YES',
+            counterClaim: { claimType: 'OTHER' },
+            counterClaimWantToUploadFiles: 'YES',
+            counterClaimDocuments: [
+              { id: 'a', value: { document: { document_filename: 'evidence.pdf' } } },
+              { id: 'b', value: { document: { document_filename: 'letter.docx' } } },
+            ],
+          })
+        ),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.counterClaimDocuments.label');
+      expect(row?.value.html).toContain('evidence.pdf');
+      expect(row?.value.html).toContain('letter.docx');
+      expect(row?.actions?.items[0].href).toContain('counter-claim-upload-files');
+      expect(row?.actions?.items[0].visuallyHiddenText).toBeTruthy();
     });
   });
 
