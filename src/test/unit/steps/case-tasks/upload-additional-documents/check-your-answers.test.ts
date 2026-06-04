@@ -49,7 +49,14 @@ const CASE_ID = '1234567890123456';
 function createPostReq(): Request {
   return {
     params: { caseReference: CASE_ID },
-    session: { user: { accessToken: 'token-123' } },
+    session: {
+      user: { accessToken: 'token-123' },
+      uploadedDocs: {
+        [CASE_ID]: {
+          'upload-your-documents': [{ value: { document: { document_filename: 'evidence.pdf' } } }],
+        },
+      },
+    },
     res: { locals: { validatedCase: { id: CASE_ID } } },
   } as unknown as Request;
 }
