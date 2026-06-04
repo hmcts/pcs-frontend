@@ -1,11 +1,13 @@
 import type { NextFunction, Request, Response } from 'express';
+import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../../../../HttpError';
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
 import { flowConfig, uploadYourDocumentsStep } from '../flow.config';
+import { isViewAllApplicationsAvailable } from '../flowConditions';
 
 import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
-import { createGetController, createStepNavigation, getFormData } from '@modules/steps';
+import { createGetController, createStepNavigation, getFormData, loadStepNamespace } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import {
   buildUploadDocumentsPayload,
@@ -37,6 +39,7 @@ export const step: StepDefinition = {
         url: req.originalUrl || '',
         documents,
         relatedApplicationText,
+        showRelatedApplication: await isViewAllApplicationsAvailable(req, {}, {}),
       };
     }),
   postController: {
@@ -50,6 +53,30 @@ export const step: StepDefinition = {
         const accessToken = req.session.user?.accessToken;
         if (!accessToken) {
           return next(new HTTPError('Authentication required', 401));
+        }
+
+        const documents = toDisplayDocuments(await uploadStorage.read(req));
+        if (documents.length === 0) {
+          await loadStepNamespace(req);
+          const getController = typeof step.getController === 'function' ? step.getController() : step.getController;
+          let pageContent: Record<string, unknown> = {};
+          const captureRes = {
+            render: (_view: string, content: Record<string, unknown>) => {
+              pageContent = content;
+            },
+          } as Response;
+
+          await getController.get(req, captureRes);
+          const t = pageContent.t as TFunction;
+          const errorMessage = t('errors.documents.required');
+
+          return res.status(400).render(templatePath, {
+            ...pageContent,
+            errorSummary: {
+              titleText: t('errors.title'),
+              errorList: [{ text: errorMessage, href: '#documents-section' }],
+            },
+          });
         }
 
         const payload = await buildUploadDocumentsPayload(req);
