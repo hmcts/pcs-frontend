@@ -1,7 +1,6 @@
 {
-  "caption": "Respond to a property possession claim",
   "heading": "Income",
-  "subheading": "What regular income does the defendant receive?",
+  "subheading": "What regular income does the defendant receive? (Optional)",
   "groupName": "Regular income options",
   "hintText": "Select all that apply. The information the defendant provides must be truthful and accurate.",
   "options": {

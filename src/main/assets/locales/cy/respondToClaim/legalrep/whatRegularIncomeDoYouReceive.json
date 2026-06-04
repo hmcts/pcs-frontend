@@ -1,7 +1,6 @@
 {
-  "caption": "cyRespond to a property possession claim",
   "heading": "cyIncome",
-  "subheading": "cyWhat regular income does the defendant receive?",
+  "subheading": "cyWhat regular income does the defendant receive? (Optional)",
   "groupName": "cyRegular income options",
   "hintText": "cySelect all that apply. The information the defendant provides must be truthful and accurate.",
   "options": {
