@@ -1,20 +1,21 @@
 import config from 'config';
 
-import { ALLOWED_EXTENSIONS, BLOCKED_EXTENSIONS, getFileExtensionLower } from './fileExtensionValidation';
+import {
+  ALLOWED_EXTENSIONS,
+  BLOCKED_EXTENSIONS,
+  getFileExtensionLower,
+  isMediaExtension,
+} from './fileExtensionValidation';
 
 export {
   ALLOWED_EXTENSIONS,
   BLOCKED_EXTENSIONS,
+  MEDIA_EXTENSIONS,
   getFileExtensionLower,
   isAllowedExtension,
   isBlockedExtension,
+  isMediaExtension,
 } from './fileExtensionValidation';
-
-export const MEDIA_EXTENSIONS = new Set<string>(['.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff']);
-
-export function isMediaExtension(filename: string): boolean {
-  return MEDIA_EXTENSIONS.has(getFileExtensionLower(filename));
-}
 
 export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizePerFileMB');
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;

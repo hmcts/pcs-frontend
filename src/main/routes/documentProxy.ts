@@ -15,10 +15,12 @@ import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cda
 import type { CdamDocument } from '@services/documentUpload.interface';
 import {
   UPLOAD_MAX_FILE_SIZE_BYTES,
-  UPLOAD_MAX_FILE_SIZE_MB,
   UPLOAD_MAX_TOTAL_SIZE_BYTES,
   UPLOAD_MAX_TOTAL_SIZE_MB,
-  validateFileType,
+  type UploadValidationError,
+  type UploadValidationOptions,
+  getUploadErrorKey,
+  validateUploadedFile,
 } from '@utils/documentUploadValidation';
 
 const logger = Logger.getLogger('document-proxy');
@@ -26,13 +28,27 @@ const logger = Logger.getLogger('document-proxy');
 /** Thrown from saveDraftWithNewDocument when total draft size would exceed the cap (CDAM doc is deleted first). */
 const DOCUMENT_TOTAL_SIZE_EXCEEDED = 'DOCUMENT_TOTAL_SIZE_EXCEEDED';
 
-export function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
-  const result = validateFileType(file.mimetype, file.originalname);
-  if (result === 'ok') {
-    cb(null, true);
+type RequestWithUploadValidation = Request & { uploadValidation?: UploadValidationOptions };
+
+export class UploadValidationFailure extends Error {
+  constructor(public readonly validationError: UploadValidationError) {
+    super('UPLOAD_VALIDATION_ERROR');
+    this.name = 'UploadValidationFailure';
+  }
+}
+
+export function fileFilter(req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
+  const opts = (req as RequestWithUploadValidation).uploadValidation ?? {};
+  // Size is unknown at fileFilter time; multer.limits.fileSize enforces the per-file byte cap during streaming.
+  const error = validateUploadedFile(
+    { originalname: file.originalname, mimetype: file.mimetype, size: 0 },
+    { maxFilenameLength: opts.maxFilenameLength }
+  );
+  if (error) {
+    cb(new UploadValidationFailure(error));
     return;
   }
-  cb(new Error(result === 'blocked_media' ? 'BLOCKED_MEDIA' : 'INVALID_FILE_TYPE'));
+  cb(null, true);
 }
 
 const upload = multer({
@@ -42,11 +58,14 @@ const upload = multer({
 
 type ErrorTranslations = ReturnType<typeof getErrorTranslations>;
 
+function translateValidationError(req: Request, error: UploadValidationError): string {
+  const { key, params } = getUploadErrorKey(error);
+  return req.t(key, params);
+}
+
 function getErrorTranslations(req: Request) {
   const t = req.t;
   return {
-    wrongType: t('errors.documentUpload.wrongFileTypeDocStore'),
-    tooLarge: t('errors.documentUpload.fileTooLargeDocStore', { maxSize: String(UPLOAD_MAX_FILE_SIZE_MB) }),
     totalTooLarge: t('errors.documentUpload.fileTotalTooLargeDocStore', {
       maxSize: String(UPLOAD_MAX_TOTAL_SIZE_MB),
     }),
@@ -73,13 +92,16 @@ export function handleMulterError(
     next();
     return;
   }
-  const errors = getErrorTranslations(req);
   if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
-    res.status(400).json({ error: { message: errors.tooLarge } });
+    const message = translateValidationError(req, {
+      kind: 'file_too_large',
+      maxBytes: UPLOAD_MAX_FILE_SIZE_BYTES,
+    });
+    res.status(400).json({ error: { message } });
     return;
   }
-  if (err.message === 'INVALID_FILE_TYPE' || err.message === 'BLOCKED_MEDIA') {
-    res.status(400).json({ error: { message: errors.wrongType } });
+  if (err instanceof UploadValidationFailure) {
+    res.status(400).json({ error: { message: translateValidationError(req, err.validationError) } });
     return;
   }
   next(err);
