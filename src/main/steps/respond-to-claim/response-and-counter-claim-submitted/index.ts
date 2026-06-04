@@ -17,6 +17,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     responseAndCounterClaimSubmittedParagraph3: 'responseAndCounterClaimSubmittedParagraph3',
     responseAndCounterClaimSubmittedParagraph4: 'responseAndCounterClaimSubmittedParagraph4',
     responseAndCounterClaimSubmittedParagraph5: 'responseAndCounterClaimSubmittedParagraph5',
+    closeAndReturnToCaseOverview: 'closeAndReturnToCaseOverview',
   },
   customTemplate: `${__dirname}/responseAndCounterClaimSubmitted.njk`,
   extendGetContent: () => ({
