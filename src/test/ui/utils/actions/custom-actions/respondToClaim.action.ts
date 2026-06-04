@@ -85,6 +85,7 @@ const rtcCyaFailurePreviewLimit = 10;
 
 const rtcCyaLabels = {
   contactDetails: 'Contact details',
+  counterClaimHelpWithFeesReference: 'Enter your Help with Fees reference number',
   universalCreditApplicationDate: 'When did you apply for Universal Credit?',
 } as const;
 
@@ -866,22 +867,21 @@ export class RespondToClaimAction implements IAction {
   private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
     const helpWithFeesQuestion =
       counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion;
+    this.recordAnswer(helpWithFeesQuestion, helpWithFee.helpWithFeeOption);
     await performAction('clickRadioButton', {
       question: helpWithFeesQuestion,
       option: helpWithFee.helpWithFeeOption,
     });
 
     if (helpWithFee.helpWithFeeOption === 'Yes') {
-      this.recordAnswer(helpWithFeesQuestion, `${helpWithFee.helpWithFeeOption}, ${helpWithFee.feeReference}`);
-      this.deleteAnswer(counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel);
+      this.recordAnswer(rtcCyaLabels.counterClaimHelpWithFeesReference, helpWithFee.feeReference);
       await performAction(
         'inputText',
         counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
         helpWithFee.feeReference
       );
     } else {
-      this.recordAnswer(helpWithFeesQuestion, helpWithFee.helpWithFeeOption);
-      this.deleteAnswer(counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel);
+      this.deleteAnswer(rtcCyaLabels.counterClaimHelpWithFeesReference);
       this.deleteAnswer(counterclaimYouNeedToApplyForHelpWithYourFees.helpWithFeesLink);
     }
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
