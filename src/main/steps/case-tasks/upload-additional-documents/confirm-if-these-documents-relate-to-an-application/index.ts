@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -43,6 +44,18 @@ function buildApplicationText(t: TFunction, type: GenAppType | undefined, submit
   }
 }
 
+function buildApplicationDocumentLink(
+  t: TFunction,
+  caseReference: string,
+  documentId: string,
+  documentFilename: string
+): string {
+  const openInNewTabText = escapeHtml(t('opensInNewTab'));
+  const safeFilename = escapeHtml(documentFilename);
+
+  return `<a href="/case/${caseReference}/view-documents/${documentId}" rel="noreferrer noopener" target="_blank" class="govuk-link">${safeFilename} (${openInNewTabText})</a>`;
+}
+
 export const step: StepDefinition = {
   url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
   name: stepName,
@@ -64,13 +77,34 @@ export const step: StepDefinition = {
 
       let applications = [noOption];
       if (caseId && accessToken) {
-        const dashboardView = await ccdCaseService.getDashboardView(accessToken, caseId);
+        const [dashboardView, ccdCase] = await Promise.all([
+          ccdCaseService.getDashboardView(accessToken, caseId),
+          ccdCaseService.getCaseById(accessToken, caseId),
+        ]);
+        const genAppsById = new Map((ccdCase.data.genApps ?? []).map(genApp => [genApp.id, genApp.value]));
         applications = [
-          ...dashboardView.relatedApplications.map(application => ({
-            value: application.id,
-            text: buildApplicationText(t, application.type, application.applicationSubmittedDate),
-            checked: selectedApplicationId === application.id,
-          })),
+          ...dashboardView.relatedApplications.map(application => {
+            const genApp = genAppsById.get(application.id);
+            const submissionDocument = genApp?.submissionDocument;
+            const hint =
+              submissionDocument?.id && submissionDocument.document?.document_filename
+                ? {
+                    html: buildApplicationDocumentLink(
+                      t,
+                      caseId,
+                      submissionDocument.id,
+                      submissionDocument.document.document_filename
+                    ),
+                  }
+                : undefined;
+
+            return {
+              value: application.id,
+              text: buildApplicationText(t, application.type, application.applicationSubmittedDate),
+              checked: selectedApplicationId === application.id,
+              ...(hint ? { hint } : {}),
+            };
+          }),
           noOption,
         ];
       }
