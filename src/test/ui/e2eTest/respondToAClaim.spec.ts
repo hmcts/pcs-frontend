@@ -416,11 +416,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Respond to a claim - Solicitor journey redirects to Dashboard when Yes is selected for Do you have a solicitor? @noDefendants @crossbrowser @regression', async () => {
+  test('Respond to a claim - Solicitor journey returns to task list when Yes is selected for Do you have a solicitor? @noDefendants @crossbrowser @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.yesRadioOption);
     await performValidation('mainHeader', askYourSolicitorToRespond.mainHeader);
     await performAction('clickButton', askYourSolicitorToRespond.closeAndReturnToTaskListButton);
+    await performValidation('mainHeader', taskList.mainHeader);
   });
 
   test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @regression @PR', async () => {
