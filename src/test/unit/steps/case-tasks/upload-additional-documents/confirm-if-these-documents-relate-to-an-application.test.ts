@@ -10,15 +10,17 @@ jest.mock('../../../../../main/modules/steps', () => {
 
   return {
     ...actual,
-    createGetController: jest.fn((_view: string, _stepName: string, _nav: unknown, extendContent?: (req: unknown) => unknown) => ({
-      get: async (req: { __translations?: Record<string, string> }, res: { render: jest.Mock }) => {
-        const content = (extendContent ? await extendContent(req) : {}) as Record<string, unknown>;
-        res.render(_view, {
-          ...content,
-          t: getTranslationFunction(req),
-        });
-      },
-    })),
+    createGetController: jest.fn(
+      (_view: string, _stepName: string, _nav: unknown, extendContent?: (req: unknown) => unknown) => ({
+        get: async (req: { __translations?: Record<string, string> }, res: { render: jest.Mock }) => {
+          const content = (extendContent ? await extendContent(req) : {}) as Record<string, unknown>;
+          res.render(_view, {
+            ...content,
+            t: getTranslationFunction(req),
+          });
+        },
+      })
+    ),
     createStepNavigation: jest.fn(() => ({
       getBackUrl: jest.fn(async () => '/back'),
       getNextStepUrl: jest.fn(async () => '/next'),
@@ -52,7 +54,8 @@ const mockGetCaseById = ccdCaseService.getCaseById as jest.Mock;
 
 function createReq(): Request {
   return {
-    originalUrl: '/case/1234567890123456/upload-additional-documents/confirm-if-these-documents-relate-to-an-application',
+    originalUrl:
+      '/case/1234567890123456/upload-additional-documents/confirm-if-these-documents-relate-to-an-application',
     params: { caseReference: '1234567890123456' },
     session: {
       user: { accessToken: 'access-token-1' },
@@ -138,7 +141,9 @@ describe('confirm-if-these-documents-relate-to-an-application step', () => {
           expect.objectContaining({
             value: 'gen-app-1',
             checked: true,
-            text: expect.stringContaining('Yes, the documents I’m uploading relate to the application to adjourn the hearing - submitted on'),
+            text: expect.stringContaining(
+              'Yes, the documents I’m uploading relate to the application to adjourn the hearing - submitted on'
+            ),
             hint: {
               html: '<a href="/case/1234567890123456/view-documents/doc-1" rel="noreferrer noopener" target="_blank" class="govuk-link">General Application GA1 - Defendant 1.pdf (opens in new tab)</a>',
             },
