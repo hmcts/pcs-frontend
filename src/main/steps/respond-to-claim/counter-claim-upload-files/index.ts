@@ -78,8 +78,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   getInitialFormData: async req => ({ documents: toDisplayDocuments(await storage.read(req)) }),
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.counterClaimDocuments =
-      response.defendantResponses.counterClaimDocuments ?? [];
+    response.defendantResponses.counterClaimDocuments = response.defendantResponses.counterClaimDocuments ?? [];
     await saveDraftDefendantResponse(req, response);
   },
 });
