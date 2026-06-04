@@ -19,34 +19,53 @@
     {% endif %}
   {% endset %}
 
-  {{ govukSummaryList({
-    rows: [
-      {
-        key: { text: t('relatedApplicationLabel') },
-        value: { text: relatedApplicationText },
-        actions: {
-          items: [
-            {
-              href: "./confirm-if-these-documents-relate-to-an-application",
-              text: t('change', { ns: 'common' })
-            }
-          ]
+  {% if showRelatedApplication %}
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { text: t('relatedApplicationLabel') },
+          value: { text: relatedApplicationText },
+          actions: {
+            items: [
+              {
+                href: "./confirm-if-these-documents-relate-to-an-application",
+                text: t('change', { ns: 'common' })
+              }
+            ]
+          }
+        },
+        {
+          key: { text: t('documentsLabel') },
+          value: { html: documentsHtml },
+          actions: {
+            items: [
+              {
+                href: "./upload-your-documents",
+                text: t('change', { ns: 'common' })
+              }
+            ]
+          }
         }
-      },
-      {
-        key: { text: t('documentsLabel') },
-        value: { html: documentsHtml },
-        actions: {
-          items: [
-            {
-              href: "./upload-your-documents",
-              text: t('change', { ns: 'common' })
-            }
-          ]
+      ]
+    }) }}
+  {% else %}
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { text: t('documentsLabel') },
+          value: { html: documentsHtml },
+          actions: {
+            items: [
+              {
+                href: "./upload-your-documents",
+                text: t('change', { ns: 'common' })
+              }
+            ]
+          }
         }
-      }
-    ]
-  }) }}
+      ]
+    }) }}
+  {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">
