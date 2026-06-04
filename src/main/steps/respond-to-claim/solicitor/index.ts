@@ -43,16 +43,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     await saveDraftDefendantResponse(req, response);
 
-    // Ensure the local validatedCase reflects the saved value so the showCondition
-    // on ask-your-solicitor-to-respond-to-the-claim resolves correctly during
-    // this request's flow navigation, regardless of what CCD echoes back.
-    const defendantResponses = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses;
-    if (defendantResponses !== undefined) {
-      if (hasSolicitor) {
-        defendantResponses.hasSolicitor = hasSolicitor;
-      } else {
-        delete defendantResponses.hasSolicitor;
-      }
+    if (hasSolicitor === 'YES') {
+      const caseId = req.res?.locals.validatedCase?.id;
+      req.res?.redirect(303, `/case/${caseId}/respond-to-claim/ask-your-solicitor-to-respond-to-the-claim?nav=1`);
     }
   },
 });

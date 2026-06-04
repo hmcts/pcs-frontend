@@ -43,10 +43,7 @@ export const flowConfig: JourneyFlowConfig = {
   // First visible step of any section back-links to this hub step.
   hubStepName: 'task-list',
   steps: {
-    'ask-your-solicitor-to-respond-to-the-claim': {
-      showCondition: (req: Request) =>
-        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',
-    },
+    'ask-your-solicitor-to-respond-to-the-claim': {},
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
     },
