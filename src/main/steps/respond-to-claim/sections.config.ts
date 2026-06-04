@@ -130,7 +130,7 @@ const sectionDefs = [
       'incomeAndExpenditure',
       'uploadFiles',
     ],
-    // HDPI-6929: 'reasonable-adjustments-triage', 'equality-and-diversity-start' and
+    // 'reasonable-adjustments-triage', 'equality-and-diversity-start' and
     // 'equality-and-diversity-end' are intentionally parked out of the live citizen
     // journey while RA / Your Support and PCQ integrations are still in progress.
     // Their step folders, registry entries and locale files are retained so re-

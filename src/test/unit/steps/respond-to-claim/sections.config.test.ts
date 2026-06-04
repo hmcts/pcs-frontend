@@ -18,7 +18,7 @@ const findSection = (id: string) => respondToClaimSections.find(section => secti
 
 describe('respond-to-claim sections config', () => {
   it('maps every sectioned flow step to exactly one section', () => {
-    // HDPI-6929: 'reasonable-adjustments-triage', 'equality-and-diversity-start'
+    // 'reasonable-adjustments-triage', 'equality-and-diversity-start'
     // and 'equality-and-diversity-end' are intentionally parked out of the live
     // section flow (see sections.config.ts). They remain in the registry so direct
     // URL access and re-enablement still work, so marking them as intentionally
