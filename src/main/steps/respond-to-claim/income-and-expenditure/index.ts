@@ -6,11 +6,13 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'income-and-expenses',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.shareIncomeExpenseDetails),
   stepDir: __dirname,
   customTemplate: `${__dirname}/incomeAndExpenditure.njk`,
 
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const existingAnswer =
       caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances?.shareIncomeExpenseDetails;
     const formValue = fromYesNoEnum(existingAnswer);

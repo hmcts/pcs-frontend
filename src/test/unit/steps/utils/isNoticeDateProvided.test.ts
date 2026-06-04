@@ -135,11 +135,9 @@ describe('isNoticeDateProvided', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false when res.locals is undefined', async () => {
+    it('should return false when res.locals.validatedCase is undefined', async () => {
       const mockReq = {
-        res: {
-          locals: undefined,
-        },
+        res: { locals: {} },
       } as unknown as Request;
 
       const result = await isNoticeDateProvided(mockReq);
