@@ -106,6 +106,8 @@ export class ActionRegistry {
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['taskList', new RespondToClaimAction()],
+    ['taskListStatus', new RespondToClaimAction()],
     ['resetRTCAnswerStore', new RespondToClaimAction()],
     ['retrieveCYATableDataRTC', new RespondToClaimAction()],
     ['validateCYARTC', new RespondToClaimAction()],

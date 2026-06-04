@@ -1,7 +1,12 @@
 import { Application, IRouter, Request, Router } from 'express';
 import type { RequestHandler } from 'express';
 
-import { caseReferenceParamMiddleware, legalRepresentativeHeaderMiddleware, oidcMiddleware } from '../middleware';
+import {
+  caseReferenceParamMiddleware,
+  legalRepresentativeHeaderMiddleware,
+  oidcMiddleware,
+  requireEventAccess,
+} from '../middleware';
 
 import { Logger } from '@modules/logger';
 import { getValidatedLanguage, stepDependencyCheckMiddleware, withStepContext } from '@modules/steps';
@@ -166,13 +171,29 @@ export function registerSteps(router: IRouter, specificJourney?: string): void {
 export function registerAllJourneys(app: Application): void {
   logger.info('Auto-registering all journeys from registry');
 
-  for (const journeyName of Object.keys(journeyRegistry)) {
+  for (const [journeyName, journey] of Object.entries(journeyRegistry)) {
     // Create a dedicated router for this journey with param merging enabled
     const journeyRouter = Router({ mergeParams: true });
+
+    const eventId = journey.default.flowConfig.eventId;
+    const basePath = journey.default.flowConfig.basePath;
+    if (!eventId) {
+      throw new Error(`Journey '${journeyName}' is missing required flowConfig.eventId`);
+    }
+    if (!basePath) {
+      throw new Error(`Journey '${journeyName}' is missing required flowConfig.basePath`);
+    }
 
     // Apply journey-specific middleware
     // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
     journeyRouter.param('caseReference', caseReferenceParamMiddleware);
+    journeyRouter.use(basePath, requireEventAccess(eventId));
+
+    // Stacked onto the :caseReference param callback so handlers fire after
+    // validatedCase loads, before per-step middleware. Mounting via .use() would fire too early.
+    for (const handler of journey.routeMiddleware ?? []) {
+      journeyRouter.param('caseReference', (req, res, next) => handler(req, res, next));
+    }
 
     // Register all steps for this journey on the journey router
     registerSteps(journeyRouter, journeyName);

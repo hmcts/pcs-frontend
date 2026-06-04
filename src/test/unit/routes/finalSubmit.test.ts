@@ -16,11 +16,19 @@ jest.mock('../../../main/middleware/oidc', () => ({
 }));
 
 const mockCaseReferenceParamMiddleware = jest.fn((req, res, next) => {
-  res.locals.validatedCase = { id: req.params.caseReference };
   next();
 });
 jest.mock('../../../main/middleware/caseReference', () => ({
   caseReferenceParamMiddleware: mockCaseReferenceParamMiddleware,
+}));
+
+const mockRequireEventAccessHandler = jest.fn((req, res, next) => {
+  res.locals.validatedCase = { id: req.params.caseReference };
+  next();
+});
+const mockRequireEventAccess = jest.fn(() => mockRequireEventAccessHandler);
+jest.mock('../../../main/middleware/requireEventAccess', () => ({
+  requireEventAccess: mockRequireEventAccess,
 }));
 
 const mockHttpGet = jest.fn();
@@ -42,6 +50,7 @@ describe('finalSubmit routes', () => {
   let mockRouterGet: jest.Mock;
   let mockRouterPost: jest.Mock;
   let mockRouterParam: jest.Mock;
+  let mockRouterUse: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,12 +58,14 @@ describe('finalSubmit routes', () => {
     mockRouterGet = jest.fn();
     mockRouterPost = jest.fn();
     mockRouterParam = jest.fn();
+    mockRouterUse = jest.fn();
     mockUse = jest.fn();
 
     const mockRouter = {
       get: mockRouterGet,
       post: mockRouterPost,
       param: mockRouterParam,
+      use: mockRouterUse,
     };
 
     jest.spyOn(require('express'), 'Router').mockReturnValue(mockRouter);
@@ -69,6 +80,14 @@ describe('finalSubmit routes', () => {
   describe('Router setup', () => {
     it('should register param middleware for caseReference', () => {
       expect(mockRouterParam).toHaveBeenCalledWith('caseReference', mockCaseReferenceParamMiddleware);
+    });
+
+    it('should apply requireEventAccess(respondPossessionClaim) only on final-submit and confirmation paths', () => {
+      expect(mockRequireEventAccess).toHaveBeenCalledWith('respondPossessionClaim');
+      expect(mockRouterUse).toHaveBeenCalledWith(
+        ['/:caseReference/final-submit', '/:caseReference/confirmation'],
+        mockRequireEventAccessHandler
+      );
     });
 
     it('should mount router under /case path', () => {
