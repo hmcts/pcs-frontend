@@ -1349,6 +1349,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async doYouWantToUploadFiles(uploadOption: actionRecord): Promise<void> {
+    this.recordAnswer(doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader, uploadOption);
     await performAction('clickRadioButton', {
       question: doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader,
       option: uploadOption.option,
