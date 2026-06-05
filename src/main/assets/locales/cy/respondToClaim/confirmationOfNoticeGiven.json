@@ -8,6 +8,7 @@
     "or": "cyor",
     "imNotSure": "cyI’m not sure"
   },
+  "noticeDateLabel": " ",
   "errors": {
     "possessionNoticeReceived": "cySelect if {{claimantName}} gave you notice of their intention to begin possession proceedings"
   }

@@ -9,7 +9,6 @@ const CITIZEN_ONLY_STEPS = [
   'free-legal-advice',
   'other-considerations',
   'reasonable-adjustments-triage',
-  'upload-document',
   // task-list + per-section CYAs are citizen-hub-only — legal rep gets the single
   // whole-claim CYA at check-your-answers, not these per-section summaries.
   'task-list',

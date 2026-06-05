@@ -1,0 +1,12 @@
+{
+  "caption": "Respond to a property possession claim",
+  "pageTitle": "Registered landlord",
+  "introText": "You can check if the landlord is registered by searching the",
+  "question": "Is the landlord registered?",
+  "options": {
+    "imNotSure": "Defendant is not sure"
+  },
+  "errors": {
+    "landlordRegistered": "Select if the defendant agrees with the landlord’s claim to be registered"
+  }
+}

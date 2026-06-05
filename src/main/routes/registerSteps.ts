@@ -104,7 +104,7 @@ function registerStepRoutes(
   }
 
   if (step.postController?.post) {
-    router.post(step.url, stepContext, ...authMiddlewares, (req, res, next) => {
+    router.post(step.url, stepContext, ...authMiddlewares, legalRepresentativeHeaderMiddleware, (req, res, next) => {
       const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
       return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
     });
