@@ -26,6 +26,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
+  isAnswered: req =>
+    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor !== undefined,
+  beforeGet: req => {
+    console.log('[solicitor] validatedCase:', JSON.stringify(req.res?.locals?.validatedCase, null, 2));
+  },
   getInitialFormData: req => {
     const hasSolicitor =
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor;
@@ -42,10 +47,5 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     await saveDraftDefendantResponse(req, response);
-
-    if (hasSolicitor === 'YES') {
-      const caseId = req.res?.locals.validatedCase?.id;
-      req.res?.redirect(303, `/case/${caseId}/respond-to-claim/ask-your-solicitor-to-respond-to-the-claim?nav=1`);
-    }
   },
 });
