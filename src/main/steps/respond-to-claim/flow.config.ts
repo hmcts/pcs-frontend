@@ -38,7 +38,6 @@ export const flowConfig: JourneyFlowConfig = {
   journeyName: 'respondToClaim',
   useShowConditions: true,
   useSessionFormData: false,
-  eventId: 'respondPossessionClaim',
   sections: respondToClaimSections,
   nonSectionStepOrder: ['end-now', 'task-list'],
   // First visible step of any section back-links to this hub step.

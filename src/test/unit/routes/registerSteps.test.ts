@@ -35,7 +35,6 @@ jest.mock('../../../main/middleware', () => ({
 
 const mockFlowConfig = {
   basePath: '/respond-to-claim',
-  eventId: 'respondPossessionClaim',
   stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
   steps: {
     'protected-step': { requiresAuth: true },
@@ -89,7 +88,6 @@ jest.mock('@steps', () => ({
       default: {
         flowConfig: {
           basePath: '/respond-to-claim',
-          eventId: 'respondPossessionClaim',
           stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
           steps: {
             'protected-step': { requiresAuth: true },
@@ -352,7 +350,6 @@ describe('registerSteps', () => {
           default: {
             flowConfig: {
               basePath: '/respond-to-claim',
-              eventId: 'respondPossessionClaim',
               stepOrder: ['no-controllers'],
               steps: {
                 'no-controllers': { requiresAuth: true },
@@ -410,8 +407,6 @@ describe('registerAllJourneys', () => {
   let mockParam: jest.Mock;
 
   const mockCaseReferenceParamMiddleware = jest.fn((req, res, next) => next());
-  const mockRequireEventAccessHandler = jest.fn((req, res, next) => next());
-  const mockRequireEventAccess = jest.fn(() => mockRequireEventAccessHandler);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -427,7 +422,6 @@ describe('registerAllJourneys', () => {
     jest.doMock('../../../main/middleware', () => ({
       oidcMiddleware: jest.fn((req, res, next) => next()),
       caseReferenceParamMiddleware: mockCaseReferenceParamMiddleware,
-      requireEventAccess: mockRequireEventAccess,
       legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
     }));
   });

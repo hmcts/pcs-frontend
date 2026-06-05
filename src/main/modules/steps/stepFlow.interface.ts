@@ -56,14 +56,6 @@ export interface JourneyFlowConfig {
   journeyName?: string;
   useShowConditions?: boolean;
   useSessionFormData?: boolean;
-  /**
-   * CCD event ID started/resumed by this journey.
-   *
-   * Required when the journey is registered via `registerAllJourneys` (enforced at app boot).
-   * Optional on flow configs used only by the step/flow engine (e.g. tests, journey variants
-   * whose `eventId` is read from the default variant).
-   */
-  eventId?: string;
   entryStepIdAtBasePath?: string;
   stepOrder?: readonly string[];
   nonSectionStepOrder?: readonly string[];

@@ -12,7 +12,6 @@ export const uploadYourDocumentsStep = 'upload-your-documents';
 export const flowConfig: JourneyFlowConfig = {
   basePath: UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE,
   journeyName: 'uploadAdditionalDocuments',
-  eventId: 'respondPossessionClaim',
   useSessionFormData: false,
   stepOrder: ['start-evidence-upload', confirmIfTheseDocumentsRelateToAnApplicationStep, uploadYourDocumentsStep],
   steps: {

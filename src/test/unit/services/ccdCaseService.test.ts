@@ -15,7 +15,6 @@ const mockGet = http.get as jest.Mock;
 const accessToken = 'token';
 const mockUrl = 'http://ccd.example.com';
 const caseId = '1234567890123456';
-const eventId = 'respondPossessionClaim';
 
 (config.get as jest.Mock).mockImplementation(key => {
   if (key === 'ccd.url') {
@@ -32,7 +31,7 @@ describe('ccdCaseService', () => {
   });
 
   describe('getCaseByIdForEvent', () => {
-    it('should retrieve case by ID for the given eventId', async () => {
+    it('should retrieve case by ID with default eventId', async () => {
       const mockCaseData = { applicantForename: 'John', applicantSurname: 'Doe' };
 
       mockGet.mockResolvedValue({
@@ -43,10 +42,10 @@ describe('ccdCaseService', () => {
         },
       });
 
-      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId);
 
       expect(mockGet).toHaveBeenCalledWith(
-        `${mockUrl}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`,
+        `${mockUrl}/cases/${caseId}/event-triggers/respondPossessionClaim?ignore-warning=false`,
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: `Bearer ${accessToken}`,
@@ -59,7 +58,7 @@ describe('ccdCaseService', () => {
       });
     });
 
-    it('should retrieve case by ID with a custom eventId', async () => {
+    it('should retrieve case by ID with custom eventId', async () => {
       const customEventId = 'customEvent';
       const mockCaseData = { applicantForename: 'Jane' };
 
@@ -92,7 +91,7 @@ describe('ccdCaseService', () => {
         data: {},
       });
 
-      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId);
 
       expect(result).toEqual({
         id: caseId,
@@ -107,7 +106,7 @@ describe('ccdCaseService', () => {
         },
       });
 
-      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId);
+      const result = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId);
 
       expect(result).toEqual({
         id: caseId,
@@ -121,8 +120,8 @@ describe('ccdCaseService', () => {
         message: 'Request failed',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Not authorised');
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow('Not authorised');
     });
 
     it('should throw HTTPError on case not found', async () => {
@@ -131,17 +130,15 @@ describe('ccdCaseService', () => {
         message: 'Case not found',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Case not found');
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow('Case not found');
     });
 
     it('should throw HTTPError on unexpected error', async () => {
       mockGet.mockRejectedValue(new Error('Network error'));
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(
-        'CCD case service error'
-      );
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId)).rejects.toThrow('CCD case service error');
     });
   });
 

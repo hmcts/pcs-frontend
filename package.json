@@ -41,8 +41,7 @@
     "test:can-i-deploy:consumer": "pact-broker can-i-deploy --pacticipant 'pcs_frontend' --version $(git rev-parse --short=7 HEAD) --broker-base-url https://pact-broker.platform.hmcts.net",
     "test:openAllureReport": "yarn allure open allure-report",
     "fortifyScan": "./src/test/java/gradlew -p src/test/java fortifyScan",
-    "prepare": "husky",
-    "lint-staged": "lint-staged"
+    "prepare": "husky"
   },
   "_moduleAliases": {
     "@modules": "dist/main/modules",

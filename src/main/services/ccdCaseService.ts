@@ -183,7 +183,11 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseByIdForEvent(accessToken: string, caseId: string, eventId: string): Promise<CcdCase> {
+  async getCaseByIdForEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string = 'respondPossessionClaim'
+  ): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
