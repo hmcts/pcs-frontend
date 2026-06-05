@@ -145,7 +145,7 @@ describe('multi-file-upload', () => {
 
     it('throws for filenames exceeding max length', () => {
       const longName = `${'a'.repeat(252)}.pdf`;
-      expect(longName.length).toBe(256);
+      expect(longName).toHaveLength(256);
       expect(() => capturedHooks.entryHook(null, { name: longName, size: 1024 })).toThrow('file_name_too_long');
       const summary = document.querySelector('.govuk-error-summary');
       expect(summary!.textContent).toContain('File name too long');
@@ -153,7 +153,7 @@ describe('multi-file-upload', () => {
 
     it('allows filenames at max length', () => {
       const maxName = `${'a'.repeat(251)}.pdf`;
-      expect(maxName.length).toBe(255);
+      expect(maxName).toHaveLength(255);
       expect(() => capturedHooks.entryHook(null, { name: maxName, size: 1024 })).not.toThrow();
     });
 

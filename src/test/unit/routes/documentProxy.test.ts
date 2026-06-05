@@ -237,7 +237,7 @@ describe('documentProxyRoutes', () => {
     it('rejects filenames longer than 255 characters with FILE_NAME_TOO_LONG error', () => {
       const cb = jest.fn();
       const longName = `${'a'.repeat(252)}.pdf`;
-      expect(longName.length).toBe(256);
+      expect(longName).toHaveLength(256);
       const file = { mimetype: 'application/pdf', originalname: longName } as Express.Multer.File;
       fileFilter({} as Request, file, cb);
       expect(cb).toHaveBeenCalledWith(expect.objectContaining({ message: 'FILE_NAME_TOO_LONG' }));
@@ -246,7 +246,7 @@ describe('documentProxyRoutes', () => {
     it('accepts filenames at 255 characters', () => {
       const cb = jest.fn();
       const maxName = `${'a'.repeat(251)}.pdf`;
-      expect(maxName.length).toBe(255);
+      expect(maxName).toHaveLength(255);
       const file = { mimetype: 'application/pdf', originalname: maxName } as Express.Multer.File;
       fileFilter({} as Request, file, cb);
       expect(cb).toHaveBeenCalledWith(null, true);
