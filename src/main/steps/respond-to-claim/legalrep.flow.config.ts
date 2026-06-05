@@ -42,6 +42,7 @@ const legalRepStepOrder = [
   'priority-debts',
   'priority-debt-details',
   'what-other-regular-expenses-do-you-have',
+  'other-considerations',
   'upload-document',
   'equality-and-diversity-start',
   'equality-and-diversity-end',
