@@ -230,7 +230,7 @@ test.afterEach(async () => {
 //@noDefendants(submitCasePayloadNoDefendants) represents all defendant details unknown pages and non-rent arrears
 //All defendant details known pages and Rent-arrears routing is covered in submitCasePayload
 //Mix and match of testcases needs to updated in e2etests once complete routing is implemented. ex: (Tendency type HDPI-3316 etc.)
-test.describe('Respond to a claim - e2e Journey @nightly', async () => {
+test.describe('Respond to a claim - e2e Journey @nightly @PR', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt, < 2 named parties - CounterClaimAppliedForHelp - Yes - about your counterclaim
   //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
   test('Respond to a claim - SelectCounterClaim - Yes @noDefendants @crossbrowser', async () => {
