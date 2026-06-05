@@ -37,6 +37,7 @@ describe('response-submitted-counter-claim-fee-payment-needed step', () => {
     expect(content.responseSubmittedCounterClaimFeePaymentNeededListItem1).toBe(
       'responseSubmittedCounterClaimFeePaymentNeededListItem1:/case/1234567890123456/respond-to-claim/counter-claim-application-fee-amount'
     );
+    expect(content.backUrl).toBe('');
   });
 
   it('falls back to # when case reference is unavailable', () => {
@@ -50,5 +51,6 @@ describe('response-submitted-counter-claim-fee-payment-needed step', () => {
     expect(content.responseSubmittedCounterClaimFeePaymentNeededListItem1).toBe(
       'responseSubmittedCounterClaimFeePaymentNeededListItem1:#'
     );
+    expect(content.backUrl).toBe('');
   });
 });

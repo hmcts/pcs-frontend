@@ -4,12 +4,13 @@ jest.mock('../../../../main/modules/steps', () => ({
 }));
 
 jest.mock('../../../../main/services/feeLookupService', () => ({
+  ...jest.requireActual('../../../../main/services/feeLookupService'),
   getCounterClaimFeeType: jest.fn(),
   getFee: jest.fn(),
 }));
 
 import { getTranslationFunction } from '../../../../main/modules/steps';
-import { getCounterClaimFeeType, getFee } from '../../../../main/services/feeLookupService';
+import { FeeType, getCounterClaimFeeType, getFee } from '../../../../main/services/feeLookupService';
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-application-fee-amount';
 
 type CounterClaimApplicationFeeAmountStep = {
@@ -86,6 +87,41 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
         counterClaimFee: '377.00',
         payNowButton: 'Pay your counterclaim fee (£377.00)',
         payNowUrl: '/case/123/respond-to-claim/counter-claim-payment/start',
+        payNowDisabled: false,
+      })
+    );
+  });
+
+  it('uses FEE0450 flat fee and empty amount for SOMETHING_ELSE claim type (AC03)', async () => {
+    (getCounterClaimFeeType as jest.Mock).mockReturnValue(FeeType.counterClaimFlatFeeFEE0450);
+    (getFee as jest.Mock).mockResolvedValue(154);
+
+    const content = await testedStep.extendGetContent({
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  counterClaim: {
+                    claimType: 'SOMETHING_ELSE',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      params: { caseReference: '123' },
+      session: { payment: { serviceRequestReference: 'SR-1' } },
+    });
+
+    expect(getCounterClaimFeeType).toHaveBeenCalledWith('SOMETHING_ELSE', undefined);
+    expect(getFee).toHaveBeenCalledWith(FeeType.counterClaimFlatFeeFEE0450, undefined);
+    expect(content).toEqual(
+      expect.objectContaining({
+        counterClaimAmount: undefined,
+        counterClaimFee: '154.00',
         payNowDisabled: false,
       })
     );

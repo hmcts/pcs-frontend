@@ -13,6 +13,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     paymentReferenceLabel: 'paymentReferenceLabel',
     paymentReferencePlaceholder: 'paymentReferencePlaceholder',
     paragraph2: 'paragraph2',
+    closeAndReturnToCaseOverview: 'closeAndReturnToCaseOverview',
   },
   extendGetContent: req => {
     const paymentReference = req.session.payment?.paymentReference;

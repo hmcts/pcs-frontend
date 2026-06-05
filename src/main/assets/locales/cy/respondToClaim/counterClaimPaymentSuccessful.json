@@ -2,6 +2,7 @@
   "pageTitle": "cyPayment successful",
   "paragraph1": "cyYour payment was successful and your counterclaim has been submitted.",
   "paymentReferenceLabel": "cyYour payment reference number is:",
-  "paymentReferencePlaceholder": "cyTo be confirmed",
-  "paragraph2": "cyWe’ve sent you a confirmation email."
+  "paymentReferencePlaceholder": "cy To be confirmed",
+  "paragraph2": "cyWe’ve sent you a confirmation email.",
+  "closeAndReturnToCaseOverview": "cyClose and return to case overview"
 }

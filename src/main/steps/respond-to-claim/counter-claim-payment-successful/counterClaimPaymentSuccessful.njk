@@ -21,7 +21,8 @@
   <p class="govuk-body">{{ paragraph2 }}</p>
 
   {{ govukButton({
-    text: "Close and return to task list",
+    text: closeAndReturnToCaseOverview,
+    href: dashboardUrl,
     classes: "govuk-!-margin-top-6"
   }) }}
 {% endblock %}

@@ -18,6 +18,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     responseSubmittedCounterClaimFeePaymentNeededParagraph2: 'responseSubmittedCounterClaimFeePaymentNeededParagraph2',
     closeAndReturnToCaseOverview: 'closeAndReturnToCaseOverview',
   },
+  customTemplate: `${__dirname}/responseSubmittedCounterClaimFeePaymentNeeded.njk`,
   extendGetContent: req => {
     const caseReference = req.params.caseReference;
     const counterClaimApplicationFeeAmountUrl = caseReference
@@ -26,6 +27,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const t = getTranslationFunction(req);
 
     return {
+      backUrl: '',
       responseSubmittedCounterClaimFeePaymentNeededListItem1: t(
         'responseSubmittedCounterClaimFeePaymentNeededListItem1',
         {
@@ -34,8 +36,4 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ),
     };
   },
-  customTemplate: `${__dirname}/responseSubmittedCounterClaimFeePaymentNeeded.njk`,
-  extendGetContent: () => ({
-    backUrl: '',
-  }),
 });

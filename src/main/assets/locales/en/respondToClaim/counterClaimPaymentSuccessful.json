@@ -3,5 +3,6 @@
   "paragraph1": "Your payment was successful and your counterclaim has been submitted.",
   "paymentReferenceLabel": "Your payment reference number is:",
   "paymentReferencePlaceholder": "To be confirmed",
-  "paragraph2": "We’ve sent you a confirmation email."
+  "paragraph2": "We’ve sent you a confirmation email.",
+  "closeAndReturnToCaseOverview": "Close and return to case overview"
 }
