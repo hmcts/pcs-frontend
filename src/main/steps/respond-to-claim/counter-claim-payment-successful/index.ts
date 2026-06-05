@@ -1,6 +1,5 @@
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
@@ -14,11 +13,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     paymentReferenceLabel: 'paymentReferenceLabel',
     paymentReferencePlaceholder: 'paymentReferencePlaceholder',
     paragraph2: 'paragraph2',
-    stubParagraph: 'stubParagraph',
   },
   extendGetContent: req => {
-    const t = getTranslationFunction(req);
-    const paymentReference = req.session.payment?.paymentReference || t('paymentReferencePlaceholder');
+    const paymentReference = req.session.payment?.paymentReference;
 
     return {
       paymentReference,

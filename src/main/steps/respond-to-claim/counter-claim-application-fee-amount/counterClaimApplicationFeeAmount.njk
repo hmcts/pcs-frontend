@@ -26,11 +26,15 @@
     ]
   }) }}
 
-  <p class="govuk-body">{{ paymentStubParagraph }}</p>
-  <p class="govuk-hint">{{ paymentStubHint }}</p>
+  {% if showPaymentError %}
+    <p class="govuk-error-message">{{ paymentError }}</p>
+  {% endif %}
+
+  <p class="govuk-hint">{{ paymentHint }}</p>
 
   {{ govukButton({
     text: payNowButton,
-    disabled: true
+    href: payNowUrl,
+    disabled: payNowDisabled
   }) }}
 {% endblock %}

@@ -3,6 +3,5 @@
   "paragraph1": "Your payment was successful and your counterclaim has been submitted.",
   "paymentReferenceLabel": "Your payment reference number is:",
   "paymentReferencePlaceholder": "To be confirmed",
-  "paragraph2": "We’ve sent you a confirmation email.",
-  "stubParagraph": "This is a placeholder confirmation screen until callback wiring and post-payment redirects are completed in Phase 6."
+  "paragraph2": "We’ve sent you a confirmation email."
 }

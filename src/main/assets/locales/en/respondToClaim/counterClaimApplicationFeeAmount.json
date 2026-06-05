@@ -4,6 +4,6 @@
   "counterClaimAmountLabel": "Counterclaim amount",
   "counterClaimFeeLabel": "Counterclaim fee",
   "payNowButton": "Pay your counterclaim fee (£{{counterClaimFee}})",
-  "paymentStubParagraph": "This page is ready for payment integration.",
-  "paymentStubHint": "The payment action will be enabled once the shared GOV.UK Pay journey is wired in Phase 6."
+  "paymentHint": "You must pay your counterclaim fee for your counterclaim to be considered.",
+  "paymentError": "We could not start your payment. Try again."
 }

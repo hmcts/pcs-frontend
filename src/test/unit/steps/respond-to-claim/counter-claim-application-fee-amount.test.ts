@@ -14,6 +14,9 @@ import { step } from '../../../../main/steps/respond-to-claim/counter-claim-appl
 
 type CounterClaimApplicationFeeAmountStep = {
   extendGetContent: (req: {
+    params?: { caseReference?: string };
+    query?: { payment?: string };
+    session?: { payment?: { serviceRequestReference?: string } };
     res?: {
       locals?: {
         validatedCase?: {
@@ -71,6 +74,8 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
           },
         },
       },
+      params: { caseReference: '123' },
+      session: { payment: { serviceRequestReference: 'SR-1' } },
     });
 
     expect(getCounterClaimFeeType).toHaveBeenCalledWith('PAYMENT_OR_COMPENSATION', '64900');
@@ -80,6 +85,8 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
         counterClaimAmount: '649.00',
         counterClaimFee: '377.00',
         payNowButton: 'Pay your counterclaim fee (£377.00)',
+        payNowUrl: '/case/123/respond-to-claim/counter-claim-payment/start',
+        payNowDisabled: false,
       })
     );
   });

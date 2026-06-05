@@ -32,8 +32,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     counterClaimAmountLabel: 'counterClaimAmountLabel',
     counterClaimFeeLabel: 'counterClaimFeeLabel',
     payNowButton: 'payNowButton',
-    paymentStubParagraph: 'paymentStubParagraph',
-    paymentStubHint: 'paymentStubHint',
+    paymentHint: 'paymentHint',
+    paymentError: 'paymentError',
   },
   extendGetContent: async req => {
     const counterClaim =
@@ -54,11 +54,20 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const t = getTranslationFunction(req);
     const formattedCounterClaimAmount = formatPounds(penceToPounds(claimAmountInPence));
     const formattedCounterClaimFee = formatPounds(counterClaimFee) ?? '0.00';
+    const caseReference = req.params.caseReference;
+    const serviceRequestReference = req.session.payment?.serviceRequestReference;
+    const payNowUrl = caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
+    const payNowDisabled = !serviceRequestReference;
+    const paymentQuery = req.query?.payment;
+    const showPaymentError = paymentQuery === 'failed' || paymentQuery === 'pending';
 
     return {
       counterClaimAmount: formattedCounterClaimAmount,
       counterClaimFee: formattedCounterClaimFee,
       payNowButton: t('payNowButton', { counterClaimFee: formattedCounterClaimFee }),
+      payNowUrl,
+      payNowDisabled,
+      showPaymentError,
     };
   },
 });

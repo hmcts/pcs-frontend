@@ -21,7 +21,7 @@ export interface CardPaymentStatusResponse {
   status: string;
 }
 
-export interface StartCardPaymentJourneyInput {
+export interface StartCardPaymentRequestInput {
   accessToken: string;
   serviceRequestReference: string;
   amount: number;
@@ -29,7 +29,7 @@ export interface StartCardPaymentJourneyInput {
   returnUrl: string;
 }
 
-export interface StartCardPaymentJourneyResult {
+export interface StartCardPaymentRequestResult {
   paymentReference: string;
   paymentStatus: string;
   nextUrl: string;
@@ -92,7 +92,7 @@ export const paymentService = {
     return response.data;
   },
 
-  async startCardPaymentJourney(input: StartCardPaymentJourneyInput): Promise<StartCardPaymentJourneyResult> {
+  async startCardPaymentRequest(input: StartCardPaymentRequestInput): Promise<StartCardPaymentRequestResult> {
     const paymentResponse = await this.createCardPaymentRequest(input.accessToken, input.serviceRequestReference, {
       amount: input.amount,
       language: mapRequestLanguageToPaymentLanguage(input.requestLanguage),

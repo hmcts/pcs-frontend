@@ -98,7 +98,7 @@ describe('paymentReturn routes', () => {
       expect(res.render).toHaveBeenCalledWith('error', { error: 'Authentication required' });
     });
 
-    it('redirects to success URL and clears payment session on successful status', async () => {
+    it('redirects to success URL and retains payment reference on successful status', async () => {
       const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       mockGetCardPaymentStatus.mockResolvedValue({ status: 'Success' });
@@ -123,7 +123,9 @@ describe('paymentReturn routes', () => {
 
       expect(mockGetCardPaymentStatus).toHaveBeenCalledWith('token-123', 'RC-123');
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/payment-successful');
-      expect(req.session.payment).toBeUndefined();
+      expect(req.session.payment).toEqual({
+        paymentReference: 'RC-123',
+      });
     });
 
     it('redirects to failure URL and clears payment session on failed status', async () => {

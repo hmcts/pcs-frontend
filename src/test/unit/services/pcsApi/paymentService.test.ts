@@ -68,12 +68,12 @@ describe('paymentService', () => {
     });
   });
 
-  it('starts card payment journey from an existing service request reference', async () => {
+  it('starts card payment request using existing service request reference', async () => {
     mockHttp.post.mockResolvedValue({
       data: { paymentReference: 'RC-123', status: 'Created', nextUrl: 'https://gov.pay/url' },
     });
 
-    const response = await paymentService.startCardPaymentJourney({
+    const response = await paymentService.startCardPaymentRequest({
       accessToken: 'token-123',
       serviceRequestReference: 'SR-123',
       amount: 10.99,

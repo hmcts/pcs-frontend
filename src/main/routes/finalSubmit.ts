@@ -19,6 +19,8 @@ import { http } from '../modules/http';
 import { getRespondToClaimConfirmationPath } from '../steps/utils/postSubmissionRouting';
 
 import { Logger } from '@modules/logger';
+import type { CcdCase } from '@services/ccdCase.interface';
+import { setPaymentSessionState } from '@services/paymentSessionService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('finalSubmit');
@@ -36,6 +38,35 @@ function getCaseHeaders(token: string) {
       'Content-Type': 'application/json',
     },
   };
+}
+
+interface SubmitPaymentPayload {
+  serviceRequestReference: string;
+  feeAmount?: number;
+}
+
+function parseSubmitPaymentPayload(confirmationBody?: string | null): SubmitPaymentPayload | undefined {
+  if (!confirmationBody) {
+    return undefined;
+  }
+  try {
+    const parsed = JSON.parse(confirmationBody) as {
+      serviceRequestReference?: unknown;
+      feeAmount?: unknown;
+    };
+
+    if (typeof parsed.serviceRequestReference !== 'string' || parsed.serviceRequestReference.trim().length === 0) {
+      return undefined;
+    }
+
+    return {
+      serviceRequestReference: parsed.serviceRequestReference,
+      feeAmount: typeof parsed.feeAmount === 'number' ? parsed.feeAmount : undefined,
+    };
+  } catch (error) {
+    logger.warn('Unable to parse submit confirmation body JSON for payment payload', error);
+    return undefined;
+  }
 }
 
 export default function finalSubmitRoutes(app: Application): void {
@@ -105,11 +136,23 @@ export default function finalSubmitRoutes(app: Application): void {
       logger.info(`Calling SUBMIT with minimal data: ${submitUrl}`);
       logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
 
-      await http.post(submitUrl, payload, getCaseHeaders(userAccessToken));
+      const submitResponse = await http.post<CcdCase>(submitUrl, payload, getCaseHeaders(userAccessToken));
+      const submittedCase = submitResponse.data;
 
       logger.info(`Response submitted successfully for case ${caseId}`);
 
-      return safeRedirect303(res, getRespondToClaimConfirmationPath(caseId, validatedCase.data), '/', ['/case']);
+      const confirmationPath = getRespondToClaimConfirmationPath(caseId, validatedCase.data);
+      const paymentPayload = parseSubmitPaymentPayload(submittedCase.after_submit_callback_response?.confirmation_body);
+
+      if (paymentPayload && confirmationPath.endsWith('/response-submitted-counter-claim-fee-payment-needed')) {
+        setPaymentSessionState(req, {
+          caseReference: caseId,
+          serviceRequestReference: paymentPayload.serviceRequestReference,
+          feeAmount: paymentPayload.feeAmount,
+        });
+      }
+
+      return safeRedirect303(res, confirmationPath, '/', ['/case']);
     } catch (error) {
       logger.error(`Failed to submit response for case ${caseId}:`, error);
       return safeRedirect303(res, `/case/${caseId}/respond-to-claim/check-your-answers?submitError=failed`, '/', [

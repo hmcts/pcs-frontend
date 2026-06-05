@@ -1,6 +1,10 @@
 import type { Request } from 'express';
 
-import { clearPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
+import {
+  clearPaymentSessionState,
+  retainPaymentReferenceOnly,
+  setPaymentSessionState,
+} from '@services/paymentSessionService';
 
 describe('paymentSessionService', () => {
   it('stores payment session state when payment has started', () => {
@@ -59,5 +63,24 @@ describe('paymentSessionService', () => {
     clearPaymentSessionState(req);
 
     expect(req.session.payment).toBeUndefined();
+  });
+
+  it('retains only payment reference in session state', () => {
+    const req = {
+      session: {
+        payment: {
+          paymentReference: 'RC-123',
+          serviceRequestReference: 'SR-123',
+          caseReference: '1234567890123456',
+          successRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-successful',
+        },
+      },
+    } as unknown as Request;
+
+    retainPaymentReferenceOnly(req);
+
+    expect(req.session.payment).toEqual({
+      paymentReference: 'RC-123',
+    });
   });
 });

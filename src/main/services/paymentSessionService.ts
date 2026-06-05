@@ -19,3 +19,16 @@ export function setPaymentSessionState(req: Request, paymentSessionState: Paymen
 export function clearPaymentSessionState(req: Request): void {
   delete req.session.payment;
 }
+
+export function retainPaymentReferenceOnly(req: Request): void {
+  const paymentReference = req.session.payment?.paymentReference;
+
+  if (!paymentReference) {
+    clearPaymentSessionState(req);
+    return;
+  }
+
+  req.session.payment = {
+    paymentReference,
+  };
+}

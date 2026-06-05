@@ -3,7 +3,7 @@ import type { Application, Request, Response } from 'express';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { Logger } from '@modules/logger';
-import { clearPaymentSessionState } from '@services/paymentSessionService';
+import { clearPaymentSessionState, retainPaymentReferenceOnly } from '@services/paymentSessionService';
 import { getPaymentOutcome, paymentService } from '@services/pcsApi/paymentService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -46,7 +46,9 @@ export default function paymentReturnRoutes(app: Application): void {
         redirectTarget = failureRedirectUrl;
       }
 
-      if (outcome !== 'pending') {
+      if (outcome === 'success') {
+        retainPaymentReferenceOnly(req);
+      } else if (outcome !== 'pending') {
         clearPaymentSessionState(req);
       }
 
