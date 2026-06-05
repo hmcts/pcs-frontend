@@ -7,13 +7,14 @@ import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccd
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-you-have-any-other-dependants',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.otherDependants),
   stepDir: __dirname,
   customTemplate: `${__dirname}/anyOtherDependants.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
     paragraph: 'otherDependantsParagraph',
-    dependantHeading: 'dependantHeading',
     dependantQuestion: 'dependantQuestion',
   },
   beforeRedirect: async req => {
@@ -45,7 +46,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
   },
   getInitialFormData: req => {
-    const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
     const householdCircumstances: HouseholdCircumstances | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict

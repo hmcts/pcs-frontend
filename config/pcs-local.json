@@ -17,6 +17,9 @@
   "xui": {
     "uri": "http://localhost:3000"
   },
+  "feeService": {
+    "url": "http://localhost:8180"
+  },
   "redirects": {
     "manageCaseReturnURL": "http://localhost:3000/cases/case-details/PCS/PCS"
   }

@@ -1,4 +1,4 @@
-import { counterClaimFee, counterClaimHaveYouAppliedForHelp, dashboard, feedback } from '../data/page-data';
+import { counterClaimFee, counterClaimHaveYouAppliedForHelp, feedback, taskList } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function counterClaimHaveYouAppliedForHelpErrorValidation(): Promise<void> {
@@ -34,5 +34,5 @@ export async function counterClaimHaveYouAppliedForHelpNavigationTests(): Promis
     counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
     counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput
   );
-  await performValidation('pageNavigation', counterClaimHaveYouAppliedForHelp.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', counterClaimHaveYouAppliedForHelp.saveForLaterButton, taskList.mainHeader);
 }

@@ -91,6 +91,7 @@ const regularExpenseKeys = [
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-other-regular-expenses-do-you-have',
+  isAnswered: () => true,
   stepDir: __dirname,
   showCancelButton: false,
   translationKeys: {
@@ -449,7 +450,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const draftHc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances as
       | HouseholdCircumstances
       | undefined;

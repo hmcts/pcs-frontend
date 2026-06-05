@@ -17,13 +17,9 @@
   {% if paragraph %}
     <p class="govuk-body">{{ paragraph }}</p>
   {% endif %}
-  
-  {% if dependantHeading %}
-    <h2 class="govuk-heading-m">{{ dependantHeading }}</h2>
-  {% endif %}
 
   {% if dependantQuestion %}
-    <p class="govuk-heading-s">{{ dependantQuestion }} </p>
+    <p class="govuk-heading-m">{{ dependantQuestion }} </p>
   {% endif %}
 
   <form method="post" action="{{ url }}">

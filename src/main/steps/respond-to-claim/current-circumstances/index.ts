@@ -8,10 +8,11 @@ import type { YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'your-circumstances',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.shareAdditionalCircumstances),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
-    circumstanceHeading: 'circumstanceHeading',
     circumstanceQuestion: 'circumstanceQuestion',
   },
   fields: [
@@ -87,7 +88,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const circumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — fromYesNoEnum handles either casing.
     const shareCircumstances = fromYesNoEnum(circumstances?.shareAdditionalCircumstances);

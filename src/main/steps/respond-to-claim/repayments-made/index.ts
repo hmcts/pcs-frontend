@@ -7,6 +7,7 @@ import type { CaseData, PaymentAgreement, YesNoValue } from '@services/ccdCase.i
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-made',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.anyPaymentsMade),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -87,8 +88,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     };
   },
   extendGetContent: req => {
-    const validatedCase = req.res?.locals?.validatedCase;
+    const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
+    // TODO HDPI-5157: hardcode fallback for now, wire claimIssueDate from START callback later
     const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
 
     return {

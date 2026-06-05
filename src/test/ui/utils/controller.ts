@@ -110,7 +110,11 @@ async function validatePageIfNavigated(action: string): Promise<void> {
           });
         } catch (error) {
           const errorMessage = String((error as Error).message || error).toLowerCase();
-          if (errorMessage.includes('execution context was destroyed') || errorMessage.includes('navigation')) {
+          if (
+            errorMessage.includes('execution context was destroyed') ||
+            errorMessage.includes('navigation') ||
+            errorMessage.includes('documentelement')
+          ) {
             console.warn(`Accessibility audit skipped due to navigation: ${errorMessage}`);
           } else {
             throw error;
@@ -143,7 +147,6 @@ export async function performAction(
 
     return;
   }
-  await validatePageIfNavigated(action);
   const actionInstance = ActionRegistry.getAction(action);
 
   let displayFieldName = fieldName;

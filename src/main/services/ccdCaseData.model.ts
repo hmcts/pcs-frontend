@@ -48,6 +48,10 @@ export class CcdCaseModel {
     return this.data.noticeServed;
   }
 
+  get walesNoticeServed(): string | undefined {
+    return this.data.walesNoticeServed;
+  }
+
   get propertyAddress(): CcdCaseAddress | undefined {
     return this.data.propertyAddress;
   }
@@ -157,6 +161,14 @@ export class CcdCaseModel {
     return this.claimantEnteredDefendantDetails.nameKnown ?? '';
   }
 
+  get claimantEnteredDefendantDetailsAddressKnown(): string {
+    return this.claimantEnteredDefendantDetails.addressKnown ?? '';
+  }
+
+  get claimantEnteredDefendantDetailsAddressSameAsProperty(): string {
+    return this.claimantEnteredDefendantDetails.addressSameAsProperty ?? '';
+  }
+
   get claimantEnteredDefendantDetailsName(): string {
     if (this.defendantName?.trim()) {
       return this.defendantName.trim();
@@ -181,14 +193,6 @@ export class CcdCaseModel {
     }
 
     return address as CcdCaseAddress;
-  }
-
-  get defendantContactDetailsPartyAddressKnown(): string {
-    return this.defendantContactDetailsParty.addressKnown ?? '';
-  }
-
-  get hasDefendantContactDetailsPartyAddress(): boolean {
-    return this.defendantContactDetailsPartyAddressKnown === 'YES' && !!this.defendantContactDetailsPartyAddress;
   }
 
   get defendantResponses(): CcdDefendantResponses | undefined {
@@ -266,10 +270,6 @@ export class CcdCaseModel {
   get defendantContactDetailsPartyName(): string {
     const { firstName, lastName } = this.defendantContactDetailsParty;
     return firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || '';
-  }
-
-  get defendantContactDetailsPartyNameKnown(): string {
-    return this.defendantContactDetailsParty.nameKnown ?? '';
   }
 
   /** Defendant's answer to "were you given notice" (normalised to yes/no/imNotSure). Used for arrears back-navigation after resume. */

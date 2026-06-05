@@ -16,11 +16,19 @@ jest.mock('../../../main/middleware/oidc', () => ({
 }));
 
 const mockCaseReferenceParamMiddleware = jest.fn((req, res, next) => {
-  res.locals.validatedCase = { id: req.params.caseReference };
   next();
 });
 jest.mock('../../../main/middleware/caseReference', () => ({
   caseReferenceParamMiddleware: mockCaseReferenceParamMiddleware,
+}));
+
+const mockRequireEventAccessHandler = jest.fn((req, res, next) => {
+  res.locals.validatedCase = { id: req.params.caseReference };
+  next();
+});
+const mockRequireEventAccess = jest.fn(() => mockRequireEventAccessHandler);
+jest.mock('../../../main/middleware/requireEventAccess', () => ({
+  requireEventAccess: mockRequireEventAccess,
 }));
 
 const mockHttpGet = jest.fn();
@@ -30,6 +38,11 @@ jest.mock('../../../main/modules/http', () => ({
     get: mockHttpGet,
     post: mockHttpPost,
   },
+}));
+
+const mockClientContextClearer = jest.fn(req => req);
+jest.mock('@utils/clientContextSessionClearer', () => ({
+  clientContextSessionClearer: mockClientContextClearer,
 }));
 
 import type { Application, Request, Response } from 'express';
@@ -42,6 +55,7 @@ describe('finalSubmit routes', () => {
   let mockRouterGet: jest.Mock;
   let mockRouterPost: jest.Mock;
   let mockRouterParam: jest.Mock;
+  let mockRouterUse: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,12 +63,14 @@ describe('finalSubmit routes', () => {
     mockRouterGet = jest.fn();
     mockRouterPost = jest.fn();
     mockRouterParam = jest.fn();
+    mockRouterUse = jest.fn();
     mockUse = jest.fn();
 
     const mockRouter = {
       get: mockRouterGet,
       post: mockRouterPost,
       param: mockRouterParam,
+      use: mockRouterUse,
     };
 
     jest.spyOn(require('express'), 'Router').mockReturnValue(mockRouter);
@@ -69,6 +85,14 @@ describe('finalSubmit routes', () => {
   describe('Router setup', () => {
     it('should register param middleware for caseReference', () => {
       expect(mockRouterParam).toHaveBeenCalledWith('caseReference', mockCaseReferenceParamMiddleware);
+    });
+
+    it('should apply requireEventAccess(respondPossessionClaim) only on final-submit and confirmation paths', () => {
+      expect(mockRequireEventAccess).toHaveBeenCalledWith('respondPossessionClaim');
+      expect(mockRouterUse).toHaveBeenCalledWith(
+        ['/:caseReference/final-submit', '/:caseReference/confirmation'],
+        mockRequireEventAccessHandler
+      );
     });
 
     it('should mount router under /case path', () => {
@@ -263,6 +287,68 @@ describe('finalSubmit routes', () => {
         })
       );
 
+      expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/confirmation');
+      expect(mockLogger.info).toHaveBeenCalledWith('Submitting response to claim for case 1234567890123456');
+      expect(mockLogger.info).toHaveBeenCalledWith('Response submitted successfully for case 1234567890123456');
+      expect(mockClientContextClearer).not.toHaveBeenCalled();
+    });
+
+    it('should successfully submit to CCD with currentRepresentedPartyId', async () => {
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      mockHttpGet.mockResolvedValue({
+        data: { token: 'mock-event-token' },
+      });
+
+      mockHttpPost.mockResolvedValue({});
+
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        session: {
+          user: { accessToken: 'mock-token' },
+          clientContext: { selectedPartyId: 'partyId' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: { validatedCase: { id: '1234567890123456' } },
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(mockHttpGet).toHaveBeenCalledWith(
+        expect.stringContaining('/cases/1234567890123456/event-triggers/respondPossessionClaim'),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer mock-token',
+          }),
+        })
+      );
+
+      expect(mockHttpPost).toHaveBeenCalledWith(
+        expect.stringContaining('/cases/1234567890123456/events'),
+        expect.objectContaining({
+          data: {
+            currentRepresentedPartyId: 'partyId',
+            possessionClaimResponse: {},
+          },
+          event: {
+            id: 'respondPossessionClaim',
+            summary: 'Citizen respondPossessionClaim summary',
+            description: 'Citizen respondPossessionClaim description',
+          },
+          event_token: 'mock-event-token',
+          ignore_warning: false,
+        }),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer mock-token',
+          }),
+        })
+      );
+
+      expect(mockClientContextClearer).toHaveBeenCalledWith(req);
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/confirmation');
       expect(mockLogger.info).toHaveBeenCalledWith('Submitting response to claim for case 1234567890123456');
       expect(mockLogger.info).toHaveBeenCalledWith('Response submitted successfully for case 1234567890123456');
