@@ -135,7 +135,7 @@ const mockStepsData = {
   allSteps,
 };
 
-import { Application, NextFunction, Request, Response } from 'express';
+import { Application, Request, Response } from 'express';
 
 import { legalRepresentativeHeaderMiddleware, oidcMiddleware } from '../../../main/middleware';
 import { registerSteps } from '../../../main/routes/registerSteps';
@@ -477,7 +477,7 @@ describe('registerAllJourneys', () => {
     jest.doMock('../../../main/middleware', () => ({
       oidcMiddleware: jest.fn((req, res, next) => next()),
       caseReferenceParamMiddleware: caseRefMw,
-      requireEventAccess: jest.fn(() => (req: Request, res: Response, next: NextFunction) => next()),
+      requireEventAccess: jest.fn(() => jest.fn((req, res, next) => next())),
       legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
     }));
 
@@ -496,7 +496,6 @@ describe('registerAllJourneys', () => {
             flowConfig: {
               eventId: 'wiringTest',
               basePath: '/case/:caseReference/wiring-test',
-              eventId: 'wiringTest',
               stepOrder: ['step-a'],
               steps: { 'step-a': { requiresAuth: false } },
             },
