@@ -23,7 +23,7 @@
     "deadline": 15000
   },
   "api": {
-    "url": "https://pcs-api-pr-1718.preview.platform.hmcts.net"
+    "url": "https://pcs-api-pr-1865.preview.platform.hmcts.net"
   },
   "s2s": {
     "microservice": "pcs_frontend",
@@ -32,7 +32,7 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "https://ccd-data-store-api-pcs-api-pr-1718.preview.platform.hmcts.net",
+    "url": "https://ccd-data-store-api-pcs-api-pr-1865.preview.platform.hmcts.net",
     "caseTypeId": "PCS"
   },
   "osPostcodeLookup": {

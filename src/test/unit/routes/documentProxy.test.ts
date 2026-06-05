@@ -379,6 +379,29 @@ describe('documentProxyRoutes', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
     });
+
+    it("sets req.uploadValidation from the step's uploadValidation", () => {
+      const stepOpts = {
+        maxFilenameLength: 255,
+        maxDocumentBytes: 1024 * 1024 * 1024,
+        maxMediaBytes: 500 * 1024 * 1024,
+      };
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: { read: jest.fn(), readFresh: jest.fn(), save: jest.fn() },
+        uploadValidation: stepOpts,
+      });
+      const req = {
+        t: mockT,
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
+      } as unknown as Request;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      middleware(req, res, next);
+
+      expect((req as unknown as { uploadValidation: unknown }).uploadValidation).toEqual(stepOpts);
+    });
   });
 
   describe('upload handler', () => {
@@ -556,6 +579,81 @@ describe('documentProxyRoutes', () => {
       expect(mockDeleteDocument).toHaveBeenCalledWith('http://dm/doc/new-after-cap', 'token');
       expect(mockSave).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    describe('post-upload validation via req.uploadValidation', () => {
+      const MB = 1024 * 1024;
+      const stepUploadValidation = {
+        maxFilenameLength: 255,
+        maxDocumentBytes: 1024 * MB,
+        maxMediaBytes: 500 * MB,
+      };
+
+      it('rejects an image over the media cap before calling CDAM', async () => {
+        const req = makeReqWithDocs({
+          file: {
+            originalname: 'photo.jpg',
+            mimetype: 'image/jpeg',
+            buffer: Buffer.from(''),
+            size: 501 * MB,
+          },
+          uploadValidation: stepUploadValidation,
+        });
+        const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+        await handler(req, res);
+
+        expect(mockUploadDocument).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+          error: { message: 'errors.documentUpload.fileTooLargeMedia' },
+        });
+      });
+
+      it('rejects a document over the document cap before calling CDAM', async () => {
+        const req = makeReqWithDocs({
+          file: {
+            originalname: 'huge.pdf',
+            mimetype: 'application/pdf',
+            buffer: Buffer.from(''),
+            size: 1025 * MB,
+          },
+          uploadValidation: stepUploadValidation,
+        });
+        const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+        await handler(req, res);
+
+        expect(mockUploadDocument).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+          error: { message: 'errors.documentUpload.fileTooLargeDocument' },
+        });
+      });
+
+      it('allows a 600MB document under the document cap even though it exceeds the media cap', async () => {
+        mockUploadDocument.mockResolvedValue({
+          document_url: 'http://dm/doc/ok',
+          document_binary_url: 'http://dm/doc/ok/binary',
+          document_filename: 'doc.pdf',
+          content_type: 'application/pdf',
+          size: 600 * MB,
+        });
+        const req = makeReqWithDocs({
+          file: {
+            originalname: 'doc.pdf',
+            mimetype: 'application/pdf',
+            buffer: Buffer.from(''),
+            size: 600 * MB,
+          },
+          uploadValidation: stepUploadValidation,
+        });
+        const res = { json: jest.fn() } as unknown as Response;
+
+        await handler(req, res);
+
+        expect(mockUploadDocument).toHaveBeenCalled();
+      });
     });
   });
 

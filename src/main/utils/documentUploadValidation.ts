@@ -21,6 +21,11 @@ export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFil
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;
 export const UPLOAD_MAX_TOTAL_SIZE_MB: number = config.get('documentUpload.maxTotalFileSizeMB');
 export const UPLOAD_MAX_TOTAL_SIZE_BYTES = UPLOAD_MAX_TOTAL_SIZE_MB * 1024 * 1024;
+export const UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB: number = config.get('documentUpload.maxDocumentFileSizeMB');
+export const UPLOAD_MAX_DOCUMENT_FILE_SIZE_BYTES = UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB * 1024 * 1024;
+export const UPLOAD_MAX_MEDIA_FILE_SIZE_MB: number = config.get('documentUpload.maxMediaFileSizeMB');
+export const UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES = UPLOAD_MAX_MEDIA_FILE_SIZE_MB * 1024 * 1024;
+export const UPLOAD_MAX_FILENAME_LENGTH: number = config.get('documentUpload.maxFilenameLength');
 
 const BLOCKED_MEDIA_PREFIXES = ['audio/', 'video/'] as const;
 
@@ -147,8 +152,17 @@ export type UploadErrorTranslation = { key: string; params?: Record<string, stri
 
 const LOCALE_PREFIX = 'errors.documentUpload';
 
-function bytesToMb(bytes: number): number {
+export function bytesToMb(bytes: number): number {
   return Math.round(bytes / (1024 * 1024));
+}
+
+export function effectivePerFileByteLimit(opts: UploadValidationOptions | undefined): number {
+  return Math.max(
+    opts?.maxPerFileBytes ?? 0,
+    opts?.maxDocumentBytes ?? 0,
+    opts?.maxMediaBytes ?? 0,
+    UPLOAD_MAX_FILE_SIZE_BYTES
+  );
 }
 
 export function getUploadErrorKey(error: UploadValidationError): UploadErrorTranslation {

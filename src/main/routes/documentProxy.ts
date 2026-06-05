@@ -19,6 +19,7 @@ import {
   UPLOAD_MAX_TOTAL_SIZE_MB,
   type UploadValidationError,
   type UploadValidationOptions,
+  effectivePerFileByteLimit,
   getUploadErrorKey,
   validateUploadedFile,
 } from '@utils/documentUploadValidation';
@@ -56,6 +57,18 @@ const upload = multer({
   fileFilter,
 });
 
+const multerByLimit = new Map<number, ReturnType<typeof multer>>();
+multerByLimit.set(UPLOAD_MAX_FILE_SIZE_BYTES, upload);
+
+function getMulterForLimit(limitBytes: number): ReturnType<typeof multer> {
+  let instance = multerByLimit.get(limitBytes);
+  if (!instance) {
+    instance = multer({ limits: { fileSize: limitBytes }, fileFilter });
+    multerByLimit.set(limitBytes, instance);
+  }
+  return instance;
+}
+
 type ErrorTranslations = ReturnType<typeof getErrorTranslations>;
 
 function translateValidationError(req: Request, error: UploadValidationError): string {
@@ -67,7 +80,7 @@ function getErrorTranslations(req: Request) {
   const t = req.t;
   return {
     totalTooLarge: t('errors.documentUpload.fileTotalTooLargeDocStore', {
-      maxSize: String(UPLOAD_MAX_TOTAL_SIZE_MB),
+      maxSize: String(Math.floor(UPLOAD_MAX_TOTAL_SIZE_MB / 1024)),
     }),
     noFile: t('errors.documentUpload.noFileSelected'),
     uploadFailed: t('errors.documentUpload.uploadFailed'),
@@ -93,9 +106,10 @@ export function handleMulterError(
     return;
   }
   if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+    const opts = (req as RequestWithUploadValidation).uploadValidation;
     const message = translateValidationError(req, {
       kind: 'file_too_large',
-      maxBytes: UPLOAD_MAX_FILE_SIZE_BYTES,
+      maxBytes: effectivePerFileByteLimit(opts),
     });
     res.status(400).json({ error: { message } });
     return;
@@ -107,7 +121,7 @@ export function handleMulterError(
   next(err);
 }
 
-function uploadCtx(req: Request): { storage: DocumentStorage } {
+function uploadCtx(req: Request): { storage: DocumentStorage; uploadValidation?: UploadValidationOptions } {
   const slug = req.params.journey as string | undefined;
   const stepName = req.params.step as string | undefined;
   const variant = getUserVariant(req);
@@ -116,7 +130,7 @@ function uploadCtx(req: Request): { storage: DocumentStorage } {
     logger.warn('Upload requested without documentStorage', { slug, stepName, variant });
     throw new HTTPError('Not found', 404);
   }
-  return { storage: step.documentStorage };
+  return { storage: step.documentStorage, uploadValidation: step.uploadValidation };
 }
 
 // Per-case in-process mutex. Two concurrent uploads/deletes for the same case
@@ -298,7 +312,17 @@ export default function documentProxyRoutes(app: Application): void {
     '/case/:caseReference/:journey/:step/upload',
     oidcMiddleware,
     (req: Request, res: Response, next) => {
-      upload.single('documents')(req, res, async err => {
+      // Resolve step-level opts early so multer + fileFilter see the right limits.
+      // Step resolution errors (missing step / documentStorage) surface in the final handler.
+      try {
+        const ctx = uploadCtx(req);
+        (req as RequestWithUploadValidation).uploadValidation = ctx.uploadValidation;
+      } catch {
+        // Defer the 404 to the final handler so it can format the locale message.
+      }
+      const opts = (req as RequestWithUploadValidation).uploadValidation;
+      const limit = effectivePerFileByteLimit(opts);
+      getMulterForLimit(limit).single('documents')(req, res, async err => {
         handleMulterError(err, req, res, next);
       });
     },
@@ -310,6 +334,21 @@ export default function documentProxyRoutes(app: Application): void {
         }
 
         uploadCtx(req);
+
+        // Post-upload validation: catches size checks that fileFilter can't do (size unknown there).
+        // Filename + type were already caught in fileFilter; this is a defence-in-depth re-check plus
+        // the per-bucket size routing.
+        const opts = (req as RequestWithUploadValidation).uploadValidation;
+        if (opts) {
+          const postUploadError = validateUploadedFile(
+            { originalname: req.file.originalname, mimetype: req.file.mimetype, size: req.file.size },
+            opts
+          );
+          if (postUploadError) {
+            return res.status(400).json({ error: { message: translateValidationError(req, postUploadError) } });
+          }
+        }
+
         const cdamDoc = await uploadDocument(req.file, getUserToken(req));
         const entry = cdamToCcdDocument(cdamDoc);
         const index = await saveDraftWithNewDocument(req, entry);
