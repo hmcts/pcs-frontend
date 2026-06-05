@@ -39,6 +39,8 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  responseAndCounterClaimSubmitted,
+  responseSubmittedCounterclaimFeePaymentNeeded,
   startNow,
   taskList,
   tenancyDateDetails,
@@ -798,7 +800,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
     await performAction('clickButton', 'Submit');
-    await performAction('clickButton', 'Close and return to case overview');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
@@ -987,7 +992,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
     await performAction('clickButton', 'Submit');
-    await performAction('clickButton', 'Close and return to case overview');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
@@ -1161,7 +1169,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
     await performAction('clickButton', 'Submit');
-    await performAction('clickButton', 'Close and return to case overview');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
@@ -1358,7 +1369,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
     await performAction('clickButton', 'Submit');
-    await performAction('clickButton', 'Close and return to case overview');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
@@ -2023,7 +2037,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: languageUsed.englishRadioOption,
     });
     await performAction('clickButton', 'Submit');
-    await performAction('clickButton', 'Close and return to case overview');
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 });
