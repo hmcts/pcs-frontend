@@ -14,6 +14,7 @@ import {
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
+  doYouHaveASolicitor,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   endNow,
@@ -142,6 +143,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('taskList', { subSection: taskList.readInformationAboutLink });
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('inputDefendantDetails', {
