@@ -234,8 +234,14 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  statementOfTruth?: StatementOfTruth;
   completedSections?: RespondToClaimSectionEnum[];
   status?: 'SUBMITTED' | 'CREATED';
+}
+
+export interface StatementOfTruth {
+  accepted?: YesNoValue;
+  fullName?: string;
 }
 
 export interface PossessionClaimResponse {

@@ -1,6 +1,5 @@
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
-import { step as checkYourAnswers } from './check-your-answers';
 import { step as checkYourAnswersDocuments } from './check-your-answers-documents';
 import { step as checkYourAnswersIncomeAndExpenses } from './check-your-answers-income-and-expenses';
 import { step as checkYourAnswersPaymentsAndAgreements } from './check-your-answers-payments-and-agreements';
@@ -32,6 +31,7 @@ import { step as defendantNameConfirmation } from './defendant-name-confirmation
 import { step as doYouHaveAnyDependantChildren } from './dependant-children';
 import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
 import { step as endNow } from './end-now';
+import { step as endOfJourneyCya } from './end-of-journey-cya';
 import { step as equalityAndDiversityEnd } from './equality-and-diversity-end';
 import { step as equalityAndDiversityStart } from './equality-and-diversity-start';
 import { step as exceptionalHardship } from './exceptional-hardship';
@@ -135,7 +135,7 @@ export const stepRegistry = {
   'equality-and-diversity-start': equalityAndDiversityStart,
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,
-  'check-your-answers': checkYourAnswers,
+  'end-of-journey-cya': endOfJourneyCya,
   'response-submitted': responseSubmitted,
   'response-submitted-counter-claim-fee-payment-needed': responseSubmittedCounterClaimFeePaymentNeeded,
   'response-and-counter-claim-submitted': responseAndCounterClaimSubmitted,

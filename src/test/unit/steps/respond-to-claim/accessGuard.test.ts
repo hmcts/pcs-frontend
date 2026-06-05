@@ -47,6 +47,7 @@ const makeReq = ({
     path,
     method,
     query,
+    session: {},
     res: { locals: { validatedCase: caseId === undefined ? undefined : { id: caseId } } },
   }) as unknown as Request;
 

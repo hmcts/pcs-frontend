@@ -58,10 +58,7 @@ describe('respond-to-claim sections config', () => {
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',
-      'check-your-answers',
-      'response-submitted',
-      'response-submitted-counter-claim-fee-payment-needed',
-      'response-and-counter-claim-submitted',
+      'end-of-journey-cya',
     ]);
   });
 
@@ -140,9 +137,9 @@ describe('respond-to-claim sections config', () => {
       expect(sectionHasCya(uploadFiles)).toBe(true);
     });
 
-    it('sectionHasCya is false for checkYourAnswersAndSubmit (no per-section CYA)', () => {
+    it('sectionHasCya is true for checkYourAnswersAndSubmit (has end-of-journey-cya step)', () => {
       const finalSection = findSection('checkYourAnswersAndSubmit')!;
-      expect(sectionHasCya(finalSection)).toBe(false);
+      expect(sectionHasCya(finalSection)).toBe(true);
     });
   });
 

@@ -135,7 +135,7 @@ const sectionDefs = [
       'equality-and-diversity-start',
       'equality-and-diversity-end',
       'language-used',
-      'check-your-answers',
+      'end-of-journey-cya',
       'response-submitted',
       'response-submitted-counter-claim-fee-payment-needed',
       'response-and-counter-claim-submitted',
@@ -176,7 +176,7 @@ export function sectionIdToBackendEnum(id: RespondToClaimSectionId): RespondToCl
 }
 
 export function sectionHasCya(section: SectionConfig): boolean {
-  return section.steps.some(stepName => stepName.startsWith(CYA_STEP_PREFIX));
+  return section.steps.some(stepName => stepName === 'end-of-journey-cya' || stepName.startsWith(CYA_STEP_PREFIX));
 }
 
 const stepToSectionId = buildStepToSectionIdMap();
