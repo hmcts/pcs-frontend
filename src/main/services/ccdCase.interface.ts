@@ -1,3 +1,5 @@
+import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
+
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export enum YesNoEnum {
@@ -146,6 +148,7 @@ export interface CcdClaimantEnteredDefendantDetails {
   lastName?: string;
   address?: CcdCaseAddress | Record<string, never>;
   addressKnown?: YesNoValue;
+  addressSameAsProperty?: YesNoValue;
 }
 
 /** Defendant party contact details (name/address known flags and values). */
@@ -231,6 +234,7 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  completedSections?: RespondToClaimSectionEnum[];
 }
 
 export interface PossessionClaimResponse {
@@ -257,6 +261,7 @@ export interface CcdCaseData {
   introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
   secureGroundsWales_DiscretionaryGrounds?: string[];
   noticeServed?: string;
+  walesNoticeServed?: string;
   propertyAddress?: CcdCaseAddress;
   claimGroundSummaries?: CcdClaimGroundSummaryItem[];
   userPcqId?: string;
@@ -360,6 +365,13 @@ export interface CcdDashboardData {
   propertyAddress?: CcdCaseAddress;
   notifications?: CcdCollectionItem<CcdDashboardNotification>[];
   taskGroups?: CcdCollectionItem<CcdDashboardTaskGroup>[];
+  relatedApplications?: CcdCollectionItem<CcdRelatedApplication>[];
+}
+
+export interface CcdRelatedApplication {
+  id?: string;
+  type?: GenAppType;
+  applicationSubmittedDate?: string;
 }
 
 export enum GenAppType {

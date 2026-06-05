@@ -1,3 +1,5 @@
+import type { Request } from 'express';
+
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../constants/caseRoutes';
 
 import { isViewAllApplicationsAvailable } from './flowConditions';
@@ -10,6 +12,7 @@ export const uploadYourDocumentsStep = 'upload-your-documents';
 export const flowConfig: JourneyFlowConfig = {
   basePath: UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE,
   journeyName: 'uploadAdditionalDocuments',
+  eventId: 'respondPossessionClaim',
   useSessionFormData: false,
   stepOrder: ['start-evidence-upload', confirmIfTheseDocumentsRelateToAnApplicationStep, uploadYourDocumentsStep],
   steps: {
@@ -23,6 +26,13 @@ export const flowConfig: JourneyFlowConfig = {
       ],
     },
     [confirmIfTheseDocumentsRelateToAnApplicationStep]: {},
-    [uploadYourDocumentsStep]: {},
+    [uploadYourDocumentsStep]: {
+      previousStep: async (req: Request) => {
+        if (await isViewAllApplicationsAvailable(req, {}, {})) {
+          return confirmIfTheseDocumentsRelateToAnApplicationStep;
+        }
+        return 'start-evidence-upload';
+      },
+    },
   },
 };

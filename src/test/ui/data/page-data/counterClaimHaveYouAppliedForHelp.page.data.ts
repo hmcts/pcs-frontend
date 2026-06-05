@@ -14,7 +14,7 @@ export const counterClaimHaveYouAppliedForHelp = {
   youWillHaveReceivedThisNumberHiddenParagraph: `You will have received this number when you applied for Help with Fees. This reference must not have been used for a previous application.`,
   exampleHiddenHintText: `For example, HWF-A1B-23C`,
   feedbackLink: `feedback (opens in new tab)`,
-  pageSlug: `counter-claim-have-you-already-applied-for-help-with-your-fees`,
+  pageSlug: `counter-claim-have-you-applied-for-help`,
   emojiTextInput: `👉 😄`,
   emojiErrorMessage: `Enter your Help with Fees reference number must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
 };

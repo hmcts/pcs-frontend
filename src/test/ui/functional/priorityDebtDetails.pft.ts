@@ -1,4 +1,4 @@
-import { dashboard, feedback, priorityDebtDetails, priorityDebts } from '../data/page-data';
+import { feedback, priorityDebtDetails, priorityDebts, taskList } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function priorityDebtDetailsErrorValidation(): Promise<void> {
@@ -205,5 +205,5 @@ export async function priorityDebtDetailsNavigationTests(): Promise<void> {
     priorityDebtDetails.amountYouPayTextInput
   );
   await performAction('clickRadioButton', priorityDebtDetails.monthRadioOption);
-  await performValidation('pageNavigation', priorityDebtDetails.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', priorityDebtDetails.saveForLaterButton, taskList.mainHeader);
 }

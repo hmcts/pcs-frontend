@@ -189,7 +189,6 @@ describe('CcdCaseModel', () => {
       });
 
       expect(model.defendantContactDetailsPartyAddress).toEqual(address);
-      expect(model.hasDefendantContactDetailsPartyAddress).toBe(true);
     });
 
     it('returns undefined when the address is missing or malformed', () => {
@@ -219,9 +218,7 @@ describe('CcdCaseModel', () => {
       });
 
       expect(emptyObjectAddressModel.defendantContactDetailsPartyAddress).toBeUndefined();
-      expect(emptyObjectAddressModel.hasDefendantContactDetailsPartyAddress).toBe(false);
       expect(arrayAddressModel.defendantContactDetailsPartyAddress).toBeUndefined();
-      expect(arrayAddressModel.hasDefendantContactDetailsPartyAddress).toBe(false);
     });
   });
 
@@ -395,7 +392,6 @@ describe('CcdCaseModel', () => {
 
       expect(model.defendantContactDetailsPartyEmailAddress).toBe('a@example.com');
       expect(model.defendantContactDetailsPartyPhoneNumber).toBe('07000000000');
-      expect(model.defendantContactDetailsPartyNameKnown).toBe('YES');
     });
 
     it('returns undefined / empty for defendantContactDetails.party when missing', () => {
@@ -403,7 +399,31 @@ describe('CcdCaseModel', () => {
 
       expect(model.defendantContactDetailsPartyEmailAddress).toBeUndefined();
       expect(model.defendantContactDetailsPartyPhoneNumber).toBeUndefined();
-      expect(model.defendantContactDetailsPartyNameKnown).toBe('');
+    });
+  });
+
+  describe('claimantEnteredDefendantDetails — claim-time flags', () => {
+    it('exposes addressKnown and addressSameAsProperty from the claimant snapshot', () => {
+      const model = buildModel({
+        data: {
+          possessionClaimResponse: {
+            claimantEnteredDefendantDetails: {
+              addressKnown: 'YES',
+              addressSameAsProperty: 'YES',
+            },
+          },
+        },
+      });
+
+      expect(model.claimantEnteredDefendantDetailsAddressKnown).toBe('YES');
+      expect(model.claimantEnteredDefendantDetailsAddressSameAsProperty).toBe('YES');
+    });
+
+    it('returns empty when the claimant snapshot is missing', () => {
+      const model = buildModel();
+
+      expect(model.claimantEnteredDefendantDetailsAddressKnown).toBe('');
+      expect(model.claimantEnteredDefendantDetailsAddressSameAsProperty).toBe('');
     });
   });
 

@@ -160,8 +160,8 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
   it('populates page heading from CCD without pre-selecting yes or filling address form', async () => {
     const validatedCase = {
       id: '1771325608502536',
-      hasDefendantContactDetailsPartyAddress: true,
-      defendantContactDetailsPartyAddressKnown: 'YES',
+      // Claim-time flag — read from claimantEnteredDefendantDetails per the rule.
+      claimantEnteredDefendantDetailsAddressKnown: 'YES',
       defendantContactDetailsPartyAddress: {
         AddressLine1: '10 Second Avenue',
         PostTown: 'London',
@@ -170,6 +170,7 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
       data: {
         possessionClaimResponse: {
           claimantEnteredDefendantDetails: {
+            addressKnown: 'YES',
             address: {
               AddressLine1: '10 Second Avenue',
               PostTown: 'London',
