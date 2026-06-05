@@ -16,6 +16,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     responseSubmittedCounterClaimFeePaymentNeededListItem3: 'responseSubmittedCounterClaimFeePaymentNeededListItem3',
     responseSubmittedCounterClaimFeePaymentNeededHeading2: 'responseSubmittedCounterClaimFeePaymentNeededHeading2',
     responseSubmittedCounterClaimFeePaymentNeededParagraph2: 'responseSubmittedCounterClaimFeePaymentNeededParagraph2',
+    closeAndReturnToCaseOverview: 'closeAndReturnToCaseOverview',
   },
   extendGetContent: req => {
     const caseReference = req.params.caseReference;
