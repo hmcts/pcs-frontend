@@ -1,0 +1,17 @@
+export const responseSubmittedCounterclaimFeePaymentNeeded = {
+  mainHeader: `Response submitted. You must pay your counterclaim fee`,
+  backLink: `Back`,
+  referenceLabel: `Your reference number`,
+  referenceNumber: `HDJ2123F`,
+  confirmationEmailText: `We've sent you a confirmation email`,
+  whatToDoNextHeader: `What to do next`,
+  payYourCounterclaimFeeLink: `Pay your counterclaim fee.`,
+  payYourCounterclaimFeeText: `If you do not, your counterclaim will not be considered.`,
+  hearingScheduledText: `A hearing date will be scheduled. You'll get a notification telling you when this has happened. At the hearing, a judge will listen to both sides and make a decision. You should come to the hearing.`,
+  supportText: `Some people need support to use HMCTS services, like step-free access to a court for a hearing. If you need support and have not already asked for it in your response, contact us. Use the 'Contact us for help' link on this page.`,
+  thoughtsHeader: `We'd like to hear your thoughts`,
+  surveyLink: `Complete this short survey to help us improve this service (opens in new tab)`,
+  surveyText: `(usually takes 5 minutes).`,
+  closeAndReturnButton: `Close and return to case overview`,
+  pageSlug: `response-submitted-counterclaim-fee-payment-needed`,
+};
