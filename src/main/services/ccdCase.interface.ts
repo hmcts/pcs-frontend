@@ -235,6 +235,7 @@ export interface CcdDefendantResponses {
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
   completedSections?: RespondToClaimSectionEnum[];
+  status?: 'SUBMITTED' | 'CREATED';
 }
 
 export interface PossessionClaimResponse {

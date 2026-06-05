@@ -50,3 +50,9 @@ export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityF
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
 export { hasMultipleParties } from './hasMultipleParties';
 export { isSingleLinkedDefendant } from './isSingleLinkedDefendant';
+export {
+  getRespondToClaimConfirmationPath,
+  shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
+  shouldShowResponseSubmittedConfirmationStep,
+} from './postSubmissionRouting';
