@@ -4,9 +4,12 @@
   "introText": "cyYou can check if the landlord is registered by searching the",
   "question": "cyIs the landlord registered?",
   "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
     "imNotSure": "cyDefendant is not sure"
   },
   "errors": {
-    "landlordRegistered": "cySelect if you agree with the landlord’s claim to be registered"
+    "landlordRegistered": "cySelect if the defendant agrees with the landlord’s claim to be registered"
   }
 }

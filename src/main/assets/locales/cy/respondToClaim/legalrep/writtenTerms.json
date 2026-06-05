@@ -5,9 +5,12 @@
   "heading": "cyWritten terms",
   "termsQuestion": "cyHas the landlord sent the defendant written terms of the occupation contract?",
   "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
     "imNotSure": "cyDefendant is not sure"
   },
   "errors": {
-    "writtenTerms": "cySelect if the landlord has sent you written terms of the occupation contract"
+    "writtenTerms": "cySelect if the landlord has sent the defendant written terms of the occupation contract"
   }
 }

@@ -7,6 +7,6 @@
     "imNotSure": "Defendant is not sure"
   },
   "errors": {
-    "confirmLandlordLicensed": "Select if you agree with the landlord’s claim to be licensed"
+    "confirmLandlordLicensed": "Select if the defendant agrees with the landlord’s claim to be licensed"
   }
 }

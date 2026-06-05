@@ -1,0 +1,18 @@
+{
+  "pageTitle": "Notice date",
+  "question": "When did the defendant receive notice from {{claimantName}} (optional)?",
+  "noticeDateHint": "For example, 27 9 2022.",
+  "paragraph": "{{claimantName}} did not provide the date they served you notice.",
+  "errors": {
+    "date": {
+      "day": "Day",
+      "month": "Month",
+      "year": "Year",
+      "notRealDate": "The date the defendant received notice must be a real date",
+      "futureDate": "The date the defendant received notice must either be today’s date or in the past",
+      "invalidValue": "The date the defendant received notice must be a real date",
+      "missingOne": "The date the defendant received notice must include a {{missingField}}",
+      "missingTwo": "The date the defendant received notice must include a {{first}} and {{second}}"
+    }
+  }
+}
