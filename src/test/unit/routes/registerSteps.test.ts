@@ -477,7 +477,6 @@ describe('registerAllJourneys', () => {
     jest.doMock('../../../main/middleware', () => ({
       oidcMiddleware: jest.fn((req, res, next) => next()),
       caseReferenceParamMiddleware: caseRefMw,
-      requireEventAccess: jest.fn(() => jest.fn((req, res, next) => next())),
       legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
     }));
 
@@ -494,7 +493,6 @@ describe('registerAllJourneys', () => {
           slug: 'wiring-test',
           default: {
             flowConfig: {
-              eventId: 'wiringTest',
               basePath: '/case/:caseReference/wiring-test',
               stepOrder: ['step-a'],
               steps: { 'step-a': { requiresAuth: false } },
