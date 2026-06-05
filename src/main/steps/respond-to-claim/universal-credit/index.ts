@@ -13,6 +13,8 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'have-you-applied-for-universal-credit',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.hasAppliedForUniversalCredit),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const selection = req.body?.haveAppliedForUniversalCredit as string | undefined;
@@ -34,11 +36,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-year'] as string | undefined) ?? ''
       ).trim();
       if (!day || !month || !year) {
-        throw new Error('Missing universal credit application date submitted');
+        return;
       }
       const isoDate = formatDatePartsToISODate(day, month, year);
       if (!isoDate) {
-        throw new Error('Invalid universal credit application date submitted');
+        return;
       }
       hc.hasAppliedForUniversalCredit = toYesNoEnum('yes');
       hc.ucApplicationDate = isoDate;

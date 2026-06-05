@@ -7,6 +7,7 @@ import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-fee',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.counterClaim?.needHelpWithFees),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimFee.njk`,
   translationKeys: {
@@ -35,28 +36,28 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const counterClaimNeedHelpWithFees: YesNoValue | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.counterClaim?.needHelpWithFees;
 
     return counterClaimNeedHelpWithFees ? { counterClaimNeedHelpWithFees } : {};
   },
   beforeRedirect: async req => {
-    const counterClaimNeedHelpWithFees: YesNoValue = req.body?.counterClaimNeedHelpWithFees;
-
-    if (!counterClaimNeedHelpWithFees) {
-      return;
-    }
-
+    const selection = req.body?.counterClaimNeedHelpWithFees as YesNoValue | undefined;
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
-    response.defendantResponses.counterClaim.needHelpWithFees = counterClaimNeedHelpWithFees;
 
+    if (selection === 'YES' || selection === 'NO') {
+      response.defendantResponses.counterClaim.needHelpWithFees = selection;
+    } else {
+      delete response.defendantResponses.counterClaim.needHelpWithFees;
+    }
+    // Downstream cleanup (appliedForHwf, hwfReferenceNumber, counterClaimAgainst/For/Reasons)
+    // is the normaliser's job — see normaliseCounterClaim.
     await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async req => {
-    const counterClaim =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+    const counterClaim = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
     const claimAmountInPence =
       counterClaim?.isClaimAmountKnown === 'YES'
         ? counterClaim?.claimAmount

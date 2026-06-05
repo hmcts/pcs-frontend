@@ -1,4 +1,4 @@
-import { dashboard, doYouHaveAnyDependantChildren, doYouHaveAnyOtherDependants, feedback } from '../data/page-data';
+import { doYouHaveAnyDependantChildren, doYouHaveAnyOtherDependants, feedback, taskList } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -50,5 +50,5 @@ export async function doYouHaveAnyOtherDependantsNavigationTests(): Promise<void
     doYouHaveAnyDependantChildren.mainHeader
   );
   await performAction('clickRadioButton', doYouHaveAnyOtherDependants.noRadioOption);
-  await performValidation('pageNavigation', doYouHaveAnyOtherDependants.saveForLaterButton, dashboard.mainHeader);
+  await performValidation('pageNavigation', doYouHaveAnyOtherDependants.saveForLaterButton, taskList.mainHeader);
 }
