@@ -2,13 +2,13 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
-{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+{% block pageTitle %}{{ pageTitle | striptags }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 {% block mainContent %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
   {{ govukPanel({
-  titleText: pageTitle
+  titleHtml: pageTitle | safe
   }) }}
   <p class="govuk-body">{{ responseSubmittedCounterClaimFeePaymentNeededParagraph1 }}</p>
   <h2 class="govuk-heading-m">{{ responseSubmittedCounterClaimFeePaymentNeededHeading1 }}</h2>
