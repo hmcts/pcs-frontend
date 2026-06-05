@@ -26,24 +26,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       translationKey: { label: 'question', hint: 'hintText' },
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
-        {
-          value: 'YES',
-          translationKey: 'options.yes',
-          subFields: {
-            noticeDateGiven: {
-              name: 'noticeDateGiven',
-              type: 'date',
-              required: false,
-              noFutureDate: true,
-              noCurrentDate: false,
-              legendClasses: 'govuk-label--s govuk-!-font-weight-bold',
-              translationKey: {
-                label: 'noticeDateLabel',
-                hint: 'noticeDateHint',
-              },
-            },
-          },
-        },
+        { value: 'YES', translationKey: 'options.yes' },
         { value: 'NO', translationKey: 'options.no' },
         { divider: 'options.or' },
         { value: 'NOT_SURE', translationKey: 'options.imNotSure' },
