@@ -16,6 +16,10 @@ export function setPaymentSessionState(req: Request, paymentSessionState: Paymen
   };
 }
 
+export function getPaymentSessionState(req: Request): PaymentSessionState | undefined {
+  return req.session.payment;
+}
+
 export function clearPaymentSessionState(req: Request): void {
   delete req.session.payment;
 }
@@ -31,4 +35,11 @@ export function retainPaymentReferenceOnly(req: Request): void {
   req.session.payment = {
     paymentReference,
   };
+}
+
+export function clearPaymentReferenceOnly(req: Request): void {
+  const paymentSessionState = getPaymentSessionState(req);
+  if (paymentSessionState) {
+    delete paymentSessionState.paymentReference;
+  }
 }
