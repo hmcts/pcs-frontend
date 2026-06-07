@@ -1,3 +1,4 @@
+import { PaymentSessionState } from '@services/paymentSessionService';
 import { type Session, type SessionData } from 'express-session';
 import { type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
@@ -27,6 +28,7 @@ interface CustomSessionData extends SessionData {
     applicationId?: string;
     showDuplicateSubmissionPage?: boolean;
   };
+  payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
 }
 

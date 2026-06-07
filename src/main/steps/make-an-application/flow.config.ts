@@ -2,6 +2,7 @@ import type { Request } from 'express';
 
 import { getFormData } from '@modules/steps';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
+import { getPaymentSessionState } from '@services/paymentSessionService';
 
 export const MAKE_AN_APPLICATION_ROUTE = '/case/:caseReference/make-an-application';
 
@@ -25,6 +26,8 @@ export const flowConfig: JourneyFlowConfig = {
     'upload-documents-to-support-your-application',
     'which-language-did-you-use-to-complete-this-service',
     'check-your-answers',
+    'pay-for-your-application',
+    'payment-unsuccessful',
     'application-submitted',
   ],
   steps: {
@@ -54,6 +57,14 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'upload-documents-to-support-your-application': {
       showCondition: (req: Request) => documentUploadWanted(req),
+    },
+    'pay-for-your-application': {
+      preventBack: true,
+      showCondition: (req: Request) => paymentRequired(req),
+    },
+    'payment-unsuccessful': {
+      preventBack: true,
+      showCondition: (_req: Request) => false,
     },
     'application-submitted': {
       preventBack: true,
@@ -87,4 +98,8 @@ function otherPartiesAgreed(req: Request): boolean {
 
 function documentUploadWanted(req: Request): boolean {
   return getFormData(req, 'do-you-want-to-upload-documents-to-support-your-application').uploadDocuments === 'yes';
+}
+
+function paymentRequired(req: Request): boolean {
+  return !!getPaymentSessionState(req);
 }

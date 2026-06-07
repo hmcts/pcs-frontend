@@ -299,10 +299,16 @@ export interface CcdCaseDocument {
   category_id?: string;
 }
 
+export type SubmitResponse = {
+  confirmation_header: string;
+  confirmation_body: string;
+};
+
 /** Case representation used by services: id + case_data. */
 export interface CcdCase {
   id: string;
   data: CcdCaseData;
+  after_submit_callback_response?: SubmitResponse;
 }
 
 /** Links object in CCD START callback response. */
@@ -396,4 +402,15 @@ export interface CitizenGenAppRequest {
   sotAccepted?: YesNoValue;
   sotFullName?: string;
   clientReference?: string;
+}
+
+export enum GenAppState {
+  PENDING_GEN_APP_ISSUED = 'PENDING_GEN_APP_ISSUED',
+  GEN_APP_ISSUED = 'GEN_APP_ISSUED',
+}
+
+export interface MakeAnApplicationResponse {
+  state?: GenAppState;
+  serviceRequestReference?: string;
+  feeAmount?: number;
 }

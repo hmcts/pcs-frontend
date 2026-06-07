@@ -3,7 +3,7 @@ import config from 'config';
 import { HTTPError } from '../../../main/HttpError';
 
 import { http } from '@modules/http';
-import { CcdCase, CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
+import { CcdCase, CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('config');
@@ -247,11 +247,21 @@ describe('ccdCaseService', () => {
         },
       });
 
+      const expectedMakeAnApplicationResponse = {
+        state: GenAppState.PENDING_GEN_APP_ISSUED,
+        serviceRequestReference: 'SR-1234',
+        feeAmount: 10.99,
+      };
+
       mockPost.mockResolvedValue({
-        data: {},
+        data: {
+          after_submit_callback_response: {
+            confirmation_body: JSON.stringify(expectedMakeAnApplicationResponse),
+          },
+        },
       });
 
-      await ccdCaseService.submitGeneralApplication(accessToken, ccdData);
+      const actualMakeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(accessToken, ccdData);
 
       expect(mockGet).toHaveBeenCalledWith(
         `${mockUrl}/cases/${caseId}/event-triggers/makeAnApplication`,
@@ -281,6 +291,33 @@ describe('ccdCaseService', () => {
             Authorization: `Bearer ${accessToken}`,
           }),
         })
+      );
+
+      expect(actualMakeAnApplicationResponse).toEqual(expectedMakeAnApplicationResponse);
+    });
+
+    it('throws HTTPError if confirmation body is missing from response', async () => {
+      const citizenGenAppRequest: CitizenGenAppRequest = { applicationType: GenAppType.ADJOURN };
+      const ccdData: CcdCase = { id: caseId, data: { citizenGenAppRequest } };
+      const eventToken = 'event token here';
+
+      mockGet.mockResolvedValue({
+        data: {
+          token: eventToken,
+        },
+      });
+
+      mockPost.mockResolvedValue({
+        data: {
+          after_submit_callback_response: {
+            confirmation_body: undefined,
+          },
+        },
+      });
+
+      await expect(ccdCaseService.submitGeneralApplication(accessToken, ccdData)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.submitGeneralApplication(accessToken, ccdData)).rejects.toThrow(
+        'No confirmation body found in response data'
       );
     });
   });

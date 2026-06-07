@@ -1,8 +1,9 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
+import { v4 as uuidv4 } from 'uuid';
 
 import { ApplicationError, ApplicationErrorCode } from '../../../ApplicationError';
-import { createFormStep, getFormData, getTranslationFunction } from '../../../modules/steps';
+import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { toYesNoEnum } from '../../utils';
 import { flowConfig } from '../flow.config';
@@ -11,7 +12,8 @@ import { buildSummaryListRows } from './summaryListRowFactory';
 import VisibleFormDataView from './visibleFormDataView';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
+import { CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
+import { PaymentSessionState, clearPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
 import { toCaseReference16 } from '@utils/caseReference';
 
 const STEP_NAME = 'check-your-answers';
@@ -60,6 +62,36 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: async (req: Request) => {
     const t: TFunction = getTranslationFunction(req);
+
+    // TODO: Temp bit
+
+    req.session.genApp = {
+      applicationId: uuidv4(),
+    };
+
+    setFormData(req, 'choose-an-application', {
+      typeOfApplication: GenAppType.SOMETHING_ELSE,
+    });
+
+    setFormData(req, 'do-you-need-help-paying-the-fee', {
+      helpWithFeesNeeded: 'no',
+    });
+
+    setFormData(req, 'have-the-other-parties-agreed-to-this-application', {
+      otherPartiesAgreed: 'yes',
+    });
+
+    setFormData(req, 'what-order-do-you-want-the-court-to-make-and-why', {
+      whatOrderWanted: 'Test order wanted',
+    });
+
+    setFormData(req, 'do-you-want-to-upload-documents-to-support-your-application', {
+      uploadDocuments: 'no',
+    });
+
+    setFormData(req, 'which-language-did-you-use-to-complete-this-service', {
+      whichLanguage: 'ENGLISH',
+    });
 
     const visibleFormData = new VisibleFormDataView(req);
 
@@ -113,7 +145,7 @@ export const step: StepDefinition = createFormStep({
       clientReference: req.session.genApp.applicationId,
     };
 
-    await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
+    const makeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
       id: ccdCase.id,
       data: {
         citizenGenAppRequest,
@@ -126,5 +158,16 @@ export const step: StepDefinition = createFormStep({
       delete req.session.uploadedDocs[caseRef];
     }
     delete req.session.genApp;
+
+    if (makeAnApplicationResponse?.state === GenAppState.PENDING_GEN_APP_ISSUED) {
+      const paymentSessionState: PaymentSessionState = {
+        serviceRequestReference: makeAnApplicationResponse.serviceRequestReference,
+        feeAmount: makeAnApplicationResponse.feeAmount,
+      };
+
+      setPaymentSessionState(req, paymentSessionState);
+    } else {
+      clearPaymentSessionState(req);
+    }
   },
 });
