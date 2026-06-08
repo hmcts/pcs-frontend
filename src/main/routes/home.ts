@@ -1,9 +1,11 @@
 import { Application, Request, Response } from 'express';
 
-import { oidcMiddleware } from '../middleware';
-
 export default function (app: Application): void {
-  app.get('/', oidcMiddleware, (_req: Request, res: Response) => {
-    res.redirect('/claims');
+  app.get('/', (req: Request, res: Response) => {
+    if (req.session?.user) {
+      res.redirect('/claims');
+    } else {
+      res.redirect('/login');
+    }
   });
 }
