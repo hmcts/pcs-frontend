@@ -8,7 +8,7 @@
   "whatHappensNext": "What happens next",
   "youDoNotNeedToDoAnythingElse": "You do not need to do anything else. We will send your application to the judge and we will contact you again when they have made a decision.",
   "giveFeedbackAboutThisService": "Give feedback about this service",
-  "completeThisShortSurvey": "<a href=\"https://www.smartsurvey.co.uk/s/CCDSurvey/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Complete this short survey to help us improve this service</a> (usually takes 5 minutes).",
+  "completeThisShortSurvey": "<a href=\"https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Complete this short survey to help us improve this service</a> (usually takes 5 minutes).",
   "buttons": {
     "closeAndReturnToCaseOverview": "Close and return to case overview"
   }
