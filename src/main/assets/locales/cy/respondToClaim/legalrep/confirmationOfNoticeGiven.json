@@ -1,4 +1,6 @@
 {
+  "pageTitle": "cyNotice details",
+  "question": "cyDid {{claimantName}} give the defendant notice of their intention to begin possession proceedings?",
   "hintText": "",
   "options": {
     "yes": "cyYes",
