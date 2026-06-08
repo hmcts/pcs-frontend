@@ -1,8 +1,8 @@
 {
   "pageTitle": "cyNotice date",
   "question": "cyWhen did the defendant receive notice from {{claimantName}} (optional)?",
-  "noticeDateHint": "cyFor example, 27 9 2022.",
-  "paragraph": "cy{{claimantName}} did not provide the date they served you notice.",
+  "noticeDateHint": "cyFor example, 27 9 2022",
+  "paragraph": "cy{{claimantName}} did not provide the date they served the defendant notice.",
   "errors": {
     "date": {
       "day": "cyDay",
