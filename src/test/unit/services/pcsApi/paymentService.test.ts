@@ -113,9 +113,14 @@ describe('payment helpers', () => {
   it.each([
     ['Success', 'success'],
     ['Paid', 'success'],
+    ['Failed', 'failure'],
+    ['Declined', 'failure'],
     ['failed', 'failure'],
+    ['declined', 'failure'],
     ['Not paid', 'failure'],
     ['Partially paid', 'failure'],
+    ['Initiated', 'pending'],
+    ['Pending', 'pending'],
     ['created', 'pending'],
     [undefined, 'pending'],
   ])('maps payment status %s to %s outcome', (status, expected) => {

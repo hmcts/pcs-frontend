@@ -60,7 +60,17 @@ export function getPaymentOutcome(status?: string): PaymentOutcome {
   }
 
   if (
-    ['failed', 'cancelled', 'canceled', 'error', 'not paid', 'not_paid', 'partially paid'].includes(normalizedStatus)
+    [
+      'failed',
+      'declined',
+      'cancelled',
+      'canceled',
+      'error',
+      'not paid',
+      'not_paid',
+      'partially paid',
+      'partially_paid',
+    ].includes(normalizedStatus)
   ) {
     return 'failure';
   }
