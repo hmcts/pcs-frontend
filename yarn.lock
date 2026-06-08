@@ -2021,31 +2021,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-sdk-common@npm:2.25.0":
-  version: 2.25.0
-  resolution: "@launchdarkly/js-sdk-common@npm:2.25.0"
-  checksum: 10/44db342fd1bd1d402b290fe3abb5bc310429cc45b4d4250bf3889f46f7323b5b4a808808d140bedf08588d0522c2b4f4014d245bc74d454cbc43746ed8f8b474
+"@launchdarkly/js-sdk-common@npm:2.25.1":
+  version: 2.25.1
+  resolution: "@launchdarkly/js-sdk-common@npm:2.25.1"
+  checksum: 10/4b99f83fb637af2a0b546afbaa400918f83f66464ed9259583520c1a632cfa401e08906cf07b5f85480c5f5c8c9b698b7e624c20f038a0a2429a88abc93cb636
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-server-sdk-common@npm:2.19.0":
-  version: 2.19.0
-  resolution: "@launchdarkly/js-server-sdk-common@npm:2.19.0"
+"@launchdarkly/js-server-sdk-common@npm:2.19.1":
+  version: 2.19.1
+  resolution: "@launchdarkly/js-server-sdk-common@npm:2.19.1"
   dependencies:
-    "@launchdarkly/js-sdk-common": "npm:2.25.0"
+    "@launchdarkly/js-sdk-common": "npm:2.25.1"
     semver: "npm:7.5.4"
-  checksum: 10/0f56ccf74c463c1c27dc0483d09d11160c6bf2e1b8f82ac261863a37fcd1bcdb575d80e4945813becb7115d4593151a03fd4bb6ee5fc0699a7d8bacb221e15a5
+  checksum: 10/dbb846685999b5809ffe4d3f3f27e0350c9c8fe4b7545c232b9d92431e2c65690fbfacb5e191bc2439b8c5982e1eb9830ad64b7aa3f28d434cfda87e1f4ff40a
   languageName: node
   linkType: hard
 
-"@launchdarkly/node-server-sdk@npm:9.11.1":
-  version: 9.11.1
-  resolution: "@launchdarkly/node-server-sdk@npm:9.11.1"
+"@launchdarkly/node-server-sdk@npm:9.11.2":
+  version: 9.11.2
+  resolution: "@launchdarkly/node-server-sdk@npm:9.11.2"
   dependencies:
-    "@launchdarkly/js-server-sdk-common": "npm:2.19.0"
+    "@launchdarkly/js-server-sdk-common": "npm:2.19.1"
     https-proxy-agent: "npm:^7.0.6"
     launchdarkly-eventsource: "npm:2.2.0"
-  checksum: 10/aa1498c4f853f9ea20c10ace5124334870d706a5f8fc9716da80a7cea16f745aee6b09a52cabddee94d7f34a8cff108ae34064dd6efbecaa987144ca555d9606
+  checksum: 10/3df57274a1948617d6bb30b1c5812dbab98a7951207f009ae5cf6ce462e3aebcf5cfc484f2eedf1d4272f8d448969b7f26e03ccc717110a9a04376b1d3faa0c3
   languageName: node
   linkType: hard
 
@@ -11768,7 +11768,7 @@ __metadata:
     "@hmcts/nodejs-healthcheck": "npm:1.8.6"
     "@hmcts/playwright-common": "npm:1.1.2"
     "@hmcts/properties-volume": "npm:1.4.0"
-    "@launchdarkly/node-server-sdk": "npm:9.11.1"
+    "@launchdarkly/node-server-sdk": "npm:9.11.2"
     "@ministryofjustice/frontend": "npm:^9.0.0"
     "@opentelemetry/api": "npm:1.9.1"
     "@opentelemetry/instrumentation-winston": "npm:0.62.0"
