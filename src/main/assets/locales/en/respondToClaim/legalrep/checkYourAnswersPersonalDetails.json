@@ -3,7 +3,7 @@
   "cardTitle": "Personal details",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "Is your name {{name}}?",
+      "label": "Is your client’s name {{name}}?",
       "changeHidden": "name"
     },
     "defendantName": {
