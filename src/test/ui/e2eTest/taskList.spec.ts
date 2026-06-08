@@ -290,6 +290,18 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly @PR', async 
       subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
       status: 'Available',
     });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('clickButton', 'Submit');
+    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -297,6 +309,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly @PR', async 
         taskList.incomeAndExpensesLink,
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
+        taskList.checkYourAnswersAndSubmitHiddenLink,
       ],
       status: 'Done',
     });
@@ -316,16 +329,4 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly @PR', async 
       status: 'In progress',
     });
   });
-  await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-  await performAction('readReasonableAdjustmentsTriage');
-  await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-  await performAction('clickButton', equalityAndDiversityStart.continueButton);
-  await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-  await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-  await performAction('languageUsed', {
-    question: languageUsed.mainHeader,
-    radioOption: languageUsed.englishRadioOption,
-  });
-  await performAction('clickButton', 'Submit');
-  await performAction('clickButton', endNow.continueButton);
 });
