@@ -37,6 +37,7 @@ import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import { GenAppType } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type {
   DashboardNotification,
@@ -54,6 +55,12 @@ const logger = Logger.getLogger('ccdCaseService');
 
 interface EventTokenResponse {
   token: string;
+}
+
+export interface RelatedApplication {
+  id: string;
+  type?: GenAppType;
+  applicationSubmittedDate?: string;
 }
 
 export interface TransformedDashboardData {

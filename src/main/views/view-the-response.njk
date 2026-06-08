@@ -1,11 +1,108 @@
 {% extends "template.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% set backUrl = dashboardUrl %}
 
 {% block pageTitle %}
-View the response - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {{ t('viewTheResponse:pageTitle') }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
 
 {% block content %}
-  <h1 class="govuk-heading-l">View the response</h1>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds view-the-response">
 
+      <span class="govuk-caption-l">{{ t('viewTheResponse:caption') }}</span>
+      <h1 class="govuk-heading-l">{{ t('viewTheResponse:heading') }}</h1>
 
+      {% if propertyAddress %}
+        <p class="govuk-body-l"> {{ t('viewTheResponse:propertyAddressLabel') }} {{ propertyAddress }}</p>
+      {% endif %}
+      {% if caseReferenceDisplay %}
+        <p class="govuk-body-l">
+          {{ t('viewTheResponse:caseReferenceLabel') }} {{ caseReferenceDisplay }}
+        </p>
+      {% endif %}
+
+      {{ govukSummaryList({ rows: caseDates.rows }) }}
+
+      {% if claimantDetails.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.claimantDetails') }}</h2>
+        {{ govukSummaryList({ rows: claimantDetails.rows }) }}
+      {% endif %}
+
+      {% if defendant1Details.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.defendant1Details') }}</h2>
+        {{ govukSummaryList({ rows: defendant1Details.rows }) }}
+      {% endif %}
+
+      {% if responseToClaim.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.responseToClaim') }}</h2>
+        {{ govukSummaryList({ rows: responseToClaim.rows }) }}
+      {% endif %}
+
+      {% if paymentsOrAgreements.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.paymentsOrAgreements') }}</h2>
+        {{ govukSummaryList({ rows: paymentsOrAgreements.rows }) }}
+      {% endif %}
+
+      {% if householdAndCircumstances.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.householdAndCircumstances') }}</h2>
+        {{ govukSummaryList({ rows: householdAndCircumstances.rows }) }}
+      {% endif %}
+
+      {% if regularIncome.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.regularIncome') }}</h2>
+        {{ govukSummaryList({ rows: regularIncome.rows }) }}
+      {% endif %}
+
+      {% if priorityDebts.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.priorityDebts') }}</h2>
+        {{ govukSummaryList({ rows: priorityDebts.rows }) }}
+      {% endif %}
+
+      {% if regularExpenses.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.regularExpenses') }}</h2>
+        {{ govukSummaryList({ rows: regularExpenses.rows }) }}
+      {% endif %}
+
+      {% if additionalInformation.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.additionalInformation') }}</h2>
+        {{ govukSummaryList({ rows: additionalInformation.rows }) }}
+      {% endif %}
+
+      {% if counterclaim.rows.length %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.counterclaim') }}</h2>
+        {{ govukSummaryList({ rows: counterclaim.rows }) }}
+      {% endif %}
+
+      <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.statementOfTruth') }}</h2>
+      <p class="govuk-body">{{ t('viewTheResponse:statementOfTruth.body') }}</p>
+      {{ govukSummaryList({ rows: statementOfTruth.rows }) }}
+
+      {% if dateSubmitted %}
+        <h2 class="govuk-heading-m">{{ t('viewTheResponse:pdf.heading') }}</h2>
+        <p class="govuk-body">
+          <a href="#" class="govuk-link">{{ t('viewTheResponse:pdf.linkText') }}</a>
+        </p>
+      {% endif %}
+
+      {{ govukButton({
+        text: t('viewTheResponse:closeAndReturn'),
+        href: dashboardUrl or '#'
+      }) }}
+
+      {{ govukDetails({
+        summaryText: t('viewTheResponse:accordion.summary'),
+        open: true,
+        html: '<p class="govuk-body">'
+              + t('viewTheResponse:accordion.body')
+              + ' <a class="govuk-link" href="' + (viewDocumentsUrl or '#') + '">'
+              + t('viewTheResponse:accordion.linkText')
+              + '</a></p>'
+      }) }}
+
+    </div>
+  </div>
 {% endblock %}

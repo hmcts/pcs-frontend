@@ -234,17 +234,21 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  statementOfTruthCompletedBy?: string;
   completedSections?: RespondToClaimSectionEnum[];
 }
 
 export interface PossessionClaimResponse {
   claimantOrganisations?: CcdClaimantOrganisation[];
+  claimantName?: string;
+  claimantServiceAddress?: CcdCaseAddress;
   defendantContactDetails?: {
     party?: CcdDefendantParty;
   };
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
+  claimIssuedDate?: string;
 }
 
 export type CaseData = CcdCaseData;
@@ -252,6 +256,7 @@ export type CaseData = CcdCaseData;
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
   claimIssueDate?: string;
+  dateSubmitted?: string;
   claimantName?: string;
   isClaimantNameCorrect?: YesNoValue;
   overriddenClaimantName?: string;

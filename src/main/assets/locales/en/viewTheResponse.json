@@ -1,0 +1,158 @@
+{
+  "pageTitle": "View the response",
+  "heading": "View the response",
+  "caption": "The response",
+  "propertyAddressLabel": "Property address:",
+  "caseReferenceLabel": "Case number:",
+
+  "summary": {
+    "dateIssued": "Date issued",
+    "dateSubmitted": "Date submitted"
+  },
+
+  "sections": {
+    "claimantDetails": "Claimant details",
+    "defendant1Details": "Defendant 1 details",
+    "additionalDefendantDetails": "Additional defendant {{number}} details",
+    "responseToClaim": "Response to the claimant’s claim",
+    "paymentsOrAgreements": "Payments or agreements since the claim was made",
+    "householdAndCircumstances": "Your household and circumstances",
+    "regularIncome": "Regular income",
+    "priorityDebts": "Priority debts",
+    "regularExpenses": "Regular expenses",
+    "additionalInformation": "Additional information",
+    "counterclaim": "Counterclaim",
+    "statementOfTruth": "Statement of truth"
+  },
+
+  "claimantDetails": {
+    "organisation": "Claimant organisation",
+    "name": "Name",
+    "address": "Address for service"
+  },
+
+  "defendant1": {
+    "name": "Name",
+    "dateOfBirth": "Date of birth",
+    "email": "Email address",
+    "phone": "Phone number",
+    "address": "Address",
+    "contactPreferences": "Contact preferences",
+    "freeLegalAdvice": "Free legal advice"
+  },
+
+  "contactPreference": {
+    "text": "Text message",
+    "phone": "Phone",
+    "email": "Email",
+    "post": "Post"
+  },
+
+  "responseToClaim": {
+    "disputeClaim": "Do you dispute the claim?",
+    "disputeDetails": "Details of your dispute",
+    "claimGrounds": "Claim grounds",
+    "tenancyTypeConfirmation": "Is the tenancy type correct?",
+    "tenancyType": "Tenancy type",
+    "tenancyStartDateConfirmation": "Is the tenancy start date correct?",
+    "tenancyStartDate": "Tenancy start date",
+    "possessionNoticeReceived": "Did you receive a possession notice?",
+    "noticeReceivedDate": "Date notice received",
+    "rentArrearsAmountConfirmation": "Is the rent arrears amount correct?",
+    "rentArrearsAmount": "Rent arrears amount",
+    "landlordRegistered": "Is your landlord registered?",
+    "landlordLicensed": "Is your landlord licensed?",
+    "writtenTerms": "Do you have written tenancy terms?"
+  },
+
+  "payments": {
+    "anyPaymentsMade": "Have any payments been made since the claim?",
+    "paymentDetails": "Payment details",
+    "repaymentPlanAgreed": "Is a repayment plan agreed?",
+    "repaymentAgreedDetails": "Repayment plan details",
+    "repayArrearsInstalments": "Repay arrears in instalments",
+    "additionalContribution": "Additional rent contribution"
+  },
+
+  "household": {
+    "shareAdditional": "Share additional circumstances?",
+    "additionalDetails": "Additional circumstances details",
+    "exceptionalHardship": "Exceptional hardship?",
+    "exceptionalHardshipDetails": "Exceptional hardship details",
+    "dependantChildren": "Any dependent children?",
+    "dependantChildrenDetails": "Dependent children details",
+    "otherDependants": "Any other dependants?",
+    "otherDependantDetails": "Other dependants details",
+    "alternativeAccommodation": "Alternative accommodation?",
+    "alternativeAccommodationDate": "Alternative accommodation transfer date",
+    "otherTenants": "Other tenants in the property?",
+    "otherTenantsDetails": "Other tenants details"
+  },
+
+  "income": {
+    "fromJobs": "Income from jobs",
+    "pension": "Pension",
+    "universalCredit": "Universal Credit",
+    "universalCreditApplied": "Universal Credit application date",
+    "otherBenefits": "Other benefits",
+    "moneyFromElsewhere": "Money from elsewhere?",
+    "moneyFromElsewhereDetails": "Money from elsewhere details"
+  },
+
+  "debts": {
+    "hasPriorityDebts": "Do you have priority debts?",
+    "debtTotal": "Total debt",
+    "debtContribution": "Regular debt contribution"
+  },
+
+  "expenses": {
+    "householdBills": "Household bills",
+    "loanPayments": "Loan payments",
+    "childSpousalMaintenance": "Child or spousal maintenance",
+    "mobilePhone": "Mobile phone",
+    "groceryShopping": "Grocery shopping",
+    "fuelParkingTransport": "Fuel, parking and transport",
+    "schoolCosts": "School costs",
+    "clothing": "Clothing",
+    "other": "Other expenses"
+  },
+
+  "additional": {
+    "otherConsiderations": "Are there other considerations?",
+    "otherConsiderationsDetails": "Other considerations details"
+  },
+
+  "counterclaim": {
+    "make": "Make a counterclaim?",
+    "type": "Type of counterclaim",
+    "amountKnown": "Is the claim amount known?",
+    "amount": "Counterclaim amount",
+    "estimatedMaxAmount": "Estimated maximum amount",
+    "needHelpWithFees": "Need help with fees?"
+  },
+
+  "frequency": {
+    "weekly": "Weekly",
+    "monthly": "Monthly"
+  },
+
+  "statementOfTruth": {
+    "body": "I believe the facts stated in this defence form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in the truth.",
+    "completedBy": "Completed by"
+  },
+
+  "pdf": {
+    "heading": "Download a PDF copy of the response",
+    "linkText": "Response (PDF)"
+  },
+
+  "closeAndReturn": "Close and return to case overview",
+
+  "accordion": {
+    "summary": "If you cannot find a document that you are looking for in this section",
+    "body": "All documents uploaded by you or the claimant are on the",
+    "linkText": "Documents page"
+  },
+
+  "personsUnknown": "Persons unknown"
+}
