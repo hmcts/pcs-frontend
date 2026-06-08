@@ -48,7 +48,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
   process.env.CLAIMANT_NAME = claimantName;
-  process.env.WALES_POSTCODE = 'YES';
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.NOTICE_SERVED = 'NO';
   } else {
