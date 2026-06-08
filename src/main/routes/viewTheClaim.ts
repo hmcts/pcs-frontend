@@ -2,8 +2,8 @@ import { Application, NextFunction, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
 import { VIEW_THE_CLAIM_ROUTE } from '../constants/caseRoutes';
-import { getTranslationFunction } from '../modules/i18n';
 import { oidcMiddleware } from '../middleware';
+import { getTranslationFunction } from '../modules/i18n';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';

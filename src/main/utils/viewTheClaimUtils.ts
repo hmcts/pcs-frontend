@@ -1,6 +1,6 @@
 import escapeHTML from 'escape-html';
-import { DateTime } from 'luxon';
 import type { TFunction } from 'i18next';
+import { DateTime } from 'luxon';
 
 import type { CcdCaseAddress, CcdCaseData } from '@services/ccdCase.interface';
 import { extractCaseDocuments } from '@utils/documentUtils';
@@ -29,6 +29,10 @@ export interface ViewTheClaimDownloadSection {
   rows: ViewTheClaimSummaryRow[];
 }
 
+export interface ViewTheClaimStatementOfTruth {
+  rows: ViewTheClaimSummaryRow[];
+}
+
 export interface ViewTheClaimPageData {
   caseReference: string;
   propertyAddressHtml?: string;
@@ -37,6 +41,7 @@ export interface ViewTheClaimPageData {
   pageMetadataRows: ViewTheClaimSummaryRow[];
   claimPdfSection: ViewTheClaimDownloadSection;
   sections: ViewTheClaimSection[];
+  statementOfTruth: ViewTheClaimStatementOfTruth;
   documentsUrl: string;
 }
 
@@ -88,11 +93,6 @@ const FREQUENCY_LABELS: Record<string, string> = {
   MONTHLY: 'Monthly',
   QUARTERLY: 'Quarterly',
   YEARLY: 'Yearly',
-};
-
-const STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS: Record<string, string> = {
-  CLAIMANT: 'Claimant',
-  LEGAL_REPRESENTATIVE: "Claimant's legal representative (as defined by CPR 2.3 (1))",
 };
 
 const GROUND_LABELS: Record<string, string> = {
@@ -265,15 +265,15 @@ export function buildViewTheClaimPageData(
   const propertyAddressHtml = addressHtml(propertyAddress);
   const propertyAddressText = addressText(propertyAddress);
   const claimant = claimantName(data, copy);
-  const claimIssueDateText = formatDate(getValue(data, 'claimIssueDate'));
-  const claimSubmittedDateText = formatDate(getFirstValue(data, ['submittedOn', 'claimSubmittedDate']));
+  const emptyValue = t('viewTheClaim:emptyValue');
+  const claimIssueDateText =
+    formatDate(getValue(data, 'claimIssueDate')) ?? getFirstString(data, ['detailsTab_DateClaimIssued']);
+  const claimSubmittedDateText =
+    getFirstString(data, ['detailsTab_DateClaimSubmitted']) ??
+    formatDate(getFirstValue(data, ['submittedOn', 'dateSubmitted', 'claimSubmittedDate']));
   const pageMetadataRows = sectionRows([
-    claimIssueDateText
-      ? summaryRow(t('viewTheClaim:dateIssued'), { text: claimIssueDateText })
-      : undefined,
-    claimSubmittedDateText
-      ? summaryRow(t('viewTheClaim:dateSubmitted'), { text: claimSubmittedDateText })
-      : undefined,
+    summaryRow(t('viewTheClaim:dateIssued'), { text: claimIssueDateText ?? emptyValue }),
+    summaryRow(t('viewTheClaim:dateSubmitted'), { text: claimSubmittedDateText ?? emptyValue }),
   ]);
 
   const sections = [
@@ -295,7 +295,6 @@ export function buildViewTheClaimPageData(
     buildSuspensionSection(data, copy),
     buildProhibitedConductSection(data, copy),
     buildRequiredDocumentsSection(data, documents, caseReference, copy),
-    buildStatementOfTruthSection(data, copy),
   ].filter((item): item is ViewTheClaimSection => !!item && item.rows.length > 0);
 
   return {
@@ -310,6 +309,7 @@ export function buildViewTheClaimPageData(
     pageMetadataRows,
     claimPdfSection: buildClaimPdfSection(documents, caseReference, copy),
     sections,
+    statementOfTruth: buildStatementOfTruthSection(data, copy, emptyValue),
     documentsUrl: `/case/${caseReference}/view-documents`,
   };
 }
@@ -320,9 +320,7 @@ function buildClaimPdfSection(
   copy: ViewTheClaimCopy
 ): ViewTheClaimDownloadSection {
   const claimDocument = documents.find(
-    document =>
-      document.categoryId === 'statementsOfCase' ||
-      document.filename.toLowerCase().includes('claim')
+    document => document.categoryId === 'statementsOfCase' || document.filename.toLowerCase().includes('claim')
   );
 
   return {
@@ -339,14 +337,14 @@ function buildClaimPdfSection(
 }
 
 function buildClaimantSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
-  const rows = [
+  const rows: (ViewTheClaimSummaryRow | undefined)[] = [
     textRow(copy.label('claimantName'), claimantName(data, copy)),
     htmlRow(copy.label('addressForService'), claimantAddressHtml(data)),
-    textRow(
-      copy.label('isExemptLandlord'),
-      yesNoText(getValue(data, 'isExemptLandlord'))
-    ),
   ];
+
+  if (isWalesCase(data)) {
+    rows.push(textRow(copy.label('isExemptLandlord'), yesNoText(getValue(data, 'isExemptLandlord'))));
+  }
 
   return section(copy.section('claimantDetails'), rows);
 }
@@ -410,15 +408,9 @@ function buildClaimDetailsSection(
 
 function buildWelshAsbSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
-    textRow(
-      copy.label('isASB'),
-      yesNoText(getValue(data, 'walesAntisocialBehaviour'))
-    ),
+    textRow(copy.label('isASB'), yesNoText(getValue(data, 'walesAntisocialBehaviour'))),
     textRow(copy.label('asbDetails'), getString(data, 'walesAntisocialBehaviourDetails')),
-    textRow(
-      copy.label('isIllegalPurposes'),
-      yesNoText(getValue(data, 'walesIllegalPurposesUse'))
-    ),
+    textRow(copy.label('isIllegalPurposes'), yesNoText(getValue(data, 'walesIllegalPurposesUse'))),
     textRow(copy.label('illegalPurposesDetails'), getString(data, 'walesIllegalPurposesUseDetails')),
     textRow(copy.label('isOtherProhibitedConduct'), yesNoText(getValue(data, 'walesOtherProhibitedConduct'))),
     textRow(copy.label('otherProhibitedConductDetails'), getString(data, 'walesOtherProhibitedConductDetails')),
@@ -437,10 +429,7 @@ function buildRentArrearsSection(
     textRow(copy.label('rentAmount'), formatMoney(getValue(data, 'rentDetails_CurrentRent'))),
     textRow(copy.label('howIsRentCalculated'), enumText(getValue(data, 'rentDetails_Frequency'), FREQUENCY_LABELS)),
     textRow(copy.label('totalRentArrears'), formatMoney(getValue(data, 'rentArrears_Total'))),
-    textRow(
-      copy.label('previousSteps'),
-      yesNoText(getValue(data, 'rentArrears_RecoveryAttempted'))
-    ),
+    textRow(copy.label('previousSteps'), yesNoText(getValue(data, 'rentArrears_RecoveryAttempted'))),
     textRow(copy.label('previousStepsDetails'), getString(data, 'rentArrears_RecoveryAttemptDetails')),
     textRow(copy.label('judgmentRequested'), yesNoText(getValue(data, 'arrearsJudgmentWanted'))),
     htmlRow(
@@ -467,6 +456,16 @@ function buildActionTakenSection(data: UnknownRecord, copy: ViewTheClaimCopy): V
     ),
     textRow(copy.label('mediationAttempted'), yesNoText(getValue(data, 'mediationAttempted'))),
     textRow(copy.label('settlementAttempted'), yesNoText(getValue(data, 'settlementAttempted'))),
+    textRow(copy.label('noticeServed'), yesNoText(getFirstValue(data, ['noticeServed', 'walesNoticeServed']))),
+    textRow(
+      copy.label('noticeNotServedReason'),
+      getFirstString(data, [
+        'notice_NoticeNotServedReason',
+        'notice_NoNoticeStatement',
+        'walesNoNoticeStatement',
+        'noticeStatement',
+      ])
+    ),
   ];
 
   return section(copy.section('actionTaken'), rows);
@@ -480,18 +479,11 @@ function buildNoticeDetailsSection(
 ): ViewTheClaimSection | undefined {
   const noticeDateTime = noticeDateTimeValue(data);
   const rows = [
-    textRow(copy.label('noticeServed'), yesNoText(getFirstValue(data, ['noticeServed', 'walesNoticeServed']))),
-    textRow(
-      copy.label('noticeNotServedReason'),
-      getFirstString(data, [
-        'notice_NoticeNotServedReason',
-        'notice_NoNoticeStatement',
-        'walesNoNoticeStatement',
-        'noticeStatement',
-      ])
-    ),
     textRow(copy.label('noticeType'), getString(data, 'walesTypeOfNoticeServed')),
-    textRow(copy.label('noticeServiceMethod'), enumText(getValue(data, 'notice_NoticeServiceMethod'), NOTICE_SERVICE_METHOD_LABELS)),
+    textRow(
+      copy.label('noticeServiceMethod'),
+      enumText(getValue(data, 'notice_NoticeServiceMethod'), NOTICE_SERVICE_METHOD_LABELS)
+    ),
     textRow(copy.label('noticeDate'), formatDate(noticeDateTime)),
     textRow(copy.label('noticeTime'), formatTime(noticeDateTime)),
     textRow(copy.label('noticePersonName'), getString(data, 'notice_NoticePersonName')),
@@ -523,49 +515,58 @@ function buildTenancySection(
   caseReference: string,
   copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
-  const rows = [
+  const walesCase = isWalesCase(data);
+  const rows: (ViewTheClaimSummaryRow | undefined)[] = [
     textRow(
       copy.label('tenancyType'),
       enumText(getFirstValue(data, ['tenancy_TypeOfTenancyLicence', 'occupationLicenceTypeWales']), TENANCY_TYPE_LABELS)
     ),
-    textRow(copy.label('tenancyStartDate'), formatDate(getFirstValue(data, ['tenancy_TenancyLicenceDate', 'licenceStartDate']))),
     textRow(
-      copy.label('tenancyCopy'),
-      yesNoText(getValue(data, 'tenancy_HasCopyOfTenancyLicence'))
+      copy.label('tenancyStartDate'),
+      formatDate(getFirstValue(data, ['tenancy_TenancyLicenceDate', 'licenceStartDate']))
     ),
-    textRow(
-      copy.label('tenancyNoCopyReason'),
-      getString(data, 'tenancy_ReasonsForNoTenancyLicenceDocuments')
-    ),
+  ];
+
+  if (walesCase) {
+    rows.push(textRow(copy.label('tenancyWalesUpload'), yesNoText(hasLicenceDocuments(data) ? 'YES' : 'NO')));
+  } else {
+    rows.push(
+      textRow(copy.label('tenancyCopy'), yesNoText(getValue(data, 'tenancy_HasCopyOfTenancyLicence'))),
+      textRow(copy.label('tenancyNoCopyReason'), getString(data, 'tenancy_ReasonsForNoTenancyLicenceDocuments'))
+    );
+  }
+
+  rows.push(
     htmlRow(
       copy.label('tenancyDocument'),
       documentLinksHtml(documents, caseReference, {
+        sourceFields: walesCase ? ['licenceDocuments'] : undefined,
         filenameIncludes: ['tenancy', 'licence', 'license', 'occupation'],
       })
-    ),
-  ];
+    )
+  );
 
   return section(copy.section('tenancyDetails'), rows);
 }
 
-function buildClaimantCircumstancesSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
+function buildClaimantCircumstancesSection(
+  data: UnknownRecord,
+  copy: ViewTheClaimCopy
+): ViewTheClaimSection | undefined {
   const rows = [
-    textRow(
-      copy.label('claimantCircumstancesQuestion'),
-      yesNoText(getValue(data, 'claimantCircumstancesSelect'))
-    ),
+    textRow(copy.label('claimantCircumstancesQuestion'), yesNoText(getValue(data, 'claimantCircumstancesSelect'))),
     textRow(copy.label('claimantCircumstancesDetails'), getString(data, 'claimantCircumstancesDetails')),
   ];
 
   return section(copy.section('claimantCircumstances'), rows);
 }
 
-function buildDefendantCircumstancesSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
+function buildDefendantCircumstancesSection(
+  data: UnknownRecord,
+  copy: ViewTheClaimCopy
+): ViewTheClaimSection | undefined {
   const rows = [
-    textRow(
-      copy.label('defendantCircumstancesQuestion'),
-      yesNoText(getValue(data, 'hasDefendantCircumstancesInfo'))
-    ),
+    textRow(copy.label('defendantCircumstancesQuestion'), yesNoText(getValue(data, 'hasDefendantCircumstancesInfo'))),
     textRow(copy.label('defendantCircumstancesDetails'), getString(data, 'defendantCircumstancesInfo')),
   ];
 
@@ -574,10 +575,7 @@ function buildDefendantCircumstancesSection(data: UnknownRecord, copy: ViewTheCl
 
 function buildUnderlesseeTriageSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   return section(copy.section('underlesseeTriage'), [
-    textRow(
-      copy.label('hasUnderlesseeOrMortgagee'),
-      yesNoText(getValue(data, 'hasUnderlesseeOrMortgagee'))
-    ),
+    textRow(copy.label('hasUnderlesseeOrMortgagee'), yesNoText(getValue(data, 'hasUnderlesseeOrMortgagee'))),
   ]);
 }
 
@@ -613,10 +611,7 @@ function buildAdditionalUnderlesseeSections(
 
 function buildDemotionSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
-    textRow(
-      copy.label('demotionQuestion'),
-      selectedAlternative(data, 'DEMOTION_OF_TENANCY')
-    ),
+    textRow(copy.label('demotionQuestion'), selectedAlternative(data, 'DEMOTION_OF_TENANCY')),
     textRow(
       copy.label('demotionHousingAct'),
       enumText(getFirstValue(data, ['demotionOfTenancy_HousingAct', 'demotionOfTenancyActs']), {
@@ -637,10 +632,7 @@ function buildDemotionSection(data: UnknownRecord, copy: ViewTheClaimCopy): View
 
 function buildSuspensionSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
-    textRow(
-      copy.label('suspensionQuestion'),
-      selectedAlternative(data, 'SUSPENSION_OF_RIGHT_TO_BUY')
-    ),
+    textRow(copy.label('suspensionQuestion'), selectedAlternative(data, 'SUSPENSION_OF_RIGHT_TO_BUY')),
     textRow(
       copy.label('suspensionHousingAct'),
       enumText(getFirstValue(data, ['suspensionOfRTB_HousingAct', 'suspensionOfRightToBuyActs']), {
@@ -657,14 +649,8 @@ function buildSuspensionSection(data: UnknownRecord, copy: ViewTheClaimCopy): Vi
 
 function buildProhibitedConductSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
-    textRow(
-      copy.label('prohibitedConductQuestion'),
-      yesNoText(getValue(data, 'prohibitedConductWalesClaim'))
-    ),
-    textRow(
-      copy.label('prohibitedConductAgreement'),
-      yesNoText(getValue(data, 'agreedTermsOfPeriodicContract'))
-    ),
+    textRow(copy.label('prohibitedConductQuestion'), yesNoText(getValue(data, 'prohibitedConductWalesClaim'))),
+    textRow(copy.label('prohibitedConductAgreement'), yesNoText(getValue(data, 'agreedTermsOfPeriodicContract'))),
     textRow(copy.label('prohibitedConductDetails'), getString(data, 'detailsOfTerms')),
     textRow(copy.label('prohibitedConductReason'), getString(data, 'prohibitedConductWalesClaimDetails')),
   ];
@@ -679,37 +665,22 @@ function buildRequiredDocumentsSection(
   copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
   const rows = [
-    textRow(
-      copy.label('epcQuestion'),
-      yesNoText(getValue(data, 'energyPerformanceCertificateProvided'))
-    ),
-    textRow(
-      copy.label('epcReason'),
-      getString(data, 'noEnergyPerformanceCertificateReason')
-    ),
+    textRow(copy.label('epcQuestion'), yesNoText(getValue(data, 'energyPerformanceCertificateProvided'))),
+    textRow(copy.label('epcReason'), getString(data, 'noEnergyPerformanceCertificateReason')),
     htmlRow(
       copy.label('epcDocument'),
       documentLinksHtml(documents, caseReference, {
         documentTypes: ['ENERGY_PERFORMANCE_CERTIFICATE'],
       })
     ),
-    textRow(
-      copy.label('gasQuestion'),
-      yesNoText(getValue(data, 'gasSafetyReportProvided'))
+    textRow(copy.label('gasQuestion'), yesNoText(getValue(data, 'gasSafetyReportProvided'))),
+    textRow(copy.label('gasReason'), getString(data, 'noGasSafetyReportReason')),
+    htmlRow(
+      copy.label('gasDocument'),
+      documentLinksHtml(documents, caseReference, { documentTypes: ['GAS_SAFETY_REPORT'] })
     ),
-    textRow(
-      copy.label('gasReason'),
-      getString(data, 'noGasSafetyReportReason')
-    ),
-    htmlRow(copy.label('gasDocument'), documentLinksHtml(documents, caseReference, { documentTypes: ['GAS_SAFETY_REPORT'] })),
-    textRow(
-      copy.label('eicrQuestion'),
-      yesNoText(getValue(data, 'electricalInstallationConditionProvided'))
-    ),
-    textRow(
-      copy.label('eicrReason'),
-      getString(data, 'noElectricalInstallationConditionReason')
-    ),
+    textRow(copy.label('eicrQuestion'), yesNoText(getValue(data, 'electricalInstallationConditionProvided'))),
+    textRow(copy.label('eicrReason'), getString(data, 'noElectricalInstallationConditionReason')),
     htmlRow(
       copy.label('eicrDocument'),
       documentLinksHtml(documents, caseReference, {
@@ -721,20 +692,45 @@ function buildRequiredDocumentsSection(
   return section(copy.section('requiredDocuments'), rows);
 }
 
-function buildStatementOfTruthSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
+function buildStatementOfTruthSection(
+  data: UnknownRecord,
+  copy: ViewTheClaimCopy,
+  emptyValue: string
+): ViewTheClaimStatementOfTruth {
   const statementOfTruth = asRecord(getValue(data, 'statementOfTruth'));
-  if (!statementOfTruth) {
-    return undefined;
+  let name: string | undefined;
+  let firm: string | undefined;
+  let position: string | undefined;
+
+  if (statementOfTruth) {
+    const completedBy = getStringFromValue(statementOfTruth.completedBy)?.toUpperCase();
+
+    if (completedBy === 'LEGAL_REPRESENTATIVE') {
+      name = getString(statementOfTruth, 'fullNameLegalRep');
+      firm = getString(statementOfTruth, 'firmNameLegalRep');
+      position = getString(statementOfTruth, 'positionLegalRep');
+    } else if (completedBy === 'CLAIMANT') {
+      name = getString(statementOfTruth, 'fullNameClaimant');
+      position = getString(statementOfTruth, 'positionClaimant');
+    } else {
+      name = getFirstString(statementOfTruth, ['fullNameLegalRep', 'fullNameClaimant']);
+      firm = getString(statementOfTruth, 'firmNameLegalRep');
+      position = getFirstString(statementOfTruth, ['positionLegalRep', 'positionClaimant']);
+    }
   }
 
-  const rows = [
-    textRow(copy.label('statementOfTruthCompletedBy'), enumText(statementOfTruth?.completedBy, STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS)),
-    textRow(copy.label('statementOfTruthName'), getFirstString(statementOfTruth ?? {}, ['fullNameLegalRep', 'fullNameClaimant'])),
-    textRow(copy.label('statementOfTruthFirmName'), getFirstString(statementOfTruth ?? {}, ['firmNameLegalRep']) ?? claimantName(data, copy)),
-    textRow(copy.label('statementOfTruthPosition'), getFirstString(statementOfTruth ?? {}, ['positionLegalRep', 'positionClaimant'])),
-  ];
+  const valueLines =
+    name || firm || position
+      ? [name, firm, position].filter((line): line is string => !!line)
+      : [emptyValue, emptyValue];
 
-  return section(copy.section('statementOfTruth'), rows);
+  return {
+    rows: sectionRows([
+      summaryRow(copy.label('statementOfTruthCompletedBy'), {
+        html: valueLines.map(line => escapeHTML(line)).join('<br>'),
+      }),
+    ]),
+  };
 }
 
 function createViewTheClaimCopy(t: TFunction): ViewTheClaimCopy {
@@ -781,6 +777,7 @@ function claimantName(data: UnknownRecord, copy: ViewTheClaimCopy): string | und
     getFirstString(data, [
       'claimantName',
       'fallbackClaimantName',
+      'detailsTab_ClaimantInformation.claimantName',
       'possessionClaimResponse.claimantOrganisations.0.value',
     ]) ??
     dynamicListLabel(getValue(data, 'claimantType'))
@@ -795,7 +792,8 @@ function claimantAddressHtml(data: UnknownRecord): string | undefined {
   return (
     collectionAddressesHtml(collectionRecords(getValue(data, 'allClaimants'))) ??
     addressHtml(getValue(data, 'organisationAddress'), { includeCountry: true }) ??
-    formattedAddressHtml(getString(data, 'formattedClaimantContactAddress'))
+    formattedAddressHtml(getString(data, 'formattedClaimantContactAddress')) ??
+    addressHtml(getValue(data, 'detailsTab_ClaimantAddress'), { includeCountry: true })
   );
 }
 
@@ -980,16 +978,36 @@ function selectedAlternative(data: UnknownRecord, value: string): string | undef
   return alternatives.length > 0 ? (alternatives.includes(value) ? 'Yes' : 'No') : undefined;
 }
 
+function isWalesCase(data: UnknownRecord): boolean {
+  const country = getStringFromValue(getValue(data, 'legislativeCountry'))?.toUpperCase();
+  return country === 'WALES' || !!getValue(data, 'occupationLicenceTypeWales');
+}
+
+function hasLicenceDocuments(data: UnknownRecord): boolean {
+  const licenceDocuments = getValue(data, 'licenceDocuments');
+  return Array.isArray(licenceDocuments) && licenceDocuments.length > 0;
+}
+
 function documentLinksHtml(
   documents: CaseDocumentLookupItem[],
   caseReference: string,
-  options: { documentTypes?: string[]; categoryIds?: string[]; filenameIncludes?: string[] }
+  options: {
+    documentTypes?: string[];
+    categoryIds?: string[];
+    filenameIncludes?: string[];
+    sourceFields?: string[];
+  }
 ): string | undefined {
   const documentTypes = new Set(options.documentTypes ?? []);
   const categoryIds = new Set(options.categoryIds ?? []);
+  const sourceFields = new Set(options.sourceFields ?? []);
   const filenameIncludes = (options.filenameIncludes ?? []).map(value => value.toLowerCase());
 
   const links = documents.filter(document => {
+    if (sourceFields.size > 0) {
+      return sourceFields.has(document.sourceField);
+    }
+
     const filename = document.filename.toLowerCase();
     return (
       (documentTypes.size > 0 && !!document.documentType && documentTypes.has(document.documentType)) ||

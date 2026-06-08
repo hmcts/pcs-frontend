@@ -118,3 +118,7 @@
     background-color: #eeefef;
   }
 }
+
+.view-the-claim .govuk-summary-list__key {
+  @include govuk-typography-weight-regular($important: true);
+}

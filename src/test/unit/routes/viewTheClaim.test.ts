@@ -17,6 +17,7 @@ jest.mock('@utils/viewTheClaimUtils', () => ({
     propertyAddressHtml: '10 Second Avenue<br>London<br>W3 7RX',
     claimPdfSection: { title: 'Download a PDF copy of the claim', rows: [] },
     sections: [],
+    statementOfTruth: { rows: [] },
     documentsUrl: '/case/1234567890123456/view-documents',
   })),
 }));
