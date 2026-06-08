@@ -14,6 +14,7 @@ export const documentsUploadedStep = 'documents-uploaded';
 export const flowConfig: JourneyFlowConfig = {
   basePath: UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE,
   journeyName: 'uploadAdditionalDocuments',
+  eventId: 'respondPossessionClaim',
   useSessionFormData: false,
   stepOrder: [
     'start-evidence-upload',
@@ -34,6 +35,7 @@ export const flowConfig: JourneyFlowConfig = {
     },
     [confirmIfTheseDocumentsRelateToAnApplicationStep]: { routes: [{ nextStep: uploadYourDocumentsStep }] },
     [uploadYourDocumentsStep]: {
+      routes: [{ nextStep: checkYourAnswersStep }],
       previousStep: async (req: Request) => {
         if (await isViewAllApplicationsAvailable(req, {}, {})) {
           return confirmIfTheseDocumentsRelateToAnApplicationStep;

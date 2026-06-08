@@ -1,21 +1,20 @@
-import type { NextFunction, Request, Response } from 'express';
-import type { TFunction } from 'i18next';
+import type { Request, Response } from 'express';
 
-import { HTTPError } from '../../../../HttpError';
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
 import { flowConfig, uploadYourDocumentsStep } from '../flow.config';
 import { isViewAllApplicationsAvailable } from '../flowConditions';
 
 import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
-import { createGetController, createStepNavigation, getFormData, loadStepNamespace } from '@modules/steps';
+import { Logger } from '@modules/logger';
+import { createGetController, createStepNavigation, getFormData } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import {
-  buildUploadDocumentsPayload,
-  clearUploadAdditionalDocumentsSession,
-} from '@modules/steps/upload-additional-documents/buildUploadDocumentsPayload';
-import { submitUploadAdditionalDocuments } from '@modules/steps/upload-additional-documents/submitUploadAdditionalDocuments';
+import { CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '@routes/cancelUploadAdditionalDocuments';
 import { getDashboardUrl } from '@routes/dashboard';
+import { ccdCaseService } from '@services/ccdCaseService';
 import { getFlowConfigForJourney } from '@steps';
+import { toCaseReference16 } from '@utils/caseReference';
+
+const logger = Logger.getLogger('uploadAdditionalDocumentsCheckYourAnswers');
 
 const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'check-your-answers';
@@ -30,12 +29,14 @@ export const step: StepDefinition = {
   stepDir: __dirname,
   getController: () =>
     createGetController(templatePath, stepName, stepNavigation, async (req: Request) => {
+      const caseId = req.res?.locals.validatedCase?.id;
       const documents = toDisplayDocuments(await uploadStorage.read(req));
       const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
       const relatedApplicationText = (confirmData?.relatedApplicationText as string) ?? '';
 
       return {
-        dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+        dashboardUrl: getDashboardUrl(caseId),
+        cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
         url: req.originalUrl || '',
         documents,
         relatedApplicationText,
@@ -43,55 +44,39 @@ export const step: StepDefinition = {
       };
     }),
   postController: {
-    post: async (req: Request, res: Response, next: NextFunction) => {
+    post: async (req: Request, res: Response) => {
+      const caseId = req.res?.locals.validatedCase?.id;
+      if (!caseId) {
+        logger.error('CYA submit: validatedCase missing — middleware not executed');
+        return res.status(500).render('error', { error: 'Internal server error' });
+      }
+
+      const uploadedAdditionalDocuments = await uploadStorage.read(req);
+      const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
+      const relatedApplicationId = confirmData?.relatedApplicationId as string | undefined;
+      const selectedRelatedApplicationId =
+        relatedApplicationId && relatedApplicationId !== 'MAIN_CLAIM_OR_COUNTERCLAIM'
+          ? relatedApplicationId
+          : undefined;
+
       try {
-        const caseId = req.res?.locals.validatedCase?.id;
-        if (!caseId) {
-          return next(new HTTPError('Case not found', 404));
+        await ccdCaseService.submitUploadDocuments(req.session?.user?.accessToken, {
+          id: caseId,
+          data: { uploadedAdditionalDocuments, selectedRelatedApplicationId },
+        });
+
+        const caseRef = toCaseReference16(req.params?.caseReference);
+        if (caseRef && req.session.uploadedDocs?.[caseRef]) {
+          delete req.session.uploadedDocs[caseRef];
         }
-
-        const accessToken = req.session.user?.accessToken;
-        if (!accessToken) {
-          return next(new HTTPError('Authentication required', 401));
-        }
-
-        const documents = toDisplayDocuments(await uploadStorage.read(req));
-        if (documents.length === 0) {
-          await loadStepNamespace(req);
-          const getController = typeof step.getController === 'function' ? step.getController() : step.getController;
-          let pageContent: Record<string, unknown> = {};
-          const captureRes = {
-            render: (_view: string, content: Record<string, unknown>) => {
-              pageContent = content;
-            },
-          } as Response;
-
-          await getController.get(req, captureRes);
-          const t = pageContent.t as TFunction;
-          const errorMessage = t('errors.documents.required');
-
-          return res.status(400).render(templatePath, {
-            ...pageContent,
-            errorSummary: {
-              titleText: t('errors.title'),
-              errorList: [{ text: errorMessage, href: '#documents-section' }],
-            },
-          });
-        }
-
-        const payload = await buildUploadDocumentsPayload(req);
-        await submitUploadAdditionalDocuments(accessToken, caseId, payload);
-
-        clearUploadAdditionalDocumentsSession(req);
-
-        const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
-        if (!redirectPath) {
-          return res.status(404).render('not-found');
-        }
-
-        return res.redirect(303, redirectPath);
       } catch (error) {
-        return next(error);
+        logger.error(`Failed to submit uploadDocuments for case ${caseId}: ${String(error)}`);
+        throw error;
+      }
+
+      const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
+      if (!redirectPath) {
+        return res.status(404).render('not-found');
       }
     },
   },

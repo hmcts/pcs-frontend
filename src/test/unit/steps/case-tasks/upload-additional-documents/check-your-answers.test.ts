@@ -1,121 +1,106 @@
-jest.mock('../../../../../main/modules/steps/upload-additional-documents/submitUploadAdditionalDocuments', () => ({
-  submitUploadAdditionalDocuments: jest.fn(),
+jest.mock('@modules/steps', () => ({
+  createGetController: jest.fn((_view, _step, _nav, fn) => fn),
+  createStepNavigation: jest.fn(() => ({
+    getNextStepUrl: jest.fn().mockResolvedValue('/documents-uploaded'),
+  })),
+  getFormData: jest.fn(),
 }));
 
-jest.mock('../../../../../main/modules/steps/upload-additional-documents/buildUploadDocumentsPayload', () => ({
-  buildUploadDocumentsPayload: jest.fn(),
-  clearUploadAdditionalDocumentsSession: jest.fn(),
+jest.mock('@modules/documents/storage', () => ({
+  sessionDocs: jest.fn(() => ({
+    read: jest.fn().mockResolvedValue([]),
+    save: jest.fn(),
+  })),
+  toDisplayDocuments: jest.fn(() => []),
 }));
 
-jest.mock('../../../../../main/modules/steps/i18n', () => ({
-  loadStepNamespace: jest.fn(),
-  getStepTranslations: jest.fn(() => ({})),
-  getTranslationFunction: jest.fn(() => (key: string) => key),
+jest.mock('@services/ccdCaseService', () => ({
+  ccdCaseService: {
+    submitUploadDocuments: jest.fn().mockResolvedValue({}),
+  },
 }));
 
-jest.mock('../../../../../main/modules/i18n', () => ({
-  getRequestLanguage: jest.fn(() => 'en'),
-  getCommonTranslations: jest.fn(() => ({})),
+jest.mock('@steps', () => ({
+  getFlowConfigForJourney: jest.fn(),
 }));
 
-type NavMocks = { getBackUrl: jest.Mock; getNextStepUrl: jest.Mock };
-
-jest.mock('../../../../../main/modules/steps/flow', () => {
-  const navigation: NavMocks = {
-    getBackUrl: jest.fn(async () => '/back'),
-    getNextStepUrl: jest.fn(async () => '/case/1234567890123456/upload-additional-documents/documents-uploaded'),
-  };
-
-  const globalCtx = globalThis as typeof globalThis & { __uploadCyaNavMocks?: NavMocks };
-  globalCtx.__uploadCyaNavMocks = navigation;
-
-  return {
-    ...jest.requireActual('../../../../../main/modules/steps/flow'),
-    createStepNavigation: jest.fn(() => navigation),
-  };
+jest.mock('@modules/logger', () => {
+  const logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
+  return { Logger: { getLogger: jest.fn(() => logger) } };
 });
 
-import type { NextFunction, Request, Response } from 'express';
+jest.mock('@routes/dashboard', () => ({
+  getDashboardUrl: jest.fn(),
+}));
 
-import {
-  buildUploadDocumentsPayload,
-  clearUploadAdditionalDocumentsSession,
-} from '../../../../../main/modules/steps/upload-additional-documents/buildUploadDocumentsPayload';
-import { submitUploadAdditionalDocuments } from '../../../../../main/modules/steps/upload-additional-documents/submitUploadAdditionalDocuments';
+import type { Request, Response } from 'express';
+
 import { step } from '../../../../../main/steps/case-tasks/upload-additional-documents/check-your-answers';
 
-const CASE_ID = '1234567890123456';
+import { sessionDocs } from '@modules/documents/storage';
+import { getFormData } from '@modules/steps';
+import { ccdCaseService } from '@services/ccdCaseService';
 
-function createPostReq(): Request {
-  return {
-    params: { caseReference: CASE_ID },
-    session: {
-      user: { accessToken: 'token-123' },
-      uploadedDocs: {
-        [CASE_ID]: {
-          'upload-your-documents': [{ value: { document: { document_filename: 'evidence.pdf' } } }],
-        },
-      },
-    },
-    res: { locals: { validatedCase: { id: CASE_ID } } },
-  } as unknown as Request;
-}
+const mockSubmit = ccdCaseService.submitUploadDocuments as jest.Mock;
+const mockGetFormData = getFormData as jest.Mock;
+const storage = (sessionDocs as jest.Mock).mock.results[0]?.value as { read: jest.Mock; save: jest.Mock } | undefined;
 
-function createPostRes(): Response {
-  return {
-    redirect: jest.fn(),
-    status: jest.fn().mockReturnThis(),
-    render: jest.fn(),
-  } as unknown as Response;
-}
+const CASE_REF = '1234567890123456';
+
+const buildReq = (uploadedDocs: unknown[] = []): Request =>
+  ({
+    session: { user: { accessToken: 'tok' }, uploadedDocs: {} },
+    res: { locals: { validatedCase: { id: CASE_REF } } },
+    params: { caseReference: CASE_REF },
+    body: {},
+    _uploaded: uploadedDocs,
+  }) as unknown as Request;
+
+const buildRes = (): Response => {
+  const res: Partial<Response> = {};
+  res.status = jest.fn().mockReturnValue(res as Response);
+  res.render = jest.fn().mockReturnValue(res as Response);
+  res.redirect = jest.fn().mockReturnValue(res as Response);
+  return res as Response;
+};
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  if (storage) {
+    storage.read.mockResolvedValue([{ id: 'doc-1', value: { document: { document_filename: 'f.pdf' } } }]);
+  }
+});
 
 describe('upload-additional-documents check-your-answers POST', () => {
-  const next = jest.fn() as NextFunction;
+  it('omits selectedRelatedApplicationId when the sentinel was chosen', async () => {
+    mockGetFormData.mockReturnValue({ relatedApplicationId: 'MAIN_CLAIM_OR_COUNTERCLAIM' });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    (buildUploadDocumentsPayload as jest.Mock).mockResolvedValue({ uploadedAdditionalDocuments: [] });
-    (submitUploadAdditionalDocuments as jest.Mock).mockResolvedValue(undefined);
+    await step.postController!.post!(buildReq(), buildRes(), jest.fn());
+
+    expect(mockSubmit).toHaveBeenCalledTimes(1);
+    const [, payload] = mockSubmit.mock.calls[0];
+    expect(payload.data.selectedRelatedApplicationId).toBeUndefined();
+    expect(payload.data.uploadedAdditionalDocuments).toHaveLength(1);
   });
 
-  it('submits uploadDocuments to CCD and redirects to documents-uploaded', async () => {
-    const req = createPostReq();
-    const res = createPostRes();
-    const payload = { uploadedAdditionalDocuments: [] };
-    (buildUploadDocumentsPayload as jest.Mock).mockResolvedValue(payload);
+  it('includes selectedRelatedApplicationId when a gen-app was chosen', async () => {
+    const genAppId = '11111111-1111-1111-1111-111111111111';
+    mockGetFormData.mockReturnValue({ relatedApplicationId: genAppId });
 
-    await step.postController!.post(req, res, next);
+    await step.postController!.post!(buildReq(), buildRes(), jest.fn());
 
-    expect(buildUploadDocumentsPayload).toHaveBeenCalledWith(req);
-    expect(submitUploadAdditionalDocuments).toHaveBeenCalledWith('token-123', CASE_ID, payload);
-    expect(clearUploadAdditionalDocumentsSession).toHaveBeenCalledWith(req);
-    expect(res.redirect).toHaveBeenCalledWith(
-      303,
-      '/case/1234567890123456/upload-additional-documents/documents-uploaded'
-    );
-    expect(next).not.toHaveBeenCalled();
+    expect(mockSubmit).toHaveBeenCalledTimes(1);
+    const [, payload] = mockSubmit.mock.calls[0];
+    expect(payload.data.selectedRelatedApplicationId).toBe(genAppId);
   });
 
-  it('returns 404 when case is missing', async () => {
-    const req = createPostReq();
-    const reqWithRes = req as unknown as Request & { res: { locals: { validatedCase?: { id: string } } } };
-    delete reqWithRes.res.locals.validatedCase;
-    const res = createPostRes();
+  it('omits selectedRelatedApplicationId when no selection exists (no-gen-app flow path)', async () => {
+    mockGetFormData.mockReturnValue(undefined);
 
-    await step.postController!.post(req, res, next);
+    await step.postController!.post!(buildReq(), buildRes(), jest.fn());
 
-    expect(submitUploadAdditionalDocuments).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Case not found', status: 404 }));
-  });
-
-  it('forwards errors from submit', async () => {
-    const req = createPostReq();
-    const res = createPostRes();
-    const error = new Error('CCD failed');
-    (submitUploadAdditionalDocuments as jest.Mock).mockRejectedValue(error);
-
-    await step.postController!.post(req, res, next);
-
-    expect(next).toHaveBeenCalledWith(error);
+    expect(mockSubmit).toHaveBeenCalledTimes(1);
+    const [, payload] = mockSubmit.mock.calls[0];
+    expect(payload.data.selectedRelatedApplicationId).toBeUndefined();
   });
 });

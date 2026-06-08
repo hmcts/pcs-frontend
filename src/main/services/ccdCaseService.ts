@@ -183,11 +183,7 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseByIdForEvent(
-    accessToken: string,
-    caseId: string,
-    eventId: string = 'respondPossessionClaim'
-  ): Promise<CcdCase> {
+  async getCaseByIdForEvent(accessToken: string, caseId: string, eventId: string): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
@@ -294,6 +290,19 @@ export const ccdCaseService = {
     }
 
     const eventId = 'makeAnApplication';
+    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
+    const eventToken = await getEventToken(accessToken || '', eventUrl);
+    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
+
+    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+  },
+
+  async submitUploadDocuments(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+    if (!ccdCase.id) {
+      throw new HTTPError('Cannot upload documents, case ID not specified', 500);
+    }
+
+    const eventId = 'uploadDocuments';
     const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
