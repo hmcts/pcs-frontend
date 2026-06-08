@@ -1,5 +1,5 @@
 {
-  "pageTitle": "Response submitted. You must pay your counterclaim fee",
+  "pageTitle": "Response submitted. <br> You must pay your counterclaim fee",
   "responseSubmittedCounterClaimFeePaymentNeededParagraph1": "We’ve sent you a confirmation email.",
   "responseSubmittedCounterClaimFeePaymentNeededHeading1": "What to do next",
   "responseSubmittedCounterClaimFeePaymentNeededListItem1": "<a href='{{counterClaimApplicationFeeAmountUrl}}'>Pay your counterclaim fee.</a> If you do not, your counterclaim will not be considered.",
