@@ -114,7 +114,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const response = buildDraftDefendantResponse(req);
     const addressKnown = req.res?.locals.validatedCase?.claimantEnteredDefendantDetailsAddressKnown;
     const propertyAddress = req.res?.locals.validatedCase?.data?.propertyAddress;
-    const wasPropertyFallback = addressKnown !== 'YES' && !!propertyAddress;
+    const wasPropertyFallback = addressKnown !== 'YES';
 
     const radioValue = req.body?.['correspondenceAddressConfirm'] as string | undefined;
 
@@ -142,9 +142,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       } else if (radioValue === 'no') {
         response.defendantResponses.correspondenceAddressConfirmation = 'NO';
         response.defendantContactDetails.party.address = enteredAddress;
-      } else {
-        delete response.defendantResponses.correspondenceAddressConfirmation;
-        delete response.defendantContactDetails.party.address;
       }
       delete response.defendantResponses.propertyAddressConfirmation;
     }
@@ -155,17 +152,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const possessionClaimResponse = req.res?.locals.validatedCase?.possessionClaimResponse;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
     const addressKnown = req.res?.locals.validatedCase?.claimantEnteredDefendantDetailsAddressKnown;
-    const propertyAddress = req.res?.locals.validatedCase?.data?.propertyAddress;
-    const wasPropertyFallback = addressKnown !== 'YES' && !!propertyAddress;
+    const wasPropertyFallback = addressKnown !== 'YES';
 
     const result: Record<string, unknown> = {};
 
     if (wasPropertyFallback) {
-      const saved = possessionClaimResponse?.defendantResponses?.propertyAddressConfirmation;
-      const selection = saved === 'YES' ? 'yes' : saved === 'NO' ? 'no' : undefined;
-      if (selection) {
-        result['correspondenceAddressConfirm'] = selection;
-        if (selection === 'no') {
+      const draftAnswer = possessionClaimResponse?.defendantResponses?.propertyAddressConfirmation;
+      const radioValueToSelect = draftAnswer === 'YES' ? 'yes' : draftAnswer === 'NO' ? 'no' : undefined;
+      if (radioValueToSelect) {
+        result['correspondenceAddressConfirm'] = radioValueToSelect;
+        if (radioValueToSelect === 'no') {
           result['correspondenceAddressConfirm.addressLine1'] = partyAddress?.AddressLine1 || '';
           result['correspondenceAddressConfirm.addressLine2'] = partyAddress?.AddressLine2 || '';
           result['correspondenceAddressConfirm.townOrCity'] = partyAddress?.PostTown || '';
@@ -174,11 +170,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         }
       }
     } else {
-      const confirmed = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
-      const selection = confirmed === 'YES' ? 'yes' : confirmed === 'NO' ? 'no' : undefined;
-      if (selection) {
-        result['correspondenceAddressConfirm'] = selection;
-        if (selection === 'no') {
+      const draftAnswer = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
+      const radioValueToSelect = draftAnswer === 'YES' ? 'yes' : draftAnswer === 'NO' ? 'no' : undefined;
+      if (radioValueToSelect) {
+        result['correspondenceAddressConfirm'] = radioValueToSelect;
+        if (radioValueToSelect === 'no') {
           result['correspondenceAddressConfirm.addressLine1'] = partyAddress?.AddressLine1 || '';
           result['correspondenceAddressConfirm.addressLine2'] = partyAddress?.AddressLine2 || '';
           result['correspondenceAddressConfirm.townOrCity'] = partyAddress?.PostTown || '';
@@ -199,7 +195,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
 
     const addressKnown = req.res?.locals.validatedCase?.claimantEnteredDefendantDetailsAddressKnown;
-    const wasPropertyFallback = addressKnown !== 'YES' && !!propertyAddress;
+    const wasPropertyFallback = addressKnown !== 'YES';
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioFormField | undefined;
     if (!radio || !radio.component) {
