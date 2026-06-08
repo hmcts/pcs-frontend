@@ -485,7 +485,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: languageUsed.englishRadioOption,
     });
 
-    await performAction('clickButton', 'Save and continue');
+    await performAction('clickButton', 'Submit');
     assertAllErrorMessageValidations();
   });
 
@@ -717,7 +717,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: languageUsed.englishRadioOption,
     });
 
-    await performAction('clickButton', 'Save and continue');
+    await performAction('clickButton', 'Submit');
     assertAllErrorMessageValidations();
   });
 });
