@@ -3,7 +3,7 @@
   "bulletPointLabel": "Notice details given by {{claimantName}}:",
   "hintText": "When making the claim, {{claimantName}} had to say the date they gave the defendant notice (the date of service).",
   "listItem1": "They served the defendant with a notice seeking possession on {{noticeDate}}",
-  "question": "When did defendant receive notice from {{claimantName}} (optional)?",
+  "question": "When did the defendant receive notice from {{claimantName}} (optional)?",
   "noticeDateHint": "For example, 27 9 2022",
   "errors": {
     "date": {
