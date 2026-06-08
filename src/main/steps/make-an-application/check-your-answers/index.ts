@@ -1,9 +1,8 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
-import { v4 as uuidv4 } from 'uuid';
 
 import { ApplicationError, ApplicationErrorCode } from '../../../ApplicationError';
-import { createFormStep, getFormData, getTranslationFunction, setFormData } from '../../../modules/steps';
+import { createFormStep, getFormData, getTranslationFunction } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { toYesNoEnum } from '../../utils';
 import { flowConfig } from '../flow.config';
@@ -62,36 +61,6 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: async (req: Request) => {
     const t: TFunction = getTranslationFunction(req);
-
-    // TODO: Temp bit
-
-    req.session.genApp = {
-      applicationId: uuidv4(),
-    };
-
-    setFormData(req, 'choose-an-application', {
-      typeOfApplication: GenAppType.SOMETHING_ELSE,
-    });
-
-    setFormData(req, 'do-you-need-help-paying-the-fee', {
-      helpWithFeesNeeded: 'no',
-    });
-
-    setFormData(req, 'have-the-other-parties-agreed-to-this-application', {
-      otherPartiesAgreed: 'yes',
-    });
-
-    setFormData(req, 'what-order-do-you-want-the-court-to-make-and-why', {
-      whatOrderWanted: 'Test order wanted',
-    });
-
-    setFormData(req, 'do-you-want-to-upload-documents-to-support-your-application', {
-      uploadDocuments: 'no',
-    });
-
-    setFormData(req, 'which-language-did-you-use-to-complete-this-service', {
-      whichLanguage: 'ENGLISH',
-    });
 
     const visibleFormData = new VisibleFormDataView(req);
 

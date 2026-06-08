@@ -297,7 +297,7 @@ export const ccdCaseService = {
     const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-    //  after_submit_callback_response
+
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data).then(responseData => {
       const confirmationBodyJson = responseData.after_submit_callback_response?.confirmation_body;
       if (confirmationBodyJson) {
