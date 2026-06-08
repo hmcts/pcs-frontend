@@ -359,7 +359,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
 
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
 
