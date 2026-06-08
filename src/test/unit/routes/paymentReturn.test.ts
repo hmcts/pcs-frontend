@@ -164,12 +164,10 @@ describe('paymentReturn routes', () => {
       await handler(req, res);
 
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/payment-failed');
-      expect(req.session.payment).toEqual(         // TODO: Update Andrew's branch
-        {
-          caseReference: '1234567890123456',
-          failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
-        }
-      );
+      expect(req.session.payment).toEqual({
+        caseReference: '1234567890123456',
+        failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
+      });
     });
 
     it('redirects to pending URL and keeps session state on pending status', async () => {
