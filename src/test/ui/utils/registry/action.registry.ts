@@ -113,6 +113,7 @@ export class ActionRegistry {
     ['validateCYARTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
     ['doYouWantToUploadFiles', new RespondToClaimAction()],
+    ['uploadFilesToSupportCounterclaim', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
