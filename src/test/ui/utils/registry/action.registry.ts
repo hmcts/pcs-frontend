@@ -112,6 +112,7 @@ export class ActionRegistry {
     ['retrieveCYATableDataRTC', new RespondToClaimAction()],
     ['validateCYARTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
+    ['doYouWantToUploadFiles', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
