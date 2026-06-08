@@ -10,6 +10,9 @@ import {
   isSomethingElseCounterClaim,
   isTenancyStartDateKnown,
   isWalesProperty,
+  shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
+  shouldShowResponseSubmittedConfirmationStep,
 } from '../utils';
 
 import {
@@ -38,6 +41,7 @@ export const flowConfig: JourneyFlowConfig = {
   journeyName: 'respondToClaim',
   useShowConditions: true,
   useSessionFormData: false,
+  eventId: 'respondPossessionClaim',
   sections: respondToClaimSections,
   nonSectionStepOrder: ['end-now', 'task-list'],
   // First visible step of any section back-links to this hub step.
@@ -141,6 +145,26 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
+    },
+    'response-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-submitted-counter-claim-fee-payment-needed': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'counter-claim-application-fee-amount': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'counter-claim-payment-successful': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-and-counter-claim-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseAndCounterClaimSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
     },
   } satisfies Partial<Record<RespondToClaimStepName, StepConfig>>,
 };

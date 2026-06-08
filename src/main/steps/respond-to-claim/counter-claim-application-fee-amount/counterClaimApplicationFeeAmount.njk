@@ -1,0 +1,40 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <span class="govuk-caption-l">{{ caption }}</span>
+  <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: { text: counterClaimAmountLabel },
+        value: { html: counterClaimAmount ? "£" + counterClaimAmount : "" }
+      },
+      {
+        key: { text: counterClaimFeeLabel },
+        value: { text: "£" + counterClaimFee }
+      }
+    ]
+  }) }}
+
+  {% if showPaymentError %}
+    <p class="govuk-error-message">{{ paymentError }}</p>
+  {% endif %}
+
+  <p class="govuk-hint">{{ paymentHint }}</p>
+
+  {{ govukButton({
+    text: payNowButton,
+    href: payNowUrl,
+    disabled: payNowDisabled
+  }) }}
+{% endblock %}

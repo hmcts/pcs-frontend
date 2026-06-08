@@ -235,6 +235,7 @@ export interface CcdDefendantResponses {
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
   completedSections?: RespondToClaimSectionEnum[];
+  status?: 'SUBMITTED' | 'CREATED';
 }
 
 export interface PossessionClaimResponse {
@@ -299,16 +300,14 @@ export interface CcdCaseDocument {
   category_id?: string;
 }
 
-export type SubmitResponse = {
-  confirmation_header: string;
-  confirmation_body: string;
-};
-
 /** Case representation used by services: id + case_data. */
 export interface CcdCase {
   id: string;
   data: CcdCaseData;
-  after_submit_callback_response?: SubmitResponse;
+  after_submit_callback_response?: {
+    confirmation_header?: string | null;
+    confirmation_body?: string | null;
+  };
 }
 
 /** Links object in CCD START callback response. */
