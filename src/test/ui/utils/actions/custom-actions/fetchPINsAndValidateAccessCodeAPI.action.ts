@@ -87,8 +87,8 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
           const addressObj = pinData.address;
           let formattedAddress = '';
           if (addressObj) {
-            const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country } = addressObj;
-            formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode, Country]
+            const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode } = addressObj;
+            formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode]
               .filter(value => value && typeof value === 'string' && value.trim() !== '')
               .join(', ');
           }

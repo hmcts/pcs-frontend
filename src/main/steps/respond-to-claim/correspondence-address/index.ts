@@ -157,7 +157,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
 
-    const isAddressKnown = formattedAddressStr !== '?';
+    // Claim-time fact — read from claimantEnteredDefendantDetails, not from the resolved address string.
+    const isAddressKnown = req.res?.locals.validatedCase?.claimantEnteredDefendantDetailsAddressKnown === 'YES';
 
     const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioFormField | undefined;
     if (!radio || !radio.component) {
@@ -239,7 +240,8 @@ function getExistingAddress(req: Request): { formattedAddress: string } {
   const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address;
 
   if (originalAddress && 'AddressLine1' in originalAddress && originalAddress.AddressLine1) {
-    return { formattedAddress: formatCcdAddress(originalAddress) + '?' };
+    // Drop Country for this caller — the legend is a UK-only correspondence address.
+    return { formattedAddress: formatCcdAddress({ ...originalAddress, Country: undefined }) + '?' };
   }
   return { formattedAddress: '?' };
 }

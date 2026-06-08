@@ -4,11 +4,17 @@ import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware';
 
 import { getDashboardUrl } from '@routes/dashboard';
-import type { CcdCaseData } from '@services/ccdCase.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
 import { extractViewDocumentFolders } from '@utils/documentUtils';
 import { asHeaderString } from '@utils/httpHeaders';
 import { sanitiseUUID } from '@utils/uuid';
+
+// view-documents is a read-only display, so we fetch the case directly via
+// CCD's plain GET /cases/{id} (which enforces access — 403/404 if the user
+// doesn't have permission). No event token is needed; requireEventAccess is
+// reserved for write journeys (e.g. finalSubmit) where we want to fail-fast
+// before the user fills in a long form.
 
 function toFilename(value: string): string {
   const filename = value.trim();
@@ -25,33 +31,28 @@ function buildInlineContentDisposition(filename: string): string {
   return `inline; filename="${fallback}"; filename*=UTF-8''${utf8Filename}`;
 }
 
-interface ValidatedCaseView {
-  id: string;
-  data: CcdCaseData;
-}
-
 export default function viewDocumentsRoutes(app: Application): void {
   app.get(
     '/case/:caseReference/view-documents',
     oidcMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
-      const validatedCase = res.locals.validatedCase as ValidatedCaseView | undefined;
-      const caseReference = validatedCase?.id || '';
+      // caseReferenceParamMiddleware (registered app-level) sanitises this
+      // param and short-circuits with a 404 if it's malformed.
+      const caseReference = req.params.caseReference as string;
       const accessToken = req.session.user?.accessToken;
 
-      if (!caseReference) {
-        return next(new HTTPError('Invalid case reference format', 404));
-      }
       if (!accessToken) {
         return next(new HTTPError('Authentication required', 401));
       }
 
       try {
+        const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
+
         res.render('view-documents', {
           dashboardUrl: getDashboardUrl(caseReference),
           backUrl: getDashboardUrl(caseReference),
           caseReference,
-          documentFolders: extractViewDocumentFolders((validatedCase?.data ?? {}) as Record<string, unknown>, {
+          documentFolders: extractViewDocumentFolders((ccdCase.data ?? {}) as Record<string, unknown>, {
             folderTitles: {
               statementsOfCase: req.t('dashboard:viewDocuments.folders.statementsOfCase'),
               propertyDocuments: req.t('dashboard:viewDocuments.folders.propertyDocuments'),
@@ -70,14 +71,10 @@ export default function viewDocumentsRoutes(app: Application): void {
     '/case/:caseReference/view-documents/:documentId',
     oidcMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
-      const validatedCase = res.locals.validatedCase as ValidatedCaseView | undefined;
-      const caseReference = validatedCase?.id || '';
+      const caseReference = req.params.caseReference as string;
       const documentId = sanitiseUUID(req.params.documentId);
       const accessToken = req.session.user?.accessToken;
 
-      if (!caseReference) {
-        return next(new HTTPError('Invalid case reference format', 404));
-      }
       if (!accessToken) {
         return next(new HTTPError('Authentication required', 401));
       }
@@ -86,7 +83,8 @@ export default function viewDocumentsRoutes(app: Application): void {
       }
 
       try {
-        const allDocuments = (validatedCase?.data?.allDocuments ?? []) as {
+        const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
+        const allDocuments = (ccdCase.data?.allDocuments ?? []) as {
           id?: string;
           value?: { document_filename?: string; document_binary_url?: string };
         }[];
