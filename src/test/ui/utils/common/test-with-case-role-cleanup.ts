@@ -1,6 +1,6 @@
 import { test as base } from '@playwright/test';
 
-import { isExecutorInitialized, performAction } from '../controller';
+import { performAction } from '../controller';
 
 /**
  * Use this instead of `@playwright/test` in specs that create a case and must
@@ -9,7 +9,7 @@ import { isExecutorInitialized, performAction } from '../controller';
 export const test = base;
 
 test.afterEach(async () => {
-  if (process.env.CASE_NUMBER && isExecutorInitialized()) {
+  if (process.env.CASE_NUMBER) {
     await performAction('deleteCaseRole', '[CLAIMANTSOLICITOR]');
   }
 });
