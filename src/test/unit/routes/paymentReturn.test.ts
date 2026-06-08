@@ -54,7 +54,11 @@ describe('paymentReturn routes', () => {
 
   describe('GET /payment/return', () => {
     it('registers route with oidc middleware', () => {
-      expect(mockRouterGet).toHaveBeenCalledWith('/payment/return', mockOidcMiddleware, expect.any(Function));
+      expect(mockRouterGet).toHaveBeenCalledWith(
+        '/payment/return/:internalReference/confirmation',
+        mockOidcMiddleware,
+        expect.any(Function)
+      );
     });
 
     it('redirects home when payment reference is missing', async () => {
@@ -85,6 +89,9 @@ describe('paymentReturn routes', () => {
             caseReference: '1234567890123456',
           },
         },
+        params: {
+          internalReference: 'e44c5090-e207-48ac-b8dd-344a63829deb',
+        },
       } as unknown as Request;
 
       const res = {
@@ -113,6 +120,9 @@ describe('paymentReturn routes', () => {
             failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
           },
         },
+        params: {
+          internalReference: 'e44c5090-e207-48ac-b8dd-344a63829deb',
+        },
       } as unknown as Request;
 
       const res = {
@@ -121,14 +131,14 @@ describe('paymentReturn routes', () => {
 
       await handler(req, res);
 
-      expect(mockGetCardPaymentStatus).toHaveBeenCalledWith('token-123', 'RC-123');
+      expect(mockGetCardPaymentStatus).toHaveBeenCalledWith('token-123', 'e44c5090-e207-48ac-b8dd-344a63829deb');
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/payment-successful');
       expect(req.session.payment).toEqual({
         paymentReference: 'RC-123',
       });
     });
 
-    it('redirects to failure URL and clears payment session on failed status', async () => {
+    it('redirects to failure URL and clears payment reference on failed status', async () => {
       const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       mockGetCardPaymentStatus.mockResolvedValue({ status: 'Not paid' });
@@ -142,6 +152,9 @@ describe('paymentReturn routes', () => {
             failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
           },
         },
+        params: {
+          internalReference: 'e44c5090-e207-48ac-b8dd-344a63829deb',
+        },
       } as unknown as Request;
 
       const res = {
@@ -151,7 +164,10 @@ describe('paymentReturn routes', () => {
       await handler(req, res);
 
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/payment-failed');
-      expect(req.session.payment).toBeUndefined();
+      expect(req.session.payment).toEqual({
+        caseReference: '1234567890123456',
+        failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
+      });
     });
 
     it('redirects to pending URL and keeps session state on pending status', async () => {
@@ -168,6 +184,9 @@ describe('paymentReturn routes', () => {
             pendingRedirectUrl: '/payment/return',
             failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
           },
+        },
+        params: {
+          internalReference: 'e44c5090-e207-48ac-b8dd-344a63829deb',
         },
       } as unknown as Request;
 
@@ -193,6 +212,9 @@ describe('paymentReturn routes', () => {
             paymentReference: 'RC-123',
             caseReference: '1234567890123456',
           },
+        },
+        params: {
+          internalReference: 'e44c5090-e207-48ac-b8dd-344a63829deb',
         },
       } as unknown as Request;
 

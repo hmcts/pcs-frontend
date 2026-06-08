@@ -3,7 +3,7 @@ import type { Application, Request, Response } from 'express';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { Logger } from '@modules/logger';
-import { clearPaymentSessionState, retainPaymentReferenceOnly } from '@services/paymentSessionService';
+import { clearPaymentReferenceOnly, retainPaymentReferenceOnly } from '@services/paymentSessionService';
 import { getPaymentOutcome, paymentService } from '@services/pcsApi/paymentService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -14,7 +14,7 @@ function getDefaultReturnPath(caseReference?: string): string {
 }
 
 export default function paymentReturnRoutes(app: Application): void {
-  app.get('/payment/return', oidcMiddleware, async (req: Request, res: Response) => {
+  app.get('/payment/return/:internalReference/confirmation', oidcMiddleware, async (req: Request, res: Response) => {
     const paymentSession = req.session.payment;
     const accessToken = req.session.user?.accessToken;
 
@@ -22,6 +22,8 @@ export default function paymentReturnRoutes(app: Application): void {
       logger.warn('Payment return called without payment reference in session');
       return safeRedirect303(res, '/', '/', ['/']);
     }
+
+    const internalPaymentReference = req.params.internalReference as string;
 
     if (!accessToken) {
       logger.error('Payment return called without user access token');
@@ -31,7 +33,7 @@ export default function paymentReturnRoutes(app: Application): void {
     const defaultReturnPath = getDefaultReturnPath(paymentSession.caseReference);
 
     try {
-      const statusResponse = await paymentService.getCardPaymentStatus(accessToken, paymentSession.paymentReference);
+      const statusResponse = await paymentService.getCardPaymentStatus(accessToken, internalPaymentReference);
       const outcome = getPaymentOutcome(statusResponse.status);
 
       const successRedirectUrl = paymentSession.successRedirectUrl || defaultReturnPath;
@@ -46,10 +48,10 @@ export default function paymentReturnRoutes(app: Application): void {
         redirectTarget = failureRedirectUrl;
       }
 
-      if (outcome === 'success') {
+      if (outcome === 'failure') {
+        clearPaymentReferenceOnly(req);
+      } else {
         retainPaymentReferenceOnly(req);
-      } else if (outcome !== 'pending') {
-        clearPaymentSessionState(req);
       }
 
       return safeRedirect303(res, redirectTarget, defaultReturnPath, ['/case', '/dashboard', '/payment']);
