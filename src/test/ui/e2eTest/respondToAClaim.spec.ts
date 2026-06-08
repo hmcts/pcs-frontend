@@ -580,7 +580,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - CounterClaimAppliedForHelp - No - SelectCounterClaim - Yes @regression temp @assured', async () => {
+  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - CounterClaimAppliedForHelp - No - SelectCounterClaim - Yes @assured', async () => {
     // > 3 named parties - CounterClaimAppliedForHelp - No - You need to apply for help with your fees
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -655,7 +655,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
   });
 
-  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - SomethingElse - SelectCounterClaim - Yes @secureFlexible @regression temp', async () => {
+  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - SomethingElse - SelectCounterClaim - Yes @secureFlexible', async () => {
     //Income and expenses - yes - no option On regular Income - universal credit, no defendants - Counterclaim - yes - SomethingElse -  I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -824,7 +824,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute - SelectCounterClaim - Yes @secureFlexible @regression temp', async () => {
+  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute - SelectCounterClaim - Yes @secureFlexible', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit - What are you claiming for - sum of money - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -1019,7 +1019,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - SelectCounterClaim - Yes @secureFlexible @regression temp', async () => {
+  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - SelectCounterClaim - Yes @secureFlexible', async () => {
     //Counterclaim - both - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -1588,7 +1588,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute - SomethingElse - SelectCounterClaim - Yes @regression temp', async () => {
+  test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute - SomethingElse - SelectCounterClaim - Yes', async () => {
     //somethingElse - multiple named parties - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -1922,7 +1922,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - @multiParty @regression temp', async () => {
+  test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - @multiParty', async () => {
     // Multiparty - Unknown defendant details - somethingElse - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
