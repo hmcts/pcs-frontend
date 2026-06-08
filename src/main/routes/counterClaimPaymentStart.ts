@@ -1,3 +1,4 @@
+import config from 'config';
 import type { Application, Request, Response } from 'express';
 
 import { oidcMiddleware } from '../middleware/oidc';
@@ -8,12 +9,6 @@ import { paymentService } from '@services/pcsApi/paymentService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('counterClaimPaymentStart');
-
-function getReturnUrl(req: Request): string {
-  const protocol = req.protocol || 'http';
-  const host = req.get('host');
-  return `${protocol}://${host}/payment/return`;
-}
 
 export default function counterClaimPaymentStartRoutes(app: Application): void {
   app.get(
@@ -40,13 +35,25 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
         );
       }
 
+      const paymentReturnUrl = config.get<string>('payment.returnUrl');
+
+      if (!paymentReturnUrl) {
+        logger.error(`No payment return URL configured when starting counterclaim payment for case ${caseReference}`);
+        return safeRedirect303(
+          res,
+          `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount?payment=failed`,
+          `/case/${caseReference}`,
+          ['/case']
+        );
+      }
+
       try {
         const paymentResponse = await paymentService.startCardPaymentRequest({
           accessToken,
           serviceRequestReference,
           amount: feeAmount,
           requestLanguage: req.language,
-          returnUrl: getReturnUrl(req),
+          returnUrl: paymentReturnUrl,
         });
 
         setPaymentSessionState(req, {
