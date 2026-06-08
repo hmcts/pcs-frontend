@@ -283,7 +283,6 @@ in [info.ts](src/main/routes/info.ts) file and currently displays info from:
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ### The following environment variables are needed to run the tests:
-
 - NODE_CONFIG_ENV
 - TEST_URL
 - PCS_FRONTEND_IDAM_SECRET
