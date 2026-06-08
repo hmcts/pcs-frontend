@@ -8,7 +8,7 @@ import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondP
 import { dashboard } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
-import { chooseAnApplication, viewAllApplications } from '../data/page-data/genApps-page-data';
+import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
@@ -140,14 +140,10 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction('reloadPage');
-    await performAction('clickLinkAndVerifySameTabTitle', {
-      sectionHeader: dashboard.applicationsSubHeader,
-      fieldName: dashboard.viewAllApplicationsLink,
-      header: viewAllApplications.mainHeader,
-    });
+    await performAction('validateViewAllApplications');
   });
 
-  test('Validate notification and response status @regression @crossbrowse', async () => {
+  test('Validate notification and response status @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
     await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
@@ -190,7 +186,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
       viewResponseHeader: dashboard.viewTheResponseSubHeader,
       tag: dashboard.completedTag,
-      viewResponsetag: dashboard.availableTag,
+      viewResponseTag: dashboard.availableTag,
     });
   });
 });
