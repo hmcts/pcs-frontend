@@ -39,11 +39,11 @@ test.afterEach(async () => {
 
 test.describe('Documents - e2e Journey @nightly', async () => {
   test('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
@@ -60,7 +60,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await softErrorMessageValidation('uploadYourDocuments', uploadYourDocumentsErrorValidation);
-    await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
+    await performAction('uploadDocuments', { files: ['uploadYourDocuments.ppt'] });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
 
