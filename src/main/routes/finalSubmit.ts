@@ -51,17 +51,25 @@ function parseSubmitPaymentPayload(confirmationBody?: string | null): ParsedSubm
   }
   try {
     const parsed = JSON.parse(confirmationBody) as {
+      counterClaim?: {
+        serviceRequestReference?: unknown;
+        feeAmount?: unknown;
+      };
       serviceRequestReference?: unknown;
       feeAmount?: unknown;
     };
+    const paymentDetails = parsed.counterClaim ?? parsed;
 
-    if (typeof parsed.serviceRequestReference !== 'string' || parsed.serviceRequestReference.trim().length === 0) {
+    if (
+      typeof paymentDetails.serviceRequestReference !== 'string' ||
+      paymentDetails.serviceRequestReference.trim().length === 0
+    ) {
       return undefined;
     }
 
     return {
-      serviceRequestReference: parsed.serviceRequestReference,
-      feeAmount: typeof parsed.feeAmount === 'number' ? parsed.feeAmount : undefined,
+      serviceRequestReference: paymentDetails.serviceRequestReference,
+      feeAmount: typeof paymentDetails.feeAmount === 'number' ? paymentDetails.feeAmount : undefined,
     };
   } catch (error) {
     logger.warn('Unable to parse submit confirmation body JSON for payment payload', error);

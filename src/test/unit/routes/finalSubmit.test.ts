@@ -232,6 +232,63 @@ describe('finalSubmit routes', () => {
       );
     });
 
+    it('stores submit-time payment data when confirmation body nests counterClaim payload', async () => {
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      mockHttpGet.mockResolvedValue({
+        data: { token: 'mock-event-token' },
+      });
+
+      mockHttpPost.mockResolvedValue({
+        data: {
+          after_submit_callback_response: {
+            confirmation_body: JSON.stringify({
+              counterClaim: {
+                status: 'PENDING_COUNTER_CLAIM_ISSUED',
+                serviceRequestReference: 'SR-456',
+                feeAmount: 303,
+              },
+            }),
+          },
+        },
+      });
+
+      const validatedCase = {
+        id: '1234567890123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { makeCounterClaim: 'NO' },
+          },
+        },
+      };
+
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        session: {
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: { validatedCase },
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(req.session.payment).toEqual(
+        expect.objectContaining({
+          caseReference: '1234567890123456',
+          serviceRequestReference: 'SR-456',
+          feeAmount: 303,
+        })
+      );
+      expect(res.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1234567890123456/respond-to-claim/response-submitted-counter-claim-fee-payment-needed'
+      );
+    });
+
     it('should redirect to check-your-answers with error when submission fails', async () => {
       const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
