@@ -156,7 +156,8 @@ export class PageContentValidation implements IValidation {
           key.includes('Hidden') ||
           key.includes('Validation') ||
           key.includes('pageSlug') ||
-          key.includes('ErrorMessage')
+          key.includes('ErrorMessage') ||
+          key.includes('Dynamic')
         ) {
           continue;
         }
