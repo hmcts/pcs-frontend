@@ -4,7 +4,7 @@ import { VIEW_RESPONSE_ROUTE } from '../../../main/constants/caseRoutes';
 import { oidcMiddleware } from '../../../main/middleware';
 
 import viewTheResponseRoute from '@routes/viewTheResponse';
-import type { CcdCaseData } from '@services/ccdCase.interface';
+import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('../../../main/middleware', () => ({
@@ -17,6 +17,13 @@ const translationStrings: Record<string, string> = {
   'common:options.imNotSure': "I'm not sure",
   'viewTheResponse:frequency.weekly': 'Weekly',
   'viewTheResponse:frequency.monthly': 'Monthly',
+  'viewTheResponse:defendant1.freeLegalAdviceOptions.YES': 'Yes',
+  'viewTheResponse:defendant1.freeLegalAdviceOptions.NO': 'No',
+  'viewTheResponse:defendant1.freeLegalAdviceOptions.PREFER_NOT_TO_SAY': 'Prefer not to say',
+  'viewTheResponse:counterclaim.claimTypeOptions.PAYMENT_OR_COMPENSATION': 'A sum of money or compensation',
+  'viewTheResponse:counterclaim.claimTypeOptions.SOMETHING_ELSE': 'Something else',
+  'viewTheResponse:counterclaim.claimTypeOptions.BOTH': 'Both',
+  'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
 };
 
 jest.mock('@modules/i18n', () => ({
@@ -78,7 +85,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         contactByPhone: 'YES',
         contactByEmail: 'YES',
         contactByPost: 'YES',
-        freeLegalAdvice: 'Citizens Advice',
+        freeLegalAdvice: 'YES',
         dateOfBirth: '1990-05-15',
         disputeClaim: 'YES',
         disputeClaimDetails: 'I dispute the amount claimed',
@@ -88,7 +95,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         tenancyStartDate: '2018-03-01',
         possessionNoticeReceived: 'NO',
         noticeReceivedDate: '2025-12-01',
-        rentArrearsAmountConfirmation: 'Confirmed',
+        rentArrearsAmountConfirmation: 'YES',
         rentArrearsAmount: '125000',
         landlordRegistered: 'YES',
         landlordLicensed: 'NO',
@@ -145,7 +152,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         otherConsiderationsDetails: 'Awaiting housing benefit',
         makeCounterClaim: 'YES',
         counterClaim: {
-          claimType: 'Disrepair',
+          claimType: 'PAYMENT_OR_COMPENSATION',
           isClaimAmountKnown: 'YES',
           claimAmount: '500000',
           estimatedMaxClaimAmount: '750000',
@@ -275,12 +282,12 @@ describe('viewTheResponse route', () => {
         caseDates: expect.objectContaining({
           rows: expect.arrayContaining([
             expect.objectContaining({
-              key: { text: 'viewTheResponse:summary.dateSubmitted' },
-              value: { text: '1 February 2026' },
-            }),
-            expect.objectContaining({
               key: { text: 'viewTheResponse:summary.dateIssued' },
               value: { text: '5 February 2026' },
+            }),
+            expect.objectContaining({
+              key: { text: 'viewTheResponse:summary.dateSubmitted' },
+              value: { text: '1 February 2026' },
             }),
           ]),
         }),
@@ -337,6 +344,86 @@ describe('viewTheResponse route', () => {
           value: {
             text: 'viewTheResponse:contactPreference.text, viewTheResponse:contactPreference.phone, viewTheResponse:contactPreference.email, viewTheResponse:contactPreference.post',
           },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant1.freeLegalAdvice' },
+          value: { text: 'Yes' },
+        }),
+      ])
+    );
+    expect(renderArgs.responseToClaim.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmountConfirmation' },
+          value: { text: 'Yes' },
+        }),
+      ])
+    );
+    expect(renderArgs.counterclaim.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.type' },
+          value: { text: 'A sum of money or compensation' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.amountKnown' },
+          value: { text: 'Yes' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.needHelpWithFees' },
+          value: { text: 'I do not need help paying the fee' },
+        }),
+      ])
+    );
+  });
+
+  it('should format yes/no values regardless of API casing', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        defendantResponses: {
+          disputeClaim: 'Yes',
+          rentArrearsAmountConfirmation: 'No',
+          makeCounterClaim: 'Yes',
+          counterClaim: {
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'Yes',
+            claimAmount: '500000',
+          },
+        } as unknown as CcdDefendantResponses,
+      },
+    });
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
+    );
+
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.responseToClaim.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:responseToClaim.disputeClaim' },
+          value: { text: 'Yes' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmountConfirmation' },
+          value: { text: 'No' },
+        }),
+      ])
+    );
+    expect(renderArgs.counterclaim.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.amountKnown' },
+          value: { text: 'Yes' },
         }),
       ])
     );
@@ -403,6 +490,10 @@ describe('viewTheResponse route', () => {
       expect.arrayContaining([
         expect.objectContaining({
           key: { text: 'viewTheResponse:income.universalCreditApplied' },
+          value: { text: 'Yes' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:income.universalCreditApplicationDate' },
           value: { text: '15 January 2026' },
         }),
       ])
