@@ -16,7 +16,7 @@ import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import { requireEventAccess } from '../middleware/requireEventAccess';
 import { http } from '../modules/http';
-import { getRespondToClaimConfirmationPath } from '../steps/utils/postSubmissionRouting';
+import { getRespondToClaimSubmitNavigation } from '../steps/utils/postSubmissionRouting';
 
 import { Logger } from '@modules/logger';
 import type { CcdCase } from '@services/ccdCase.interface';
@@ -40,12 +40,12 @@ function getCaseHeaders(token: string) {
   };
 }
 
-interface SubmitPaymentPayload {
+interface ParsedSubmitPaymentPayload {
   serviceRequestReference: string;
   feeAmount?: number;
 }
 
-function parseSubmitPaymentPayload(confirmationBody?: string | null): SubmitPaymentPayload | undefined {
+function parseSubmitPaymentPayload(confirmationBody?: string | null): ParsedSubmitPaymentPayload | undefined {
   if (!confirmationBody) {
     return undefined;
   }
@@ -141,10 +141,14 @@ export default function finalSubmitRoutes(app: Application): void {
 
       logger.info(`Response submitted successfully for case ${caseId}`);
 
-      const confirmationPath = getRespondToClaimConfirmationPath(caseId, validatedCase.data);
       const paymentPayload = parseSubmitPaymentPayload(submittedCase.after_submit_callback_response?.confirmation_body);
+      const { confirmationPath, counterClaimFeePaymentRequired } = getRespondToClaimSubmitNavigation(
+        caseId,
+        validatedCase.data,
+        paymentPayload
+      );
 
-      if (paymentPayload && confirmationPath.endsWith('/response-submitted-counter-claim-fee-payment-needed')) {
+      if (counterClaimFeePaymentRequired && paymentPayload) {
         setPaymentSessionState(req, {
           caseReference: caseId,
           serviceRequestReference: paymentPayload.serviceRequestReference,
