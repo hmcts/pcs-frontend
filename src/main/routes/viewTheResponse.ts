@@ -119,32 +119,20 @@ function formatMoneyAmount(pence: string | number | undefined): string {
   return pounds ? `£${pounds}` : '';
 }
 
-function formatIncomeValue(
-  t: TFunction,
-  amount: string | undefined,
-  frequency: string | undefined | null
-): string {
+function formatIncomeValue(t: TFunction, amount: string | undefined, frequency: string | undefined | null): string {
   const money = formatMoneyAmount(amount);
   const freq =
-    frequency === 'WEEKLY' || frequency === 'MONTHLY'
-      ? t(`viewTheResponse:incomeFrequencies.${frequency}`)
-      : '';
+    frequency === 'WEEKLY' || frequency === 'MONTHLY' ? t(`viewTheResponse:incomeFrequencies.${frequency}`) : '';
   if (money && freq) {
     return `${money} ${freq}`;
   }
   return money || freq;
 }
 
-function formatPaymentValue(
-  t: TFunction,
-  amount: string | undefined,
-  frequency: string | undefined | null
-): string {
+function formatPaymentValue(t: TFunction, amount: string | undefined, frequency: string | undefined | null): string {
   const money = formatMoneyAmount(amount);
   const freq =
-    frequency === 'WEEKLY' || frequency === 'MONTHLY'
-      ? t(`viewTheResponse:paymentFrequencies.${frequency}`)
-      : '';
+    frequency === 'WEEKLY' || frequency === 'MONTHLY' ? t(`viewTheResponse:paymentFrequencies.${frequency}`) : '';
   if (money && freq) {
     return `${money} ${freq}`;
   }
@@ -195,7 +183,7 @@ function buildCaseDatesSummary(t: TFunction, dateSubmitted: string | null, dateI
   return {
     rows: [
       { key: summaryKey(t('viewTheResponse:summary.dateIssued')), value: { text: dateIssued ?? '' } },
-      { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } }
+      { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } },
     ],
   };
 }
@@ -242,7 +230,10 @@ function resolveClaimantName(caseData: CcdCaseData): string {
     return caseData.claimantName.trim();
   }
   const orgs = caseData.possessionClaimResponse?.claimantOrganisations ?? [];
-  const fromOrgs = orgs.map(o => o.value?.trim()).filter(Boolean).join(', ');
+  const fromOrgs = orgs
+    .map(o => o.value?.trim())
+    .filter(Boolean)
+    .join(', ');
   if (fromOrgs) {
     return fromOrgs;
   }
@@ -370,7 +361,11 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData): Summary
   pushRow(rows, t('viewTheResponse:payments.repaymentAgreedDetails'), payment.repaymentAgreedDetails);
   pushRow(rows, t('viewTheResponse:payments.repayArrearsInstalments'), yesNo(t, payment.repayArrearsInstalments));
   if (payment.additionalRentContribution || payment.additionalContributionFrequency) {
-    pushRow(rows, t('viewTheResponse:payments.additionalContribution'), formatMoneyAmount(payment.additionalRentContribution));
+    pushRow(
+      rows,
+      t('viewTheResponse:payments.additionalContribution'),
+      formatMoneyAmount(payment.additionalRentContribution)
+    );
     pushRow(
       rows,
       t('viewTheResponse:payments.additionalContributionFrequency'),
@@ -565,7 +560,11 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
     if (isYes(cc.isClaimAmountKnown)) {
       pushRow(rows, t('viewTheResponse:counterclaim.amount'), formatMoneyAmount(cc.claimAmount));
     } else if (isNo(cc.isClaimAmountKnown)) {
-      pushRow(rows, t('viewTheResponse:counterclaim.estimatedMaxAmount'), formatMoneyAmount(cc.estimatedMaxClaimAmount));
+      pushRow(
+        rows,
+        t('viewTheResponse:counterclaim.estimatedMaxAmount'),
+        formatMoneyAmount(cc.estimatedMaxClaimAmount)
+      );
     }
   }
 
