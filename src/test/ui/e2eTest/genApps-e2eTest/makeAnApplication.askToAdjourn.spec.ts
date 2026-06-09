@@ -1,6 +1,7 @@
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import { dashboard } from '../../data/page-data';
 import {
+  applicationSubmitted,
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   askToAdjournTheCourtHearing,
   checkYourAnswersGenApps,
@@ -10,10 +11,10 @@ import {
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  payForYourApplication,
+  paymentDetails,
   uploadDocumentsToSupportYourApplication,
-  whatOrderDoYouWantTheCourtToMakeAndWhy,
-  whichLanguageDidYouUseToCompleteThisService,
-} from '../../data/page-data/genApps-page-data';
+ whatOrderDoYouWantTheCourtToMakeAndWhy , whichLanguageDidYouUseToCompleteThisService } from '../../data/page-data/genApps-page-data';
 import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
@@ -157,4 +158,19 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
   });
+  await performValidation('mainHeader', payForYourApplication.mainHeader);
+  await performAction('clickButton', payForYourApplication.continueToPaymentButton);
+  await performValidation('mainHeader', payForYourApplication.mainHeader);
+  await performAction('inputText', paymentDetails.cardNumberTextLabel, paymentDetails.cardNumberTextInput);
+  await performAction('inputText', paymentDetails.monthTextLabel, paymentDetails.monthTextInput);
+  await performAction('inputText', paymentDetails.yearTextLabel, paymentDetails.yearTextInput);
+  await performAction('inputText', paymentDetails.nameOnCardTextLabel, paymentDetails.nameOnCardTextInput);
+  await performAction('inputText', paymentDetails.cardSecurityCodeTextLabel, paymentDetails.cardSecurityCodeTextInput);
+  await performAction('inputText', paymentDetails.addressLine1TextLabel, paymentDetails.addressLine1TextInput);
+  await performAction('inputText', paymentDetails.townOrCityTextLabel, paymentDetails.townOrCityTextInput);
+  await performAction('inputText', paymentDetails.postcodeTextLabel, paymentDetails.postcodeTextInput);
+  await performAction('inputText', paymentDetails.postcodeTextLabel, paymentDetails.postcodeTextInput);
+  await performAction('inputText', paymentDetails.emailTextLabel, paymentDetails.emailTextInput);
+  await performAction('clickButton', paymentDetails.continueButton);
+  await performValidation('mainHeader', applicationSubmitted.mainHeader);
 });
