@@ -1,6 +1,8 @@
 {% extends "template.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
+{% block pageTitle %}{{ t('claimList:pageTitle') }} - GOV.UK{% endblock %}
+
 {% block content %}
   <h1 class="govuk-heading-l">{{ t('claimList:heading') }}</h1>
 
