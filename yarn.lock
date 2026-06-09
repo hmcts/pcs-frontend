@@ -2021,31 +2021,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-sdk-common@npm:2.25.0":
-  version: 2.25.0
-  resolution: "@launchdarkly/js-sdk-common@npm:2.25.0"
-  checksum: 10/44db342fd1bd1d402b290fe3abb5bc310429cc45b4d4250bf3889f46f7323b5b4a808808d140bedf08588d0522c2b4f4014d245bc74d454cbc43746ed8f8b474
+"@launchdarkly/js-sdk-common@npm:2.25.1":
+  version: 2.25.1
+  resolution: "@launchdarkly/js-sdk-common@npm:2.25.1"
+  checksum: 10/4b99f83fb637af2a0b546afbaa400918f83f66464ed9259583520c1a632cfa401e08906cf07b5f85480c5f5c8c9b698b7e624c20f038a0a2429a88abc93cb636
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-server-sdk-common@npm:2.19.0":
-  version: 2.19.0
-  resolution: "@launchdarkly/js-server-sdk-common@npm:2.19.0"
+"@launchdarkly/js-server-sdk-common@npm:2.19.1":
+  version: 2.19.1
+  resolution: "@launchdarkly/js-server-sdk-common@npm:2.19.1"
   dependencies:
-    "@launchdarkly/js-sdk-common": "npm:2.25.0"
+    "@launchdarkly/js-sdk-common": "npm:2.25.1"
     semver: "npm:7.5.4"
-  checksum: 10/0f56ccf74c463c1c27dc0483d09d11160c6bf2e1b8f82ac261863a37fcd1bcdb575d80e4945813becb7115d4593151a03fd4bb6ee5fc0699a7d8bacb221e15a5
+  checksum: 10/dbb846685999b5809ffe4d3f3f27e0350c9c8fe4b7545c232b9d92431e2c65690fbfacb5e191bc2439b8c5982e1eb9830ad64b7aa3f28d434cfda87e1f4ff40a
   languageName: node
   linkType: hard
 
-"@launchdarkly/node-server-sdk@npm:9.11.1":
-  version: 9.11.1
-  resolution: "@launchdarkly/node-server-sdk@npm:9.11.1"
+"@launchdarkly/node-server-sdk@npm:9.11.2":
+  version: 9.11.2
+  resolution: "@launchdarkly/node-server-sdk@npm:9.11.2"
   dependencies:
-    "@launchdarkly/js-server-sdk-common": "npm:2.19.0"
+    "@launchdarkly/js-server-sdk-common": "npm:2.19.1"
     https-proxy-agent: "npm:^7.0.6"
     launchdarkly-eventsource: "npm:2.2.0"
-  checksum: 10/aa1498c4f853f9ea20c10ace5124334870d706a5f8fc9716da80a7cea16f745aee6b09a52cabddee94d7f34a8cff108ae34064dd6efbecaa987144ca555d9606
+  checksum: 10/3df57274a1948617d6bb30b1c5812dbab98a7951207f009ae5cf6ce462e3aebcf5cfc484f2eedf1d4272f8d448969b7f26e03ccc717110a9a04376b1d3faa0c3
   languageName: node
   linkType: hard
 
@@ -3975,12 +3975,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:24.13.0":
-  version: 24.13.0
-  resolution: "@types/node@npm:24.13.0"
+"@types/node@npm:24.13.1":
+  version: 24.13.1
+  resolution: "@types/node@npm:24.13.1"
   dependencies:
     undici-types: "npm:~7.18.0"
-  checksum: 10/13e69ffde58cfdade78fba370afaa193b5666962a9c9e8bbf0281ba2447e13c36638b8d8abc7be894cc87ab3abf60560bbb65804f5d9e56bcd30aae1e4d4de24
+  checksum: 10/44aef6ada09b68f69b22d8dc6e84e2a40135af97ee4c0c5203c77fc27d7363a1b3659b71e82e4530de7786ed5e4ea6dd42579dcc9708dea9c1ab40e5bdd9c48e
   languageName: node
   linkType: hard
 
@@ -5128,12 +5128,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-commandline@npm:2.42.0":
-  version: 2.42.0
-  resolution: "allure-commandline@npm:2.42.0"
+"allure-commandline@npm:2.42.1":
+  version: 2.42.1
+  resolution: "allure-commandline@npm:2.42.1"
   bin:
     allure: bin/allure
-  checksum: 10/8744e61be5dd4260ba458c48e06869c86c0048d27d82b35f3f2e4d68f0c4fdddb367995969f04458cf9daf95db5800d21bff0c7da1dec7f6ad56cc9abee6030e
+  checksum: 10/c69ce036a01e66cd06d9828f2a863c4f440b993a5110026147bded94188148b9736bc6a3ea1c50d1ac7736d7db8db6d29d8bea28189707636e6c125a97eff8d5
   languageName: node
   linkType: hard
 
@@ -9056,9 +9056,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ioredis@npm:5.11.0":
-  version: 5.11.0
-  resolution: "ioredis@npm:5.11.0"
+"ioredis@npm:5.11.1":
+  version: 5.11.1
+  resolution: "ioredis@npm:5.11.1"
   dependencies:
     "@ioredis/commands": "npm:1.10.0"
     cluster-key-slot: "npm:1.1.1"
@@ -9067,7 +9067,7 @@ __metadata:
     redis-errors: "npm:1.2.0"
     redis-parser: "npm:3.0.0"
     standard-as-callback: "npm:2.1.0"
-  checksum: 10/ab802874e22aeb90db5fa0c0d35dc9e9faca3b544afa0faa4b94c30ee0961f70dbfa73f123eb7dd8ca43b3c5a3fb7e5eafaa9d03fb3ad7b5f6c4c4aad6a23bee
+  checksum: 10/f27653075b0599a9e8886b28a59bb2e232ca7d91b4a81de699e932cb55dcdcec791fe571fb7d4ebc81fc26f44667a76cf165162ecea57285548190ea0d58f734
   languageName: node
   linkType: hard
 
@@ -11775,7 +11775,7 @@ __metadata:
     "@hmcts/nodejs-healthcheck": "npm:1.8.6"
     "@hmcts/playwright-common": "npm:1.1.2"
     "@hmcts/properties-volume": "npm:1.4.0"
-    "@launchdarkly/node-server-sdk": "npm:9.11.1"
+    "@launchdarkly/node-server-sdk": "npm:9.11.2"
     "@ministryofjustice/frontend": "npm:^9.0.0"
     "@opentelemetry/api": "npm:1.9.1"
     "@opentelemetry/instrumentation-winston": "npm:0.62.0"
@@ -11795,7 +11795,7 @@ __metadata:
     "@types/lodash": "npm:4.17.24"
     "@types/luxon": "npm:3.7.1"
     "@types/multer": "npm:^2.1.0"
-    "@types/node": "npm:24.13.0"
+    "@types/node": "npm:24.13.1"
     "@types/nunjucks": "npm:3.2.6"
     "@types/serve-favicon": "npm:2.5.7"
     "@types/totp-generator": "npm:0.0.8"
@@ -11804,7 +11804,7 @@ __metadata:
     "@types/webpack-env": "npm:1.18.8"
     "@typescript-eslint/eslint-plugin": "npm:8.60.1"
     "@typescript-eslint/parser": "npm:8.60.1"
-    allure-commandline: "npm:2.42.0"
+    allure-commandline: "npm:2.42.1"
     allure-js-commons: "npm:3.9.0"
     allure-playwright: "npm:3.9.0"
     axios: "npm:1.17.0"
@@ -11837,7 +11837,7 @@ __metadata:
     i18next: "npm:26.3.1"
     i18next-fs-backend: "npm:2.6.6"
     i18next-http-middleware: "npm:3.9.7"
-    ioredis: "npm:5.11.0"
+    ioredis: "npm:5.11.1"
     jest: "npm:30.4.2"
     jest-environment-jsdom: "npm:30.4.1"
     jest-html-reporter: "npm:4.4.0"
@@ -12297,11 +12297,11 @@ __metadata:
   linkType: hard
 
 "protobufjs@npm:^8.0.0":
-  version: 8.5.0
-  resolution: "protobufjs@npm:8.5.0"
+  version: 8.6.1
+  resolution: "protobufjs@npm:8.6.1"
   dependencies:
     long: "npm:^5.3.2"
-  checksum: 10/31fc8237b3d77a22e41f3aba75223dd254ceb85491de74595201830ddf49e14b785bde80fbacb2a01e6c7084906a43d3587759dbcd96b6cc8646b288da9efe19
+  checksum: 10/67ed945a9512e145578ab2ee33ce46fcbc51afe9660003a82be09c5ce6821f8d394902279bd086b2851c2edcf32f08591b3403a4e5ebe18aad549bfb6794e553
   languageName: node
   linkType: hard
 
@@ -12951,11 +12951,11 @@ __metadata:
   linkType: hard
 
 "semver@npm:^7.5.2":
-  version: 7.8.1
-  resolution: "semver@npm:7.8.1"
+  version: 7.8.2
+  resolution: "semver@npm:7.8.2"
   bin:
     semver: bin/semver.js
-  checksum: 10/3244f6c4cb3f8126fea0426d353829ed4967e41e1f4696337c6fdcad87426466fe2badaf49d7dc85849acfc496ea0599432a4aecc33802d2d774e723acfa30e6
+  checksum: 10/52221d8f1cadacda3cc3f0a2e7f7146e0442c7f4219acb25970bed055f5d0a6afbba5f22e293b078c2e93fca3dce0a08b088485e8b75d32a165f16c3627091c8
   languageName: node
   linkType: hard
 
