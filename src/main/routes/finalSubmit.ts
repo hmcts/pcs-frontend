@@ -16,7 +16,7 @@ import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import { requireEventAccess } from '../middleware/requireEventAccess';
 import { http } from '../modules/http';
-import { getRespondToClaimConfirmationPath } from '../steps/utils/postSubmissionRouting';
+import { getRespondToClaimSubmitNavigation } from '../steps/utils/postSubmissionRouting';
 
 import { Logger } from '@modules/logger';
 import type { CcdCase } from '@services/ccdCase.interface';
@@ -40,28 +40,36 @@ function getCaseHeaders(token: string) {
   };
 }
 
-interface SubmitPaymentPayload {
+interface ParsedSubmitPaymentPayload {
   serviceRequestReference: string;
   feeAmount?: number;
 }
 
-function parseSubmitPaymentPayload(confirmationBody?: string | null): SubmitPaymentPayload | undefined {
+function parseSubmitPaymentPayload(confirmationBody?: string | null): ParsedSubmitPaymentPayload | undefined {
   if (!confirmationBody) {
     return undefined;
   }
   try {
     const parsed = JSON.parse(confirmationBody) as {
+      counterClaim?: {
+        serviceRequestReference?: unknown;
+        feeAmount?: unknown;
+      };
       serviceRequestReference?: unknown;
       feeAmount?: unknown;
     };
+    const paymentDetails = parsed.counterClaim ?? parsed;
 
-    if (typeof parsed.serviceRequestReference !== 'string' || parsed.serviceRequestReference.trim().length === 0) {
+    if (
+      typeof paymentDetails.serviceRequestReference !== 'string' ||
+      paymentDetails.serviceRequestReference.trim().length === 0
+    ) {
       return undefined;
     }
 
     return {
-      serviceRequestReference: parsed.serviceRequestReference,
-      feeAmount: typeof parsed.feeAmount === 'number' ? parsed.feeAmount : undefined,
+      serviceRequestReference: paymentDetails.serviceRequestReference,
+      feeAmount: typeof paymentDetails.feeAmount === 'number' ? paymentDetails.feeAmount : undefined,
     };
   } catch (error) {
     logger.warn('Unable to parse submit confirmation body JSON for payment payload', error);
@@ -141,10 +149,14 @@ export default function finalSubmitRoutes(app: Application): void {
 
       logger.info(`Response submitted successfully for case ${caseId}`);
 
-      const confirmationPath = getRespondToClaimConfirmationPath(caseId, validatedCase.data);
       const paymentPayload = parseSubmitPaymentPayload(submittedCase.after_submit_callback_response?.confirmation_body);
+      const { confirmationPath, counterClaimFeePaymentRequired } = getRespondToClaimSubmitNavigation(
+        caseId,
+        validatedCase.data,
+        paymentPayload
+      );
 
-      if (paymentPayload && confirmationPath.endsWith('/response-submitted-counter-claim-fee-payment-needed')) {
+      if (counterClaimFeePaymentRequired && paymentPayload) {
         setPaymentSessionState(req, {
           caseReference: caseId,
           serviceRequestReference: paymentPayload.serviceRequestReference,

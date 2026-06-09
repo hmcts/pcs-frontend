@@ -22,6 +22,16 @@ jest.mock('../../../main/services/pcsApi/paymentService', () => ({
   },
 }));
 
+jest.mock('config', () => ({
+  get: jest.fn((key: string) => {
+    if (key === 'payment.returnUrl') {
+      return 'https://pcs.aat.platform.hmcts.net/payment/return';
+    }
+
+    throw new Error(`Unexpected config key: ${key}`);
+  }),
+}));
+
 import type { Application, Request, Response } from 'express';
 
 import counterClaimPaymentStartRoutes from '../../../main/routes/counterClaimPaymentStart';
@@ -72,8 +82,6 @@ describe('counterClaimPaymentStart routes', () => {
     });
 
     const req = {
-      protocol: 'https',
-      get: jest.fn().mockReturnValue('frontend.example'),
       language: 'en',
       params: { caseReference: '123' },
       session: {
@@ -94,7 +102,7 @@ describe('counterClaimPaymentStart routes', () => {
         serviceRequestReference: 'SR-1',
         amount: 404,
         requestLanguage: 'en',
-        returnUrl: 'https://frontend.example/payment/return',
+        returnUrl: 'https://pcs.aat.platform.hmcts.net/payment/return',
       })
     );
     expect(req.session.payment).toEqual(

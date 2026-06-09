@@ -141,7 +141,7 @@ describe('paymentReturn routes', () => {
     it('redirects to failure URL and clears payment reference on failed status', async () => {
       const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
-      mockGetCardPaymentStatus.mockResolvedValue({ status: 'Not paid' });
+      mockGetCardPaymentStatus.mockResolvedValue({ status: 'Failed' });
 
       const req = {
         session: {
