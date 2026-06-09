@@ -49,7 +49,7 @@ export class ActionRegistry {
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
-    
+
     //Citizen Dashboard
     ['citizenDashboard', new CitizenDashboardAction()],
     ['validateViewAllApplications', new CitizenDashboardAction()],
