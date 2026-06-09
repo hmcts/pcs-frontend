@@ -59,11 +59,7 @@ describe('counterClaimPaymentStart routes', () => {
   });
 
   it('returns 401 via error middleware when access token is missing', async () => {
-    const handler = mockGet.mock.calls[0][2] as (
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ) => Promise<void>;
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     const req = {
       params: { caseReference: '123' },
       session: {
@@ -83,11 +79,7 @@ describe('counterClaimPaymentStart routes', () => {
   });
 
   it('redirects to fee page when service request reference is missing', async () => {
-    const handler = mockGet.mock.calls[0][2] as (
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ) => Promise<void>;
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     const req = {
       params: { caseReference: '123' },
       session: {
@@ -104,11 +96,7 @@ describe('counterClaimPaymentStart routes', () => {
   });
 
   it('creates card payment and redirects to gov pay nextUrl', async () => {
-    const handler = mockGet.mock.calls[0][2] as (
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ) => Promise<void>;
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     mockStartCardPaymentRequest.mockResolvedValue({
       paymentReference: 'RC-1',
       paymentStatus: 'Created',

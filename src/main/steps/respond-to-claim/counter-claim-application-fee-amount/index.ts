@@ -37,8 +37,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const t = getTranslationFunction(req);
     const counterClaimAmountPounds = claimAmountInPence ? penceToPounds(claimAmountInPence) : undefined;
-    const counterClaimAmount =
-      counterClaimAmountPounds !== undefined ? Number(counterClaimAmountPounds) : undefined;
+    const counterClaimAmount = counterClaimAmountPounds !== undefined ? Number(counterClaimAmountPounds) : undefined;
     const caseReference = req.params.caseReference;
     const serviceRequestReference = req.session.payment?.serviceRequestReference;
     const payNowUrl = caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
@@ -48,9 +47,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       formattedCounterClaimAmount:
-        counterClaimAmount !== undefined
-          ? t('counterClaimAmountDisplay', { counterClaimAmount })
-          : undefined,
+        counterClaimAmount !== undefined ? t('counterClaimAmountDisplay', { counterClaimAmount }) : undefined,
       formattedCounterClaimFee: t('counterClaimFeeDisplay', { counterClaimFee }),
       payNowButton: t('payNowButton', { counterClaimFee }),
       payNowUrl,
