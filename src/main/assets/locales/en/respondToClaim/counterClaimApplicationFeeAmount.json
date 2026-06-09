@@ -3,7 +3,9 @@
   "caption": "Respond to a property possession claim",
   "counterClaimAmountLabel": "Counterclaim amount",
   "counterClaimFeeLabel": "Counterclaim fee",
-  "payNowButton": "Pay your counterclaim fee (£{{counterClaimFee}})",
+  "counterClaimAmountDisplay": "{{counterClaimAmount, currency(currency: GBP)}}",
+  "counterClaimFeeDisplay": "{{counterClaimFee, currency(currency: GBP)}}",
+  "payNowButton": "Pay your counterclaim fee ({{counterClaimFee, currency(currency: GBP)}})",
   "paymentHint": "You must pay your counterclaim fee for your counterclaim to be considered.",
   "paymentError": "We could not start your payment. Try again."
 }

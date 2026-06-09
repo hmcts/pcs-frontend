@@ -17,11 +17,11 @@
     rows: [
       {
         key: { text: counterClaimAmountLabel },
-        value: { html: counterClaimAmount ? "£" + counterClaimAmount : "" }
+        value: { text: formattedCounterClaimAmount or "" }
       },
       {
         key: { text: counterClaimFeeLabel },
-        value: { text: "£" + counterClaimFee }
+        value: { text: formattedCounterClaimFee }
       }
     ]
   }) }}
