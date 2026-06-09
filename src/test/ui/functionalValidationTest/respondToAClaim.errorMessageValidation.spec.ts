@@ -20,7 +20,6 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
-  endNow,
   equalityAndDiversityEnd,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -486,20 +485,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: languageUsed.englishRadioOption,
     });
 
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-      ],
-      status: 'Done',
-    });
-
+    await performAction('clickButton', 'Submit');
     assertAllErrorMessageValidations();
   });
 
@@ -731,8 +717,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: languageUsed.englishRadioOption,
     });
 
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
+    await performAction('clickButton', 'Submit');
     assertAllErrorMessageValidations();
   });
 });
