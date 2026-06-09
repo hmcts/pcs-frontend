@@ -21,7 +21,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Claims list - e2e Journey @nightly', async () => {
-  test('Claims list - View claim @noDefendants @regression @crossbrowser', async () => {
+  test('Claims list - View claim @regression @crossbrowser', async () => {
     await performValidation('elementToBeVisible', claims.noClaimsAgainstYouDynamicParagraph);
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
