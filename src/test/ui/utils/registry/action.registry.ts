@@ -46,15 +46,16 @@ export class ActionRegistry {
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
     ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
-    ['citizenDashboard', new CitizenDashboardAction()],
-    ['verifyRespondToClaimNotificationAndTag', new CitizenDashboardAction()],
-    ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
-    ['startEvidenceUpload', new DocumentsAction()],
-    ['validateViewDocuments', new DocumentsAction()],
-    ['verifyDocumentRelatesToApplication', new DocumentsAction()],
+
+    //Citizen Dashboard
+    ['citizenDashboard', new CitizenDashboardAction()],
+    ['verifyRespondToClaimNotificationAndTag', new CitizenDashboardAction()],
+    ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()],
+
+    //Respond to claim
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
@@ -111,6 +112,12 @@ export class ActionRegistry {
     ['retrieveCYATableDataRTC', new RespondToClaimAction()],
     ['validateCYARTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
+
+    //Documents
+    ['startEvidenceUpload', new DocumentsAction()],
+    ['uploadDocuments', new DocumentsAction()],
+    ['validateViewDocuments', new DocumentsAction()],
+    ['verifyDocumentRelatesToApplication', new DocumentsAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],

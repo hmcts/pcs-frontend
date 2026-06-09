@@ -1,11 +1,15 @@
 import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  checkYourAnswers,
   confirmIfTheseDocumentsRelateToAnApplication,
   startEvidenceUpload,
   uploadYourDocuments,
   viewDocuments,
 } from '../data/page-data/documents-page-data';
-import { confirmDocumentsRelateToApplicationErrorValidation } from '../functional/documents-functional/confirmIfTheseDocumentsRelateToAnApplication.pft';
+import {
+  confirmDocumentsRelateToApplicationErrorValidation,
+  uploadYourDocumentsErrorValidation,
+} from '../functional/documents-functional';
 import { softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -41,14 +45,12 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     );
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await softErrorMessageValidation(
-      'confirmIfTheseDocumentsRelateToAnApplication',
-      confirmDocumentsRelateToApplicationErrorValidation
-    );
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden,
     });
+    await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
 
   test('Upload documents when GenApps not submitted @regression', async () => {
@@ -57,7 +59,9 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+    await softErrorMessageValidation('uploadYourDocuments', uploadYourDocumentsErrorValidation);
+    await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
 
   test('View documents submitted through make a claim @regression', async () => {
