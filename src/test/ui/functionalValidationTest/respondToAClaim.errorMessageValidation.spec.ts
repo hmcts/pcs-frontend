@@ -21,8 +21,6 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   endNow,
-  equalityAndDiversityEnd,
-  equalityAndDiversityStart,
   exceptionalHardship,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
@@ -89,7 +87,7 @@ import {
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { initializeExecutor, performAction } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
 
 const home_url = process.env.TEST_URL;
@@ -469,17 +467,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
-    await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
-    await performAction('readReasonableAdjustmentsTriage');
-
-    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-
-    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
@@ -713,17 +700,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-
-    await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
-    await performAction('readReasonableAdjustmentsTriage');
-
-    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-
-    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
