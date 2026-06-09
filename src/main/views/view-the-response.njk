@@ -12,17 +12,8 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds view-the-response">
-      <div class="govuk-grid-row govuk-!-margin-bottom-2">
-        <div class="govuk-grid-column-two-thirds">
-          <span class="govuk-caption-l">{{ t('viewTheResponse:caption') }}</span>
-          <h1 class="govuk-heading-l">{{ t('viewTheResponse:heading') }}</h1>
-        </div>
-        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-          <a class="govuk-link govuk-!-display-inline-block govuk-!-margin-top-3" href="#view-the-response-help">{{ t('common:contactUsForHelp') }}</a>
-        </div>
-      </div>
-
-
+      <span class="govuk-caption-l">{{ t('viewTheResponse:caption') }}</span>
+      <h1 class="govuk-heading-l">{{ t('viewTheResponse:heading') }}</h1>
 
       {% if propertyAddress %}
         <p class="govuk-body-l govuk-!-margin-bottom-2"> {{ t('viewTheResponse:propertyAddressLabel') }} {{ propertyAddress }}</p>
@@ -101,10 +92,6 @@
         href: dashboardUrl or '#'
       }) }}
 
-      <div id="view-the-response-help" class="govuk-!-margin-bottom-6">
-        {% include "components/contact-us-details.njk" %}
-      </div>
-
       {{ govukDetails({
         summaryText: t('viewTheResponse:accordion.summary'),
         open: true,
@@ -115,6 +102,12 @@
               + '</a></p>'
       }) }}
 
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <aside class="app-related-items" aria-label="{{ t('common:supportAndContactInformation') }}">
+        {% include "components/contact-us-details.njk" %}
+      </aside>
     </div>
   </div>
 {% endblock %}

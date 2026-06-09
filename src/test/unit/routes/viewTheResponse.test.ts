@@ -429,6 +429,38 @@ describe('viewTheResponse route', () => {
     );
   });
 
+  it('should resolve claimant name from claimantOrganisations when case-level name is absent', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        claimantOrganisations: [{ id: 'claimant-1', value: 'Possession Claims Solicitor Org' }],
+        defendantResponses: {},
+      },
+    } as CcdCaseData);
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
+    );
+
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.claimantDetails.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:claimantDetails.name' },
+          value: { text: 'Possession Claims Solicitor Org' },
+        }),
+      ])
+    );
+  });
+
   it('should show universal credit as no when not receiving or applying', async () => {
     mockCaseById({
       possessionClaimResponse: {

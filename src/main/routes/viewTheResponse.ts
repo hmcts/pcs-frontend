@@ -25,6 +25,7 @@ import type {
   YesNoNotSureValue,
   YesNoValue,
 } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
@@ -223,25 +224,7 @@ function buildClaimantDetails(t: TFunction, caseData: CcdCaseData): SummarySecti
 }
 
 function resolveClaimantName(caseData: CcdCaseData): string {
-  if (caseData.isClaimantNameCorrect === 'NO' && caseData.overriddenClaimantName?.trim()) {
-    return caseData.overriddenClaimantName.trim();
-  }
-  if (caseData.claimantName?.trim()) {
-    return caseData.claimantName.trim();
-  }
-  const orgs = caseData.possessionClaimResponse?.claimantOrganisations ?? [];
-  const fromOrgs = orgs
-    .map(o => o.value?.trim())
-    .filter(Boolean)
-    .join(', ');
-  if (fromOrgs) {
-    return fromOrgs;
-  }
-  const fromAllClaimants = (caseData.allClaimants ?? [])
-    .map(c => [c.value?.orgName, c.value?.firstName, c.value?.lastName].filter(Boolean).join(' ').trim())
-    .filter(Boolean)
-    .join(', ');
-  return fromAllClaimants;
+  return new CcdCaseModel({ id: '', data: caseData }).claimantName;
 }
 
 function buildContactPreferences(t: TFunction, responses: CcdDefendantResponses | undefined): string {
