@@ -35,7 +35,7 @@
   "ccd": {
     // "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
     "url": "https://ccd-data-store-api-pcs-api-pr-1828.preview.platform.hmcts.net",
-    "caseTypeId": "PCS"
+    "caseTypeId": "PCS-1828"
   },
   "osPostcodeLookup": {
     "url": "https://api.os.uk/search/places/v1"
