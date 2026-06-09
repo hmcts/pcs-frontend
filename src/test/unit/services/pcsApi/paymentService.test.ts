@@ -117,11 +117,11 @@ describe('payment helpers', () => {
     ['Declined', 'failure'],
     ['failed', 'failure'],
     ['declined', 'failure'],
-    ['Not paid', 'failure'],
-    ['Partially paid', 'failure'],
     ['Initiated', 'pending'],
     ['Pending', 'pending'],
     ['created', 'pending'],
+    ['Not paid', 'pending'],
+    ['Partially paid', 'pending'],
     [undefined, 'pending'],
   ])('maps payment status %s to %s outcome', (status, expected) => {
     expect(getPaymentOutcome(status)).toBe(expected);
