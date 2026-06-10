@@ -35,6 +35,7 @@ export const correspondenceAddress = {
   findAddressHiddenButton: `Find address`,
   enterAddressManuallyHiddenLink: `Enter an address manually`,
   addressSelectHiddenLabel: `Select an address`,
+  whatsYourPostalAddressQuestion: `What’s your postal address?`,
   whatsYourAddressHiddenQuestion: `What’s your correspondence address?`,
   addressLine1HiddenTextLabel: `Address Line 1`,
   addressLine2HiddenTextLabel: `Address Line 2 (Optional)`,

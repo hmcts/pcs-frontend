@@ -487,9 +487,9 @@ export class RespondToClaimAction implements IAction {
       question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
     });
-    this.recordAnswer(correspondenceAddress.correspondenceAddressPostalMainHeader, addressData.radioOption);
 
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
+      this.deleteAnswer(correspondenceAddress.correspondenceAddressPostalMainHeader);
       if (addressData.addressIndex) {
         await performActions(
           'Find Address based on postcode',
@@ -499,7 +499,7 @@ export class RespondToClaimAction implements IAction {
         );
       } else if (addressData.addressLine1) {
         this.recordAnswer(
-          correspondenceAddress.correspondenceAddressPostalMainHeader,
+          correspondenceAddress.whatsYourPostalAddressQuestion,
           this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
         );
         await performActions(
@@ -510,6 +510,8 @@ export class RespondToClaimAction implements IAction {
           ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
         );
       }
+    } else {
+      this.recordAnswer(correspondenceAddress.correspondenceAddressPostalMainHeader, addressData.radioOption);
     }
 
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);

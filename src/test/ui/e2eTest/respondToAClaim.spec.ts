@@ -436,10 +436,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressKnown', {
-      radioOption: correspondenceAddress.noRadioOption,
-      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      radioOption: correspondenceAddress.yesRadioOption,
+      /*addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-      postcode: correspondenceAddress.walesPostcodeTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,*/
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
