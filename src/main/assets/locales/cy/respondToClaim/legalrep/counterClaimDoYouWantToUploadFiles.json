@@ -1,0 +1,7 @@
+{
+  "heading": "cyDo you want to upload files to support the counterclaim?",
+  "paragraph2": "cyAll parties will be able to see these files.",
+  "errors": {
+    "counterClaimWantToUploadFiles": "cySelect if you want to upload files to support the counterclaim"
+  }
+}

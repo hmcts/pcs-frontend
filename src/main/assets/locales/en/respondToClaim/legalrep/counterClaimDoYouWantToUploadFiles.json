@@ -1,0 +1,7 @@
+{
+  "heading": "Do you want to upload files to support the counterclaim?",
+  "paragraph2": "All parties will be able to see these files.",
+  "errors": {
+    "counterClaimWantToUploadFiles": "Select if you want to upload files to support the counterclaim"
+  }
+}
