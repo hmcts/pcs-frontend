@@ -6,12 +6,15 @@ import type { CaseData, LanguageUsed } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'language-used',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.languageUsed),
   stepDir: __dirname,
   customTemplate: `${__dirname}/languageUsed.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
     caption: 'caption',
+    languageHeading: 'languageHeading',
+    question: 'question',
   },
   fields: [
     {
@@ -31,7 +34,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: req => {
-    const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
     const languageUsedCcd: LanguageUsed | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.languageUsed;
 

@@ -6,11 +6,13 @@ import type { CaseData, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'other-considerations',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.otherConsiderations),
   stepDir: __dirname,
   customTemplate: `${__dirname}/otherConsiderations.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
+    question: 'question',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -35,7 +37,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
-    const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
     const existingAnswer: YesNoValue | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.otherConsiderations;
 

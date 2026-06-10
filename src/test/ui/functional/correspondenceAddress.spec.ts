@@ -1,11 +1,12 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  checkYourAnswersRTC,
   correspondenceAddress,
-  dashboard,
   defendantDateOfBirth,
   defendantNameConfirmation,
   freeLegalAdvice,
   startNow,
+  taskList,
 } from '../data/page-data';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -31,9 +32,13 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', {
+    caseNumber: process.env.CASE_NUMBER,
+    defendantDetailsKnown: !testInfo.title.includes('@noDefendants'),
+  });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   console.log('caseId', process.env.CASE_NUMBER);
   await performAction('clickButton', startNow.startNowButton);
@@ -43,6 +48,8 @@ test.beforeEach(async ({ page }, testInfo) => {
 test.describe('Correspondence Address - functional test @nightly', async () => {
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
@@ -120,6 +127,6 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
     });
     await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
     await performAction('clickButton', correspondenceAddress.saveForLaterButton);
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('mainHeader', taskList.mainHeader);
   });
 });

@@ -1,12 +1,14 @@
-import type { Request } from 'express';
+import type { Request, RequestHandler } from 'express';
 
 import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/upload-additional-documents/flow.config';
 import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
+import { respondToClaimAccessGuard } from './respond-to-claim/accessGuard';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from './respond-to-claim/draftEvent';
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
+import { legalRepStepRegistry as respondToClaimLegalRepStepRegistry } from './respond-to-claim/legalrep.stepRegistry';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
 import { getUserType } from './utils';
 
@@ -15,6 +17,7 @@ import { Logger } from '@modules/logger';
 import { getStepOrder } from '@modules/steps/flow';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { validateSectionConfig } from '@services/sectionStatus';
 
 const logger = Logger.getLogger('steps');
 
@@ -29,6 +32,8 @@ export interface JourneyConfig {
   draftEvent?: CcdDraftEvent;
   default: ResolvedJourneyConfig;
   legalrep?: ResolvedJourneyConfig;
+  // Stacked onto the journey's :caseReference param callback (see registerAllJourneys).
+  routeMiddleware?: RequestHandler[];
 }
 
 // JourneyVariant intentionally diverges from UserType ('citizen' | 'legalrep').
@@ -49,8 +54,9 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     },
     legalrep: {
       flowConfig: respondToClaimLegalrepFlowConfig,
-      stepRegistry: respondToClaimStepRegistry,
+      stepRegistry: respondToClaimLegalRepStepRegistry,
     },
+    routeMiddleware: [respondToClaimAccessGuard()],
   },
   makeAnApplication: {
     name: 'makeAnApplication',
@@ -82,6 +88,13 @@ export function validateJourneyRegistry(registry: Record<string, JourneyConfig>)
       throw new Error(`Duplicate journey slug "${journey.slug}" in journeyRegistry`);
     }
     seenSlugs.add(journey.slug);
+
+    // Sectionalised flows must have an acyclic dependsOn graph with valid refs.
+    // No-op for flows without sections (legalrep, gen-app).
+    validateSectionConfig(journey.default.flowConfig);
+    if (journey.legalrep) {
+      validateSectionConfig(journey.legalrep.flowConfig);
+    }
   }
 }
 

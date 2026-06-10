@@ -15,9 +15,11 @@ import { Router as createRouter } from 'express';
 
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
+import { requireEventAccess } from '../middleware/requireEventAccess';
 import { http } from '../modules/http';
 
 import { Logger } from '@modules/logger';
+import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('finalSubmit');
@@ -41,9 +43,22 @@ export default function finalSubmitRoutes(app: Application): void {
   // Create dedicated router for final submit routes
   const finalSubmitRouter: Router = createRouter({ mergeParams: true });
 
-  // Apply param middleware - validates format AND user access
-  // This ensures res.locals.validatedCase is set for routes with :caseReference
+  // Apply param middleware - validates the case reference format
   finalSubmitRouter.param('caseReference', caseReferenceParamMiddleware);
+
+  // Check user has access to the case via the respondPossessionClaim event and
+  // hydrate res.locals.validatedCase for downstream handlers.
+  //
+  // IMPORTANT: scope this to the specific paths this router serves. The router
+  // is mounted at '/case', so a router-level `use(...)` would run for every
+  // /case/* URL — including journey + documentProxy URLs that fall through to
+  // here — and req.params.caseReference is NOT populated at the mount-path
+  // level (the mount is '/case', not '/case/:caseReference'), causing a
+  // spurious "Missing case reference" 404.
+  finalSubmitRouter.use(
+    ['/:caseReference/final-submit', '/:caseReference/confirmation'],
+    requireEventAccess('respondPossessionClaim')
+  );
 
   // GET: Display final submit page
   finalSubmitRouter.get('/:caseReference/final-submit', oidcMiddleware, (req: Request, res: Response) => {
@@ -100,9 +115,11 @@ export default function finalSubmitRoutes(app: Application): void {
       // Note: possessionClaimResponse: {} is required to pass pcs-api validation
       // pcs-api will load actual data from draft database
       const submitUrl = `${getBaseUrl()}/cases/${caseId}/events`;
+      const selectedPartyId = req.session?.clientContext?.selectedPartyId;
       const payload = {
         data: {
           possessionClaimResponse: {}, // Minimal empty object to pass validation
+          ...(selectedPartyId !== null && { currentRepresentedPartyId: selectedPartyId }),
         },
         event: {
           id: 'respondPossessionClaim',
@@ -119,6 +136,10 @@ export default function finalSubmitRoutes(app: Application): void {
       await http.post(submitUrl, payload, getCaseHeaders(userAccessToken));
 
       logger.info(`Response submitted successfully for case ${caseId}`);
+
+      if (selectedPartyId) {
+        clientContextSessionClearer(req);
+      }
 
       // Use safeRedirect303 to prevent open redirect vulnerabilities
       return safeRedirect303(res, `/case/${caseId}/confirmation`, '/', ['/case']);

@@ -6,12 +6,14 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'landlord-licensed',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.landlordLicensed),
   stepDir: __dirname,
   customTemplate: `${__dirname}/landlordLicensed.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     question: 'question',
     paragraph: 'paragraph',
+    landlordQuestion: 'landlordQuestion',
   },
   fields: [
     {
@@ -41,7 +43,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: async req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const landlordLicensed = caseData?.possessionClaimResponse?.defendantResponses?.landlordLicensed;
 
     return {

@@ -2,12 +2,14 @@ import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps';
+import { getTranslation, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'exceptional-hardship',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.exceptionalHardship),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -51,7 +53,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       introParagraph1: t('introParagraph1'),
-      introParagraph2: t('introParagraph2'),
+      introParagraph2: getTranslation(t, 'introParagraph2', '') ?? '',
       forExample: t('forExample'),
       bullet1: t('bullet1'),
       bullet2: t('bullet2'),
@@ -87,7 +89,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const householdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — fromYesNoEnum handles either casing.
     const exceptionalHardshipValue = fromYesNoEnum(householdCircumstances?.exceptionalHardship);

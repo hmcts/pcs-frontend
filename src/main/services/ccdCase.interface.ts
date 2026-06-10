@@ -1,7 +1,4 @@
-export enum CaseState {
-  DRAFT = 'Draft',
-  SUBMITTED = 'Submitted',
-}
+import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
 
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
@@ -82,20 +79,6 @@ export type PaymentAgreement = {
   additionalContributionFrequency?: string;
 };
 
-export interface CcdUserCase {
-  id: string;
-  state: CaseState;
-  jurisdiction: string;
-  case_type_id: string;
-  case_data: Record<string, unknown>;
-}
-
-export interface CcdUserCases {
-  total: number;
-  cases: CcdUserCase[];
-}
-
-/** Address shape used in CCD case data (property, defendant, etc.). */
 export interface CcdCaseAddress {
   AddressLine1?: string;
   AddressLine2?: string;
@@ -120,6 +103,31 @@ export interface CcdClaimGroundSummaryItem {
   id: string;
 }
 
+export interface Party {
+  id: string;
+  idamId: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Document {
+  document_url: string;
+  document_filename: string;
+  document_binary_url: string;
+}
+
+export interface DocumentWithId {
+  id: string;
+  document: Document;
+}
+
+export interface GenApp {
+  applicationType: GenAppType;
+  party: Party;
+  submittedOn: string;
+  submissionDocument: DocumentWithId;
+  supportingDocuments: CcdCollectionItem<Document>[];
+}
 /** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
 export interface CcdClaimantOrganisation {
   value: string;
@@ -140,6 +148,7 @@ export interface CcdClaimantEnteredDefendantDetails {
   lastName?: string;
   address?: CcdCaseAddress | Record<string, never>;
   addressKnown?: YesNoValue;
+  addressSameAsProperty?: YesNoValue;
 }
 
 /** Defendant party contact details (name/address known flags and values). */
@@ -155,6 +164,22 @@ export interface CcdDefendantParty {
   phoneNumber?: string;
 }
 
+/** Counter-claim data captured across the counterclaim journey screens. */
+export interface CcdCounterClaim {
+  needHelpWithFees?: YesNoValue;
+  appliedForHwf?: YesNoValue;
+  hwfReferenceNumber?: string;
+  claimType?: string;
+  isClaimAmountKnown?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
+  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
+  counterClaimFor?: string;
+  counterClaimReasons?: string;
+  otherOrderRequestDetails?: string;
+  otherOrderRequestFacts?: string;
+}
+
 /** CCD SDK Document type -- flat reference with URLs. */
 export interface CcdDocumentReference {
   document_url: string;
@@ -162,6 +187,7 @@ export interface CcdDocumentReference {
   document_filename: string;
   document_hash?: string;
   category_id?: string;
+  upload_timestamp?: string;
 }
 
 /** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
@@ -196,9 +222,9 @@ export interface CcdDefendantResponses {
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
   disputeClaimDetails?: string;
+  counterClaim?: CcdCounterClaim;
   paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
-  counterClaim?: CcdCounterClaim;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
   defendantDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
@@ -208,15 +234,8 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
-}
-
-/** Counter-claim data captured across the counterclaim journey screens. */
-export interface CcdCounterClaim {
-  needHelpWithFees?: YesNoValue;
-  claimType?: string;
-  isClaimAmountKnown?: string;
-  claimAmount?: PenceAmount;
-  estimatedMaxClaimAmount?: PenceAmount;
+  counterClaimWantToUploadFiles?: YesNoValue;
+  completedSections?: RespondToClaimSectionEnum[];
 }
 
 export interface PossessionClaimResponse {
@@ -243,6 +262,7 @@ export interface CcdCaseData {
   introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
   secureGroundsWales_DiscretionaryGrounds?: string[];
   noticeServed?: string;
+  walesNoticeServed?: string;
   propertyAddress?: CcdCaseAddress;
   claimGroundSummaries?: CcdClaimGroundSummaryItem[];
   userPcqId?: string;
@@ -262,13 +282,23 @@ export interface CcdCaseData {
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
+  genApps?: CcdCollectionItem<GenApp>[];
   allClaimants?: CcdCollectionItem<CcdParty>[];
   allDefendants?: CcdCollectionItem<CcdParty>[];
+  allLinkedDefendants?: CcdCollectionItem<CcdDefendantParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+}
+
+export interface CcdCaseDocument {
+  document_binary_url?: string;
+  document_filename?: string;
+  upload_timestamp?: string;
+  category_id?: string;
 }
 
 /** Case representation used by services: id + case_data. */
@@ -337,10 +367,16 @@ export interface CcdDashboardData {
   propertyAddress?: CcdCaseAddress;
   notifications?: CcdCollectionItem<CcdDashboardNotification>[];
   taskGroups?: CcdCollectionItem<CcdDashboardTaskGroup>[];
+  relatedApplications?: CcdCollectionItem<CcdRelatedApplication>[];
+}
+
+export interface CcdRelatedApplication {
+  id?: string;
+  type?: GenAppType;
+  applicationSubmittedDate?: string;
 }
 
 export enum GenAppType {
-  SUSPEND = 'SUSPEND',
   ADJOURN = 'ADJOURN',
   SET_ASIDE = 'SET_ASIDE',
   SOMETHING_ELSE = 'SOMETHING_ELSE',

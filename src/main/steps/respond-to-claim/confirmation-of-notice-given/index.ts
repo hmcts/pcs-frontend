@@ -9,12 +9,14 @@ import type { CaseData, YesNoNotSureValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-given',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.possessionNoticeReceived),
   stepDir: __dirname,
   customTemplate: `${__dirname}/confirmationOfNoticeGiven.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     question: 'question',
     hintText: 'hintText',
+    noticeDateHint: 'noticeDateHint',
   },
   fields: [
     {

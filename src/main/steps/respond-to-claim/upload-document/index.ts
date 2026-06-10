@@ -21,7 +21,7 @@ import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/doc
 // must remain journey-agnostic for genapps and other journeys (see PR #1259).
 const storage: DocumentStorage = {
   async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-    const docs = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.defendantDocuments;
+    const docs = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.defendantDocuments;
     return Array.isArray(docs) ? docs : [];
   },
 
@@ -31,7 +31,7 @@ const storage: DocumentStorage = {
     if (!caseId) {
       throw new HTTPError('Invalid case reference format', 404);
     }
-    const fresh = await ccdCaseService.getCaseById(token, caseId, RESPOND_TO_CLAIM_DRAFT_EVENT.id);
+    const fresh = await ccdCaseService.getCaseByIdForEvent(token, caseId, RESPOND_TO_CLAIM_DRAFT_EVENT.id);
     const docs = fresh.data?.possessionClaimResponse?.defendantResponses?.defendantDocuments;
     return Array.isArray(docs) ? docs : [];
   },
@@ -45,6 +45,14 @@ const storage: DocumentStorage = {
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'upload-document',
+  // Upload is optional, but once the citizen has visited this page we want the section
+  // to show as In progress on the task list. We tell apart a fresh case (defendantDocuments
+  // absent) from one the citizen has visited (defendantDocuments is at least an empty array
+  // — see beforeRedirect below). Done still comes from the CYA Save and continue, not here.
+  isAnswered: req => {
+    const docs = req.res?.locals.validatedCase?.defendantResponses?.defendantDocuments;
+    return Array.isArray(docs);
+  },
   documentStorage: storage,
   stepDir: __dirname,
   customTemplate: `${__dirname}/uploadDocument.njk`,
@@ -73,6 +81,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     deleteButton: 'deleteButton',
   },
   getInitialFormData: async req => ({ documents: toDisplayDocuments(await storage.read(req)) }),
-  // No extendGetContent — formBuilder auto-wires uploadUrl/deleteUrl when documentStorage is set.
-  // No beforeRedirect — documents are saved to CCD via documentProxy on upload/delete (holistic save).
+  // formBuilder wires up the upload and delete URLs automatically because we passed in
+  // documentStorage, so there's nothing for extendGetContent to do. The actual file save
+  // happens through documentProxy on each upload or delete — not here. This beforeRedirect
+  // does two small things: it re-saves the draft so clearSectionCompletionOnEdit can drop
+  // the section from Done back to In progress when the citizen revisits after confirming;
+  // and it seeds defendantDocuments to [] when it's still undefined, which is how
+  // isAnswered above knows the citizen has been to this page (even without uploading).
+  beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.defendantDocuments = response.defendantResponses.defendantDocuments ?? [];
+    await saveDraftDefendantResponse(req, response);
+  },
 });

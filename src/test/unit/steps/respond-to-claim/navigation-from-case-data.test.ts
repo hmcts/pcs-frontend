@@ -2,7 +2,9 @@ import type { Request } from 'express';
 
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import {
+  hasAppliedForCounterClaimHwf,
   hasConfirmedInstallmentOffer,
+  hasNotAppliedForCounterClaimHwf,
   hasProvidedFinanceDetails,
   shouldShowInstallmentPaymentsStep,
   shouldShowUniversalCreditStep,
@@ -37,7 +39,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       'contact-preferences-text-message'
     );
     await expect(getNextStep(optedOutReq, 'contact-preferences-telephone', flowConfig, {})).resolves.toBe(
-      'dispute-claim-interstitial'
+      'check-your-answers-personal-details'
     );
   });
 
@@ -83,6 +85,8 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const englishReq = createReq({ legislativeCountry: 'England' });
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
+    // dispute-claim-interstitial is now the first step of disputeAndTenancy; the
+    // non-Wales back-walk lands on it after the hidden landlord-* steps are skipped.
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
       'dispute-claim-interstitial'
     );
@@ -104,34 +108,42 @@ describe('respond-to-claim navigation from CCD case data', () => {
     claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }],
   };
 
-  it('uses valid static previous step for household interstitial path', async () => {
+  it('routes back from the first step of situationAndCircumstances to the task-list hub', async () => {
     const req = createReq({ data: rentArrearsData });
-    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe(
-      'repayments-agreed'
-    );
+    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe('task-list');
   });
 
-  it('routes counter-claim NO to household interstitial for non-rent-arrears-only claims', async () => {
+  it('routes counter-claim NO to section CYA for non-rent-arrears-only claims', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'NO' } }],
+        possessionClaimResponse: {
+          defendantResponses: {
+            makeCounterClaim: 'NO',
+          },
+        },
       },
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'your-household-and-circumstances'
+      'check-your-answers-your-response'
     );
   });
 
-  it('routes counter-claim NO to payment interstitial for rent-arrears claims', async () => {
+  it('routes counter-claim NO to section CYA for rent-arrears claims', async () => {
     const req = createReq({
       data: {
         claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }, { value: { isRentArrears: 'NO' } }],
+        possessionClaimResponse: {
+          defendantResponses: {
+            makeCounterClaim: 'NO',
+          },
+        },
       },
     });
 
     await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'payment-interstitial'
+      'check-your-answers-your-response'
     );
   });
 
@@ -387,5 +399,106 @@ describe('respond-to-claim navigation from CCD case data', () => {
     await expect(getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
       'have-you-applied-for-universal-credit'
     );
+  });
+
+  it('routes counter-claim HWF step to counter-claim-about when user applied for HWF (YES)', async () => {
+    const req = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaim: { needHelpWithFees: 'YES', appliedForHwf: 'YES' },
+          },
+        },
+      },
+    });
+
+    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
+      'counter-claim-about'
+    );
+  });
+
+  it('routes counter-claim-have-you-applied-for-help to counter-claim-against-whom when HWF YES, applied YES, and multiple parties', async () => {
+    const req = createReq({
+      data: {
+        possessionClaimResponse: {
+          currentDefendantPartyId: 'def-1',
+          defendantResponses: {
+            counterClaim: { needHelpWithFees: 'YES', appliedForHwf: 'YES' },
+          },
+        },
+        allDefendants: [
+          { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } },
+          { id: 'def-2', value: { firstName: 'Other', lastName: 'Defendant' } },
+        ],
+        allClaimants: [{ id: 'claim-1', value: { orgName: 'Landlord Org' } }],
+      },
+    });
+
+    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
+      'counter-claim-against-whom'
+    );
+  });
+
+  it('routes counter-claim-fee forward to counter-claim-about when needHelpWithFees is NO and not multiple parties', async () => {
+    const req = createReq({
+      data: {
+        possessionClaimResponse: {
+          currentDefendantPartyId: 'def-1',
+          defendantResponses: {
+            counterClaim: { needHelpWithFees: 'NO' },
+          },
+        },
+        allDefendants: [{ id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } }],
+        allClaimants: [{ id: 'claim-1', value: { orgName: 'Landlord Org' } }],
+      },
+    });
+
+    await expect(getNextStep(req, 'counter-claim-fee', flowConfig, {})).resolves.toBe('counter-claim-about');
+  });
+
+  it('routes counter-claim HWF step to you-need-to-apply when user has not applied for HWF (NO)', async () => {
+    const req = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaim: { needHelpWithFees: 'YES', appliedForHwf: 'NO' },
+          },
+        },
+      },
+    });
+
+    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
+      'counter-claim-you-need-to-apply-for-help-with-your-fees'
+    );
+  });
+
+  it('HWF show condition helpers are derived from CCD counterClaim data', () => {
+    const appliedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaim: { appliedForHwf: 'YES' },
+          },
+        },
+      },
+    });
+    const notAppliedReq = createReq({
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            counterClaim: { appliedForHwf: 'NO' },
+          },
+        },
+      },
+    });
+    const noDataReq = createReq({});
+
+    expect(hasAppliedForCounterClaimHwf(appliedReq)).toBe(true);
+    expect(hasAppliedForCounterClaimHwf(notAppliedReq)).toBe(false);
+    expect(hasAppliedForCounterClaimHwf(noDataReq)).toBe(false);
+
+    expect(hasNotAppliedForCounterClaimHwf(notAppliedReq)).toBe(true);
+    expect(hasNotAppliedForCounterClaimHwf(appliedReq)).toBe(false);
+    expect(hasNotAppliedForCounterClaimHwf(noDataReq)).toBe(false);
   });
 });

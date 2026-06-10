@@ -1,3 +1,4 @@
+export { isSomethingElseCounterClaim } from './isSomethingElseCounterClaim';
 export { isDefendantNameKnown } from './isDefendantNameKnown';
 export { isWalesProperty } from './isWalesProperty';
 export { isNoticeDateProvided } from './isNoticeDateProvided';
@@ -43,8 +44,10 @@ export {
   isLegalRepresentativeUser,
 } from './userRole';
 export { getPreviousStepForCounterClaimAbout } from './getPreviousStepForCounterClaimAbout';
-export { formatDatePartsToISODate, parseISOToDateParts } from './dateUtils';
+export { formatDatePartsToISODate, formatIsoDate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
+export { counterClaimUploadWanted } from './counterClaimUploadWanted';
 export { hasMultipleParties } from './hasMultipleParties';
+export { isSingleLinkedDefendant } from './isSingleLinkedDefendant';

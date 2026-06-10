@@ -14,10 +14,12 @@ const logger = Logger.getLogger('confirmation-of-notice-date-when-not-provided')
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-date-when-not-provided',
+  isAnswered: () => true,
   stepDir: __dirname,
   customTemplate: `${__dirname}/confirmationOfNoticeDateWhenNotProvided.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    caseNumber: 'caseNumber',
     subTitle: 'subTitle',
     question: 'question',
     paragraph: 'paragraph',

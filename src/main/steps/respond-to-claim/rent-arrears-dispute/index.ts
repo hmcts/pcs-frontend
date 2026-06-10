@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import { currency } from '../../../modules/nunjucks/filters/currency';
-import { getTranslationFunction } from '../../../modules/steps';
+import { getTranslation, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -14,6 +14,7 @@ const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 d
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'rent-arrears-dispute',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.rentArrearsAmountConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
@@ -45,7 +46,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const response = caseData?.possessionClaimResponse?.defendantResponses;
     const formValue = fromYesNoNotSureEnum(response?.rentArrearsAmountConfirmation);
 
@@ -71,8 +72,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const t = getTranslationFunction(req);
 
-    const insetIntroText = t('insetIntroText');
-    const insetDetailsText = t('insetDetailsText', { claimantName });
+    const insetIntroText = getTranslation(t, 'insetIntroText', '') ?? '';
+    const insetDetailsText = getTranslation(t, 'insetDetailsText', '', { claimantName }) ?? '';
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
     return {

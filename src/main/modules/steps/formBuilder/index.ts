@@ -7,6 +7,7 @@ import { createGetController } from '../controller';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
+import { wireFileUploadUrls } from './fileUploadUtils';
 import { getStaticBasePath, getStaticEntryStepId, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
@@ -58,6 +59,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     customTemplate,
     basePath: configuredBasePath,
     documentStorage,
+    isAnswered,
   } = config;
 
   if (!flowConfig) {
@@ -77,6 +79,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     stepDir,
     showCancelButton,
     documentStorage,
+    isAnswered,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
         await loadStepNamespace(req);
@@ -106,16 +109,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           interpolationValues as Record<string, unknown>
         ) as BuiltFormContent;
 
-        // Auto-wire upload/delete URLs for upload steps — identical in every upload step,
-        // so handled once here instead of duplicating extendGetContent on each step.
-        if (documentStorage) {
-          const urlBase = req.originalUrl.split('?')[0];
-          const fileField = formContent.fields?.find(f => f.componentType === 'fileUpload');
-          if (fileField?.component) {
-            fileField.component.uploadUrl = `${urlBase}/upload`;
-            fileField.component.deleteUrl = `${urlBase}/delete`;
-          }
-        }
+        wireFileUploadUrls(formContent, req, documentStorage);
 
         const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
         const result = extraContent ? { ...formContent, ...extraContent } : formContent;
@@ -145,7 +139,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       beforeRedirect,
       translationKeys,
       showCancelButton,
-      extendGetContent
+      extendGetContent,
+      documentStorage
     ),
   };
 }

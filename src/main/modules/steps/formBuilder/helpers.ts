@@ -18,7 +18,7 @@ export function getTranslation(
   fallback?: string,
   interpolation?: Record<string, unknown>
 ): string | undefined {
-  const options = { returnObjects: true, ...interpolation };
+  const options = { returnObjects: true, returnEmptyString: true, ...interpolation };
   const result = t(key, options) as unknown;
   if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
     return result;
@@ -501,7 +501,9 @@ export function validateForm(
             const customError = field.validate(value, formData, validationAllData);
             if (customError) {
               if (!errors[fieldName]) {
-                errors[fieldName] = customError;
+                errors[fieldName] = customError.startsWith('errors.')
+                  ? translations?.[customError.replace('errors.', '')] || customError
+                  : customError;
               }
             }
           } catch (err) {
@@ -514,7 +516,9 @@ export function validateForm(
           const customError = field.validate(value, formData, validationAllData);
           if (customError) {
             if (!errors[fieldName]) {
-              errors[fieldName] = customError;
+              errors[fieldName] = customError.startsWith('errors.')
+                ? translations?.[customError.replace('errors.', '')] || customError
+                : customError;
             }
           }
         } catch (err) {

@@ -33,14 +33,23 @@
 import { AxiosError } from 'axios';
 import config from 'config';
 
+import { ClientContextHeaders } from '../../types/global';
 import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import { CaseState } from '@services/ccdCase.interface';
-import type { CcdCase, CcdCaseData, CcdUserCases, StartCallbackData } from '@services/ccdCase.interface';
-import type { DashboardNotification, DashboardTaskGroup } from '@services/dashboard.interface';
-import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
+import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
+import type {
+  DashboardNotification,
+  DashboardRelatedApplication,
+  DashboardTaskGroup,
+} from '@services/dashboard.interface';
+import {
+  formatAddress,
+  unwrapNotifications,
+  unwrapRelatedApplications,
+  unwrapTaskGroups,
+} from '@utils/ccdDashboardUtils';
 
 const logger = Logger.getLogger('ccdCaseService');
 
@@ -52,6 +61,7 @@ export interface TransformedDashboardData {
   notifications: DashboardNotification[];
   taskGroups: DashboardTaskGroup[];
   propertyAddress: string | undefined;
+  relatedApplications: DashboardRelatedApplication[];
 }
 
 function getBaseUrl(): string {
@@ -62,7 +72,17 @@ function getCaseTypeId(): string {
   return config.get('ccd.caseTypeId');
 }
 
-function getCaseHeaders(token: string) {
+export type CaseHeaders = {
+  headers: {
+    Authorization: string;
+    experimental: boolean;
+    Accept: string;
+    'Content-Type': string;
+    'Client-Context'?: string;
+  };
+};
+
+function getCaseHeaders(token: string): CaseHeaders {
   return {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -99,7 +119,13 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
     return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
   }
 
-  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500);
+  const retryAfterHeader = axiosError.response?.headers?.['retry-after'];
+  const retryAfter =
+    status && [502, 503, 504, 429].includes(status) && typeof retryAfterHeader === 'string'
+      ? retryAfterHeader
+      : undefined;
+
+  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500, retryAfter);
 }
 
 /**
@@ -174,21 +200,33 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseById(accessToken: string, caseId: string, eventId: string = 'respondPossessionClaim'): Promise<CcdCase> {
+  async getCaseByIdForEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string = 'respondPossessionClaim',
+    clientContextHeaders?: ClientContextHeaders
+  ): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
-      logger.info(`[ccdCaseService] Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
-      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
-      logger.info(`[ccdCaseService] Case access validated successfully for caseId: ${caseId}`);
+      logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
+      const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
+
+      if (clientContextHeaders) {
+        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+      }
+
+      const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
+      logger.info(`Case access validated successfully for caseId: ${caseId}`);
 
       const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
+
       return {
         id: caseId,
         data: caseData,
       };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
+      const httpError = convertAxiosErrorToHttpError(error, 'getCaseByIdForEvent');
 
       // coerce 400 and 404 to 404 so we can return a 404 error to the client
       if (httpError.status === 400 || httpError.status === 404) {
@@ -198,46 +236,26 @@ export const ccdCaseService = {
     }
   },
 
-  async getCase(accessToken: string | undefined): Promise<CcdCase | null> {
-    const url = `${getBaseUrl()}/searchCases?ctid=${getCaseTypeId()}`;
-    const headersConfig = getCaseHeaders(accessToken || '');
-
-    const requestBody = {
-      query: { match_all: {} },
-      sort: [{ created_date: { order: 'desc' } }],
-    };
-
-    logger.info(`Calling ccdCaseService search with URL: ${url}`);
-    logger.info(`Request body: ${JSON.stringify(requestBody, null, 2)}`);
+  async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
+    const caseUrl = `${getBaseUrl()}/cases/${caseId}`;
 
     try {
-      const response = await http.post<CcdUserCases>(url, requestBody, headersConfig);
-      const allCases = response?.data?.cases;
-      logger.info(`Response data: ${JSON.stringify(response?.data?.cases, null, 2)}`);
-      const draftCase = allCases?.find(c => c.state === CaseState.DRAFT);
+      logger.debug(`Fetching case by id for read view: ${caseId}`);
+      const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
+      logger.debug(`Read case response for ${caseId}: ${JSON.stringify(response.data, null, 2)}`);
+      const caseData = response.data.data ?? {};
 
-      if (draftCase) {
-        logger.info(`Draft case found: ${JSON.stringify(draftCase, null, 2)}`);
-        return {
-          id: draftCase.id,
-          data: draftCase.case_data as CcdCaseData,
-        };
-      }
-
-      return null;
+      return {
+        id: String(response.data.id ?? caseId),
+        data: caseData,
+      };
     } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 404) {
-        logger.warn('No case found, returning null.');
-        return null;
+      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
+
+      if (httpError.status === 400 || httpError.status === 404) {
+        throw new HTTPError('Case not found', 404);
       }
-      if (axiosError.response?.status === 400) {
-        logger.warn(
-          `Bad request (400) when searching for cases. Response: ${JSON.stringify(axiosError.response?.data, null, 2)}`
-        );
-        return null;
-      }
-      throw convertAxiosErrorToHttpError(error, 'getCase');
+      throw httpError;
     }
   },
 
@@ -300,7 +318,7 @@ export const ccdCaseService = {
       throw new HTTPError('Cannot submit general application, case ID not specified', 500);
     }
 
-    const eventId = 'citizenCreateGenApp';
+    const eventId = 'makeAnApplication';
     const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
@@ -327,7 +345,8 @@ export const ccdCaseService = {
     draftEvent: { id: string; pageId: string },
     accessToken: string | undefined,
     caseId: string,
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
+    clientContextHeaders?: ClientContextHeaders
   ): Promise<CcdCase> {
     if (!caseId) {
       throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
@@ -347,8 +366,14 @@ export const ccdCaseService = {
       ignore_warning: false,
     };
 
+    const caseHeaders: CaseHeaders = getCaseHeaders(accessToken || '');
+
+    if (clientContextHeaders) {
+      caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+    }
+
     try {
-      const response = await http.post<{ data: CcdCaseData }>(url, payload, getCaseHeaders(accessToken || ''));
+      const response = await http.post<{ data: CcdCaseData }>(url, payload, caseHeaders);
       return {
         id: caseId,
         data: response.data?.data ?? {},
@@ -366,8 +391,9 @@ export const ccdCaseService = {
 
       const notifications = unwrapNotifications(raw.notifications);
       const taskGroups = unwrapTaskGroups(raw.taskGroups);
+      const relatedApplications = unwrapRelatedApplications(raw.relatedApplications);
 
-      return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress) };
+      return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress), relatedApplications };
     } catch (error) {
       const httpError = convertAxiosErrorToHttpError(error, 'getDashboardView');
       if (httpError.status === 400 || httpError.status === 404) {

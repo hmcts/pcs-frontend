@@ -8,8 +8,10 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-agreed',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.repaymentPlanAgreed),
   showCancelButton: false,
   stepDir: __dirname,
+  customTemplate: `${__dirname}/repaymentsAgreed.njk`,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
@@ -39,10 +41,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
+    heading: 'heading',
     question: 'question',
+    repaymentsAgreedQuestion: 'repaymentsAgreedQuestion',
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const pcr = caseData?.possessionClaimResponse as
       | {
           defendantResponses?: {
@@ -78,8 +82,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return initial;
   },
   extendGetContent: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    // TODO HDPI-5157: hardcode for now, wire claimIssueDate from START callback later
     const claimIssueDate = '20th May 2025';
 
     return {
@@ -118,5 +123,4 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
-  customTemplate: `${__dirname}/repaymentsAgreed.njk`,
 });

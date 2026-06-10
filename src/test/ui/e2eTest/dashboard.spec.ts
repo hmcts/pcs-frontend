@@ -1,8 +1,14 @@
-import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
+import {
+  citizenCreateGenAppApiData,
+  createCaseApiData,
+  respondPossessionClaimApiData,
+  submitCaseApiData,
+} from '../data/api-data';
+import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
 import { dashboard } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
-import { startEvidenceUpload } from '../data/page-data/documents-page-data';
-import { chooseAnApplication, viewAllApplications } from '../data/page-data/genApps-page-data';
+import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
+import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
@@ -21,9 +27,10 @@ test.beforeEach(async ({ page }, testInfo) => {
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
   await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
 });
 
@@ -107,6 +114,16 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       header: viewTheClaim.mainHeader,
     });
     await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.uploadAdditionalDocumentsLink,
+      header: startEvidenceUpload.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.viewDocumentsLink,
+      header: viewDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.courtHearingSubHeader,
       fieldName: dashboard.viewHearingDocumentsLink,
       header: viewHearingDocuments.mainHeader,
@@ -121,12 +138,55 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       fieldName: dashboard.askTheCourtToMakeAnOrderLink,
       header: chooseAnApplication.mainHeader,
     });
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData.citizenCreateGenAppPayload });
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction('reloadPage');
-    await performAction('clickLinkAndVerifySameTabTitle', {
-      sectionHeader: dashboard.applicationsSubHeader,
-      fieldName: dashboard.viewAllApplicationsLink,
-      header: viewAllApplications.mainHeader,
+    await performAction('validateViewAllApplications');
+  });
+
+  test('Validate notification and response status @regression @crossbrowser', async () => {
+    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
+    await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
+    await performValidation('text', { elementType: 'subHeader', text: dashboard.yourResponseSubHeader });
+    await performAction('verifyRespondToClaimNotificationAndTag', {
+      notificationText: dashboard.respondToClaimBeforeHearingParagraph,
+      responseLink: dashboard.startYourResponseLink,
+      respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
+      viewResponseHeader: dashboard.viewTheResponseSubHeader,
+      tag: dashboard.notStartedTag,
+      nextPageHeader: dashboard.respondToAPropertyHeader,
+    });
+    await performAction('verifyNavigationFromNotificationLink', {
+      responseLink: dashboard.startYourResponseLink,
+      nextPageHeader: dashboard.respondToAPropertyHeader,
+    });
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimMidEventApiData.respondPossessionClaimPayload,
+      type: 'midEvent',
+    });
+    await performAction('reloadPage');
+    await performAction('verifyRespondToClaimNotificationAndTag', {
+      notificationText: dashboard.completeClaimBeforeHearingParagraph,
+      responseLink: dashboard.continueYourResponseLink,
+      respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
+      viewResponseHeader: dashboard.viewTheResponseSubHeader,
+      tag: dashboard.inProgressTag,
+    });
+    await performAction('verifyNavigationFromNotificationLink', {
+      responseLink: dashboard.continueYourResponseLink,
+      nextPageHeader: dashboard.respondToAPropertyHeader,
+    });
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      type: 'submit',
+    });
+    await performAction('reloadPage');
+    await performAction('verifyRespondToClaimNotificationAndTag', {
+      notificationText: dashboard.respondedToClaimParagraph,
+      respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
+      viewResponseHeader: dashboard.viewTheResponseSubHeader,
+      tag: dashboard.completedTag,
+      viewResponseTag: dashboard.availableTag,
     });
   });
 });
