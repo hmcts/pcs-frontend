@@ -115,6 +115,8 @@ export class ActionRegistry {
     ['validateRTCSectionCYA', new RespondToClaimAction()],
     ['getCaseAPI', new CreateCaseAPIAction()],
     ['linkSolicitorAPI', new LinkSolicitorAPIAction()],
+    ['doYouWantToUploadFiles', new RespondToClaimAction()],
+    ['uploadFilesToSupportCounterclaim', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
