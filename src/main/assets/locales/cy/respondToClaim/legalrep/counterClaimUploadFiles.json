@@ -1,0 +1,8 @@
+{
+  "heading": "cyUpload files to support the counterclaim",
+  "guidanceText": "cyYou should only upload files that are relevant to the counterclaim.",
+  "guidanceText2": "cyAll parties will be able to see any files you upload.",
+  "errors": {
+    "documents": "cySelect a file to support the counterclaim"
+  }
+}
