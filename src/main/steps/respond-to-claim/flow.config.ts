@@ -1,6 +1,7 @@
 import { type Request } from 'express';
 
 import {
+  counterClaimUploadWanted,
   hasAnyRentArrearsGround,
   hasMadeCounterClaim,
   hasOnlyRentArrearsGrounds,
@@ -38,6 +39,7 @@ export const flowConfig: JourneyFlowConfig = {
   journeyName: 'respondToClaim',
   useShowConditions: true,
   useSessionFormData: false,
+  eventId: 'respondPossessionClaim',
   sections: respondToClaimSections,
   nonSectionStepOrder: ['end-now', 'task-list'],
   // First visible step of any section back-links to this hub step.
@@ -91,6 +93,12 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-fee': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
+    'counter-claim-do-you-want-to-upload-files': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-upload-files': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req) && counterClaimUploadWanted(req),
+    },
     'counter-claim-have-you-applied-for-help': {
       showCondition: (req: Request) => shouldShowCounterClaimHelpWithFeesStep(req),
     },
@@ -105,9 +113,6 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counter-claim-order-other-than-sum': {
       showCondition: (req: Request) => isSomethingElseCounterClaim(req),
-    },
-    'counter-claim-upload-documents': {
-      showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
