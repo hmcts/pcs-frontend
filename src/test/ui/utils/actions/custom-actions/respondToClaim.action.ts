@@ -499,7 +499,7 @@ export class RespondToClaimAction implements IAction {
         );
       } else if (addressData.addressLine1) {
         this.recordAnswer(
-          correspondenceAddress.correspondenceAddressUnKnownMainHeader,
+          correspondenceAddress.correspondenceAddressPostalMainHeader,
           this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
         );
         await performActions(
