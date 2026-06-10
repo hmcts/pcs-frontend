@@ -37,7 +37,11 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
   const tPayments = getTranslationFunction(req, ['respondToClaim/checkYourAnswersPaymentsAndAgreements', 'common']);
   const tCircumstances = getTranslationFunction(req, ['respondToClaim/checkYourAnswersYourCircumstances', 'common']);
   const tIncome = getTranslationFunction(req, ['respondToClaim/checkYourAnswersIncomeAndExpenses', 'common']);
-  const tDocuments = getTranslationFunction(req, ['respondToClaim/checkYourAnswersDocuments', 'common']);
+  const tDocuments = getTranslationFunction(req, [
+    'respondToClaim/endOfJourneyCya',
+    'respondToClaim/checkYourAnswersDocuments',
+    'common',
+  ]);
 
   const claimantName = getValidatedCase(req)?.claimantName ?? '';
   const sections: EndOfJourneyCyaSection[] = [];

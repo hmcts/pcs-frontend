@@ -17,6 +17,9 @@
     "languageUsed": "Language used"
   },
   "rows": {
+    "uploadedDocuments": {
+      "label": "Upload any files that you think are relevant to your response"
+    },
     "otherConsiderations": {
       "label": "Is there anything else you want to tell the court as part of your response?",
       "changeHidden": "whether there is anything else you want to tell the court as part of your response"

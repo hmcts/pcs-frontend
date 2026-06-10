@@ -26,6 +26,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
@@ -50,6 +51,7 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
   uploadFiles,
+  uploadFilesToSupportYourCounterclaim,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -189,6 +191,8 @@ export class RespondToClaimAction implements IAction {
         'selectIfAnyOtherAdultsLiveInYourHouse',
         () => this.selectIfAnyOtherAdultsLiveInYourHouse(fieldName as actionRecord),
       ],
+      ['uploadFilesToSupportCounterclaim', () => this.uploadFilesToSupportCounterclaim(fieldName as actionRecord)],
+      ['doYouWantToUploadFiles', () => this.doYouWantToUploadFiles(fieldName as actionRecord)],
       ['taskList', () => this.taskList(fieldName as actionRecord)],
       ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
@@ -201,6 +205,10 @@ export class RespondToClaimAction implements IAction {
       ['selectPriorityDebts', () => this.selectPriorityDebts(fieldName as actionRecord)],
       ['enterPriorityDebtDetails', () => this.enterPriorityDebtDetails(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
+      [
+        'selectDoYouWantToUploadDocFoCounterclaim',
+        () => this.selectDoYouWantToUploadDocFoCounterclaim(fieldName as actionRecord),
+      ],
       ['otherConsiderations', () => this.otherConsiderations(fieldName as actionRecord)],
       ['uploadFiles', () => this.uploadFiles(fieldName as actionRecord)],
       ['selectWhatAreYouClaimingFor', () => this.selectWhatAreYouClaimingFor(fieldName as actionRecord)],
@@ -1149,6 +1157,14 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', priorityDebts.saveAndContinueButton);
   }
 
+  private async selectDoYouWantToUploadDocFoCounterclaim(uploadOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader,
+      option: uploadOption.option,
+    });
+    await performAction('clickButton', doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton);
+  }
+
   private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
     this.recordAnswer(
       priorityDebtDetails.whatIsTheTotalAmountQuestion,
@@ -1319,6 +1335,20 @@ export class RespondToClaimAction implements IAction {
       this.recordAnswer(rtcUploadedDocumentsQuestion, rtcNoDocumentsUploadedValue);
     }
     await performAction('clickButton', uploadFiles.saveAndContinueButton);
+  }
+
+  private async doYouWantToUploadFiles(uploadOption: actionRecord): Promise<void> {
+    this.recordAnswer(doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader, uploadOption);
+    await performAction('clickRadioButton', {
+      question: doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader,
+      option: uploadOption.option,
+    });
+    await performAction('clickButton', doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton);
+  }
+
+  private async uploadFilesToSupportCounterclaim(uploadCounterClaimFiles: actionRecord): Promise<void> {
+    await performAction('uploadFile', uploadCounterClaimFiles.files);
+    await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   }
 
   private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {
