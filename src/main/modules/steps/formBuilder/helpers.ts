@@ -501,7 +501,9 @@ export function validateForm(
             const customError = field.validate(value, formData, validationAllData);
             if (customError) {
               if (!errors[fieldName]) {
-                errors[fieldName] = customError;
+                errors[fieldName] = customError.startsWith('errors.')
+                  ? translations?.[customError.replace('errors.', '')] || customError
+                  : customError;
               }
             }
           } catch (err) {
@@ -514,7 +516,9 @@ export function validateForm(
           const customError = field.validate(value, formData, validationAllData);
           if (customError) {
             if (!errors[fieldName]) {
-              errors[fieldName] = customError;
+              errors[fieldName] = customError.startsWith('errors.')
+                ? translations?.[customError.replace('errors.', '')] || customError
+                : customError;
             }
           }
         } catch (err) {
