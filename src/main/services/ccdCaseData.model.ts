@@ -255,6 +255,10 @@ export class CcdCaseModel {
     return this.defendantResponses?.landlordLicensed ?? undefined;
   }
 
+  get defendantResponsesCounterClaimWantToUploadFiles(): string | undefined {
+    return this.defendantResponses?.counterClaimWantToUploadFiles ?? undefined;
+  }
+
   get introGroundsIntroductoryDemotedOrOtherGrounds(): string[] {
     return this.data.introGrounds_IntroductoryDemotedOrOtherGrounds ?? [];
   }

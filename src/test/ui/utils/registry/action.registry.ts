@@ -47,6 +47,7 @@ export class ActionRegistry {
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
     ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
     ['citizenDashboard', new CitizenDashboardAction()],
+    ['validateViewAllApplications', new CitizenDashboardAction()],
     ['verifyRespondToClaimNotificationAndTag', new CitizenDashboardAction()],
     ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
@@ -111,6 +112,8 @@ export class ActionRegistry {
     ['retrieveCYATableDataRTC', new RespondToClaimAction()],
     ['validateCYARTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
+    ['doYouWantToUploadFiles', new RespondToClaimAction()],
+    ['uploadFilesToSupportCounterclaim', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
