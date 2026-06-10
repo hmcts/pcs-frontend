@@ -50,6 +50,8 @@ const legalRepStepOrder = [
   'end-now',
 ] as const satisfies readonly LegalRepRespondToClaimStepName[];
 
+//empty space
+
 // Legal-rep journey is a flat, linear stepOrder. It is intentionally NOT sectionalised
 // (citizen is). Construct explicitly instead of spreading citizenFlowConfig so we don't
 // silently inherit `sections` / `nonSectionStepOrder` and have the engine pick
