@@ -1,4 +1,4 @@
-import type { Request, RequestHandler } from 'express';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { getUserType } from '../utils';
 
@@ -32,7 +32,7 @@ export function respondToClaimAccessGuard(): RequestHandler {
 
     const caseId = req.res?.locals.validatedCase?.id;
     if (!caseId) {
-      return next();
+      return failClosedWhenCaseMissing(req, res, next, hubStepName);
     }
 
     const hubUrl = getStepUrl(hubStepName, flowConfig, caseId);
@@ -73,6 +73,18 @@ export function respondToClaimAccessGuard(): RequestHandler {
 
 function shouldSkipGuard(req: Request): boolean {
   return req.method !== 'GET' || getUserType(req) === 'legalrep';
+}
+
+// requireEventAccess loads validatedCase before this guard (see registerAllJourneys); reaching
+// here without it means the guard is mis-wired, so deny the step rather than wave it through.
+function failClosedWhenCaseMissing(req: Request, res: Response, next: NextFunction, hubStepName: string): void {
+  logger.error('accessGuard ran without validatedCase — must be mounted after requireEventAccess');
+  const caseRef = typeof req.params?.caseReference === 'string' ? req.params.caseReference : undefined;
+  if (caseRef) {
+    res.redirect(303, getStepUrl(hubStepName, flowConfig, caseRef));
+    return;
+  }
+  next();
 }
 
 function isCyaStep(stepName: string): boolean {
