@@ -200,7 +200,14 @@ describe('finalSubmit routes', () => {
         id: '1234567890123456',
         data: {
           possessionClaimResponse: {
-            defendantResponses: { makeCounterClaim: 'YES', counterClaim: { hwfReferenceNumber: '' } },
+            defendantResponses: {
+              makeCounterClaim: 'YES',
+              counterClaim: {
+                hwfReferenceNumber: '',
+                isClaimAmountKnown: 'YES',
+                claimAmount: '250000',
+              },
+            },
           },
         },
       };
@@ -224,6 +231,7 @@ describe('finalSubmit routes', () => {
           caseReference: '1234567890123456',
           serviceRequestReference: 'SR-123',
           feeAmount: 404,
+          counterClaimAmountInPence: '250000',
         })
       );
       expect(res.redirect).toHaveBeenCalledWith(

@@ -16,6 +16,7 @@ import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import { requireEventAccess } from '../middleware/requireEventAccess';
 import { http } from '../modules/http';
+import { getCounterClaimAmountInPence } from '../steps/utils/counterClaimAmount';
 import { getRespondToClaimSubmitNavigation } from '../steps/utils/postSubmissionRouting';
 
 import { Logger } from '@modules/logger';
@@ -157,10 +158,12 @@ export default function finalSubmitRoutes(app: Application): void {
       );
 
       if (counterClaimFeePaymentRequired) {
+        const counterClaim = validatedCase.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
         setPaymentSessionState(req, {
           caseReference: caseId,
-          serviceRequestReference: paymentPayload!.serviceRequestReference!,
+          serviceRequestReference: paymentPayload!.serviceRequestReference,
           feeAmount: paymentPayload!.feeAmount,
+          counterClaimAmountInPence: getCounterClaimAmountInPence(counterClaim),
         });
       }
 
