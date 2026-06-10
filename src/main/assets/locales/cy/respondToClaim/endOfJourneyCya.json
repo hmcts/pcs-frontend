@@ -17,6 +17,9 @@
     "languageUsed": "cy Language used"
   },
   "rows": {
+    "uploadedDocuments": {
+      "label": "cy Upload any files that you think are relevant to your response"
+    },
     "otherConsiderations": {
       "label": "cy Is there anything else you want to tell the court as part of your response?",
       "changeHidden": "cy whether there is anything else you want to tell the court as part of your response"
