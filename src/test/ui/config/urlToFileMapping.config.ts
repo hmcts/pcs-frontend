@@ -75,4 +75,7 @@ export default {
   'reasonable-adjustments-triage': 'reasonableAdjustmentsTriage',
   'task-list': 'taskList',
   'confirm-if-these-documents-relate-to-an-application': 'confirmIfTheseDocumentsRelateToAnApplication',
+  'response-submitted-counter-claim-fee-payment-needed': 'responseSubmittedCounterclaimFeePaymentNeeded',
+  'response-and-counter-claim-submitted': 'responseAndCounterClaimSubmitted',
+  'response-submitted': 'responseSubmitted',
 };

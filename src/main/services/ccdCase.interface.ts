@@ -234,7 +234,9 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  counterClaimWantToUploadFiles?: YesNoValue;
   completedSections?: RespondToClaimSectionEnum[];
+  status?: 'SUBMITTED' | 'CREATED';
 }
 
 export interface PossessionClaimResponse {
@@ -303,6 +305,10 @@ export interface CcdCaseDocument {
 export interface CcdCase {
   id: string;
   data: CcdCaseData;
+  after_submit_callback_response?: {
+    confirmation_header?: string | null;
+    confirmation_body?: string | null;
+  };
 }
 
 /** Links object in CCD START callback response. */
@@ -396,4 +402,15 @@ export interface CitizenGenAppRequest {
   sotAccepted?: YesNoValue;
   sotFullName?: string;
   clientReference?: string;
+}
+
+export enum GenAppState {
+  PENDING_GEN_APP_ISSUED = 'PENDING_GEN_APP_ISSUED',
+  GEN_APP_ISSUED = 'GEN_APP_ISSUED',
+}
+
+export interface MakeAnApplicationResponse {
+  state?: GenAppState;
+  serviceRequestReference?: string;
+  feeAmount?: number;
 }

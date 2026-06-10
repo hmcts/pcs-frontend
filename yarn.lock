@@ -5128,12 +5128,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-commandline@npm:2.42.0":
-  version: 2.42.0
-  resolution: "allure-commandline@npm:2.42.0"
+"allure-commandline@npm:2.42.1":
+  version: 2.42.1
+  resolution: "allure-commandline@npm:2.42.1"
   bin:
     allure: bin/allure
-  checksum: 10/8744e61be5dd4260ba458c48e06869c86c0048d27d82b35f3f2e4d68f0c4fdddb367995969f04458cf9daf95db5800d21bff0c7da1dec7f6ad56cc9abee6030e
+  checksum: 10/c69ce036a01e66cd06d9828f2a863c4f440b993a5110026147bded94188148b9736bc6a3ea1c50d1ac7736d7db8db6d29d8bea28189707636e6c125a97eff8d5
   languageName: node
   linkType: hard
 
@@ -11797,7 +11797,7 @@ __metadata:
     "@types/webpack-env": "npm:1.18.8"
     "@typescript-eslint/eslint-plugin": "npm:8.60.1"
     "@typescript-eslint/parser": "npm:8.60.1"
-    allure-commandline: "npm:2.42.0"
+    allure-commandline: "npm:2.42.1"
     allure-js-commons: "npm:3.9.0"
     allure-playwright: "npm:3.9.0"
     axios: "npm:1.17.0"
@@ -12289,11 +12289,11 @@ __metadata:
   linkType: hard
 
 "protobufjs@npm:^8.0.0":
-  version: 8.5.0
-  resolution: "protobufjs@npm:8.5.0"
+  version: 8.6.1
+  resolution: "protobufjs@npm:8.6.1"
   dependencies:
     long: "npm:^5.3.2"
-  checksum: 10/31fc8237b3d77a22e41f3aba75223dd254ceb85491de74595201830ddf49e14b785bde80fbacb2a01e6c7084906a43d3587759dbcd96b6cc8646b288da9efe19
+  checksum: 10/67ed945a9512e145578ab2ee33ce46fcbc51afe9660003a82be09c5ce6821f8d394902279bd086b2851c2edcf32f08591b3403a4e5ebe18aad549bfb6794e553
   languageName: node
   linkType: hard
 
@@ -12943,11 +12943,11 @@ __metadata:
   linkType: hard
 
 "semver@npm:^7.5.2":
-  version: 7.8.2
-  resolution: "semver@npm:7.8.2"
+  version: 7.8.3
+  resolution: "semver@npm:7.8.3"
   bin:
     semver: bin/semver.js
-  checksum: 10/52221d8f1cadacda3cc3f0a2e7f7146e0442c7f4219acb25970bed055f5d0a6afbba5f22e293b078c2e93fca3dce0a08b088485e8b75d32a165f16c3627091c8
+  checksum: 10/4386558b6d44616512ca55dd2ed37ea6449f97df13e1e44b8afd41d1f21889912ec1fb80e41a3f26a701fad5b0a621752bea183ff74d565dd1fc6e9ca4c734d7
   languageName: node
   linkType: hard
 

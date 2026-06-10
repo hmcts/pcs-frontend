@@ -37,6 +37,7 @@ import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import { MakeAnApplicationResponse } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type {
   DashboardNotification,
@@ -108,7 +109,13 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
     return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
   }
 
-  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500);
+  const retryAfterHeader = axiosError.response?.headers?.['retry-after'];
+  const retryAfter =
+    status && [502, 503, 504, 429].includes(status) && typeof retryAfterHeader === 'string'
+      ? retryAfterHeader
+      : undefined;
+
+  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500, retryAfter);
 }
 
 /**
@@ -284,7 +291,10 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
   },
 
-  async submitGeneralApplication(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+  async submitGeneralApplication(
+    accessToken: string | undefined,
+    ccdCase: CcdCase
+  ): Promise<MakeAnApplicationResponse> {
     if (!ccdCase.id) {
       throw new HTTPError('Cannot submit general application, case ID not specified', 500);
     }
@@ -294,7 +304,14 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
-    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data).then(responseData => {
+      const confirmationBodyJson = responseData.after_submit_callback_response?.confirmation_body;
+      if (confirmationBodyJson) {
+        return JSON.parse(confirmationBodyJson) as MakeAnApplicationResponse;
+      } else {
+        throw new HTTPError('No confirmation body found in response data', 500);
+      }
+    });
   },
 
   async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {

@@ -1,0 +1,28 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {{ govukPanel({
+    titleText: pageTitle
+  }) }}
+
+  <p class="govuk-body">{{ paragraph1 }}</p>
+  {% if paymentReferenceLine %}
+    <p class="govuk-body">{{ paymentReferenceLine }}</p>
+  {% endif %}
+  <p class="govuk-body">{{ paragraph2 }}</p>
+
+  {{ govukButton({
+    text: closeAndReturnToCaseOverview,
+    href: dashboardUrl,
+    classes: "govuk-!-margin-top-6"
+  }) }}
+{% endblock %}

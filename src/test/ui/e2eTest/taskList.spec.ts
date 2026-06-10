@@ -9,20 +9,16 @@ import {
   counterClaimAbout,
   counterClaimFee,
   counterClaimSpecificSumOfMoney,
-  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
-  endNow,
-  equalityAndDiversityEnd,
-  equalityAndDiversityStart,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
   freeLegalAdvice,
   incomeAndExpenses,
-  languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
   priorityDebtDetails,
@@ -39,7 +35,7 @@ import {
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
 let claimantName: string;
@@ -211,7 +207,9 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
@@ -289,18 +287,6 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
       status: 'Available',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
-    });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -308,7 +294,6 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
         taskList.incomeAndExpensesLink,
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
       ],
       status: 'Done',
     });

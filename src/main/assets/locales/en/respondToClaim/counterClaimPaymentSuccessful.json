@@ -1,0 +1,7 @@
+{
+  "pageTitle": "Payment successful",
+  "paragraph1": "Your payment was successful and your counterclaim has been submitted.",
+  "paymentReference": "Your payment reference number is: {{paymentReference}}",
+  "paragraph2": "We’ve sent you a confirmation email.",
+  "closeAndReturnToCaseOverview": "Close and return to case overview"
+}
