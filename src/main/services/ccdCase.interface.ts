@@ -234,6 +234,7 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  counterClaimWantToUploadFiles?: YesNoValue;
   statementOfTruthCompletedBy?: string;
   completedSections?: RespondToClaimSectionEnum[];
 }
