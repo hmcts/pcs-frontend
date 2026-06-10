@@ -19,7 +19,10 @@
       },
       hint: component.hint,
       errorMessage: component.errorMessage,
-      attributes: { accept: component.accept }
+      attributes: {
+        accept: component.accept,
+        tabindex: "-1"
+      }
     }) }}
     {{ govukButton({
       text: uploadButtonText,

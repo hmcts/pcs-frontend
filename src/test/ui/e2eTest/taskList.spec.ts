@@ -9,13 +9,13 @@ import {
   counterClaimAbout,
   counterClaimFee,
   counterClaimSpecificSumOfMoney,
-  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
   endNow,
   equalityAndDiversityEnd,
   equalityAndDiversityStart,
@@ -211,7 +211,9 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
