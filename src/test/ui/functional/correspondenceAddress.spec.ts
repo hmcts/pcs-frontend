@@ -64,7 +64,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.radio,
       inputArray: correspondenceAddress.errorValidationField.errorRadioMsg,
-      question: correspondenceAddress.correspondenceAddressKnownMainHeader,
+      question: correspondenceAddress.correspondenceAddressPostalMainHeader,
       header: correspondenceAddress.errorValidationHeader,
     });
     await performAction('clickRadioButton', correspondenceAddress.noRadioOption);

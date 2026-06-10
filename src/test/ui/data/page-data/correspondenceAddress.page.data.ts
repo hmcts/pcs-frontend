@@ -1,7 +1,24 @@
 import { address } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { createCaseApiData } from '../api-data/createCase.api.data';
+
+function getDefaultPostalAddress(): string {
+  const propertyAddress = createCaseApiData.createCasePayload.propertyAddress;
+  return [
+    propertyAddress.AddressLine1,
+    propertyAddress.AddressLine2,
+    propertyAddress.AddressLine3,
+    propertyAddress.PostTown,
+    propertyAddress.County,
+    propertyAddress.PostCode,
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
 export const correspondenceAddress = {
-  get correspondenceAddressKnownMainHeader(): string {
-    return `Is your correspondence address ${address}?`;
+  get correspondenceAddressPostalMainHeader(): string {
+    const postalAddress = process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN' ? getDefaultPostalAddress() : address;
+    return `Is your postal address ${postalAddress}?`;
   },
   correspondenceAddressUnKnownMainHeader: `What’s your correspondence address?`,
   correspondenceAddressUnKnownParagraph: `Your correspondence address is your postal address.`,

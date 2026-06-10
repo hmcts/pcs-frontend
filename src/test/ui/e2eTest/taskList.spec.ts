@@ -153,7 +153,8 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,

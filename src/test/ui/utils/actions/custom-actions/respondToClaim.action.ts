@@ -474,40 +474,47 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
+    await performValidation('mainHeader', correspondenceAddress.correspondenceAddressPostalMainHeader);
     await performAction('clickRadioButton', {
       question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
     });
+    this.recordAnswer(correspondenceAddress.correspondenceAddressPostalMainHeader, addressData.radioOption);
+
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
-      await this.selectCorrespondenceAddressUnKnown(addressData);
-    } else {
-      this.recordAnswer(correspondenceAddress.correspondenceAddressKnownMainHeader, addressData.radioOption);
-      await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+      if (addressData.addressIndex) {
+        await performActions(
+          'Find Address based on postcode',
+          ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
+          ['clickButton', correspondenceAddress.findAddressHiddenButton],
+          ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
+        );
+      } else if (addressData.addressLine1) {
+        this.recordAnswer(
+          correspondenceAddress.correspondenceAddressUnKnownMainHeader,
+          this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
+        );
+        await performActions(
+          'Enter Address Manually',
+          ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
+          ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
+          ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
+          ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
+        );
+      }
     }
+
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressUnKnown(addressData: actionRecord) {
-    if (addressData.addressIndex) {
-      await performActions(
-        'Find Address based on postcode',
-        ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
-        ['clickButton', correspondenceAddress.findAddressHiddenButton],
-        ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
-      );
-    } else if (addressData.addressLine1) {
-      this.recordAnswer(
-        correspondenceAddress.correspondenceAddressUnKnownMainHeader,
-        this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
-      );
-      await performActions(
-        'Enter Address Manually',
-        ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
-        ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
-        ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
-        ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
-      );
-    }
-    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await this.selectCorrespondenceAddressKnown({
+      radioOption: addressData.option ?? correspondenceAddress.noRadioOption,
+      addressIndex: addressData.addressIndex,
+      postcode: addressData.postcode,
+      addressLine1: addressData.addressLine1,
+      townOrCity: addressData.townOrCity,
+    });
   }
 
   private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord) {

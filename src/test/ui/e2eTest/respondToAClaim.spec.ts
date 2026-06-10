@@ -186,6 +186,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else if (testInfo.title.includes('@assured')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   } else if (testInfo.title.includes('@secureFlexible')) {
@@ -246,7 +247,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -430,7 +432,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -579,7 +582,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -650,7 +654,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails');
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -817,7 +822,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -1006,7 +1012,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -1882,7 +1889,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
