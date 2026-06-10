@@ -16,9 +16,6 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
-  endNow,
-  equalityAndDiversityEnd,
-  equalityAndDiversityStart,
   exceptionalHardship,
   freeLegalAdvice,
   incomeAndExpenses,
@@ -33,7 +30,7 @@ import {
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  yourCircumstances,
+  yourCircumstances
 } from '../data/page-data';
 import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
