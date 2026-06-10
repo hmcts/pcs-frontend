@@ -136,17 +136,56 @@
     "textareaDescriptionText": "You can enter up to %{count} characters"
   },
   "errorPages": {
-    "403": {
-      "title": "Not Authorised",
-      "paragraph": "Sorry you do not have access to this account."
-    },
-    "404": {
+    "pageNotFound": {
       "title": "Page not found",
-      "paragraph": "This could be because you’ve followed a broken or outdated link, or because there’s an error on our site. Use the browser back button to go to the previous page."
+      "paragraph": "If you typed the web address, check it is correct.",
+      "paragraph2": "If you pasted the web address, check you copied the entire address.",
+      "paragraph3": "If the web address is correct or you selected a link or button, contact us by email or telephone.",
+      "heading": "Email",
+      "paragraph4": "Use the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
+      "paragraph5": "If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.",
+      "heading2": "Telephone",
+      "paragraph6": "0300 123 7050",
+      "paragraph7": "Monday to Friday, 8.30am to 5pm.",
+      "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
-    "500": {
-      "title": "Sorry, we’re having technical problems",
-      "paragraph": "Please try again in a few minutes."
+    "serviceUnavailable": {
+      "title": "Sorry, the service is unavailable",
+      "paragraphMinutes": "You will be able to use the service in {{minutes}} minutes.",
+      "paragraphDateAndTime": "You will be able to use the service from {{time}} on {{date}}.",
+      "paragraphFallback": "Try again later.",
+      "paragraph2": "For help with your case, contact us by email or telephone.",
+      "heading": "Email",
+      "paragraph3": "Use the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
+      "paragraph4": "If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.",
+      "heading2": "Telephone",
+      "paragraph5": "0300 123 7050",
+      "paragraph6": "Monday to Friday, 8.30am to 5pm.",
+      "paragraph7": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
+    },
+    "technicalError": {
+      "title": "Sorry, there is a problem with the service",
+      "paragraph": "Try again later.",
+      "paragraph2": "We saved your answers. They will be available for 30 days.",
+      "paragraph3": "For help with your case, contact us by email or telephone.",
+      "heading": "Email",
+      "paragraph4": "Use the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
+      "paragraph5": "If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.",
+      "heading2": "Telephone",
+      "paragraph6": "0300 123 7050",
+      "paragraph7": "Monday to Friday, 8.30am to 5pm.",
+      "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
+    },
+    "accessDenied": {
+      "title": "You do not have access to this page",
+      "paragraph": "Contact us if you think you should have access, or if you need help with your case.",
+      "heading": "Email",
+      "paragraph2": "Use the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
+      "paragraph3": "If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.",
+      "heading2": "Telephone",
+      "paragraph4": "0300 123 7050",
+      "paragraph5": "Monday to Friday, 8.30am to 5pm.",
+      "paragraph6": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     }
   },
   "applicationErrors": {
