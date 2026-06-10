@@ -5,22 +5,6 @@ import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 
-function formatPounds(amount: number | string | undefined): string | undefined {
-  if (amount === undefined || amount === null || amount === '') {
-    return undefined;
-  }
-
-  const numericAmount = typeof amount === 'string' ? Number(amount) : amount;
-  if (Number.isNaN(numericAmount)) {
-    return undefined;
-  }
-
-  return new Intl.NumberFormat('en-GB', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(numericAmount);
-}
-
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-application-fee-amount',
   stepDir: __dirname,
@@ -52,8 +36,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const counterClaimFee = await getFee(feeType, claimAmountInPence);
 
     const t = getTranslationFunction(req);
-    const formattedCounterClaimAmount = formatPounds(penceToPounds(claimAmountInPence));
-    const formattedCounterClaimFee = formatPounds(counterClaimFee) ?? '0.00';
+    const counterClaimAmountPounds = claimAmountInPence ? penceToPounds(claimAmountInPence) : undefined;
+    const counterClaimAmount = counterClaimAmountPounds !== undefined ? Number(counterClaimAmountPounds) : undefined;
     const caseReference = req.params.caseReference;
     const serviceRequestReference = req.session.payment?.serviceRequestReference;
     const payNowUrl = caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
@@ -62,9 +46,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const showPaymentError = paymentQuery === 'failed' || paymentQuery === 'pending';
 
     return {
-      counterClaimAmount: formattedCounterClaimAmount,
-      counterClaimFee: formattedCounterClaimFee,
-      payNowButton: t('payNowButton', { counterClaimFee: formattedCounterClaimFee }),
+      formattedCounterClaimAmount:
+        counterClaimAmount !== undefined ? t('counterClaimAmountDisplay', { counterClaimAmount }) : undefined,
+      formattedCounterClaimFee: t('counterClaimFeeDisplay', { counterClaimFee }),
+      payNowButton: t('payNowButton', { counterClaimFee }),
       payNowUrl,
       payNowDisabled,
       showPaymentError,

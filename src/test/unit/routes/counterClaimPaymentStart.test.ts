@@ -32,8 +32,9 @@ jest.mock('config', () => ({
   }),
 }));
 
-import type { Application, Request, Response } from 'express';
+import type { Application, NextFunction, Request, Response } from 'express';
 
+import { HTTPError } from '../../../main/HttpError';
 import counterClaimPaymentStartRoutes from '../../../main/routes/counterClaimPaymentStart';
 
 describe('counterClaimPaymentStart routes', () => {
@@ -57,8 +58,28 @@ describe('counterClaimPaymentStart routes', () => {
     );
   });
 
+  it('returns 401 via error middleware when access token is missing', async () => {
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const req = {
+      params: { caseReference: '123' },
+      session: {
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+        },
+      },
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(new HTTPError('Authentication required', 401));
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
   it('redirects to fee page when service request reference is missing', async () => {
-    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     const req = {
       params: { caseReference: '123' },
       session: {
@@ -67,14 +88,15 @@ describe('counterClaimPaymentStart routes', () => {
       },
     } as unknown as Request;
     const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
 
-    await handler(req, res);
+    await handler(req, res, next);
 
     expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
   });
 
   it('creates card payment and redirects to gov pay nextUrl', async () => {
-    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     mockStartCardPaymentRequest.mockResolvedValue({
       paymentReference: 'RC-1',
       paymentStatus: 'Created',
@@ -93,8 +115,9 @@ describe('counterClaimPaymentStart routes', () => {
       },
     } as unknown as Request;
     const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
 
-    await handler(req, res);
+    await handler(req, res, next);
 
     expect(mockStartCardPaymentRequest).toHaveBeenCalledWith(
       expect.objectContaining({

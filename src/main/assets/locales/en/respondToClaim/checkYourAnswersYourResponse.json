@@ -123,6 +123,15 @@
     "otherOrderRequestFacts": {
       "label": "What facts would you like the court to consider when deciding the claim?",
       "changeHidden": "facts for the court"
+    },
+    "counterClaimWantToUploadFiles": {
+      "label": "Do you want to upload files to support your counterclaim?",
+      "changeHidden": "upload files for counterclaim"
+    },
+    "counterClaimDocuments": {
+      "label": "Uploaded files",
+      "changeHidden": "uploaded files for counterclaim",
+      "none": "No files uploaded"
     }
   }
 }

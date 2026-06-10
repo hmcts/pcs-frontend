@@ -43,8 +43,13 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
   const testedStep = step as unknown as CounterClaimApplicationFeeAmountStep;
   const tMock = jest.fn((key: string, options?: Record<string, unknown>) => {
     if (key === 'payNowButton') {
-      const interpolatedFee = typeof options?.counterClaimFee === 'string' ? options.counterClaimFee : '';
-      return `Pay your counterclaim fee (£${interpolatedFee})`;
+      return `Pay your counterclaim fee (£${options?.counterClaimFee})`;
+    }
+    if (key === 'counterClaimAmountDisplay') {
+      return `£${options?.counterClaimAmount}`;
+    }
+    if (key === 'counterClaimFeeDisplay') {
+      return `£${options?.counterClaimFee}`;
     }
     return key;
   });
@@ -56,7 +61,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     (getFee as jest.Mock).mockResolvedValue(377);
   });
 
-  it('returns formatted counterclaim amount, fee and interpolated pay button text when claim amount is known', async () => {
+  it('returns i18n-formatted counterclaim amount, fee and pay button text when claim amount is known', async () => {
     const content = await testedStep.extendGetContent({
       res: {
         locals: {
@@ -81,11 +86,14 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
 
     expect(getCounterClaimFeeType).toHaveBeenCalledWith('PAYMENT_OR_COMPENSATION', '64900');
     expect(getFee).toHaveBeenCalledWith('counterClaimRanged', '64900');
+    expect(tMock).toHaveBeenCalledWith('counterClaimAmountDisplay', { counterClaimAmount: 649 });
+    expect(tMock).toHaveBeenCalledWith('counterClaimFeeDisplay', { counterClaimFee: 377 });
+    expect(tMock).toHaveBeenCalledWith('payNowButton', { counterClaimFee: 377 });
     expect(content).toEqual(
       expect.objectContaining({
-        counterClaimAmount: '649.00',
-        counterClaimFee: '377.00',
-        payNowButton: 'Pay your counterclaim fee (£377.00)',
+        formattedCounterClaimAmount: '£649',
+        formattedCounterClaimFee: '£377',
+        payNowButton: 'Pay your counterclaim fee (£377)',
         payNowUrl: '/case/123/respond-to-claim/counter-claim-payment/start',
         payNowDisabled: false,
       })
@@ -120,8 +128,8 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     expect(getFee).toHaveBeenCalledWith(FeeType.counterClaimFlatFeeFEE0450, undefined);
     expect(content).toEqual(
       expect.objectContaining({
-        counterClaimAmount: undefined,
-        counterClaimFee: '154.00',
+        formattedCounterClaimAmount: undefined,
+        formattedCounterClaimFee: '£154',
         payNowDisabled: false,
       })
     );

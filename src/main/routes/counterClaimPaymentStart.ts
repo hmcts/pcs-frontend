@@ -1,6 +1,7 @@
 import config from 'config';
-import type { Application, Request, Response } from 'express';
+import type { Application, NextFunction, Request, Response } from 'express';
 
+import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { Logger } from '@modules/logger';
@@ -14,15 +15,14 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
   app.get(
     '/case/:caseReference/respond-to-claim/counter-claim-payment/start',
     oidcMiddleware,
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next: NextFunction) => {
       const caseReference = String(req.params.caseReference || '');
       const accessToken = req.session.user?.accessToken;
-      const serviceRequestReference = req.session.payment?.serviceRequestReference;
-      const feeAmount = req.session.payment?.feeAmount;
+      const { serviceRequestReference, feeAmount } = req.session.payment ?? {};
 
       if (!accessToken) {
         logger.error(`Missing access token when starting counterclaim payment for case ${caseReference}`);
-        return res.status(401).render('error', { error: 'Authentication required' });
+        return next(new HTTPError('Authentication required', 401));
       }
 
       if (!serviceRequestReference || feeAmount === undefined) {

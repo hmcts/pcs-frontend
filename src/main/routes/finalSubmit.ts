@@ -156,11 +156,11 @@ export default function finalSubmitRoutes(app: Application): void {
         paymentPayload
       );
 
-      if (counterClaimFeePaymentRequired && paymentPayload) {
+      if (counterClaimFeePaymentRequired) {
         setPaymentSessionState(req, {
           caseReference: caseId,
-          serviceRequestReference: paymentPayload.serviceRequestReference,
-          feeAmount: paymentPayload.feeAmount,
+          serviceRequestReference: paymentPayload!.serviceRequestReference!,
+          feeAmount: paymentPayload!.feeAmount,
         });
       }
 

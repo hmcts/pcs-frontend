@@ -1,7 +1,9 @@
 jest.mock('../../../../main/modules/steps', () => ({
   createFormStep: jest.fn(config => config),
+  getTranslationFunction: jest.fn(),
 }));
 
+import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-payment-successful';
 
 type CounterClaimPaymentSuccessfulStep = {
@@ -10,8 +12,19 @@ type CounterClaimPaymentSuccessfulStep = {
 
 describe('counter-claim-payment-successful step', () => {
   const testedStep = step as unknown as CounterClaimPaymentSuccessfulStep;
+  const tMock = jest.fn((key: string, options?: Record<string, unknown>) => {
+    if (key === 'paymentReference') {
+      return `Your payment reference number is: ${options?.paymentReference}`;
+    }
+    return key;
+  });
 
-  it('returns payment reference from session when present', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getTranslationFunction as jest.Mock).mockReturnValue(tMock);
+  });
+
+  it('returns interpolated payment reference line from session when present', () => {
     const content = testedStep.extendGetContent({
       session: {
         payment: {
@@ -20,14 +33,15 @@ describe('counter-claim-payment-successful step', () => {
       },
     });
 
-    expect(content.paymentReference).toBe('RC-123');
+    expect(tMock).toHaveBeenCalledWith('paymentReference', { paymentReference: 'RC-123' });
+    expect(content.paymentReferenceLine).toBe('Your payment reference number is: RC-123');
   });
 
-  it('returns undefined payment reference when not present in session', () => {
+  it('returns undefined payment reference line when not present in session', () => {
     const content = testedStep.extendGetContent({
       session: {},
     });
 
-    expect(content.paymentReference).toBeUndefined();
+    expect(content.paymentReferenceLine).toBeUndefined();
   });
 });
