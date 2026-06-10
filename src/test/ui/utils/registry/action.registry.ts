@@ -13,6 +13,7 @@ import {
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
 import { LinkSolicitorAPIAction } from '../actions/custom-actions/linkSolicitorAPI.action';
+import { RespondToClaimLRAction } from '../actions/custom-actions/respondToClaimLR.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -139,6 +140,13 @@ export class ActionRegistry {
     ['counterClaimAbout', new RespondToClaimAction()],
     ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
+
+    //LR details below
+    ['selectNoticeDetailsLR', new RespondToClaimLRAction()],
+    ['enterTenancyStartDetailsUnKnownLR', new RespondToClaimLRAction()],
+    ['disputingOtherPartsOfTheClaimLR', new RespondToClaimLRAction()],
+    ['enterNoticeDateUnknownLR', new RespondToClaimLRAction()],
+    ['doesTheDependantHaveChildrenLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

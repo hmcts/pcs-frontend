@@ -13,6 +13,7 @@ export const nonRentArrearsDispute = {
   //anyDocumentsList: `any documents they’ve uploaded to support their claim`,
   //anyOtherList: `any other information they’ve given as part of their claim`,
   doYouWantToDisputeQuestion: `Do you want to dispute any other parts of the claim?`,
+  doesTheDefendantWantToDisputeHiddenQuestion: `Does the defendant dispute any other parts of the claim?`,
   explainPartOfClaimHiddenTextLabel: `Explain which parts of the claim you do not agree with`,
   explainClaimTextInput: `Example - Do not agree with claim 1`,
   yesRadioOption: `Yes`,

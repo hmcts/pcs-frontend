@@ -4,6 +4,8 @@ export const noticeDateWhenNotProvided = {
   mainHeader: `Notice date`,
   backLink: `Back`,
   didNotProvideNoticeLabel: () => `${process.env.CLAIMANT_NAME} did not provide the date they served you notice.`,
+  didNotProvideHiddenParagraph: () =>
+    `${process.env.CLAIMANT_NAME} did not provide the date they served the defendant notice.`,
   getWhenDidYouReceiveNoticeQuestion: () => `When did you receive notice from ${process.env.CLAIMANT_NAME} (optional)?`,
   exampleHintText: `For example, 27 9 2022. If you’re not sure of the exact date, you can find it on the notice`,
   dayTextLabel: `Day`,

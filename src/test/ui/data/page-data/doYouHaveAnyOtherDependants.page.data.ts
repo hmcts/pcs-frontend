@@ -1,5 +1,6 @@
 export const doYouHaveAnyOtherDependants = {
   mainHeader: `Do you have any other dependants?`,
+  lrHiddenMainHeader: `Other dependants`,
   dependantArePeopleParagraph: `Dependants are people you look after financially, like elderly relatives.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

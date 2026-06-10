@@ -1,9 +1,12 @@
 export const doYouHaveAnyDependantChildren = {
   mainHeader: `Do you have any dependent children?`,
+  lrMainHeaderHidden: `Dependant children`,
+  lrHiddenQuestion: `Does the defendant have any dependant children?`,
   dependantChildrenParagraph: `Dependent children are children you look after financially.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   giveDetailsHiddenTextLabel: `Give details about your dependent children`,
+  giveDetailsHiddenLrTextLabel: `Give details about their dependant children`,
   detailsTextInput: `1 dependant child - Name:Samuel and Age:7`,
   saveAndContinueButton: `Save and continue`,
   youShouldIncludeHiddenHintText: `You should include details about how many dependent children you have and how old they are`,

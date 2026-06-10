@@ -4,6 +4,9 @@ export const defendantNameConfirmation = {
   get mainHeader(): string {
     return `Is your name ${firstName} ${lastName}?`;
   },
+  get lrMainHeader(): string {
+    return `Is your client’s name ?`;
+  },
   get nameErrorMessage(): string {
     return `You must say if your name is ${firstName} ${lastName}`;
   },
