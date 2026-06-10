@@ -143,7 +143,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('validateViewAllApplications');
   });
 
-  test('View all applications should be disabled when another defendant has withoutNotice = YES @regression', async () => {
+  test('View all applications should be disabled when another defendant has withoutNotice = YES', async () => {
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction('reloadPage');
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
@@ -160,7 +160,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
   });
 
-  test('View all applications should be enabled when another defendant has withoutNotice = NO @regression', async () => {
+  test('View all applications should be enabled when another defendant has withoutNotice = NO', async () => {
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
     });
@@ -176,7 +176,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
   });
 
-  test('Validate notification and response status @regression @crossbrowser', async () => {
+  test('Validate notification and response status @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
     await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
