@@ -119,7 +119,13 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
     return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
   }
 
-  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500);
+  const retryAfterHeader = axiosError.response?.headers?.['retry-after'];
+  const retryAfter =
+    status && [502, 503, 504, 429].includes(status) && typeof retryAfterHeader === 'string'
+      ? retryAfterHeader
+      : undefined;
+
+  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500, retryAfter);
 }
 
 /**

@@ -17,13 +17,13 @@
   {% if caption %}
     <span class="govuk-caption-xl">{{ caption }}</span>
   {% endif %}
+
   {% if languageHeading %}
    <h1 class="govuk-heading-l">{{ languageHeading }}</h1>
   {% endif %}
 
-
  {% if question %}
-     <p class="govuk-heading-s">{{ question }} </p>
+     <p class="govuk-fieldset__legend govuk-fieldset__legend--m">{{ question }} </p>
   {% endif %}
 
   <form method="post" action="{{ url }}">
