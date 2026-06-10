@@ -20,6 +20,118 @@ describe('normaliseCounterClaim', () => {
     expect(response.defendantResponses).toEqual({ makeCounterClaim: 'NO' });
   });
 
+  it('drops counterClaimDocuments and counterClaimWantToUploadFiles when makeCounterClaim is NO', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'NO',
+        counterClaimWantToUploadFiles: 'YES',
+        counterClaimDocuments: [
+          {
+            id: 'doc-1',
+            value: {
+              document: {
+                document_url: 'http://cdam/documents/abc',
+                document_filename: 'a.png',
+                document_binary_url: 'http://cdam/documents/abc/binary',
+              },
+              contentType: 'image/png',
+              sizeInBytes: 1,
+            },
+          },
+        ],
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses).toEqual({ makeCounterClaim: 'NO' });
+  });
+
+  it('drops counterClaimDocuments when counterClaimWantToUploadFiles is NO', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'YES',
+        counterClaimWantToUploadFiles: 'NO',
+        counterClaimDocuments: [
+          {
+            id: 'doc-1',
+            value: {
+              document: {
+                document_url: 'http://cdam/documents/abc',
+                document_filename: 'a.png',
+                document_binary_url: 'http://cdam/documents/abc/binary',
+              },
+              contentType: 'image/png',
+              sizeInBytes: 1,
+            },
+          },
+        ],
+        counterClaim: { claimType: 'OTHER' },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaimDocuments).toBeUndefined();
+    expect(response.defendantResponses?.counterClaimWantToUploadFiles).toBe('NO');
+  });
+
+  it('drops counterClaimDocuments when counterClaimWantToUploadFiles is undefined', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'YES',
+        counterClaimDocuments: [
+          {
+            id: 'doc-1',
+            value: {
+              document: {
+                document_url: 'http://cdam/documents/abc',
+                document_filename: 'a.png',
+                document_binary_url: 'http://cdam/documents/abc/binary',
+              },
+              contentType: 'image/png',
+              sizeInBytes: 1,
+            },
+          },
+        ],
+        counterClaim: { claimType: 'OTHER' },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaimDocuments).toBeUndefined();
+  });
+
+  it('preserves counterClaimDocuments when counterClaimWantToUploadFiles is YES', () => {
+    const docs = [
+      {
+        id: 'doc-1',
+        value: {
+          document: {
+            document_url: 'http://cdam/documents/abc',
+            document_filename: 'a.png',
+            document_binary_url: 'http://cdam/documents/abc/binary',
+          },
+          contentType: 'image/png',
+          sizeInBytes: 1,
+        },
+      },
+    ];
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        makeCounterClaim: 'YES',
+        counterClaimWantToUploadFiles: 'YES',
+        counterClaimDocuments: docs,
+        counterClaim: { claimType: 'OTHER' },
+      },
+    };
+
+    normaliseCounterClaim(response);
+
+    expect(response.defendantResponses?.counterClaimDocuments).toEqual(docs);
+  });
+
   it('drops the entire counterClaim object when makeCounterClaim is undefined', () => {
     const response: PossessionClaimResponse = {
       defendantResponses: {

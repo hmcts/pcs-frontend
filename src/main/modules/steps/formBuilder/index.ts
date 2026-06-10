@@ -7,6 +7,7 @@ import { createGetController } from '../controller';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
+import { wireFileUploadUrls } from './fileUploadUtils';
 import { getStaticBasePath, getStaticEntryStepId, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
@@ -141,14 +142,10 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           interpolationValues as Record<string, unknown>
         ) as BuiltFormContent;
 
-        // Auto-wire upload/delete URLs for upload steps — identical in every upload step,
-        // so handled once here instead of duplicating extendGetContent on each step.
+        wireFileUploadUrls(formContent, req, documentStorage);
         if (documentStorage) {
-          const urlBase = req.originalUrl.split('?')[0];
           const fileField = formContent.fields?.find(f => f.componentType === 'fileUpload');
           if (fileField?.component) {
-            fileField.component.uploadUrl = `${urlBase}/upload`;
-            fileField.component.deleteUrl = `${urlBase}/delete`;
             applyUploadValidationToComponent(fileField.component, uploadValidation, t);
           }
         }
