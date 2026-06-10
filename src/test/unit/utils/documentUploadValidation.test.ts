@@ -120,14 +120,14 @@ describe('documentUploadValidation', () => {
   });
 
   describe('constants', () => {
-    it('has 100MB max file size per file', () => {
-      expect(UPLOAD_MAX_FILE_SIZE_MB).toBe(100);
-      expect(UPLOAD_MAX_FILE_SIZE_BYTES).toBe(100 * 1024 * 1024);
+    it('has 1024MB max file size per file', () => {
+      expect(UPLOAD_MAX_FILE_SIZE_MB).toBe(1024);
+      expect(UPLOAD_MAX_FILE_SIZE_BYTES).toBe(1024 * 1024 * 1024);
     });
 
-    it('has 1GB max total file size', () => {
-      expect(UPLOAD_MAX_TOTAL_SIZE_MB).toBe(1024);
-      expect(UPLOAD_MAX_TOTAL_SIZE_BYTES).toBe(1024 * 1024 * 1024);
+    it('has 4000MB max total file size', () => {
+      expect(UPLOAD_MAX_TOTAL_SIZE_MB).toBe(4000);
+      expect(UPLOAD_MAX_TOTAL_SIZE_BYTES).toBe(4000 * 1024 * 1024);
     });
 
     it('has accept attribute string with sorted extensions', () => {
