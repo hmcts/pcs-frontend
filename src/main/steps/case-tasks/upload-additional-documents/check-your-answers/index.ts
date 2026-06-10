@@ -78,6 +78,8 @@ export const step: StepDefinition = {
       if (!redirectPath) {
         return res.status(404).render('not-found');
       }
+
+      return res.redirect(303, redirectPath);
     },
   },
 };
