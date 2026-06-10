@@ -351,6 +351,65 @@ describe('multi-file-upload', () => {
       expect(value.index).toBe(0);
     });
 
+    it('rebuilds hidden inputs for server-rendered rows without __filename', () => {
+      const container = getContainer();
+      const row = document.createElement('div');
+      row.className = 'moj-multi-file-upload__row';
+      const message = document.createElement('div');
+      message.className = 'moj-multi-file-upload__message';
+      message.textContent = 'remaining.pdf';
+      row.appendChild(message);
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'moj-multi-file-upload__delete';
+      deleteBtn.value = 'ccd-doc-id';
+      deleteBtn.textContent = 'Remove ';
+      const hiddenSpan = document.createElement('span');
+      hiddenSpan.className = 'govuk-visually-hidden';
+      hiddenSpan.textContent = 'remaining.pdf';
+      deleteBtn.appendChild(hiddenSpan);
+      row.appendChild(deleteBtn);
+      container.appendChild(row);
+
+      const xhr = makeXhr(200, { success: true });
+      capturedHooks.deleteHook(null, undefined, xhr);
+
+      const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
+      expect(inputs).toHaveLength(1);
+      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      expect(value.document_filename).toBe('remaining.pdf');
+      expect(value.id).toBe('ccd-doc-id');
+      expect(value.index).toBeUndefined();
+    });
+
+    it('rebuilds hidden inputs for success rows using visually-hidden filename', () => {
+      const container = getContainer();
+      const row = document.createElement('div');
+      row.className = 'moj-multi-file-upload__row';
+      const message = document.createElement('div');
+      message.className = 'moj-multi-file-upload__message';
+      message.innerHTML = '<span class="moj-multi-file-upload__success"><svg></svg>uploaded.pdf</span>';
+      row.appendChild(message);
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'moj-multi-file-upload__delete';
+      deleteBtn.value = 'ccd-doc-id-2';
+      deleteBtn.textContent = 'Remove ';
+      const hiddenSpan = document.createElement('span');
+      hiddenSpan.className = 'govuk-visually-hidden';
+      hiddenSpan.textContent = 'uploaded.pdf';
+      deleteBtn.appendChild(hiddenSpan);
+      row.appendChild(deleteBtn);
+      container.appendChild(row);
+
+      const xhr = makeXhr(200, { success: true });
+      capturedHooks.deleteHook(null, undefined, xhr);
+
+      const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
+      expect(inputs).toHaveLength(1);
+      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      expect(value.document_filename).toBe('uploaded.pdf');
+      expect(value.id).toBe('ccd-doc-id-2');
+    });
+
     it('shows error summary on failed delete', () => {
       const xhr = makeXhr(500, { error: { message: 'fail' } });
       capturedHooks.deleteHook(null, undefined, xhr);
@@ -465,6 +524,93 @@ describe('multi-file-upload', () => {
 
       expect(clonedSpy).toHaveBeenCalledTimes(1);
       expect(originalSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('error summary dropzone highlight', () => {
+    function setupErrorHighlightDOM() {
+      document.body.innerHTML = `
+        <div class="govuk-grid-column-two-thirds">
+          <div class="govuk-error-summary" role="alert">
+            <div class="govuk-error-summary__body">
+              <ul class="govuk-list govuk-error-summary__list">
+                <li><a href="#documents">Select a document to upload</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <form>
+          <div id="uploaded-documents-container"></div>
+          <div class="govuk-form-group govuk-form-group--error">
+            <div id="upload-container"
+                 data-module="moj-multi-file-upload"
+                 data-upload-url="/upload"
+                 data-delete-url="/delete">
+              <div class="moj-multi-file-upload__dropzone">
+                <input id="documents" class="moj-multi-file-upload__input" type="file" />
+              </div>
+            </div>
+          </div>
+        </form>
+      `;
+    }
+
+    function getDropzone(): HTMLElement {
+      return document.querySelector('.moj-multi-file-upload__dropzone')!;
+    }
+
+    it('highlights dropzone when error-summary link is clicked', () => {
+      setupErrorHighlightDOM();
+      initMultiFileUpload();
+
+      const dropzone = getDropzone();
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
+
+      document.querySelector<HTMLAnchorElement>('.govuk-error-summary a[href="#documents"]')!.click();
+
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(true);
+    });
+
+    it('highlights dropzone on file input focus when form group is in error', () => {
+      setupErrorHighlightDOM();
+      initMultiFileUpload();
+
+      const dropzone = getDropzone();
+      const fileInput = document.getElementById('documents') as HTMLInputElement;
+
+      fileInput.focus();
+
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(true);
+    });
+
+    it('clears dropzone highlight on file input blur', () => {
+      setupErrorHighlightDOM();
+      initMultiFileUpload();
+
+      const dropzone = getDropzone();
+      const fileInput = document.getElementById('documents') as HTMLInputElement;
+
+      fileInput.focus();
+      fileInput.blur();
+
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
+    });
+
+    it('clears dropzone highlight when inline field error is cleared', () => {
+      setupErrorHighlightDOM();
+      initMultiFileUpload();
+
+      const dropzone = getDropzone();
+      document.querySelector<HTMLAnchorElement>('.govuk-error-summary a[href="#documents"]')!.click();
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(true);
+
+      try {
+        capturedHooks.entryHook(null, { name: 'doc.pdf', size: 1024 });
+      } catch {
+        /* not expected */
+      }
+
+      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
     });
   });
 });

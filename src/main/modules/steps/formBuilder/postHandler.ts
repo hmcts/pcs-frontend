@@ -6,6 +6,7 @@ import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
+import { hydrateUploadedDocumentsFromBody, wireFileUploadOnPostError } from './fileUploadUtils';
 import { type FormBuilderFlowConfig, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import {
@@ -104,6 +105,7 @@ export function createPostHandler(
           }
         }
       }
+      await hydrateUploadedDocumentsFromBody(req, documentStorage);
 
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
       const emptyFormContent = { fields: [] } as BuiltFormContent;
@@ -142,19 +144,7 @@ export function createPostHandler(
           interpolationValues,
           showCancelButton
         );
-        // Mirror the GET controller's auto-wiring of upload/delete URLs onto the fileUpload
-        // component. Without this, the error re-render emits empty data-upload-url/data-delete-url,
-        // which causes multi-file-upload.ts:initContainer to bail before MOJ's JS upgrade runs —
-        // so the no-JS "Upload file" fallback button stays visible and async upload doesn't fire
-        // on file selection.
-        if (documentStorage) {
-          const urlBase = req.originalUrl.split('?')[0];
-          const fileField = formContent.fields?.find(f => f.componentType === 'fileUpload');
-          if (fileField?.component) {
-            fileField.component.uploadUrl = `${urlBase}/upload`;
-            fileField.component.deleteUrl = `${urlBase}/delete`;
-          }
-        }
+        await wireFileUploadOnPostError(formContent, req, documentStorage);
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
