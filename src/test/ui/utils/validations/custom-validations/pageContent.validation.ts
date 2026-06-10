@@ -187,7 +187,7 @@ export class PageContentValidation implements IValidation {
 
   private async getPageData(pageName: string): Promise<object | null> {
     const pageData = this.loadPageDataFile(pageName);
-    if (pageName !== 'home') {
+    if (!(pageName === 'home' || pageName === 'claims')) {
       const contactUsData = this.loadSectionDataFile('contactUs');
       if (contactUsData) {
         await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
