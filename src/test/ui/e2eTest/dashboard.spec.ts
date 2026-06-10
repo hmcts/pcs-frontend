@@ -143,6 +143,39 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('validateViewAllApplications');
   });
 
+  test('View all applications should be disabled when another defendant has withoutNotice = YES @regression', async () => {
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
+    await performAction('reloadPage');
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+    await performAction('clickLink', 'Sign out');
+    await performAction('createUser', 'citizen', ['citizen']);
+    await performAction('navigateToUrl', home_url);
+    await performAction('login');
+    await performAction('navigateToUrl', home_url + `/access-your-case`);
+    await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 1 });
+    await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
+    await performValidation('textNotVisible', {
+      elementType: 'link',
+      text: dashboard.viewAllApplicationsLink,
+    });
+  });
+
+  test('View all applications should be enabled when another defendant has withoutNotice = NO @regression', async () => {
+    await performAction('citizenCreateGenAppAPI', {
+      data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
+    });
+    await performAction('reloadPage');
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+    await performAction('clickLink', 'Sign out');
+    await performAction('createUser', 'citizen', ['citizen']);
+    await performAction('navigateToUrl', home_url);
+    await performAction('login');
+    await performAction('navigateToUrl', home_url + `/access-your-case`);
+    await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 1 });
+    await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+  });
+
   test('Validate notification and response status @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
