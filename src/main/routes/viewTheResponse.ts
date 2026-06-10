@@ -5,7 +5,7 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../HttpError';
 import { VIEW_DOCUMENTS_ROUTE, VIEW_RESPONSE_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
-import { penceToPounds } from '../steps/utils';
+import { normalizeYesNoValue, penceToPounds } from '../steps/utils';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -14,15 +14,18 @@ import type {
   CcdCaseAddress,
   CcdCaseData,
   CcdClaimGroundSummaryItem,
+  CcdCollectionItem,
   CcdCounterClaim,
   CcdDefendantParty,
   CcdDefendantResponses,
+  CcdParty,
   HouseholdCircumstances,
   IncomeExpenseDetails,
   PaymentAgreement,
   YesNoNotSureValue,
   YesNoValue,
 } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
@@ -59,27 +62,47 @@ function formatGdsDate(value: string | undefined | null): string | null {
   return null;
 }
 
-function yesNo(t: TFunction, value: YesNoValue | undefined): string {
-  if (value === 'YES') {
+function isYes(value: string | null | undefined): boolean {
+  return normalizeYesNoValue(value) === 'YES';
+}
+
+function isNo(value: string | null | undefined): boolean {
+  return normalizeYesNoValue(value) === 'NO';
+}
+
+function yesNo(t: TFunction, value: YesNoValue | string | undefined): string {
+  if (!value) {
+    return '';
+  }
+  const normalized = normalizeYesNoValue(value);
+  if (normalized === 'YES') {
     return t('common:options.yes');
   }
-  if (value === 'NO') {
+  if (normalized === 'NO') {
     return t('common:options.no');
   }
   return '';
 }
 
-function yesNoNotSure(t: TFunction, value: YesNoNotSureValue | undefined): string {
-  if (value === 'YES') {
-    return t('common:options.yes');
+function yesNoNotSure(t: TFunction, value: YesNoNotSureValue | string | undefined): string {
+  if (!value) {
+    return '';
   }
-  if (value === 'NO') {
-    return t('common:options.no');
+  const yesNoLabel = yesNo(t, value);
+  if (yesNoLabel) {
+    return yesNoLabel;
   }
-  if (value === 'NOT_SURE') {
+  if (value.trim().toUpperCase() === 'NOT_SURE') {
     return t('common:options.imNotSure');
   }
   return '';
+}
+
+function formatEnumOption(t: TFunction, optionKey: string, value: string | undefined): string {
+  if (!value?.trim()) {
+    return '';
+  }
+  return t(`${optionKey}.${value.trim().toUpperCase()}`, '');
 }
 
 function frequencyLabel(t: TFunction, frequency: string | undefined | null): string {
@@ -97,17 +120,47 @@ function formatMoneyAmount(pence: string | number | undefined): string {
   return pounds ? `£${pounds}` : '';
 }
 
-function formatAmountAndFrequency(
-  t: TFunction,
-  amount: string | undefined,
-  frequency: string | undefined | null
-): string {
+function formatIncomeValue(t: TFunction, amount: string | undefined, frequency: string | undefined | null): string {
   const money = formatMoneyAmount(amount);
-  const freq = frequencyLabel(t, frequency);
+  const freq =
+    frequency === 'WEEKLY' || frequency === 'MONTHLY' ? t(`viewTheResponse:incomeFrequencies.${frequency}`) : '';
   if (money && freq) {
-    return `${money} ${freq.toLowerCase()}`;
+    return `${money} ${freq}`;
   }
   return money || freq;
+}
+
+function formatPaymentValue(t: TFunction, amount: string | undefined, frequency: string | undefined | null): string {
+  const money = formatMoneyAmount(amount);
+  const freq =
+    frequency === 'WEEKLY' || frequency === 'MONTHLY' ? t(`viewTheResponse:paymentFrequencies.${frequency}`) : '';
+  if (money && freq) {
+    return `${money} ${freq}`;
+  }
+  return money || freq;
+}
+
+function pushAmountFrequencyRows(
+  rows: SummaryRow[],
+  t: TFunction,
+  amount: string | undefined,
+  frequency: string | undefined | null,
+  amountLabelKey: string,
+  frequencyLabelKey: string,
+  formatValue: (t: TFunction, amount: string | undefined, frequency: string | undefined | null) => string
+): void {
+  const money = formatMoneyAmount(amount);
+  const freq = frequencyLabel(t, frequency);
+  if (money) {
+    pushRow(rows, t(amountLabelKey), money);
+  }
+  if (freq) {
+    pushRow(rows, t(frequencyLabelKey), freq);
+  }
+  if (!money && !freq) {
+    const combined = formatValue(t, amount, frequency);
+    pushRow(rows, t(amountLabelKey), combined);
+  }
 }
 
 function joinName(firstName?: string, lastName?: string): string {
@@ -130,8 +183,8 @@ function pushRow(rows: SummaryRow[], label: string, value: string | null | undef
 function buildCaseDatesSummary(t: TFunction, dateSubmitted: string | null, dateIssued: string | null): SummarySection {
   return {
     rows: [
-      { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } },
       { key: summaryKey(t('viewTheResponse:summary.dateIssued')), value: { text: dateIssued ?? '' } },
+      { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } },
     ],
   };
 }
@@ -140,21 +193,28 @@ function buildStatementOfTruthSummary(t: TFunction, completedByName: string | un
   return {
     rows: [
       {
-        key: summaryKey(t('viewTheResponse:statementOfTruth.completedBy')),
+        key: summaryKey(t('viewTheResponse:statementOfTruth.yourFullName')),
         value: { text: completedByName?.trim() ?? '' },
       },
     ],
   };
 }
 
+function partyDisplayName(party: CcdParty | undefined): string {
+  return [party?.orgName, party?.firstName, party?.lastName].filter(Boolean).join(' ').trim();
+}
+
+function formatCounterClaimParties(parties: CcdCollectionItem<CcdParty>[] | undefined): string {
+  return (parties ?? [])
+    .map(p => partyDisplayName(p.value))
+    .filter(Boolean)
+    .join(', ');
+}
+
 function buildClaimantDetails(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
-  const claimantName =
-    caseData.isClaimantNameCorrect === 'NO' && caseData.overriddenClaimantName?.trim()
-      ? caseData.overriddenClaimantName.trim()
-      : (caseData.claimantName?.trim() ?? '');
   const serviceAddress = caseData.possessionClaimResponse?.claimantServiceAddress;
-  pushRow(rows, t('viewTheResponse:claimantDetails.name'), claimantName);
+  pushRow(rows, t('viewTheResponse:claimantDetails.name'), resolveClaimantName(caseData));
   pushRow(
     rows,
     t('viewTheResponse:claimantDetails.address'),
@@ -163,21 +223,25 @@ function buildClaimantDetails(t: TFunction, caseData: CcdCaseData): SummarySecti
   return { rows };
 }
 
+function resolveClaimantName(caseData: CcdCaseData): string {
+  return new CcdCaseModel({ id: '', data: caseData }).claimantName;
+}
+
 function buildContactPreferences(t: TFunction, responses: CcdDefendantResponses | undefined): string {
   if (!responses) {
     return '';
   }
   const prefs: string[] = [];
-  if (responses.contactByText === 'YES') {
+  if (isYes(responses.contactByText)) {
     prefs.push(t('viewTheResponse:contactPreference.text'));
   }
-  if (responses.contactByPhone === 'YES') {
+  if (isYes(responses.contactByPhone)) {
     prefs.push(t('viewTheResponse:contactPreference.phone'));
   }
-  if (responses.contactByEmail === 'YES') {
+  if (isYes(responses.contactByEmail)) {
     prefs.push(t('viewTheResponse:contactPreference.email'));
   }
-  if (responses.contactByPost === 'YES') {
+  if (isYes(responses.contactByPost)) {
     prefs.push(t('viewTheResponse:contactPreference.post'));
   }
   return prefs.join(', ');
@@ -191,12 +255,16 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
   pushRow(rows, t('viewTheResponse:defendant1.name'), joinName(party?.firstName, party?.lastName));
   pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
   pushRow(rows, t('viewTheResponse:defendant1.email'), party?.emailAddress);
-  if (party?.phoneNumberProvided === 'YES') {
+  if (isYes(party?.phoneNumberProvided)) {
     pushRow(rows, t('viewTheResponse:defendant1.phone'), party?.phoneNumber);
   }
   pushRow(rows, t('viewTheResponse:defendant1.address'), addressToString(party?.address));
   pushRow(rows, t('viewTheResponse:defendant1.contactPreferences'), buildContactPreferences(t, responses));
-  pushRow(rows, t('viewTheResponse:defendant1.freeLegalAdvice'), responses?.freeLegalAdvice);
+  pushRow(
+    rows,
+    t('viewTheResponse:defendant1.freeLegalAdvice'),
+    formatEnumOption(t, 'viewTheResponse:defendant1.freeLegalAdviceOptions', responses?.freeLegalAdvice)
+  );
   return { rows };
 }
 
@@ -247,7 +315,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.rentArrearsAmountConfirmation'),
-    responses?.rentArrearsAmountConfirmation
+    yesNoNotSure(t, responses?.rentArrearsAmountConfirmation)
   );
   pushRow(
     rows,
@@ -275,11 +343,18 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData): Summary
   pushRow(rows, t('viewTheResponse:payments.repaymentPlanAgreed'), yesNoNotSure(t, payment.repaymentPlanAgreed));
   pushRow(rows, t('viewTheResponse:payments.repaymentAgreedDetails'), payment.repaymentAgreedDetails);
   pushRow(rows, t('viewTheResponse:payments.repayArrearsInstalments'), yesNo(t, payment.repayArrearsInstalments));
-  pushRow(
-    rows,
-    t('viewTheResponse:payments.additionalContribution'),
-    formatAmountAndFrequency(t, payment.additionalRentContribution, payment.additionalContributionFrequency)
-  );
+  if (payment.additionalRentContribution || payment.additionalContributionFrequency) {
+    pushRow(
+      rows,
+      t('viewTheResponse:payments.additionalContribution'),
+      formatMoneyAmount(payment.additionalRentContribution)
+    );
+    pushRow(
+      rows,
+      t('viewTheResponse:payments.additionalContributionFrequency'),
+      frequencyLabel(t, payment.additionalContributionFrequency)
+    );
+  }
   return { rows };
 }
 
@@ -290,22 +365,22 @@ function buildHouseholdAndCircumstances(t: TFunction, caseData: CcdCaseData): Su
   if (!hc) {
     return { rows };
   }
-  pushRow(rows, t('viewTheResponse:household.shareAdditional'), yesNo(t, hc.shareAdditionalCircumstances));
-  pushRow(rows, t('viewTheResponse:household.additionalDetails'), hc.additionalCircumstancesDetails);
-  pushRow(rows, t('viewTheResponse:household.exceptionalHardship'), yesNo(t, hc.exceptionalHardship));
-  pushRow(rows, t('viewTheResponse:household.exceptionalHardshipDetails'), hc.exceptionalHardshipDetails);
   pushRow(rows, t('viewTheResponse:household.dependantChildren'), yesNo(t, hc.dependantChildren));
   pushRow(rows, t('viewTheResponse:household.dependantChildrenDetails'), hc.dependantChildrenDetails);
   pushRow(rows, t('viewTheResponse:household.otherDependants'), yesNo(t, hc.otherDependants));
   pushRow(rows, t('viewTheResponse:household.otherDependantDetails'), hc.otherDependantDetails);
+  pushRow(rows, t('viewTheResponse:household.otherTenants'), yesNo(t, hc.otherTenants));
+  pushRow(rows, t('viewTheResponse:household.otherTenantsDetails'), hc.otherTenantsDetails);
   pushRow(rows, t('viewTheResponse:household.alternativeAccommodation'), yesNoNotSure(t, hc.alternativeAccommodation));
   pushRow(
     rows,
     t('viewTheResponse:household.alternativeAccommodationDate'),
     formatGdsDate(hc.alternativeAccommodationTransferDate) ?? ''
   );
-  pushRow(rows, t('viewTheResponse:household.otherTenants'), yesNo(t, hc.otherTenants));
-  pushRow(rows, t('viewTheResponse:household.otherTenantsDetails'), hc.otherTenantsDetails);
+  pushRow(rows, t('viewTheResponse:household.shareAdditional'), yesNo(t, hc.shareAdditionalCircumstances));
+  pushRow(rows, t('viewTheResponse:household.additionalDetails'), hc.additionalCircumstancesDetails);
+  pushRow(rows, t('viewTheResponse:household.exceptionalHardship'), yesNo(t, hc.exceptionalHardship));
+  pushRow(rows, t('viewTheResponse:household.exceptionalHardshipDetails'), hc.exceptionalHardshipDetails);
   return { rows };
 }
 
@@ -317,11 +392,20 @@ function buildIncomeRow(
   frequency: string | undefined,
   labelKey: string
 ): void {
-  if (applies !== 'YES') {
+  if (!isYes(applies)) {
     pushRow(rows, t(labelKey), yesNo(t, applies));
     return;
   }
-  pushRow(rows, t(labelKey), formatAmountAndFrequency(t, amount, frequency));
+  pushRow(rows, t(labelKey), t('common:options.yes'));
+  pushAmountFrequencyRows(
+    rows,
+    t,
+    amount,
+    frequency,
+    'viewTheResponse:income.totalAmountReceived',
+    'viewTheResponse:income.receivedEvery',
+    formatIncomeValue
+  );
 }
 
 function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection {
@@ -339,17 +423,23 @@ function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection
     'viewTheResponse:income.fromJobs'
   );
   buildIncomeRow(t, rows, hc.pension, hc.pensionAmount, hc.pensionFrequency, 'viewTheResponse:income.pension');
-  if (hc.universalCredit === 'YES') {
-    pushRow(
+  if (isYes(hc.universalCredit)) {
+    pushRow(rows, t('viewTheResponse:income.universalCredit'), t('common:options.yes'));
+    pushAmountFrequencyRows(
       rows,
-      t('viewTheResponse:income.universalCredit'),
-      formatAmountAndFrequency(t, hc.universalCreditAmount ?? undefined, hc.universalCreditFrequency ?? undefined)
+      t,
+      hc.universalCreditAmount ?? undefined,
+      hc.universalCreditFrequency ?? undefined,
+      'viewTheResponse:income.totalAmountReceived',
+      'viewTheResponse:income.receivedEvery',
+      formatIncomeValue
     );
-  } else if (hc.hasAppliedForUniversalCredit === 'YES') {
+  } else if (isYes(hc.hasAppliedForUniversalCredit)) {
+    pushRow(rows, t('viewTheResponse:income.universalCreditApplied'), t('common:options.yes'));
     pushRow(
       rows,
-      t('viewTheResponse:income.universalCreditApplied'),
-      formatGdsDate(hc.ucApplicationDate) ?? t('common:options.yes')
+      t('viewTheResponse:income.universalCreditApplicationDate'),
+      formatGdsDate(hc.ucApplicationDate) ?? ''
     );
   } else {
     pushRow(rows, t('viewTheResponse:income.universalCredit'), yesNo(t, hc.universalCredit));
@@ -375,11 +465,10 @@ function buildPriorityDebts(t: TFunction, caseData: CcdCaseData): SummarySection
   }
   pushRow(rows, t('viewTheResponse:debts.hasPriorityDebts'), yesNo(t, hc.priorityDebts));
   pushRow(rows, t('viewTheResponse:debts.debtTotal'), formatMoneyAmount(hc.debtTotal));
-  pushRow(
-    rows,
-    t('viewTheResponse:debts.debtContribution'),
-    formatAmountAndFrequency(t, hc.debtContribution, hc.debtContributionFrequency)
-  );
+  if (hc.debtContribution || hc.debtContributionFrequency) {
+    pushRow(rows, t('viewTheResponse:debts.debtContribution'), formatMoneyAmount(hc.debtContribution));
+    pushRow(rows, t('viewTheResponse:debts.paidEvery'), frequencyLabel(t, hc.debtContributionFrequency));
+  }
   return { rows };
 }
 
@@ -392,11 +481,20 @@ function buildExpenseRow(
   if (!detail) {
     return;
   }
-  if (detail.applies !== 'YES') {
+  if (!isYes(detail.applies)) {
     pushRow(rows, t(labelKey), yesNo(t, detail.applies));
     return;
   }
-  pushRow(rows, t(labelKey), formatAmountAndFrequency(t, detail.amount, detail.frequency));
+  pushRow(rows, t(labelKey), t('common:options.yes'));
+  pushAmountFrequencyRows(
+    rows,
+    t,
+    detail.amount,
+    detail.frequency,
+    'viewTheResponse:expenses.amountPaid',
+    'viewTheResponse:expenses.paidEvery',
+    formatPaymentValue
+  );
 }
 
 function buildRegularExpenses(t: TFunction, caseData: CcdCaseData): SummarySection {
@@ -428,15 +526,49 @@ function buildAdditionalInformation(t: TFunction, caseData: CcdCaseData): Summar
 function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
-  pushRow(rows, t('viewTheResponse:counterclaim.make'), yesNo(t, responses?.makeCounterClaim));
-  const cc: CcdCounterClaim | undefined = responses?.counterClaim;
-  if (cc) {
-    pushRow(rows, t('viewTheResponse:counterclaim.type'), cc.claimType);
-    pushRow(rows, t('viewTheResponse:counterclaim.amountKnown'), cc.isClaimAmountKnown);
-    pushRow(rows, t('viewTheResponse:counterclaim.amount'), formatMoneyAmount(cc.claimAmount));
-    pushRow(rows, t('viewTheResponse:counterclaim.estimatedMaxAmount'), formatMoneyAmount(cc.estimatedMaxClaimAmount));
-    pushRow(rows, t('viewTheResponse:counterclaim.needHelpWithFees'), yesNo(t, cc.needHelpWithFees));
+  if (!responses || !isYes(responses.makeCounterClaim) || !responses.counterClaim) {
+    return { rows };
   }
+
+  const cc: CcdCounterClaim = responses.counterClaim;
+
+  if (cc.claimType) {
+    const typeLabel = t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`, cc.claimType);
+    pushRow(rows, t('viewTheResponse:counterclaim.type'), typeLabel);
+  }
+
+  const claimsMoney = cc.claimType === 'PAYMENT_OR_COMPENSATION' || cc.claimType === 'BOTH';
+  if (claimsMoney && cc.isClaimAmountKnown) {
+    pushRow(rows, t('viewTheResponse:counterclaim.amountKnown'), yesNo(t, cc.isClaimAmountKnown));
+    if (isYes(cc.isClaimAmountKnown)) {
+      pushRow(rows, t('viewTheResponse:counterclaim.amount'), formatMoneyAmount(cc.claimAmount));
+    } else if (isNo(cc.isClaimAmountKnown)) {
+      pushRow(
+        rows,
+        t('viewTheResponse:counterclaim.estimatedMaxAmount'),
+        formatMoneyAmount(cc.estimatedMaxClaimAmount)
+      );
+    }
+  }
+
+  pushRow(rows, t('viewTheResponse:counterclaim.against'), formatCounterClaimParties(cc.counterClaimAgainst));
+  pushRow(rows, t('viewTheResponse:counterclaim.for'), cc.counterClaimFor);
+  pushRow(rows, t('viewTheResponse:counterclaim.reasons'), cc.counterClaimReasons);
+  pushRow(rows, t('viewTheResponse:counterclaim.ordersRequested'), cc.otherOrderRequestDetails);
+  pushRow(rows, t('viewTheResponse:counterclaim.factsForCourt'), cc.otherOrderRequestFacts);
+
+  if (cc.needHelpWithFees) {
+    const feesLabel = t(
+      `viewTheResponse:counterclaim.needHelpWithFeesOptions.${cc.needHelpWithFees}`,
+      yesNo(t, cc.needHelpWithFees)
+    );
+    pushRow(rows, t('viewTheResponse:counterclaim.needHelpWithFees'), feesLabel);
+  }
+  if (cc.appliedForHwf) {
+    pushRow(rows, t('viewTheResponse:counterclaim.appliedForHwf'), yesNo(t, cc.appliedForHwf));
+    pushRow(rows, t('viewTheResponse:counterclaim.hwfReference'), cc.hwfReferenceNumber);
+  }
+
   return { rows };
 }
 

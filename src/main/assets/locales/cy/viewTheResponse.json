@@ -36,9 +36,14 @@
     "dateOfBirth": "cyDate of birth",
     "email": "cyEmail address",
     "phone": "cyPhone number",
-    "address": "cyAddress",
+    "address": "cyPostal address",
     "contactPreferences": "cyContact preferences",
-    "freeLegalAdvice": "cyFree legal advice"
+    "freeLegalAdvice": "cyHave you had any free legal advice?",
+    "freeLegalAdviceOptions": {
+      "YES": "cyYes",
+      "NO": "cyNo",
+      "PREFER_NOT_TO_SAY": "cyPrefer not to say"
+    }
   },
 
   "contactPreference": {
@@ -49,86 +54,118 @@
   },
 
   "responseToClaim": {
-    "disputeClaim": "cyDo you dispute the claim?",
-    "disputeDetails": "cyDetails of your dispute",
+    "disputeClaim": "cyDo you dispute any other parts of the claim?",
+    "disputeDetails": "cyExplain which parts of the claim you do not agree with",
     "claimGrounds": "cyClaim grounds",
-    "tenancyTypeConfirmation": "cyIs the tenancy type correct?",
-    "tenancyType": "cyTenancy type",
-    "tenancyStartDateConfirmation": "cyIs the tenancy start date correct?",
-    "tenancyStartDate": "cyTenancy start date",
-    "possessionNoticeReceived": "cyDid you receive a possession notice?",
-    "noticeReceivedDate": "cyDate notice received",
-    "rentArrearsAmountConfirmation": "cyIs the rent arrears amount correct?",
-    "rentArrearsAmount": "cyRent arrears amount",
+    "tenancyTypeConfirmation": "cyIs the tenancy, occupation contract or licence agreement type correct?",
+    "tenancyType": "cyCorrected tenancy, occupation contract or licence type",
+    "tenancyStartDateConfirmation": "cyIs the tenancy, licence or occupation contract start date correct?",
+    "tenancyStartDate": "cyCorrected tenancy, licence or occupation contract start date",
+    "possessionNoticeReceived": "cyDid the claimant give you notice of their intention to begin possession proceedings?",
+    "noticeReceivedDate": "cyWhen did you receive notice from the claimant?",
+    "rentArrearsAmountConfirmation": "cyIs the amount of rent arrears given by the claimant correct?",
+    "rentArrearsAmount": "cyAdmitted amount owed in rent arrears",
     "landlordRegistered": "cyIs your landlord registered?",
     "landlordLicensed": "cyIs your landlord licensed?",
-    "writtenTerms": "cyDo you have written tenancy terms?"
+    "writtenTerms": "cyHas the landlord sent written terms of the occupation contract?"
   },
 
   "payments": {
-    "anyPaymentsMade": "cyHave any payments been made since the claim?",
-    "paymentDetails": "cyPayment details",
-    "repaymentPlanAgreed": "cyIs a repayment plan agreed?",
-    "repaymentAgreedDetails": "cyRepayment plan details",
-    "repayArrearsInstalments": "cyRepay arrears in instalments",
-    "additionalContribution": "cyAdditional rent contribution"
+    "anyPaymentsMade": "cyHave you paid any money to the claimant since the claim issue date?",
+    "paymentDetails": "cyDetails of payments made",
+    "repaymentPlanAgreed": "cyHave you come to any agreement with the claimant to repay the arrears since the claim issue date?",
+    "repaymentAgreedDetails": "cyDetails of repayment agreement",
+    "repayArrearsInstalments": "cyWould you like to offer to pay your arrears in instalments?",
+    "additionalContribution": "cyHow much could you afford to pay in addition to the current rent?",
+    "additionalContributionFrequency": "cyHow frequently could you afford to pay this amount?"
   },
 
   "household": {
-    "shareAdditional": "cyShare additional circumstances?",
-    "additionalDetails": "cyAdditional circumstances details",
-    "exceptionalHardship": "cyExceptional hardship?",
-    "exceptionalHardshipDetails": "cyExceptional hardship details",
-    "dependantChildren": "cyAny dependent children?",
-    "dependantChildrenDetails": "cyDependent children details",
-    "otherDependants": "cyAny other dependants?",
-    "otherDependantDetails": "cyOther dependants details",
-    "alternativeAccommodation": "cyAlternative accommodation?",
-    "alternativeAccommodationDate": "cyAlternative accommodation transfer date",
-    "otherTenants": "cyOther tenants in the property?",
-    "otherTenantsDetails": "cyOther tenants details"
+    "dependantChildren": "cyDo you have any dependent children?",
+    "dependantChildrenDetails": "cyGive details about your dependent children",
+    "otherDependants": "cyDo you have any other dependants?",
+    "otherDependantDetails": "cyGive details about your other dependants",
+    "otherTenants": "cyDo any other adults live in your home?",
+    "otherTenantsDetails": "cyGive details about the other adults living in your home",
+    "alternativeAccommodation": "cyWould you have somewhere else to live if you had to leave your home?",
+    "alternativeAccommodationDate": "cyWhen would you be able to move in? (optional)",
+    "shareAdditional": "cyWould you like to share anything about your circumstances?",
+    "additionalDetails": "cyGive details about your circumstances",
+    "exceptionalHardship": "cyWould you experience exceptional hardship if you were asked to leave your home?",
+    "exceptionalHardshipDetails": "cyGive details about the exceptional hardship you’d experience"
   },
 
   "income": {
-    "fromJobs": "cyIncome from jobs",
-    "pension": "cyPension",
+    "fromJobs": "cyIncome from all jobs you do",
+    "pension": "cyPension – state and private",
     "universalCredit": "cyUniversal Credit",
-    "universalCreditApplied": "cyUniversal Credit application date",
-    "otherBenefits": "cyOther benefits",
-    "moneyFromElsewhere": "cyMoney from elsewhere?",
-    "moneyFromElsewhereDetails": "cyMoney from elsewhere details"
+    "universalCreditApplied": "cyHave you applied for Universal Credit?",
+    "universalCreditApplicationDate": "cyWhen did you apply?",
+    "otherBenefits": "cyOther benefits and credits",
+    "moneyFromElsewhere": "cyMoney from somewhere else (for example, child maintenance payments or someone in your household gives you money)",
+    "moneyFromElsewhereDetails": "cyGive details about the other sources of income and how much you usually receive",
+    "totalAmountReceived": "cyTotal amount received",
+    "receivedEvery": "cyReceived every"
   },
 
   "debts": {
-    "hasPriorityDebts": "cyDo you have priority debts?",
-    "debtTotal": "cyTotal debt",
-    "debtContribution": "cyRegular debt contribution"
+    "hasPriorityDebts": "cyDo you have any priority debts?",
+    "debtTotal": "cyWhat is the total amount you owe for all your priority debts?",
+    "debtContribution": "cyHow much do you pay towards your priority debts each week or month?",
+    "paidEvery": "cyPaid every"
   },
 
   "expenses": {
-    "householdBills": "cyHousehold bills",
+    "householdBills": "cyHousehold bills (for example, council tax, gas, electricity, water, internet)",
     "loanPayments": "cyLoan payments",
     "childSpousalMaintenance": "cyChild or spousal maintenance",
     "mobilePhone": "cyMobile phone",
     "groceryShopping": "cyGrocery shopping",
     "fuelParkingTransport": "cyFuel, parking and transport",
-    "schoolCosts": "cySchool costs",
+    "schoolCosts": "cySchool costs (for example, uniform and school dinners)",
     "clothing": "cyClothing",
-    "other": "cyOther expenses"
+    "other": "cyOther",
+    "amountPaid": "cyAmount paid",
+    "paidEvery": "cyPaid every"
   },
 
   "additional": {
-    "otherConsiderations": "cyAre there other considerations?",
-    "otherConsiderationsDetails": "cyOther considerations details"
+    "otherConsiderations": "cyIs there anything else you want to tell the court as part of your response?",
+    "otherConsiderationsDetails": "cyGive details about what else you want to tell the court"
   },
 
   "counterclaim": {
-    "make": "cyMake a counterclaim?",
-    "type": "cyType of counterclaim",
-    "amountKnown": "cyIs the claim amount known?",
-    "amount": "cyCounterclaim amount",
-    "estimatedMaxAmount": "cyEstimated maximum amount",
-    "needHelpWithFees": "cyNeed help with fees?"
+    "type": "cyWhat are you claiming for?",
+    "amountKnown": "cyAre you claiming for a specific sum of money?",
+    "amount": "cyHow much are you claiming?",
+    "estimatedMaxAmount": "cyWhat’s the maximum value of your claim?",
+    "against": "cyWho are you making the counterclaim against?",
+    "for": "cyWhat is your counterclaim for?",
+    "reasons": "cyWhat are your reasons for making the counterclaim?",
+    "ordersRequested": "cyWhat orders are you asking the court to make?",
+    "factsForCourt": "cyWhat facts would you like the court to consider when deciding the claim?",
+    "needHelpWithFees": "cyDo you need help paying the counterclaim fee?",
+    "appliedForHwf": "cyHave you already applied for help with your counterclaim fee?",
+    "hwfReference": "cyHelp with Fees reference number",
+    "claimTypeOptions": {
+      "PAYMENT_OR_COMPENSATION": "cyA sum of money or compensation",
+      "SOMETHING_ELSE": "cySomething else",
+      "BOTH": "cyBoth"
+    },
+    "needHelpWithFeesOptions": {
+      "YES": "cyI need help paying the fee",
+      "NO": "cyI do not need help paying the fee"
+    }
+  },
+
+  "incomeFrequencies": {
+    "WEEKLY": "cyreceived every week",
+    "MONTHLY": "cyreceived every month"
+  },
+
+  "paymentFrequencies": {
+    "WEEKLY": "cypaid every week",
+    "MONTHLY": "cypaid every month"
   },
 
   "frequency": {
@@ -138,7 +175,7 @@
 
   "statementOfTruth": {
     "body": "cyI believe the facts stated in this defence form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in the truth.",
-    "completedBy": "cyCompleted by"
+    "yourFullName": "cyYour full name"
   },
 
   "pdf": {

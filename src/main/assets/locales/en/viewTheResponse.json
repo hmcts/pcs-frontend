@@ -36,9 +36,14 @@
     "dateOfBirth": "Date of birth",
     "email": "Email address",
     "phone": "Phone number",
-    "address": "Address",
+    "address": "Postal address",
     "contactPreferences": "Contact preferences",
-    "freeLegalAdvice": "Free legal advice"
+    "freeLegalAdvice": "Have you had any free legal advice?",
+    "freeLegalAdviceOptions": {
+      "YES": "Yes",
+      "NO": "No",
+      "PREFER_NOT_TO_SAY": "Prefer not to say"
+    }
   },
 
   "contactPreference": {
@@ -49,86 +54,118 @@
   },
 
   "responseToClaim": {
-    "disputeClaim": "Do you dispute the claim?",
-    "disputeDetails": "Details of your dispute",
+    "disputeClaim": "Do you dispute any other parts of the claim?",
+    "disputeDetails": "Explain which parts of the claim you do not agree with",
     "claimGrounds": "Claim grounds",
-    "tenancyTypeConfirmation": "Is the tenancy type correct?",
-    "tenancyType": "Tenancy type",
-    "tenancyStartDateConfirmation": "Is the tenancy start date correct?",
-    "tenancyStartDate": "Tenancy start date",
-    "possessionNoticeReceived": "Did you receive a possession notice?",
-    "noticeReceivedDate": "Date notice received",
-    "rentArrearsAmountConfirmation": "Is the rent arrears amount correct?",
-    "rentArrearsAmount": "Rent arrears amount",
+    "tenancyTypeConfirmation": "Is the tenancy, occupation contract or licence agreement type correct?",
+    "tenancyType": "Corrected tenancy, occupation contract or licence type",
+    "tenancyStartDateConfirmation": "Is the tenancy, licence or occupation contract start date correct?",
+    "tenancyStartDate": "Corrected tenancy, licence or occupation contract start date",
+    "possessionNoticeReceived": "Did the claimant give you notice of their intention to begin possession proceedings?",
+    "noticeReceivedDate": "When did you receive notice from the claimant?",
+    "rentArrearsAmountConfirmation": "Is the amount of rent arrears given by the claimant correct?",
+    "rentArrearsAmount": "Admitted amount owed in rent arrears",
     "landlordRegistered": "Is your landlord registered?",
     "landlordLicensed": "Is your landlord licensed?",
-    "writtenTerms": "Do you have written tenancy terms?"
+    "writtenTerms": "Has the landlord sent written terms of the occupation contract?"
   },
 
   "payments": {
-    "anyPaymentsMade": "Have any payments been made since the claim?",
-    "paymentDetails": "Payment details",
-    "repaymentPlanAgreed": "Is a repayment plan agreed?",
-    "repaymentAgreedDetails": "Repayment plan details",
-    "repayArrearsInstalments": "Repay arrears in instalments",
-    "additionalContribution": "Additional rent contribution"
+    "anyPaymentsMade": "Have you paid any money to the claimant since the claim issue date?",
+    "paymentDetails": "Details of payments made",
+    "repaymentPlanAgreed": "Have you come to any agreement with the claimant to repay the arrears since the claim issue date?",
+    "repaymentAgreedDetails": "Details of repayment agreement",
+    "repayArrearsInstalments": "Would you like to offer to pay your arrears in instalments?",
+    "additionalContribution": "How much could you afford to pay in addition to the current rent?",
+    "additionalContributionFrequency": "How frequently could you afford to pay this amount?"
   },
 
   "household": {
-    "shareAdditional": "Share additional circumstances?",
-    "additionalDetails": "Additional circumstances details",
-    "exceptionalHardship": "Exceptional hardship?",
-    "exceptionalHardshipDetails": "Exceptional hardship details",
-    "dependantChildren": "Any dependent children?",
-    "dependantChildrenDetails": "Dependent children details",
-    "otherDependants": "Any other dependants?",
-    "otherDependantDetails": "Other dependants details",
-    "alternativeAccommodation": "Alternative accommodation?",
-    "alternativeAccommodationDate": "Alternative accommodation transfer date",
-    "otherTenants": "Other tenants in the property?",
-    "otherTenantsDetails": "Other tenants details"
+    "dependantChildren": "Do you have any dependent children?",
+    "dependantChildrenDetails": "Give details about your dependent children",
+    "otherDependants": "Do you have any other dependants?",
+    "otherDependantDetails": "Give details about your other dependants",
+    "otherTenants": "Do any other adults live in your home?",
+    "otherTenantsDetails": "Give details about the other adults living in your home",
+    "alternativeAccommodation": "Would you have somewhere else to live if you had to leave your home?",
+    "alternativeAccommodationDate": "When would you be able to move in? (optional)",
+    "shareAdditional": "Would you like to share anything about your circumstances?",
+    "additionalDetails": "Give details about your circumstances",
+    "exceptionalHardship": "Would you experience exceptional hardship if you were asked to leave your home?",
+    "exceptionalHardshipDetails": "Give details about the exceptional hardship you’d experience"
   },
 
   "income": {
-    "fromJobs": "Income from jobs",
-    "pension": "Pension",
+    "fromJobs": "Income from all jobs you do",
+    "pension": "Pension – state and private",
     "universalCredit": "Universal Credit",
-    "universalCreditApplied": "Universal Credit application date",
-    "otherBenefits": "Other benefits",
-    "moneyFromElsewhere": "Money from elsewhere?",
-    "moneyFromElsewhereDetails": "Money from elsewhere details"
+    "universalCreditApplied": "Have you applied for Universal Credit?",
+    "universalCreditApplicationDate": "When did you apply?",
+    "otherBenefits": "Other benefits and credits",
+    "moneyFromElsewhere": "Money from somewhere else (for example, child maintenance payments or someone in your household gives you money)",
+    "moneyFromElsewhereDetails": "Give details about the other sources of income and how much you usually receive",
+    "totalAmountReceived": "Total amount received",
+    "receivedEvery": "Received every"
   },
 
   "debts": {
-    "hasPriorityDebts": "Do you have priority debts?",
-    "debtTotal": "Total debt",
-    "debtContribution": "Regular debt contribution"
+    "hasPriorityDebts": "Do you have any priority debts?",
+    "debtTotal": "What is the total amount you owe for all your priority debts?",
+    "debtContribution": "How much do you pay towards your priority debts each week or month?",
+    "paidEvery": "Paid every"
   },
 
   "expenses": {
-    "householdBills": "Household bills",
+    "householdBills": "Household bills (for example, council tax, gas, electricity, water, internet)",
     "loanPayments": "Loan payments",
     "childSpousalMaintenance": "Child or spousal maintenance",
     "mobilePhone": "Mobile phone",
     "groceryShopping": "Grocery shopping",
     "fuelParkingTransport": "Fuel, parking and transport",
-    "schoolCosts": "School costs",
+    "schoolCosts": "School costs (for example, uniform and school dinners)",
     "clothing": "Clothing",
-    "other": "Other expenses"
+    "other": "Other",
+    "amountPaid": "Amount paid",
+    "paidEvery": "Paid every"
   },
 
   "additional": {
-    "otherConsiderations": "Are there other considerations?",
-    "otherConsiderationsDetails": "Other considerations details"
+    "otherConsiderations": "Is there anything else you want to tell the court as part of your response?",
+    "otherConsiderationsDetails": "Give details about what else you want to tell the court"
   },
 
   "counterclaim": {
-    "make": "Make a counterclaim?",
-    "type": "Type of counterclaim",
-    "amountKnown": "Is the claim amount known?",
-    "amount": "Counterclaim amount",
-    "estimatedMaxAmount": "Estimated maximum amount",
-    "needHelpWithFees": "Need help with fees?"
+    "type": "What are you claiming for?",
+    "amountKnown": "Are you claiming for a specific sum of money?",
+    "amount": "How much are you claiming?",
+    "estimatedMaxAmount": "What’s the maximum value of your claim?",
+    "against": "Who are you making the counterclaim against?",
+    "for": "What is your counterclaim for?",
+    "reasons": "What are your reasons for making the counterclaim?",
+    "ordersRequested": "What orders are you asking the court to make?",
+    "factsForCourt": "What facts would you like the court to consider when deciding the claim?",
+    "needHelpWithFees": "Do you need help paying the counterclaim fee?",
+    "appliedForHwf": "Have you already applied for help with your counterclaim fee?",
+    "hwfReference": "Help with Fees reference number",
+    "claimTypeOptions": {
+      "PAYMENT_OR_COMPENSATION": "A sum of money or compensation",
+      "SOMETHING_ELSE": "Something else",
+      "BOTH": "Both"
+    },
+    "needHelpWithFeesOptions": {
+      "YES": "I need help paying the fee",
+      "NO": "I do not need help paying the fee"
+    }
+  },
+
+  "incomeFrequencies": {
+    "WEEKLY": "received every week",
+    "MONTHLY": "received every month"
+  },
+
+  "paymentFrequencies": {
+    "WEEKLY": "paid every week",
+    "MONTHLY": "paid every month"
   },
 
   "frequency": {
@@ -138,7 +175,7 @@
 
   "statementOfTruth": {
     "body": "I believe the facts stated in this defence form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in the truth.",
-    "completedBy": "Completed by"
+    "yourFullName": "Your full name"
   },
 
   "pdf": {
