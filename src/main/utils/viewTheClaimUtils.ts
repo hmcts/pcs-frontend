@@ -280,6 +280,9 @@ export function buildViewTheClaimPageData(
     buildClaimantSection(data, copy),
     buildDefendantSection(data, propertyAddress, copy),
     ...buildAdditionalDefendantSections(data, propertyAddress, copy),
+    buildUnderlesseeTriageSection(data, copy),
+    buildUnderlesseeSection(data, propertyAddress, copy),
+    ...buildAdditionalUnderlesseeSections(data, propertyAddress, copy),
     buildClaimDetailsSection(data, propertyAddress, copy),
     buildWelshAsbSection(data, copy),
     buildRentArrearsSection(data, documents, caseReference, copy),
@@ -288,9 +291,6 @@ export function buildViewTheClaimPageData(
     buildTenancySection(data, documents, caseReference, copy),
     buildClaimantCircumstancesSection(data, copy),
     buildDefendantCircumstancesSection(data, copy),
-    buildUnderlesseeTriageSection(data, copy),
-    buildUnderlesseeSection(data, propertyAddress, copy),
-    ...buildAdditionalUnderlesseeSections(data, propertyAddress, copy),
     buildDemotionSection(data, copy),
     buildSuspensionSection(data, copy),
     buildProhibitedConductSection(data, copy),
@@ -407,6 +407,10 @@ function buildClaimDetailsSection(
 }
 
 function buildWelshAsbSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
+  if (!isWalesCase(data)) {
+    return undefined;
+  }
+
   const rows = [
     textRow(copy.label('isASB'), yesNoText(getValue(data, 'walesAntisocialBehaviour'))),
     textRow(copy.label('asbDetails'), getString(data, 'walesAntisocialBehaviourDetails')),
@@ -425,6 +429,10 @@ function buildRentArrearsSection(
   caseReference: string,
   copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
+  if (!isRentArrearsClaim(data)) {
+    return undefined;
+  }
+
   const rows = [
     textRow(copy.label('rentAmount'), formatMoney(getValue(data, 'rentDetails_CurrentRent'))),
     textRow(copy.label('howIsRentCalculated'), enumText(getValue(data, 'rentDetails_Frequency'), FREQUENCY_LABELS)),
@@ -462,7 +470,7 @@ function buildActionTakenSection(data: UnknownRecord, copy: ViewTheClaimCopy): V
       getFirstString(data, [
         'notice_NoticeNotServedReason',
         'notice_NoNoticeStatement',
-        'walesNoNoticeStatement',
+        'walesNoticeStatement',
         'noticeStatement',
       ])
     ),
@@ -699,29 +707,23 @@ function buildStatementOfTruthSection(
 ): ViewTheClaimStatementOfTruth {
   const statementOfTruth = asRecord(getValue(data, 'statementOfTruth'));
   let name: string | undefined;
-  let firm: string | undefined;
   let position: string | undefined;
 
   if (statementOfTruth) {
     const completedBy = getStringFromValue(statementOfTruth.completedBy)?.toUpperCase();
 
     if (completedBy === 'LEGAL_REPRESENTATIVE') {
-      name = getString(statementOfTruth, 'fullNameLegalRep');
-      firm = getString(statementOfTruth, 'firmNameLegalRep');
-      position = getString(statementOfTruth, 'positionLegalRep');
-    } else if (completedBy === 'CLAIMANT') {
-      name = getString(statementOfTruth, 'fullNameClaimant');
-      position = getString(statementOfTruth, 'positionClaimant');
+      name = getFirstString(statementOfTruth, ['fullNameLegalRep']);
+      position = getFirstString(statementOfTruth, ['positionLegalRep']);
     } else {
-      name = getFirstString(statementOfTruth, ['fullNameLegalRep', 'fullNameClaimant']);
-      firm = getString(statementOfTruth, 'firmNameLegalRep');
-      position = getFirstString(statementOfTruth, ['positionLegalRep', 'positionClaimant']);
+      name = getFirstString(statementOfTruth, ['fullNameParty', 'fullNameClaimant']);
+      position = getFirstString(statementOfTruth, ['positionParty', 'positionClaimant']);
     }
   }
 
   const valueLines =
-    name || firm || position
-      ? [name, firm, position].filter((line): line is string => !!line)
+    name || position
+      ? [name ?? emptyValue, position ?? emptyValue]
       : [emptyValue, emptyValue];
 
   return {
@@ -981,6 +983,10 @@ function selectedAlternative(data: UnknownRecord, value: string): string | undef
 function isWalesCase(data: UnknownRecord): boolean {
   const country = getStringFromValue(getValue(data, 'legislativeCountry'))?.toUpperCase();
   return country === 'WALES' || !!getValue(data, 'occupationLicenceTypeWales');
+}
+
+function isRentArrearsClaim(data: UnknownRecord): boolean {
+  return normaliseYesNo(getValue(data, 'claimDueToRentArrears')) === 'YES';
 }
 
 function hasLicenceDocuments(data: UnknownRecord): boolean {

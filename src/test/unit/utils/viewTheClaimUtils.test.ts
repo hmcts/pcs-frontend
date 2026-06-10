@@ -120,6 +120,7 @@ describe('viewTheClaimUtils', () => {
         ],
         introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
         introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS'],
+        claimDueToRentArrears: 'YES',
         rentDetails_CurrentRent: '100000',
         rentDetails_Frequency: 'MONTHLY',
         rentArrears_Total: '200000',
@@ -145,8 +146,8 @@ describe('viewTheClaimUtils', () => {
         ],
         statementOfTruth: {
           completedBy: 'CLAIMANT',
-          fullNameClaimant: 'Jane Claimant',
-          positionClaimant: 'Housing officer',
+          fullNameParty: 'Jane Claimant',
+          positionParty: 'Housing officer',
         },
       } as never,
       t
@@ -203,7 +204,7 @@ describe('viewTheClaimUtils', () => {
       t
     );
 
-    expect(rowHtml(page.statementOfTruth, 'Completed by')).toBe('John Smith<br>Smith &amp; Co Solicitors<br>Solicitor');
+    expect(rowHtml(page.statementOfTruth, 'Completed by')).toBe('John Smith<br>Solicitor');
   });
 
   it('shows statement of truth section with empty name and position when statementOfTruth is missing', () => {
@@ -219,7 +220,7 @@ describe('viewTheClaimUtils', () => {
       {
         preActionProtocolCompleted: 'NO',
         walesNoticeServed: 'NO',
-        walesNoNoticeStatement: 'Notice was not required for this claim',
+        walesNoticeStatement: 'Notice was not required for this claim',
       } as never,
       t
     );
@@ -443,10 +444,10 @@ describe('viewTheClaimUtils', () => {
     );
 
     expect(page.sections.map(section => section.title)).toEqual([
-      'Claim details',
       'Underlessees or mortgagees entitled to claim relief against forfeiture',
       'Underlessee or mortgagee 1 details',
       'Additional underlessee or mortgagee 1 details',
+      'Claim details',
     ]);
     expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe('Persons unknown');
     expect(rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')).toBe(

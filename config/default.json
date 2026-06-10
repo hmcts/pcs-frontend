@@ -24,7 +24,7 @@
   },
   "api": {
     // "url": "http://pcs-api-aat.service.core-compute-aat.internal"
-    "url": "https://pcs-api-pr-1847.preview.platform.hmcts.net"
+    "url": "https://pcs-api-pr-1951.preview.platform.hmcts.net"
   },
   "s2s": {
     "microservice": "pcs_frontend",
@@ -34,7 +34,7 @@
   },
   "ccd": {
     // "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
-    "url": "https://ccd-data-store-api-pcs-api-pr-1847.preview.platform.hmcts.net",
+    "url": "https://ccd-data-store-api-pcs-api-pr-1951.preview.platform.hmcts.net",
     "caseTypeId": "PCS"
   },
   "osPostcodeLookup": {

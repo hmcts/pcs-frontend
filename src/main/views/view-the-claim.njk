@@ -20,16 +20,8 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds view-the-claim">
-      
-      <div class="govuk-grid-row govuk-!-margin-bottom-2">
-        <div class="govuk-grid-column-two-thirds">
-          <span class="govuk-caption-l">{{ t('viewTheClaim:theClaimEyebrow') }}</span>
-          <h1 class="govuk-heading-l">{{ t('viewTheClaim:pageTitle') }}</h1>
-        </div>
-        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-          <a class="govuk-link govuk-!-display-inline-block govuk-!-margin-top-3" href="#view-the-claim-help">{{ t('viewTheClaim:contactUsForHelp') }}</a>
-        </div>
-      </div>
+      <span class="govuk-caption-l">{{ t('viewTheClaim:theClaimEyebrow') }}</span>
+      <h1 class="govuk-heading-l">{{ t('viewTheClaim:pageTitle') }}</h1>
 
       {% if propertyAddressText %}
         <p class="govuk-body govuk-!-font-size-24 govuk-!-margin-bottom-0">
@@ -38,7 +30,7 @@
       {% endif %}
 
       <p class="govuk-body govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-6">
-        <span >{{ t('viewTheClaim:caseNumberLabel') }}</span> {{ caseReference | caseReferenceDisplay }}
+        <span>{{ t('viewTheClaim:caseNumberLabel') }}</span> {{ caseReference | caseReferenceDisplay }}
       </p>
 
       <p class="govuk-body govuk-!-margin-bottom-6">{{ introText }}</p>
@@ -79,8 +71,14 @@
               + t('viewTheClaim:documentsHelpBody')
               + ' <a class="govuk-link" href="' + (documentsUrl or '#') + '">'
               + t('viewTheClaim:documentsHelpLinkText')
-              + '</a>.</p>'
+              + '</a></p>'
       }) }}
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <aside class="app-related-items" aria-label="{{ t('common:supportAndContactInformation') }}">
+        {% include "components/contact-us-details.njk" %}
+      </aside>
     </div>
   </div>
 {% endblock %}
