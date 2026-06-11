@@ -1,7 +1,12 @@
 {
   "pageTitle": "Payment successful",
-  "paragraph1": "Your payment was successful and your counterclaim has been submitted.",
-  "paymentReference": "Your payment reference number is: {{paymentReference}}",
+  "paragraph1": "Your counterclaim fee has been paid and your counterclaim has been submitted.",
   "paragraph2": "We’ve sent you a confirmation email.",
+  "paymentReference": "Your payment reference number is: {{paymentReference}}",
+  "heading1": "What to do next",
+  "listItem1": "A hearing date will be scheduled. You’ll get a notification telling you when this has happened. At the hearing, a judge will listen to both sides and make a decision. You should come to the hearing.",
+  "listItem2": "Some people need support to use HMCTS services, like step-free access to a court for a hearing. If you need support and have not already asked for it in your response, contact us. Use the ‘Contact us for help’ link on this page.",
+  "heading2": "We’d like to hear your thoughts",
+  "surveyParagraph": "<a href='https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession' rel=\"noopener\" class=\"govuk-link\" target='_blank'>Complete this short survey to help us improve this service (opens in new tab)</a> (usually takes 5 minutes).",
   "closeAndReturnToCaseOverview": "Close and return to case overview"
 }
