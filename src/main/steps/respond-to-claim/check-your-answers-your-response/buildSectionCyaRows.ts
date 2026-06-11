@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -9,6 +10,7 @@ import {
   createRowContext,
   escapeWithLineBreaks,
   groupQuestionAndDetail,
+  listHtml,
   multiSelectValue,
   pushYesNoRow,
 } from '../section-cya/cyaRow';
@@ -266,6 +268,45 @@ function addCounterClaimDetailsRows(ctx: RowContext): void {
   addCounterClaimAboutRows(ctx, cc);
   addCounterClaimAgainstRow(ctx, cc);
   addCounterClaimOrderOtherThanSumRows(ctx, cc);
+  addCounterClaimWantToUploadFilesRow(ctx);
+  addCounterClaimDocumentsRow(ctx);
+}
+
+function addCounterClaimWantToUploadFilesRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
+  if (!responses.counterClaimWantToUploadFiles) {
+    return;
+  }
+  pushYesNoRow(
+    rows,
+    'rows.counterClaimWantToUploadFiles',
+    responses.counterClaimWantToUploadFiles,
+    'counter-claim-do-you-want-to-upload-files',
+    t,
+    yesNoNotSure,
+    change
+  );
+}
+
+function addCounterClaimDocumentsRow({ rows, responses, t, change }: RowContext): void {
+  if (normalizeYesNoValue(responses.counterClaimWantToUploadFiles) !== 'YES') {
+    return;
+  }
+  const filenames = counterClaimUploadedFilenames(responses);
+  rows.push({
+    key: { text: t('rows.counterClaimDocuments.label') },
+    value:
+      filenames.length === 0
+        ? { text: t('rows.counterClaimDocuments.none') }
+        : { html: listHtml(filenames.map(escapeHtml)) },
+    actions: { items: [change('counter-claim-upload-files', 'rows.counterClaimDocuments.changeHidden')] },
+  });
+}
+
+function counterClaimUploadedFilenames(responses: CcdDefendantResponses): string[] {
+  const documents = Array.isArray(responses.counterClaimDocuments) ? responses.counterClaimDocuments : [];
+  return documents
+    .map(item => item.value?.document?.document_filename?.trim())
+    .filter((name): name is string => Boolean(name));
 }
 
 function addCounterClaimAgainstRow({ rows, t, change }: RowContext, cc: CcdCounterClaim): void {
