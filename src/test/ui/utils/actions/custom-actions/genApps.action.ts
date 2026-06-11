@@ -215,7 +215,7 @@ export class GenAppsAction implements IAction {
       ['inputText', inputDetails.addressLine1Label, inputDetails.addressLine1],
       ['inputText', inputDetails.townOrCityLabel, inputDetails.townOrCity],
       ['inputText', inputDetails.postcodeLabel, inputDetails.postcode],
-      ['inputText', inputDetails.emailLabel, inputDetails.email],
+      ['inputText', inputDetails.emailLabel, inputDetails.email]
     );
     await performAction('clickButton', paymentDetails.continueButton);
   }
