@@ -1,3 +1,5 @@
+import path from 'path';
+
 import { Page, expect, test } from '@playwright/test';
 
 import {
@@ -42,7 +44,7 @@ export class GenAppsAction implements IAction {
       ],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
       ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
-      ['uploadFilesGenApps', () => this.uploadFilesGenApps(fieldName as actionRecord)],
+      ['uploadFilesGenApps', () => this.uploadFilesGenApps(page, fieldName as actionRecord)],
       ['selectStatementOfTruth', () => this.selectStatementOfTruth(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
@@ -156,12 +158,16 @@ export class GenAppsAction implements IAction {
     await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
   }
 
-  private async uploadFilesGenApps(uploadDocs: actionRecord): Promise<void> {
+  private async uploadFilesGenApps(page: Page, uploadDocs: actionRecord): Promise<void> {
+    const fileUploadSuccessMessage = page.locator('.moj-multi-file-upload__message');
     await performAction('recordUserEntry', uploadDocs);
     if (uploadDocs.files) {
       await performAction('uploadFile', uploadDocs.files);
       const file = Array.isArray(uploadDocs.files) ? uploadDocs.files[0] : uploadDocs.files;
-      FieldsStore.set('Upload documents', String(file));
+      const fileName = path.basename(String(file));
+      await expect(fileUploadSuccessMessage).toBeVisible();
+      await expect(fileUploadSuccessMessage).toHaveText(`${fileName} has been uploaded`);
+      FieldsStore.set('Upload documents', fileName);
     }
     await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
   }
