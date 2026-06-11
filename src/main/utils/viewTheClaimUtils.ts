@@ -721,10 +721,7 @@ function buildStatementOfTruthSection(
     }
   }
 
-  const valueLines =
-    name || position
-      ? [name ?? emptyValue, position ?? emptyValue]
-      : [emptyValue, emptyValue];
+  const valueLines = name || position ? [name ?? emptyValue, position ?? emptyValue] : [emptyValue, emptyValue];
 
   return {
     rows: sectionRows([
