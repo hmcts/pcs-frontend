@@ -8,16 +8,36 @@ export class ClickRadioButtonAction implements IAction {
       await page.getByRole('radio', { name: params, exact: true }).first().check();
       return;
     }
+
     const { question, option, index } = params as actionRecord;
     const idx = index !== undefined ? Number(index) : 0;
-    const targetQuestion = page
+
+    const fieldset = page
       .locator('fieldset')
       .filter({ hasText: question as string })
       .nth(idx);
-    const radioButton = targetQuestion.getByRole('radio', {
-      name: option as string,
-      exact: true,
-    });
-    await radioButton.check();
+
+    if ((await fieldset.count()) > 0) {
+      await fieldset
+        .getByRole('radio', {
+          name: option as string,
+          exact: true,
+        })
+        .check();
+      return;
+    }
+
+    const questionLocator = page
+      .locator('p.govuk-heading-m, h2.govuk-heading-m')
+      .filter({ hasText: question as string })
+      .nth(idx);
+
+    await questionLocator
+      .locator('..')
+      .getByRole('radio', {
+        name: option as string,
+        exact: true,
+      })
+      .check();
   }
 }

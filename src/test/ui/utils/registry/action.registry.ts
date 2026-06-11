@@ -150,6 +150,12 @@ export class ActionRegistry {
     ['disputingOtherPartsOfTheClaimLR', new RespondToClaimLRAction()],
     ['enterNoticeDateUnknownLR', new RespondToClaimLRAction()],
     ['doesTheDependantHaveChildrenLR', new RespondToClaimLRAction()],
+    ['otherDependantsLR', new RespondToClaimLRAction()],
+    ['otherAdultsLR', new RespondToClaimLRAction()],
+    ['alternativeAccommodationLR', new RespondToClaimLRAction()],
+    ['circumstancesLR', new RespondToClaimLRAction()],
+    ['exceptionalHardshipLR', new RespondToClaimLRAction()],
+    ['selectIncomeAndExpensesLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

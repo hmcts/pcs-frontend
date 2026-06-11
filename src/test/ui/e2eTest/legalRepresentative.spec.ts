@@ -25,8 +25,8 @@ import {
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  yourCircumstances,
 } from '../data/page-data';
+import { circumstancesLR } from '../data/page-data/circumstancesLR.page.data';
 import { user } from '../data/user-data';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
@@ -119,22 +119,22 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
-    await performAction('doYouHaveAnyOtherDependants', {
+    await performAction('otherDependantsLR', {
       otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
-    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+    await performAction('otherAdultsLR', {
       radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
       details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
     });
-    await performAction('selectAlternativeAccommodation', {
+    await performAction('alternativeAccommodationLR', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(5),
     });
-    await performAction('yourCircumstances', {
-      question: yourCircumstances.wouldYouLikeToShareHeader,
-      yourCircumstancesOption: yourCircumstances.yesRadioOption,
+    await performAction('circumstancesLR', {
+      question: circumstancesLR.lrWouldYouLikeToShareHeader,
+      yourCircumstancesOption: circumstancesLR.yesRadioOption,
     });
-    await performAction('exceptionalHardship', {
+    await performAction('exceptionalHardshipLR', {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });

@@ -1,11 +1,18 @@
 import { Page } from '@playwright/test';
 
 import {
+  circumstancesLR,
   confirmationOfNoticeGiven,
+  doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
+  exceptionalHardship,
+  incomeAndExpenses,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   tenancyDateUnknown,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  yourCircumstances,
 } from '../../../data/page-data';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -21,6 +28,12 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['disputingOtherPartsOfTheClaimLR', () => this.disputingOtherPartsOfTheClaimLR(fieldName as actionRecord)],
       ['enterNoticeDateUnknownLR', () => this.enterNoticeDateUnknownLR(fieldName as actionRecord)],
       ['doesTheDependantHaveChildrenLR', () => this.doesTheDependantHaveChildrenLR(fieldName as actionRecord)],
+      ['otherDependantsLR', () => this.otherDependantsLR(fieldName as actionRecord)],
+      ['otherAdultsLR', () => this.otherAdultsLR(fieldName as actionRecord)],
+      ['alternativeAccommodationLR', () => this.alternativeAccommodationLR(fieldName as actionRecord)],
+      ['circumstancesLR', () => this.circumstancesLR(fieldName as actionRecord)],
+      ['exceptionalHardshipLR', () => this.exceptionalHardshipLR(fieldName as actionRecord)],
+      ['selectIncomeAndExpensesLR', () => this.selectIncomeAndExpensesLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -100,5 +113,88 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       );
     }
     await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  }
+
+  private async otherDependantsLR(otherDependantsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: doYouHaveAnyOtherDependants.lrHiddenMainHeader,
+      option: otherDependantsData.otherDependantsOption,
+    });
+
+    if (otherDependantsData.otherDependantsOption === 'Yes') {
+      await performAction(
+        'inputText',
+        doYouHaveAnyOtherDependants.lrHiddenTextLabel,
+        otherDependantsData.otherDependantsInfo
+      );
+    }
+    await performAction('clickButton', doYouHaveAnyOtherDependants.saveAndContinueButton);
+  }
+
+  private async otherAdultsLR(adultsInHouseDetails: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: doAnyOtherAdultsLiveInYourHome.lrMainHeader,
+      option: adultsInHouseDetails.radioOption,
+    });
+
+    if (adultsInHouseDetails.radioOption === 'Yes' && adultsInHouseDetails.details) {
+      await performAction(
+        'inputText',
+        doAnyOtherAdultsLiveInYourHome.lrGiveDetailsHiddenTextLabel,
+        adultsInHouseDetails.details
+      );
+    }
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+  }
+
+  private async alternativeAccommodationLR(moveInDetails: actionRecord) {
+    await performAction('clickRadioButton', {
+      question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.lrHiddenParagraph,
+      option: moveInDetails.radioOption,
+    });
+
+    if (moveInDetails.radioOption === 'Yes' && moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, moveInDetails.day],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, moveInDetails.month],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, moveInDetails.year]
+      );
+    }
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  }
+
+  private async circumstancesLR(yourCircumstancesData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: yourCircumstancesData.question,
+      option: yourCircumstancesData.yourCircumstancesOption,
+    });
+    if (yourCircumstancesData.yourCircumstancesOption === 'Yes') {
+      await performAction('inputText', circumstancesLR.lrGiveDetailsHiddenTextLabel, circumstancesLR.detailsTextInput);
+    }
+    await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  }
+
+  private async exceptionalHardshipLR(exceptionalHardshipData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: exceptionalHardshipData.question,
+      option: exceptionalHardshipData.exceptionalHardshipOption,
+    });
+    if (exceptionalHardshipData.exceptionalHardshipOption === 'Yes') {
+      await performAction(
+        'inputText',
+        exceptionalHardship.lrGiveDetailsHiddenTextLabel,
+        exceptionalHardship.detailsTextInput
+      );
+    }
+    await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
+  }
+
+  private async selectIncomeAndExpensesLR(incomeAndExpenseData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: incomeAndExpenses.lrDoesDefendantWantToProvideHiddenHeader,
+      option: incomeAndExpenseData.incomeAndExpensesOption,
+    });
+    await performAction('clickButton', incomeAndExpenses.saveAndContinueButton);
   }
 }
