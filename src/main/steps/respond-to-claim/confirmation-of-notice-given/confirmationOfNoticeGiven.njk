@@ -19,7 +19,7 @@
       {% if field.componentType == 'radios' %}
         {{ govukRadios(field.component) }}
       {% endif %}
-    {% endfor %}
+    {% endfor %} 
 
     {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}
