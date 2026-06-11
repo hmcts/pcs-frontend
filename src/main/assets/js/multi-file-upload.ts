@@ -16,19 +16,6 @@ function getCsrfToken(): string {
   return document.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value || '';
 }
 
-function parseOptionalInt(value: string | undefined): number | undefined {
-  if (!value) {
-    return undefined;
-  }
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) ? parsed : undefined;
-}
-
-function parseOptionalMbToBytes(value: string | undefined): number | undefined {
-  const mb = parseOptionalInt(value);
-  return mb === undefined ? undefined : mb * 1024 * 1024;
-}
-
 // MOJ multi-file-upload error pattern (https://design-patterns.service.justice.gov.uk/components/multi-file-upload/):
 // - Page-level error summary at the top of the grid column / main, linking to the file input.
 // - Inline govuk-error-message inside the input's form-group, with form-group--error and aria-describedby on the input.
@@ -233,14 +220,13 @@ function initContainer(container: HTMLElement): void {
 
   const maxFileSizeMb = Number.parseInt(container.dataset.maxFileSizeMb || '1024', 10);
   const maxBytes = maxFileSizeMb * 1024 * 1024;
-  const maxFilenameLength = parseOptionalInt(container.dataset.maxFilenameLength);
-  const maxDocumentBytes = parseOptionalMbToBytes(container.dataset.maxDocumentMb);
-  const maxMediaBytes = parseOptionalMbToBytes(container.dataset.maxMediaMb);
+  const maxMediaMb = Number.parseInt(container.dataset.maxMediaMb || '0', 10);
+  const maxMediaBytes = maxMediaMb > 0 ? maxMediaMb * 1024 * 1024 : 0;
+  const maxFilenameLength = Number.parseInt(container.dataset.maxFilenameLength || '0', 10);
   const wrongTypeMessage = container.dataset.errorWrongType || '';
   const tooLargeMessage = container.dataset.errorFileTooLarge || '';
-  const filenameTooLongMessage = container.dataset.errorFilenameTooLong || tooLargeMessage;
-  const tooLargeDocumentMessage = container.dataset.errorFileTooLargeDocument || tooLargeMessage;
   const tooLargeMediaMessage = container.dataset.errorFileTooLargeMedia || tooLargeMessage;
+  const filenameTooLongMessage = container.dataset.errorFilenameTooLong || '';
   const deleteFailedMessage = container.dataset.errorDelete || '';
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
@@ -251,31 +237,30 @@ function initContainer(container: HTMLElement): void {
     hooks: {
       entryHook: (_upload: InstanceType<typeof MultiFileUpload>, file: File) => {
         clearErrorSummary(container);
-        // Mirrors validateUploadedFile precedence on the server (see documentUploadValidation.ts).
-        // Pre-flight here saves the round-trip; server validates again as defence in depth.
+        // Mirror server's validateFileType precedence:
+        //   1. blocked media (AC04)         → wrong-type message
+        //   2. filename too long            → filename-too-long message
+        //   3. extension not in allowlist   → wrong-type message
+        //   4. image file too large         → media-too-large message
+        //   5. file too large               → too-large message
+        // Pre-flight here saves the round-trip; server still validates as defence in depth.
         if (isBlockedExtension(file.name)) {
           showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
           throw new Error('blocked');
+        }
+        if (maxFilenameLength > 0 && file.name.length > maxFilenameLength) {
+          showErrorSummary(container, filenameTooLongMessage, errorSummaryTitle);
+          throw new Error('filename_too_long');
         }
         if (!isAllowedExtension(file.name)) {
           showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
           throw new Error('invalid_type');
         }
-        if (maxFilenameLength !== undefined && file.name.length > maxFilenameLength) {
-          showErrorSummary(container, filenameTooLongMessage, errorSummaryTitle);
-          throw new Error('filename_too_long');
+        if (maxMediaBytes > 0 && isMediaExtension(file.name) && file.size > maxMediaBytes) {
+          showErrorSummary(container, tooLargeMediaMessage, errorSummaryTitle);
+          throw new Error('media_too_large');
         }
-        if (maxDocumentBytes !== undefined && maxMediaBytes !== undefined) {
-          if (isMediaExtension(file.name)) {
-            if (file.size > maxMediaBytes) {
-              showErrorSummary(container, tooLargeMediaMessage, errorSummaryTitle);
-              throw new Error('media_too_large');
-            }
-          } else if (file.size > maxDocumentBytes) {
-            showErrorSummary(container, tooLargeDocumentMessage, errorSummaryTitle);
-            throw new Error('document_too_large');
-          }
-        } else if (file.size > maxBytes) {
+        if (file.size > maxBytes) {
           showErrorSummary(container, tooLargeMessage, errorSummaryTitle);
           throw new Error('too_large');
         }

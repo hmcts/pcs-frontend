@@ -10,7 +10,12 @@ import type {
   FormFieldConfig,
   FormFieldOption,
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
-import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
+import {
+  ACCEPT_ATTRIBUTE_EXTENSIONS,
+  UPLOAD_MAX_FILENAME_LENGTH,
+  UPLOAD_MAX_FILE_SIZE_MB,
+  UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
+} from '@utils/documentUploadValidation';
 
 function createFieldsetLegend(
   label: string,
@@ -206,12 +211,20 @@ export function buildComponentConfig({
       component.value = fieldValue || [];
       component.accept = field.accept || ACCEPT_ATTRIBUTE_EXTENSIONS;
       component.maxFileSize = field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB;
+      component.maxMediaMB = UPLOAD_MAX_MEDIA_FILE_SIZE_MB;
+      component.maxFilenameLength = UPLOAD_MAX_FILENAME_LENGTH;
       component.uploadUrl = field.uploadUrl || '';
       component.deleteUrl = field.deleteUrl || '';
       component.classes = field.classes || 'govuk-file-upload';
       component.errorWrongType = t('common:errors.documentUpload.wrongFileTypeDocStore');
       component.errorFileTooLarge = t('common:errors.documentUpload.fileTooLargeDocStore', {
         maxSize: String(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
+      });
+      component.errorFileTooLargeMedia = t('common:errors.documentUpload.fileTooLargeMedia', {
+        maxSize: String(UPLOAD_MAX_MEDIA_FILE_SIZE_MB),
+      });
+      component.errorFilenameTooLong = t('common:errors.documentUpload.filenameTooLong', {
+        maxLength: String(UPLOAD_MAX_FILENAME_LENGTH),
       });
       component.errorDelete = t('common:errors.documentUpload.fileDeleteFailed');
       component.errorSummaryTitle = t('common:errors.documentUpload.errorSummaryTitle');

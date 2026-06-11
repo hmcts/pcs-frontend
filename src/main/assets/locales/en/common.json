@@ -74,9 +74,8 @@
     "documentUpload": {
       "wrongFileTypeDocStore": "The selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
       "fileTooLargeDocStore": "The selected file must be smaller than {{maxSize}}MB",
-      "fileTooLargeDocument": "File you have uploaded is too big. Document files must be less than {{maxSize}}MB.",
       "fileTooLargeMedia": "File you have uploaded is too big. Image files must be smaller than {{maxSize}}MB.",
-      "fileTotalTooLargeDocStore": "The selected files must be smaller than {{maxSize}}GB. Delete one or more files or reduce the file sizes.",
+      "fileTotalTooLargeDocStore": "The selected files must be smaller than {{maxSize}}MB. Delete one or more files or reduce the file sizes.",
       "filenameTooLong": "The file name must be {{maxLength}} characters or fewer",
       "noFileSelected": "Select a file to upload",
       "uploadFailed": "The selected file could not be uploaded – try again",
