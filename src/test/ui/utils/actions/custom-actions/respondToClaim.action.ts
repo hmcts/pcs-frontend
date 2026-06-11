@@ -81,6 +81,7 @@ const rtcCyaMap = new Map<string, string>();
 const rtcSectionAnswers = new Map<string, Map<string, string>>();
 let activeRtcSection = '';
 const rtcUploadedDocumentsQuestion = 'Uploaded files';
+const rtcFinalCyaUploadedDocumentsQuestion = 'Upload any files that you think are relevant to your response';
 const rtcNoDocumentsUploadedValue = 'No files uploaded';
 const rtcNoAnswerProvidedValue = 'No answer provided';
 const rtcCyaFailurePreviewLimit = 10;
@@ -1338,7 +1339,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async doYouWantToUploadFiles(uploadOption: actionRecord): Promise<void> {
-    this.recordAnswer(doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader, uploadOption);
+    this.recordAnswer(doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader, uploadOption.option);
     await performAction('clickRadioButton', {
       question: doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader,
       option: uploadOption.option,
@@ -1388,46 +1389,34 @@ export class RespondToClaimAction implements IAction {
   private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
     const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
     rtcCyaMap.clear();
-    const summaryLists = page.locator('.govuk-summary-list');
-    const summaryListCount = await summaryLists.count();
+    const rowsLocator = page.locator('.govuk-summary-list__row:visible');
+    await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
 
-    if (summaryListCount === 0) {
-      throw new Error('RTC CYA table not found. Exiting...');
+    if (FieldsStore.getAll().has(rtcUploadedDocumentsQuestion)) {
+      const uploadedFilesLabel = sectionData ? rtcUploadedDocumentsQuestion : rtcFinalCyaUploadedDocumentsQuestion;
+      await page
+        .locator('.govuk-summary-list__row:visible')
+        .filter({ has: page.locator('.govuk-summary-list__key', { hasText: uploadedFilesLabel }) })
+        .first()
+        .waitFor({ state: 'visible', timeout: 15000 });
     }
 
-    let hasVisibleRows = false;
+    const rowCount = await rowsLocator.count();
+    for (let j = 0; j < rowCount; j++) {
+      const row = rowsLocator.nth(j);
+      const displayedKeyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
+      const keyText =
+        !sectionData && displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion
+          ? rtcUploadedDocumentsQuestion
+          : displayedKeyText;
+      const valueCell = row.locator('.govuk-summary-list__value').first();
+      const innerText = (await valueCell.innerText()).trim();
+      const textContent = ((await valueCell.textContent()) ?? '').trim();
+      const valueText = (innerText || textContent).replace(/\r?\n+/g, ', ').replace(/\s{2,}/g, ' ');
 
-    for (let i = 0; i < summaryListCount; i++) {
-      const summaryList = summaryLists.nth(i);
-      if (!(await summaryList.isVisible())) {
-        continue;
+      if (keyText) {
+        rtcCyaMap.set(keyText, valueText);
       }
-
-      await summaryList.waitFor({ state: 'visible' });
-      const rows = summaryList.locator('.govuk-summary-list__row');
-      const rowCount = await rows.count();
-
-      for (let j = 0; j < rowCount; j++) {
-        const row = rows.nth(j);
-        if (!(await row.isVisible())) {
-          continue;
-        }
-
-        hasVisibleRows = true;
-        const keyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
-        const valueCell = row.locator('.govuk-summary-list__value').first();
-        const innerText = (await valueCell.innerText()).trim();
-        const textContent = ((await valueCell.textContent()) ?? '').trim();
-        const valueText = (innerText || textContent).replace(/\r?\n+/g, ', ').replace(/\s{2,}/g, ' ');
-
-        if (keyText) {
-          rtcCyaMap.set(keyText, valueText);
-        }
-      }
-    }
-
-    if (!hasVisibleRows) {
-      throw new Error('RTC CYA table not found. Exiting...');
     }
 
     console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);

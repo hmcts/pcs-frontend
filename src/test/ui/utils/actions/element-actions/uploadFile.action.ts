@@ -9,19 +9,18 @@ export class UploadFileAction implements IAction {
     if (typeof files === 'string') {
       await this.uploadFile(page, files);
     } else if (Array.isArray(files)) {
-      for (let index = 0; index < files.length; index++) {
-        await this.uploadFile(page, files[index]);
-        if (index < files.length - 1) {
-          await page.waitForTimeout(5000);
-        }
+      for (const file of files) {
+        await this.uploadFile(page, file);
       }
     }
   }
 
   private async uploadFile(page: Page, file: string): Promise<void> {
-    const fileInput = page.locator('input[type="file"].govuk-file-upload');
+    const uploadedDocuments = page.locator('input[name="uploadedDocuments[]"]');
+    const uploadedDocumentCount = await uploadedDocuments.count();
+    const fileInput = page.locator('input[type="file"].moj-multi-file-upload__input');
     const filePath = path.resolve(__dirname, '../../../data/inputFiles', file);
     await fileInput.last().setInputFiles(filePath);
-    // await performValidation('waitUntilElementDisappears', 'Uploading...');
+    await uploadedDocuments.nth(uploadedDocumentCount).waitFor({ state: 'attached' });
   }
 }
