@@ -257,6 +257,43 @@ describe('section-CYA row builders — characterisation', () => {
       expect(addressRow?.value).toEqual({ html: '3 Wiltshire Close<br>WA1 4DA' });
       expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
     });
+
+    it('correspondence-address: shows Yes row using property address when citizen confirmed in fallback scenario', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          propertyAddress: { AddressLine1: '5 Property Lane', PostCode: 'PR1 2OP' },
+          possessionClaimResponse: {
+            defendantResponses: { propertyAddressConfirmation: 'YES' },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.label');
+      expect(addressRow?.value).toEqual({ text: 'options.yes' });
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel')).toBe(false);
+    });
+
+    it('correspondence-address: shows entered address when citizen answered No in fallback scenario', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          propertyAddress: { AddressLine1: '5 Property Lane', PostCode: 'PR1 2OP' },
+          possessionClaimResponse: {
+            defendantResponses: { propertyAddressConfirmation: 'NO' },
+            defendantContactDetails: {
+              party: {
+                address: { AddressLine1: '10 New Street', PostTown: 'Manchester', PostCode: 'M1 1AA' },
+              },
+            },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
+      expect(addressRow?.value).toEqual({ html: '10 New Street<br>Manchester<br>M1 1AA' });
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
+    });
   });
 
   describe('dispute-and-tenancy', () => {
