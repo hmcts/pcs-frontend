@@ -1399,9 +1399,10 @@ export class RespondToClaimAction implements IAction {
   private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
     const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
     rtcCyaMap.clear();
-    const summaryList = page.locator('.govuk-summary-list').first();
-    await summaryList.waitFor({ state: 'visible' });
+    const rowsLocator = page.locator('.govuk-summary-list__row:visible');
+    await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
 
+    const summaryList = rowsLocator.first().locator('xpath=ancestor::*[contains(@class, "govuk-summary-list")][1]');
     const rows = summaryList.locator('.govuk-summary-list__row');
     const rowCount = await rows.count();
 
