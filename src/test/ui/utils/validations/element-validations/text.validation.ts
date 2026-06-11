@@ -43,6 +43,10 @@ export class TextValidation implements IValidation {
         data.elementType = 'legend';
     }
     const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
+    if (validation === 'textNotVisible') {
+      await expect(locator).toHaveCount(0);
+      return;
+    }
     await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(String(data.text))}\\s*$`));
   }
 }
