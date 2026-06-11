@@ -26,6 +26,7 @@ import {
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
 } from '../data/page-data';
+import { startNow } from '../data/page-data';
 import { circumstancesLR } from '../data/page-data/circumstancesLR.page.data';
 import { user } from '../data/user-data';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';

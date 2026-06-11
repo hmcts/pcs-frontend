@@ -21,6 +21,5 @@ export function loadPlaywrightSetupEnvIntoProcess(): void {
   }
 }
 
-// src/test/config/testConstants.ts
 export const VERY_SHORT_TIMEOUT = 5_000;
 export const actionRetries = 3;
