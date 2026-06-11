@@ -156,7 +156,7 @@
     "playwright": "1.60.0",
     "playwright-core": "1.60.0",
     "postcss": "8.5.15",
-    "prettier": "3.8.3",
+    "prettier": "3.8.4",
     "sass": "1.100.0",
     "sass-loader": "17.0.0",
     "saucectl": "^0.205.0",
