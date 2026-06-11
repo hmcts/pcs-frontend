@@ -207,15 +207,15 @@ export class GenAppsAction implements IAction {
   private async inputPaymentDetails(inputDetails: actionRecord) {
     await performActions(
       'Enter details',
-      ['inputText', inputDetails.label1, inputDetails.input1],
-      ['inputText', inputDetails.label2, inputDetails.input2],
-      ['inputText', inputDetails.label3, inputDetails.input3],
-      ['inputText', inputDetails.label4, inputDetails.input4],
-      ['inputText', inputDetails.label5, inputDetails.input5],
-      ['inputText', inputDetails.label6, inputDetails.input6],
-      ['inputText', inputDetails.label7, inputDetails.input7],
-      ['inputText', inputDetails.label8, inputDetails.input8],
-      ['inputText', inputDetails.label9, inputDetails.input9]
+      ['inputText', inputDetails.cardNumberLabel, inputDetails.cardNumber],
+      ['inputText', inputDetails.monthLabel, inputDetails.month],
+      ['inputText', inputDetails.yearLabel, inputDetails.year],
+      ['inputText', inputDetails.nameOnCardLabel, inputDetails.nameOnCard],
+      ['inputText', inputDetails.cardSecurityCodeLabel, inputDetails.cardSecurityCode],
+      ['inputText', inputDetails.addressLine1Label, inputDetails.addressLine1],
+      ['inputText', inputDetails.townOrCityLabel, inputDetails.townOrCity],
+      ['inputText', inputDetails.postcodeLabel, inputDetails.postcode],
+      ['inputText', inputDetails.emailLabel, inputDetails.email],
     );
     await performAction('clickButton', paymentDetails.continueButton);
   }
