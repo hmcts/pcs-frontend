@@ -20,6 +20,7 @@ export class UploadFileAction implements IAction {
     const uploadedDocumentCount = await uploadedDocuments.count();
     const fileInput = page.locator('input[type="file"].moj-multi-file-upload__input');
     const filePath = path.resolve(__dirname, '../../../data/inputFiles', file);
+
     await fileInput.last().setInputFiles(filePath);
     await uploadedDocuments.nth(uploadedDocumentCount).waitFor({ state: 'attached' });
   }

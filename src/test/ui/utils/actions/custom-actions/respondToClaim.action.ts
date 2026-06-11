@@ -1391,7 +1391,6 @@ export class RespondToClaimAction implements IAction {
     rtcCyaMap.clear();
     const rowsLocator = page.locator('.govuk-summary-list__row:visible');
     await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
-
     if (FieldsStore.getAll().has(rtcUploadedDocumentsQuestion)) {
       const uploadedFilesLabel = sectionData ? rtcUploadedDocumentsQuestion : rtcFinalCyaUploadedDocumentsQuestion;
       await page
@@ -1504,19 +1503,25 @@ export class RespondToClaimAction implements IAction {
 
     const defendantDetailsKnown = explicitDefendantDetailsKnown ?? explicitDefendantTypeKnown;
 
-    const pin =
-      typeof defendantDetailsKnown === 'boolean'
-        ? selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin
-        : (getSelectedPinUser()?.pin ?? pins[0]);
+    let pin: string | undefined;
+
+    if (typeof accessCode.pinIndex === 'number') {
+      pin = pins[accessCode.pinIndex];
+    } else if (typeof defendantDetailsKnown === 'boolean') {
+      pin = selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin;
+    } else {
+      pin = getSelectedPinUser()?.pin ?? pins[0];
+    }
 
     if (!pin) {
-      throw new Error('PIN is not available. Ensure fetchPINsAPI is called before accessYourCase');
+      throw new Error(`PIN is not available for index ${accessCode.pinIndex}`);
     }
 
     await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
     await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
     await performAction('clickButton', accessYourCase.continueButton);
   }
+
   private async readReasonableAdjustmentsTriage(): Promise<void> {
     //this.recordAnswer(reasonableAdjustmentsTriage.mainHeader, reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
