@@ -15,10 +15,19 @@
   }) }}
 
   <p class="govuk-body">{{ paragraph1 }}</p>
+  <p class="govuk-body">{{ paragraph2 }}</p>
   {% if paymentReferenceLine %}
     <p class="govuk-body">{{ paymentReferenceLine }}</p>
   {% endif %}
-  <p class="govuk-body">{{ paragraph2 }}</p>
+
+  <h2 class="govuk-heading-m">{{ heading1 }}</h2>
+  <ol class="govuk-list govuk-list--number govuk-list--spaced">
+    <li>{{ listItem1 }}</li>
+    <li>{{ listItem2 | safe }}</li>
+  </ol>
+
+  <h2 class="govuk-heading-s">{{ heading2 }}</h2>
+  <p class="govuk-body">{{ surveyParagraph | safe }}</p>
 
   {{ govukButton({
     text: closeAndReturnToCaseOverview,
