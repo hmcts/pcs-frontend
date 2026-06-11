@@ -190,9 +190,11 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   } else if (testInfo.title.includes('@secureFlexible')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
   } else if (testInfo.title.includes('@other')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
   } else if (testInfo.title.includes('@rentNonRent')) {

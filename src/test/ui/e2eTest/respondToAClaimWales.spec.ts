@@ -56,6 +56,7 @@ let claimantName: string;
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   process.env.WALES_POSTCODE = 'YES';
+  process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
   process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
   if (testInfo.title.includes('Secure')) {
     process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
