@@ -74,4 +74,5 @@ export default {
   'reasonable-adjustments-triage': 'reasonableAdjustmentsTriage',
   'task-list': 'taskList',
   'confirm-if-these-documents-relate-to-an-application': 'confirmIfTheseDocumentsRelateToAnApplication',
+  claims: 'claims',
 };
