@@ -123,7 +123,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test.skip('Select an Application - Ask to Set aside - You need to apply for application fee @regression', async () => {
+  test('Select an Application - Ask to Set aside - You need to apply for application fee @regression', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
