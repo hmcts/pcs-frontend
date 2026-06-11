@@ -225,7 +225,8 @@ export class GenAppsAction implements IAction {
     await performAction('clickButton', confirmYourPayment.confirmPaymentButton);
   }
 
-  private async verifyApplicationSubmitted() {
+  private async verifyApplicationSubmitted(): Promise<void> {
+    await performValidation('mainHeader', applicationSubmitted.mainHeader);
     await performAction('clickButton', applicationSubmitted.closeAndReturnToCaseOverviewButton);
   }
 
