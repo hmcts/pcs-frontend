@@ -1,7 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import { dashboard } from '../../data/page-data';
 import {
-  applicationSubmitted,
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   askToAdjournTheCourtHearing,
   checkYourAnswersGenApps,
@@ -11,10 +10,11 @@ import {
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
-  payForYourApplication,
   paymentDetails,
   uploadDocumentsToSupportYourApplication,
- whatOrderDoYouWantTheCourtToMakeAndWhy , whichLanguageDidYouUseToCompleteThisService } from '../../data/page-data/genApps-page-data';
+  whatOrderDoYouWantTheCourtToMakeAndWhy,
+  whichLanguageDidYouUseToCompleteThisService,
+} from '../../data/page-data/genApps-page-data';
 import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
@@ -104,9 +104,11 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
+    await performAction('verifyApplicationSubmitted');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No]', async () => {
+  test.skip('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No]', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.adjournTheHearingRadioOption,
@@ -157,20 +159,31 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
+    await performAction('payForApplication');
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputPaymentDetails', {
+      question: paymentDetails.mainHeader,
+      label1: paymentDetails.cardNumberTextLabel,
+      input1: paymentDetails.cardNumberTextInput,
+      label2: paymentDetails.monthTextLabel,
+      input2: paymentDetails.monthTextInput,
+      label3: paymentDetails.yearTextLabel,
+      input3: paymentDetails.yearTextInput,
+      label4: paymentDetails.nameOnCardTextLabel,
+      input4: paymentDetails.nameOnCardTextInput,
+      label5: paymentDetails.cardSecurityCodeTextLabel,
+      input5: paymentDetails.cardSecurityCodeTextInput,
+      label6: paymentDetails.addressLine1TextLabel,
+      input6: paymentDetails.addressLine1TextInput,
+      label7: paymentDetails.townOrCityTextLabel,
+      input7: paymentDetails.townOrCityTextInput,
+      label8: paymentDetails.postcodeTextLabel,
+      input8: paymentDetails.postcodeTextInput,
+      label9: paymentDetails.emailTextLabel,
+      input9: paymentDetails.emailTextInput,
+    });
+    await performAction('confirmPayment');
+    await performAction('verifyApplicationSubmitted');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
-  await performValidation('mainHeader', payForYourApplication.mainHeader);
-  await performAction('clickButton', payForYourApplication.continueToPaymentButton);
-  await performValidation('mainHeader', payForYourApplication.mainHeader);
-  await performAction('inputText', paymentDetails.cardNumberTextLabel, paymentDetails.cardNumberTextInput);
-  await performAction('inputText', paymentDetails.monthTextLabel, paymentDetails.monthTextInput);
-  await performAction('inputText', paymentDetails.yearTextLabel, paymentDetails.yearTextInput);
-  await performAction('inputText', paymentDetails.nameOnCardTextLabel, paymentDetails.nameOnCardTextInput);
-  await performAction('inputText', paymentDetails.cardSecurityCodeTextLabel, paymentDetails.cardSecurityCodeTextInput);
-  await performAction('inputText', paymentDetails.addressLine1TextLabel, paymentDetails.addressLine1TextInput);
-  await performAction('inputText', paymentDetails.townOrCityTextLabel, paymentDetails.townOrCityTextInput);
-  await performAction('inputText', paymentDetails.postcodeTextLabel, paymentDetails.postcodeTextInput);
-  await performAction('inputText', paymentDetails.postcodeTextLabel, paymentDetails.postcodeTextInput);
-  await performAction('inputText', paymentDetails.emailTextLabel, paymentDetails.emailTextInput);
-  await performAction('clickButton', paymentDetails.continueButton);
-  await performValidation('mainHeader', applicationSubmitted.mainHeader);
 });

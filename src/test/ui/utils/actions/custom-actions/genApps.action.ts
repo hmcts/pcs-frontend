@@ -1,6 +1,7 @@
 import { Page, expect, test } from '@playwright/test';
 
 import {
+  applicationSubmitted,
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   checkYourAnswersGenApps,
   chooseAnApplication,
@@ -9,13 +10,16 @@ import {
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  payForYourApplication,
+  paymentDetails,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
+import { confirmYourPayment } from '../../../data/page-data/genApps-page-data/confirmYourPayment.page.data';
 import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString, stringToCamelCase } from '../../common/string.utils';
-import { performAction, performValidation } from '../../controller';
+import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 import { defaultJourney, journeys } from '../../journeyMappingGenApps';
 
@@ -45,6 +49,10 @@ export class GenAppsAction implements IAction {
       ['validateCYA', () => this.validateCYA()],
       ['reviewCYA', () => this.reviewCYA(page, fieldName as actionData)],
       ['reviewAndUpdateCYA', () => this.reviewAndUpdateCYA(page, fieldName as actionRecord)],
+      ['payForApplication', () => this.payForApplication()],
+      ['inputPaymentDetails', () => this.inputPaymentDetails(fieldName as actionRecord)],
+      ['confirmPayment', () => this.confirmPayment()],
+      ['verifyApplicationSubmitted', () => this.verifyApplicationSubmitted()],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -184,6 +192,35 @@ export class GenAppsAction implements IAction {
         ? checkYourAnswersGenApps.submitHiddenButton
         : checkYourAnswersGenApps.continueToPaymentHiddenButton;
     await performAction('clickButton', button);
+  }
+
+  private async payForApplication() {
+    await performAction('clickButton', payForYourApplication.continueToPaymentButton);
+  }
+
+  private async inputPaymentDetails(inputDetails: actionRecord) {
+    await performActions(
+      'Enter details',
+      ['inputText', inputDetails.label1, inputDetails.input1],
+      ['inputText', inputDetails.label2, inputDetails.input2],
+      ['inputText', inputDetails.label3, inputDetails.input3],
+      ['inputText', inputDetails.label4, inputDetails.input4],
+      ['inputText', inputDetails.label5, inputDetails.input5],
+      ['inputText', inputDetails.label6, inputDetails.input6],
+      ['inputText', inputDetails.label7, inputDetails.input7],
+      ['inputText', inputDetails.label8, inputDetails.input8],
+      ['inputText', inputDetails.label9, inputDetails.input9]
+    );
+    await performAction('clickButton', paymentDetails.continueButton);
+  }
+
+  private async confirmPayment() {
+    await performValidation('mainHeader', confirmYourPayment.mainHeader);
+    await performAction('clickButton', confirmYourPayment.confirmPaymentButton);
+  }
+
+  private async verifyApplicationSubmitted() {
+    await performAction('clickButton', applicationSubmitted.closeAndReturnToCaseOverviewButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {

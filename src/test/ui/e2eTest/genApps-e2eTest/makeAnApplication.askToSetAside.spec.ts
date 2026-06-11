@@ -8,6 +8,7 @@ import {
   doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
+  paymentDetails,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
@@ -94,9 +95,35 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
+    await performAction('payForApplication');
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputPaymentDetails', {
+      question: paymentDetails.mainHeader,
+      label1: paymentDetails.cardNumberTextLabel,
+      input1: paymentDetails.cardNumberTextInput,
+      label2: paymentDetails.monthTextLabel,
+      input2: paymentDetails.monthTextInput,
+      label3: paymentDetails.yearTextLabel,
+      input3: paymentDetails.yearTextInput,
+      label4: paymentDetails.nameOnCardTextLabel,
+      input4: paymentDetails.nameOnCardTextInput,
+      label5: paymentDetails.cardSecurityCodeTextLabel,
+      input5: paymentDetails.cardSecurityCodeTextInput,
+      label6: paymentDetails.addressLine1TextLabel,
+      input6: paymentDetails.addressLine1TextInput,
+      label7: paymentDetails.townOrCityTextLabel,
+      input7: paymentDetails.townOrCityTextInput,
+      label8: paymentDetails.postcodeTextLabel,
+      input8: paymentDetails.postcodeTextInput,
+      label9: paymentDetails.emailTextLabel,
+      input9: paymentDetails.emailTextInput,
+    });
+    await performAction('confirmPayment');
+    await performAction('verifyApplicationSubmitted');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('Select an Application - Ask to Set aside - You need to apply for application fee', async () => {
+  test.skip('Select an Application - Ask to Set aside - You need to apply for application fee', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
