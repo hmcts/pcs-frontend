@@ -12,6 +12,7 @@ import {
   respondPossessionClaimAPIAction,
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
+import { LinkSolicitorAPIAction } from '../actions/custom-actions/linkSolicitorAPI.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -106,6 +107,8 @@ export class ActionRegistry {
     ['languageUsed', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
+    ['getCaseAPI', new CreateCaseAPIAction()],
+    ['linkSolicitorAPI', new LinkSolicitorAPIAction()],
     ['taskList', new RespondToClaimAction()],
     ['taskListStatus', new RespondToClaimAction()],
     ['resetRTCAnswerStore', new RespondToClaimAction()],
