@@ -20,6 +20,7 @@ import {
 export class ValidationRegistry {
   private static validations: Map<string, IValidation> = new Map([
     ['text', new TextValidation()],
+    ['textNotVisible', new TextValidation()],
     ['bannerAlert', new BannerAlertValidation()],
     ['formLabelValue', new FormLabelValueValidation()],
     ['optionList', new OptionListValidation()],
