@@ -93,7 +93,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Verify confirm document options based on GenApp type @regression', async () => {
+  test('Verify confirm document options based on GenApp type', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`

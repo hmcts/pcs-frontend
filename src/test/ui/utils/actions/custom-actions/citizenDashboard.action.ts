@@ -1,6 +1,7 @@
 import { Page, expect } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
+import { dashboard } from '../../../data/page-data';
 import { viewAllApplications } from '../../../data/page-data/genApps-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -88,7 +89,7 @@ export class CitizenDashboardAction implements IAction {
   }
 
   private async validateViewAllApplications(): Promise<void> {
-    await performAction('clickLink', 'View all applications');
+    await performAction('clickLink', dashboard.viewAllApplicationsLink);
     await performValidation('mainHeader', viewAllApplications.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: viewAllApplications.getCaseNumber() });
     await performValidation('text', { elementType: 'subHeader', text: viewAllApplications.yourApplicationsSubHeader });
