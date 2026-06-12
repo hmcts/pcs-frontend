@@ -8,7 +8,7 @@
     "pension": "Pension – state and private",
     "universalCredit": "Universal Credit",
     "otherBenefits": "Other benefits and credits",
-    "moneyFromElsewhere": "Money from somewhere else (for example, child maintenance payments or someone in the defendant's household gives them money)"
+    "moneyFromElsewhere": "Money from somewhere else (for example, child maintenance payments or someone in the defendant’s household gives them money)"
   },
   "subFields": {
     "moneyFromElsewhereDetailsHint": "Give details about the other sources of income and how much the defendant usually receives a month"
