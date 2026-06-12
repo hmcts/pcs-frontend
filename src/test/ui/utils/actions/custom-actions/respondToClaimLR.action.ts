@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import {
   circumstancesLR,
   confirmationOfNoticeGiven,
+  counterClaimAgainstWhom,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
@@ -34,6 +35,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['circumstancesLR', () => this.circumstancesLR(fieldName as actionRecord)],
       ['exceptionalHardshipLR', () => this.exceptionalHardshipLR(fieldName as actionRecord)],
       ['selectIncomeAndExpensesLR', () => this.selectIncomeAndExpensesLR(fieldName as actionRecord)],
+      ['representationLR', () => this.representationLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -196,5 +198,13 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       option: incomeAndExpenseData.incomeAndExpensesOption,
     });
     await performAction('clickButton', incomeAndExpenses.saveAndContinueButton);
+  }
+
+  private async representationLR(representationOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: representationOption.question,
+      option: representationOption.radioOption,
+    });
+    await performAction('clickButton', counterClaimAgainstWhom.saveAndContinueButton);
   }
 }

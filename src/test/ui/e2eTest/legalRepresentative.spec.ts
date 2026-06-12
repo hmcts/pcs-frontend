@@ -1,10 +1,12 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  circumstancesLR,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
   correspondenceAddress,
   counterClaim,
+  counterClaimAgainstWhom,
   defendantDateOfBirth,
   defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHome,
@@ -26,9 +28,8 @@ import {
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
 } from '../data/page-data';
-import { startNow } from '../data/page-data';
-import { circumstancesLR } from '../data/page-data/circumstancesLR.page.data';
 import { user } from '../data/user-data';
+import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -39,12 +40,14 @@ const home_url = process.env.TEST_URL;
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   process.env.NOTICE_SERVED = 'YES';
-  process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
+  process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadAssuredTenancy.claimantName;
   process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
   process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+  process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
+  process.env.NOTICE_SERVED = 'NO';
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   await performAction('getCaseAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login', user.defendantSolicitor.email);
@@ -57,7 +60,12 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('Respond to claim - LR  @noDefendants @smoke @regression @PR', async () => {
+  test('Respond to claim - LR @smoke @regression @PR', async () => {
+    const pin2User = await getPinUserAt(1);
+    await performAction('representationLR', {
+      question: counterClaimAgainstWhom.lrHiddenMainHeader,
+      option: `${pin2User.firstName} ${pin2User.lastName}`,
+    });
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.lrMainHeader,
       option: defendantNameConfirmation.yesRadioOption,
@@ -80,7 +88,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadNoDefendants.tenancy_TypeOfTenancyLicence,
+      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR', {
