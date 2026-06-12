@@ -94,6 +94,16 @@ describe('upload-additional-documents check-your-answers POST', () => {
     expect(payload.data.selectedRelatedApplicationId).toBe(genAppId);
   });
 
+  it('redirects to upload when session has no documents', async () => {
+    storage!.read.mockResolvedValue([]);
+    const res = buildRes();
+
+    await step.postController!.post!(buildReq(), res, jest.fn());
+
+    expect(mockSubmit).not.toHaveBeenCalled();
+    expect(res.redirect).toHaveBeenCalledWith(303, './upload-your-documents');
+  });
+
   it('omits selectedRelatedApplicationId when no selection exists (no-gen-app flow path)', async () => {
     mockGetFormData.mockReturnValue(undefined);
 

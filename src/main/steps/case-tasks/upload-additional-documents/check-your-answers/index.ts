@@ -52,6 +52,10 @@ export const step: StepDefinition = {
       }
 
       const uploadedAdditionalDocuments = await uploadStorage.read(req);
+      if (uploadedAdditionalDocuments.length === 0) {
+        return res.redirect(303, './upload-your-documents');
+      }
+
       const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
       const relatedApplicationId = confirmData?.relatedApplicationId as string | undefined;
       const selectedRelatedApplicationId =
