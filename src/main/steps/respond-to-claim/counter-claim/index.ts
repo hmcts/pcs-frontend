@@ -2,8 +2,10 @@ import type { Request } from 'express';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
+import { purgeCounterClaimDocumentsFromCdam } from '../utils';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { YesNoEnum } from '@services/ccdCase.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
 import { FeeType, getFee } from '@services/feeLookupService';
 
@@ -63,6 +65,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     } else {
       delete response.defendantResponses.makeCounterClaim;
       delete response.defendantResponses.counterClaim;
+    }
+
+    // User has flipped away from YES on the parent counter-claim question → any
+    // previously uploaded counter-claim documents are now orphaned. Purge them
+    // from CDAM; the normaliser will strip the metadata from the saved draft.
+    if (makeCounterClaim !== YesNoEnum.YES) {
+      await purgeCounterClaimDocumentsFromCdam(req);
     }
 
     await saveDraftDefendantResponse(req, response);

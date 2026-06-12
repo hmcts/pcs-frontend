@@ -123,6 +123,7 @@ def pcsE2eVaultSecrets = [
   secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
   secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64'),
   secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID'),
+  secret('pcs-api-idam-secret', 'PCS_API_IDAM_SECRET'),
 ]
 
 withNightlyPipeline(type, product, component) {

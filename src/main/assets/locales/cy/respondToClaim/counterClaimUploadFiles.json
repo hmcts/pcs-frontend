@@ -1,0 +1,16 @@
+{
+  "pageTitle": "cyUpload counterclaim files",
+  "heading": "cyUpload files to support your counterclaim",
+  "guidanceText": "cyYou should only upload files that are relevant to your counterclaim.",
+  "guidanceText2": "cyThe claimant will be able to see any files you upload.",
+  "beforeUploadText": "cyBefore you upload the file give it a name that tells the court what it is, for example 'Job offer letter'.",
+  "fileTypesText": "cyYou can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.",
+  "uploadLabel": "cyUpload a file",
+  "filesAddedHeading": "cyFiles added",
+  "uploadButton": "cyUpload file",
+  "deleteButton": "cyRemove",
+  "noFilesUploaded": "cyNo files uploaded",
+  "errors": {
+    "documents": "cySelect a file to support your counterclaim"
+  }
+}
