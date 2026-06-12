@@ -21,6 +21,7 @@ import {
   UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
   UPLOAD_MAX_TOTAL_SIZE_BYTES,
   UPLOAD_MAX_TOTAL_SIZE_MB,
+  formatSizeForDisplay,
   isMediaExtension,
   validateFileType,
 } from '@utils/documentUploadValidation';
@@ -54,11 +55,15 @@ function getErrorTranslations(req: Request) {
   const t = req.t;
   return {
     wrongType: t('errors.documentUpload.wrongFileTypeDocStore'),
-    tooLarge: t('errors.documentUpload.fileTooLargeDocStore', { maxSize: String(UPLOAD_MAX_FILE_SIZE_MB) }),
-    tooLargeMedia: t('errors.documentUpload.fileTooLargeMedia', { maxSize: String(UPLOAD_MAX_MEDIA_FILE_SIZE_MB) }),
+    tooLarge: t('errors.documentUpload.fileTooLargeDocStore', {
+      maxSize: formatSizeForDisplay(UPLOAD_MAX_FILE_SIZE_MB),
+    }),
+    tooLargeMedia: t('errors.documentUpload.fileTooLargeMedia', {
+      maxSize: formatSizeForDisplay(UPLOAD_MAX_MEDIA_FILE_SIZE_MB),
+    }),
     filenameTooLong: t('errors.documentUpload.filenameTooLong', { maxLength: String(UPLOAD_MAX_FILENAME_LENGTH) }),
     totalTooLarge: t('errors.documentUpload.fileTotalTooLargeDocStore', {
-      maxSize: String(UPLOAD_MAX_TOTAL_SIZE_MB),
+      maxSize: formatSizeForDisplay(UPLOAD_MAX_TOTAL_SIZE_MB),
     }),
     noFile: t('errors.documentUpload.noFileSelected'),
     uploadFailed: t('errors.documentUpload.uploadFailed'),

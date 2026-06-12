@@ -7,6 +7,7 @@ import {
   UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
   UPLOAD_MAX_TOTAL_SIZE_BYTES,
   UPLOAD_MAX_TOTAL_SIZE_MB,
+  formatSizeForDisplay,
   getFileExtensionLower,
   isBlockedExtension,
   isMediaExtension,
@@ -154,6 +155,28 @@ describe('documentUploadValidation', () => {
 
     it('is case insensitive', () => {
       expect(isMediaExtension('photo.JPG')).toBe(true);
+    });
+  });
+
+  describe('formatSizeForDisplay', () => {
+    it.each([
+      [1024, '1GB'],
+      [2048, '2GB'],
+      [4096, '4GB'],
+    ])('formats whole gigabytes (%s MB) as "%s"', (mb, expected) => {
+      expect(formatSizeForDisplay(mb)).toBe(expected);
+    });
+
+    it.each([
+      [500, '500MB'],
+      [100, '100MB'],
+      [1500, '1500MB'],
+    ])('formats non-whole-GB values (%s MB) as "%s"', (mb, expected) => {
+      expect(formatSizeForDisplay(mb)).toBe(expected);
+    });
+
+    it('handles 0 as "0MB"', () => {
+      expect(formatSizeForDisplay(0)).toBe('0MB');
     });
   });
 

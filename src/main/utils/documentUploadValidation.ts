@@ -50,6 +50,12 @@ export const ACCEPT_ATTRIBUTE_EXTENSIONS = Array.from(ALLOWED_EXTENSIONS)
   .sort((a, b) => a.localeCompare(b))
   .join(',');
 
+// Locale messages render sizes as friendly units. Whole gigabytes render as "1GB"; anything
+// else (e.g. 500) renders as "{N}MB". Numbers come from config, the unit is presentation.
+export function formatSizeForDisplay(mb: number): string {
+  return mb > 0 && mb % 1024 === 0 ? `${mb / 1024}GB` : `${mb}MB`;
+}
+
 function isBlockedMedia(mime: string, ext: string): boolean {
   if (BLOCKED_EXTENSIONS.has(ext)) {
     return true;

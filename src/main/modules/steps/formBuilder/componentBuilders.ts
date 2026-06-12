@@ -15,6 +15,7 @@ import {
   UPLOAD_MAX_FILENAME_LENGTH,
   UPLOAD_MAX_FILE_SIZE_MB,
   UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
+  formatSizeForDisplay,
 } from '@utils/documentUploadValidation';
 
 function createFieldsetLegend(
@@ -218,10 +219,10 @@ export function buildComponentConfig({
       component.classes = field.classes || 'govuk-file-upload';
       component.errorWrongType = t('common:errors.documentUpload.wrongFileTypeDocStore');
       component.errorFileTooLarge = t('common:errors.documentUpload.fileTooLargeDocStore', {
-        maxSize: String(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
+        maxSize: formatSizeForDisplay(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
       });
       component.errorFileTooLargeMedia = t('common:errors.documentUpload.fileTooLargeMedia', {
-        maxSize: String(UPLOAD_MAX_MEDIA_FILE_SIZE_MB),
+        maxSize: formatSizeForDisplay(UPLOAD_MAX_MEDIA_FILE_SIZE_MB),
       });
       component.errorFilenameTooLong = t('common:errors.documentUpload.filenameTooLong', {
         maxLength: String(UPLOAD_MAX_FILENAME_LENGTH),

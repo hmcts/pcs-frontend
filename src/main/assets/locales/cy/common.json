@@ -72,9 +72,9 @@
     },
     "documentUpload": {
       "wrongFileTypeDocStore": "cyThe selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
-      "fileTooLargeDocStore": "cyThe selected file must be smaller than {{maxSize}}MB",
-      "fileTooLargeMedia": "cyFile you have uploaded is too big. Image files must be smaller than {{maxSize}}MB.",
-      "fileTotalTooLargeDocStore": "cyThe selected files must be smaller than {{maxSize}}MB. Delete one or more files or reduce the file sizes.",
+      "fileTooLargeDocStore": "cyFile you have uploaded is too big. Document files must be less than {{maxSize}}.",
+      "fileTooLargeMedia": "cyFile you have uploaded is too big. Image files must be smaller than {{maxSize}}.",
+      "fileTotalTooLargeDocStore": "cyThe selected files must be smaller than {{maxSize}}. Delete one or more files or reduce the file sizes.",
       "filenameTooLong": "cyThe file name must be {{maxLength}} characters or fewer",
       "noFileSelected": "cySelect a file to upload",
       "uploadFailed": "cyThe selected file could not be uploaded – try again",
