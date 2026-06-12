@@ -55,25 +55,26 @@
 
   "responseToClaim": {
     "disputeClaim": "Do you dispute any other parts of the claim?",
-    "disputeDetails": "Explain which parts of the claim you do not agree with",
+    "disputeDetails": "Explain which parts of the claim you dispute",
     "claimGrounds": "Claim grounds",
-    "tenancyTypeConfirmation": "Is the tenancy, occupation contract or licence agreement type correct?",
-    "tenancyType": "Corrected tenancy, occupation contract or licence type",
-    "tenancyStartDateConfirmation": "Is the tenancy, licence or occupation contract start date correct?",
-    "tenancyStartDate": "Corrected tenancy, licence or occupation contract start date",
+    "exemptLandlord": "Is your landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?",
+    "tenancyTypeConfirmation": "Is the tenancy, occupation contract or licence agreement type given by the claimant correct?",
+    "tenancyType": "Corrected tenancy, occupation contract or licence agreement type",
+    "tenancyStartDateConfirmation": "Is the tenancy, occupation contract or licence agreement start date given by the claimant correct?",
+    "tenancyStartDate": "Corrected tenancy, occupation contract or licence agreement start date",
     "possessionNoticeReceived": "Did the claimant give you notice of their intention to begin possession proceedings?",
     "noticeReceivedDate": "When did you receive notice from the claimant?",
     "rentArrearsAmountConfirmation": "Is the amount of rent arrears given by the claimant correct?",
     "rentArrearsAmount": "Admitted amount owed in rent arrears",
     "landlordRegistered": "Is your landlord registered?",
     "landlordLicensed": "Is your landlord licensed?",
-    "writtenTerms": "Has the landlord sent written terms of the occupation contract?"
+    "writtenTerms": "Has your landlord sent you written terms of the occupation contract?"
   },
 
   "payments": {
-    "anyPaymentsMade": "Have you paid any money to the claimant since the claim issue date?",
+    "anyPaymentsMade": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
     "paymentDetails": "Details of payments made",
-    "repaymentPlanAgreed": "Have you come to any agreement with the claimant to repay the arrears since the claim issue date?",
+    "repaymentPlanAgreed": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
     "repaymentAgreedDetails": "Details of repayment agreement",
     "repayArrearsInstalments": "Would you like to offer to pay your arrears in instalments?",
     "additionalContribution": "How much could you afford to pay in addition to the current rent?",
@@ -82,17 +83,17 @@
 
   "household": {
     "dependantChildren": "Do you have any dependent children?",
-    "dependantChildrenDetails": "Give details about your dependent children",
+    "dependantChildrenDetails": "Details of dependent children",
     "otherDependants": "Do you have any other dependants?",
-    "otherDependantDetails": "Give details about your other dependants",
+    "otherDependantDetails": "Details of other dependants",
     "otherTenants": "Do any other adults live in your home?",
-    "otherTenantsDetails": "Give details about the other adults living in your home",
+    "otherTenantsDetails": "Details of other adults living in your home",
     "alternativeAccommodation": "Would you have somewhere else to live if you had to leave your home?",
-    "alternativeAccommodationDate": "When would you be able to move in? (optional)",
+    "alternativeAccommodationDate": "When would you be able to move in?",
     "shareAdditional": "Would you like to share anything about your circumstances?",
-    "additionalDetails": "Give details about your circumstances",
+    "additionalDetails": "Details about your circumstances",
     "exceptionalHardship": "Would you experience exceptional hardship if you were asked to leave your home?",
-    "exceptionalHardshipDetails": "Give details about the exceptional hardship you’d experience"
+    "exceptionalHardshipDetails": "Details about the exceptional hardship you’d experience"
   },
 
   "income": {
@@ -131,7 +132,7 @@
 
   "additional": {
     "otherConsiderations": "Is there anything else you want to tell the court as part of your response?",
-    "otherConsiderationsDetails": "Give details about what else you want to tell the court"
+    "otherConsiderationsDetails": "Details of what else you want to tell the court"
   },
 
   "counterclaim": {
@@ -140,6 +141,8 @@
     "amount": "How much are you claiming?",
     "estimatedMaxAmount": "What’s the maximum value of your claim?",
     "against": "Who are you making the counterclaim against?",
+    "againstName": "What is the name of the person or organisation you are making the counterclaim against?",
+    "againstAddress": "What's their postal address?",
     "for": "What is your counterclaim for?",
     "reasons": "What are your reasons for making the counterclaim?",
     "ordersRequested": "What orders are you asking the court to make?",

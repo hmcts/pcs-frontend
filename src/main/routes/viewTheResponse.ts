@@ -140,29 +140,6 @@ function formatPaymentValue(t: TFunction, amount: string | undefined, frequency:
   return money || freq;
 }
 
-function pushAmountFrequencyRows(
-  rows: SummaryRow[],
-  t: TFunction,
-  amount: string | undefined,
-  frequency: string | undefined | null,
-  amountLabelKey: string,
-  frequencyLabelKey: string,
-  formatValue: (t: TFunction, amount: string | undefined, frequency: string | undefined | null) => string
-): void {
-  const money = formatMoneyAmount(amount);
-  const freq = frequencyLabel(t, frequency);
-  if (money) {
-    pushRow(rows, t(amountLabelKey), money);
-  }
-  if (freq) {
-    pushRow(rows, t(frequencyLabelKey), freq);
-  }
-  if (!money && !freq) {
-    const combined = formatValue(t, amount, frequency);
-    pushRow(rows, t(amountLabelKey), combined);
-  }
-}
-
 function joinName(firstName?: string, lastName?: string): string {
   return [firstName, lastName].filter(Boolean).join(' ').trim();
 }
@@ -279,13 +256,6 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
-  pushRow(rows, t('viewTheResponse:responseToClaim.disputeClaim'), yesNo(t, responses?.disputeClaim));
-  pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.claimGrounds'),
-    buildClaimGroundsText(caseData.claimGroundSummaries)
-  );
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.tenancyTypeConfirmation'),
@@ -302,6 +272,13 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.tenancyStartDate'),
     formatGdsDate(responses?.tenancyStartDate) ?? ''
   );
+  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
+  pushRow(
+    rows,
+    t('viewTheResponse:responseToClaim.landlordRegistered'),
+    yesNoNotSure(t, responses?.landlordRegistered)
+  );
+  pushRow(rows, t('viewTheResponse:responseToClaim.landlordLicensed'), yesNoNotSure(t, responses?.landlordLicensed));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
@@ -322,25 +299,47 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.rentArrearsAmount'),
     formatMoneyAmount(responses?.rentArrearsAmount)
   );
+  pushRow(rows, t('viewTheResponse:responseToClaim.disputeClaim'), yesNo(t, responses?.disputeClaim));
+  pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
   pushRow(
     rows,
-    t('viewTheResponse:responseToClaim.landlordRegistered'),
-    yesNoNotSure(t, responses?.landlordRegistered)
+    t('viewTheResponse:responseToClaim.claimGrounds'),
+    buildClaimGroundsText(caseData.claimGroundSummaries)
   );
-  pushRow(rows, t('viewTheResponse:responseToClaim.landlordLicensed'), yesNoNotSure(t, responses?.landlordLicensed));
-  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   return { rows };
 }
 
-function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData): SummarySection {
+function resolveClaimIssueDate(caseData: CcdCaseData, dateIssued: string | null): string {
+  return (
+    formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate) ??
+    formatGdsDate(new CcdCaseModel({ id: '', data: caseData }).claimIssueDate) ??
+    formatGdsDate(caseData.claimIssueDate) ??
+    dateIssued ??
+    ''
+  );
+}
+
+function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssued: string | null): SummarySection {
   const rows: SummaryRow[] = [];
   const payment: PaymentAgreement | undefined = caseData.possessionClaimResponse?.defendantResponses?.paymentAgreement;
   if (!payment) {
     return { rows };
   }
-  pushRow(rows, t('viewTheResponse:payments.anyPaymentsMade'), yesNo(t, payment.anyPaymentsMade));
+  const paymentLabelContext = {
+    claimantName: resolveClaimantName(caseData),
+    claimIssueDate: resolveClaimIssueDate(caseData, dateIssued),
+  };
+  pushRow(
+    rows,
+    t('viewTheResponse:payments.anyPaymentsMade', paymentLabelContext),
+    yesNo(t, payment.anyPaymentsMade)
+  );
   pushRow(rows, t('viewTheResponse:payments.paymentDetails'), payment.paymentDetails);
-  pushRow(rows, t('viewTheResponse:payments.repaymentPlanAgreed'), yesNoNotSure(t, payment.repaymentPlanAgreed));
+  pushRow(
+    rows,
+    t('viewTheResponse:payments.repaymentPlanAgreed', paymentLabelContext),
+    yesNoNotSure(t, payment.repaymentPlanAgreed)
+  );
   pushRow(rows, t('viewTheResponse:payments.repaymentAgreedDetails'), payment.repaymentAgreedDetails);
   pushRow(rows, t('viewTheResponse:payments.repayArrearsInstalments'), yesNo(t, payment.repayArrearsInstalments));
   if (payment.additionalRentContribution || payment.additionalContributionFrequency) {
@@ -396,16 +395,7 @@ function buildIncomeRow(
     pushRow(rows, t(labelKey), yesNo(t, applies));
     return;
   }
-  pushRow(rows, t(labelKey), t('common:options.yes'));
-  pushAmountFrequencyRows(
-    rows,
-    t,
-    amount,
-    frequency,
-    'viewTheResponse:income.totalAmountReceived',
-    'viewTheResponse:income.receivedEvery',
-    formatIncomeValue
-  );
+  pushRow(rows, t(labelKey), formatIncomeValue(t, amount, frequency));
 }
 
 function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection {
@@ -424,15 +414,10 @@ function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection
   );
   buildIncomeRow(t, rows, hc.pension, hc.pensionAmount, hc.pensionFrequency, 'viewTheResponse:income.pension');
   if (isYes(hc.universalCredit)) {
-    pushRow(rows, t('viewTheResponse:income.universalCredit'), t('common:options.yes'));
-    pushAmountFrequencyRows(
+    pushRow(
       rows,
-      t,
-      hc.universalCreditAmount ?? undefined,
-      hc.universalCreditFrequency ?? undefined,
-      'viewTheResponse:income.totalAmountReceived',
-      'viewTheResponse:income.receivedEvery',
-      formatIncomeValue
+      t('viewTheResponse:income.universalCredit'),
+      formatIncomeValue(t, hc.universalCreditAmount ?? undefined, hc.universalCreditFrequency ?? undefined)
     );
   } else if (isYes(hc.hasAppliedForUniversalCredit)) {
     pushRow(rows, t('viewTheResponse:income.universalCreditApplied'), t('common:options.yes'));
@@ -466,8 +451,11 @@ function buildPriorityDebts(t: TFunction, caseData: CcdCaseData): SummarySection
   pushRow(rows, t('viewTheResponse:debts.hasPriorityDebts'), yesNo(t, hc.priorityDebts));
   pushRow(rows, t('viewTheResponse:debts.debtTotal'), formatMoneyAmount(hc.debtTotal));
   if (hc.debtContribution || hc.debtContributionFrequency) {
-    pushRow(rows, t('viewTheResponse:debts.debtContribution'), formatMoneyAmount(hc.debtContribution));
-    pushRow(rows, t('viewTheResponse:debts.paidEvery'), frequencyLabel(t, hc.debtContributionFrequency));
+    pushRow(
+      rows,
+      t('viewTheResponse:debts.debtContribution'),
+      formatPaymentValue(t, hc.debtContribution, hc.debtContributionFrequency)
+    );
   }
   return { rows };
 }
@@ -485,16 +473,7 @@ function buildExpenseRow(
     pushRow(rows, t(labelKey), yesNo(t, detail.applies));
     return;
   }
-  pushRow(rows, t(labelKey), t('common:options.yes'));
-  pushAmountFrequencyRows(
-    rows,
-    t,
-    detail.amount,
-    detail.frequency,
-    'viewTheResponse:expenses.amountPaid',
-    'viewTheResponse:expenses.paidEvery',
-    formatPaymentValue
-  );
+  pushRow(rows, t(labelKey), formatPaymentValue(t, detail.amount, detail.frequency));
 }
 
 function buildRegularExpenses(t: TFunction, caseData: CcdCaseData): SummarySection {
@@ -608,7 +587,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         claimantDetails: buildClaimantDetails(t, caseData),
         defendant1Details: buildDefendant1Details(t, caseData),
         responseToClaim: buildResponseToClaim(t, caseData),
-        paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData),
+        paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
         regularIncome: buildRegularIncome(t, caseData),
         priorityDebts: buildPriorityDebts(t, caseData),
