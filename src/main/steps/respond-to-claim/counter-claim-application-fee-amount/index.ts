@@ -1,11 +1,11 @@
-import { HTTPError } from '../../../HttpError';
 import { penceToPounds } from '../../utils';
 import { getCounterClaimAmountInPence } from '../../utils/counterClaimAmount';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { getPaymentSessionState } from '@services/paymentSessionService';
+import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+import { getPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-application-fee-amount',
@@ -23,17 +23,25 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: async req => {
     const paymentSession = getPaymentSessionState(req);
-    const feeAmount = paymentSession?.feeAmount;
+    const counterClaim =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
 
-    if (feeAmount === undefined) {
-      throw new HTTPError('No fee amount found in payment session', 500);
+    if (!counterClaim?.claimType) {
+      throw new Error('Counterclaim fee unavailable: missing claimType');
     }
 
-    const claimAmountInPence =
-      paymentSession?.counterClaimAmountInPence ??
-      getCounterClaimAmountInPence(
-        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim
-      );
+    const claimAmountInPence = paymentSession?.counterClaimAmountInPence ?? getCounterClaimAmountInPence(counterClaim);
+
+    const feeType = getCounterClaimFeeType(counterClaim.claimType, claimAmountInPence);
+    const feeAmount = await getFee(feeType, claimAmountInPence);
+
+    if (paymentSession) {
+      setPaymentSessionState(req, {
+        ...paymentSession,
+        feeAmount,
+        counterClaimAmountInPence: claimAmountInPence,
+      });
+    }
 
     const t = getTranslationFunction(req);
     const counterClaimAmountPounds = claimAmountInPence ? penceToPounds(claimAmountInPence) : undefined;

@@ -3,8 +3,20 @@ jest.mock('../../../../main/modules/steps', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
+jest.mock('@services/feeLookupService', () => ({
+  FeeType: {
+    counterClaimFlatFeeFEE0450: 2,
+    counterClaimRanged: 3,
+    counterClaim: 4,
+  },
+  getCounterClaimFeeType: jest.fn(),
+  getFee: jest.fn(),
+}));
+
 import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-application-fee-amount';
+
+import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 
 type CounterClaimApplicationFeeAmountStep = {
   extendGetContent: (req: {
@@ -56,20 +68,41 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (getTranslationFunction as jest.Mock).mockReturnValue(tMock);
+    (getCounterClaimFeeType as jest.Mock).mockReturnValue(3);
+    (getFee as jest.Mock).mockResolvedValue(377);
   });
 
-  it('returns i18n-formatted counterclaim amount and fee from payment session (Scott-style)', async () => {
+  it('returns i18n-formatted counterclaim amount and fee from fee register lookup', async () => {
     const content = await testedStep.extendGetContent({
       params: { caseReference: '123' },
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  counterClaim: {
+                    claimType: 'PAYMENT_OR_COMPENSATION',
+                    isClaimAmountKnown: 'YES',
+                    claimAmount: '64900',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       session: {
         payment: {
           serviceRequestReference: 'SR-1',
-          feeAmount: 377,
+          feeAmount: 35,
           counterClaimAmountInPence: '64900',
         },
       },
     });
 
+    expect(getCounterClaimFeeType).toHaveBeenCalledWith('PAYMENT_OR_COMPENSATION', '64900');
+    expect(getFee).toHaveBeenCalledWith(3, '64900');
     expect(tMock).toHaveBeenCalledWith('counterClaimAmountDisplay', { counterClaimAmount: 649 });
     expect(tMock).toHaveBeenCalledWith('counterClaimFeeDisplay', { counterClaimFee: 377 });
     expect(tMock).toHaveBeenCalledWith('payNowButton', { counterClaimFee: 377 });
@@ -85,12 +118,29 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
   });
 
   it('omits counterclaim amount row when session has no amount (AC03 / something else)', async () => {
+    (getFee as jest.Mock).mockResolvedValue(154);
+
     const content = await testedStep.extendGetContent({
       params: { caseReference: '123' },
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  counterClaim: {
+                    claimType: 'SOMETHING_ELSE',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       session: {
         payment: {
           serviceRequestReference: 'SR-1',
-          feeAmount: 154,
+          feeAmount: 35,
         },
       },
     });
@@ -105,6 +155,8 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
   });
 
   it('falls back to CCD counterclaim amount when session snapshot is absent', async () => {
+    (getFee as jest.Mock).mockResolvedValue(35);
+
     const content = await testedStep.extendGetContent({
       res: {
         locals: {
@@ -141,7 +193,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     );
   });
 
-  it('throws when fee amount is missing from payment session', async () => {
+  it('throws when counterclaim claim type is missing', async () => {
     await expect(
       testedStep.extendGetContent({
         session: {
@@ -150,13 +202,73 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
           },
         },
       })
-    ).rejects.toMatchObject({ message: 'No fee amount found in payment session', status: 500 });
+    ).rejects.toThrow('Counterclaim fee unavailable: missing claimType');
+  });
+
+  it('uses higher-tier fee lookup when counterclaim amount exceeds £5,000', async () => {
+    (getCounterClaimFeeType as jest.Mock).mockReturnValue(4);
+    (getFee as jest.Mock).mockResolvedValue(455);
+
+    const content = await testedStep.extendGetContent({
+      params: { caseReference: '123' },
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  counterClaim: {
+                    claimType: 'BOTH',
+                    isClaimAmountKnown: 'YES',
+                    claimAmount: '600000',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      session: {
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 80,
+          counterClaimAmountInPence: '600000',
+        },
+      },
+    });
+
+    expect(getCounterClaimFeeType).toHaveBeenCalledWith('BOTH', '600000');
+    expect(getFee).toHaveBeenCalledWith(4, '600000');
+    expect(content).toEqual(
+      expect.objectContaining({
+        formattedCounterClaimAmount: '£6000',
+        formattedCounterClaimFee: '£455',
+        payNowButton: 'Pay your counterclaim fee (£455)',
+      })
+    );
   });
 
   it('shows payment error when query indicates failed or pending payment', async () => {
     const content = await testedStep.extendGetContent({
       params: { caseReference: '123' },
       query: { payment: 'failed' },
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  counterClaim: {
+                    claimType: 'PAYMENT_OR_COMPENSATION',
+                    isClaimAmountKnown: 'YES',
+                    claimAmount: '250000',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       session: {
         payment: {
           serviceRequestReference: 'SR-1',
