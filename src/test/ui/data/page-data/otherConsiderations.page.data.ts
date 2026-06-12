@@ -1,11 +1,13 @@
 export const otherConsiderations = {
   mainHeader: `Is there anything else you want to tell the court as part of your response?`,
+  lrHiddenMainHeader: `Is there anything else the defendant wants to tell the court as part of their response?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   detailsTextInput: `Court details`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   giveDetailsHiddenTextLabel: `Give details about what else you want to tell the court`,
+  lrHiddenGiveDetailsTextLabel: `Give details about what else the defendant wants to tell the court`,
   youCanEnterUpToHiddenHintText: `You can enter up to 500 characters`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   backLink: `Back`,

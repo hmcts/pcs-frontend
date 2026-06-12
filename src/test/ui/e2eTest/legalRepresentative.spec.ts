@@ -44,7 +44,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
   process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
   process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
-  process.env.NOTICE_SERVED = 'NO';
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
@@ -68,7 +67,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.getLrMainHeader(pin2User.firstName, pin2User.lastName),
+      question: defendantNameConfirmation.getLrHiddenMainHeader(pin2User.firstName, pin2User.lastName),
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
@@ -148,10 +147,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-    await performAction('selectIncomeAndExpenses', {
+    await performAction('selectIncomeAndExpensesLR', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
-    await performAction('selectWhatRegularIncomeDoYouReceive', {
+    await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
       regularIncomeOptions: [
         [
           whatRegularIncomeDoYouReceive.universalCreditParagraph,
@@ -160,18 +159,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performAction('selectPriorityDebts', {
-      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+    await performAction('selectPriorityDebtsLR', {
+      question: priorityDebts.lrDoesDefendantHavePriorityDebtsHiddenQuestion,
       option: priorityDebts.yesRadioOption,
     });
-    await performAction('enterPriorityDebtDetails', {
+    await performAction('enterPriorityDebtDetailsLR', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
       question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.monthRadioOption,
     });
-    await performAction('selectWhatOtherRegularExpensesDoYouHave', {
-      regularIncomeOptions: [
+    await performAction('selectExpensesLR', {
+      regularExpensesOptions: [
         [
           whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
           whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
@@ -184,8 +183,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
         ],
       ],
     });
-    await performAction('otherConsiderations', {
-      question: otherConsiderations.mainHeader,
+    await performAction('otherConsiderationsLR', {
+      question: otherConsiderations.lrHiddenMainHeader,
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
@@ -195,7 +194,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+      question: languageUsed.lrHiddenMainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
     await performAction('clickButton', 'Save and continue');

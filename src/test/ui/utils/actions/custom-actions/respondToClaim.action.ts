@@ -1245,6 +1245,7 @@ export class RespondToClaimAction implements IAction {
     });
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
   }
+
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
     const regularExpensesQuestionLabel = this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader);
 
@@ -1324,7 +1325,7 @@ export class RespondToClaimAction implements IAction {
       question: otherConsiderationsData.question,
       option: otherConsiderationsData.option,
     });
-    if (otherConsiderationsData.option === otherConsiderations.yesRadioOption) {
+    if (otherConsiderationsData.option === 'Yes') {
       this.recordAnswer(otherConsiderations.giveDetailsHiddenTextLabel, otherConsiderationsData.courtInfo);
       await performAction(
         'inputText',

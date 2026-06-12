@@ -13,6 +13,7 @@ export const priorityDebts = {
   unpaidChildList: `unpaid child maintenance`,
   readGuidanceLink: `Read guidance from Citizens Advice on what counts as a priority debt (opens in new tab)`,
   doYouHaveAnyPriorityDebtsQuestion: `Do you have any priority debts?`,
+  lrDoesDefendantHavePriorityDebtsHiddenQuestion: `Does the defendant have any priority debts?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   feedbackLink: `feedback (opens in new tab)`,

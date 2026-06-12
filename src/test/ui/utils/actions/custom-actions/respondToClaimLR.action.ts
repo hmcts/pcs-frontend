@@ -4,7 +4,6 @@ import {
   circumstancesLR,
   confirmationOfNoticeGiven,
   counterClaimAgainstWhom,
-  defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
@@ -12,7 +11,12 @@ import {
   incomeAndExpenses,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
+  otherConsiderations,
+  priorityDebtDetails,
+  priorityDebts,
   tenancyDateUnknown,
+  whatOtherRegularExpensesDoYouHave,
+  whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../../../data/page-data';
@@ -37,7 +41,14 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['exceptionalHardshipLR', () => this.exceptionalHardshipLR(fieldName as actionRecord)],
       ['selectIncomeAndExpensesLR', () => this.selectIncomeAndExpensesLR(fieldName as actionRecord)],
       ['representationLR', () => this.representationLR(fieldName as actionRecord)],
-      ['confirmDefendantDetailsLR', () => this.confirmDefendantDetailsLR(fieldName as actionRecord)],
+      [
+        'selectWhatRegularIncomeDoTheyReceiveLR',
+        () => this.selectWhatRegularIncomeDoTheyReceiveLR(fieldName as actionRecord),
+      ],
+      ['selectPriorityDebtsLR', () => this.selectPriorityDebtsLR(fieldName as actionRecord)],
+      ['enterPriorityDebtDetailsLR', () => this.enterPriorityDebtDetailsLR(fieldName as actionRecord)],
+      ['selectExpensesLR', () => this.selectExpensesLR(fieldName as actionRecord)],
+      ['otherConsiderationsLR', () => this.otherConsiderationsLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -210,16 +221,100 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('clickButton', counterClaimAgainstWhom.saveAndContinueButton);
   }
 
-  private async confirmDefendantDetailsLR(defendantData: actionRecord) {
-    //await performValidation('mainHeader', defendantData.question);
-    await performAction('clickRadioButton', {
-      question: `Is your client’s name ` + defendantData.defendantName + `?`,
-      option: defendantData.option,
-    });
-    if (defendantData.option === 'No') {
-      await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
-      await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
+  private async selectWhatRegularIncomeDoTheyReceiveLR(regularIncome?: actionRecord): Promise<void> {
+    if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
+      await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+      return;
     }
-    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    for (const income of regularIncome.regularIncomeOptions) {
+      const [option, value, frequency] = income;
+
+      await performAction('check', {
+        question: whatRegularIncomeDoYouReceive.lrHiddenMainHeader,
+        option,
+      });
+
+      if (option === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph) {
+        await performAction(
+          'inputText',
+          whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
+          value
+        );
+        continue;
+      }
+
+      if (!value || !frequency) {
+        throw new Error(`Amount and frequency are required for option: ${option}`);
+      }
+
+      await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
+      await performAction('clickRadioButton', frequency);
+    }
+
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  }
+
+  private async selectPriorityDebtsLR(priorityDebtsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: priorityDebts.lrDoesDefendantHavePriorityDebtsHiddenQuestion,
+      option: priorityDebtsData.option,
+    });
+    await performAction('clickButton', priorityDebts.saveAndContinueButton);
+  }
+
+  private async enterPriorityDebtDetailsLR(priorityDebtDetailsData: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      priorityDebtDetails.lrHiddenTotalAmountQuestion,
+      priorityDebtDetailsData.totalAmount
+    );
+    await performAction(
+      'inputText',
+      priorityDebtDetails.lrHiddenHowMuchDefendantPays,
+      priorityDebtDetailsData.payAmount
+    );
+    await performAction('clickRadioButton', {
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetailsData.option,
+    });
+    await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  }
+
+  private async selectExpensesLR(regularExpense?: actionRecord): Promise<void> {
+    if (!Array.isArray(regularExpense?.regularExpensesOptions)) {
+      await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+      return;
+    }
+    for (const expense of regularExpense.regularExpensesOptions) {
+      const [option, value, frequency] = expense;
+
+      await performAction('check', {
+        question: whatOtherRegularExpensesDoYouHave.lrHiddenMainHeader,
+        option,
+      });
+
+      if (!value || !frequency) {
+        throw new Error(`Amount and frequency are required for option: ${option}`);
+      }
+
+      await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
+      await performAction('clickRadioButton', frequency);
+    }
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+  }
+
+  private async otherConsiderationsLR(otherConsiderationsData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: otherConsiderationsData.question,
+      option: otherConsiderationsData.option,
+    });
+    if (otherConsiderationsData.option === 'Yes') {
+      await performAction(
+        'inputText',
+        otherConsiderations.lrHiddenGiveDetailsTextLabel,
+        otherConsiderationsData.courtInfo
+      );
+    }
+    await performAction('clickButton', otherConsiderations.saveAndContinueButton);
   }
 }

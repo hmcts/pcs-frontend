@@ -157,7 +157,11 @@ export class ActionRegistry {
     ['exceptionalHardshipLR', new RespondToClaimLRAction()],
     ['selectIncomeAndExpensesLR', new RespondToClaimLRAction()],
     ['representationLR', new RespondToClaimLRAction()],
-    ['confirmDefendantDetailsLR', new RespondToClaimLRAction()],
+    ['selectWhatRegularIncomeDoTheyReceiveLR', new RespondToClaimLRAction()],
+    ['selectPriorityDebtsLR', new RespondToClaimLRAction()],
+    ['enterPriorityDebtDetailsLR', new RespondToClaimLRAction()],
+    ['selectExpensesLR', new RespondToClaimLRAction()],
+    ['otherConsiderationsLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {
