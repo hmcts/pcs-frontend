@@ -1,7 +1,7 @@
 {
   "pageTitle": "cyRegular income",
   "heading": "cyIncome",
-  "subheading": "cyWhat regular income does the defendant receive? (Optional)",
+  "incomeQuestion": "cyWhat regular income does the defendant receive? (Optional)",
   "groupName": "cyRegular income options",
   "hintText": "cySelect all that apply. The information the defendant provides must be truthful and accurate.",
   "options": {
@@ -17,7 +17,7 @@
     "moneyFromElsewhereDetailsLabel": "cyGive details",
     "moneyFromElsewhereDetailsHint": "cyGive details about the other sources of income and how much the defendant usually receives a month"
   },
-    "frequency": {
+  "frequency": {
     "week": "cyWeek",
     "month": "cyMonth"
   },
