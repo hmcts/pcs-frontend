@@ -38,6 +38,7 @@ export const validateAccessCode = async (
         validateStatus: () => true,
       }
     );
+    console.log('response', JSON.stringify(response, null, 2));
 
     if (response.status >= 200 && response.status < 300) {
       return { valid: true };
@@ -56,7 +57,8 @@ export const validateAccessCode = async (
       default:
         return { valid: false, error: 'unknown' };
     }
-  } catch {
+  } catch (error) {
+    console.log('error', JSON.stringify(error, null, 2));
     return { valid: false, error: 'unknown' };
   }
 };
