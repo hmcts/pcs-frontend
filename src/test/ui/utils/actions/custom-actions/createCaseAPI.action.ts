@@ -55,9 +55,9 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw new Error(`Create case failed after retries: ${error.response?.status}`);
+            throw new Error(`Create case failed after retries: ${error.response?.status}`, { cause: error });
           }
-          throw new Error('Create case failed unexpectedly.');
+          throw new Error('Create case failed unexpectedly.', { cause: error });
         }
       }
       await new Promise(res => setTimeout(res, delayMs));
@@ -98,10 +98,11 @@ export class CreateCaseAPIAction implements IAction {
       console.error('Full response body:', JSON.stringify(responseBody, null, 2));
 
       if (!status) {
-        throw new Error('Defendant id not retrieved: no response from server.');
+        throw new Error('Defendant id not retrieved: no response from server.', { cause: error });
       }
       throw new Error(
-        `Retrieving defendant id  failed with status ${status}.Response received is ${responseBody?.message}}`
+        `Retrieving defendant id  failed with status ${status}.Response received is ${responseBody?.message}}`,
+        { cause: error }
       );
     }
   }
@@ -141,9 +142,9 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw new Error(`Submit case failed after retries: ${error.response?.status}`);
+            throw new Error(`Submit case failed after retries: ${error.response?.status}`, { cause: error });
           }
-          throw new Error('Submit case failed unexpectedly.');
+          throw new Error('Submit case failed unexpectedly.', { cause: error });
         }
       }
       await new Promise(res => setTimeout(res, delayMs));

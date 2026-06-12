@@ -42,15 +42,16 @@ export class CitizenCreateGenAppAPIAction implements IAction {
           //console.error(citizenCreateGenAppApiData.citizenCreateGenAppPayload);
 
           throw new Error(
-            `GenApp submission failed: endpoint not found (404). Please check the payload above.\n${error.message}`
+            `GenApp submission failed: endpoint not found (404). Please check the payload above.\n${error.message}`,
+            { cause: error }
           );
         }
         if (!status) {
-          throw new Error('GenApp submission failed: no response from server.');
+          throw new Error('GenApp submission failed: no response from server.', { cause: error });
         }
-        throw new Error(`GenApp submission failed with status ${status}.`);
+        throw new Error(`GenApp submission failed with status ${status}.`, { cause: error });
       }
-      throw new Error('GenApp submission failed due to an unexpected error.');
+      throw new Error('GenApp submission failed due to an unexpected error.', { cause: error });
     }
   }
 }

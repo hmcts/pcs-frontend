@@ -81,11 +81,12 @@ export class respondPossessionClaimAPIAction implements IAction {
         const status = error.response?.status;
 
         throw new Error(
-          `respondPossessionClaimMidEvent failed${status ? ` with status ${status}` : ''}. ${error.message}`
+          `respondPossessionClaimMidEvent failed${status ? ` with status ${status}` : ''}. ${error.message}`,
+          { cause: error }
         );
       }
 
-      throw new Error('respondPossessionClaimMidEvent failed due to an unexpected error.');
+      throw new Error('respondPossessionClaimMidEvent failed due to an unexpected error.', { cause: error });
     }
   }
 
@@ -133,10 +134,10 @@ export class respondPossessionClaimAPIAction implements IAction {
 
         console.error('==========================================');
 
-        throw new Error(`RESPONDTOCLAIM submission failed${status ? ` with status ${status}` : ''}.`);
+        throw new Error(`RESPONDTOCLAIM submission failed${status ? ` with status ${status}` : ''}.`, { cause: error });
       }
 
-      throw new Error('RESPONDTOCLAIM submission failed due to an unexpected error.');
+      throw new Error('RESPONDTOCLAIM submission failed due to an unexpected error.', { cause: error });
     }
   }
 }

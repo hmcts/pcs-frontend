@@ -44,12 +44,13 @@ export class LinkSolicitorAPIAction implements IAction {
         console.error('Timestamp:', responseBody?.timestamp);
 
         if (status === 404) {
-          throw new Error(`Endpoint not found\n${error}`);
+          throw new Error(`Endpoint not found\n${error}`, { cause: error });
         }
 
         if (attempt === maxRetries) {
           throw new Error(
-            `Linking Solicitor failed after ${attempt} attempts. Status: ${status}, Message: ${responseBody?.message}`
+            `Linking Solicitor failed after ${attempt} attempts. Status: ${status}, Message: ${responseBody?.message}`,
+            { cause: error }
           );
         }
 
