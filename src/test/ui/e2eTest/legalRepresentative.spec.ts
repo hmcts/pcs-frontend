@@ -48,6 +48,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
+  await performAction('fetchPINsAPI');
   await performAction('getCaseAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login', user.defendantSolicitor.email);
