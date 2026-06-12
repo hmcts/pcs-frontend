@@ -45,10 +45,11 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await performAction('verifyDocumentRelatesToApplication', {
+    // The lines below need to be enabled once we have a workaround to change the case status to "Case Issued".
+    /*await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden,
-    });
+    });*/
     await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
@@ -64,7 +65,8 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
 
-  test('View documents submitted through make a claim @regression', async () => {
+  // The test below need to be enabled once we have a workaround to change the case status to "Case Issued".
+  test.skip('View documents submitted through make a claim @regression', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
     await performAction('validateViewDocuments', {
       caseNumber: viewDocuments.getCaseNumber(),
