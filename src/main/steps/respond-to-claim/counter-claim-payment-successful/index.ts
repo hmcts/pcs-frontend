@@ -11,8 +11,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     paragraph1: 'paragraph1',
-    paymentReference: 'paymentReference',
     paragraph2: 'paragraph2',
+    paymentReference: 'paymentReference',
+    heading1: 'heading1',
+    listItem1: 'listItem1',
+    listItem2: 'listItem2',
+    heading2: 'heading2',
+    surveyParagraph: 'surveyParagraph',
     closeAndReturnToCaseOverview: 'closeAndReturnToCaseOverview',
   },
   extendGetContent: req => {
