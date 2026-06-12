@@ -4,7 +4,10 @@ export const defendantNameConfirmation = {
   get mainHeader(): string {
     return `Is your name ${firstName} ${lastName}?`;
   },
-  nameErrorMessage(): string {
+  getLrMainHeader(clientFirstName: string, clientLastName: string): string {
+    return `Is your client’s name ${clientFirstName} ${clientLastName}?`;
+  },
+  get nameErrorMessage(): string {
     return `You must say if your name is ${firstName} ${lastName}`;
   },
   thisIsTheNameHintText: `This is the name provided by Possession Claims Solicitor Org`,

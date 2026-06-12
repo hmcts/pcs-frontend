@@ -67,8 +67,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: counterClaimAgainstWhom.lrHiddenMainHeader,
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
-    await performAction('confirmDefendantDetailsLR', {
-      defendantName: `${pin2User.firstName} ${pin2User.lastName}`,
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.getLrMainHeader(pin2User.firstName, pin2User.lastName),
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
