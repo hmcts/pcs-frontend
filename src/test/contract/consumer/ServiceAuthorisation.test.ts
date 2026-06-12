@@ -1,20 +1,31 @@
-import { PactV3 } from '@pact-foundation/pact/src/v3';
+import { Pact } from '@pact-foundation/pact';
 import axios from 'axios';
 
+const mockProvider = new Pact({
+  consumer: 'pcs_frontend',
+  provider: 's2s_auth',
+  port: 5050,
+  log: './pact/logs',
+  dir: './pact/pacts',
+  logLevel: 'info',
+});
+
 describe('Service Authorisation Consumer Pact Test', () => {
+  beforeAll(async () => {
+    await mockProvider.setup();
+  });
+  afterAll(async () => {
+    await mockProvider.finalize();
+  });
+
   const MICRO_SERVICE_NAME = 'someMicroServiceName';
   const MICRO_SERVICE_TOKEN = 'someMicroServiceToken';
 
   test('should receive a token when making a request to the lease endpoint', async () => {
-    const mockProvider = new PactV3({
-      consumer: 'pcs_frontend',
-      provider: 's2s_auth',
-      dir: './pact/pacts',
-      logLevel: 'info',
-    });
+    const BASE_URL = mockProvider.mockService.baseUrl;
 
     await mockProvider.addInteraction({
-      states: [{ description: 'microservice with valid credentials' }],
+      state: 'microservice with valid credentials',
       uponReceiving: 'a request for a token',
       withRequest: {
         method: 'POST',
@@ -29,14 +40,14 @@ describe('Service Authorisation Consumer Pact Test', () => {
       },
     });
 
-    await mockProvider.executeTest(async mockServer => {
-      const response = await axios.post(`${mockServer.url}/lease`, {
-        microservice: MICRO_SERVICE_NAME,
-        oneTimePassword: '784467',
-      });
-
-      expect(response.status).toBe(200);
-      expect(response.data).toBe(MICRO_SERVICE_TOKEN);
+    const response = await axios.post(`${BASE_URL}/lease`, {
+      microservice: MICRO_SERVICE_NAME,
+      oneTimePassword: '784467',
     });
+
+    expect(response.status).toBe(200);
+    expect(response.data).toBe(MICRO_SERVICE_TOKEN);
+
+    await mockProvider.verify();
   });
 });

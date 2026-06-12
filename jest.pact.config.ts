@@ -8,7 +8,6 @@ const config: Config.InitialOptions = {
     '^.+\\.ts$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'json'],
-  transformIgnorePatterns: ['node_modules/(?!(https-proxy-agent|agent-base|@pact-foundation)/)'],
 };
 
 export default config;
