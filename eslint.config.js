@@ -118,6 +118,8 @@ module.exports = defineConfig([
       'no-console': 'warn',
       'no-prototype-builtins': 'off',
       'no-return-await': 'error',
+      'no-useless-assignment': 'off', // TODO: Remove this rule once we have a better solution for the issue
+      'preserve-caught-error': 'off', // TODO: Remove this rule once we have a better solution for the issue
 
       'no-unneeded-ternary': [
         'error',
@@ -125,10 +127,6 @@ module.exports = defineConfig([
           defaultAssignment: false,
         },
       ],
-
-      // eslint 10 promoted these to recommended; opting out for now
-      'no-useless-assignment': 'off',
-      'preserve-caught-error': 'off',
 
       'object-curly-spacing': ['error', 'always'],
       'object-shorthand': ['error', 'properties'],
