@@ -126,6 +126,10 @@ module.exports = defineConfig([
         },
       ],
 
+      // eslint 10 promoted these to recommended; opting out for now
+      'no-useless-assignment': 'off',
+      'preserve-caught-error': 'off',
+
       'object-curly-spacing': ['error', 'always'],
       'object-shorthand': ['error', 'properties'],
 
