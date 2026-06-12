@@ -65,10 +65,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: counterClaimAgainstWhom.lrHiddenMainHeader,
-      option: `${pin2User.firstName} ${pin2User.lastName}`,
+      radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.lrMainHeader,
+    await performAction('confirmDefendantDetailsLR', {
+      defendantName: `${pin2User.firstName} ${pin2User.lastName}`,
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {

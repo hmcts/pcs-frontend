@@ -4,6 +4,7 @@ import {
   circumstancesLR,
   confirmationOfNoticeGiven,
   counterClaimAgainstWhom,
+  defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
@@ -36,6 +37,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['exceptionalHardshipLR', () => this.exceptionalHardshipLR(fieldName as actionRecord)],
       ['selectIncomeAndExpensesLR', () => this.selectIncomeAndExpensesLR(fieldName as actionRecord)],
       ['representationLR', () => this.representationLR(fieldName as actionRecord)],
+      ['confirmDefendantDetailsLR', () => this.confirmDefendantDetailsLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -206,5 +208,18 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       option: representationOption.radioOption,
     });
     await performAction('clickButton', counterClaimAgainstWhom.saveAndContinueButton);
+  }
+
+  private async confirmDefendantDetailsLR(defendantData: actionRecord) {
+    //await performValidation('mainHeader', defendantData.question);
+    await performAction('clickRadioButton', {
+      question: `Is your client’s name ` + defendantData.defendantName + `?`,
+      option: defendantData.option,
+    });
+    if (defendantData.option === 'No') {
+      await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
+      await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
+    }
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   }
 }
