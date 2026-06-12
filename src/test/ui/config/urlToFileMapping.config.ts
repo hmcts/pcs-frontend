@@ -59,6 +59,7 @@ export default {
   'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',
   'application-submitted': 'applicationSubmitted',
+  'pay-for-your-application': 'payForYourApplication',
   'have-you-applied-for-universal-credit': 'haveYouAppliedForUniversalCredit',
   'priority-debt-details': 'priorityDebtDetails',
   'priority-debts': 'priorityDebts',
