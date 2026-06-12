@@ -1,11 +1,15 @@
 import {
   ACCEPT_ATTRIBUTE_EXTENSIONS,
+  UPLOAD_MAX_FILENAME_LENGTH,
   UPLOAD_MAX_FILE_SIZE_BYTES,
   UPLOAD_MAX_FILE_SIZE_MB,
+  UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES,
+  UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
   UPLOAD_MAX_TOTAL_SIZE_BYTES,
   UPLOAD_MAX_TOTAL_SIZE_MB,
   getFileExtensionLower,
   isBlockedExtension,
+  isMediaExtension,
   validateFileType,
 } from '@utils/documentUploadValidation';
 
@@ -117,6 +121,40 @@ describe('documentUploadValidation', () => {
         expect(validateFileType('', 'app.exe')).toBe('invalid_type');
       });
     });
+
+    describe('filename length', () => {
+      const longBase = 'a'.repeat(UPLOAD_MAX_FILENAME_LENGTH);
+
+      it('returns filename_too_long when name exceeds the cap', () => {
+        expect(validateFileType('application/pdf', `${longBase}.pdf`)).toBe('filename_too_long');
+      });
+
+      it('accepts a name exactly at the cap', () => {
+        // base + .pdf = UPLOAD_MAX_FILENAME_LENGTH + 4 ⇒ too long; size to total == cap
+        const exact = 'a'.repeat(UPLOAD_MAX_FILENAME_LENGTH - 4) + '.pdf';
+        expect(exact).toHaveLength(UPLOAD_MAX_FILENAME_LENGTH);
+        expect(validateFileType('application/pdf', exact)).toBe('ok');
+      });
+
+      it('still blocks media before checking filename length', () => {
+        // Precedence: blocked_media wins even if the name is also over-length.
+        expect(validateFileType('audio/mp3', `${longBase}.mp3`)).toBe('blocked_media');
+      });
+    });
+  });
+
+  describe('isMediaExtension', () => {
+    it.each(['.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff'])('flags %s as media', ext => {
+      expect(isMediaExtension(`pic${ext}`)).toBe(true);
+    });
+
+    it.each(['.pdf', '.doc', '.docx', '.txt', '.csv'])('does not flag %s as media', ext => {
+      expect(isMediaExtension(`file${ext}`)).toBe(false);
+    });
+
+    it('is case insensitive', () => {
+      expect(isMediaExtension('photo.JPG')).toBe(true);
+    });
   });
 
   describe('constants', () => {
@@ -125,9 +163,18 @@ describe('documentUploadValidation', () => {
       expect(UPLOAD_MAX_FILE_SIZE_BYTES).toBe(1024 * 1024 * 1024);
     });
 
+    it('has 500MB max media file size', () => {
+      expect(UPLOAD_MAX_MEDIA_FILE_SIZE_MB).toBe(500);
+      expect(UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES).toBe(500 * 1024 * 1024);
+    });
+
     it('has 4096MB (4GB) max total file size', () => {
       expect(UPLOAD_MAX_TOTAL_SIZE_MB).toBe(4096);
       expect(UPLOAD_MAX_TOTAL_SIZE_BYTES).toBe(4096 * 1024 * 1024);
+    });
+
+    it('has 255-character max filename length', () => {
+      expect(UPLOAD_MAX_FILENAME_LENGTH).toBe(255);
     });
 
     it('has accept attribute string with sorted extensions', () => {

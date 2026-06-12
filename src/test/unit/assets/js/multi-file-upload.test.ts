@@ -24,6 +24,15 @@ jest.mock('@utils/fileExtensionValidation', () => ({
       filename.endsWith('.txt') ||
       filename.endsWith('.csv')
   ),
+  isMediaExtension: jest.fn(
+    (filename: string) =>
+      filename.endsWith('.jpg') ||
+      filename.endsWith('.jpeg') ||
+      filename.endsWith('.png') ||
+      filename.endsWith('.bmp') ||
+      filename.endsWith('.tif') ||
+      filename.endsWith('.tiff')
+  ),
 }));
 
 import { initMultiFileUpload } from '../../../../main/assets/js/multi-file-upload';
@@ -40,6 +49,30 @@ function setupDOM() {
            data-max-file-size-mb="1024"
            data-error-wrong-type="Wrong file type"
            data-error-file-too-large="File too large"
+           data-error-delete="Delete failed"
+           data-error-summary-title="There is a problem"
+           data-delete-button-text="Remove">
+      </div>
+    </form>
+  `;
+}
+
+function setupDOMWithMediaAndFilenameCaps() {
+  document.body.innerHTML = `
+    <input name="_csrf" value="test-csrf-token" />
+    <form>
+      <div id="uploaded-documents-container"></div>
+      <div id="upload-container"
+           data-module="moj-multi-file-upload"
+           data-upload-url="/case/123/respond-to-claim/upload-document/upload"
+           data-delete-url="/case/123/respond-to-claim/upload-document/delete"
+           data-max-file-size-mb="1024"
+           data-max-media-mb="500"
+           data-max-filename-length="255"
+           data-error-wrong-type="Wrong file type"
+           data-error-file-too-large="File too large"
+           data-error-file-too-large-media="Image too large"
+           data-error-filename-too-long="Filename too long"
            data-error-delete="Delete failed"
            data-error-summary-title="There is a problem"
            data-delete-button-text="Remove">
@@ -152,6 +185,44 @@ describe('multi-file-upload', () => {
 
       expect(() => capturedHooks.entryHook(null, { name: 'doc.pdf', size: 100 })).not.toThrow();
       expect(summary!.hidden).toBe(true);
+    });
+  });
+
+  describe('entryHook with media + filename caps', () => {
+    beforeEach(() => {
+      setupDOMWithMediaAndFilenameCaps();
+      initMultiFileUpload();
+    });
+
+    it('throws filename_too_long for an over-length name', () => {
+      const longName = 'a'.repeat(256) + '.pdf';
+      expect(() => capturedHooks.entryHook(null, { name: longName, size: 100 })).toThrow('filename_too_long');
+      expect(document.querySelector('.govuk-error-summary')!.textContent).toContain('Filename too long');
+    });
+
+    it('throws media_too_large for an oversize image', () => {
+      const fiveHundredMbPlusOneByte = 500 * 1024 * 1024 + 1;
+      expect(() => capturedHooks.entryHook(null, { name: 'big-photo.jpg', size: fiveHundredMbPlusOneByte })).toThrow(
+        'media_too_large'
+      );
+      expect(document.querySelector('.govuk-error-summary')!.textContent).toContain('Image too large');
+    });
+
+    it('allows an image just under the media cap', () => {
+      const justUnder = 500 * 1024 * 1024 - 1;
+      expect(() => capturedHooks.entryHook(null, { name: 'photo.jpg', size: justUnder })).not.toThrow();
+    });
+
+    it('uses the document cap for non-image files even when the media cap is configured', () => {
+      // 600MB pdf — over the 500MB media cap, under the 1024MB document cap. Should pass.
+      const sixHundredMb = 600 * 1024 * 1024;
+      expect(() => capturedHooks.entryHook(null, { name: 'big.pdf', size: sixHundredMb })).not.toThrow();
+    });
+
+    it('checks filename length before extension allowlist', () => {
+      // Overlong .xyz name: precedence puts filename_too_long before invalid_type.
+      const longName = 'a'.repeat(256) + '.xyz';
+      expect(() => capturedHooks.entryHook(null, { name: longName, size: 100 })).toThrow('filename_too_long');
     });
   });
 
