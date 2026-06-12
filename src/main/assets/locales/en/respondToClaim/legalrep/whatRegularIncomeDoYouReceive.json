@@ -5,6 +5,9 @@
   "hintText": "Select all that apply. The information the defendant provides must be truthful and accurate.",
   "options": {
     "incomeFromJobs": "Income from all jobs they do",
+    "pension": "Pension – state and private",
+    "universalCredit": "Universal Credit",
+    "otherBenefits": "Other benefits and credits",
     "moneyFromElsewhere": "Money from somewhere else (for example, child maintenance payments or someone in the defendant's household gives them money)"
   },
   "subFields": {
