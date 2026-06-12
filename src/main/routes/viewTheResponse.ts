@@ -329,11 +329,7 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssu
     claimantName: resolveClaimantName(caseData),
     claimIssueDate: resolveClaimIssueDate(caseData, dateIssued),
   };
-  pushRow(
-    rows,
-    t('viewTheResponse:payments.anyPaymentsMade', paymentLabelContext),
-    yesNo(t, payment.anyPaymentsMade)
-  );
+  pushRow(rows, t('viewTheResponse:payments.anyPaymentsMade', paymentLabelContext), yesNo(t, payment.anyPaymentsMade));
   pushRow(rows, t('viewTheResponse:payments.paymentDetails'), payment.paymentDetails);
   pushRow(
     rows,
