@@ -9,9 +9,11 @@ import {
   counterClaim,
   counterClaimAbout,
   counterClaimAgainstWhom,
+  counterClaimApplicationFeeAmount,
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
+  counterClaimPaymentSuccessful,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   counterclaimYouNeedToApplyForHelpWithYourFees,
@@ -34,11 +36,13 @@ import {
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
+  paymentDetails,
   priorityDebtDetails,
   priorityDebts,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  responseSubmittedCounterclaimFeePaymentNeeded,
   startNow,
   taskList,
   tenancyDateDetails,
@@ -401,18 +405,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-      ],
-      status: 'Done',
+    await performAction('clickButton', 'Submit');
+    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
+      fee: '35',
+    });
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('35'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.paymentConfirmationParagraph,
     });
   });
 
@@ -1720,18 +1726,20 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-      ],
-      status: 'Done',
+    await performAction('clickButton', 'Submit');
+    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: '',
+      fee: '377',
+    });
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('377'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.declinedCardNumber });
+    await performValidation('mainHeader', counterClaimApplicationFeeAmount.mainHeader);
+    await performValidation('textNotVisible', {
+      elementType: 'h1',
+      text: counterClaimPaymentSuccessful.mainHeader,
     });
   });
 
