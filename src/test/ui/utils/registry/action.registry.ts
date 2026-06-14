@@ -105,6 +105,8 @@ export class ActionRegistry {
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
+    ['inputCounterClaimPaymentDetails', new RespondToClaimAction()],
+    ['validateCounterClaimApplicationFee', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
     ['taskList', new RespondToClaimAction()],
