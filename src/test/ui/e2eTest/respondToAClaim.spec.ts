@@ -48,6 +48,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { viewDocuments } from '../data/page-data/documents-page-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
@@ -413,6 +414,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         taskList.checkYourAnswersAndSubmitHiddenLink,
       ],
       status: 'Done',
+    });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
+    await performAction('validateViewDocuments', {
+      documents: [
+        {
+          sectionHeader: viewDocuments.evidenceSubHeader,
+          documentName: 'rentArrears - Defendant 1.pdf',
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+      ],
     });
   });
 
