@@ -25,21 +25,26 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const paymentSession = getPaymentSessionState(req);
     const counterClaim =
       req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+    const claimType = paymentSession?.counterClaimType ?? counterClaim?.claimType;
 
-    if (!counterClaim?.claimType) {
+    if (!claimType) {
       throw new Error('Counterclaim fee unavailable: missing claimType');
     }
 
     const claimAmountInPence = paymentSession?.counterClaimAmountInPence ?? getCounterClaimAmountInPence(counterClaim);
 
-    const feeType = getCounterClaimFeeType(counterClaim.claimType, claimAmountInPence);
-    const feeAmount = await getFee(feeType, claimAmountInPence);
+    let feeAmount = paymentSession?.feeAmount;
+    if (feeAmount === undefined) {
+      const feeType = getCounterClaimFeeType(claimType, claimAmountInPence);
+      feeAmount = await getFee(feeType, claimAmountInPence);
+    }
 
     if (paymentSession) {
       setPaymentSessionState(req, {
         ...paymentSession,
         feeAmount,
         counterClaimAmountInPence: claimAmountInPence,
+        counterClaimType: claimType,
       });
     }
 

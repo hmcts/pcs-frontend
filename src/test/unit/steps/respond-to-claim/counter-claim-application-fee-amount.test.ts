@@ -27,6 +27,7 @@ type CounterClaimApplicationFeeAmountStep = {
         serviceRequestReference?: string;
         feeAmount?: number;
         counterClaimAmountInPence?: string;
+        counterClaimType?: string;
       };
     };
     res?: {
@@ -95,7 +96,6 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       session: {
         payment: {
           serviceRequestReference: 'SR-1',
-          feeAmount: 35,
           counterClaimAmountInPence: '64900',
         },
       },
@@ -148,7 +148,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     expect(content).toEqual(
       expect.objectContaining({
         formattedCounterClaimAmount: undefined,
-        formattedCounterClaimFee: '£154',
+        formattedCounterClaimFee: '£35',
         payNowDisabled: false,
       })
     );
@@ -193,7 +193,42 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     );
   });
 
-  it('throws when counterclaim claim type is missing', async () => {
+  it('uses submit-time session snapshot when CCD counterclaim draft is cleared after submit', async () => {
+    const content = await testedStep.extendGetContent({
+      params: { caseReference: '123' },
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {},
+              },
+            },
+          },
+        },
+      },
+      session: {
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 35,
+          counterClaimAmountInPence: '250000',
+          counterClaimType: 'PAYMENT_OR_COMPENSATION',
+        },
+      },
+    });
+
+    expect(getCounterClaimFeeType).not.toHaveBeenCalled();
+    expect(getFee).not.toHaveBeenCalled();
+    expect(content).toEqual(
+      expect.objectContaining({
+        formattedCounterClaimAmount: '£2500',
+        formattedCounterClaimFee: '£35',
+        payNowDisabled: false,
+      })
+    );
+  });
+
+  it('throws when counterclaim claim type is missing from session and CCD', async () => {
     await expect(
       testedStep.extendGetContent({
         session: {
@@ -231,7 +266,6 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       session: {
         payment: {
           serviceRequestReference: 'SR-1',
-          feeAmount: 80,
           counterClaimAmountInPence: '600000',
         },
       },

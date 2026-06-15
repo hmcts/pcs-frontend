@@ -206,6 +206,7 @@ describe('finalSubmit routes', () => {
                 hwfReferenceNumber: '',
                 isClaimAmountKnown: 'YES',
                 claimAmount: '250000',
+                claimType: 'PAYMENT_OR_COMPENSATION',
               },
             },
           },
@@ -232,6 +233,7 @@ describe('finalSubmit routes', () => {
           serviceRequestReference: 'SR-123',
           feeAmount: 404,
           counterClaimAmountInPence: '250000',
+          counterClaimType: 'PAYMENT_OR_COMPENSATION',
         })
       );
       expect(res.redirect).toHaveBeenCalledWith(
