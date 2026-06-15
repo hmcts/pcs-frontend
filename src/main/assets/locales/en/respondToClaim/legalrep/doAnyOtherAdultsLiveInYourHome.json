@@ -2,7 +2,7 @@
   "question": "",
   "heading": "Other adults",
   "dependantQuestion": "Do any other adults live in the defendant\u2019s home?",
-  "textAreaLabel": "Give details about the other adults living in the defendant\u2019 s home",
+  "textAreaLabel": "Give details about the other adults living in the defendant\u2019s home",
   "textAreaHintText": "",
   "errors": {
     "confirmOtherAdults": "Select if any other adults live in the defendant\u2019s home",
