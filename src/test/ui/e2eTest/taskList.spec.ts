@@ -17,8 +17,6 @@ import {
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
   endNow,
-  equalityAndDiversityEnd,
-  equalityAndDiversityStart,
   exceptionalHardship,
   freeLegalAdvice,
   incomeAndExpenses,
@@ -39,7 +37,7 @@ import {
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
 let claimantName: string;
@@ -292,11 +290,6 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       status: 'Available',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
