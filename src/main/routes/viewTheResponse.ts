@@ -334,7 +334,11 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssu
   pushRow(rows, t('viewTheResponse:payments.repaymentAgreedDetails'), payment.repaymentAgreedDetails);
   pushRow(rows, t('viewTheResponse:payments.repayArrearsInstalments'), yesNo(t, payment.repayArrearsInstalments));
   if (payment.additionalRentContribution || payment.additionalContributionFrequency) {
-    pushRow(rows, t('viewTheResponse:payments.additionalContribution'), formatMoneyAmount(payment.additionalRentContribution));
+    pushRow(
+      rows,
+      t('viewTheResponse:payments.additionalContribution'),
+      formatMoneyAmount(payment.additionalRentContribution)
+    );
     pushRow(
       rows,
       t('viewTheResponse:payments.additionalContributionFrequency'),
