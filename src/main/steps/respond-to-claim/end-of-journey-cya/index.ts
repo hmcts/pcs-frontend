@@ -8,9 +8,9 @@ import { sectionIdToBackendEnum } from '../sections.config';
 import { buildEndOfJourneyCyaSections } from './buildEndOfJourneyCyaRows';
 
 import { getTranslationFunction } from '@modules/steps';
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const STEP_NAME = 'end-of-journey-cya';
 
