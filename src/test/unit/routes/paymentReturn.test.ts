@@ -119,6 +119,10 @@ describe('paymentReturn routes', () => {
             successRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-successful',
             failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
           },
+          save: jest.fn(callback => {
+            callback?.(undefined);
+            return req.session;
+          }),
         },
         params: {
           internalReference: 'e44c5090-e207-48ac-b8dd-344a63829deb',
@@ -151,6 +155,10 @@ describe('paymentReturn routes', () => {
             caseReference: '1234567890123456',
             failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
           },
+          save: jest.fn(callback => {
+            callback?.(undefined);
+            return req.session;
+          }),
         },
         params: {
           internalReference: 'e44c5090-e207-48ac-b8dd-344a63829deb',
@@ -184,6 +192,10 @@ describe('paymentReturn routes', () => {
             pendingRedirectUrl: '/payment/return',
             failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
           },
+          save: jest.fn(callback => {
+            callback?.(undefined);
+            return req.session;
+          }),
         },
         params: {
           internalReference: 'e44c5090-e207-48ac-b8dd-344a63829deb',

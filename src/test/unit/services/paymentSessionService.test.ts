@@ -8,10 +8,21 @@ import {
 } from '@services/paymentSessionService';
 
 describe('paymentSessionService', () => {
-  it('stores payment session state when payment has started', () => {
+  const createReq = (session: Record<string, unknown> = {}) => {
     const req = {
-      session: {},
+      session,
     } as unknown as Request;
+
+    req.session.save = jest.fn(callback => {
+      callback?.(undefined);
+      return req.session;
+    });
+
+    return req;
+  };
+
+  it('stores payment session state when payment has started', () => {
+    const req = createReq();
 
     setPaymentSessionState(req, {
       caseReference: '1234567890123456',
@@ -35,9 +46,7 @@ describe('paymentSessionService', () => {
   });
 
   it('stores payment session state before payment starts', () => {
-    const req = {
-      session: {},
-    } as unknown as Request;
+    const req = createReq();
 
     setPaymentSessionState(req, {
       caseReference: '1234567890123456',
@@ -52,57 +61,54 @@ describe('paymentSessionService', () => {
     });
   });
 
-  it('clears payment session state', () => {
-    const req = {
-      session: {
-        payment: {
-          paymentReference: 'RC-123',
-        },
+  it('clears payment session state', async () => {
+    const req = createReq({
+      payment: {
+        paymentReference: 'RC-123',
       },
-    } as unknown as Request;
+    });
 
-    clearPaymentSessionState(req);
+    await clearPaymentSessionState(req);
 
     expect(req.session.payment).toBeUndefined();
+    expect(req.session.save).toHaveBeenCalled();
   });
 
-  it('retains only payment reference in session state', () => {
-    const req = {
-      session: {
-        payment: {
-          paymentReference: 'RC-123',
-          serviceRequestReference: 'SR-123',
-          caseReference: '1234567890123456',
-          successRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-successful',
-        },
+  it('retains only payment reference in session state', async () => {
+    const req = createReq({
+      payment: {
+        paymentReference: 'RC-123',
+        serviceRequestReference: 'SR-123',
+        caseReference: '1234567890123456',
+        successRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-successful',
       },
-    } as unknown as Request;
+    });
 
-    retainPaymentReferenceOnly(req);
+    await retainPaymentReferenceOnly(req);
 
     expect(req.session.payment).toEqual({
       paymentReference: 'RC-123',
     });
+    expect(req.session.save).toHaveBeenCalled();
   });
 
-  it('clears only payment reference in session state', () => {
-    const req = {
-      session: {
-        payment: {
-          paymentReference: 'RC-123',
-          serviceRequestReference: 'SR-123',
-          caseReference: '1234567890123456',
-          successRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-successful',
-        },
+  it('clears only payment reference in session state', async () => {
+    const req = createReq({
+      payment: {
+        paymentReference: 'RC-123',
+        serviceRequestReference: 'SR-123',
+        caseReference: '1234567890123456',
+        successRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-successful',
       },
-    } as unknown as Request;
+    });
 
-    clearPaymentReferenceOnly(req);
+    await clearPaymentReferenceOnly(req);
 
     expect(req.session.payment).toEqual({
       serviceRequestReference: 'SR-123',
       caseReference: '1234567890123456',
       successRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-successful',
     });
+    expect(req.session.save).toHaveBeenCalled();
   });
 });
