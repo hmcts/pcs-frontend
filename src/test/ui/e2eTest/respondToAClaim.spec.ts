@@ -13,7 +13,6 @@ import {
   counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
-  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   counterclaimYouNeedToApplyForHelpWithYourFees,
   defendantDateOfBirth,
@@ -22,6 +21,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
   endNow,
   exceptionalHardship,
   freeLegalAdvice,
@@ -229,7 +229,7 @@ test.afterEach(async () => {
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt, < 2 named parties - CounterClaimAppliedForHelp - Yes - about your counterclaim
   //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
-  test('Respond to a claim - SelectCounterClaim - Yes @noDefendants @crossbrowser', async () => {
+  test('Respond to a claim - RegularIncome - Universal Credit - SelectCounterClaim - Yes @noDefendants @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
@@ -304,7 +304,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+    });
+    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -406,7 +409,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @regression @PR', async () => {
+  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -484,7 +487,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -702,7 +707,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
       factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -785,7 +792,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute - SelectCounterClaim - Yes @secureFlexible', async () => {
+  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @secureFlexible @regression @PR', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit - What are you claiming for - sum of money - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -859,7 +866,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -969,7 +978,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
   });
 
-  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - SelectCounterClaim - Yes @secureFlexible', async () => {
+  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @secureFlexible', async () => {
     //Counterclaim - both - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -1040,7 +1049,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1216,7 +1227,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1406,7 +1419,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1577,7 +1592,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
       factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1898,7 +1915,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
       factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
