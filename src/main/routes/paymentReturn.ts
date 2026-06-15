@@ -44,11 +44,9 @@ export default function paymentReturnRoutes(app: Application): void {
 
       if (outcome === 'success') {
         redirectTarget = successRedirectUrl;
+        retainPaymentReferenceOnly(req);
       } else if (outcome === 'failure') {
         redirectTarget = failureRedirectUrl;
-      }
-
-      if (outcome === 'failure') {
         clearPaymentReferenceOnly(req);
       } else {
         retainPaymentReferenceOnly(req);
