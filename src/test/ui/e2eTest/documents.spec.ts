@@ -35,7 +35,7 @@ test.afterEach(async () => {
 
 test.describe('Documents - e2e Journey @nightly', async () => {
   // The test below needs to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
-  test('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
+  test.skip('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
@@ -91,7 +91,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
   });
 
   // The test below needs to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
-  test('Verify confirm document options based on GenApp type', async () => {
+  test.skip('Verify confirm document options based on GenApp type', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
