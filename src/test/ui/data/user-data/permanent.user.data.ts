@@ -14,4 +14,8 @@ export const user = {
       return resolveIdamPassword();
     },
   },
+  defendantSolicitor: {
+    email: 'pcs-org1-solicitor2@test.com',
+    password: process.env.IDAM_PCS_USER_PASSWORD,
+  },
 };
