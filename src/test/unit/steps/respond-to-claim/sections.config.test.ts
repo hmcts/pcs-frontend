@@ -59,6 +59,9 @@ describe('respond-to-claim sections config', () => {
       'equality-and-diversity-end',
       'language-used',
       'end-of-journey-cya',
+      'response-submitted',
+      'response-submitted-counter-claim-fee-payment-needed',
+      'response-and-counter-claim-submitted',
     ]);
   });
 

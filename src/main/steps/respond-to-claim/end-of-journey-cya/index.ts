@@ -8,9 +8,14 @@ import { sectionIdToBackendEnum } from '../sections.config';
 import { buildEndOfJourneyCyaSections } from './buildEndOfJourneyCyaRows';
 
 import { getTranslationFunction } from '@modules/steps';
+import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
+import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const STEP_NAME = 'end-of-journey-cya';
+
+// Field config override for the submit error when submitting the response fails
+const submitResponseErrorFields: FormFieldConfig[] = [{ name: 'submitResponse', type: 'text' }];
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
@@ -68,10 +73,27 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       'respondToClaim/checkYourAnswersYourCircumstances',
       'respondToClaim/checkYourAnswersIncomeAndExpenses',
       'respondToClaim/checkYourAnswersDocuments',
+      'respondToClaim/checkYourAnswers',
     ]);
     const t: TFunction = getTranslationFunction(req, ['common']);
     const sections = buildEndOfJourneyCyaSections(req, t);
-    return { sections };
+    const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
+    const submitDisabled = status === 'SUBMITTED';
+
+    if (req.query.submitError !== 'failed') {
+      return { sections, submitDisabled };
+    }
+
+    const tError = getTranslationFunction(req, ['respondToClaim/checkYourAnswers', 'common']);
+    const translated = tError('errors.submitResponseFailed');
+    const message =
+      translated && translated !== 'errors.submitResponseFailed'
+        ? translated
+        : 'Failed to submit response. Please try again.';
+
+    const errorSummary = buildErrorSummary({ submitResponse: message }, submitResponseErrorFields, tError);
+
+    return { sections, submitDisabled, ...(errorSummary ? { errorSummary } : {}) };
   },
   beforeRedirect: async (req: Request) => {
     const draft = buildDraftDefendantResponse(req);
