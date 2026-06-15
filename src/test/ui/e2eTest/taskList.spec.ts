@@ -297,5 +297,20 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
       status: 'Available',
     });
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
+    );
+    await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
+    await performAction('clickButton', tenancyTypeDetails.saveForLaterButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('clickRadioButton', doYouHaveAnyDependantChildren.noRadioOption);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.saveForLaterButton);
+    await performAction('taskListStatus', {
+      subSecArray: [taskList.householdAndCircumstancesLink, taskList.respondToSpecificPartsOfClaimantsClaimLink],
+      status: 'In progress',
+    });
   });
 });
