@@ -237,6 +237,7 @@ export interface CcdDefendantResponses {
   statementOfTruth?: StatementOfTruth;
   counterClaimWantToUploadFiles?: YesNoValue;
   completedSections?: RespondToClaimSectionEnum[];
+  status?: 'SUBMITTED' | 'CREATED';
 }
 
 export interface StatementOfTruth {
