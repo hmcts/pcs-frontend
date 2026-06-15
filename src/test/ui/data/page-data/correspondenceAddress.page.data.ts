@@ -1,8 +1,14 @@
 import { address } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { createCaseApiData } from '../api-data/createCase.api.data';
+import { createCaseApiWalesData } from '../api-data/createCaseWales.api.data';
 
 function getDefaultPostalAddress(): string {
-  const propertyAddress = createCaseApiData.createCasePayload.propertyAddress;
+  const isWalesJourney = process.env.WALES_POSTCODE && process.env.WALES_POSTCODE.toUpperCase() === 'YES';
+
+  const propertyAddress = isWalesJourney
+    ? createCaseApiWalesData.createCasePayload.propertyAddress
+    : createCaseApiData.createCasePayload.propertyAddress;
+
   return [
     propertyAddress.AddressLine1,
     propertyAddress.AddressLine2,
