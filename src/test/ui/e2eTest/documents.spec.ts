@@ -45,7 +45,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    // The lines below need to be enabled once we have a workaround to change the case status to "Case Issued".
+    // The lines below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
     /*await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden,
@@ -94,7 +94,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
   });
 
-  // The test below need to be enabled once we have a workaround to change the case status to "Case Issued".
+  // The test below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
   test.skip('Verify confirm document options based on GenApp type', async () => {
     await performAction(
       'navigateToUrl',
