@@ -1,6 +1,6 @@
 import config from 'config';
 
-import { getRootGreeting, validateAccessCode } from '@services/pcsApi/pcsApiService';
+import { getCitizenClaims, getRootGreeting, validateAccessCode } from '@services/pcsApi/pcsApiService';
 
 jest.mock('config', () => ({
   get: jest.fn(),
@@ -96,6 +96,27 @@ describe('pcsApiService', () => {
       mockHttp.post.mockRejectedValue(new Error('Network error'));
       const result = await validateAccessCode(accessToken, caseId, accessCode);
       expect(result).toEqual({ valid: false, error: 'unknown' });
+    });
+  });
+
+  describe('getCitizenClaims', () => {
+    const accessToken = 'test-access-token';
+
+    test('returns array of claims on success', async () => {
+      const claims = [{ caseReference: '1234567890123456', claimantName: 'John Doe', propertyPostcode: 'SW1A 1AA' }];
+      mockHttp.get.mockResolvedValue({ data: claims });
+
+      const result = await getCitizenClaims(accessToken);
+      expect(result).toEqual(claims);
+      expect(mockHttp.get).toHaveBeenCalledWith(
+        `${testApiBase}/cases/citizen-claims`,
+        expect.objectContaining({ headers: { Authorization: `Bearer ${accessToken}` } })
+      );
+    });
+
+    test('throws when response data is not an array', async () => {
+      mockHttp.get.mockResolvedValue({ data: null });
+      await expect(getCitizenClaims(accessToken)).rejects.toThrow('Unexpected response from citizen-claims endpoint');
     });
   });
 });
