@@ -1,4 +1,5 @@
 export default {
+  claims: 'claims',
   'start-now': 'startNow',
   'free-legal-advice': 'freeLegalAdvice',
   home: 'home',
