@@ -236,6 +236,7 @@ export interface CcdDefendantResponses {
   makeCounterClaim?: YesNoValue;
   counterClaimWantToUploadFiles?: YesNoValue;
   completedSections?: RespondToClaimSectionEnum[];
+  status?: 'SUBMITTED' | 'CREATED';
 }
 
 export interface PossessionClaimResponse {

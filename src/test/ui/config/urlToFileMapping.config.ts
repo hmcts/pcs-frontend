@@ -1,4 +1,5 @@
 export default {
+  claims: 'claims',
   'start-now': 'startNow',
   'free-legal-advice': 'freeLegalAdvice',
   home: 'home',
@@ -74,5 +75,7 @@ export default {
   'reasonable-adjustments-triage': 'reasonableAdjustmentsTriage',
   'task-list': 'taskList',
   'confirm-if-these-documents-relate-to-an-application': 'confirmIfTheseDocumentsRelateToAnApplication',
-  claims: 'claims',
+  'response-submitted-counter-claim-fee-payment-needed': 'responseSubmittedCounterclaimFeePaymentNeeded',
+  'response-and-counter-claim-submitted': 'responseAndCounterClaimSubmitted',
+  'response-submitted': 'responseSubmitted',
 };
