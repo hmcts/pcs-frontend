@@ -25,8 +25,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: async req => {
     const paymentSession = getPaymentSessionState(req);
     const caseModel = req.res?.locals?.validatedCase;
-    const counterClaim =
-      caseModel instanceof CcdCaseModel ? caseModel.defendantResponsesCounterClaim : undefined;
+    const counterClaim = caseModel instanceof CcdCaseModel ? caseModel.defendantResponsesCounterClaim : undefined;
     const claimType = paymentSession?.counterClaimType ?? counterClaim?.claimType;
 
     if (!claimType) {
