@@ -138,7 +138,13 @@ const sectionDefs = [
     // enablement is a one-line restore here. See HDPI-3793 (RA triage), HDPI-6649
     // (RA confirmation, parked on a custom branch) and the PCQ tie-in tracked in
     // config/default.json (`pcq.enabled`).
-    steps: ['language-used', 'check-your-answers'],
+    steps: [
+      'language-used',
+      'check-your-answers',
+      'response-submitted',
+      'response-submitted-counter-claim-fee-payment-needed',
+      'response-and-counter-claim-submitted',
+    ],
   },
 ] as const satisfies readonly {
   id: string;

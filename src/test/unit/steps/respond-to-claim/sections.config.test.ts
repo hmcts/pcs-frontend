@@ -65,7 +65,13 @@ describe('respond-to-claim sections config', () => {
   });
 
   it('maps end-of-journey steps into final section', () => {
-    expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual(['language-used', 'check-your-answers']);
+    expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
+      'language-used',
+      'check-your-answers',
+      'response-submitted',
+      'response-submitted-counter-claim-fee-payment-needed',
+      'response-and-counter-claim-submitted',
+    ]);
   });
 
   // HDPI-6929 — focused navigation test

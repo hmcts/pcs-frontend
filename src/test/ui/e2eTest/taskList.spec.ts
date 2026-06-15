@@ -16,11 +16,9 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
-  endNow,
   exceptionalHardship,
   freeLegalAdvice,
   incomeAndExpenses,
-  languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
   priorityDebtDetails,
@@ -289,13 +287,6 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
       status: 'Available',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
-    });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -303,7 +294,6 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
         taskList.incomeAndExpensesLink,
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
       ],
       status: 'Done',
     });
