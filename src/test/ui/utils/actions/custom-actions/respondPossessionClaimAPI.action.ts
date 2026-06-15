@@ -78,15 +78,10 @@ export class respondPossessionClaimAPIAction implements IAction {
       console.log('MID EVENT RESPONSE:\n', JSON.stringify(midEventResponse.data, null, 2));
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
-        const status = error.response?.status;
-
-        throw new Error(
-          `respondPossessionClaimMidEvent failed${status ? ` with status ${status}` : ''}. ${error.message}`,
-          { cause: error }
-        );
+        throw error;
       }
 
-      throw new Error('respondPossessionClaimMidEvent failed due to an unexpected error.', { cause: error });
+      throw new Error('respondPossessionClaimMidEvent failed due to an unexpected error.');
     }
   }
 
@@ -116,26 +111,10 @@ export class respondPossessionClaimAPIAction implements IAction {
       );
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
-        const status = error.response?.status;
-        const responseData = error.response?.data;
-        const responseHeaders = error.response?.headers;
-
-        console.error('========== RESPONDTOCLAIM DEBUG ==========');
-
-        console.error('ENDPOINT:', respondPossessionClaimApiData.respondPossessionClaimApiEndPoint());
-
-        console.error('REQUEST PAYLOAD:', JSON.stringify(submitRequest, null, 2));
-
-        console.error('STATUS:', status);
-
-        console.error('RESPONSE DATA:', JSON.stringify(responseData, null, 2));
-
-        console.error('RESPONSE HEADERS:', JSON.stringify(responseHeaders, null, 2));
-
-        throw new Error(`RESPONDTOCLAIM submission failed${status ? ` with status ${status}` : ''}.`, { cause: error });
+        throw error;
       }
 
-      throw new Error('RESPONDTOCLAIM submission failed due to an unexpected error.', { cause: error });
+      throw new Error('RESPONDTOCLAIM submission failed due to an unexpected error.');
     }
   }
 }

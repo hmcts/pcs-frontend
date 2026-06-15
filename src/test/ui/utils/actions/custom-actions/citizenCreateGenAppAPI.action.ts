@@ -36,22 +36,10 @@ export class CitizenCreateGenAppAPIAction implements IAction {
       });
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
-        const status = error.response?.status;
-        if (status === 404) {
-          console.error(citizenCreateGenAppPayloadData);
-          //console.error(citizenCreateGenAppApiData.citizenCreateGenAppPayload);
-
-          throw new Error(
-            `GenApp submission failed: endpoint not found (404). Please check the payload above.\n${error.message}`,
-            { cause: error }
-          );
-        }
-        if (!status) {
-          throw new Error('GenApp submission failed: no response from server.', { cause: error });
-        }
-        throw new Error(`GenApp submission failed with status ${status}.`, { cause: error });
+        throw error;
       }
-      throw new Error('GenApp submission failed due to an unexpected error.', { cause: error });
+
+      throw new Error('GenApp submission failed due to an unexpected error.');
     }
   }
 }

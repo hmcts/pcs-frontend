@@ -31,27 +31,35 @@ export class LinkSolicitorAPIAction implements IAction {
           `Successfully Linked Solicitor: ${user.defendantSolicitor.email} with Defendant with id ${process.env.Defendant_ID}`
         );
         break;
-      } catch (error: any) {
-        const status = error?.response?.status;
-        const responseBody = error?.response?.data;
+      } catch (error: unknown) {
+        if (Axios.isAxiosError(error)) {
+          const status = error.response?.status;
+          const responseBody = error.response?.data;
 
-        console.error('=== ERROR RESPONSE ===');
-        console.error('HTTP Status:', status);
-        console.error('Exception:', responseBody?.exception);
-        console.error('Error:', responseBody?.error);
-        console.error('Message:', responseBody?.message);
-        console.error('Path:', responseBody?.path);
-        console.error('Timestamp:', responseBody?.timestamp);
+          console.error('=== ERROR RESPONSE ===');
+          console.error('HTTP Status:', status);
+          console.error('Exception:', responseBody?.exception);
+          console.error('Error:', responseBody?.error);
+          console.error('Message:', responseBody?.message);
+          console.error('Path:', responseBody?.path);
+          console.error('Timestamp:', responseBody?.timestamp);
 
-        if (status === 404) {
-          throw new Error(`Endpoint not found\n${error}`, { cause: error });
+          if (status === 404) {
+            throw error;
+          }
+
+          if (attempt === maxRetries) {
+            throw error;
+          }
+
+          console.warn(`⚠️ Retry attempt ${attempt} failed. Retrying...`);
+
+          await new Promise(res => setTimeout(res, VERY_SHORT_TIMEOUT));
+          continue;
         }
 
         if (attempt === maxRetries) {
-          throw new Error(
-            `Linking Solicitor failed after ${attempt} attempts. Status: ${status}, Message: ${responseBody?.message}`,
-            { cause: error }
-          );
+          throw new Error('Linking Solicitor failed due to an unexpected error.');
         }
 
         console.warn(`⚠️ Retry attempt ${attempt} failed. Retrying...`);

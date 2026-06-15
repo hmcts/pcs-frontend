@@ -145,9 +145,9 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw new Error(`Validate access code failed after retries: ${error.response?.status}`, { cause: error });
+            throw error;
           }
-          throw new Error('Validate access code failed unexpectedly after retries.', { cause: error });
+          throw new Error('Validate access code failed unexpectedly after retries.');
         }
       }
       await new Promise(res => setTimeout(res, delayMs));
