@@ -34,7 +34,8 @@ test.afterEach(async () => {
 });
 
 test.describe('Documents - e2e Journey @nightly', async () => {
-  test('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
+  // The test below needs to be enabled once we have a workaround to change the case status to "Case Issued".
+  test.skip('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
@@ -89,7 +90,8 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Verify confirm document options based on GenApp type @regression', async () => {
+  // The test below needs to be enabled once we have a workaround to change the case status to "Case Issued".
+  test.skip('Verify confirm document options based on GenApp type @regression', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
