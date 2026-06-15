@@ -1,6 +1,7 @@
 import config from 'config';
 
 import { HTTPError } from '../../../main/HttpError';
+import { ClientContextHeaders } from '../../../types/global';
 
 import { http } from '@modules/http';
 import { CcdCase, CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
@@ -184,6 +185,43 @@ describe('ccdCaseService', () => {
       expect(result).toEqual({
         id: caseId,
         data: {},
+      });
+    });
+
+    it('should retrieve case by ID with client context headers', async () => {
+      const mockCaseData = { applicantForename: 'John', applicantSurname: 'Doe' };
+
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: mockCaseData,
+          },
+        },
+      });
+
+      const clientContextHeaders: ClientContextHeaders = {
+        selectedPartyId: 'abc',
+      };
+
+      const result = await ccdCaseService.getCaseByIdForEvent(
+        accessToken,
+        caseId,
+        'respondPossessionClaim',
+        clientContextHeaders
+      );
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/respondPossessionClaim?ignore-warning=false`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+            'Client-Context': '{"selectedPartyId":"abc"}',
+          }),
+        })
+      );
+      expect(result).toEqual({
+        id: caseId,
+        data: mockCaseData,
       });
     });
   });
@@ -477,5 +515,42 @@ describe('updateCase', () => {
     await expect(ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
       'CCD callback rejected request: Invalid submission: immutable field nameKnown'
     );
+  });
+
+  it('should call CCD validate endpoint with client context headers and return merged data with caller-supplied id', async () => {
+    const mockData = { defendantName: 'John Doe' };
+
+    mockPost.mockResolvedValue({
+      data: { data: mockData, _links: { self: { href: 'self' } } },
+    });
+
+    const clientContextHeaders: ClientContextHeaders = {
+      selectedPartyId: 'abc',
+    };
+
+    const result = await ccdCaseService.updateDraft(draftEvent, accessToken, caseId, mockData, clientContextHeaders);
+
+    expect(mockPost).toHaveBeenCalledWith(
+      `${mockUrl}/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,
+      {
+        event: {
+          id: 'respondPossessionClaim',
+          summary: 'Citizen respondPossessionClaim draft save summary',
+          description: 'Citizen respondPossessionClaim draft save description',
+        },
+        case_reference: caseId,
+        event_data: mockData,
+        ignore_warning: false,
+      },
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: `Bearer ${accessToken}`,
+          experimental: true,
+          'Client-Context': '{"selectedPartyId":"abc"}',
+        }),
+      })
+    );
+
+    expect(result).toEqual({ id: caseId, data: mockData });
   });
 });

@@ -6,6 +6,7 @@ import { createGetController, createStepNavigation } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
+import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
 
 const journeyName = 'respondToClaim';
 const stepName = 'start-now';
@@ -25,6 +26,7 @@ export const step: StepDefinition = {
   },
   postController: {
     post: async (req: Request, res: Response) => {
+      clientContextSessionClearer(req);
       // Get next step URL and redirect
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
 

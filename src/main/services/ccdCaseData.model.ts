@@ -4,6 +4,7 @@ import {
   CcdCaseData,
   CcdClaimGroundSummaryItem,
   CcdClaimantEnteredDefendantDetails,
+  CcdCollectionItem,
   CcdDefendantParty,
   CcdDefendantResponses,
   PossessionClaimResponse,
@@ -305,5 +306,9 @@ export class CcdCaseModel {
     ].find(Boolean);
 
     return populatedNoticeField?.slice(0, 10);
+  }
+
+  get allLinkedDefendants(): CcdCollectionItem<CcdDefendantParty>[] | undefined {
+    return this.data.allLinkedDefendants;
   }
 }
