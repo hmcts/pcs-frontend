@@ -415,7 +415,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -589,7 +588,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -850,7 +848,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -1062,7 +1059,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -1259,7 +1255,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -1479,7 +1474,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -1682,7 +1676,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -1880,7 +1873,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -2048,7 +2040,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -2231,7 +2222,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
