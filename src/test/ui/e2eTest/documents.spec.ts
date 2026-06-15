@@ -65,8 +65,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
 
-  // The test below need to be enabled once we have a workaround to change the case status to "Case Issued".
-  test.skip('View documents submitted through make a claim @regression', async () => {
+  test('View documents submitted through make a claim @regression', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
     await performAction('validateViewDocuments', {
       caseNumber: viewDocuments.getCaseNumber(),
@@ -95,7 +94,8 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Verify confirm document options based on GenApp type', async () => {
+  // The test below need to be enabled once we have a workaround to change the case status to "Case Issued".
+  test.skip('Verify confirm document options based on GenApp type', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
