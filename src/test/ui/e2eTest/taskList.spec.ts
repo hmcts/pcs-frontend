@@ -9,7 +9,8 @@ import {
   counterClaimAbout,
   counterClaimFee,
   counterClaimSpecificSumOfMoney,
-  counterClaimWhatAreYouClaimingFor, dashboard,
+  counterClaimWhatAreYouClaimingFor,
+  dashboard,
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
@@ -81,7 +82,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url);
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
-  await performAction('clickButton',dashboard.startYourResponseLink);
+  await performAction('clickButton', dashboard.startYourResponseLink);
   await performValidation('mainHeader', taskList.mainHeader);
 });
 
