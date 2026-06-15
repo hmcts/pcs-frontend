@@ -15,6 +15,7 @@ import {
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   counterclaimYouNeedToApplyForHelpWithYourFees,
+  dashboard,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
@@ -22,7 +23,6 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
-  endNow,
   equalityAndDiversityEnd,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -39,6 +39,9 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  responseAndCounterClaimSubmitted,
+  responseSubmitted,
+  responseSubmittedCounterclaimFeePaymentNeeded,
   startNow,
   taskList,
   tenancyDateDetails,
@@ -231,7 +234,7 @@ test.afterEach(async () => {
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt, < 2 named parties - CounterClaimAppliedForHelp - Yes - about your counterclaim
   //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
-  test('Respond to a claim - RegularIncome - Universal Credit - SelectCounterClaim - Yes @noDefendants @crossbrowser @PR', async () => {
+  test('Respond to a claim - RegularIncome - Universal Credit - SelectCounterClaim - Yes @noDefendants @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
@@ -391,6 +394,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -401,22 +414,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-      ],
-      status: 'Done',
-    });
+    await performAction('clickButton', 'Submit');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @regression @PR', async () => {
+  test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -544,17 +550,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
-    });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -562,10 +557,25 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         taskList.incomeAndExpensesLink,
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
       ],
       status: 'Done',
     });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('readReasonableAdjustmentsTriage');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('clickButton', 'Submit');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - CounterClaimAppliedForHelp - No - SelectCounterClaim - Yes @assured', async () => {
@@ -783,6 +793,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -793,22 +813,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-      ],
-      status: 'Done',
-    });
+    await performAction('clickButton', 'Submit');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @secureFlexible', async () => {
+  test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @secureFlexible @regression @PR', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit - What are you claiming for - sum of money - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -974,6 +987,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -984,19 +1007,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-      ],
-      status: 'Done',
-    });
+    await performAction('clickButton', 'Submit');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @secureFlexible', async () => {
@@ -1150,6 +1166,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -1160,19 +1186,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-      ],
-      status: 'Done',
-    });
+    await performAction('clickButton', 'Submit');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @regression', async () => {
@@ -1349,6 +1368,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -1359,20 +1388,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
-      ],
-      status: 'Done',
-    });
+    await performAction('clickButton', 'Submit');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No - PriorityDebts - Yes - SelectCounterClaim - Yes @smoke @PR @regression', async () => {
@@ -1532,6 +1553,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -1542,20 +1573,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
-      ],
-      status: 'Done',
-    });
+    await performAction('clickButton', 'Submit');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute - SomethingElse - SelectCounterClaim - Yes', async () => {
@@ -1710,6 +1733,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -1720,19 +1753,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-      ],
-      status: 'Done',
-    });
+    await performAction('clickButton', 'Submit');
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - No @PR @rentNonRent @regression', async () => {
@@ -1857,6 +1883,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -1867,20 +1903,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
-      ],
-      status: 'Done',
-    });
+    await performAction('clickButton', 'Submit');
+    await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - @multiParty', async () => {
@@ -2023,6 +2048,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('readReasonableAdjustmentsTriage');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -2033,19 +2068,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
-      ],
-      status: 'Done',
-    });
+    await performAction('clickButton', 'Submit');
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });
