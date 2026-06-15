@@ -101,7 +101,7 @@ let claimantName: string;
 //   to explain why ErrorMessageValidation(EMV) is missing/deferred/not applicable.
 
 const NO_EMV_READ_ONLY = 'Read-only / informational screen — no field error validation.';
-const NO_EMV_PLACEHOLDER_PAGE = 'Placeholder page — ErrorMessageValidation(EMV) is not designed yet.';
+// const NO_EMV_PLACEHOLDER_PAGE = 'Placeholder page — ErrorMessageValidation(EMV) is not designed yet.';
 const NO_EMV_MISSING_DESIGN = 'ErrorMessageValidation(EMV) is missing for this page and needs to be designed.';
 
 test.beforeEach(async ({ page }, testInfo) => {
