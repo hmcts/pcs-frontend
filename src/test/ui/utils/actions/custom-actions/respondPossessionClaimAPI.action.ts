@@ -132,8 +132,6 @@ export class respondPossessionClaimAPIAction implements IAction {
 
         console.error('RESPONSE HEADERS:', JSON.stringify(responseHeaders, null, 2));
 
-        console.error('==========================================');
-
         throw new Error(`RESPONDTOCLAIM submission failed${status ? ` with status ${status}` : ''}.`, { cause: error });
       }
 
