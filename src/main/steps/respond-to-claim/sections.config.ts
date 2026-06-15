@@ -137,6 +137,9 @@ const sectionDefs = [
       'equality-and-diversity-end',
       'language-used',
       'check-your-answers',
+      'response-submitted',
+      'response-submitted-counter-claim-fee-payment-needed',
+      'response-and-counter-claim-submitted',
     ],
   },
 ] as const satisfies readonly {
