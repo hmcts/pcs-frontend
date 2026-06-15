@@ -36,6 +36,13 @@
         {{ govukSummaryList({ rows: defendant1Details.rows }) }}
       {% endif %}
 
+      {% for section in additionalDefendantDetails %}
+        {% if section.rows.length %}
+          <h2 class="govuk-heading-m">{{ section.sectionTitle }}</h2>
+          {{ govukSummaryList({ rows: section.rows }) }}
+        {% endif %}
+      {% endfor %}
+
       {% if responseToClaim.rows.length %}
         <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.responseToClaim') }}</h2>
         {{ govukSummaryList({ rows: responseToClaim.rows }) }}

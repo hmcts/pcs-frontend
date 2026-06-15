@@ -58,6 +58,20 @@ function buildComprehensiveCaseData(): CcdCaseData {
       },
     ],
     dateSubmitted: '2026-02-01',
+    allDefendants: [
+      { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
+      {
+        id: 'def-2',
+        value: {
+          nameKnown: 'YES',
+          firstName: 'Peter',
+          lastName: 'Parker',
+          addressKnown: 'YES',
+          addressSameAsProperty: 'YES',
+          dateOfBirth: '1985-07-20',
+        },
+      },
+    ] as CcdCaseData['allDefendants'],
     possessionClaimResponse: {
       claimIssuedDate: '2026-02-05',
       claimantServiceAddress: {
@@ -329,6 +343,19 @@ describe('viewTheResponse route', () => {
       ])
     );
     expect(renderArgs.defendant1Details.rows.length).toBeGreaterThan(0);
+    expect(renderArgs.additionalDefendantDetails).toHaveLength(1);
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant1.name' },
+          value: { text: 'Peter Parker' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant1.dateOfBirth' },
+          value: { text: '20 July 1985' },
+        }),
+      ])
+    );
     expect(renderArgs.responseToClaim.rows.length).toBeGreaterThan(0);
     expect(renderArgs.paymentsOrAgreements.rows.length).toBeGreaterThan(0);
     expect(renderArgs.householdAndCircumstances.rows.length).toBeGreaterThan(0);
@@ -337,25 +364,19 @@ describe('viewTheResponse route', () => {
     expect(renderArgs.regularExpenses.rows.length).toBeGreaterThan(0);
     expect(renderArgs.additionalInformation.rows.length).toBeGreaterThan(0);
     expect(renderArgs.counterclaim.rows.length).toBeGreaterThan(0);
-    expect(renderArgs.defendant1Details.rows).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant1.contactPreferences' },
-          value: {
-            text: 'viewTheResponse:contactPreference.text, viewTheResponse:contactPreference.phone, viewTheResponse:contactPreference.email, viewTheResponse:contactPreference.post',
-          },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant1.freeLegalAdvice' },
-          value: { text: 'Yes' },
-        }),
-      ])
-    );
     expect(renderArgs.responseToClaim.rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmountConfirmation' },
           value: { text: 'Yes' },
+        }),
+      ])
+    );
+    expect(renderArgs.paymentsOrAgreements.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:payments.additionalContribution' },
+          value: { text: '£50.00 viewTheResponse:paymentFrequencies.WEEKLY' },
         }),
       ])
     );
@@ -372,6 +393,46 @@ describe('viewTheResponse route', () => {
         expect.objectContaining({
           key: { text: 'viewTheResponse:counterclaim.needHelpWithFees' },
           value: { text: 'I do not need help paying the fee' },
+        }),
+      ])
+    );
+  });
+
+  it('should show persons unknown and address unknown for additional defendants when not known', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        defendantResponses: { disputeClaim: 'NO' },
+      },
+      allDefendants: [
+        { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
+        { id: 'def-2', value: { nameKnown: 'NO', addressKnown: 'NO' } },
+      ],
+    } as CcdCaseData);
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    const next: NextFunction = jest.fn();
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      next
+    );
+
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant1.name' },
+          value: { text: 'viewTheResponse:personsUnknown' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant1.address' },
+          value: { text: 'viewTheResponse:addressUnknown' },
         }),
       ])
     );
