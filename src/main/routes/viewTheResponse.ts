@@ -13,11 +13,9 @@ import { getDashboardUrl } from '@routes/dashboard';
 import type {
   CcdCaseAddress,
   CcdCaseData,
-  CcdClaimGroundSummaryItem,
   CcdCollectionItem,
   CcdCounterClaim,
   CcdDefendantParty,
-  CcdDefendantResponses,
   CcdParty,
   HouseholdCircumstances,
   IncomeExpenseDetails,
@@ -45,6 +43,20 @@ function summaryKey(text: string): SummaryRow['key'] {
 
 interface SummarySection {
   rows: SummaryRow[];
+}
+
+interface TitledSummarySection extends SummarySection {
+  sectionTitle: string;
+}
+
+interface AdditionalDefendantParty {
+  firstName?: string;
+  lastName?: string;
+  nameKnown?: string;
+  addressKnown?: string;
+  addressSameAsProperty?: string;
+  address?: CcdCaseAddress | Record<string, never>;
+  dateOfBirth?: string;
 }
 
 function formatGdsDate(value: string | undefined | null): string | null {
@@ -98,23 +110,6 @@ function yesNoNotSure(t: TFunction, value: YesNoNotSureValue | string | undefine
   return '';
 }
 
-function formatEnumOption(t: TFunction, optionKey: string, value: string | undefined): string {
-  if (!value?.trim()) {
-    return '';
-  }
-  return t(`${optionKey}.${value.trim().toUpperCase()}`, '');
-}
-
-function frequencyLabel(t: TFunction, frequency: string | undefined | null): string {
-  if (frequency === 'WEEKLY') {
-    return t('viewTheResponse:frequency.weekly');
-  }
-  if (frequency === 'MONTHLY') {
-    return t('viewTheResponse:frequency.monthly');
-  }
-  return '';
-}
-
 function formatMoneyAmount(pence: string | number | undefined): string {
   const pounds = penceToPounds(pence);
   return pounds ? `£${pounds}` : '';
@@ -138,6 +133,16 @@ function formatPaymentValue(t: TFunction, amount: string | undefined, frequency:
     return `${money} ${freq}`;
   }
   return money || freq;
+}
+
+function frequencyLabel(t: TFunction, frequency: string | undefined | null): string {
+  if (frequency === 'WEEKLY') {
+    return t('viewTheResponse:frequency.weekly');
+  }
+  if (frequency === 'MONTHLY') {
+    return t('viewTheResponse:frequency.monthly');
+  }
+  return '';
 }
 
 function joinName(firstName?: string, lastName?: string): string {
@@ -204,26 +209,6 @@ function resolveClaimantName(caseData: CcdCaseData): string {
   return new CcdCaseModel({ id: '', data: caseData }).claimantName;
 }
 
-function buildContactPreferences(t: TFunction, responses: CcdDefendantResponses | undefined): string {
-  if (!responses) {
-    return '';
-  }
-  const prefs: string[] = [];
-  if (isYes(responses.contactByText)) {
-    prefs.push(t('viewTheResponse:contactPreference.text'));
-  }
-  if (isYes(responses.contactByPhone)) {
-    prefs.push(t('viewTheResponse:contactPreference.phone'));
-  }
-  if (isYes(responses.contactByEmail)) {
-    prefs.push(t('viewTheResponse:contactPreference.email'));
-  }
-  if (isYes(responses.contactByPost)) {
-    prefs.push(t('viewTheResponse:contactPreference.post'));
-  }
-  return prefs.join(', ');
-}
-
 function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
   const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
@@ -236,26 +221,48 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
     pushRow(rows, t('viewTheResponse:defendant1.phone'), party?.phoneNumber);
   }
   pushRow(rows, t('viewTheResponse:defendant1.address'), addressToString(party?.address));
-  pushRow(rows, t('viewTheResponse:defendant1.contactPreferences'), buildContactPreferences(t, responses));
-  pushRow(
-    rows,
-    t('viewTheResponse:defendant1.freeLegalAdvice'),
-    formatEnumOption(t, 'viewTheResponse:defendant1.freeLegalAdviceOptions', responses?.freeLegalAdvice)
-  );
   return { rows };
 }
 
-function buildClaimGroundsText(grounds: CcdClaimGroundSummaryItem[] | undefined): string {
-  return (grounds ?? [])
-    .map(g => g.value?.label)
-    .filter((l): l is string => !!l)
-    .join(', ');
+function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): TitledSummarySection[] {
+  const defendants = caseData.allDefendants ?? [];
+  if (defendants.length < 2) {
+    return [];
+  }
+
+  return defendants.slice(1).map((defendant, index) => {
+    const party = defendant.value as AdditionalDefendantParty;
+    const rows: SummaryRow[] = [];
+
+    pushRow(
+      rows,
+      t('viewTheResponse:defendant1.name'),
+      isNo(party.nameKnown) ? t('viewTheResponse:personsUnknown') : joinName(party.firstName, party.lastName)
+    );
+
+    let address = '';
+    if (isNo(party.addressKnown)) {
+      address = t('viewTheResponse:addressUnknown');
+    } else if (isYes(party.addressSameAsProperty) || !addressToString(party.address)) {
+      address = caseData.propertyAddress ? (formatAddress(caseData.propertyAddress) ?? '') : '';
+    } else {
+      address = addressToString(party.address);
+    }
+    pushRow(rows, t('viewTheResponse:defendant1.address'), address);
+    pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(party.dateOfBirth) ?? '');
+
+    return {
+      sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
+      rows,
+    };
+  });
 }
 
 function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
+  pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNo(t, caseData.isExemptLandlord));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.tenancyTypeConfirmation'),
@@ -272,13 +279,6 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.tenancyStartDate'),
     formatGdsDate(responses?.tenancyStartDate) ?? ''
   );
-  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.landlordRegistered'),
-    yesNoNotSure(t, responses?.landlordRegistered)
-  );
-  pushRow(rows, t('viewTheResponse:responseToClaim.landlordLicensed'), yesNoNotSure(t, responses?.landlordLicensed));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
@@ -299,21 +299,16 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.rentArrearsAmount'),
     formatMoneyAmount(responses?.rentArrearsAmount)
   );
+  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(rows, t('viewTheResponse:responseToClaim.disputeClaim'), yesNo(t, responses?.disputeClaim));
   pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.claimGrounds'),
-    buildClaimGroundsText(caseData.claimGroundSummaries)
-  );
   return { rows };
 }
 
 function resolveClaimIssueDate(caseData: CcdCaseData, dateIssued: string | null): string {
   return (
-    formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate) ??
-    formatGdsDate(new CcdCaseModel({ id: '', data: caseData }).claimIssueDate) ??
     formatGdsDate(caseData.claimIssueDate) ??
+    formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate) ??
     dateIssued ??
     ''
   );
@@ -339,11 +334,7 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssu
   pushRow(rows, t('viewTheResponse:payments.repaymentAgreedDetails'), payment.repaymentAgreedDetails);
   pushRow(rows, t('viewTheResponse:payments.repayArrearsInstalments'), yesNo(t, payment.repayArrearsInstalments));
   if (payment.additionalRentContribution || payment.additionalContributionFrequency) {
-    pushRow(
-      rows,
-      t('viewTheResponse:payments.additionalContribution'),
-      formatMoneyAmount(payment.additionalRentContribution)
-    );
+    pushRow(rows, t('viewTheResponse:payments.additionalContribution'), formatMoneyAmount(payment.additionalRentContribution));
     pushRow(
       rows,
       t('viewTheResponse:payments.additionalContributionFrequency'),
@@ -582,6 +573,7 @@ export default function viewTheResponseRoutes(app: Application): void {
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
         defendant1Details: buildDefendant1Details(t, caseData),
+        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
         responseToClaim: buildResponseToClaim(t, caseData),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
