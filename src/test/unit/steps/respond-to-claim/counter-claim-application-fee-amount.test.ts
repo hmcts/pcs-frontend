@@ -16,7 +16,22 @@ jest.mock('@services/feeLookupService', () => ({
 import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-application-fee-amount';
 
+import type { CcdCounterClaim } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+
+const makeValidatedCase = (counterClaim?: CcdCounterClaim, defendantResponses: Record<string, unknown> = {}) =>
+  new CcdCaseModel({
+    id: '',
+    data: {
+      possessionClaimResponse: {
+        defendantResponses: {
+          ...defendantResponses,
+          ...(counterClaim !== undefined && { counterClaim }),
+        },
+      },
+    },
+  });
 
 type CounterClaimApplicationFeeAmountStep = {
   extendGetContent: (req: {
@@ -32,20 +47,7 @@ type CounterClaimApplicationFeeAmountStep = {
     };
     res?: {
       locals?: {
-        validatedCase?: {
-          data?: {
-            possessionClaimResponse?: {
-              defendantResponses?: {
-                counterClaim?: {
-                  claimType?: string;
-                  isClaimAmountKnown?: string;
-                  claimAmount?: string;
-                  estimatedMaxClaimAmount?: string;
-                };
-              };
-            };
-          };
-        };
+        validatedCase?: CcdCaseModel;
       };
     };
   }) => Promise<Record<string, string | boolean | undefined>>;
@@ -78,19 +80,11 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       params: { caseReference: '123' },
       res: {
         locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  counterClaim: {
-                    claimType: 'PAYMENT_OR_COMPENSATION',
-                    isClaimAmountKnown: 'YES',
-                    claimAmount: '64900',
-                  },
-                },
-              },
-            },
-          },
+          validatedCase: makeValidatedCase({
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '64900',
+          }),
         },
       },
       session: {
@@ -124,17 +118,9 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       params: { caseReference: '123' },
       res: {
         locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  counterClaim: {
-                    claimType: 'SOMETHING_ELSE',
-                  },
-                },
-              },
-            },
-          },
+          validatedCase: makeValidatedCase({
+            claimType: 'SOMETHING_ELSE',
+          }),
         },
       },
       session: {
@@ -160,19 +146,11 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     const content = await testedStep.extendGetContent({
       res: {
         locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  counterClaim: {
-                    claimType: 'PAYMENT_OR_COMPENSATION',
-                    isClaimAmountKnown: 'YES',
-                    claimAmount: '250000',
-                  },
-                },
-              },
-            },
-          },
+          validatedCase: makeValidatedCase({
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '250000',
+          }),
         },
       },
       params: { caseReference: '123' },
@@ -198,13 +176,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       params: { caseReference: '123' },
       res: {
         locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {},
-              },
-            },
-          },
+          validatedCase: makeValidatedCase(undefined, {}),
         },
       },
       session: {
@@ -248,19 +220,11 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       params: { caseReference: '123' },
       res: {
         locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  counterClaim: {
-                    claimType: 'BOTH',
-                    isClaimAmountKnown: 'YES',
-                    claimAmount: '600000',
-                  },
-                },
-              },
-            },
-          },
+          validatedCase: makeValidatedCase({
+            claimType: 'BOTH',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '600000',
+          }),
         },
       },
       session: {
@@ -288,19 +252,11 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       query: { payment: 'failed' },
       res: {
         locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  counterClaim: {
-                    claimType: 'PAYMENT_OR_COMPENSATION',
-                    isClaimAmountKnown: 'YES',
-                    claimAmount: '250000',
-                  },
-                },
-              },
-            },
-          },
+          validatedCase: makeValidatedCase({
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '250000',
+          }),
         },
       },
       session: {

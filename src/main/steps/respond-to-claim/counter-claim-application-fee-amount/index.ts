@@ -4,6 +4,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 import { getPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
 
@@ -23,8 +24,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: async req => {
     const paymentSession = getPaymentSessionState(req);
+    const caseModel = req.res?.locals?.validatedCase;
     const counterClaim =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+      caseModel instanceof CcdCaseModel ? caseModel.defendantResponsesCounterClaim : undefined;
     const claimType = paymentSession?.counterClaimType ?? counterClaim?.claimType;
 
     if (!claimType) {
