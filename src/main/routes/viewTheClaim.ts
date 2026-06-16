@@ -14,10 +14,6 @@ export default function viewTheClaimRoutes(app: Application): void {
     const caseReference = req.params.caseReference as string;
     const accessToken = req.session.user?.accessToken;
 
-    if (!caseReference) {
-      return next(new HTTPError('Invalid case reference format', 404));
-    }
-
     if (!accessToken) {
       return next(new HTTPError('Authentication required', 401));
     }
