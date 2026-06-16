@@ -1,0 +1,14 @@
+{
+  "pageTitle": "cy Your Possession Claims account",
+  "heading": "cy Your Possession Claims account",
+  "accessYourCase": "cy If a claim you want to view is not listed below, you must first <a href=\"/access-your-case\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">cy provide some details to access it (opens in new tab)</a>.",
+  "claimsMadeAgainstYou": "cy Claims made against you",
+  "table": {
+    "claimNumber": "cy Claim number",
+    "claimantsName": "cy Claimant’s name",
+    "propertyPostcode": "cy Property postcode",
+    "actions": "cy Actions",
+    "viewClaim": "cy View claim"
+  },
+  "noClaimsFound": "cy There are no claims against you."
+}
