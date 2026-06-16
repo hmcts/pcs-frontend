@@ -68,11 +68,14 @@ export const step: StepDefinition = createFormStep({
       visibleFormData.getApplicationTypeField()?.fieldValue !== GenAppType.ADJOURN ||
       visibleFormData.getHearingInNext14DaysField()?.fieldValue === 'yes';
 
+    const hwfApplies = visibleFormData.getHwfReferenceField()?.fieldValue;
+    const paymentNeeded = feeApplies && !hwfApplies;
+
     return {
       summaryData: {
         rows: buildSummaryListRows(req, t),
       },
-      buttonLabel: feeApplies ? t('buttons.continueToPayment') : t('buttons.submit'),
+      buttonLabel: paymentNeeded ? t('buttons.continueToPayment') : t('buttons.submit'),
     };
   },
   beforeRedirect: async (req: Request) => {
