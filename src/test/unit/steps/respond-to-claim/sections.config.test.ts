@@ -116,11 +116,11 @@ describe('respond-to-claim sections config', () => {
       }
     });
 
-    it('forward walk from upload-document reaches language-used and check-your-answers', async () => {
+    it('forward walk from upload-document reaches check-your-answers-documents and language-used', async () => {
       const path = await walkFrom('upload-document');
 
+      expect(path).toContain('check-your-answers-documents');
       expect(path).toContain('language-used');
-      expect(path).toContain('check-your-answers');
     });
   });
 
