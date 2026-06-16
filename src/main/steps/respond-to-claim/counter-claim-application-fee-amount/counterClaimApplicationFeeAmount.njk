@@ -10,21 +10,22 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  <span class="govuk-caption-l">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {{ govukSummaryList({
-    rows: [
-      {
-        key: { text: counterClaimAmountLabel },
-        value: { text: formattedCounterClaimAmount or "" }
-      },
-      {
-        key: { text: counterClaimFeeLabel },
-        value: { text: formattedCounterClaimFee }
-      }
-    ]
-  }) }}
+  <div class="govuk-!-margin-top-6">
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { text: counterClaimAmountLabel },
+          value: { text: formattedCounterClaimAmount ?? notApplicable }
+        },
+        {
+          key: { text: counterClaimFeeLabel },
+          value: { text: formattedCounterClaimFee }
+        }
+      ]
+    }) }}
+  </div>
 
   {% if showPaymentError %}
     <p class="govuk-error-message">{{ paymentError }}</p>
