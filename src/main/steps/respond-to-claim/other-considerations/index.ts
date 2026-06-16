@@ -12,6 +12,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
+    question: 'question',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);

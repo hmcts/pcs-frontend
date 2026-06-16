@@ -462,8 +462,8 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(502);
     });
 
-    it('returns 400 when total upload size exceeds 1024MB, deletes orphan CDAM doc', async () => {
-      const oneGbMinusOneByte = 1024 * 1024 * 1024 - 1;
+    it('returns 400 when total upload size exceeds 4000MB, deletes orphan CDAM doc', async () => {
+      const fourThousandMbMinusOneByte = 4000 * 1024 * 1024 - 1;
       const hugeExistingDoc = {
         value: {
           document: {
@@ -472,7 +472,7 @@ describe('documentProxyRoutes', () => {
             document_filename: 'huge.pdf',
           },
           contentType: 'application/pdf',
-          sizeInBytes: oneGbMinusOneByte,
+          sizeInBytes: fourThousandMbMinusOneByte,
         },
       };
 
@@ -821,8 +821,21 @@ describe('documentProxyRoutes', () => {
     });
 
     it('parallel uploads are capped using fresh total — second saves fails and deletes orphan CDAM doc', async () => {
-      const sixHundredMb = 600 * 1024 * 1024;
-      const persisted: unknown[] = [];
+      const threeThousandSevenHundredMb = 3700 * 1024 * 1024;
+      const twoHundredMb = 200 * 1024 * 1024;
+      const hugeSeedDoc = {
+        id: 'huge-seed-id',
+        value: {
+          document: {
+            document_url: 'http://dm/doc/huge-seed',
+            document_binary_url: 'http://dm/doc/huge-seed/binary',
+            document_filename: 'huge.pdf',
+          },
+          contentType: 'application/pdf',
+          sizeInBytes: threeThousandSevenHundredMb,
+        },
+      };
+      const persisted: unknown[] = [hugeSeedDoc];
       const { findStep } = require('../../../main/steps/index');
 
       const readFresh = jest.fn().mockImplementation(async () => [...persisted]);
@@ -832,12 +845,16 @@ describe('documentProxyRoutes', () => {
       });
 
       (findStep as jest.Mock).mockReturnValue({
-        documentStorage: { read: jest.fn().mockResolvedValue([]), readFresh, save },
+        documentStorage: {
+          read: jest.fn().mockResolvedValue([hugeSeedDoc]),
+          readFresh,
+          save,
+        },
       });
 
       mockUploadDocument
-        .mockResolvedValueOnce(makeCdamDoc('first', 'first.pdf', sixHundredMb))
-        .mockResolvedValueOnce(makeCdamDoc('second', 'second.pdf', sixHundredMb));
+        .mockResolvedValueOnce(makeCdamDoc('first', 'first.pdf', twoHundredMb))
+        .mockResolvedValueOnce(makeCdamDoc('second', 'second.pdf', twoHundredMb));
       mockDeleteDocument.mockResolvedValue(undefined);
 
       const baseReq = {
@@ -851,12 +868,15 @@ describe('documentProxyRoutes', () => {
       const resB = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await Promise.all([
-        uploadHandler({ ...baseReq, file: makeFile('first.pdf', sixHundredMb) } as unknown as Request, resA),
-        uploadHandler({ ...baseReq, file: makeFile('second.pdf', sixHundredMb) } as unknown as Request, resB),
+        uploadHandler({ ...baseReq, file: makeFile('first.pdf', twoHundredMb) } as unknown as Request, resA),
+        uploadHandler({ ...baseReq, file: makeFile('second.pdf', twoHundredMb) } as unknown as Request, resB),
       ]);
 
-      expect(persisted).toHaveLength(1);
-      expect((persisted[0] as { value: { sizeInBytes?: number } }).value.sizeInBytes).toBe(sixHundredMb);
+      expect(persisted).toHaveLength(2);
+      const sizes = persisted
+        .map(d => (d as { value: { sizeInBytes?: number } }).value.sizeInBytes)
+        .sort((a, b) => (a ?? 0) - (b ?? 0));
+      expect(sizes).toEqual([twoHundredMb, threeThousandSevenHundredMb]);
       expect(mockDeleteDocument).toHaveBeenCalledTimes(1);
       const rejected = [resA, resB].filter(r =>
         (r.status as jest.Mock).mock.calls.some(([code]: [number]) => code === 400)

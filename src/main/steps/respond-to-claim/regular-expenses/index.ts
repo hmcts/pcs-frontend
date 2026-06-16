@@ -98,6 +98,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     pageTitle: 'pageTitle',
     hintText: 'hintText',
+    caseNumber: 'caseNumber',
+    expenseQuestion: 'expenseQuestion',
   },
 
   fields: [
@@ -105,9 +107,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'regularExpenses',
       type: 'checkbox',
       required: false,
-      legendClasses: 'govuk-visually-hidden',
+      legendClasses: 'govuk-fieldset__legend--m',
       translationKey: {
-        label: 'pageTitle',
+        label: 'expenseQuestion',
         hint: 'hintText',
       },
       options: [

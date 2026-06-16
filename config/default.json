@@ -125,9 +125,8 @@
     "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
   },
   "documentUpload": {
-    "maxFileSizeMB": 1024,
-    "maxFileSizePerFileMB": 100,
-    "maxTotalFileSizeMB": 1024
+    "maxFileSizePerFileMB": 1024,
+    "maxTotalFileSizeMB": 4000
   },
   "dashboard": {
     "taskRoutes": {
@@ -139,5 +138,8 @@
       "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
       "ViewDocuments": "/case/:caseReference/view-documents"
     }
+  },
+  "redirects": {
+    "manageCaseReturnURL": "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
   }
 }

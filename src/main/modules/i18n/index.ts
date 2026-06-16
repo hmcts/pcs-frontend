@@ -178,7 +178,7 @@ function createI18nextConfig(localesDir: string, namespaces: string[]): InitOpti
     debug: false,
     saveMissing: false,
     interpolation: { escapeValue: false },
-    returnEmptyString: false,
+    returnEmptyString: true,
   };
 }
 

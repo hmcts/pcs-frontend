@@ -1,0 +1,11 @@
+{
+  "heading": "cyDependant children",
+  "dependentChildrenParagraph": "",
+  "dependentQuestion": "cyDoes the defendant have any dependant children?",
+  "dependentChildrenDetailsLabel": "cyGive details about their dependant children",
+  "dependentChildrenDetailsHint": "",
+  "errors": {
+    "dependentChildren": "cySelect if they have any dependant children",
+    "dependentChildrenDetails": "cyGive details about their dependant children"
+  }
+}

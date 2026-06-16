@@ -1,0 +1,25 @@
+{
+  "pageTitle": "cyNotice details",
+  "question": "cyDid {{claimantName}} give the defendant notice of their intention to begin possession proceedings?",
+  "hintText": "",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "imNotSure": "cyDefendant is not sure"
+  },
+  "noticeDateLabel": "cyWhen did the defendant receive notice from {{claimantName}}? (Optional)",
+  "noticeDateHint": "cyFor example, 16 4 2021",
+  "errors": {
+    "possessionNoticeReceived": "cySelect if {{claimantName}} gave the defendant notice of their intention to begin possession proceedings",
+    "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
+      "required": "cyThe date must include a day, month and year",
+      "notRealDate": "cyThe date must be a real date",
+      "futureDate": "cyThe date must be in the past",
+      "missingOne": "cyThe date must include a {{missingField}}",
+      "missingTwo": "cyThe date must include a {{first}} and {{second}}"
+    }
+  }
+}
