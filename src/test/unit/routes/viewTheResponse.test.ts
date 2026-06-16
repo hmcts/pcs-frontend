@@ -17,6 +17,10 @@ const translationStrings: Record<string, string> = {
   'common:options.imNotSure': "I'm not sure",
   'viewTheResponse:frequency.weekly': 'Weekly',
   'viewTheResponse:frequency.monthly': 'Monthly',
+  'viewTheResponse:incomeFrequencies.WEEKLY': 'received every week',
+  'viewTheResponse:incomeFrequencies.MONTHLY': 'received every month',
+  'viewTheResponse:paymentFrequencies.WEEKLY': 'paid every week',
+  'viewTheResponse:paymentFrequencies.MONTHLY': 'paid every month',
   'viewTheResponse:defendant1.freeLegalAdviceOptions.YES': 'Yes',
   'viewTheResponse:defendant1.freeLegalAdviceOptions.NO': 'No',
   'viewTheResponse:defendant1.freeLegalAdviceOptions.PREFER_NOT_TO_SAY': 'Prefer not to say',
@@ -57,6 +61,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         },
       },
     ],
+    isExemptLandlord: 'YES',
     dateSubmitted: '2026-02-01',
     allDefendants: [
       { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
@@ -369,6 +374,46 @@ describe('viewTheResponse route', () => {
         expect.objectContaining({
           key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmountConfirmation' },
           value: { text: 'Yes' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
+          value: { text: 'Yes' },
+        }),
+      ])
+    );
+    expect(renderArgs.regularIncome.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:income.fromJobs' },
+          value: { text: '£2500.00 received every month' },
+        }),
+      ])
+    );
+    expect(renderArgs.priorityDebts.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:debts.debtContribution' },
+          value: { text: '£150.00 paid every month' },
+        }),
+      ])
+    );
+    expect(renderArgs.regularExpenses.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:expenses.householdBills' },
+          value: { text: '£120.00 paid every month' },
+        }),
+      ])
+    );
+    expect(renderArgs.paymentsOrAgreements.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:payments.additionalContribution' },
+          value: { text: '£50.00' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:payments.additionalContributionFrequency' },
+          value: { text: 'Weekly' },
         }),
       ])
     );

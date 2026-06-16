@@ -264,6 +264,7 @@ export interface CcdCaseData {
   defendantName?: string;
   defendantAddress?: string;
   rentArrears_Total?: string;
+  isExemptLandlord?: YesNoValue;
   introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
   secureGroundsWales_DiscretionaryGrounds?: string[];
   noticeServed?: string;
