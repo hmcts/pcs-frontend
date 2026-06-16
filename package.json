@@ -65,7 +65,7 @@
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/instrumentation-winston": "0.63.0",
     "axios": "1.18.0",
-    "body-parser": "2.2.2",
+    "body-parser": "2.3.0",
     "config": "4.4.1",
     "connect-redis": "7.1.1",
     "cookie-parser": "1.4.7",
