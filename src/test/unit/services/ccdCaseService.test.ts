@@ -125,14 +125,24 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Not authorised');
     });
 
-    it('should throw HTTPError on case not found', async () => {
+    it('should throw HTTPError with 403 status on case not found (404)', async () => {
       mockGet.mockRejectedValue({
         response: { status: 404, data: { message: 'Not found' } },
         message: 'Case not found',
       });
 
       await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Case not found');
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Access denied');
+    });
+
+    it('should throw HTTPError with 403 status on invalid case (400)', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 400, data: { message: 'Case ID is not valid' } },
+        message: 'Bad request',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Access denied');
     });
 
     it('should throw HTTPError on unexpected error', async () => {
@@ -372,24 +382,62 @@ describe('ccdCaseService', () => {
       });
     });
 
-    it('maps 404 from CCD to Case not found HTTPError', async () => {
+    it('maps 404 from CCD to Access denied HTTPError', async () => {
       mockGet.mockRejectedValue({
         response: { status: 404, data: {} },
         message: 'Not found',
       });
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Case not found');
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Access denied');
     });
 
-    it('maps 400 from CCD to Case not found HTTPError', async () => {
+    it('maps 400 from CCD to Access denied HTTPError', async () => {
       mockGet.mockRejectedValue({
         response: { status: 400, data: {} },
         message: 'Bad request',
       });
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Case not found');
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Access denied');
+    });
+
+    it('maps 502 CallbackException from about-to-start callback to Access denied HTTPError', async () => {
+      mockGet.mockRejectedValue({
+        response: {
+          status: 502,
+          data: {
+            exception: 'uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException',
+            status: 502,
+            message:
+              'Callback to service has been unsuccessful for event Dashboard view url https://pcs-api.example.com/callbacks/about-to-start?eventId=dashboardView caseTypeId PCS caseEvent Id dashboardView callbackType AboutToStart',
+          },
+        },
+        message: 'Bad Gateway',
+      });
+
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Access denied');
+    });
+
+    it('preserves generic 502 as CCD case service HTTPError', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 502, data: { message: 'Upstream unavailable' } },
+        message: 'Bad Gateway',
+      });
+
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
+    });
+
+    it('preserves 503 as CCD case service HTTPError', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 503, data: {} },
+        message: 'Service unavailable',
+      });
+
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
     });
 
     it('maps other HTTP errors to CCD case service HTTPError', async () => {

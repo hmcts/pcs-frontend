@@ -82,6 +82,28 @@ function getCaseHeaders(token: string) {
   };
 }
 
+interface CcdErrorResponseData {
+  callbackErrors?: string[];
+  callbackWarnings?: string[];
+  exception?: string;
+  message?: string;
+}
+
+function isAccessDeniedCallbackFailure(status: number | undefined, responseData: CcdErrorResponseData | undefined): boolean {
+  if (status !== 502 || !responseData) {
+    return false;
+  }
+
+  const exception = responseData.exception ?? '';
+  const message = responseData.message ?? '';
+
+  return (
+    exception.includes('CallbackException') &&
+    message.includes('Callback to service has been unsuccessful') &&
+    message.includes('about-to-start')
+  );
+}
+
 function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPError {
   // HttpService throws HTTPError(401) directly for user-token 401s - propagate as-is
   if (error instanceof HTTPError) {
@@ -90,9 +112,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
-  const responseData = axiosError.response?.data as
-    | { callbackErrors?: string[]; callbackWarnings?: string[] }
-    | undefined;
+  const responseData = axiosError.response?.data as CcdErrorResponseData | undefined;
 
   logger.error(`Error in ${context}: ${axiosError.message}`);
   if (responseData) {
@@ -101,6 +121,10 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   if (status === 403) {
     return new HTTPError('Not authorised to access CCD case service', 403);
+  }
+
+  if (isAccessDeniedCallbackFailure(status, responseData)) {
+    return new HTTPError('Access denied', 403);
   }
 
   const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
@@ -205,9 +229,9 @@ export const ccdCaseService = {
     } catch (error) {
       const httpError = convertAxiosErrorToHttpError(error, 'getCaseByIdForEvent');
 
-      // coerce 400 and 404 to 404 so we can return a 404 error to the client
+      // coerce 400 and 404 to 403 so we can return an access denied error to the client
       if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
+        throw new HTTPError('Access denied', 403);
       }
       throw httpError;
     }
@@ -230,7 +254,7 @@ export const ccdCaseService = {
       const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
 
       if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
+        throw new HTTPError('Access denied', 403);
       }
       throw httpError;
     }
@@ -312,7 +336,7 @@ export const ccdCaseService = {
     } catch (error) {
       const httpError = convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
       if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
+        throw new HTTPError('Access denied', 403);
       }
       throw httpError;
     }
@@ -367,7 +391,7 @@ export const ccdCaseService = {
     } catch (error) {
       const httpError = convertAxiosErrorToHttpError(error, 'getDashboardView');
       if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
+        throw new HTTPError('Access denied', 403);
       }
       throw httpError;
     }
