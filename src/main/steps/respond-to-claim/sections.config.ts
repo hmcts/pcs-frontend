@@ -20,7 +20,13 @@ const sectionDefs = [
     id: 'startNowAndDetails',
     groupId: 'checkBeforeYouStart',
     titleKey: 'taskList.startNowAndDetails',
-    steps: ['start-now', 'free-legal-advice', 'check-your-answers-start-now-and-details'],
+    steps: [
+      'start-now',
+      'free-legal-advice',
+      'solicitor',
+      'ask-your-solicitor-to-respond-to-the-claim',
+      'check-your-answers-start-now-and-details',
+    ],
   },
   {
     id: 'personalDetails',
