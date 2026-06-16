@@ -89,7 +89,10 @@ interface CcdErrorResponseData {
   message?: string;
 }
 
-function isAccessDeniedCallbackFailure(status: number | undefined, responseData: CcdErrorResponseData | undefined): boolean {
+function isAccessDeniedCallbackFailure(
+  status: number | undefined,
+  responseData: CcdErrorResponseData | undefined
+): boolean {
   if (status !== 502 || !responseData) {
     return false;
   }
