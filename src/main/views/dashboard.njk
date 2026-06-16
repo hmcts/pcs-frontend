@@ -8,7 +8,7 @@
 {% block serviceNavigation %}
   {{ govukServiceNavigation({
     serviceName: t('dashboard:serviceName'),
-    serviceUrl: dashboardUrl if dashboardUrl else "/dashboard",
+    serviceUrl: "/claims",
     navigation: [
       {
         text: t('logout', 'Log out'),
