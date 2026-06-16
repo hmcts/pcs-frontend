@@ -6,7 +6,7 @@ import { oidcMiddleware } from '../middleware';
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
-import { extractViewDocumentFolders } from '@utils/documentUtils';
+import { extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
 import { asHeaderString } from '@utils/httpHeaders';
 import { sanitiseUUID } from '@utils/uuid';
 
@@ -83,6 +83,7 @@ export default function viewDocumentsRoutes(app: Application): void {
       }
 
       try {
+<<<<<<< HEAD
         const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
         const allDocuments = (ccdCase.data?.allDocuments ?? []) as {
           id?: string;
@@ -91,6 +92,11 @@ export default function viewDocumentsRoutes(app: Application): void {
         const document = allDocuments.find(item => item.id === documentId)?.value;
         const filename = document?.document_filename?.trim() || 'document';
         const binaryUrl = document?.document_binary_url?.trim();
+=======
+        const document = findCaseDocumentById((validatedCase?.data ?? {}) as Record<string, unknown>, documentId);
+        const filename = document?.filename?.trim() || 'document';
+        const binaryUrl = document?.binaryUrl?.trim();
+>>>>>>> 148d1d269 (Initial commit)
         if (!binaryUrl) {
           return next(new HTTPError('Document not found', 404));
         }
