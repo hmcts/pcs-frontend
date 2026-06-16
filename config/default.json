@@ -79,7 +79,7 @@
         "jurisdiction2": "county court",
         "channel": "default",
         "event": "issue",
-        "keyword": "CMCCounter"
+        "keyword": "counter-claim"
       }
     }
   },
