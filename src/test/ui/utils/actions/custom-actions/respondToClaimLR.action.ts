@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 
+import { submitCaseApiData } from '../../../data/api-data';
 import {
   circumstancesLR,
   confirmationOfNoticeGiven,
@@ -8,24 +9,28 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   exceptionalHardship,
+  haveYouAppliedForUniversalCredit,
   incomeAndExpenses,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   otherConsiderations,
+  previousPaymentsLR,
   priorityDebtDetails,
   priorityDebts,
+  rentArrears,
+  repaymentsAgreed,
   tenancyDateUnknown,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../../../data/page-data';
+import { formatCurrency } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { RespondToClaimAction } from './respondToClaim.action';
 
-export let claimantsName: string;
 export class RespondToClaimLRAction extends RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -49,6 +54,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['enterPriorityDebtDetailsLR', () => this.enterPriorityDebtDetailsLR(fieldName as actionRecord)],
       ['selectExpensesLR', () => this.selectExpensesLR(fieldName as actionRecord)],
       ['otherConsiderationsLR', () => this.otherConsiderationsLR(fieldName as actionRecord)],
+      ['rentArrearsLR', () => this.rentArrearsLR(fieldName as actionRecord)],
+      ['previousPaymentsLR', () => this.previousPaymentsLR(fieldName as actionRecord)],
+      ['repaymentAgreedLR', () => this.repaymentAgreedLR(fieldName as actionRecord)],
+      ['selectUniversalCreditLR', () => this.selectUniversalCreditLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -316,5 +325,78 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       );
     }
     await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  }
+
+  private async rentArrearsLR(rentArrearsInfo: actionRecord): Promise<void> {
+    await performValidation('text', {
+      elementType: 'subHeader',
+      text: `Amount the defendant owes in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
+    });
+    const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `${rentArrearsAmount}`,
+    });
+    await performAction('clickRadioButton', {
+      question: rentArrears.lrHiddenDoesDefendantOweQuestion,
+      option: rentArrearsInfo.option,
+    });
+    if (rentArrearsInfo.option === 'No') {
+      await performAction(
+        'inputText',
+        rentArrears.lrHiddenHowMuchDoesDefendantBelieveTextLabel,
+        rentArrearsInfo.rentAmount
+      );
+    }
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
+  }
+
+  private async previousPaymentsLR(repaymentsData: actionRecord): Promise<void> {
+    const repaymentsMadeQuestion = previousPaymentsLR.getMainHeader();
+    await performAction('clickRadioButton', {
+      question: repaymentsMadeQuestion,
+      option: repaymentsData.repaymentOption,
+    });
+    if (repaymentsData.repaymentOption === 'Yes') {
+      await performAction('inputText', previousPaymentsLR.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
+    }
+    await performAction('clickButton', previousPaymentsLR.saveAndContinueButton);
+  }
+
+  private async repaymentAgreedLR(repaymentsAgreedData: actionRecord): Promise<void> {
+    const repaymentsAgreedQuestion = repaymentsAgreed.lrHiddenMainHeader();
+    await performAction('clickRadioButton', {
+      question: repaymentsAgreedQuestion,
+      option: repaymentsAgreedData.repaymentAgreedOption,
+    });
+    if (repaymentsAgreedData.repaymentAgreedOption === 'Yes') {
+      await performAction(
+        'inputText',
+        repaymentsAgreed.lrGiveDetailsHiddenTextLabel,
+        repaymentsAgreedData.repaymentAgreedInfo
+      );
+    }
+    await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  }
+
+  private async selectUniversalCreditLR(universalCreditDateData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: haveYouAppliedForUniversalCredit.lrHiddenmainHeader,
+      option: universalCreditDateData.creditRadioOption,
+    });
+    if (
+      universalCreditDateData.creditRadioOption === 'Yes' &&
+      universalCreditDateData?.day &&
+      universalCreditDateData?.month &&
+      universalCreditDateData?.year
+    ) {
+      await performActions(
+        'Enter Date',
+        ['inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, universalCreditDateData.day],
+        ['inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, universalCreditDateData.month],
+        ['inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, universalCreditDateData.year]
+      );
+    }
+    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   }
 }

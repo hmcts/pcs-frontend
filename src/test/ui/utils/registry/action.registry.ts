@@ -162,6 +162,10 @@ export class ActionRegistry {
     ['enterPriorityDebtDetailsLR', new RespondToClaimLRAction()],
     ['selectExpensesLR', new RespondToClaimLRAction()],
     ['otherConsiderationsLR', new RespondToClaimLRAction()],
+    ['rentArrearsLR', new RespondToClaimLRAction()],
+    ['previousPaymentsLR', new RespondToClaimLRAction()],
+    ['repaymentAgreedLR', new RespondToClaimLRAction()],
+    ['selectUniversalCreditLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {
