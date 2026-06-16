@@ -81,12 +81,18 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
-    // TODO HDPI-5157: hardcode for now, wire claimIssueDate from START callback later
-    const claimIssueDate = '20th May 2025';
+    const claimIssueDate = new Date(caseData?.claimIssueDate ?? '');
 
     return {
       claimantName,
       claimIssueDate,
+      formatParams: {
+        claimIssueDate: {
+          month: 'long',
+          year: 'numeric',
+          locale: req.language === 'cy' ? 'cy-GB' : 'en-GB',
+        },
+      },
     };
   },
   fields: [
