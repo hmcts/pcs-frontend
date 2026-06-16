@@ -164,6 +164,7 @@ export default function finalSubmitRoutes(app: Application): void {
           serviceRequestReference: paymentPayload!.serviceRequestReference,
           feeAmount: paymentPayload!.feeAmount,
           counterClaimAmountInPence: getCounterClaimAmountInPence(counterClaim),
+          counterClaimType: counterClaim?.claimType,
         });
       }
 

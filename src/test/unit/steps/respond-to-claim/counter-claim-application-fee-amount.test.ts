@@ -3,8 +3,35 @@ jest.mock('../../../../main/modules/steps', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
+jest.mock('@services/feeLookupService', () => ({
+  FeeType: {
+    counterClaimFlatFeeFEE0450: 2,
+    counterClaimRanged: 3,
+    counterClaim: 4,
+  },
+  getCounterClaimFeeType: jest.fn(),
+  getFee: jest.fn(),
+}));
+
 import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-application-fee-amount';
+
+import type { CcdCounterClaim } from '@services/ccdCase.interface';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
+import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+
+const makeValidatedCase = (counterClaim?: CcdCounterClaim, defendantResponses: Record<string, unknown> = {}) =>
+  new CcdCaseModel({
+    id: '',
+    data: {
+      possessionClaimResponse: {
+        defendantResponses: {
+          ...defendantResponses,
+          ...(counterClaim !== undefined && { counterClaim }),
+        },
+      },
+    },
+  });
 
 type CounterClaimApplicationFeeAmountStep = {
   extendGetContent: (req: {
@@ -15,24 +42,12 @@ type CounterClaimApplicationFeeAmountStep = {
         serviceRequestReference?: string;
         feeAmount?: number;
         counterClaimAmountInPence?: string;
+        counterClaimType?: string;
       };
     };
     res?: {
       locals?: {
-        validatedCase?: {
-          data?: {
-            possessionClaimResponse?: {
-              defendantResponses?: {
-                counterClaim?: {
-                  claimType?: string;
-                  isClaimAmountKnown?: string;
-                  claimAmount?: string;
-                  estimatedMaxClaimAmount?: string;
-                };
-              };
-            };
-          };
-        };
+        validatedCase?: CcdCaseModel;
       };
     };
   }) => Promise<Record<string, string | boolean | undefined>>;
@@ -56,20 +71,32 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (getTranslationFunction as jest.Mock).mockReturnValue(tMock);
+    (getCounterClaimFeeType as jest.Mock).mockReturnValue(3);
+    (getFee as jest.Mock).mockResolvedValue(377);
   });
 
-  it('returns i18n-formatted counterclaim amount and fee from payment session (Scott-style)', async () => {
+  it('returns i18n-formatted counterclaim amount and fee from fee register lookup', async () => {
     const content = await testedStep.extendGetContent({
       params: { caseReference: '123' },
+      res: {
+        locals: {
+          validatedCase: makeValidatedCase({
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '64900',
+          }),
+        },
+      },
       session: {
         payment: {
           serviceRequestReference: 'SR-1',
-          feeAmount: 377,
           counterClaimAmountInPence: '64900',
         },
       },
     });
 
+    expect(getCounterClaimFeeType).toHaveBeenCalledWith('PAYMENT_OR_COMPENSATION', '64900');
+    expect(getFee).toHaveBeenCalledWith(3, '64900');
     expect(tMock).toHaveBeenCalledWith('counterClaimAmountDisplay', { counterClaimAmount: 649 });
     expect(tMock).toHaveBeenCalledWith('counterClaimFeeDisplay', { counterClaimFee: 377 });
     expect(tMock).toHaveBeenCalledWith('payNowButton', { counterClaimFee: 377 });
@@ -85,12 +112,21 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
   });
 
   it('omits counterclaim amount row when session has no amount (AC03 / something else)', async () => {
+    (getFee as jest.Mock).mockResolvedValue(154);
+
     const content = await testedStep.extendGetContent({
       params: { caseReference: '123' },
+      res: {
+        locals: {
+          validatedCase: makeValidatedCase({
+            claimType: 'SOMETHING_ELSE',
+          }),
+        },
+      },
       session: {
         payment: {
           serviceRequestReference: 'SR-1',
-          feeAmount: 154,
+          feeAmount: 35,
         },
       },
     });
@@ -98,29 +134,23 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     expect(content).toEqual(
       expect.objectContaining({
         formattedCounterClaimAmount: undefined,
-        formattedCounterClaimFee: '£154',
+        formattedCounterClaimFee: '£35',
         payNowDisabled: false,
       })
     );
   });
 
   it('falls back to CCD counterclaim amount when session snapshot is absent', async () => {
+    (getFee as jest.Mock).mockResolvedValue(35);
+
     const content = await testedStep.extendGetContent({
       res: {
         locals: {
-          validatedCase: {
-            data: {
-              possessionClaimResponse: {
-                defendantResponses: {
-                  counterClaim: {
-                    claimType: 'PAYMENT_OR_COMPENSATION',
-                    isClaimAmountKnown: 'YES',
-                    claimAmount: '250000',
-                  },
-                },
-              },
-            },
-          },
+          validatedCase: makeValidatedCase({
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '250000',
+          }),
         },
       },
       params: { caseReference: '123' },
@@ -141,7 +171,36 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     );
   });
 
-  it('throws when fee amount is missing from payment session', async () => {
+  it('uses submit-time session snapshot when CCD counterclaim draft is cleared after submit', async () => {
+    const content = await testedStep.extendGetContent({
+      params: { caseReference: '123' },
+      res: {
+        locals: {
+          validatedCase: makeValidatedCase(undefined, {}),
+        },
+      },
+      session: {
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 35,
+          counterClaimAmountInPence: '250000',
+          counterClaimType: 'PAYMENT_OR_COMPENSATION',
+        },
+      },
+    });
+
+    expect(getCounterClaimFeeType).not.toHaveBeenCalled();
+    expect(getFee).not.toHaveBeenCalled();
+    expect(content).toEqual(
+      expect.objectContaining({
+        formattedCounterClaimAmount: '£2500',
+        formattedCounterClaimFee: '£35',
+        payNowDisabled: false,
+      })
+    );
+  });
+
+  it('throws when counterclaim claim type is missing from session and CCD', async () => {
     await expect(
       testedStep.extendGetContent({
         session: {
@@ -150,13 +209,56 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
           },
         },
       })
-    ).rejects.toMatchObject({ message: 'No fee amount found in payment session', status: 500 });
+    ).rejects.toThrow('Counterclaim fee unavailable: missing claimType');
+  });
+
+  it('uses higher-tier fee lookup when counterclaim amount exceeds £5,000', async () => {
+    (getCounterClaimFeeType as jest.Mock).mockReturnValue(4);
+    (getFee as jest.Mock).mockResolvedValue(455);
+
+    const content = await testedStep.extendGetContent({
+      params: { caseReference: '123' },
+      res: {
+        locals: {
+          validatedCase: makeValidatedCase({
+            claimType: 'BOTH',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '600000',
+          }),
+        },
+      },
+      session: {
+        payment: {
+          serviceRequestReference: 'SR-1',
+          counterClaimAmountInPence: '600000',
+        },
+      },
+    });
+
+    expect(getCounterClaimFeeType).toHaveBeenCalledWith('BOTH', '600000');
+    expect(getFee).toHaveBeenCalledWith(4, '600000');
+    expect(content).toEqual(
+      expect.objectContaining({
+        formattedCounterClaimAmount: '£6000',
+        formattedCounterClaimFee: '£455',
+        payNowButton: 'Pay your counterclaim fee (£455)',
+      })
+    );
   });
 
   it('shows payment error when query indicates failed or pending payment', async () => {
     const content = await testedStep.extendGetContent({
       params: { caseReference: '123' },
       query: { payment: 'failed' },
+      res: {
+        locals: {
+          validatedCase: makeValidatedCase({
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '250000',
+          }),
+        },
+      },
       session: {
         payment: {
           serviceRequestReference: 'SR-1',

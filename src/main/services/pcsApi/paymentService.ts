@@ -52,26 +52,19 @@ export function mapRequestLanguageToPaymentLanguage(requestLanguage?: string): P
   return requestLanguage?.toLowerCase() === 'cy' ? 'Welsh' : 'English';
 }
 
-const PAYMENT_SUCCESS_STATUSES = new Set(['success', 'paid']);
-const PAYMENT_FAILURE_STATUSES = new Set(['failed', 'declined']);
-const PAYMENT_PENDING_STATUSES = new Set(['initiated', 'pending', 'created']);
+const PAYMENT_OUTCOME_BY_STATUS: Record<string, PaymentOutcome> = {
+  success: 'success',
+  paid: 'success',
+  failed: 'failure',
+  declined: 'failure',
+  initiated: 'pending',
+  pending: 'pending',
+  created: 'pending',
+};
 
 export function getPaymentOutcome(status?: string): PaymentOutcome {
-  const normalizedStatus = status?.trim().toLowerCase() || '';
-
-  if (PAYMENT_SUCCESS_STATUSES.has(normalizedStatus)) {
-    return 'success';
-  }
-
-  if (PAYMENT_FAILURE_STATUSES.has(normalizedStatus)) {
-    return 'failure';
-  }
-
-  if (PAYMENT_PENDING_STATUSES.has(normalizedStatus) || normalizedStatus === '') {
-    return 'pending';
-  }
-
-  return 'pending';
+  const normalizedStatus = status?.trim().toLowerCase() ?? '';
+  return PAYMENT_OUTCOME_BY_STATUS[normalizedStatus] ?? 'pending';
 }
 
 export const paymentService = {

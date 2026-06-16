@@ -1,11 +1,12 @@
-import { HTTPError } from '../../../HttpError';
 import { penceToPounds } from '../../utils';
 import { getCounterClaimAmountInPence } from '../../utils/counterClaimAmount';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { getPaymentSessionState } from '@services/paymentSessionService';
+import { CcdCaseModel } from '@services/ccdCaseData.model';
+import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+import { getPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-application-fee-amount',
@@ -23,17 +24,30 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: async req => {
     const paymentSession = getPaymentSessionState(req);
-    const feeAmount = paymentSession?.feeAmount;
+    const caseModel = req.res?.locals?.validatedCase;
+    const counterClaim = caseModel instanceof CcdCaseModel ? caseModel.defendantResponsesCounterClaim : undefined;
+    const claimType = paymentSession?.counterClaimType ?? counterClaim?.claimType;
 
-    if (feeAmount === undefined) {
-      throw new HTTPError('No fee amount found in payment session', 500);
+    if (!claimType) {
+      throw new Error('Counterclaim fee unavailable: missing claimType');
     }
 
-    const claimAmountInPence =
-      paymentSession?.counterClaimAmountInPence ??
-      getCounterClaimAmountInPence(
-        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim
-      );
+    const claimAmountInPence = paymentSession?.counterClaimAmountInPence ?? getCounterClaimAmountInPence(counterClaim);
+
+    let feeAmount = paymentSession?.feeAmount;
+    if (feeAmount === undefined) {
+      const feeType = getCounterClaimFeeType(claimType, claimAmountInPence);
+      feeAmount = await getFee(feeType, claimAmountInPence);
+    }
+
+    if (paymentSession) {
+      setPaymentSessionState(req, {
+        ...paymentSession,
+        feeAmount,
+        counterClaimAmountInPence: claimAmountInPence,
+        counterClaimType: claimType,
+      });
+    }
 
     const t = getTranslationFunction(req);
     const counterClaimAmountPounds = claimAmountInPence ? penceToPounds(claimAmountInPence) : undefined;
