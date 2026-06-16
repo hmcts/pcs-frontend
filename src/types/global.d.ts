@@ -7,6 +7,7 @@ import { S2S } from '../main/modules/s2s';
 import { OIDCModule } from '../main/modules/oidc';
 import { type TFunction } from 'i18next';
 import { type CcdCaseModel } from '@services/ccdCaseData.model';
+import { type PaymentSessionState } from '@services/paymentSessionService';
 import { type StepContext } from '../main/modules/steps/stepContext';
 
 export interface UserInfoResponseWithToken extends UserInfoResponse {
@@ -27,6 +28,7 @@ interface CustomSessionData extends SessionData {
     applicationId?: string;
     showDuplicateSubmissionPage?: boolean;
   };
+  payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
 }
 

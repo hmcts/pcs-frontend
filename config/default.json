@@ -138,5 +138,8 @@
       "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
       "ViewDocuments": "/case/:caseReference/view-documents"
     }
+  },
+  "payment": {
+    "returnUrl": "https://pcs.aat.platform.hmcts.net/payment/return"
   }
 }

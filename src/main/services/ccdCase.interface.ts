@@ -306,6 +306,10 @@ export interface CcdCaseDocument {
 export interface CcdCase {
   id: string;
   data: CcdCaseData;
+  after_submit_callback_response?: {
+    confirmation_header?: string | null;
+    confirmation_body?: string | null;
+  };
 }
 
 /** Links object in CCD START callback response. */
