@@ -6,7 +6,7 @@ import { oidcMiddleware } from '../middleware';
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
-import { extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
+import { extractViewDocumentFolders } from '@utils/documentUtils';
 import { asHeaderString } from '@utils/httpHeaders';
 import { sanitiseUUID } from '@utils/uuid';
 

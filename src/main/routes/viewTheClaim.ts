@@ -2,19 +2,19 @@ import { Application, NextFunction, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
 import { VIEW_THE_CLAIM_ROUTE } from '../constants/caseRoutes';
-import { getTranslationFunction } from '../modules/i18n';
 import { oidcMiddleware } from '../middleware';
+import { getTranslationFunction } from '../modules/i18n';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
-import { buildViewTheClaimPageData } from '@utils/viewTheClaimUtils';
+import { buildViewTheClaimPageData } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 export default function viewTheClaimRoutes(app: Application): void {
   app.get(VIEW_THE_CLAIM_ROUTE, oidcMiddleware, (req: Request, res: Response, next: NextFunction) => {
     const validatedCase = res.locals.validatedCase as CcdCaseModel | undefined;
     const caseReference = validatedCase?.id || '';
 
-    if (!validatedCase || !caseReference) {
+    if (!validatedCase) {
       return next(new HTTPError('Invalid case reference format', 404));
     }
 

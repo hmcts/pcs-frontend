@@ -10,7 +10,7 @@ jest.mock('@routes/dashboard', () => ({
   getDashboardUrl: jest.fn(() => '/dashboard/1234567890123456'),
 }));
 
-jest.mock('@utils/viewTheClaimUtils', () => ({
+jest.mock('@utils/viewTheClaim/viewTheClaimUtils', () => ({
   buildViewTheClaimPageData: jest.fn(() => ({
     caseReference: '1234567890123456',
     propertyAddressHtml: '10 Second Avenue<br>London<br>W3 7RX',

@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 
-import { ViewTheClaimSection, buildViewTheClaimPageData } from '@utils/viewTheClaimUtils';
+import { ViewTheClaimSection, buildViewTheClaimPageData } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const translations: Record<string, string> = {
   'viewTheClaim:claimPdfLabel': 'Claim (PDF)',
@@ -21,7 +21,8 @@ const translations: Record<string, string> = {
   'viewTheClaim:labels.descriptionOfGrounds': 'Description of grounds',
   'viewTheClaim:labels.reasonForGround': 'Reason for claiming possession under ground Rent arrears',
   'viewTheClaim:labels.whyClaimingPossession': 'Why is the claimant claiming possession?',
-  'viewTheClaim:labels.otherInfoAboutReasons': 'Is there any other information the claimant wants to provide about their reasons for possession?',
+  'viewTheClaim:labels.otherInfoAboutReasons':
+    'Is there any other information the claimant wants to provide about their reasons for possession?',
   'viewTheClaim:labels.additionalReasons': 'Additional reasons for possession',
   'viewTheClaim:labels.rentAmount': 'Rent amount',
   'viewTheClaim:labels.howIsRentCalculated': 'How is rent calculated?',
@@ -65,71 +66,75 @@ function rowHtml(section: ViewTheClaimSection, label: string): string | undefine
 
 describe('viewTheClaimUtils', () => {
   it('builds claim summary sections in mapping order with case data values', () => {
-    const page = buildViewTheClaimPageData('1234567890123456', {
-      propertyAddress: {
-        AddressLine1: '2 Second Avenue',
-        PostTown: 'London',
-        PostCode: 'W3 7RX',
-      },
-      claimantName: 'Treetops Housing',
-      isClaimantNameCorrect: 'YES',
-      organisationAddress: {
-        AddressLine1: '102 Petty France',
-        PostTown: 'London',
-        PostCode: 'SW1H 9AJ',
-      },
-      defendant1: {
-        nameKnown: 'YES',
-        firstName: 'Alex',
-        lastName: 'Tenant',
-        addressKnown: 'YES',
-        addressSameAsPossession: 'NO',
-        correspondenceAddress: {
-          AddressLine1: '10 Second Avenue',
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Second Avenue',
           PostTown: 'London',
           PostCode: 'W3 7RX',
         },
-      },
-      additionalDefendants: [
-        {
-          id: 'def-2',
-          value: {
-            nameKnown: 'NO',
-            addressKnown: 'NO',
+        claimantName: 'Treetops Housing',
+        isClaimantNameCorrect: 'YES',
+        organisationAddress: {
+          AddressLine1: '102 Petty France',
+          PostTown: 'London',
+          PostCode: 'SW1H 9AJ',
+        },
+        defendant1: {
+          nameKnown: 'YES',
+          firstName: 'Alex',
+          lastName: 'Tenant',
+          addressKnown: 'YES',
+          addressSameAsPossession: 'NO',
+          correspondenceAddress: {
+            AddressLine1: '10 Second Avenue',
+            PostTown: 'London',
+            PostCode: 'W3 7RX',
           },
         },
-      ],
-      introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
-      introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS'],
-      rentDetails_CurrentRent: '100000',
-      rentDetails_Frequency: 'MONTHLY',
-      rentArrears_Total: '200000',
-      rentArrears_RecoveryAttempted: 'NO',
-      arrearsJudgmentWanted: 'YES',
-      allDocuments: [
-        {
-          id: '11111111-1111-1111-1111-111111111111',
-          value: {
-            document_filename: 'rent-statement.pdf',
-            document_binary_url: 'http://doc-store/rent-statement/binary',
-            document_type: 'RENT_STATEMENT',
+        additionalDefendants: [
+          {
+            id: 'def-2',
+            value: {
+              nameKnown: 'NO',
+              addressKnown: 'NO',
+            },
           },
-        },
-        {
-          id: '22222222-2222-2222-2222-222222222222',
-          value: {
-            document_filename: 'generated-claim.pdf',
-            document_binary_url: 'http://doc-store/generated-claim/binary',
-            category_id: 'statementsOfCase',
+        ],
+        introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
+        introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS'],
+        rentDetails_CurrentRent: '100000',
+        rentDetails_Frequency: 'MONTHLY',
+        rentArrears_Total: '200000',
+        rentArrears_RecoveryAttempted: 'NO',
+        arrearsJudgmentWanted: 'YES',
+        allDocuments: [
+          {
+            id: '11111111-1111-1111-1111-111111111111',
+            value: {
+              document_filename: 'rent-statement.pdf',
+              document_binary_url: 'http://doc-store/rent-statement/binary',
+              document_type: 'RENT_STATEMENT',
+            },
           },
+          {
+            id: '22222222-2222-2222-2222-222222222222',
+            value: {
+              document_filename: 'generated-claim.pdf',
+              document_binary_url: 'http://doc-store/generated-claim/binary',
+              category_id: 'statementsOfCase',
+            },
+          },
+        ],
+        statementOfTruth: {
+          completedBy: 'CLAIMANT',
+          fullNameClaimant: 'Jane Claimant',
+          positionClaimant: 'Housing officer',
         },
-      ],
-      statementOfTruth: {
-        completedBy: 'CLAIMANT',
-        fullNameClaimant: 'Jane Claimant',
-        positionClaimant: 'Housing officer',
-      },
-    } as never, t);
+      } as never,
+      t
+    );
 
     expect(page.caseReference).toBe('1234567890123456');
     expect(page.propertyAddressHtml).toBe('2 Second Avenue<br>London<br>W3 7RX');
@@ -160,63 +165,71 @@ describe('viewTheClaimUtils', () => {
   });
 
   it('hides additional defendant sections when there are no additional defendants', () => {
-    const page = buildViewTheClaimPageData('1234567890123456', {
-      propertyAddress: {
-        AddressLine1: '2 Second Avenue',
-        PostTown: 'London',
-        PostCode: 'W3 7RX',
-      },
-      defendant1: {
-        nameKnown: 'YES',
-        firstName: 'Alex',
-        lastName: 'Tenant',
-        addressKnown: 'NO',
-      },
-    } as never, t);
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Second Avenue',
+          PostTown: 'London',
+          PostCode: 'W3 7RX',
+        },
+        defendant1: {
+          nameKnown: 'YES',
+          firstName: 'Alex',
+          lastName: 'Tenant',
+          addressKnown: 'NO',
+        },
+      } as never,
+      t
+    );
 
     expect(page.sections.some(section => section.title.startsWith('Additional defendant'))).toBe(false);
   });
 
   it('uses pcs-api returned party collections for claimant and defendant details', () => {
-    const page = buildViewTheClaimPageData('1234567890123456', {
-      propertyAddress: {
-        AddressLine1: '2 Second Avenue',
-        PostTown: 'London',
-        PostCode: 'W3 7RX',
-      },
-      allClaimants: [
-        {
-          id: 'claimant-1',
-          value: {
-            orgName: 'Treetops Housing',
-            address: {
-              AddressLine1: '102 Petty France',
-              PostTown: 'London',
-              PostCode: 'SW1H 9AJ',
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Second Avenue',
+          PostTown: 'London',
+          PostCode: 'W3 7RX',
+        },
+        allClaimants: [
+          {
+            id: 'claimant-1',
+            value: {
+              orgName: 'Treetops Housing',
+              address: {
+                AddressLine1: '102 Petty France',
+                PostTown: 'London',
+                PostCode: 'SW1H 9AJ',
+              },
             },
           },
-        },
-      ],
-      allDefendants: [
-        {
-          id: 'defendant-1',
-          value: {
-            nameKnown: 'YES',
-            firstName: 'Alex',
-            lastName: 'Tenant',
-            addressKnown: 'YES',
-            addressSameAsProperty: 'YES',
+        ],
+        allDefendants: [
+          {
+            id: 'defendant-1',
+            value: {
+              nameKnown: 'YES',
+              firstName: 'Alex',
+              lastName: 'Tenant',
+              addressKnown: 'YES',
+              addressSameAsProperty: 'YES',
+            },
           },
-        },
-        {
-          id: 'defendant-2',
-          value: {
-            nameKnown: 'NO',
-            addressKnown: 'NO',
+          {
+            id: 'defendant-2',
+            value: {
+              nameKnown: 'NO',
+              addressKnown: 'NO',
+            },
           },
-        },
-      ],
-    } as never, t);
+        ],
+      } as never,
+      t
+    );
 
     expect(rowText(sectionByTitle(page, 'Claimant details'), 'Name')).toBe('Treetops Housing');
     expect(rowHtml(sectionByTitle(page, 'Claimant details'), 'Address for service')).toBe(
@@ -230,33 +243,37 @@ describe('viewTheClaimUtils', () => {
   });
 
   it('builds underlessee and additional underlessee sections in numerical order', () => {
-    const page = buildViewTheClaimPageData('1234567890123456', {
-      propertyAddress: {
-        AddressLine1: '2 Pentre Street',
-        PostTown: 'Caerdydd',
-        PostCode: 'CF11 6QX',
-      },
-      hasUnderlesseeOrMortgagee: 'YES',
-      underlesseeOrMortgagee1: {
-        nameKnown: 'NO',
-        addressKnown: 'NO',
-      },
-      additionalUnderlesseeOrMortgagee: [
-        {
-          id: 'underlessee-2',
-          value: {
-            nameKnown: 'YES',
-            name: 'Acme Mortgagee',
-            addressKnown: 'YES',
-            address: {
-              AddressLine1: '1 Bank Street',
-              PostTown: 'Cardiff',
-              PostCode: 'CF10 1AA',
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Pentre Street',
+          PostTown: 'Caerdydd',
+          PostCode: 'CF11 6QX',
+        },
+        hasUnderlesseeOrMortgagee: 'YES',
+        underlesseeOrMortgagee1: {
+          nameKnown: 'NO',
+          addressKnown: 'NO',
+        },
+        additionalUnderlesseeOrMortgagee: [
+          {
+            id: 'underlessee-2',
+            value: {
+              nameKnown: 'YES',
+              name: 'Acme Mortgagee',
+              addressKnown: 'YES',
+              address: {
+                AddressLine1: '1 Bank Street',
+                PostTown: 'Cardiff',
+                PostCode: 'CF10 1AA',
+              },
             },
           },
-        },
-      ],
-    } as never, t);
+        ],
+      } as never,
+      t
+    );
 
     expect(page.sections.map(section => section.title)).toEqual([
       'Claim details',
