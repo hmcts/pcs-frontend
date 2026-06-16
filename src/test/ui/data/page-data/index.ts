@@ -1,7 +1,10 @@
 export * from './home.page.data';
+export * from './claims.page.data';
 export * from './startNow.page.data';
 export * from './disputeClaimInterstitial.page.data';
 export * from './freeLegalAdvice.page.data';
+export * from './askYourSolicitorToRespond.page.data';
+export * from './doYouHaveASolicitor.page.data';
 export * from './defendantNameCapture.page.data';
 export * from './defendantDateOfBirth.page.data';
 export * from './correspondenceAddress.page.data';
@@ -66,4 +69,6 @@ export * from './endNow.page.data';
 export * from './counterClaimApplicationFeeAmount.page.data';
 export * from './counterClaimPaymentSuccessful.page.data';
 export * from './paymentDetails.page.data';
+export * from './responseAndCounterClaimSubmitted.page.data';
+export * from './responseSubmitted.page.data';
 export * from './responseSubmittedCounterclaimFeePaymentNeeded.page.data';
