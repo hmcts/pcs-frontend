@@ -23,8 +23,6 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
-  equalityAndDiversityEnd,
-  equalityAndDiversityStart,
   exceptionalHardship,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
@@ -426,11 +424,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -599,11 +592,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -859,11 +847,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1070,11 +1053,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1266,11 +1244,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1485,11 +1458,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1687,11 +1655,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1884,11 +1847,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -2051,11 +2009,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -2233,11 +2186,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,

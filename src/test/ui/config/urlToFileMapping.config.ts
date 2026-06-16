@@ -1,4 +1,5 @@
 export default {
+  claims: 'claims',
   'start-now': 'startNow',
   'free-legal-advice': 'freeLegalAdvice',
   home: 'home',
@@ -71,7 +72,6 @@ export default {
   'counter-claim-other-than-sum': 'counterClaimOtherThanSum',
   'counter-claim-fee': 'counterClaimFee',
   'start-evidence-upload': 'startEvidenceUpload',
-  'reasonable-adjustments-triage': 'reasonableAdjustmentsTriage',
   'task-list': 'taskList',
   'confirm-if-these-documents-relate-to-an-application': 'confirmIfTheseDocumentsRelateToAnApplication',
   'response-submitted-counter-claim-fee-payment-needed': 'responseSubmittedCounterclaimFeePaymentNeeded',
