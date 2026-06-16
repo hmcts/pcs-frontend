@@ -404,6 +404,13 @@ export interface CitizenGenAppRequest {
   clientReference?: string;
 }
 
+/** Claim summary returned by GET /cases/defendant-claims on pcs-api. */
+export interface ClaimSummary {
+  caseReference?: string;
+  claimantName?: string;
+  propertyPostcode?: string;
+}
+
 export enum GenAppState {
   PENDING_GEN_APP_ISSUED = 'PENDING_GEN_APP_ISSUED',
   GEN_APP_ISSUED = 'GEN_APP_ISSUED',
