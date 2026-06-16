@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -16,7 +17,7 @@ import {
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '@routes/cancelUploadAdditionalDocuments';
 import { getDashboardUrl } from '@routes/dashboard';
-import type { CcdCollectionItem, RelatedApplicationOption } from '@services/ccdCase.interface';
+import type { CcdCollectionItem, GenApp, RelatedApplicationOption } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getFlowConfigForJourney } from '@steps';
 
@@ -55,6 +56,44 @@ async function loadRelatedApplicationOptions(req: Request): Promise<CcdCollectio
   return startResponse.data?.relatedApplicationOptions ?? [];
 }
 
+function buildApplicationDocumentLink(
+  caseReference: string,
+  documentId: string,
+  documentFilename: string,
+  openInNewTabText: string
+): string {
+  const safeFilename = escapeHtml(documentFilename);
+  const safeOpenInNewTabText = escapeHtml(openInNewTabText);
+
+  return `<a href="/case/${caseReference}/view-documents/${documentId}" rel="noreferrer noopener" target="_blank" class="govuk-link">${safeFilename} (${safeOpenInNewTabText})</a>`;
+}
+
+function buildApplicationHint(
+  caseReference: string | undefined,
+  genAppsById: Map<string, GenApp>,
+  genAppId: string | undefined,
+  openInNewTabText: string
+): { html: string } | undefined {
+  if (!caseReference || !genAppId) {
+    return undefined;
+  }
+
+  const genApp = genAppsById.get(genAppId);
+  const submissionDocument = genApp?.submissionDocument;
+  if (!submissionDocument?.id || !submissionDocument.document?.document_filename) {
+    return undefined;
+  }
+
+  return {
+    html: buildApplicationDocumentLink(
+      caseReference,
+      submissionDocument.id,
+      submissionDocument.document.document_filename,
+      openInNewTabText
+    ),
+  };
+}
+
 export const step: StepDefinition = {
   url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
   name: stepName,
@@ -64,18 +103,32 @@ export const step: StepDefinition = {
     createGetController(templatePath, stepName, stepNavigation, async (req: Request) => {
       const t = getTranslationFunction(req);
       const caseId = req.res?.locals.validatedCase?.id;
+      const accessToken = req.session?.user?.accessToken;
       const savedFormData = getFormData(req, stepName);
       const selectedApplicationId = savedFormData?.relatedApplicationId as string | undefined;
+      const openInNewTabText = t('opensInNewTab');
 
       const options = await loadRelatedApplicationOptions(req);
+      const ccdCase = caseId && accessToken ? await ccdCaseService.getCaseById(accessToken, caseId) : undefined;
+      const genAppsById = new Map<string, GenApp>();
+      for (const genApp of ccdCase?.data.genApps ?? []) {
+        if (genApp.id) {
+          genAppsById.set(genApp.id, genApp.value);
+        }
+      }
+
       const applications = [
         ...options
           .filter(item => Boolean(item.value.genAppId))
-          .map(item => ({
-            value: item.value.genAppId as string,
-            text: labelForOption(t, item.value),
-            checked: selectedApplicationId === item.value.genAppId,
-          })),
+          .map(item => {
+            const hint = buildApplicationHint(caseId, genAppsById, item.value.genAppId, openInNewTabText);
+            return {
+              value: item.value.genAppId as string,
+              text: labelForOption(t, item.value),
+              checked: selectedApplicationId === item.value.genAppId,
+              ...(hint ? { hint } : {}),
+            };
+          }),
         {
           value: MAIN_CLAIM_OPTION_VALUE,
           text: t('optionClaimOrCounterclaim'),
