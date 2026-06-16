@@ -1,5 +1,6 @@
 export const responseSubmittedCounterclaimFeePaymentNeeded = {
   mainHeader: `Response submitted. You must pay your counterclaim fee`,
+  payYourCounterclaimFeeLink: `Pay your counterclaim fee`,
   confirmationEmailParagraph: `We’ve sent you a confirmation email.`,
   whatToDoNextHeader: `What to do next`,
   payYourCounterclaimFeeLink: `Pay your counterclaim fee.`,

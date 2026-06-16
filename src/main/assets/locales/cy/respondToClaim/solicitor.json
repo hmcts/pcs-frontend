@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyDo you have a solicitor?",
+  "heading": "cyDo you have a solicitor?",
+  "question": "cyDo you have a solicitor?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
+  "errors": {
+    "hasSolicitor": "cySelect if you have a solicitor"
+  }
+}
