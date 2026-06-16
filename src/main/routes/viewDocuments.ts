@@ -91,7 +91,7 @@ export default function viewDocumentsRoutes(app: Application): void {
         const document = allDocuments.find(item => item.id === documentId)?.value;
         const filename = document?.document_filename?.trim() || 'document';
         const binaryUrl = document?.document_binary_url?.trim();
-        
+
         if (!binaryUrl) {
           return next(new HTTPError('Document not found', 404));
         }
