@@ -148,7 +148,7 @@ describe('citizenCaseLink routes', () => {
 
       await handler(req, res);
 
-      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, '/dashboard/1234567890123456', '/', ['/dashboard']);
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, '/case/1234567890123456/dashboard', '/', ['/case']);
     });
 
     it('should strip hyphens from claim number before validating', async () => {
