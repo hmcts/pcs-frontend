@@ -44,14 +44,12 @@ export default function paymentReturnRoutes(app: Application): void {
 
       if (outcome === 'success') {
         redirectTarget = successRedirectUrl;
+        await retainPaymentReferenceOnly(req);
       } else if (outcome === 'failure') {
         redirectTarget = failureRedirectUrl;
-      }
-
-      if (outcome === 'failure') {
-        clearPaymentReferenceOnly(req);
+        await clearPaymentReferenceOnly(req);
       } else {
-        retainPaymentReferenceOnly(req);
+        await retainPaymentReferenceOnly(req);
       }
 
       return safeRedirect303(res, redirectTarget, defaultReturnPath, ['/case', '/dashboard', '/payment']);
