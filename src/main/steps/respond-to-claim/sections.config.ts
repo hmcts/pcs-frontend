@@ -69,7 +69,8 @@ const sectionDefs = [
       'counter-claim-against-whom',
       'counter-claim-about',
       'counter-claim-order-other-than-sum',
-      'counter-claim-upload-documents',
+      'counter-claim-do-you-want-to-upload-files',
+      'counter-claim-upload-files',
       'check-your-answers-your-response',
     ],
   },
@@ -136,12 +137,19 @@ const sectionDefs = [
       'incomeAndExpenditure',
       'uploadFiles',
     ],
+    // 'reasonable-adjustments-triage', 'equality-and-diversity-start' and
+    // 'equality-and-diversity-end' are intentionally parked out of the live citizen
+    // journey while RA / Your Support and PCQ integrations are still in progress.
+    // Their step folders, registry entries and locale files are retained so re-
+    // enablement is a one-line restore here. See HDPI-3793 (RA triage), HDPI-6649
+    // (RA confirmation, parked on a custom branch) and the PCQ tie-in tracked in
+    // config/default.json (`pcq.enabled`).
     steps: [
-      'reasonable-adjustments-triage',
-      'equality-and-diversity-start',
-      'equality-and-diversity-end',
       'language-used',
       'check-your-answers',
+      'response-submitted',
+      'response-submitted-counter-claim-fee-payment-needed',
+      'response-and-counter-claim-submitted',
     ],
   },
 ] as const satisfies readonly {

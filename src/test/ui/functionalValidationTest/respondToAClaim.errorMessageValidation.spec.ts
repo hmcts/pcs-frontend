@@ -12,7 +12,6 @@ import {
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
   counterClaimSpecificSumOfMoney,
-  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   defendantDateOfBirth,
   defendantNameCapture,
@@ -21,9 +20,7 @@ import {
   doYouHaveASolicitor,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
-  endNow,
-  equalityAndDiversityEnd,
-  equalityAndDiversityStart,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
@@ -62,6 +59,7 @@ import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doA
 import { doYouHaveASolicitorErrorValidation } from '../functional/doYouHaveASolicitor.pft';
 import { doYouHaveAnyDependantChildrenErrorValidation } from '../functional/doYouHaveAnyDependantChildren.pft';
 import { doYouHaveAnyOtherDependantsErrorValidation } from '../functional/doYouHaveAnyOtherDependants.pft';
+import { doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation } from '../functional/doYouWantToUploadFilesToSupportYourCounterclaim.pft';
 import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
 import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pft';
 import { haveYouAppliedForUniversalCreditErrorValidation } from '../functional/haveYouAppliedForUniversalCredit.pft';
@@ -79,6 +77,7 @@ import { repaymentsMadeErrorValidation } from '../functional/repaymentsMade.pft'
 import { tenancyDateDetailsErrorValidation } from '../functional/tenancyDateDetails.pft';
 import { tenancyDateUnknownErrorValidation } from '../functional/tenancyDateUnknown.pft';
 import { tenancyTypeDetailsErrorValidation } from '../functional/tenancyTypeDetails.pft';
+import { uploadFilesToSupportYourCounterclaimErrorValidation } from '../functional/uploadFilesToSupportYourCounterclaim.pft';
 import { whatOtherRegularExpensesDoYouHaveErrorValidation } from '../functional/whatOtherRegularExpensesDoYouHave.pft';
 import { whatRegularIncomeDoYouReceiveErrorValidation } from '../functional/whatRegularIncomeDoYouReceive.pft';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation } from '../functional/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.pft';
@@ -91,7 +90,7 @@ import {
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { initializeExecutor, performAction } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
 
 const home_url = process.env.TEST_URL;
@@ -103,7 +102,7 @@ let claimantName: string;
 //   to explain why ErrorMessageValidation(EMV) is missing/deferred/not applicable.
 
 const NO_EMV_READ_ONLY = 'Read-only / informational screen — no field error validation.';
-const NO_EMV_PLACEHOLDER_PAGE = 'Placeholder page — ErrorMessageValidation(EMV) is not designed yet.';
+// const NO_EMV_PLACEHOLDER_PAGE = 'Placeholder page — ErrorMessageValidation(EMV) is not designed yet.';
 const NO_EMV_MISSING_DESIGN = 'ErrorMessageValidation(EMV) is missing for this page and needs to be designed.';
 
 test.beforeEach(async ({ page }, testInfo) => {
@@ -343,9 +342,20 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await softErrorMessageValidation('counterClaimUploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
 
+    await softErrorMessageValidation(
+      'doYouWantToUploadFilesToSupportYourCounterclaim',
+      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+    });
+
+    await softErrorMessageValidation(
+      'uploadFilesToSupportYourCounterclaim',
+      uploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
 
@@ -472,37 +482,13 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
-    await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
-    await performAction('readReasonableAdjustmentsTriage');
-
-    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-
-    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
 
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-      ],
-      status: 'Done',
-    });
-
+    await performAction('clickButton', 'Submit');
     assertAllErrorMessageValidations();
   });
 
@@ -624,8 +610,14 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await softErrorMessageValidation('counterClaimUploadDocuments', NO_EMV_PLACEHOLDER_PAGE);
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+
+    await softErrorMessageValidation(
+      'doYouWantToUploadFilesToSupportYourCounterclaim',
+      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
 
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
@@ -719,25 +711,13 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
-    await softErrorMessageValidation('readReasonableAdjustmentsTriage', NO_EMV_READ_ONLY);
-    await performAction('readReasonableAdjustmentsTriage');
-
-    await softErrorMessageValidation('equalityAndDiversityStart', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-
-    await softErrorMessageValidation('equalityAndDiversityEnd', NO_EMV_PLACEHOLDER_PAGE);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
 
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
+    await performAction('clickButton', 'Submit');
     assertAllErrorMessageValidations();
   });
 });

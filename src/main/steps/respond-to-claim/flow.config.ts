@@ -1,6 +1,7 @@
 import { type Request } from 'express';
 
 import {
+  counterClaimUploadWanted,
   hasAnyRentArrearsGround,
   hasMadeCounterClaim,
   hasOnlyRentArrearsGrounds,
@@ -10,6 +11,9 @@ import {
   isSomethingElseCounterClaim,
   isTenancyStartDateKnown,
   isWalesProperty,
+  shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
+  shouldShowResponseSubmittedConfirmationStep,
 } from '../utils';
 
 import {
@@ -96,6 +100,12 @@ export const flowConfig: JourneyFlowConfig = {
     'counter-claim-fee': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
+    'counter-claim-do-you-want-to-upload-files': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-upload-files': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req) && counterClaimUploadWanted(req),
+    },
     'counter-claim-have-you-applied-for-help': {
       showCondition: (req: Request) => shouldShowCounterClaimHelpWithFeesStep(req),
     },
@@ -110,9 +120,6 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counter-claim-order-other-than-sum': {
       showCondition: (req: Request) => isSomethingElseCounterClaim(req),
-    },
-    'counter-claim-upload-documents': {
-      showCondition: (req: Request) => hasMadeCounterClaim(req),
     },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
@@ -146,6 +153,18 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
+    },
+    'response-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-submitted-counter-claim-fee-payment-needed': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-and-counter-claim-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseAndCounterClaimSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
     },
   } satisfies Partial<Record<RespondToClaimStepName, StepConfig>>,
 };

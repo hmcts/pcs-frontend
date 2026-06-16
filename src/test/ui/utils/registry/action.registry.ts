@@ -12,6 +12,7 @@ import {
   respondPossessionClaimAPIAction,
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
+import { LinkSolicitorAPIAction } from '../actions/custom-actions/linkSolicitorAPI.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -114,6 +115,10 @@ export class ActionRegistry {
     ['retrieveCYATableDataRTC', new RespondToClaimAction()],
     ['validateCYARTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
+    ['getCaseAPI', new CreateCaseAPIAction()],
+    ['linkSolicitorAPI', new LinkSolicitorAPIAction()],
+    ['doYouWantToUploadFiles', new RespondToClaimAction()],
+    ['uploadFilesToSupportCounterclaim', new RespondToClaimAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
