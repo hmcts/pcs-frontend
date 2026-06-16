@@ -1,0 +1,198 @@
+{
+  "pageTitle": "View the response",
+  "heading": "View the response",
+  "caption": "The response",
+  "propertyAddressLabel": "Property address:",
+  "caseReferenceLabel": "Case number:",
+
+  "summary": {
+    "dateIssued": "Date issued",
+    "dateSubmitted": "Date submitted"
+  },
+
+  "sections": {
+    "claimantDetails": "Claimant details",
+    "defendant1Details": "Defendant 1 details",
+    "additionalDefendantDetails": "Additional defendant {{number}} details",
+    "responseToClaim": "Response to the claimant’s claim",
+    "paymentsOrAgreements": "Payments or agreements since the claim was made",
+    "householdAndCircumstances": "Your household and circumstances",
+    "regularIncome": "Regular income",
+    "priorityDebts": "Priority debts",
+    "regularExpenses": "Regular expenses",
+    "additionalInformation": "Additional information",
+    "counterclaim": "Counterclaim",
+    "statementOfTruth": "Statement of truth"
+  },
+
+  "claimantDetails": {
+    "organisation": "Claimant organisation",
+    "name": "Name",
+    "address": "Address for service"
+  },
+
+  "defendant1": {
+    "name": "Name",
+    "dateOfBirth": "Date of birth",
+    "email": "Email address",
+    "phone": "Phone number",
+    "address": "Postal address",
+    "contactPreferences": "Contact preferences",
+    "freeLegalAdvice": "Have you had any free legal advice?",
+    "freeLegalAdviceOptions": {
+      "YES": "Yes",
+      "NO": "No",
+      "PREFER_NOT_TO_SAY": "Prefer not to say"
+    }
+  },
+
+  "contactPreference": {
+    "text": "Text message",
+    "phone": "Phone",
+    "email": "Email",
+    "post": "Post"
+  },
+
+  "responseToClaim": {
+    "disputeClaim": "Do you dispute any other parts of the claim?",
+    "disputeDetails": "Explain which parts of the claim you do not agree with",
+    "claimGrounds": "Claim grounds",
+    "exemptLandlord": "Is your landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?",
+    "tenancyTypeConfirmation": "Is the tenancy, occupation contract or licence agreement type given by the claimant correct?",
+    "tenancyType": "Corrected tenancy, occupation contract or licence agreement type",
+    "tenancyStartDateConfirmation": "Is the tenancy, licence or occupation contract start date correct?",
+    "tenancyStartDate": "Corrected tenancy, occupation contract or licence agreement start date",
+    "possessionNoticeReceived": "Did the claimant give you notice of their intention to begin possession proceedings?",
+    "noticeReceivedDate": "When did you receive notice from the claimant?",
+    "rentArrearsAmountConfirmation": "Is the amount of rent arrears given by the claimant correct?",
+    "rentArrearsAmount": "Admitted amount owed in rent arrears",
+    "landlordRegistered": "Is your landlord registered?",
+    "landlordLicensed": "Is your landlord licensed?",
+    "writtenTerms": "Has your landlord sent you written terms of the occupation contract?"
+  },
+
+  "payments": {
+    "anyPaymentsMade": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
+    "paymentDetails": "Details of payments made",
+    "repaymentPlanAgreed": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+    "repaymentAgreedDetails": "Details of repayment agreement",
+    "repayArrearsInstalments": "Would you like to offer to pay your arrears in instalments?",
+    "additionalContribution": "How much could you afford to pay in addition to the current rent?",
+    "additionalContributionFrequency": "How frequently could you afford to pay this amount?"
+  },
+
+  "household": {
+    "dependantChildren": "Do you have any dependent children?",
+    "dependantChildrenDetails": "Give details about your dependent children",
+    "otherDependants": "Do you have any other dependants?",
+    "otherDependantDetails": "Give details about your other dependants",
+    "otherTenants": "Do any other adults live in your home?",
+    "otherTenantsDetails": "Give details about the other adults living in your home",
+    "alternativeAccommodation": "Would you have somewhere else to live if you had to leave your home?",
+    "alternativeAccommodationDate": "When would you be able to move in?",
+    "shareAdditional": "Would you like to share anything about your circumstances?",
+    "additionalDetails": "Give details about your circumstances",
+    "exceptionalHardship": "Would you experience exceptional hardship if you were asked to leave your home?",
+    "exceptionalHardshipDetails": "Give details about the exceptional hardship you’d experience"
+  },
+
+  "income": {
+    "fromJobs": "Income from all jobs you do",
+    "pension": "Pension – state and private",
+    "universalCredit": "Universal Credit",
+    "universalCreditApplied": "Have you applied for Universal Credit?",
+    "universalCreditApplicationDate": "When did you apply?",
+    "otherBenefits": "Other benefits and credits",
+    "moneyFromElsewhere": "Money from somewhere else (for example, child maintenance payments or someone in your household gives you money)",
+    "moneyFromElsewhereDetails": "Give details about the other sources of income and how much you usually receive",
+    "totalAmountReceived": "Total amount received",
+    "receivedEvery": "Received every"
+  },
+
+  "debts": {
+    "hasPriorityDebts": "Do you have any priority debts?",
+    "debtTotal": "What is the total amount you owe for all your priority debts?",
+    "debtContribution": "How much do you pay towards your priority debts each week or month?",
+    "paidEvery": "Paid every"
+  },
+
+  "expenses": {
+    "householdBills": "Household bills (for example, council tax, gas, electricity, water, internet)",
+    "loanPayments": "Loan payments",
+    "childSpousalMaintenance": "Child or spousal maintenance",
+    "mobilePhone": "Mobile phone",
+    "groceryShopping": "Grocery shopping",
+    "fuelParkingTransport": "Fuel, parking and transport",
+    "schoolCosts": "School costs (for example, uniform and school dinners)",
+    "clothing": "Clothing",
+    "other": "Other",
+    "amountPaid": "Amount paid",
+    "paidEvery": "Paid every"
+  },
+
+  "additional": {
+    "otherConsiderations": "Is there anything else you want to tell the court as part of your response?",
+    "otherConsiderationsDetails": "Give details about what else you want to tell the court"
+  },
+
+  "counterclaim": {
+    "type": "What are you claiming for?",
+    "amountKnown": "Are you claiming for a specific sum of money?",
+    "amount": "How much are you claiming?",
+    "estimatedMaxAmount": "What’s the maximum value of your claim?",
+    "against": "Who are you making the counterclaim against?",
+    "againstName": "What is the name of the person or organisation you are making the counterclaim against?",
+    "againstAddress": "What's their postal address?",
+    "for": "What is your counterclaim for?",
+    "reasons": "What are your reasons for making the counterclaim?",
+    "ordersRequested": "What orders are you asking the court to make?",
+    "factsForCourt": "What facts would you like the court to consider when deciding the claim?",
+    "needHelpWithFees": "Do you need help paying the counterclaim fee?",
+    "appliedForHwf": "Have you already applied for help with your counterclaim fee?",
+    "hwfReference": "Help with Fees reference number",
+    "claimTypeOptions": {
+      "PAYMENT_OR_COMPENSATION": "A sum of money or compensation",
+      "SOMETHING_ELSE": "Something else",
+      "BOTH": "Both"
+    },
+    "needHelpWithFeesOptions": {
+      "YES": "I need help paying the fee",
+      "NO": "I do not need help paying the fee"
+    }
+  },
+
+  "incomeFrequencies": {
+    "WEEKLY": "received every week",
+    "MONTHLY": "received every month"
+  },
+
+  "paymentFrequencies": {
+    "WEEKLY": "paid every week",
+    "MONTHLY": "paid every month"
+  },
+
+  "frequency": {
+    "weekly": "Weekly",
+    "monthly": "Monthly"
+  },
+
+  "statementOfTruth": {
+    "body": "I believe the facts stated in this defence form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in the truth.",
+    "yourFullName": "Your full name"
+  },
+
+  "pdf": {
+    "heading": "Download a PDF copy of the response",
+    "linkText": "Response (PDF)"
+  },
+
+  "closeAndReturn": "Close and return to case overview",
+
+  "accordion": {
+    "summary": "If you cannot find a document that you are looking for in this section",
+    "body": "All documents uploaded by you or the claimant are on the",
+    "linkText": "Documents page"
+  },
+
+  "personsUnknown": "Persons unknown"
+}
