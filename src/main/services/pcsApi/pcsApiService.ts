@@ -1,6 +1,7 @@
 import config from 'config';
 
 import { http } from '@modules/http';
+import type { ClaimSummary } from '@services/ccdCase.interface';
 
 function getBaseUrl(): string {
   return config.get('api.url');
@@ -59,4 +60,14 @@ export const validateAccessCode = async (
   } catch {
     return { valid: false, error: 'unknown' };
   }
+};
+
+export const getCitizenClaims = async (accessToken: string): Promise<ClaimSummary[]> => {
+  const response = await http.get<ClaimSummary[]>(`${getBaseUrl()}/cases/citizen-claims`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!Array.isArray(response.data)) {
+    throw new Error('Unexpected response from citizen-claims endpoint');
+  }
+  return response.data;
 };
