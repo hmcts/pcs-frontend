@@ -110,7 +110,7 @@ describe('View All Application Route', () => {
       'view-all-applications',
       expect.objectContaining({
         caseReference: `${caseReference}`,
-        dashboardUrl: `/dashboard/${caseReference}`,
+        dashboardUrl: `/case/${caseReference}/dashboard`,
         formattedCaseReference: '1234 5678 9012 3456',
         otherPartyGenAppsMap: expectedOtherPartyMap,
         userGenApps: [

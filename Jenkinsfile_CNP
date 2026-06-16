@@ -77,7 +77,6 @@ withPipeline(type, product, component) {
         env.PCS_API_URL = "https://pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
         env.CDAM_URL = "http://pcs-api-pr-${env.PCS_API_CHANGE_ID}-cdam"
         env.XUI_BASE_URI = "https://xui-pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
-        env.CASE_TYPE_ID = "PCS-${env.PCS_API_CHANGE_ID}"
         env.CASE_API_URL = "https://pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net"
         env.REDIRECTS_MANAGE_CASE_RETURN_URL = "https://xui-pcs-api-pr-${env.PCS_API_CHANGE_ID}.preview.platform.hmcts.net/cases/case-details/PCS/PCS"
     }
