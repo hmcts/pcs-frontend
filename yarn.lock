@@ -2163,7 +2163,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:0.219.0":
+"@opentelemetry/api-logs@npm:0.219.0, @opentelemetry/api-logs@npm:^0.219.0":
   version: 0.219.0
   resolution: "@opentelemetry/api-logs@npm:0.219.0"
   dependencies:
@@ -2752,16 +2752,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.66.0":
-  version: 0.66.0
-  resolution: "@opentelemetry/instrumentation-redis@npm:0.66.0"
+"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.67.0":
+  version: 0.67.0
+  resolution: "@opentelemetry/instrumentation-redis@npm:0.67.0"
   dependencies:
-    "@opentelemetry/instrumentation": "npm:^0.218.0"
+    "@opentelemetry/instrumentation": "npm:^0.219.0"
     "@opentelemetry/redis-common": "npm:^0.38.3"
     "@opentelemetry/semantic-conventions": "npm:^1.27.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/41365cd99b22d116be3fb3bf87bdfe72b1aa525705c6e61a6a83598c149cad4b7b7742de0d1db50b0dbd28ef357c671743a6b89360492dcdcaad742633c41966
+  checksum: 10/db946c5d4a372cb6a2f80ed7cff5654b97afb3d55b4e8680c133406ee710fec66c2e5e54002bf45e18444fad1418005bb6f93e3bd715f3e87acc258a4cf801e8
   languageName: node
   linkType: hard
 
@@ -2803,15 +2803,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-winston@npm:0.62.0":
-  version: 0.62.0
-  resolution: "@opentelemetry/instrumentation-winston@npm:0.62.0"
+"@opentelemetry/instrumentation-winston@npm:0.63.0":
+  version: 0.63.0
+  resolution: "@opentelemetry/instrumentation-winston@npm:0.63.0"
   dependencies:
-    "@opentelemetry/api-logs": "npm:^0.218.0"
-    "@opentelemetry/instrumentation": "npm:^0.218.0"
+    "@opentelemetry/api-logs": "npm:^0.219.0"
+    "@opentelemetry/instrumentation": "npm:^0.219.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/654b73ce2b78ec919d07a135ad77b8350955a839d68f6ec23369a2422c85ed3751620426309448fcb34e3b6c9c4acb7c2be9acd22d275b39b6baf6c261574f0f
+  checksum: 10/ade3e0f326a79526c55af4fb3d66d1e65056c468c79bb029a87c3e9ad5844d714b9b8fe252117920db15b080192a29e80920bb9f5b828b4cb5b4abdae6b2db37
   languageName: node
   linkType: hard
 
@@ -11739,7 +11739,7 @@ __metadata:
     "@launchdarkly/node-server-sdk": "npm:9.11.2"
     "@ministryofjustice/frontend": "npm:^9.0.0"
     "@opentelemetry/api": "npm:1.9.1"
-    "@opentelemetry/instrumentation-winston": "npm:0.62.0"
+    "@opentelemetry/instrumentation-winston": "npm:0.63.0"
     "@pact-foundation/pact": "npm:16.5.0"
     "@pact-foundation/pact-cli": "npm:18.1.0"
     "@playwright/test": "npm:1.60.0"
@@ -11819,7 +11819,7 @@ __metadata:
     prettier: "npm:3.8.4"
     sass: "npm:1.101.0"
     sass-loader: "npm:17.0.0"
-    saucectl: "npm:^0.205.0"
+    saucectl: "npm:^0.206.0"
     serve-favicon: "npm:2.5.1"
     style-loader: "npm:4.0.0"
     stylelint: "npm:17.13.0"
@@ -12838,14 +12838,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"saucectl@npm:^0.205.0":
-  version: 0.205.2
-  resolution: "saucectl@npm:0.205.2"
+"saucectl@npm:^0.206.0":
+  version: 0.206.0
+  resolution: "saucectl@npm:0.206.0"
   dependencies:
     "@saucelabs/bin-wrapper": "npm:^2.1.0"
   bin:
     saucectl: index.js
-  checksum: 10/c44dc0f4b549dc42d5733ae09330da031f399cb61806ba6ea1dbd6715c0dedd85ead7c839dec15244a0c7a5e7d8e989f179f2c7cccd8d93d06689bde0dfa5c11
+  checksum: 10/2a2b0c2441b2680e1dbe2de0c5b24f82d02abec01c28e5f033e7b1c8817816861e8646e20b247b6dc032fc68d5780fd087c6b08274b0bf51282a15bf1066636f
   languageName: node
   linkType: hard
 
