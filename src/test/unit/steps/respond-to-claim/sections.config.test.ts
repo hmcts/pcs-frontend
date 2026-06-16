@@ -10,13 +10,25 @@ import {
   sectionIdToBackendEnum,
 } from '../../../../main/steps/respond-to-claim/sections.config';
 import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegistry';
-import { getSectionCoverage, getSectionForStep } from '../../../../main/steps/utils/sections';
+import { getSectionCoverage, getSectionForStep } from '../../../../main/steps/utils';
+
+import { getNextStep } from '@modules/steps/flow';
 
 const findSection = (id: string) => respondToClaimSections.find(section => section.id === id);
 
 describe('respond-to-claim sections config', () => {
   it('maps every sectioned flow step to exactly one section', () => {
-    const nonSectionStepSlugs = new Set(flowConfig.nonSectionStepOrder ?? []);
+    // 'reasonable-adjustments-triage', 'equality-and-diversity-start'
+    // and 'equality-and-diversity-end' are intentionally parked out of the live
+    // section flow (see sections.config.ts). They remain in the registry so direct
+    // URL access and re-enablement still work, so marking them as intentionally
+    // unmapped here in addition to flowConfig.nonSectionStepOrder.
+    const nonSectionStepSlugs = new Set([
+      ...(flowConfig.nonSectionStepOrder ?? []),
+      'reasonable-adjustments-triage',
+      'equality-and-diversity-start',
+      'equality-and-diversity-end',
+    ]);
     const flowStepSlugs = Object.keys(stepRegistry).filter(stepSlug => !nonSectionStepSlugs.has(stepSlug));
     const coverage = getSectionCoverage(flowStepSlugs, respondToClaimSections);
 
@@ -54,12 +66,62 @@ describe('respond-to-claim sections config', () => {
 
   it('maps end-of-journey steps into final section', () => {
     expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
+      'language-used',
+      'check-your-answers',
+      'response-submitted',
+      'response-submitted-counter-claim-fee-payment-needed',
+      'response-and-counter-claim-submitted',
+    ]);
+  });
+
+  // HDPI-6929 — focused navigation test
+  describe('HDPI-6929 — navigation contract from upload-document', () => {
+    const PARKED_STEPS = [
       'reasonable-adjustments-triage',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
-      'language-used',
-      'check-your-answers',
-    ]);
+    ];
+
+    const makeReq = (): Request =>
+      ({
+        res: { locals: { validatedCase: { data: {} } } },
+      }) as unknown as Request;
+
+    const walkFrom = async (startStep: string): Promise<string[]> => {
+      const visited: string[] = [];
+      let current: string | null = startStep;
+      while (current) {
+        const next: string | null = await getNextStep(makeReq(), current, flowConfig, {});
+        if (!next || visited.includes(next)) {
+          break;
+        }
+        visited.push(next);
+        current = next;
+      }
+      return visited;
+    };
+
+    it('next step after upload-document is check-your-answers-documents (per-section CYA, not RA triage)', async () => {
+      const next = await getNextStep(makeReq(), 'upload-document', flowConfig, {});
+
+      expect(next).toBe('check-your-answers-documents');
+      expect(PARKED_STEPS).not.toContain(next);
+    });
+
+    it('forward walk from upload-document never visits any parked step', async () => {
+      const path = await walkFrom('upload-document');
+
+      for (const parked of PARKED_STEPS) {
+        expect(path).not.toContain(parked);
+      }
+    });
+
+    it('forward walk from upload-document reaches language-used and check-your-answers', async () => {
+      const path = await walkFrom('upload-document');
+
+      expect(path).toContain('language-used');
+      expect(path).toContain('check-your-answers');
+    });
   });
 
   it('treats payments section as applicable for rent arrears claims', async () => {

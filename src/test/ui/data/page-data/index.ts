@@ -1,4 +1,5 @@
 export * from './home.page.data';
+export * from './claims.page.data';
 export * from './startNow.page.data';
 export * from './disputeClaimInterstitial.page.data';
 export * from './freeLegalAdvice.page.data';
@@ -34,6 +35,7 @@ export * from './wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.page.dat
 export * from './yourCircumstances.page.data';
 export * from './exceptionalHardship.page.data';
 export * from './incomeAndExpenses.page.data';
+export * from './doYouWantToUploadFilesToSupportYourCounterclaim.page.data';
 export * from './feedback.page.data';
 export * from './yourHouseholdAndCircumstances.page.data';
 export * from './haveYouAppliedForUniversalCredit.page.data';
@@ -57,8 +59,11 @@ export * from './counterClaimFee.page.data';
 export * from './counterClaimSpecificSumOfMoney.page.data';
 export * from './counterClaimWhatAreYouClaimingFor.page.data';
 export * from './counterClaimAgainstWhom.page.data';
-export * from './taskList.page.data';
+export * from './uploadFilesToSupportYourCounterclaim.page.data';
 export * from './checkYourAnswersRTC.page.data';
 export * from './counterClaimOrderOtherThanSum.page.data';
-export * from './counterClaimUploadDocuments.page.data';
+export * from './taskList.page.data';
 export * from './endNow.page.data';
+export * from './responseAndCounterClaimSubmitted.page.data';
+export * from './responseSubmitted.page.data';
+export * from './responseSubmittedCounterclaimFeePaymentNeeded.page.data';
