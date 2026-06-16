@@ -1,4 +1,5 @@
 export * from './home.page.data';
+export * from './claims.page.data';
 export * from './startNow.page.data';
 export * from './disputeClaimInterstitial.page.data';
 export * from './freeLegalAdvice.page.data';
@@ -64,3 +65,6 @@ export * from './counterClaimOrderOtherThanSum.page.data';
 export * from './endNow.page.data';
 export * from './circumstancesLR.page.data';
 export * from './uploadFilesToSupportYourCounterclaim.page.data';
+export * from './responseAndCounterClaimSubmitted.page.data';
+export * from './responseSubmitted.page.data';
+export * from './responseSubmittedCounterclaimFeePaymentNeeded.page.data';

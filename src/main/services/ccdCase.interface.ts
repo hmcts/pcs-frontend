@@ -236,6 +236,7 @@ export interface CcdDefendantResponses {
   makeCounterClaim?: YesNoValue;
   counterClaimWantToUploadFiles?: YesNoValue;
   completedSections?: RespondToClaimSectionEnum[];
+  status?: 'SUBMITTED' | 'CREATED';
 }
 
 export interface PossessionClaimResponse {
@@ -397,4 +398,11 @@ export interface CitizenGenAppRequest {
   sotAccepted?: YesNoValue;
   sotFullName?: string;
   clientReference?: string;
+}
+
+/** Claim summary returned by GET /cases/defendant-claims on pcs-api. */
+export interface ClaimSummary {
+  caseReference?: string;
+  claimantName?: string;
+  propertyPostcode?: string;
 }

@@ -1,0 +1,6 @@
+{
+  "pageTitle": "cyCheck your answers",
+  "errors": {
+    "submitResponseFailed": "cyFailed to submit response. Please try again."
+  }
+}
