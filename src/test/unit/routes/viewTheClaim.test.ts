@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express';
 
 import viewTheClaimRoute from '@routes/viewTheClaim';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
@@ -8,6 +9,12 @@ jest.mock('../../../main/middleware', () => ({
 
 jest.mock('@routes/dashboard', () => ({
   getDashboardUrl: jest.fn(() => '/dashboard/1234567890123456'),
+}));
+
+jest.mock('@services/ccdCaseService', () => ({
+  ccdCaseService: {
+    getCaseById: jest.fn(),
+  },
 }));
 
 jest.mock('@utils/viewTheClaim/viewTheClaimUtils', () => ({
@@ -43,24 +50,34 @@ describe('viewTheClaim route', () => {
     );
   });
 
-  it('should render the view-the-claim template with page data', () => {
+  it('should render the view-the-claim template with page data', async () => {
+    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+      data: {
+        claimantName: 'Treetops Housing',
+      },
+    });
     viewTheClaimRoute(app);
 
-    const handler = (app.get as jest.Mock).mock.calls[0][2] as (req: Request, res: Response) => void;
+    const handler = (app.get as jest.Mock).mock.calls[0][2] as (
+      req: Request,
+      res: Response,
+      next: jest.Mock
+    ) => Promise<void>;
+    const next = jest.fn();
     const res = {
-      locals: {
-        validatedCase: {
-          id: '1234567890123456',
-          data: {
-            claimantName: 'Treetops Housing',
-          },
-        },
-      },
       render: jest.fn(),
     } as unknown as Response;
 
-    handler({} as Request, res);
+    await handler(
+      {
+        params: { caseReference: '1234567890123456' },
+        session: { user: { accessToken: 'access-token' } },
+      } as unknown as Request,
+      res,
+      next
+    );
 
+    expect(ccdCaseService.getCaseById).toHaveBeenCalledWith('access-token', '1234567890123456');
     expect(res.render).toHaveBeenCalledWith(
       'view-the-claim',
       expect.objectContaining({
@@ -71,16 +88,20 @@ describe('viewTheClaim route', () => {
     );
   });
 
-  it('should return 404 when validated case is missing', () => {
+  it('should return 401 when access token is missing', async () => {
     viewTheClaimRoute(app);
 
-    const handler = (app.get as jest.Mock).mock.calls[0][2] as (req: Request, res: Response, next: jest.Mock) => void;
+    const handler = (app.get as jest.Mock).mock.calls[0][2] as (
+      req: Request,
+      res: Response,
+      next: jest.Mock
+    ) => Promise<void>;
     const next = jest.fn();
-    const res = { locals: {}, render: jest.fn() } as unknown as Response;
+    const res = { render: jest.fn() } as unknown as Response;
 
-    handler({} as Request, res, next);
+    await handler({ params: { caseReference: '1234567890123456' } } as unknown as Request, res, next);
 
     expect(res.render).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 404 }));
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 401 }));
   });
 });

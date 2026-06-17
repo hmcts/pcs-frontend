@@ -3,12 +3,17 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
+{% set backUrl = dashboardUrl %}
+
 {% block pageTitle %}
-{{ t('viewTheClaim:pageTitle') }}
+  {{ t('viewTheClaim:pageTitle') }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
 
 {% macro claimSummarySection(summarySection) %}
   <h2 class="govuk-heading-m govuk-!-margin-bottom-3">{{ summarySection.title }}</h2>
+  {% if summarySection.title == t('viewTheClaim:sections.statementOfTruth') %}
+    <p class="govuk-body">{{ t('viewTheClaim:statementOfTruthBody') }}</p>
+  {% endif %}
   {{ govukSummaryList({
     rows: summarySection.rows,
     classes: 'govuk-!-margin-bottom-6'
@@ -26,25 +31,18 @@
 
 {% block content %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-grid-row govuk-!-margin-bottom-2">
-        <div class="govuk-grid-column-two-thirds">
-          <p class="govuk-heading-s govuk-!-margin-bottom-1 govuk-!-margin-top-0">{{ t('viewTheClaim:theClaimEyebrow') }}</p>
-          <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ t('viewTheClaim:pageTitle') }}</h1>
-        </div>
-        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-          <a class="govuk-link govuk-!-display-inline-block govuk-!-margin-top-3" href="#view-the-claim-help">{{ t('viewTheClaim:contactUsForHelp') }}</a>
-        </div>
-      </div>
+    <div class="govuk-grid-column-two-thirds view-the-claim">
+      <span class="govuk-caption-l">{{ t('viewTheClaim:theClaimEyebrow') }}</span>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ t('viewTheClaim:pageTitle') }}</h1>
 
       {% if propertyAddressText %}
-        <p class="govuk-body govuk-!-font-size-24 govuk-!-margin-bottom-0">
-          <span class="govuk-!-font-weight-bold">{{ t('viewTheClaim:propertyAddressLabel') }}</span> {{ propertyAddressText }}
+        <p class="govuk-body-l govuk-!-margin-bottom-2">
+          <span>{{ t('viewTheClaim:propertyAddressLabel') }}</span> {{ propertyAddressText }}
         </p>
       {% endif %}
 
-      <p class="govuk-body govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-6">
-        <span class="govuk-!-font-weight-bold">{{ t('viewTheClaim:caseNumberLabel') }}</span> {{ caseReference | caseReferenceDisplay }}
+      <p class="govuk-body-l govuk-!-margin-bottom-6">
+        <span>{{ t('viewTheClaim:caseNumberLabel') }}</span> {{ caseReference | caseReferenceDisplay }}
       </p>
 
       <p class="govuk-body govuk-!-margin-bottom-6">{{ introText }}</p>
@@ -56,22 +54,34 @@
         }) }}
       {% endif %}
 
-      {{ claimPdfBlock(claimPdfSection) }}
-
       {% for section in sections %}
         {{ claimSummarySection(section) }}
       {% endfor %}
 
-      {{ govukDetails({
-        id: 'view-the-claim-help',
-        summaryText: t('viewTheClaim:documentsHelpSummary'),
-        text: t('viewTheClaim:documentsHelpText')
-      }) }}
+      {{ claimPdfBlock(claimPdfSection) }}
 
       {{ govukButton({
         text: t('viewTheClaim:closeAndReturn'),
         href: dashboardUrl
       }) }}
+
+      {{ govukDetails({
+        id: 'view-the-claim-help',
+        summaryText: t('viewTheClaim:documentsHelpSummary'),
+        open: true,
+        html: '<p class="govuk-body">'
+              + t('viewTheClaim:documentsHelpTextBeforeLink')
+              + ' <a class="govuk-link" href="' + documentsUrl + '">'
+              + t('viewTheClaim:documentsHelpLinkText')
+              + '</a>.</p>'
+      }) }}
+
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <aside class="app-related-items" aria-label="{{ t('common:supportAndContactInformation') }}">
+        {% include "components/contact-us-details.njk" %}
+      </aside>
     </div>
   </div>
 {% endblock %}

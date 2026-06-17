@@ -18,7 +18,8 @@
   }
 }
 
-.view-the-response .govuk-summary-list__key {
+.view-the-response .govuk-summary-list__key,
+.view-the-claim .govuk-summary-list__key {
   @include govuk-typography-weight-regular($important: true);
 }
 
