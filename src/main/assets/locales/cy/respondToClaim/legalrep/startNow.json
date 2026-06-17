@@ -1,7 +1,11 @@
 {
-  "listItemName": "cyyour client's name",
-  "listItemDateOfBirth": "cyyour client’s date of birth",
-  "listItemCircumstances": "cyyour client's circumstances and any exceptional hardship they would experience if they had to leave their home",
-  "listItemIncomeExpenses": "cyyour client's income and expenses",
-  "financialSituationInfo": "cyYou do not have to answer questions about your client's financial situation, but sharing this information can help a judge understand your client's circumstances."
+  "title": "cyRespond to a property possession claim online",
+  "saveDraftInfo": "cyYou can save your response as a draft and return to it later. You’ll be able to review and edit your answers before you submit them.",
+  "description": "",
+  "completingYourResponse": "",
+  "uploadDocumentsInfo": "",
+  "whatYouWillNeed": "",
+  "claimantVisibilityInfo": "cyThe claimant will be able to see any documents you upload and your answers.",
+  "provideDetailsInfo": "cyThis service is also available <a href=\"?lang=en\" class=\"govuk-link language\">in English</a>.",
+  "hmctsSupportInfo": "cyIf you or the defendant need support to use HMCTS services, like step-free access to a court for the hearing, you can request this after you’ve submitted your response."
 }

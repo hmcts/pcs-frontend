@@ -56,3 +56,4 @@ export {
   shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
   shouldShowResponseSubmittedConfirmationStep,
 } from './postSubmissionRouting';
+export { isSingleLinkedDefendant } from './isSingleLinkedDefendant';

@@ -11,8 +11,10 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
+const STEP_NAME = 'have-you-applied-for-universal-credit';
+
 export const step: StepDefinition = createRespondToClaimFormStep({
-  stepName: 'have-you-applied-for-universal-credit',
+  stepName: STEP_NAME,
   isAnswered: req =>
     Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.hasAppliedForUniversalCredit),
   stepDir: __dirname,
@@ -81,6 +83,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     heading: 'heading',
     caption: 'caption',
+    question: 'question',
   },
   fields: [
     {

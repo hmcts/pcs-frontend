@@ -1,0 +1,12 @@
+{
+  "question": "",
+  "heading": "cyOther adults",
+  "dependantQuestion": "cyDo any other adults live in the defendant\u2019s home?",
+  "textAreaLabel": "cyGive details about the other adults living in the defendant\u2019s home",
+  "textAreaHintText": "",
+  "errors": {
+    "confirmOtherAdults": "cySelect if any other adults live in the defendant's home",
+    "otherAdultsDetails": "cyGive details about the other adults living in their home",
+    "otherAdultsDetailsInvalidCharacters": "cyGive details about the other adults living in their home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+  }
+}

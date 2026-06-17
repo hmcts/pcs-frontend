@@ -19,6 +19,7 @@ import { http } from '../modules/http';
 import { getRespondToClaimConfirmationPath } from '../steps/utils/postSubmissionRouting';
 
 import { Logger } from '@modules/logger';
+import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('finalSubmit');
@@ -89,9 +90,11 @@ export default function finalSubmitRoutes(app: Application): void {
       // Note: possessionClaimResponse: {} is required to pass pcs-api validation
       // pcs-api will load actual data from draft database
       const submitUrl = `${getBaseUrl()}/cases/${caseId}/events`;
+      const selectedPartyId = req.session?.clientContext?.selectedPartyId;
       const payload = {
         data: {
           possessionClaimResponse: {}, // Minimal empty object to pass validation
+          ...(selectedPartyId !== null && { currentRepresentedPartyId: selectedPartyId }),
         },
         event: {
           id: 'respondPossessionClaim',
@@ -108,6 +111,10 @@ export default function finalSubmitRoutes(app: Application): void {
       await http.post(submitUrl, payload, getCaseHeaders(userAccessToken));
 
       logger.info(`Response submitted successfully for case ${caseId}`);
+
+      if (selectedPartyId) {
+        clientContextSessionClearer(req);
+      }
 
       return safeRedirect303(res, getRespondToClaimConfirmationPath(caseId, validatedCase.data), '/', ['/case']);
     } catch (error) {

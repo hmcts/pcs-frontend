@@ -17,10 +17,12 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  <div class="govuk-inset-text">
-    <p class="govuk-body">{{ insetIntroText }}</p>
-    <p class="govuk-body">{{ insetDetailsText }}</p>
-  </div>
+  {% if insetIntroText %}
+    <div class="govuk-inset-text">
+      <p class="govuk-body">{{ insetIntroText }}</p>
+      <p class="govuk-body">{{ insetDetailsText }}</p>
+    </div>
+  {% endif %}
 
   <h2 class="govuk-heading-s">{{ amountOwedHeading }}</h2>
 

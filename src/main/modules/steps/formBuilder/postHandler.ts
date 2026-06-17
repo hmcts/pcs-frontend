@@ -1,6 +1,8 @@
+import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { isLegalRepresentativeUser } from '../../../steps/utils/userRole';
 import { createStepNavigation, getStepUrl } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -170,6 +172,17 @@ export function createPostHandler(
       }
 
       if (isSaveForLater) {
+        const caseId = req.res?.locals.validatedCase?.id;
+
+        if (isLegalRepresentativeUser(req)) {
+          const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
+            ? config.get<string>('redirects.manageCaseReturnURL')
+            : null;
+          if (caseDetailsBaseUrl) {
+            const caseDetailsUrl = `${caseDetailsBaseUrl}/${caseId}`;
+            return res.redirect(caseDetailsUrl);
+          }
+        }
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
       }
 
