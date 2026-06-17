@@ -11,18 +11,16 @@ import {
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
   counterClaimSpecificSumOfMoney,
-  counterClaimUploadDocuments,
   counterClaimWhatAreYouClaimingFor,
   counterclaimYouNeedToApplyForHelpWithYourFees,
+  dashboard,
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveASolicitor,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
-  endNow,
-  equalityAndDiversityEnd,
-  equalityAndDiversityStart,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
@@ -195,7 +193,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+    });
+    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -284,18 +285,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
     await performAction('validateRTCSectionCYA', 'uploadFiles');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
-    });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -303,11 +292,17 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         taskList.incomeAndExpensesLink,
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
-        taskList.declareRecentPaymentsHiddenLink,
       ],
       status: 'Done',
     });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('clickButton', 'Submit');
+    await performAction('clickButton', 'Close and return to case overview');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Respond to a claim - Wales - Standard contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes @noDefendants', async () => {
@@ -395,7 +390,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await performAction('clickButton', counterClaimUploadDocuments.continueButton);
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);

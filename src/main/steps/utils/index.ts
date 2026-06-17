@@ -48,4 +48,11 @@ export { formatDatePartsToISODate, formatIsoDate, parseISOToDateParts } from './
 export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
 export { hasSkippedEqualityAndDiversityQuestions } from './equalityAndDiversityFromCase';
 export { hasMadeCounterClaim } from './hasMadeCounterClaim';
+export { counterClaimUploadWanted } from './counterClaimUploadWanted';
 export { hasMultipleParties } from './hasMultipleParties';
+export {
+  getRespondToClaimConfirmationPath,
+  shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
+  shouldShowResponseSubmittedConfirmationStep,
+} from './postSubmissionRouting';

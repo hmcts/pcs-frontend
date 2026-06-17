@@ -1,7 +1,12 @@
 import { Page, expect } from '@playwright/test';
 
-import { performValidation } from '../../controller';
+import { submitCaseApiData } from '../../../data/api-data';
+import { dashboard } from '../../../data/page-data';
+import { viewAllApplications } from '../../../data/page-data/genApps-page-data';
+import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
+
+import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
 
 export class CitizenDashboardAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -14,6 +19,7 @@ export class CitizenDashboardAction implements IAction {
         'verifyNavigationFromNotificationLink',
         () => this.verifyNavigationFromNotificationLink(page, fieldName as actionRecord),
       ],
+      ['validateViewAllApplications', () => this.validateViewAllApplications()],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -57,7 +63,7 @@ export class CitizenDashboardAction implements IAction {
         hasText: String(notificationData.viewResponseHeader),
       });
       await expect(vireResponseTask.locator('.govuk-task-list__status')).toHaveText(
-        String(notificationData.viewResponsetag)
+        String(notificationData.viewResponseTag)
       );
     } else {
       // Verify link is deactivated (not rendered as a link)
@@ -80,5 +86,35 @@ export class CitizenDashboardAction implements IAction {
     await yourResponseLink.click();
     await performValidation('mainHeader', notificationData.nextPageHeader);
     await page.goBack();
+  }
+
+  private async validateViewAllApplications(): Promise<void> {
+    await performAction('clickLink', dashboard.viewAllApplicationsLink);
+    await performValidation('mainHeader', viewAllApplications.mainHeader);
+    await performValidation('text', { elementType: 'paragraph', text: viewAllApplications.getCaseNumber() });
+    await performValidation('text', { elementType: 'subHeader', text: viewAllApplications.yourApplicationsSubHeader });
+    const firstName = pinUsers[0]?.firstName;
+    if (firstName === submitCaseApiData.submitCasePayload.defendant1.firstName) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: viewAllApplications.generalApplicationGA1Defendant1Link,
+      });
+    }
+    if (firstName === submitCaseApiData.submitCasePayload.additionalDefendants?.[0]?.value?.firstName) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: viewAllApplications.generalApplicationGA1Defendant2Link,
+      });
+    }
+    if (firstName === submitCaseApiData.submitCasePayload.additionalDefendants?.[1]?.value?.firstName) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: viewAllApplications.generalApplicationGA1Defendant3Link,
+      });
+    }
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: 'Submitted on ' + viewAllApplications.getSubmittedDate(),
+    });
   }
 }
