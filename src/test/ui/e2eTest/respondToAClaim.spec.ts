@@ -417,7 +417,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
     await performValidation('mainHeader', dashboard.mainHeader);
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
+    await performAction('clickLink', `view-documents`);
     await performAction('validateViewDocuments', {
       documents: [
         {
