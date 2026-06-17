@@ -4,6 +4,14 @@ jest.mock('@modules/steps', () => ({
     getNextStepUrl: jest.fn().mockResolvedValue('/documents-uploaded'),
   })),
   getFormData: jest.fn(),
+  getTranslationFunction: jest.fn(() => (key: string) => {
+    const translations: Record<string, string> = {
+      'errors.submitFailed': 'Your files were not submitted. Try again.',
+      'errors.title': 'There is a problem',
+    };
+    return translations[key] ?? key;
+  }),
+  loadStepNamespace: jest.fn(),
 }));
 
 jest.mock('@modules/documents/storage', () => ({
@@ -112,5 +120,30 @@ describe('upload-additional-documents check-your-answers POST', () => {
     expect(mockSubmit).toHaveBeenCalledTimes(1);
     const [, payload] = mockSubmit.mock.calls[0];
     expect(payload.data.selectedRelatedApplicationId).toBeUndefined();
+  });
+
+  it('renders the AC05 error and does not progress when submit fails', async () => {
+    mockGetFormData.mockReturnValue(undefined);
+    mockSubmit.mockRejectedValueOnce(new Error('database unavailable'));
+    const res = buildRes();
+
+    await step.postController!.post!(buildReq(), res, jest.fn());
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.render).toHaveBeenCalledWith(
+      'case-tasks/upload-additional-documents/check-your-answers/checkYourAnswers.njk',
+      expect.objectContaining({
+        errorSummary: {
+          titleText: 'There is a problem',
+          errorList: [
+            {
+              text: 'Your files were not submitted. Try again.',
+              href: '#submit',
+            },
+          ],
+        },
+      })
+    );
+    expect(res.redirect).not.toHaveBeenCalled();
   });
 });

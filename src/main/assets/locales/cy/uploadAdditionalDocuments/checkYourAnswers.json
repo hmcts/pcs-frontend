@@ -3,5 +3,8 @@
   "heading": "cyCheck your answers",
   "relatedApplicationLabel": "cyRelated application",
   "documentsLabel": "cyUploaded documents",
-  "documentsNone": "cyNo documents uploaded"
+  "documentsNone": "cyNo documents uploaded",
+  "errors": {
+    "submitFailed": "cyYour files were not submitted. Try again."
+  }
 }

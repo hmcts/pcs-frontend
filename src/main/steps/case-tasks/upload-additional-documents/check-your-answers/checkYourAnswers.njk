@@ -1,5 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "macros/csrf.njk" import csrfProtection %}
 
@@ -7,6 +8,10 @@
 {% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
 
 {% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
   <h1 class="govuk-heading-l">{{ t('heading') }}</h1>
 
   {% set documentsHtml %}
@@ -71,7 +76,7 @@
     <div class="govuk-button-group">
       {{ govukButton({
         text: t('buttons.submit', { ns: 'common' }),
-        attributes: { type: 'submit' }
+        attributes: { type: 'submit', id: 'submit' }
       }) }}
       <p class="govuk-body">
         <a href="{{ cancelUrl }}" class="govuk-link">{{ t('buttons.cancel', { ns: 'common' }) }}</a>
