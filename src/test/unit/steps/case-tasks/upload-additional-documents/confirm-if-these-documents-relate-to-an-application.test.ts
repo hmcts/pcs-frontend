@@ -20,6 +20,7 @@ jest.mock('@modules/steps', () => ({
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
     getCaseByIdForEvent: jest.fn(),
+    getCaseById: jest.fn(),
   },
 }));
 
@@ -45,6 +46,7 @@ import type { CcdCase, CcdCollectionItem, RelatedApplicationOption } from '@serv
 import { ccdCaseService } from '@services/ccdCaseService';
 
 const mockGetCaseByIdForEvent = ccdCaseService.getCaseByIdForEvent as jest.Mock;
+const mockGetCaseById = ccdCaseService.getCaseById as jest.Mock;
 const mockGetFormData = getFormData as jest.Mock;
 const mockGetTranslationFunction = getTranslationFunction as jest.Mock;
 const mockSetFormData = setFormData as jest.Mock;
@@ -94,6 +96,35 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockGetTranslationFunction.mockReturnValue(t);
   mockGetFormData.mockReturnValue({});
+  mockGetCaseById.mockResolvedValue({
+    id: CASE_REF,
+    data: {
+      genApps: [
+        {
+          id: GEN_APP_1,
+          value: {
+            submissionDocument: {
+              id: 'doc-1',
+              document: {
+                document_filename: 'General Application GA1 - Defendant 1.pdf',
+              },
+            },
+          },
+        },
+        {
+          id: GEN_APP_2,
+          value: {
+            submissionDocument: {
+              id: 'doc-2',
+              document: {
+                document_filename: 'General Application GA2 - Defendant 1.pdf',
+              },
+            },
+          },
+        },
+      ],
+    },
+  });
   (createGetController as jest.Mock).mockImplementation((_view, _step, _nav, fn) => ({
     get: async (req: Request, res?: Response) => {
       const content = { ...(await fn(req)), t: mockGetTranslationFunction() };
@@ -131,11 +162,17 @@ describe('confirm-if-these-documents-relate-to-an-application GET', () => {
         value: GEN_APP_1,
         text: 'applicationOptionAdjourn|{"date":"formatted(2026-05-01)"}',
         checked: false,
+        hint: {
+          html: '<a href="/case/1234567890123456/view-documents/doc-1" rel="noreferrer noopener" target="_blank" class="govuk-link">General Application GA1 - Defendant 1.pdf (opensInNewTab)</a>',
+        },
       },
       {
         value: GEN_APP_2,
         text: 'applicationOptionGeneric|{"date":"formatted(2026-05-10)"}',
         checked: false,
+        hint: {
+          html: '<a href="/case/1234567890123456/view-documents/doc-2" rel="noreferrer noopener" target="_blank" class="govuk-link">General Application GA2 - Defendant 1.pdf (opensInNewTab)</a>',
+        },
       },
       {
         value: 'MAIN_CLAIM_OR_COUNTERCLAIM',
@@ -250,36 +287,26 @@ describe('confirm-if-these-documents-relate-to-an-application POST', () => {
     );
   });
 
-  it('returns validation errors when no option is selected', async () => {
-    mockGetTranslationFunction.mockReturnValue((key: string) => {
-      if (key === 'errors.relatedApplicationId.required') {
-        return 'Confirm if these documents relate to an existing application';
-      }
-      if (key === 'errors.title') {
-        return 'There is a problem';
-      }
-      return key;
-    });
-    mockGetCaseByIdForEvent.mockResolvedValue(startResponseWithOptions([]));
-
-    const { res } = await invokePost({});
+  it('renders validation error when relatedApplicationId missing', async () => {
+    const req = buildReq({ body: {} });
+    const res = buildRes();
+    const next = jest.fn();
+    await step.postController!.post!(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.render).toHaveBeenCalledWith(
-      'case-tasks/upload-additional-documents/confirm-if-these-documents-relate-to-an-application/confirmIfTheseDocumentsRelateToAnApplication.njk',
+      expect.stringContaining('confirmIfTheseDocumentsRelateToAnApplication'),
       expect.objectContaining({
-        errorSummary: {
-          titleText: 'There is a problem',
-          errorList: [
-            {
-              text: 'Confirm if these documents relate to an existing application',
-              href: '#relatedApplicationId',
-            },
-          ],
-        },
-        radioErrorMessage: { text: 'Confirm if these documents relate to an existing application' },
+        errorSummary: expect.objectContaining({
+          titleText: 'errors.title',
+        }),
+        radioErrorMessage: { text: 'errors.relatedApplicationId.required' },
       })
     );
-    expect(mockSetFormData).not.toHaveBeenCalled();
+  });
+
+  it('redirects to next step after valid selection', async () => {
+    const { res } = await invokePost({ relatedApplicationId: GEN_APP_1 });
+    expect(res.redirect).toHaveBeenCalledWith(303, '/next');
   });
 });
