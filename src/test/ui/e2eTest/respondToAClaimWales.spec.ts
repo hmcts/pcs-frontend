@@ -2,6 +2,7 @@ import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.dat
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
   checkYourAnswersRTC,
+  confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
@@ -163,8 +164,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
-    await performAction('clickRadioButton', rentArrears.yesRadioOption);
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown');
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption,
+    });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -364,8 +370,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
-    await performAction('clickRadioButton', rentArrears.yesRadioOption);
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption,
+    });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -487,41 +494,42 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterTenancyStartDetailsUnKnown');
     // The below step should be enabled after the bug fix - https://tools.hmcts.net/jira/browse/HDPI-6021
-    // await performAction('selectNoticeDetails', {
-    //   option: confirmationOfNoticeGiven.imNotSureRadioOption,
-    // });
-    //   await performAction('clickRadioButton', rentArrears.yesRadioOption);
-    //   await performAction('clickButton', rentArrears.saveAndContinueButton);
-    //   await performValidation('mainHeader', counterClaim.mainHeader);
-    //   await performAction('clickButton', counterClaim.saveAndContinueButton);
-    //   await performAction('readPaymentInterstitial');
-    //   await performAction('repaymentsMade', {
-    //     question: repaymentsMade.getmainHeader(claimantName),
-    //     repaymentOption: repaymentsMade.noRadioOption,
-    //   });
-    //   await performAction('repaymentsAgreed', {
-    //     repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    //   });
-    //   await performAction('installmentPayments', {
-    //     question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-    //     radioOption: installmentPayments.noRadioOption,
-    //   });
-    //   await performAction('readYourHouseholdAndCircumstances');
-    //   await performAction('doYouHaveAnyDependantChildren', {
-    //     dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
-    //   });
-    //   await performAction('doYouHaveAnyOtherDependants', {
-    //     otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
-    //     otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
-    //   });
-    //   await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-    //     radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-    //     details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
-    //   });
-    //   await performAction('selectAlternativeAccommodation', {
-    //     radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
-    //   });
-    //   await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.imNotSureRadioOption,
+    });
+    await performAction('clickRadioButton', rentArrears.yesRadioOption);
+    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.noRadioOption,
+    });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
   test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - No @noDefendants @regression', async () => {
