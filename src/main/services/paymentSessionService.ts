@@ -24,6 +24,14 @@ export function setPaymentSessionState(req: Request, paymentSessionState: Paymen
   };
 }
 
+export async function persistPaymentSessionState(
+  req: Request,
+  paymentSessionState: PaymentSessionState
+): Promise<void> {
+  setPaymentSessionState(req, paymentSessionState);
+  await saveSession(req);
+}
+
 export function getPaymentSessionState(req: Request): PaymentSessionState | undefined {
   return req.session.payment;
 }
