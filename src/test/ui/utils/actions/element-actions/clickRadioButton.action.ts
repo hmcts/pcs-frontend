@@ -28,7 +28,9 @@ export class ClickRadioButtonAction implements IAction {
     }
 
     const questionLocator = page
-      .locator('p.govuk-heading-m, h2.govuk-heading-m, h1.govuk-fieldset__heading, p.govuk-fieldset__legend')
+      .locator(
+        'p.govuk-heading-m, h2.govuk-heading-m, h1.govuk-fieldset__heading, p.govuk-fieldset__legend, h1.govuk-heading-l'
+      )
       .filter({ hasText: question as string })
       .nth(idx);
 
