@@ -3,6 +3,8 @@ export * from './claims.page.data';
 export * from './startNow.page.data';
 export * from './disputeClaimInterstitial.page.data';
 export * from './freeLegalAdvice.page.data';
+export * from './askYourSolicitorToRespond.page.data';
+export * from './doYouHaveASolicitor.page.data';
 export * from './defendantNameCapture.page.data';
 export * from './defendantDateOfBirth.page.data';
 export * from './correspondenceAddress.page.data';
