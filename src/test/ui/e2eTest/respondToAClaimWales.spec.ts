@@ -439,7 +439,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Other contract - @noDefendants', async () => {
+  test('Respond to a claim - Wales - Other contract - Rent Arrears @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -493,12 +493,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnown');
-    // The below step should be enabled after the bug fix - https://tools.hmcts.net/jira/browse/HDPI-6021
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.imNotSureRadioOption,
     });
-    await performAction('clickRadioButton', rentArrears.yesRadioOption);
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption,
+    });
     await performAction('selectCounterClaim', {
       option: counterClaim.noRadioOption,
     });
@@ -591,6 +591,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknown');
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -678,6 +682,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       day: '01',
       month: '12',
       year: '2025',
+    });
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,

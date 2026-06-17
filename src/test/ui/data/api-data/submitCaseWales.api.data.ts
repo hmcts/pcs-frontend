@@ -393,7 +393,7 @@ export const submitCaseApiDataWales = {
     preActionProtocolCompleted: 'NO',
     mediationAttempted: 'NO',
     settlementAttempted: 'NO',
-    walesNoticeServed: 'No',
+    walesNoticeServed: 'YES',
     claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
