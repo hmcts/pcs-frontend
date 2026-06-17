@@ -21,7 +21,7 @@ import { getRespondToClaimSubmitNavigation } from '../steps/utils/postSubmission
 
 import { Logger } from '@modules/logger';
 import type { CcdCase } from '@services/ccdCase.interface';
-import { setPaymentSessionState } from '@services/paymentSessionService';
+import { persistPaymentSessionState } from '@services/paymentSessionService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('finalSubmit');
@@ -159,7 +159,7 @@ export default function finalSubmitRoutes(app: Application): void {
 
       if (counterClaimFeePaymentRequired) {
         const counterClaim = validatedCase.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
-        setPaymentSessionState(req, {
+        await persistPaymentSessionState(req, {
           caseReference: caseId,
           serviceRequestReference: paymentPayload!.serviceRequestReference,
           feeAmount: paymentPayload!.feeAmount,
