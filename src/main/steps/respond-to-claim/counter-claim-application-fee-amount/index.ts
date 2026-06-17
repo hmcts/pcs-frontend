@@ -16,6 +16,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
+    notApplicable: 'notApplicable',
     counterClaimAmountLabel: 'counterClaimAmountLabel',
     counterClaimFeeLabel: 'counterClaimFeeLabel',
     payNowButton: 'payNowButton',
@@ -59,6 +60,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const paymentQuery = req.query?.payment;
     const showPaymentError = paymentQuery === 'failed' || paymentQuery === 'pending';
 
+    const backUrl = caseReference
+      ? `/case/${caseReference}/respond-to-claim/response-submitted-counter-claim-fee-payment-needed`
+      : '';
+
     return {
       formattedCounterClaimAmount:
         counterClaimAmount === undefined ? undefined : t('counterClaimAmountDisplay', { counterClaimAmount }),
@@ -67,6 +72,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       payNowUrl,
       payNowDisabled,
       showPaymentError,
+      backUrl,
     };
   },
 });

@@ -41,6 +41,20 @@ describe('counterClaimPaymentStart routes', () => {
   let app: Application;
   let mockGet: jest.Mock;
 
+  const createSession = (overrides: Record<string, unknown> = {}) => {
+    const session = {
+      user: { accessToken: 'token-1' },
+      ...overrides,
+    } as Record<string, unknown>;
+
+    session.save = jest.fn(callback => {
+      callback?.(undefined);
+      return session;
+    });
+
+    return session;
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet = jest.fn();
@@ -106,13 +120,12 @@ describe('counterClaimPaymentStart routes', () => {
     const req = {
       language: 'en',
       params: { caseReference: '123' },
-      session: {
-        user: { accessToken: 'token-1' },
+      session: createSession({
         payment: {
           serviceRequestReference: 'SR-1',
           feeAmount: 404,
         },
-      },
+      }),
     } as unknown as Request;
     const res = { redirect: jest.fn() } as unknown as Response;
     const next = jest.fn();
@@ -133,6 +146,7 @@ describe('counterClaimPaymentStart routes', () => {
         paymentReference: 'RC-1',
       })
     );
+    expect(req.session.save).toHaveBeenCalled();
     expect(res.redirect).toHaveBeenCalledWith(303, 'https://pay.example/next');
   });
 });

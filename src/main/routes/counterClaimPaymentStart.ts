@@ -5,7 +5,7 @@ import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { Logger } from '@modules/logger';
-import { setPaymentSessionState } from '@services/paymentSessionService';
+import { persistPaymentSessionState } from '@services/paymentSessionService';
 import { paymentService } from '@services/pcsApi/paymentService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -56,7 +56,7 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
           returnUrl: paymentReturnUrl,
         });
 
-        setPaymentSessionState(req, {
+        await persistPaymentSessionState(req, {
           caseReference,
           serviceRequestReference,
           feeAmount,

@@ -51,6 +51,20 @@ describe('finalSubmit routes', () => {
   let mockRouterParam: jest.Mock;
   let mockRouterUse: jest.Mock;
 
+  const createSession = (overrides: Record<string, unknown> = {}) => {
+    const session = {
+      user: { accessToken: 'mock-token' },
+      ...overrides,
+    } as Record<string, unknown>;
+
+    session.save = jest.fn(callback => {
+      callback?.(undefined);
+      return session;
+    });
+
+    return session;
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -215,9 +229,7 @@ describe('finalSubmit routes', () => {
 
       const req = {
         params: { caseReference: '1234567890123456' },
-        session: {
-          user: { accessToken: 'mock-token' },
-        },
+        session: createSession(),
       } as unknown as Request;
 
       const res = {
@@ -236,6 +248,7 @@ describe('finalSubmit routes', () => {
           counterClaimType: 'PAYMENT_OR_COMPENSATION',
         })
       );
+      expect(req.session.save).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(
         303,
         '/case/1234567890123456/respond-to-claim/response-submitted-counter-claim-fee-payment-needed'
@@ -274,9 +287,7 @@ describe('finalSubmit routes', () => {
 
       const req = {
         params: { caseReference: '1234567890123456' },
-        session: {
-          user: { accessToken: 'mock-token' },
-        },
+        session: createSession(),
       } as unknown as Request;
 
       const res = {
@@ -293,6 +304,7 @@ describe('finalSubmit routes', () => {
           feeAmount: 303,
         })
       );
+      expect(req.session.save).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(
         303,
         '/case/1234567890123456/respond-to-claim/response-submitted-counter-claim-fee-payment-needed'
