@@ -3,6 +3,8 @@ export default {
   'start-now': 'startNow',
   'free-legal-advice': 'freeLegalAdvice',
   home: 'home',
+  solicitor: 'doYouHaveASolicitor',
+  'ask-your-solicitor': 'askYourSolicitorToRespond',
   'what-other-regular-expenses-do-you-have': 'whatOtherRegularExpensesDoYouHave',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',

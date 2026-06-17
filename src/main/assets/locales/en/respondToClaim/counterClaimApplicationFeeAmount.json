@@ -1,6 +1,7 @@
 {
   "pageTitle": "Counterclaim application fee amount",
   "caption": "Respond to a property possession claim",
+  "notApplicable": "Not applicable",
   "counterClaimAmountLabel": "Counterclaim amount",
   "counterClaimFeeLabel": "Counterclaim fee",
   "counterClaimAmountDisplay": "{{counterClaimAmount, currency(currency: GBP)}}",

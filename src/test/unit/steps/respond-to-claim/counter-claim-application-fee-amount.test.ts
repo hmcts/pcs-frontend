@@ -107,6 +107,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
         payNowButton: 'Pay your counterclaim fee (£377)',
         payNowUrl: '/case/123/respond-to-claim/counter-claim-payment/start',
         payNowDisabled: false,
+        backUrl: '/case/123/respond-to-claim/response-submitted-counter-claim-fee-payment-needed',
       })
     );
   });
@@ -136,6 +137,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
         formattedCounterClaimAmount: undefined,
         formattedCounterClaimFee: '£35',
         payNowDisabled: false,
+        backUrl: '/case/123/respond-to-claim/response-submitted-counter-claim-fee-payment-needed',
       })
     );
   });
@@ -167,6 +169,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       expect.objectContaining({
         formattedCounterClaimAmount: '£2500',
         formattedCounterClaimFee: '£35',
+        backUrl: '/case/123/respond-to-claim/response-submitted-counter-claim-fee-payment-needed',
       })
     );
   });
@@ -196,6 +199,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
         formattedCounterClaimAmount: '£2500',
         formattedCounterClaimFee: '£35',
         payNowDisabled: false,
+        backUrl: '/case/123/respond-to-claim/response-submitted-counter-claim-fee-payment-needed',
       })
     );
   });
@@ -242,6 +246,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
         formattedCounterClaimAmount: '£6000',
         formattedCounterClaimFee: '£455',
         payNowButton: 'Pay your counterclaim fee (£455)',
+        backUrl: '/case/123/respond-to-claim/response-submitted-counter-claim-fee-payment-needed',
       })
     );
   });
