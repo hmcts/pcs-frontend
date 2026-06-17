@@ -70,6 +70,8 @@ export class ActionRegistry {
     ['selectNoticeDetails', new RespondToClaimAction()],
     ['enterNoticeDateKnown', new RespondToClaimAction()],
     ['enterNoticeDateUnknown', new RespondToClaimAction()],
+    ['selectDoYouHaveASolicitor', new RespondToClaimAction()],
+    ['askYourSolicitorToRespond', new RespondToClaimAction()],
     ['disputeClaimInterstitial', new RespondToClaimAction()],
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['repaymentsMade', new RespondToClaimAction()],

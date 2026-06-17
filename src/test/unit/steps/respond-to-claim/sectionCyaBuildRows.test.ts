@@ -41,6 +41,21 @@ describe('section-CYA row builders — characterisation', () => {
         '/case/1234123412341234/respond-to-claim/free-legal-advice?edit=startNowAndDetails'
       );
     });
+
+    it('renders the solicitor row when answered', () => {
+      const rows = buildStartNowRows(reqWith(model({ hasSolicitor: 'NO' })), t);
+      expect(rows).toHaveLength(1);
+      expect(rows[0].key.text).toBe('rows.hasSolicitor.label');
+      expect(rows[0].value.text).toBe('rows.hasSolicitor.options.NO');
+      expect(rows[0].actions?.items[0].href).toBe(
+        '/case/1234123412341234/respond-to-claim/solicitor?edit=startNowAndDetails'
+      );
+    });
+
+    it('renders free-legal-advice and solicitor rows in section order', () => {
+      const rows = buildStartNowRows(reqWith(model({ freeLegalAdvice: 'YES', hasSolicitor: 'YES' })), t);
+      expect(rows.map(r => r.key.text)).toEqual(['rows.freeLegalAdvice.label', 'rows.hasSolicitor.label']);
+    });
   });
 
   describe('personal-details', () => {
