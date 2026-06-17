@@ -11,6 +11,9 @@ import {
   isSomethingElseCounterClaim,
   isTenancyStartDateKnown,
   isWalesProperty,
+  shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
+  shouldShowResponseSubmittedConfirmationStep,
 } from '../utils';
 
 import {
@@ -45,6 +48,10 @@ export const flowConfig: JourneyFlowConfig = {
   // First visible step of any section back-links to this hub step.
   hubStepName: 'task-list',
   steps: {
+    'ask-your-solicitor-to-respond-to-the-claim': {
+      showCondition: (req: Request) =>
+        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',
+    },
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
     },
@@ -146,6 +153,18 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
+    },
+    'response-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-submitted-counter-claim-fee-payment-needed': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-and-counter-claim-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseAndCounterClaimSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
     },
   } satisfies Partial<Record<RespondToClaimStepName, StepConfig>>,
 };

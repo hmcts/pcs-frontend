@@ -1,5 +1,6 @@
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
+import { step as askYourSolicitorToRespondToTheClaim } from './ask-your-solicitor-to-respond-to-the-claim';
 import { step as checkYourAnswers } from './check-your-answers';
 import { step as checkYourAnswersDocuments } from './check-your-answers-documents';
 import { step as checkYourAnswersIncomeAndExpenses } from './check-your-answers-income-and-expenses';
@@ -55,7 +56,11 @@ import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
+import { step as responseAndCounterClaimSubmitted } from './response-and-counter-claim-submitted';
+import { step as responseSubmitted } from './response-submitted';
+import { step as responseSubmittedCounterClaimFeePaymentNeeded } from './response-submitted-counter-claim-fee-payment-needed';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
+import { step as solicitor } from './solicitor';
 import { step as startNow } from './start-now';
 import { step as taskList } from './task-list';
 import { step as tenancyDateDetails } from './tenancy-date-details';
@@ -71,6 +76,8 @@ export const stepRegistry = {
   'start-now': startNow,
   'correspondence-address': correspondenceAddress,
   'free-legal-advice': freeLegalAdvice,
+  solicitor,
+  'ask-your-solicitor-to-respond-to-the-claim': askYourSolicitorToRespondToTheClaim,
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
@@ -135,6 +142,9 @@ export const stepRegistry = {
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,
   'check-your-answers': checkYourAnswers,
+  'response-submitted': responseSubmitted,
+  'response-submitted-counter-claim-fee-payment-needed': responseSubmittedCounterClaimFeePaymentNeeded,
+  'response-and-counter-claim-submitted': responseAndCounterClaimSubmitted,
 } satisfies Record<string, StepDefinition>;
 
 export type RespondToClaimStepName = keyof typeof stepRegistry;
