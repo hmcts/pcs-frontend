@@ -76,22 +76,25 @@ export interface ViewTheClaimCopy {
   label: (key: string, options?: Record<string, unknown>) => string;
   text: (key: string, options?: Record<string, unknown>) => string;
   personsUnknown: string;
+  locale: string;
 }
 
 export function buildViewTheClaimPageData(
   caseReference: string,
   caseData: CcdCaseData,
-  t: TFunction
+  t: TFunction,
+  language?: string
 ): ViewTheClaimPageData {
-  const copy = createViewTheClaimCopy(t);
+  const locale = toDateLocale(language);
+  const copy = createViewTheClaimCopy(t, locale);
   const data = caseData as UnknownRecord;
   const documents = extractCaseDocuments(data);
   const propertyAddress = data.propertyAddress;
   const propertyAddressHtml = addressHtml(propertyAddress);
   const propertyAddressText = addressText(propertyAddress);
   const claimant = claimantName(data, copy);
-  const claimIssueDateText = formatDate(getValue(data, 'claimIssueDate'));
-  const claimSubmittedDateText = formatDate(getFirstValue(data, ['submittedOn', 'claimSubmittedDate']));
+  const claimIssueDateText = formatDate(getValue(data, 'claimIssueDate'), locale);
+  const claimSubmittedDateText = formatDate(getFirstValue(data, ['submittedOn', 'claimSubmittedDate']), locale);
   const pageMetadataRows = sectionRows([
     claimIssueDateText ? summaryRow(t('viewTheClaim:dateIssued'), { text: claimIssueDateText }) : undefined,
     claimSubmittedDateText ? summaryRow(t('viewTheClaim:dateSubmitted'), { text: claimSubmittedDateText }) : undefined,
@@ -135,13 +138,19 @@ export function buildViewTheClaimPageData(
   };
 }
 
-function createViewTheClaimCopy(t: TFunction): ViewTheClaimCopy {
+function createViewTheClaimCopy(t: TFunction, locale: string): ViewTheClaimCopy {
   return {
     section: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:sections.${key}`, options),
     label: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:labels.${key}`, options),
     text: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:${key}`, options),
     personsUnknown: t('viewTheClaim:personsUnknown'),
+    locale,
   };
+}
+
+/** Maps an application language code to the Luxon locale used for date formatting. */
+export function toDateLocale(language?: string): string {
+  return language?.toLowerCase() === 'cy' ? 'cy' : 'en-gb';
 }
 
 export function section(title: string, rows: (ViewTheClaimSummaryRow | undefined)[]): ViewTheClaimSection | undefined {
@@ -472,24 +481,24 @@ export function noticeDateTimeValue(data: UnknownRecord): unknown {
   ]);
 }
 
-export function formatDate(value: unknown): string | undefined {
+export function formatDate(value: unknown, locale = 'en-gb'): string | undefined {
   const text = getStringFromValue(value);
   if (!text) {
     return undefined;
   }
 
   const date = DateTime.fromISO(text, { zone: 'utc' });
-  return date.isValid ? date.setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y') : text;
+  return date.isValid ? date.setZone('Europe/London').setLocale(locale).toFormat('d LLLL y') : text;
 }
 
-export function formatTime(value: unknown): string | undefined {
+export function formatTime(value: unknown, locale = 'en-gb'): string | undefined {
   const text = getStringFromValue(value);
   if (!text || !text.includes('T')) {
     return undefined;
   }
 
   const date = DateTime.fromISO(text, { zone: 'utc' });
-  return date.isValid ? date.setZone('Europe/London').setLocale('en-gb').toFormat('HH:mm') : undefined;
+  return date.isValid ? date.setZone('Europe/London').setLocale(locale).toFormat('HH:mm') : undefined;
 }
 
 export function formatMoney(value: unknown): string | undefined {

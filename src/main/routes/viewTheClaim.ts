@@ -3,7 +3,7 @@ import { Application, NextFunction, Request, Response } from 'express';
 import { HTTPError } from '../HttpError';
 import { VIEW_THE_CLAIM_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
-import { getTranslationFunction } from '../modules/i18n';
+import { getRequestLanguage, getTranslationFunction } from '../modules/i18n';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -22,9 +22,10 @@ export default function viewTheClaimRoutes(app: Application): void {
       const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
       const dashboardUrl = getDashboardUrl(caseReference);
       const t = getTranslationFunction(req, ['common', 'dashboard', 'viewTheClaim']);
+      const language = getRequestLanguage(req);
 
       res.render('view-the-claim', {
-        ...buildViewTheClaimPageData(caseReference, ccdCase.data, t),
+        ...buildViewTheClaimPageData(caseReference, ccdCase.data, t, language),
         dashboardUrl,
         backUrl: dashboardUrl,
       });

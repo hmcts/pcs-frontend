@@ -214,8 +214,8 @@ export function buildNoticeDetailsSection(
       copy.label('noticeServiceMethod'),
       enumText(getValue(data, 'notice_NoticeServiceMethod'), NOTICE_SERVICE_METHOD_LABELS)
     ),
-    textRow(copy.label('noticeDate'), formatDate(noticeDateTime)),
-    textRow(copy.label('noticeTime'), formatTime(noticeDateTime)),
+    textRow(copy.label('noticeDate'), formatDate(noticeDateTime, copy.locale)),
+    textRow(copy.label('noticeTime'), formatTime(noticeDateTime, copy.locale)),
     textRow(copy.label('noticePersonName'), getString(data, 'notice_NoticePersonName')),
     textRow(copy.label('noticeEmailAddress'), getString(data, 'notice_NoticeEmailAddress')),
     textRow(copy.label('noticeOtherElectronic'), getString(data, 'notice_NoticeOtherElectronicMethodExplanation')),
@@ -252,7 +252,7 @@ export function buildTenancySection(
     ),
     textRow(
       copy.label('tenancyStartDate'),
-      formatDate(getFirstValue(data, ['tenancy_TenancyLicenceDate', 'licenceStartDate']))
+      formatDate(getFirstValue(data, ['tenancy_TenancyLicenceDate', 'licenceStartDate']), copy.locale)
     ),
     textRow(copy.label('tenancyCopy'), yesNoText(getValue(data, 'tenancy_HasCopyOfTenancyLicence'))),
     textRow(copy.label('tenancyNoCopyReason'), getString(data, 'tenancy_ReasonsForNoTenancyLicenceDocuments')),
