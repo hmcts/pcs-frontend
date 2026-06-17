@@ -38,7 +38,7 @@ export class respondPossessionClaimAPIAction implements IAction {
 
     switch (type) {
       case 'midEvent':
-        await this.respondPossessionClaimMidEvent(respondPossessionClaimPayloadData);
+        await this.respondPossessionClaimMidEvent(respondPossessionClaimApi);
         break;
 
       case 'submit':
@@ -47,13 +47,13 @@ export class respondPossessionClaimAPIAction implements IAction {
 
       case 'both':
       default:
-        await this.respondPossessionClaimMidEvent(respondPossessionClaimPayloadData);
+        await this.respondPossessionClaimMidEvent(respondPossessionClaimApi);
 
         await this.submitRespondPossessionClaim(respondPossessionClaimApi, RESPONDCLAIM_EVENT_TOKEN);
     }
   }
 
-  private async respondPossessionClaimMidEvent(payload: actionData): Promise<void> {
+  /*private async respondPossessionClaimMidEvent(payload: actionData): Promise<void> {
     try {
       const respondPossessionClaimMidEventApi = Axios.create(
         respondPossessionClaimMidEventApiData.respondPossessionClaimMidEventApiInstance()
@@ -88,6 +88,48 @@ export class respondPossessionClaimAPIAction implements IAction {
       throw new Error('respondPossessionClaimMidEvent failed due to an unexpected error.');
     }
   }
+*/
+  private async respondPossessionClaimMidEvent(
+    respondPossessionClaimMidEventApi: ReturnType<typeof Axios.create>
+  ): Promise<void> {
+    const midEventRequest = {
+      event: {
+      id: 'respondPossessionClaim',
+      summary: 'Citizen respondPossessionClaim draft save summary',
+      description: 'Citizen respondPossessionClaim draft save description'
+    },
+    case_reference: process.env.CASE_NUMBER,
+    event_data: { 
+      possessionClaimResponse: respondPossessionClaimMidEventApiData.respondPossessionClaimPayload.event_data.possessionClaimResponse },
+    ignore_warning: false,
+  };
+  try {
+      console.log('RESPONDTOCLAIM MID EVENT REQUEST:\n', JSON.stringify(midEventRequest, null, 2));
+
+      await respondPossessionClaimMidEventApi.post(
+        respondPossessionClaimApiData.respondPossessionClaimApiEndPoint(),
+        midEventRequest
+      );
+     console.log('RESPONDTOCLAIM MID EVENT REQUEST:\n', JSON.stringify(midEventRequest, null, 2));
+
+      const midEventResponse = await respondPossessionClaimMidEventApi.post(
+        respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint(),
+        midEventRequest
+      );
+
+      console.log('MID EVENT RESPONSE:\n', JSON.stringify(midEventResponse.data, null, 2));
+    } catch (error: unknown) {
+      if (Axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        throw new Error(
+          `respondPossessionClaimMidEvent failed${status ? ` with status ${status}` : ''}. ${error.message}`
+        );
+      }
+
+      throw new Error('respondPossessionClaimMidEvent failed due to an unexpected error.');
+    }
+}
 
   private async submitRespondPossessionClaim(
     respondPossessionClaimApi: ReturnType<typeof Axios.create>,

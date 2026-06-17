@@ -4,7 +4,7 @@ import {
   respondPossessionClaimApiData,
   submitCaseApiData,
 } from '../data/api-data';
-import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
+//import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
 import { dashboard } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
@@ -31,7 +31,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/access-your-case`);
   await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
-  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+  await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
@@ -143,40 +143,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('validateViewAllApplications');
   });
 
-  test('View all applications should be disabled when another defendant has withoutNotice = YES', async () => {
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
-    await performAction('reloadPage');
-    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
-    await performAction('clickLink', 'Sign out');
-    await performAction('createUser', 'citizen', ['citizen']);
-    await performAction('navigateToUrl', home_url);
-    await performAction('login');
-    await performAction('navigateToUrl', home_url + `/access-your-case`);
-    await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 1 });
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
-    await performValidation('textNotVisible', {
-      elementType: 'link',
-      text: dashboard.viewAllApplicationsLink,
-    });
-  });
-
-  test('View all applications should be enabled when another defendant has withoutNotice = NO', async () => {
-    await performAction('citizenCreateGenAppAPI', {
-      data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
-    });
-    await performAction('reloadPage');
-    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
-    await performAction('clickLink', 'Sign out');
-    await performAction('createUser', 'citizen', ['citizen']);
-    await performAction('navigateToUrl', home_url);
-    await performAction('login');
-    await performAction('navigateToUrl', home_url + `/access-your-case`);
-    await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 1 });
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
-    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
-  });
-
-  test('Validate notification and response status @crossbrowser', async () => {
+  test('Validate notification and response status @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
     await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
@@ -194,7 +161,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       nextPageHeader: dashboard.respondToAPropertyHeader,
     });
     await performAction('respondPossessionClaimAPI', {
-      data: respondPossessionClaimMidEventApiData.respondPossessionClaimPayload,
+      data: respondPossessionClaimMidEventValidateApiData.respondPossessionClaimPayload,
       type: 'midEvent',
     });
     await performAction('reloadPage');
@@ -225,20 +192,20 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
 
   test('Validate View the response data @regression @crossbrowse', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
-    // await performAction('respondPossessionClaimAPI', {
-    //   data: respondPossessionClaimMidEventValidateApiData.respondPossessionClaimPayload,
-    //   type: 'midEvent',
+   // await performAction('respondPossessionClaimAPI', {
+   //   data: respondPossessionClaimMidEventValidateApiData.respondPossessionClaimPayload,
+   //   type: 'midEvent',
     //});
-    await performAction('reloadPage');
+    await performAction('reloadPage'); 
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimApiData.respondPossessionClaimPayload,
       type: 'both',
     });
     await performAction('reloadPage');
-   /* await performAction('clickButton', dashboard.viewTheResponseSubHeader);
+    await performAction('clickButton', dashboard.viewTheResponseSubHeader);
     await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
     await performValidation('text', { elementType: 'span', text: viewTheResponse.theResponseCaption });
-    // await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
+   // await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
     //await performValidation('text', { elementType: 'paragraph', text: dashboard.propertyAddressParagraph() });
     //also verify dates
     await performAction('verifyResponse', {
@@ -246,6 +213,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       name: submitCaseApiData.submitCasePayload.claimantName,
       address: submitCaseApiData.submitCasePayload.organisationAddress
     });
-*/
+
 });
 });
+

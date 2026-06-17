@@ -7,6 +7,7 @@ import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
+import { respondPossessionClaimMidEventApiData } from '../../../data/api-data/respondPossessionClaimMidEvent.api.data';
 
 export class CitizenDashboardAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -20,6 +21,7 @@ export class CitizenDashboardAction implements IAction {
         () => this.verifyNavigationFromNotificationLink(page, fieldName as actionRecord),
       ],
       ['validateViewAllApplications', () => this.validateViewAllApplications()],
+       ['verifyResponse', () => this.verifyResponse(fieldName as actionRecord, page)],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -117,4 +119,46 @@ export class CitizenDashboardAction implements IAction {
       text: 'Submitted on ' + viewAllApplications.getSubmittedDate(),
     });
   }
+  private async verifyResponse( responseData: actionRecord, page: Page) {
+
+    await performValidation('text', { elementType: 'subHeader', text: responseData.header });
+    const viewResponse = new Map<string, string>();
+    const expectedResponse = new Map<string, string>();
+
+const summaryList = page.locator('h2.govuk-heading-m:text("Defendant 1 details") + dl.govuk-summary-list');
+const rows = summaryList.locator('.govuk-summary-list__row');
+const count = await rows.count();
+for (let i = 0; i < count; i++) {
+  const key = (await rows.nth(i).locator('.govuk-summary-list__key').textContent())?.trim() ?? '';
+  const value = (await rows.nth(i).locator('.govuk-summary-list__value').textContent())?.trim() ?? '';
+  viewResponse.set(key, value);
+}
+console.log(viewResponse);
+
+switch (responseData.header) {
+  case 'Defendant 1 details':
+    expectedResponse.set(`Name`, respondPossessionClaimMidEventApiData.respondPossessionClaimPayload.event_data.possessionClaimResponse.defendantContactDetails.party.firstName);
+
+    abc = 1;
+
+    break;
+
+  case 'Claimant details':
+
+    abc = 12;
+
+    break;
+
+  default:
+
+    abc = 0;
+
+    break;
+
+}
+
+
+
+  }
+
 }
