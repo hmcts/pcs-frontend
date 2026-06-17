@@ -47,7 +47,6 @@ import finalSubmitRoutes from '../../../main/routes/finalSubmit';
 describe('finalSubmit routes', () => {
   let app: Application;
   let mockUse: jest.Mock;
-  let mockRouterGet: jest.Mock;
   let mockRouterPost: jest.Mock;
   let mockRouterParam: jest.Mock;
   let mockRouterUse: jest.Mock;
@@ -55,14 +54,12 @@ describe('finalSubmit routes', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockRouterGet = jest.fn();
     mockRouterPost = jest.fn();
     mockRouterParam = jest.fn();
     mockRouterUse = jest.fn();
     mockUse = jest.fn();
 
     const mockRouter = {
-      get: mockRouterGet,
       post: mockRouterPost,
       param: mockRouterParam,
       use: mockRouterUse,
@@ -82,12 +79,9 @@ describe('finalSubmit routes', () => {
       expect(mockRouterParam).toHaveBeenCalledWith('caseReference', mockCaseReferenceParamMiddleware);
     });
 
-    it('should apply requireEventAccess(respondPossessionClaim) only on final-submit and confirmation paths', () => {
+    it('should apply requireEventAccess(respondPossessionClaim) only on final-submit', () => {
       expect(mockRequireEventAccess).toHaveBeenCalledWith('respondPossessionClaim');
-      expect(mockRouterUse).toHaveBeenCalledWith(
-        ['/:caseReference/final-submit', '/:caseReference/confirmation'],
-        mockRequireEventAccessHandler
-      );
+      expect(mockRouterUse).toHaveBeenCalledWith(['/:caseReference/final-submit'], mockRequireEventAccessHandler);
     });
 
     it('should mount router under /case path', () => {

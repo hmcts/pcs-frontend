@@ -42,7 +42,6 @@ export default function finalSubmitRoutes(app: Application): void {
   // Create dedicated router for final submit routes
   const finalSubmitRouter: Router = createRouter({ mergeParams: true });
 
-  // Apply param middleware - validates the case reference format
   finalSubmitRouter.param('caseReference', caseReferenceParamMiddleware);
 
   // Check user has access to the case via the respondPossessionClaim event and
@@ -54,30 +53,7 @@ export default function finalSubmitRoutes(app: Application): void {
   // here — and req.params.caseReference is NOT populated at the mount-path
   // level (the mount is '/case', not '/case/:caseReference'), causing a
   // spurious "Missing case reference" 404.
-  finalSubmitRouter.use(
-    ['/:caseReference/final-submit', '/:caseReference/confirmation'],
-    requireEventAccess('respondPossessionClaim')
-  );
-
-  // GET: Display final submit page
-  finalSubmitRouter.get('/:caseReference/final-submit', oidcMiddleware, (req: Request, res: Response) => {
-    const validatedCase = res.locals.validatedCase;
-
-    if (!validatedCase) {
-      logger.error('Final submit: validatedCase is undefined - middleware not executed');
-      return res.status(500).render('error', {
-        error: 'Internal server error',
-      });
-    }
-
-    const caseId = validatedCase.id;
-    const error = req.query.error as string | undefined;
-
-    return res.render('finalSubmit', {
-      caseId,
-      error: error === 'failed' ? 'Failed to submit response. Please try again.' : undefined,
-    });
-  });
+  finalSubmitRouter.use(['/:caseReference/final-submit'], requireEventAccess('respondPossessionClaim'));
 
   // POST: Submit to CCD with minimal data
   finalSubmitRouter.post('/:caseReference/final-submit', oidcMiddleware, async (req: Request, res: Response) => {
