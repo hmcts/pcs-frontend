@@ -104,18 +104,21 @@ export class respondPossessionClaimAPIAction implements IAction {
     ignore_warning: false,
   };
   try {
-      console.log('RESPONDTOCLAIM MID EVENT REQUEST:\n', JSON.stringify(midEventRequest, null, 2));
+      //console.log('RESPONDTOCLAIM MID EVENT REQUEST:\n', JSON.stringify(midEventRequest, null, 2));
 
-      await respondPossessionClaimMidEventApi.post(
-        respondPossessionClaimApiData.respondPossessionClaimApiEndPoint(),
-        midEventRequest
-      );
+      //await respondPossessionClaimMidEventApi.post(
+       // respondPossessionClaimApiData.respondPossessionClaimApiEndPoint(),
+       // midEventRequest
+      //);
      console.log('RESPONDTOCLAIM MID EVENT REQUEST:\n', JSON.stringify(midEventRequest, null, 2));
+     console.log('MID EVENT ENDPOINT:',respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint());
+     console.log( respondPossessionClaimMidEventApi.defaults.headers);
 
       const midEventResponse = await respondPossessionClaimMidEventApi.post(
         respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint(),
         midEventRequest
       );
+      
 
       console.log('MID EVENT RESPONSE:\n', JSON.stringify(midEventResponse.data, null, 2));
     } catch (error: unknown) {

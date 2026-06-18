@@ -225,10 +225,10 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
 
   test('Validate View the response data @regression @crossbrowse', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
-    // await performAction('respondPossessionClaimAPI', {
-    //   data: respondPossessionClaimMidEventValidateApiData.respondPossessionClaimPayload,
-    //   type: 'midEvent',
-    //});
+   //  await performAction('respondPossessionClaimAPI', {
+   //    data: respondPossessionClaimMidEventApiData.respondPossessionClaimPayload,
+   //    type: 'midEvent',
+   // });
     await performAction('reloadPage');
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimApiData.respondPossessionClaimPayload,
