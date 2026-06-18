@@ -133,6 +133,9 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toMatchObject({
+        status: 403,
+      });
     });
 
     it('should throw HTTPError with 403 status on invalid case (400)', async () => {
@@ -143,6 +146,9 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toMatchObject({
+        status: 403,
+      });
     });
 
     it('should throw HTTPError on unexpected error', async () => {
@@ -205,6 +211,7 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
     });
 
     it('should throw HTTPError with 403 status on invalid case (400)', async () => {
@@ -215,6 +222,7 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
     });
 
     it('maps 502 CallbackException from about-to-start callback to Access denied HTTPError', async () => {
@@ -273,6 +281,7 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
     });
 
     it('should throw HTTPError with 403 status on invalid case (400)', async () => {
@@ -283,6 +292,7 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
     });
 
     it('should preserve direct 403 from CCD', async () => {
@@ -506,6 +516,7 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
     });
 
     it('maps 400 from CCD to Access denied HTTPError', async () => {
@@ -516,6 +527,7 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
     });
 
     it('maps 502 CallbackException from about-to-start callback to Access denied HTTPError', async () => {
@@ -543,8 +555,7 @@ describe('ccdCaseService', () => {
           data: {
             exception: 'uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException',
             status: 502,
-            message:
-              'Callback to service has been unsuccessful for event ... callbackType AboutToSubmit',
+            message: 'Callback to service has been unsuccessful for event ... callbackType AboutToSubmit',
           },
         },
         message: 'Bad Gateway',
