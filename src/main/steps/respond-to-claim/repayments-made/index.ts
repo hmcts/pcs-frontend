@@ -88,18 +88,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: req => {
     const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
-    const claimIssueDate = new Date(validatedCase?.claimIssueDate ?? '');
+    const dateIssued = validatedCase?.dateIssued;
 
     return {
       claimantName,
-      claimIssueDate,
-      formatParams: {
-        claimIssueDate: {
-          month: 'long',
-          year: 'numeric',
-          locale: req.language === 'cy' ? 'cy-GB' : 'en-GB',
-        },
-      },
+      dateIssued,
     };
   },
   customTemplate: `${__dirname}/repaymentsMade.njk`,

@@ -30,7 +30,7 @@ describe('ordinalDate formatter', () => {
       resources: {
         en: {
           translation: {
-            question: 'Since {{claimIssueDate, ordinalDate}}',
+            question: 'Since {{dateIssued, ordinalDate}}',
           },
         },
       },
@@ -38,7 +38,7 @@ describe('ordinalDate formatter', () => {
 
     ordinalDate(i18n);
 
-    expect(i18n.t('question', { claimIssueDate: new Date(2025, 4, 20) })).toBe('Since 20th May 2025');
+    expect(i18n.t('question', { dateIssued: new Date(2025, 4, 20) })).toBe('Since 20th May 2025');
   });
 
   it('supports i18next formatParams for the interpolation value', async () => {
@@ -48,7 +48,7 @@ describe('ordinalDate formatter', () => {
       resources: {
         en: {
           translation: {
-            question: 'Since {{claimIssueDate, ordinalDate}}',
+            question: 'Since {{dateIssued, ordinalDate}}',
           },
         },
       },
@@ -58,9 +58,9 @@ describe('ordinalDate formatter', () => {
 
     expect(
       i18n.t('question', {
-        claimIssueDate: new Date(2025, 4, 20),
+        dateIssued: new Date(2025, 4, 20),
         formatParams: {
-          claimIssueDate: {
+          dateIssued: {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
@@ -78,13 +78,13 @@ describe('ordinalDate formatter', () => {
         month: 'short',
         year: '2-digit',
         formatParams: {
-          claimIssueDate: {
+          dateIssued: {
             month: 'long',
             year: 'numeric',
             locale: 'en-GB',
           },
         },
-        interpolationkey: 'claimIssueDate',
+        interpolationkey: 'dateIssued',
       })
     ).toBe('15th June 2026');
   });

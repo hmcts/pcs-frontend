@@ -254,7 +254,7 @@ export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
-  claimIssueDate?: string;
+  dateIssued?: string;
   claimantName?: string;
   isClaimantNameCorrect?: YesNoValue;
   overriddenClaimantName?: string;

@@ -27,7 +27,7 @@ describe('CcdCaseModel', () => {
 
       expect(model.data).toEqual({});
       expect(model.id).toBe('');
-      expect(model.claimIssueDate).toBe('');
+      expect(model.dateIssued).toBeUndefined();
       expect(model.defendantName).toBe('');
       expect(model.defendantAddress).toBe('');
       expect(model.claimantName).toBe('');

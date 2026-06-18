@@ -27,8 +27,8 @@ export class CcdCaseModel {
     return this.validatedCase.id ?? '';
   }
 
-  get claimIssueDate(): string {
-    return this.data.claimIssueDate ?? '';
+  get dateIssued(): Date | undefined {
+    return this.data.dateIssued ? new Date(this.data.dateIssued) : undefined;
   }
 
   get defendantName(): string {

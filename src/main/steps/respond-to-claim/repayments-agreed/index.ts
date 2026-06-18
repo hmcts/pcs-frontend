@@ -81,18 +81,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
-    const claimIssueDate = new Date(caseData?.claimIssueDate ?? '');
+    const dateIssued = caseData?.dateIssued;
 
     return {
       claimantName,
-      claimIssueDate,
-      formatParams: {
-        claimIssueDate: {
-          month: 'long',
-          year: 'numeric',
-          locale: req.language === 'cy' ? 'cy-GB' : 'en-GB',
-        },
-      },
+      dateIssued,
     };
   },
   fields: [
