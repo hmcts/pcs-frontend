@@ -57,6 +57,7 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
         });
 
         await persistPaymentSessionState(req, {
+          ...req.session.payment,
           caseReference,
           serviceRequestReference,
           feeAmount,
