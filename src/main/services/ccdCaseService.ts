@@ -144,6 +144,16 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
   return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500, retryAfter);
 }
 
+// Read endpoints coerce 400/404 to a 403 so the client sees an access-denied page
+// rather than leaking case existence (404 -> pageNotFound) or a bad-request.
+function convertReadErrorToHttpError(error: unknown, context: string): HTTPError {
+  const httpError = convertAxiosErrorToHttpError(error, context);
+  if (httpError.status === 400 || httpError.status === 404) {
+    return new HTTPError('Access denied', 403);
+  }
+  return httpError;
+}
+
 /**
  * START Phase: Get event token from CCD
  *
@@ -230,13 +240,7 @@ export const ccdCaseService = {
         data: caseData,
       };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getCaseByIdForEvent');
-
-      // coerce 400 and 404 to 403 so we can return an access denied error to the client
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Access denied', 403);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getCaseByIdForEvent');
     }
   },
 
@@ -254,12 +258,7 @@ export const ccdCaseService = {
         data: caseData,
       };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
-
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Access denied', 403);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getCaseById');
     }
   },
 
@@ -337,11 +336,7 @@ export const ccdCaseService = {
       const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
       return response.data;
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Access denied', 403);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getExistingCaseDataError');
     }
   },
 
@@ -392,11 +387,7 @@ export const ccdCaseService = {
 
       return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress), relatedApplications };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getDashboardView');
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Access denied', 403);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getDashboardView');
     }
   },
 };
