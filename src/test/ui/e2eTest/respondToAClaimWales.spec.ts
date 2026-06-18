@@ -502,6 +502,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.noRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
+    await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
@@ -514,6 +518,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
       radioOption: installmentPayments.noRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC', 'payments');
+    await performAction('validateRTCSectionCYA', 'payments');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -529,7 +537,49 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
     });
-    await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
+    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
+    });
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
+    await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC', 'uploadFiles');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('clickButton', 'Submit');
   });
 
   test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - No @noDefendants @regression', async () => {
