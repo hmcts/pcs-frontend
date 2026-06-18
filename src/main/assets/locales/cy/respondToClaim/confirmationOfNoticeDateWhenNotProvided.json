@@ -10,7 +10,7 @@
       "year": "cyYear",
       "notRealDate": "cyThe date you received notice must be a real date",
       "futureDate": "cyThe date you received notice must either be today’s date or in the past",
-      "invalidValue": "cyThe date you received notice must be a real date",
+      "invalidValue": "cyThe date you received notice must be a real date ",
       "missingOne": "cyThe date you received notice must include a {{missingField}}",
       "missingTwo": "cyThe date you received notice must include a {{first}} and {{second}}"
     }
