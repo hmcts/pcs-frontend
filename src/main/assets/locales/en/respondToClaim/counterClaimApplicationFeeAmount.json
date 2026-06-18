@@ -1,5 +1,5 @@
 {
-  "pageTitle": "Counterclaim application fee amount",
+  "pageTitle": "Pay your counterclaim fee",
   "caption": "Respond to a property possession claim",
   "notApplicable": "Not applicable",
   "counterClaimAmountLabel": "Counterclaim amount",
@@ -7,6 +7,5 @@
   "counterClaimAmountDisplay": "{{counterClaimAmount, currency(currency: GBP)}}",
   "counterClaimFeeDisplay": "{{counterClaimFee, currency(currency: GBP)}}",
   "payNowButton": "Pay your counterclaim fee ({{counterClaimFee, currency(currency: GBP)}})",
-  "paymentHint": "You must pay your counterclaim fee for your counterclaim to be considered.",
   "paymentError": "We could not start your payment. Try again."
 }
