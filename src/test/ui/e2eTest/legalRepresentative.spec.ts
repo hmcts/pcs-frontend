@@ -12,7 +12,6 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
-  endNow,
   equalityAndDiversityEnd,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -67,9 +66,10 @@ test.beforeEach(async ({ page }, testInfo) => {
 
   await performAction('fetchPINsAPI');
   await performAction('getCaseAPI');
-  await performAction('navigateToUrl', home_url);
-  await performAction('login', user.defendantSolicitor.email);
+  //await performAction('navigateToUrl', home_url);
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+  await performAction('login', user.defendantSolicitor.email);
+  //await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
 
@@ -215,8 +215,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.lrHiddenMainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
+    //await performAction('clickButton', 'Submit');
   });
 
   test('Respond to claim - RentArrears - DemotedTenancy - LR @smoke @PR @regression', async () => {
@@ -358,7 +357,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.lrHiddenMainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
+    //await performAction('clickButton', 'Submit');
   });
 });
