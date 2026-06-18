@@ -44,6 +44,7 @@ function getCaseHeaders(token: string) {
 interface ParsedSubmitPaymentPayload {
   serviceRequestReference: string;
   feeAmount?: number;
+  counterClaimType?: string;
 }
 
 function parseSubmitPaymentPayload(confirmationBody?: string | null): ParsedSubmitPaymentPayload | undefined {
@@ -55,9 +56,11 @@ function parseSubmitPaymentPayload(confirmationBody?: string | null): ParsedSubm
       counterClaim?: {
         serviceRequestReference?: unknown;
         feeAmount?: unknown;
+        claimType?: unknown;
       };
       serviceRequestReference?: unknown;
       feeAmount?: unknown;
+      claimType?: unknown;
     };
     const paymentDetails = parsed.counterClaim ?? parsed;
 
@@ -68,9 +71,15 @@ function parseSubmitPaymentPayload(confirmationBody?: string | null): ParsedSubm
       return undefined;
     }
 
+    const claimType =
+      typeof paymentDetails.claimType === 'string' && paymentDetails.claimType.trim().length > 0
+        ? paymentDetails.claimType
+        : undefined;
+
     return {
       serviceRequestReference: paymentDetails.serviceRequestReference,
       feeAmount: typeof paymentDetails.feeAmount === 'number' ? paymentDetails.feeAmount : undefined,
+      counterClaimType: claimType,
     };
   } catch (error) {
     logger.warn('Unable to parse submit confirmation body JSON for payment payload', error);
@@ -164,7 +173,7 @@ export default function finalSubmitRoutes(app: Application): void {
           serviceRequestReference: paymentPayload!.serviceRequestReference,
           feeAmount: paymentPayload!.feeAmount,
           counterClaimAmountInPence: getCounterClaimAmountInPence(counterClaim),
-          counterClaimType: counterClaim?.claimType,
+          counterClaimType: counterClaim?.claimType ?? paymentPayload?.counterClaimType,
         });
       }
 
