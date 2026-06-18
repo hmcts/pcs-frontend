@@ -310,7 +310,7 @@ describe('viewTheResponse route', () => {
             }),
           ]),
         }),
-        dashboardUrl: `/dashboard/${caseReference}`,
+        dashboardUrl: `/case/${caseReference}/dashboard`,
         viewDocumentsUrl: `/case/${caseReference}/view-documents`,
       })
     );

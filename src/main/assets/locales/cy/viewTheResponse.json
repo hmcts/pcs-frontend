@@ -55,12 +55,12 @@
 
   "responseToClaim": {
     "disputeClaim": "cyDo you dispute any other parts of the claim?",
-    "disputeDetails": "cyExplain which parts of the claim you do not agree with",
+    "disputeDetails": "cyExplain which parts of the claim you dispute",
     "claimGrounds": "cyClaim grounds",
     "exemptLandlord": "cyIs your landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?",
     "tenancyTypeConfirmation": "cyIs the tenancy, occupation contract or licence agreement type given by the claimant correct?",
     "tenancyType": "cyCorrected tenancy, occupation contract or licence agreement type",
-    "tenancyStartDateConfirmation": "cyIs the tenancy, licence or occupation contract start date correct?",
+    "tenancyStartDateConfirmation": "cyIs the tenancy, occupation contract or licence agreement start date given by the claimant correct?",
     "tenancyStartDate": "cyCorrected tenancy, occupation contract or licence agreement start date",
     "possessionNoticeReceived": "cyDid the claimant give you notice of their intention to begin possession proceedings?",
     "noticeReceivedDate": "cyWhen did you receive notice from the claimant?",
@@ -83,17 +83,17 @@
 
   "household": {
     "dependantChildren": "cyDo you have any dependent children?",
-    "dependantChildrenDetails": "cyGive details about your dependent children",
+    "dependantChildrenDetails": "cyDetails of dependent children",
     "otherDependants": "cyDo you have any other dependants?",
-    "otherDependantDetails": "cyGive details about your other dependants",
+    "otherDependantDetails": "cyDetails of other dependants",
     "otherTenants": "cyDo any other adults live in your home?",
-    "otherTenantsDetails": "cyGive details about the other adults living in your home",
+    "otherTenantsDetails": "cyDetails of other adults living in your home?",
     "alternativeAccommodation": "cyWould you have somewhere else to live if you had to leave your home?",
     "alternativeAccommodationDate": "cyWhen would you be able to move in?",
     "shareAdditional": "cyWould you like to share anything about your circumstances?",
-    "additionalDetails": "cyGive details about your circumstances",
+    "additionalDetails": "cyDetails about your circumstances",
     "exceptionalHardship": "cyWould you experience exceptional hardship if you were asked to leave your home?",
-    "exceptionalHardshipDetails": "cyGive details about the exceptional hardship you’d experience"
+    "exceptionalHardshipDetails": "cyDetails about the exceptional hardship you’d experience"
   },
 
   "income": {
@@ -132,7 +132,7 @@
 
   "additional": {
     "otherConsiderations": "cyIs there anything else you want to tell the court as part of your response?",
-    "otherConsiderationsDetails": "cyGive details about what else you want to tell the court"
+    "otherConsiderationsDetails": "cyDetails of what else you want to tell the court"
   },
 
   "counterclaim": {

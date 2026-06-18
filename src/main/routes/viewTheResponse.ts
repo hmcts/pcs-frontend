@@ -216,7 +216,6 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
 
   pushRow(rows, t('viewTheResponse:defendant1.name'), joinName(party?.firstName, party?.lastName));
   pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
-  pushRow(rows, t('viewTheResponse:defendant1.email'), party?.emailAddress);
   if (isYes(party?.phoneNumberProvided)) {
     pushRow(rows, t('viewTheResponse:defendant1.phone'), party?.phoneNumber);
   }
@@ -279,6 +278,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.tenancyStartDate'),
     formatGdsDate(responses?.tenancyStartDate) ?? ''
   );
+  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
@@ -299,7 +299,6 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.rentArrearsAmount'),
     formatMoneyAmount(responses?.rentArrearsAmount)
   );
-  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(rows, t('viewTheResponse:responseToClaim.disputeClaim'), yesNo(t, responses?.disputeClaim));
   pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
   return { rows };
