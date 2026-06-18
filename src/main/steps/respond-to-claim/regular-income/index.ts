@@ -233,6 +233,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     pageTitle: 'pageTitle',
     hintText: 'hintText',
+    incomeQuestion: 'incomeQuestion',
   },
 
   fields: [
@@ -240,9 +241,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'regularIncome',
       type: 'checkbox',
       required: false, // Page is optional - can select zero checkboxes
-      legendClasses: 'govuk-visually-hidden',
+      legendClasses: 'govuk-fieldset__legend govuk-fieldset__legend--m',
       translationKey: {
-        label: 'groupName',
+        label: 'incomeQuestion',
         hint: 'hintText',
       },
       options: [

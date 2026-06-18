@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
@@ -135,10 +136,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       (req.body?.correctType as string) ||
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
       '';
-
+    const claimantName = req.res?.locals.validatedCase?.claimantName;
     const caseData = req.res?.locals.validatedCase?.data;
     const walesProperty = isWalesProperty(caseData);
-    const orgName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string;
+    const orgName = req.res?.locals.validatedCase?.orgName;
     const tenancyTypeOfTenancyLicence = caseData?.tenancy_TypeOfTenancyLicence as string;
     const occupationLicenceTypeWales = caseData?.occupationLicenceTypeWales;
     // Wales: flat keys from OccupationLicenceDetailsWales.
@@ -147,10 +148,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       : caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence;
     // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
-    const detailsHeading =
-      typeof formContent.detailsHeading === 'string'
-        ? `${formContent.detailsHeading}${orgName}${':'}`
-        : formContent.detailsHeading;
+    const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
 
     const t = getTranslationFunction(req);
     let tenancyType: unknown;
@@ -170,7 +168,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       ...formContent,
-      detailsHeading,
+      senderName,
       tenancyType,
       organisationName: orgName,
       orgname: orgName,

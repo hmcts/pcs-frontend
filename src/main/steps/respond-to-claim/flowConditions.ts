@@ -8,6 +8,7 @@ import {
   isFinanceDetailsProvided,
   isNoticeDateProvided,
   isPriorityDebtsSelected,
+  isSingleLinkedDefendant,
   isUniversalCreditSelected,
   normalizeYesNoValue,
 } from '../utils';
@@ -109,4 +110,8 @@ export function shouldShowCounterClaimAgainstWhoStep(req: Request): boolean {
 
 export function shouldShowCounterClaimAboutStep(req: Request): boolean {
   return hasAppliedForCounterClaimHwf(req) || getCounterClaimNeedHelpWithFees(req) === 'NO';
+}
+
+export function hasSingleLinkedDefendant(req: Request): boolean {
+  return isSingleLinkedDefendant(req);
 }

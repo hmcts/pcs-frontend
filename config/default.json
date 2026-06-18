@@ -138,5 +138,8 @@
       "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
       "ViewDocuments": "/case/:caseReference/view-documents"
     }
+  },
+  "redirects": {
+    "manageCaseReturnURL": "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
   }
 }

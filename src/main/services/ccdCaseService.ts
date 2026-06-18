@@ -33,6 +33,7 @@
 import { AxiosError } from 'axios';
 import config from 'config';
 
+import { ClientContextHeaders } from '../../types/global';
 import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
@@ -71,7 +72,17 @@ function getCaseTypeId(): string {
   return config.get('ccd.caseTypeId');
 }
 
-function getCaseHeaders(token: string) {
+export type CaseHeaders = {
+  headers: {
+    Authorization: string;
+    experimental: boolean;
+    Accept: string;
+    'Content-Type': string;
+    'Client-Context'?: string;
+  };
+};
+
+function getCaseHeaders(token: string): CaseHeaders {
   return {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -189,15 +200,27 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseByIdForEvent(accessToken: string, caseId: string, eventId: string): Promise<CcdCase> {
+  async getCaseByIdForEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string = 'respondPossessionClaim',
+    clientContextHeaders?: ClientContextHeaders
+  ): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
       logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
-      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
+      const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
+
+      if (clientContextHeaders) {
+        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+      }
+
+      const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
       logger.info(`Case access validated successfully for caseId: ${caseId}`);
 
       const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
+
       return {
         id: caseId,
         data: caseData,
@@ -322,7 +345,8 @@ export const ccdCaseService = {
     draftEvent: { id: string; pageId: string },
     accessToken: string | undefined,
     caseId: string,
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
+    clientContextHeaders?: ClientContextHeaders
   ): Promise<CcdCase> {
     if (!caseId) {
       throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
@@ -342,8 +366,14 @@ export const ccdCaseService = {
       ignore_warning: false,
     };
 
+    const caseHeaders: CaseHeaders = getCaseHeaders(accessToken || '');
+
+    if (clientContextHeaders) {
+      caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+    }
+
     try {
-      const response = await http.post<{ data: CcdCaseData }>(url, payload, getCaseHeaders(accessToken || ''));
+      const response = await http.post<{ data: CcdCaseData }>(url, payload, caseHeaders);
       return {
         id: caseId,
         data: response.data?.data ?? {},

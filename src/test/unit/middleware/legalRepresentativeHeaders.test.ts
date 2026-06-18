@@ -37,17 +37,19 @@ describe('legalRepresentativeHeaderMiddleware', () => {
     next = jest.fn();
   });
 
-  it('does not append extra headers for non-legalrep users', () => {
+  it('sets citizen header mode for non-legalrep users', () => {
     mockIsLegalRepresentativeUser.mockReturnValue(false);
     const req = {} as unknown as Request;
 
     invokeMiddleware(req);
 
     expect(next).toHaveBeenCalled();
-    expect(res.locals?.extraHeaders).toBeUndefined();
+    expect(res.locals?.isLegalRepresentative).toBe(false);
+    expect(res.locals?.headerModel).toBeUndefined();
+    expect(res.locals?.footerModel).toBeUndefined();
   });
 
-  it('appends extra headers for legalrep users', () => {
+  it('sets legalrep header mode and appends header/footer locals for legalrep users', () => {
     const headerModel = { name: 'header', assetsPath: '' };
     const footerModel = { name: 'footer' };
     mockIsLegalRepresentativeUser.mockReturnValue(true);
@@ -58,10 +60,8 @@ describe('legalRepresentativeHeaderMiddleware', () => {
     invokeMiddleware(req);
 
     expect(next).toHaveBeenCalled();
-    expect(res.locals?.extraHeaders).toEqual({
-      headerModel,
-      footerModel,
-      isLegalRepresentative: true,
-    });
+    expect(res.locals?.isLegalRepresentative).toBe(true);
+    expect(res.locals?.headerModel).toEqual(headerModel);
+    expect(res.locals?.footerModel).toEqual(footerModel);
   });
 });

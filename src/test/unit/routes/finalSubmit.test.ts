@@ -40,6 +40,11 @@ jest.mock('../../../main/modules/http', () => ({
   },
 }));
 
+const mockClientContextClearer = jest.fn(req => req);
+jest.mock('@utils/clientContextSessionClearer', () => ({
+  clientContextSessionClearer: mockClientContextClearer,
+}));
+
 import type { Application, Request, Response } from 'express';
 
 import finalSubmitRoutes from '../../../main/routes/finalSubmit';
@@ -175,6 +180,68 @@ describe('finalSubmit routes', () => {
       expect(mockHttpGet).toHaveBeenCalled();
       expect(mockHttpPost).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
+      expect(mockClientContextClearer).not.toHaveBeenCalled();
+    });
+
+    it('should successfully submit to CCD with currentRepresentedPartyId', async () => {
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      mockHttpGet.mockResolvedValue({
+        data: { token: 'mock-event-token' },
+      });
+
+      mockHttpPost.mockResolvedValue({});
+
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        session: {
+          user: { accessToken: 'mock-token' },
+          clientContext: { selectedPartyId: 'partyId' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: { validatedCase: { id: '1234567890123456' } },
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(mockHttpGet).toHaveBeenCalledWith(
+        expect.stringContaining('/cases/1234567890123456/event-triggers/respondPossessionClaim'),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer mock-token',
+          }),
+        })
+      );
+
+      expect(mockHttpPost).toHaveBeenCalledWith(
+        expect.stringContaining('/cases/1234567890123456/events'),
+        expect.objectContaining({
+          data: {
+            currentRepresentedPartyId: 'partyId',
+            possessionClaimResponse: {},
+          },
+          event: {
+            id: 'respondPossessionClaim',
+            summary: 'Citizen respondPossessionClaim summary',
+            description: 'Citizen respondPossessionClaim description',
+          },
+          event_token: 'mock-event-token',
+          ignore_warning: false,
+        }),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer mock-token',
+          }),
+        })
+      );
+
+      expect(mockClientContextClearer).toHaveBeenCalledWith(req);
+      expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
+      expect(mockLogger.info).toHaveBeenCalledWith('Submitting response to claim for case 1234567890123456');
+      expect(mockLogger.info).toHaveBeenCalledWith('Response submitted successfully for case 1234567890123456');
     });
 
     it('should redirect to check-your-answers with error when submission fails', async () => {
