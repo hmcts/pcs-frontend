@@ -107,7 +107,7 @@ export const submitCaseApiDataWales = {
     walesTypeOfNoticeServed: 'terts',
     notice_ServiceMethod: 'FIRST_CLASS_POST',
     notice_PostedDate: '1995-11-10',
-    notice_AbleToUploadDocument: 'NO',
+    notice_AbleToUploadDocument: 'No',
     notice_UnableToUploadReason: 'no documents to upload',
 
     preActionProtocolCompleted: 'YES',
@@ -304,7 +304,7 @@ export const submitCaseApiDataWales = {
     walesTypeOfNoticeServed: null,
     notice_ServiceMethod: 'FIRST_CLASS_POST',
     notice_PostedDate: '2022-02-02',
-    notice_AbleToUploadDocument: 'NO',
+    notice_AbleToUploadDocument: 'No',
     notice_UnableToUploadReason: 'no documents to upload',
     rentDetails_CurrentRent: '50000',
     rentDetails_Frequency: 'MONTHLY',

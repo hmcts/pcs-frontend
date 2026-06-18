@@ -101,7 +101,7 @@ export const submitCaseApiData = {
       rentArrears_Total: '200000',
       rentArrears_RecoveryAttempted: 'NO',
       arrearsJudgmentWanted: 'NO',
-      notice_AbleToUploadDocument: 'NO',
+      notice_AbleToUploadDocument: 'No',
       notice_UnableToUploadReason: 'no documents to upload',
       notice_ServiceMethod: 'FIRST_CLASS_POST',
       claimantNamePossessiveForm: null,
@@ -556,7 +556,7 @@ export const submitCaseApiData = {
       notice_ServiceMethod: 'EMAIL',
       notice_EmailAddress: null,
       notice_EmailSentDateTime: null,
-      notice_AbleToUploadDocument: 'NO',
+      notice_AbleToUploadDocument: 'No',
       notice_UnableToUploadReason: 'no documents to upload',
       alternativesToPossession: [],
       additionalReasonsForPossession: {
