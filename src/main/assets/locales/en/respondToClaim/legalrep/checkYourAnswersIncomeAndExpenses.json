@@ -1,0 +1,76 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Income and expenses",
+  "frequencies": {
+    "WEEKLY": "every week",
+    "MONTHLY": "every month"
+  },
+  "incomeFrequencies": {
+    "WEEKLY": "received every week",
+    "MONTHLY": "received every month"
+  },
+  "paymentFrequencies": {
+    "WEEKLY": "paid every week",
+    "MONTHLY": "paid every month"
+  },
+  "rows": {
+    "shareIncomeExpenseDetails": {
+      "label": "Does the defendant want to provide details of their income and expenses?",
+      "changeHidden": "share income and expense details"
+    },
+    "regularIncome": {
+      "label": "What regular income does the defendant receive?",
+      "changeHidden": "regular income",
+      "options": {
+        "incomeFromJobs": "Income from all jobs they do",
+        "pension": "Pension – state and private",
+        "universalCredit": "Universal Credit",
+        "otherBenefits": "Other benefits and credits",
+        "moneyFromElsewhere": "Money from somewhere else (for example, child maintenance payments or someone in the defendant’s household gives them money)"
+      }
+    },
+    "hasAppliedForUniversalCredit": {
+      "label": "Has the defendant applied for Universal Credit?",
+      "changeHidden": "applied for Universal Credit"
+    },
+    "universalCreditApplicationDate": {
+      "label": "When did the defendant apply?",
+      "changeHidden": "Universal Credit application date"
+    },
+    "priorityDebts": {
+      "label": "Does the defendant have any priority debts?",
+      "changeHidden": "priority debts"
+    },
+    "priorityDebtTotal": {
+      "label": "What is the total amount the defendant owes for all their priority debts?",
+      "changeHidden": "priority debt total"
+    },
+    "priorityDebtContribution": {
+      "label": "How much does the defendant pay towards their priority debts each week or month?",
+      "changeHidden": "priority debt contribution"
+    },
+    "regularExpenses": {
+      "label": "What regular monthly expenses does the defendant have?",
+      "changeHidden": "regular expenses",
+      "options": {
+        "householdBills": "Household bills (for example, council tax, gas, electricity, water, internet)",
+        "loanPayments": "Loan payments",
+        "childSpousalMaintenance": "Child or spousal maintenance",
+        "mobilePhone": "Mobile phone",
+        "groceryShopping": "Grocery shopping",
+        "fuelParkingTransport": "Fuel, parking and transport",
+        "schoolCosts": "School costs (for example, uniform and school dinners)",
+        "clothing": "Clothing",
+        "otherExpenses": "Other"
+      }
+    },
+    "otherConsiderations": {
+      "label": "Is there anything else the defendant wants to tell the court as part of their response",
+      "changeHidden": "other considerations"
+    },
+    "otherConsiderationsDetails": {
+      "label": "Give details about what else the defendant wants to tell the court",
+      "changeHidden": "other considerations details"
+    }
+  }
+}

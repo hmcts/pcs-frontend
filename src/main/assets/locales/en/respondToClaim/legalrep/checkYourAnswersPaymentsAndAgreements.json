@@ -1,0 +1,40 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Payments and agreements",
+  "rows": {
+    "anyPaymentsMade": {
+      "label": "Has the defendant paid any money to {{claimantName}} since {{claimIssueDate}}?",
+      "changeHidden": "payments made"
+    },
+    "paymentDetails": {
+      "label": "Give details about how much the defendant paid and when",
+      "changeHidden": "payment details"
+    },
+    "repaymentPlanAgreed": {
+      "label": "Has the defendant come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+      "changeHidden": "repayment agreement"
+    },
+    "repaymentAgreedDetails": {
+      "label": "Give details about how much the defendant has agreed to pay, how often the defendant will pay and when the agreement was made",
+      "changeHidden": "repayment details"
+    },
+    "repayArrearsInstalments": {
+      "label": "Would the defendant like to offer to pay off their arrears in instalments?",
+      "changeHidden": "offer to pay in instalments"
+    },
+    "installmentAmount": {
+      "label": "How much could the defendant afford to pay in addition to the current rent?",
+      "changeHidden": "instalment amount"
+    },
+    "installmentFrequency": {
+      "label": "How frequently could the defendant afford to pay this amount?",
+      "changeHidden": "instalment frequency",
+      "frequencies": {
+        "weekly": "Weekly",
+        "every2Weeks": "Every 2 weeks",
+        "every4Weeks": "Every 4 weeks",
+        "monthly": "Monthly"
+      }
+    }
+  }
+}
