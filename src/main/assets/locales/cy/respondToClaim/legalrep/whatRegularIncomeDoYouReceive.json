@@ -24,8 +24,8 @@
   "errors": {
     "incomeFromJobsAmount": {
       "required": "cyEnter the total amount the defendant receives from all jobs they do",
-      "negative": "cyThe total amount the defendant receive from all jobs they do each week or month must be £0.00 or above",
-      "largeAmount": "cyThe total amount the defendant receive from all jobs you do each week or month must be less than £1 billion"
+      "negative": "cyThe total amount the defendant receives from all jobs they do each week or month must be £0.00 or above",
+      "largeAmount": "cyThe total amount the defendant receives from all jobs you do each week or month must be less than £1 billion"
     },
     "incomeFromJobsFrequency": {
       "required": "cySelect how frequently the defendant receives income from all jobs they do"
@@ -56,7 +56,7 @@
     },
     "moneyFromElsewhereDetailsMaxLength": "cyDetails of money from somewhere else must be 500 characters or less",
     "moneyFromElsewhereDetails": {
-      "required": "cyEnter details about the money the defendant received from somewhere else and how much the defendant usually receive",
+      "required": "cyEnter details about the money the defendant received from somewhere else and how much the defendant usually receives",
       "invalidCharacters": "cyGive details about the other sources of income and how much the defendant usually receives must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
     },
     "amount": {
