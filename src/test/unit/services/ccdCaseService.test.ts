@@ -536,6 +536,24 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Access denied');
     });
 
+    it('preserves 502 CallbackException without about-to-start as CCD case service error', async () => {
+      mockGet.mockRejectedValue({
+        response: {
+          status: 502,
+          data: {
+            exception: 'uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException',
+            status: 502,
+            message:
+              'Callback to service has been unsuccessful for event ... callbackType AboutToSubmit',
+          },
+        },
+        message: 'Bad Gateway',
+      });
+
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toMatchObject({ status: 502 });
+    });
+
     it('preserves generic 502 as CCD case service HTTPError', async () => {
       mockGet.mockRejectedValue({
         response: { status: 502, data: { message: 'Upstream unavailable' } },
