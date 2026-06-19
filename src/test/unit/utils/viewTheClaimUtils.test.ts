@@ -29,6 +29,8 @@ const translations: Record<string, string> = {
   'viewTheClaim:labels.rentStatement': 'Rent statement',
   'viewTheClaim:labels.underlesseeName': 'Name',
   'viewTheClaim:labels.underlesseeAddress': 'Address for service',
+  'viewTheClaim:sections.statementOfTruth': 'Statement of truth',
+  'viewTheClaim:labels.statementOfTruthCompletedBy': 'Completed by',
   'viewTheClaim:personsUnknown': 'Persons unknown',
 };
 

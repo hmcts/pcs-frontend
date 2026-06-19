@@ -426,11 +426,12 @@ export function buildStatementOfTruthSection(
   }
 
   const completedBy =
-    getFirstString(statementOfTruth, ['fullNameLegalRep', 'fullNameClaimant']) ??
+    getFirstString(statementOfTruth, ['fullNameLegalRep', 'fullNameParty', 'fullNameClaimant']) ??
     enumText(statementOfTruth.completedBy, STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS);
-  const position = getFirstString(statementOfTruth, ['positionLegalRep', 'positionClaimant']);
+  const firmName = getFirstString(statementOfTruth, ['firmNameLegalRep']);
+  const position = getFirstString(statementOfTruth, ['positionLegalRep', 'positionParty', 'positionClaimant']);
   const rows = [
-    htmlRow(copy.label('statementOfTruthCompletedBy'), [completedBy, position].filter(Boolean).join('<br>')),
+    htmlRow(copy.label('statementOfTruthCompletedBy'), [completedBy, firmName, position].filter(Boolean).join('<br>')),
   ];
 
   return section(copy.section('statementOfTruth'), rows);
