@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import {
   clearPaymentReferenceOnly,
   clearPaymentSessionState,
+  persistPaymentSessionState,
   retainPaymentReferenceOnly,
   setPaymentSessionState,
 } from '@services/paymentSessionService';
@@ -59,6 +60,25 @@ describe('paymentSessionService', () => {
       serviceRequestReference: 'SR-123',
       feeAmount: 10.99,
     });
+  });
+
+  it('persists payment session state to the session store', async () => {
+    const req = createReq();
+
+    await persistPaymentSessionState(req, {
+      caseReference: '1234567890123456',
+      serviceRequestReference: 'SR-123',
+      feeAmount: 10.99,
+      counterClaimType: 'PAYMENT_OR_COMPENSATION',
+    });
+
+    expect(req.session.payment).toEqual({
+      caseReference: '1234567890123456',
+      serviceRequestReference: 'SR-123',
+      feeAmount: 10.99,
+      counterClaimType: 'PAYMENT_OR_COMPENSATION',
+    });
+    expect(req.session.save).toHaveBeenCalled();
   });
 
   it('clears payment session state', async () => {

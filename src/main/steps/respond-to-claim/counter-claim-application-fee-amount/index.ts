@@ -20,7 +20,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     counterClaimAmountLabel: 'counterClaimAmountLabel',
     counterClaimFeeLabel: 'counterClaimFeeLabel',
     payNowButton: 'payNowButton',
-    paymentHint: 'paymentHint',
     paymentError: 'paymentError',
   },
   extendGetContent: async req => {

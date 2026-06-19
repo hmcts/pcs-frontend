@@ -41,6 +41,20 @@ describe('counterClaimPaymentStart routes', () => {
   let app: Application;
   let mockGet: jest.Mock;
 
+  const createSession = (overrides: Record<string, unknown> = {}) => {
+    const session = {
+      user: { accessToken: 'token-1' },
+      ...overrides,
+    } as Record<string, unknown>;
+
+    session.save = jest.fn(callback => {
+      callback?.(undefined);
+      return session;
+    });
+
+    return session;
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet = jest.fn();
@@ -106,13 +120,12 @@ describe('counterClaimPaymentStart routes', () => {
     const req = {
       language: 'en',
       params: { caseReference: '123' },
-      session: {
-        user: { accessToken: 'token-1' },
+      session: createSession({
         payment: {
           serviceRequestReference: 'SR-1',
           feeAmount: 404,
         },
-      },
+      }),
     } as unknown as Request;
     const res = { redirect: jest.fn() } as unknown as Response;
     const next = jest.fn();
@@ -131,8 +144,46 @@ describe('counterClaimPaymentStart routes', () => {
     expect(req.session.payment).toEqual(
       expect.objectContaining({
         paymentReference: 'RC-1',
+        serviceRequestReference: 'SR-1',
+        feeAmount: 404,
       })
     );
+    expect(req.session.save).toHaveBeenCalled();
     expect(res.redirect).toHaveBeenCalledWith(303, 'https://pay.example/next');
+  });
+
+  it('preserves submit-time counterclaim snapshot when starting gov pay', async () => {
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    mockStartCardPaymentRequest.mockResolvedValue({
+      paymentReference: 'RC-1',
+      paymentStatus: 'Created',
+      nextUrl: 'https://pay.example/next',
+    });
+
+    const req = {
+      language: 'en',
+      params: { caseReference: '123' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+          counterClaimType: 'PAYMENT_OR_COMPENSATION',
+          counterClaimAmountInPence: '64900',
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(req.session.payment).toEqual(
+      expect.objectContaining({
+        paymentReference: 'RC-1',
+        counterClaimType: 'PAYMENT_OR_COMPENSATION',
+        counterClaimAmountInPence: '64900',
+        failureRedirectUrl: '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed',
+      })
+    );
   });
 });
