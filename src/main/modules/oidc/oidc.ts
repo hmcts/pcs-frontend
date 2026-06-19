@@ -23,7 +23,9 @@ export class OIDCModule {
   private readonly logger = Logger.getLogger('oidc');
 
   constructor() {
-    this.setupClient();
+    // Don't let a transient IDAM discovery failure at boot crash the process.
+    // The auth middleware retries discovery lazily on the first request.
+    this.setupClient().catch(error => this.logger.error('OIDC init failed; will retry on first request:', error));
   }
 
   private async setupClient(): Promise<Configuration> {

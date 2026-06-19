@@ -120,6 +120,18 @@ describe('OIDCModule', () => {
       expect(oidcModule).toBeInstanceOf(OIDCModule);
       expect(discovery).toHaveBeenCalled();
     });
+
+    it('should not throw an unhandled rejection when discovery fails at construction', async () => {
+      const unhandled = jest.fn();
+      process.once('unhandledRejection', unhandled);
+      (discovery as jest.Mock).mockRejectedValueOnce(new Error('Discovery failed'));
+
+      expect(() => new OIDCModule()).not.toThrow();
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(unhandled).not.toHaveBeenCalled();
+      process.removeListener('unhandledRejection', unhandled);
+    });
   });
 
   describe('getCurrentUrl', () => {
