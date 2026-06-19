@@ -818,6 +818,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
+    await performValidation('text', { elementType: 'paragraph', text: noticeDateWhenProvided.noticeGivenDateLabel });
     this.recordRtcCyaDateFromParts(
       `When did you receive notice from ${claimantsName}?`,
       noticeData?.day,
