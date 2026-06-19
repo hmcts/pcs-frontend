@@ -235,6 +235,7 @@ export interface CcdDefendantResponses {
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
   statementOfTruth?: StatementOfTruth;
+  hasSolicitor?: YesNoValue;
   counterClaimWantToUploadFiles?: YesNoValue;
   completedSections?: RespondToClaimSectionEnum[];
   status?: 'SUBMITTED' | 'CREATED';

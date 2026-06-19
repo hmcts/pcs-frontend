@@ -1,5 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  askYourSolicitorToRespond,
   checkYourAnswersRTC,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
@@ -20,6 +21,7 @@ import {
   defendantNameCapture,
   defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHome,
+  doYouHaveASolicitor,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
@@ -235,6 +237,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
   test('Respond to a claim - RegularIncome - Universal Credit - SelectCounterClaim - Yes @noDefendants @crossbrowser', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -436,10 +439,18 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
+  test('Respond to a claim - Solicitor journey returns to task list when Yes is selected for Do you have a solicitor? @noDefendants @crossbrowser @regression', async () => {
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.yesRadioOption);
+    await performValidation('mainHeader', askYourSolicitorToRespond.mainHeader);
+    await performAction('clickButton', askYourSolicitorToRespond.closeAndReturnToTaskListButton);
+    await performValidation('mainHeader', taskList.mainHeader);
+  });
+
   test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -607,6 +618,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('NonRentArrears - Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - CounterClaimAppliedForHelp - No - SelectCounterClaim - Yes @assured', async () => {
     // > 3 named parties - CounterClaimAppliedForHelp - No - You need to apply for help with your fees
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -682,6 +694,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - SomethingElse - SelectCounterClaim - Yes @secureFlexible', async () => {
     //Income and expenses - yes - no option On regular Income - universal credit, no defendants - Counterclaim - yes - SomethingElse -  I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -862,6 +875,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('NonRentArrears - Flexible - NoticeServed - Yes NoticeDateProvided - No - NoticeDetails - Im not sure - NonRentArrearsDispute - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @secureFlexible @regression @PR', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit - What are you claiming for - sum of money - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.preferNotToSayRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1068,6 +1082,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @secureFlexible', async () => {
     //Counterclaim - both - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1259,6 +1274,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - RegularIncome - Universal Credit - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @regression', async () => {
     //universal credit with all other options - priority debts - No - Multiple namedParties - sumOfMoney - iNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1472,6 +1488,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No - PriorityDebts - Yes - SelectCounterClaim - Yes @smoke @PR @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1670,6 +1687,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('RentArrears - Demoted - NoticeServed - Yes - NoticeDateProvided - Yes NoticeDetails - No - RentArrearsDispute - SomethingElse - SelectCounterClaim - Yes', async () => {
     //somethingElse - multiple named parties - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -1862,6 +1880,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - No @PR @rentNonRent @regression', async () => {
     //> 3 named parties - CounterClaimAppliedForHelp - Yes - Who are you claiming against
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -2021,6 +2040,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - yes - @multiParty', async () => {
     // Multiparty - Unknown defendant details - somethingElse - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);

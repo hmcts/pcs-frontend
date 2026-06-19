@@ -1,5 +1,6 @@
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
+import { step as askYourSolicitorToRespondToTheClaim } from './ask-your-solicitor-to-respond-to-the-claim';
 import { step as checkYourAnswersDocuments } from './check-your-answers-documents';
 import { step as checkYourAnswersIncomeAndExpenses } from './check-your-answers-income-and-expenses';
 import { step as checkYourAnswersPaymentsAndAgreements } from './check-your-answers-payments-and-agreements';
@@ -59,6 +60,7 @@ import { step as responseAndCounterClaimSubmitted } from './response-and-counter
 import { step as responseSubmitted } from './response-submitted';
 import { step as responseSubmittedCounterClaimFeePaymentNeeded } from './response-submitted-counter-claim-fee-payment-needed';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
+import { step as solicitor } from './solicitor';
 import { step as startNow } from './start-now';
 import { step as taskList } from './task-list';
 import { step as tenancyDateDetails } from './tenancy-date-details';
@@ -74,6 +76,8 @@ export const stepRegistry = {
   'start-now': startNow,
   'correspondence-address': correspondenceAddress,
   'free-legal-advice': freeLegalAdvice,
+  solicitor,
+  'ask-your-solicitor-to-respond-to-the-claim': askYourSolicitorToRespondToTheClaim,
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
