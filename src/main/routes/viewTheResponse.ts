@@ -136,13 +136,18 @@ function formatPaymentValue(t: TFunction, amount: string | undefined, frequency:
 }
 
 function frequencyLabel(t: TFunction, frequency: string | undefined | null): string {
-  if (frequency === 'WEEKLY') {
-    return t('viewTheResponse:frequency.weekly');
+  if (!frequency) {
+    return '';
   }
-  if (frequency === 'MONTHLY') {
-    return t('viewTheResponse:frequency.monthly');
-  }
-  return '';
+  const labelKey = {
+    weekly: 'viewTheResponse:frequency.weekly',
+    every2Weeks: 'viewTheResponse:frequency.every2Weeks',
+    every4Weeks: 'viewTheResponse:frequency.every4Weeks',
+    monthly: 'viewTheResponse:frequency.monthly',
+    WEEKLY: 'viewTheResponse:frequency.weekly',
+    MONTHLY: 'viewTheResponse:frequency.monthly',
+  }[frequency];
+  return labelKey ? t(labelKey) : '';
 }
 
 function joinName(firstName?: string, lastName?: string): string {

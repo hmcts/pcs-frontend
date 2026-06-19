@@ -173,6 +173,8 @@
 
   "frequency": {
     "weekly": "cyWeekly",
+    "every2Weeks": "cyEvery 2 weeks",
+    "every4Weeks": "cyEvery 4 weeks",
     "monthly": "cyMonthly"
   },
 

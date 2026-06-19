@@ -173,6 +173,8 @@
 
   "frequency": {
     "weekly": "Weekly",
+    "every2Weeks": "Every 2 weeks",
+    "every4Weeks": "Every 4 weeks",
     "monthly": "Monthly"
   },
 
