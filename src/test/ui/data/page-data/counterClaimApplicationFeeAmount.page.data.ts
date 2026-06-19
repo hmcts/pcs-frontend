@@ -1,5 +1,5 @@
 export const counterClaimApplicationFeeAmount = {
-  mainHeader: `Counterclaim application fee amount`,
+  mainHeader: `Pay your counterclaim fee`,
   counterClaimAmountLabel: `Counterclaim amount`,
   counterClaimFeeLabel: `Counterclaim fee`,
   paymentHint: `You must pay your counterclaim fee for your counterclaim to be considered.`,
