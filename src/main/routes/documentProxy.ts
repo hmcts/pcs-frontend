@@ -10,6 +10,7 @@ import { getUserToken } from '../steps/utils';
 
 import type { DocumentStorage } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
+import { withRedisLock } from '@modules/redisLock';
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 import type { CdamDocument } from '@services/documentUpload.interface';
@@ -97,26 +98,20 @@ function uploadCtx(req: Request): { storage: DocumentStorage } {
   return { storage: step.documentStorage };
 }
 
-// Per-case in-process mutex. Two concurrent uploads/deletes for the same case
+// Per-case cross-pod mutex. Two concurrent uploads/deletes for the same case
 // can otherwise race on the read-modify-write of the documents collection and
 // silently drop entries. The lock serialises only the cheap append-and-save
 // phase; CDAM uploads run in parallel outside the lock.
-const caseLocks = new Map<string, Promise<void>>();
+const CASE_LOCK_TTL_MS = 30_000;
+const CASE_LOCK_WAIT_TIMEOUT_MS = 15_000;
 
-async function withCaseLock<T>(caseId: string, fn: () => Promise<T>): Promise<T> {
-  const previous = caseLocks.get(caseId) ?? Promise.resolve();
-  let release!: () => void;
-  const myTail = previous.then(() => new Promise<void>(resolve => (release = resolve)));
-  caseLocks.set(caseId, myTail);
-  try {
-    await previous;
-    return await fn();
-  } finally {
-    release();
-    if (caseLocks.get(caseId) === myTail) {
-      caseLocks.delete(caseId);
-    }
-  }
+function caseLock<T>(req: Request, caseId: string, fn: () => Promise<T>): Promise<T> {
+  return withRedisLock(
+    req.app.locals.redisClient,
+    `pcs:case-documents:${caseId}`,
+    { ttlMs: CASE_LOCK_TTL_MS, waitTimeoutMs: CASE_LOCK_WAIT_TIMEOUT_MS },
+    fn
+  );
 }
 
 async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<CcdUploadedDocument>): Promise<number> {
@@ -124,7 +119,7 @@ async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<C
   const { storage } = uploadCtx(req);
   const token = getUserToken(req);
 
-  return withCaseLock(caseId, async () => {
+  return caseLock(req, caseId, async () => {
     const existing = await storage.readFresh(req);
     const newTotalSize = getTotalDocumentSizeBytes(existing) + (entry.value.sizeInBytes ?? 0);
     if (newTotalSize > UPLOAD_MAX_TOTAL_SIZE_BYTES) {
@@ -147,7 +142,7 @@ async function removeDraftDocument(req: Request, docId: string): Promise<'remove
   const caseId = req.params.caseReference as string;
   const { storage } = uploadCtx(req);
 
-  return withCaseLock(caseId, async () => {
+  return caseLock(req, caseId, async () => {
     const existing = await storage.readFresh(req);
     const docToDelete = existing.find(d => d.id === docId);
     if (!docToDelete) {
