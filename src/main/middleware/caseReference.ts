@@ -1,3 +1,4 @@
+import { trace } from '@opentelemetry/api';
 import { NextFunction, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
@@ -21,5 +22,7 @@ export async function caseReferenceParamMiddleware(
   }
 
   req.params.caseReference = sanitisedCaseReference;
+  // surfaced as a customDimension in App Insights so telemetry can be filtered by case
+  trace.getActiveSpan()?.setAttribute('caseId', sanitisedCaseReference);
   return next();
 }
