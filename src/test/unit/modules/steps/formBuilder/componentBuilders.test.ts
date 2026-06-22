@@ -849,6 +849,10 @@ describe('componentBuilders', () => {
 
       expect(result.component.errorWrongType).toBe('common:errors.documentUpload.wrongFileTypeDocStore');
       expect(result.component.errorFileTooLarge).toBeTruthy();
+      expect(result.component.errorFileNameTooLong).toEqual({
+        maxLength: '255',
+      });
+      expect(result.component.maxFilenameLength).toBe(255);
       expect(result.component.errorDelete).toBe('common:errors.documentUpload.fileDeleteFailed');
       expect(result.component.uploadButtonText).toBe('uploadButton');
       expect(result.component.filesAddedHeading).toBe('filesAddedHeading');

@@ -222,6 +222,8 @@ function initContainer(container: HTMLElement): void {
   const maxBytes = maxFileSizeMb * 1024 * 1024;
   const wrongTypeMessage = container.dataset.errorWrongType || '';
   const tooLargeMessage = container.dataset.errorFileTooLarge || '';
+  const fileNameTooLongMessage = container.dataset.errorFileNameTooLong || '';
+  const maxFilenameLength = Number.parseInt(container.dataset.maxFilenameLength || '255', 10);
   const deleteFailedMessage = container.dataset.errorDelete || '';
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
@@ -236,6 +238,7 @@ function initContainer(container: HTMLElement): void {
         //   1. blocked media (AC04)         → wrong-type message
         //   2. extension not in allowlist   → wrong-type message
         //   3. file too large               → too-large message
+        //   4. filename too long            → fileNameTooLong message
         // Pre-flight here saves the round-trip; server still validates as defence in depth.
         if (isBlockedExtension(file.name)) {
           showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
@@ -248,6 +251,10 @@ function initContainer(container: HTMLElement): void {
         if (file.size > maxBytes) {
           showErrorSummary(container, tooLargeMessage, errorSummaryTitle);
           throw new Error('too_large');
+        }
+        if (file.name.length > maxFilenameLength) {
+          showErrorSummary(container, fileNameTooLongMessage, errorSummaryTitle);
+          throw new Error('file_name_too_long');
         }
       },
 

@@ -10,7 +10,11 @@ import type {
   FormFieldConfig,
   FormFieldOption,
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
-import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
+import {
+  ACCEPT_ATTRIBUTE_EXTENSIONS,
+  MAX_FILENAME_LENGTH,
+  UPLOAD_MAX_FILE_SIZE_MB,
+} from '@utils/documentUploadValidation';
 
 function createFieldsetLegend(
   label: string,
@@ -213,6 +217,10 @@ export function buildComponentConfig({
       component.errorFileTooLarge = t('common:errors.documentUpload.fileTooLargeDocStore', {
         maxSize: String(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
       });
+      component.errorFileNameTooLong = t('common:errors.documentUpload.fileNameTooLong', {
+        maxLength: String(MAX_FILENAME_LENGTH),
+      });
+      component.maxFilenameLength = MAX_FILENAME_LENGTH;
       component.errorDelete = t('common:errors.documentUpload.fileDeleteFailed');
       component.errorSummaryTitle = t('common:errors.documentUpload.errorSummaryTitle');
       component.uploadButtonText = t('uploadButton');

@@ -78,6 +78,7 @@
       "fileDeleteFailed": "cyThe file could not be removed – try again",
       "documentUrlRequired": "cySelect a file to remove",
       "uploadSuccess": "cy{{filename}} has been uploaded",
+      "fileNameTooLong": "cyThe selected file name must be {{maxLength}} characters or fewer",
       "errorSummaryTitle": "cyThere is a problem"
     }
   },

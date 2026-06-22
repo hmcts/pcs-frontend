@@ -233,6 +233,24 @@ describe('documentProxyRoutes', () => {
       fileFilter({} as Request, file, cb);
       expect(cb).toHaveBeenCalledWith(expect.objectContaining({ message: 'INVALID_FILE_TYPE' }));
     });
+
+    it('rejects filenames longer than 255 characters with FILE_NAME_TOO_LONG error', () => {
+      const cb = jest.fn();
+      const longName = `${'a'.repeat(252)}.pdf`;
+      expect(longName).toHaveLength(256);
+      const file = { mimetype: 'application/pdf', originalname: longName } as Express.Multer.File;
+      fileFilter({} as Request, file, cb);
+      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ message: 'FILE_NAME_TOO_LONG' }));
+    });
+
+    it('accepts filenames at 255 characters', () => {
+      const cb = jest.fn();
+      const maxName = `${'a'.repeat(251)}.pdf`;
+      expect(maxName).toHaveLength(255);
+      const file = { mimetype: 'application/pdf', originalname: maxName } as Express.Multer.File;
+      fileFilter({} as Request, file, cb);
+      expect(cb).toHaveBeenCalledWith(null, true);
+    });
   });
 
   describe('handleMulterError', () => {
@@ -275,6 +293,21 @@ describe('documentProxyRoutes', () => {
       handleMulterError(err, req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 with fileNameTooLong for FILE_NAME_TOO_LONG', () => {
+      const err = new Error('FILE_NAME_TOO_LONG');
+      const req = { t: mockT } as unknown as Request;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      handleMulterError(err, req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: { message: 'errors.documentUpload.fileNameTooLong' },
+      });
       expect(next).not.toHaveBeenCalled();
     });
 
