@@ -4,8 +4,8 @@ import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
   accessYourCase,
-  checkYourAnswersRTC,
   askYourSolicitorToRespond,
+  checkYourAnswersRTC,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
