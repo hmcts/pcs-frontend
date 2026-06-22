@@ -1,5 +1,6 @@
 {
   "question": "Has the defendant applied for Universal Credit?",
+  "caption": "",
   "heading": "Universal Credit",
   "dateLabel": "When did the defendant apply?",
   "errors": {
