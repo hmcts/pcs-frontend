@@ -5214,12 +5214,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-commandline@npm:2.42.1":
-  version: 2.42.1
-  resolution: "allure-commandline@npm:2.42.1"
+"allure-commandline@npm:2.43.0":
+  version: 2.43.0
+  resolution: "allure-commandline@npm:2.43.0"
   bin:
     allure: bin/allure
-  checksum: 10/c69ce036a01e66cd06d9828f2a863c4f440b993a5110026147bded94188148b9736bc6a3ea1c50d1ac7736d7db8db6d29d8bea28189707636e6c125a97eff8d5
+  checksum: 10/6630021c98e4d5a880beb8ef5f4e80ec766f0e7bfb0ceb5202312e3d51d962a0c0e3af2713b9b560997378a7eb9da753cdfca49d11dfa3afad9c6ca901be1b0a
   languageName: node
   linkType: hard
 
@@ -11777,7 +11777,7 @@ __metadata:
     "@types/webpack-env": "npm:1.18.8"
     "@typescript-eslint/eslint-plugin": "npm:8.61.1"
     "@typescript-eslint/parser": "npm:8.61.1"
-    allure-commandline: "npm:2.42.1"
+    allure-commandline: "npm:2.43.0"
     allure-js-commons: "npm:3.10.0"
     allure-playwright: "npm:3.10.0"
     axios: "npm:1.18.0"
