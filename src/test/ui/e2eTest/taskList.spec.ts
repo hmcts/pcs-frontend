@@ -78,7 +78,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
-  await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
+  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
   await performAction('clickButton', dashboard.startYourResponseLink);
   await performValidation('mainHeader', taskList.mainHeader);
 });
