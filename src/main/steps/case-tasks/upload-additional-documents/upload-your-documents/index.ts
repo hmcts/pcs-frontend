@@ -1,25 +1,51 @@
-import type { Request } from 'express';
-
-import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
 import { flowConfig } from '../flow.config';
 
-import { createGetController, createStepNavigation } from '@modules/steps';
+import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
+import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { getDashboardUrl } from '@routes/dashboard';
-import { getFlowConfigForJourney } from '@steps';
+import { CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '@routes/cancelUploadAdditionalDocuments';
+import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
 
-const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'upload-your-documents';
-const templatePath = 'case-tasks/upload-additional-documents/upload-your-documents/uploadYourDocuments.njk';
-const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
-export const step: StepDefinition = {
-  url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
-  name: stepName,
-  view: templatePath,
+const storage = sessionDocs({ stepName });
+
+export const step: StepDefinition = createFormStep({
+  stepName,
+  journeyFolder: 'uploadAdditionalDocuments',
+  documentStorage: storage,
   stepDir: __dirname,
-  getController: () =>
-    createGetController(templatePath, stepName, stepNavigation, (req: Request) => ({
-      dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
-    })),
-};
+  flowConfig,
+  customTemplate: `${__dirname}/uploadYourDocuments.njk`,
+  fields: [
+    {
+      name: 'documents',
+      type: 'file',
+      required: true,
+      accept: ACCEPT_ATTRIBUTE_EXTENSIONS,
+      maxFileSize: UPLOAD_MAX_FILE_SIZE_MB,
+      labelClasses: 'govuk-label--s',
+      translationKey: { label: 'uploadLabel' },
+    },
+  ],
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    heading: 'heading',
+    guidanceText: 'guidanceText',
+    beforeUploadText: 'beforeUploadText',
+    fileTypesText: 'fileTypesText',
+    uploadLabel: 'uploadLabel',
+    filesAddedHeading: 'filesAddedHeading',
+    uploadButton: 'uploadButton',
+    deleteButton: 'deleteButton',
+  },
+  getInitialFormData: async req => ({
+    documents: toDisplayDocuments(await storage.read(req)),
+  }),
+  extendGetContent: async req => {
+    const caseId = req.res?.locals.validatedCase?.id;
+    return {
+      cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
+    };
+  },
+});

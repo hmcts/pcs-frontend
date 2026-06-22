@@ -72,6 +72,7 @@
     "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
     "ViewAllApplications": { "title": "View all applications" }
   },
+
   "viewDocuments": {
     "pageTitle": "View documents",
     "noDocuments": "There are no documents to display.",
