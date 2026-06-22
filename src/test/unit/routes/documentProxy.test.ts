@@ -233,6 +233,16 @@ describe('documentProxyRoutes', () => {
       fileFilter({} as Request, file, cb);
       expect(cb).toHaveBeenCalledWith(expect.objectContaining({ message: 'INVALID_FILE_TYPE' }));
     });
+
+    it('rejects overlong filenames with FILENAME_TOO_LONG error', () => {
+      const cb = jest.fn();
+      const file = {
+        mimetype: 'application/pdf',
+        originalname: 'a'.repeat(256) + '.pdf',
+      } as Express.Multer.File;
+      fileFilter({} as Request, file, cb);
+      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ message: 'FILENAME_TOO_LONG' }));
+    });
   });
 
   describe('handleMulterError', () => {
@@ -275,6 +285,21 @@ describe('documentProxyRoutes', () => {
       handleMulterError(err, req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 with filenameTooLong for FILENAME_TOO_LONG', () => {
+      const err = new Error('FILENAME_TOO_LONG');
+      const req = { t: mockT } as unknown as Request;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      handleMulterError(err, req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: { message: 'errors.documentUpload.filenameTooLong' },
+      });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -351,6 +376,52 @@ describe('documentProxyRoutes', () => {
       await handler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it('rejects an oversize image before CDAM upload (500MB media cap)', async () => {
+      const fiveHundredMbPlusOneByte = 500 * 1024 * 1024 + 1;
+      const req = makeReqWithDocs({
+        file: {
+          originalname: 'big-photo.jpg',
+          mimetype: 'image/jpeg',
+          buffer: Buffer.from(''),
+          size: fiveHundredMbPlusOneByte,
+        },
+      });
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(mockUploadDocument).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: { message: 'errors.documentUpload.fileTooLargeMedia' },
+      });
+    });
+
+    it('allows a non-media file at the same size (only images are capped at 500MB)', async () => {
+      const fiveHundredMbPlusOneByte = 500 * 1024 * 1024 + 1;
+      mockUploadDocument.mockResolvedValue({
+        document_url: 'http://dm/doc/new',
+        document_binary_url: 'http://dm/doc/new/binary',
+        document_filename: 'big.pdf',
+        content_type: 'application/pdf',
+        size: fiveHundredMbPlusOneByte,
+      });
+
+      const req = makeReqWithDocs({
+        file: {
+          originalname: 'big.pdf',
+          mimetype: 'application/pdf',
+          buffer: Buffer.from(''),
+          size: fiveHundredMbPlusOneByte,
+        },
+      });
+      const res = { json: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(mockUploadDocument).toHaveBeenCalled();
     });
 
     it('returns index and filename on successful upload, no CDAM URLs', async () => {
@@ -462,8 +533,8 @@ describe('documentProxyRoutes', () => {
       expect(res.status).toHaveBeenCalledWith(502);
     });
 
-    it('returns 400 when total upload size exceeds 4000MB, deletes orphan CDAM doc', async () => {
-      const fourThousandMbMinusOneByte = 4000 * 1024 * 1024 - 1;
+    it('returns 400 when total upload size exceeds 4GB, deletes orphan CDAM doc', async () => {
+      const fourGbMinusOneByte = 4096 * 1024 * 1024 - 1;
       const hugeExistingDoc = {
         value: {
           document: {
@@ -472,7 +543,7 @@ describe('documentProxyRoutes', () => {
             document_filename: 'huge.pdf',
           },
           contentType: 'application/pdf',
-          sizeInBytes: fourThousandMbMinusOneByte,
+          sizeInBytes: fourGbMinusOneByte,
         },
       };
 

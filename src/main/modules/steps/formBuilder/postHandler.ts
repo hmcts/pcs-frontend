@@ -19,7 +19,7 @@ import {
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
 
-import type { DocumentStorage } from '@modules/documents/storage';
+import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/storage';
 import type {
   BuiltFormContent,
   ExtendGetContent,
@@ -92,6 +92,19 @@ export function createPostHandler(
       // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
       normalizeCheckboxFields(req, fields);
 
+      // For file fields backed by documentStorage, the form body's `uploadedDocuments[]`
+      // hidden inputs are a UI mirror only — session is the source of truth. Hydrate
+      // req.body[field.name] from storage so required-validation and the error re-render
+      // both see actual upload state. Empty -> undefined so the standard isMissing check
+      // fires; non-empty -> display documents so the macro repopulates the file list.
+      if (documentStorage) {
+        for (const field of fields) {
+          if (field.type === 'file') {
+            const docs = await documentStorage.read(req);
+            req.body[field.name] = docs.length > 0 ? toDisplayDocuments(docs) : undefined;
+          }
+        }
+      }
       await hydrateUploadedDocumentsFromBody(req, documentStorage);
 
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
