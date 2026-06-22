@@ -47,16 +47,17 @@ export class ActionRegistry {
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
     ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
+    ['deleteCaseRole', new CreateCaseAPIAction()],
+    ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+
+    //Citizen Dashboard
     ['citizenDashboard', new CitizenDashboardAction()],
     ['validateViewAllApplications', new CitizenDashboardAction()],
     ['verifyRespondToClaimNotificationAndTag', new CitizenDashboardAction()],
     ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()],
-    ['deleteCaseRole', new CreateCaseAPIAction()],
-    ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
-    ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
-    ['startEvidenceUpload', new DocumentsAction()],
-    ['validateViewDocuments', new DocumentsAction()],
-    ['verifyDocumentRelatesToApplication', new DocumentsAction()],
+
+    //Respond to claim
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
@@ -122,6 +123,12 @@ export class ActionRegistry {
     ['linkSolicitorAPI', new LinkSolicitorAPIAction()],
     ['doYouWantToUploadFiles', new RespondToClaimAction()],
     ['uploadFilesToSupportCounterclaim', new RespondToClaimAction()],
+
+    //Documents
+    ['startEvidenceUpload', new DocumentsAction()],
+    ['uploadDocuments', new DocumentsAction()],
+    ['validateViewDocuments', new DocumentsAction()],
+    ['verifyDocumentRelatesToApplication', new DocumentsAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
