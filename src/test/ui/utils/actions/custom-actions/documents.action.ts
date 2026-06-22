@@ -1,6 +1,9 @@
 import { Page } from '@playwright/test';
 
-import { confirmIfTheseDocumentsRelateToAnApplication } from '../../../data/page-data/documents-page-data';
+import {
+  confirmIfTheseDocumentsRelateToAnApplication,
+  uploadYourDocuments,
+} from '../../../data/page-data/documents-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -8,6 +11,7 @@ export class DocumentsAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['startEvidenceUpload', () => this.startEvidenceUpload(fieldName)],
+      ['uploadDocuments', () => this.uploadDocuments(fieldName)],
       ['validateViewDocuments', () => this.validateViewDocuments(fieldName)],
       [
         'verifyDocumentRelatesToApplication',
@@ -24,6 +28,13 @@ export class DocumentsAction implements IAction {
 
   private async startEvidenceUpload(data: actionData): Promise<void> {
     await performAction('clickButton', data);
+  }
+
+  private async uploadDocuments(data: actionRecord): Promise<void> {
+    if (data?.files) {
+      await performAction('uploadFile', data.files);
+    }
+    await performAction('clickButton', uploadYourDocuments.continueButton);
   }
 
   private async validateViewDocuments(data: actionRecord): Promise<void> {
