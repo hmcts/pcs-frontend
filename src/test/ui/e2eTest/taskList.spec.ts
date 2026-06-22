@@ -33,8 +33,8 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';
 
@@ -286,10 +286,6 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('uploadFiles');
     await performAction('clickButton', 'Save and continue');
     await performAction('taskListStatus', {
-      subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
-      status: 'Available',
-    });
-    await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
         taskList.respondToSpecificPartsOfClaimantsClaimLink,
@@ -298,6 +294,10 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
         taskList.confirmDetailsLink,
       ],
       status: 'Done',
+    });
+    await performAction('taskListStatus', {
+      subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
+      status: 'Available',
     });
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
