@@ -14,10 +14,11 @@
 
   <div class="govuk-!-margin-top-6">
     {{ govukSummaryList({
+      classes: 'pcs-fee-summary-list',
       rows: [
         {
           key: { text: counterClaimAmountLabel },
-          value: { text: formattedCounterClaimAmount ?? notApplicable }
+          value: { text: formattedCounterClaimAmount or notApplicable }
         },
         {
           key: { text: counterClaimFeeLabel },
@@ -30,8 +31,6 @@
   {% if showPaymentError %}
     <p class="govuk-error-message">{{ paymentError }}</p>
   {% endif %}
-
-  <p class="govuk-hint">{{ paymentHint }}</p>
 
   {{ govukButton({
     text: payNowButton,
