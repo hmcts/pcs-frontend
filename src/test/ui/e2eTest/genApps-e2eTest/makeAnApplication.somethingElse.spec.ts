@@ -98,5 +98,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
+    await performAction('verifyApplicationSubmitted');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });

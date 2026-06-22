@@ -5,23 +5,18 @@
 
 {% block mainContent %}
 
-  {{ govukPanel({
-    titleText: confirmationPanelTitle
-  }) }}
+  <div class="govuk-panel govuk-panel--confirmation panel-error">
+    <h1 class="govuk-panel__title">
+      {{ yourPaymentWasUnsuccessful }}
+    </h1>
+  </div>
 
-  <p class="govuk-body">
-   {{ receivedYourApplicationMessage }}
-  </p>
-
+  {% if payForYourApplicationUrl %}
   <h2 class="govuk-heading-m">{{ whatHappensNext }}</h2>
   <p class="govuk-body">
-   {{ youDoNotNeedToDoAnythingElse }}
+   {{ youCanTryToMakeACardPayment | safe }}
   </p>
-
-  <h2 class="govuk-heading-m">{{ giveFeedbackAboutThisService }}</h2>
-  <p class="govuk-body">
-   {{ completeThisShortSurvey | safe }}
-  </p>
+  {% endif %}
 
   <a href="{{ dashboardUrl }}" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
       {{ closeAndReturnToCaseOverview }}
