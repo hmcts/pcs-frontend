@@ -271,12 +271,12 @@ export interface CcdCaseData {
   userPcqIdSet?: string;
   tenancy_TenancyLicenceDate?: string;
   legislativeCountry?: string;
-  notice_NoticeHandedOverDateTime?: string;
-  notice_NoticePostedDate?: string;
-  notice_NoticeDeliveredDate?: string;
-  notice_NoticeEmailSentDateTime?: string;
-  notice_NoticeOtherElectronicDateTime?: string;
-  notice_NoticeOtherDateTime?: string;
+  notice_HandedOverDateTime?: string;
+  notice_PostedDate?: string;
+  notice_DeliveredDate?: string;
+  notice_EmailSentDateTime?: string;
+  notice_OtherElectronicDateTime?: string;
+  notice_OtherDateTime?: string;
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
