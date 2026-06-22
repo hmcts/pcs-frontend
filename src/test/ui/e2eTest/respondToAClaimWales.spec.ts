@@ -307,7 +307,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', 'Submit');
     await performAction('clickButton', 'Close and return to case overview');
     await performValidation('mainHeader', dashboard.mainHeader);
   });
