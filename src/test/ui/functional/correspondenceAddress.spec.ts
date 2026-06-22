@@ -24,9 +24,11 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
   if (testInfo.title.includes('@noDefendants')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else {
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
@@ -64,7 +66,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.radio,
       inputArray: correspondenceAddress.errorValidationField.errorRadioMsg,
-      question: correspondenceAddress.correspondenceAddressKnownMainHeader,
+      question: correspondenceAddress.correspondenceAddressPostalMainHeader,
       header: correspondenceAddress.errorValidationHeader,
     });
     await performAction('clickRadioButton', correspondenceAddress.noRadioOption);

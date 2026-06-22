@@ -482,40 +482,49 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
+    await performValidation('mainHeader', correspondenceAddress.correspondenceAddressPostalMainHeader);
     await performAction('clickRadioButton', {
       question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
     });
+
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
-      await this.selectCorrespondenceAddressUnKnown(addressData);
+      this.deleteAnswer(correspondenceAddress.correspondenceAddressPostalMainHeader);
+      if (addressData.addressIndex) {
+        await performActions(
+          'Find Address based on postcode',
+          ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
+          ['clickButton', correspondenceAddress.findAddressHiddenButton],
+          ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
+        );
+      } else if (addressData.addressLine1) {
+        this.recordAnswer(
+          correspondenceAddress.whatsYourPostalAddressQuestion,
+          this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
+        );
+        await performActions(
+          'Enter Address Manually',
+          ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
+          ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
+          ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
+          ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
+        );
+      }
     } else {
-      this.recordAnswer(correspondenceAddress.correspondenceAddressKnownMainHeader, addressData.radioOption);
-      await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+      this.recordAnswer(correspondenceAddress.correspondenceAddressPostalMainHeader, addressData.radioOption);
     }
+
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressUnKnown(addressData: actionRecord) {
-    if (addressData.addressIndex) {
-      await performActions(
-        'Find Address based on postcode',
-        ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
-        ['clickButton', correspondenceAddress.findAddressHiddenButton],
-        ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
-      );
-    } else if (addressData.addressLine1) {
-      this.recordAnswer(
-        correspondenceAddress.correspondenceAddressUnKnownMainHeader,
-        this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
-      );
-      await performActions(
-        'Enter Address Manually',
-        ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
-        ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
-        ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
-        ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
-      );
-    }
-    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await this.selectCorrespondenceAddressKnown({
+      radioOption: addressData.option ?? correspondenceAddress.noRadioOption,
+      addressIndex: addressData.addressIndex,
+      postcode: addressData.postcode,
+      addressLine1: addressData.addressLine1,
+      townOrCity: addressData.townOrCity,
+    });
   }
 
   private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord) {
@@ -1401,7 +1410,6 @@ export class RespondToClaimAction implements IAction {
     rtcCyaMap.clear();
     const rowsLocator = page.locator('.govuk-summary-list__row:visible');
     await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
-
     const summaryList = rowsLocator.first().locator('xpath=ancestor::*[contains(@class, "govuk-summary-list")][1]');
     const rows = summaryList.locator('.govuk-summary-list__row');
     const rowCount = await rows.count();
