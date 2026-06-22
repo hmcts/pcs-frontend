@@ -37,7 +37,7 @@ import {
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';
+import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
 let claimantName: string;
@@ -87,7 +87,7 @@ test.afterEach(async () => {
   finaliseAllValidations();
 });
 
-test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () => {
+test.describe('Respond to a claim - TaskList - e2e Journey @nightly @PR', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
   test('Respond to a claim - TaskList @noDefendants @regression @crossbrowser', async () => {
     //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
