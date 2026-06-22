@@ -5214,12 +5214,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-commandline@npm:2.42.1":
-  version: 2.42.1
-  resolution: "allure-commandline@npm:2.42.1"
+"allure-commandline@npm:2.43.0":
+  version: 2.43.0
+  resolution: "allure-commandline@npm:2.43.0"
   bin:
     allure: bin/allure
-  checksum: 10/c69ce036a01e66cd06d9828f2a863c4f440b993a5110026147bded94188148b9736bc6a3ea1c50d1ac7736d7db8db6d29d8bea28189707636e6c125a97eff8d5
+  checksum: 10/6630021c98e4d5a880beb8ef5f4e80ec766f0e7bfb0ceb5202312e3d51d962a0c0e3af2713b9b560997378a7eb9da753cdfca49d11dfa3afad9c6ca901be1b0a
   languageName: node
   linkType: hard
 
@@ -10464,9 +10464,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:17.0.7":
-  version: 17.0.7
-  resolution: "lint-staged@npm:17.0.7"
+"lint-staged@npm:17.0.8":
+  version: 17.0.8
+  resolution: "lint-staged@npm:17.0.8"
   dependencies:
     listr2: "npm:^10.2.1"
     picomatch: "npm:^4.0.4"
@@ -10478,7 +10478,7 @@ __metadata:
       optional: true
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: 10/4ed3cd01caa78ff5cc5da7ec69f77f091c43a0d5cbb1e084f7ffd3872a9e599675fb8b5f11fd5911faee0d330952889dd0e14378a26620d8f529eae401ce49b4
+  checksum: 10/2b574a3107c030e27ff1c34166ef49f2189c256bb423b0deabef0becdf13ed4cfdcc6fb6815a1285ce0daa92fc6c545d8d0245c9d47a8eb3fbccbc4cf3754587
   languageName: node
   linkType: hard
 
@@ -11777,7 +11777,7 @@ __metadata:
     "@types/webpack-env": "npm:1.18.8"
     "@typescript-eslint/eslint-plugin": "npm:8.61.1"
     "@typescript-eslint/parser": "npm:8.61.1"
-    allure-commandline: "npm:2.42.1"
+    allure-commandline: "npm:2.43.0"
     allure-js-commons: "npm:3.10.0"
     allure-playwright: "npm:3.10.0"
     axios: "npm:1.18.0"
@@ -11816,7 +11816,7 @@ __metadata:
     jest-html-reporter: "npm:4.4.0"
     jest-pact: "npm:0.13.0"
     jose: "npm:6.2.3"
-    lint-staged: "npm:17.0.7"
+    lint-staged: "npm:17.0.8"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
     mini-css-extract-plugin: "npm:2.10.2"
@@ -11843,7 +11843,7 @@ __metadata:
     ts-node: "npm:10.9.2"
     tsconfig-paths: "npm:4.2.0"
     typescript: "npm:5.9.3"
-    uuid: "npm:14.0.0"
+    uuid: "npm:14.0.1"
     validator: "npm:13.15.35"
     webpack: "npm:5.107.2"
     webpack-cli: "npm:7.0.3"
@@ -14546,12 +14546,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^14.0.0":
-  version: 14.0.0
-  resolution: "uuid@npm:14.0.0"
+"uuid@npm:14.0.1":
+  version: 14.0.1
+  resolution: "uuid@npm:14.0.1"
   bin:
     uuid: dist-node/bin/uuid
-  checksum: 10/8ee9b98f9650e25555515f7a28d3c3ae9364e72f7bb19b9e08b681bc135338beba5509b2830f6ae1cfaba4d45401da0d16d4d109b977097bc3d6ba0c5583341b
+  checksum: 10/0f978fd5b0269d7acb615342aeb131f0b8d85eeb8ec34f2915d906baa3befcc14a079a430d0f8116aec6fd20c850cbfab65d1b3d1643fa81ed373c0cf9574f18
   languageName: node
   linkType: hard
 
