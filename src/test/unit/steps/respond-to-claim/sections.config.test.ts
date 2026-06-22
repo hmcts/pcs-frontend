@@ -67,7 +67,7 @@ describe('respond-to-claim sections config', () => {
   it('maps end-of-journey steps into final section', () => {
     expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
       'language-used',
-      'check-your-answers',
+      'end-of-journey-cya',
       'response-submitted',
       'response-submitted-counter-claim-fee-payment-needed',
       'response-and-counter-claim-submitted',
@@ -116,11 +116,11 @@ describe('respond-to-claim sections config', () => {
       }
     });
 
-    it('forward walk from upload-document reaches language-used and check-your-answers', async () => {
+    it('forward walk from upload-document reaches check-your-answers-documents and language-used', async () => {
       const path = await walkFrom('upload-document');
 
+      expect(path).toContain('check-your-answers-documents');
       expect(path).toContain('language-used');
-      expect(path).toContain('check-your-answers');
     });
   });
 
@@ -199,9 +199,9 @@ describe('respond-to-claim sections config', () => {
       expect(sectionHasCya(uploadFiles)).toBe(true);
     });
 
-    it('sectionHasCya is false for checkYourAnswersAndSubmit (no per-section CYA)', () => {
+    it('sectionHasCya is true for checkYourAnswersAndSubmit (has end-of-journey-cya step)', () => {
       const finalSection = findSection('checkYourAnswersAndSubmit')!;
-      expect(sectionHasCya(finalSection)).toBe(false);
+      expect(sectionHasCya(finalSection)).toBe(true);
     });
   });
 

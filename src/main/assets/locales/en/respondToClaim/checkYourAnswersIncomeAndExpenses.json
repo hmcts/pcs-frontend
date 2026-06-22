@@ -65,7 +65,7 @@
       }
     },
     "otherConsiderations": {
-      "label": "Is there anything else you want to tell the court?",
+      "label": "Is there anything else you want to tell the court as part of your response?",
       "changeHidden": "other considerations"
     },
     "otherConsiderationsDetails": {
