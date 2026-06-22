@@ -136,13 +136,18 @@ function formatPaymentValue(t: TFunction, amount: string | undefined, frequency:
 }
 
 function frequencyLabel(t: TFunction, frequency: string | undefined | null): string {
-  if (frequency === 'WEEKLY') {
-    return t('viewTheResponse:frequency.weekly');
+  if (!frequency) {
+    return '';
   }
-  if (frequency === 'MONTHLY') {
-    return t('viewTheResponse:frequency.monthly');
-  }
-  return '';
+  const labelKey = {
+    weekly: 'viewTheResponse:frequency.weekly',
+    every2Weeks: 'viewTheResponse:frequency.every2Weeks',
+    every4Weeks: 'viewTheResponse:frequency.every4Weeks',
+    monthly: 'viewTheResponse:frequency.monthly',
+    WEEKLY: 'viewTheResponse:frequency.weekly',
+    MONTHLY: 'viewTheResponse:frequency.monthly',
+  }[frequency];
+  return labelKey ? t(labelKey) : '';
 }
 
 function joinName(firstName?: string, lastName?: string): string {
@@ -216,7 +221,6 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
 
   pushRow(rows, t('viewTheResponse:defendant1.name'), joinName(party?.firstName, party?.lastName));
   pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
-  pushRow(rows, t('viewTheResponse:defendant1.email'), party?.emailAddress);
   if (isYes(party?.phoneNumberProvided)) {
     pushRow(rows, t('viewTheResponse:defendant1.phone'), party?.phoneNumber);
   }
@@ -279,6 +283,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.tenancyStartDate'),
     formatGdsDate(responses?.tenancyStartDate) ?? ''
   );
+  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
@@ -299,7 +304,6 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.rentArrearsAmount'),
     formatMoneyAmount(responses?.rentArrearsAmount)
   );
-  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(rows, t('viewTheResponse:responseToClaim.disputeClaim'), yesNo(t, responses?.disputeClaim));
   pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
   return { rows };
