@@ -41,9 +41,9 @@ function dashboardCaseRequest(options: {
 }
 
 function getDashboardCaseHandler(): RequestHandler {
-  const fn = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1];
+  const fn = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference/dashboard')?.[1];
   if (typeof fn !== 'function') {
-    throw new Error('Dashboard /:caseReference handler not registered');
+    throw new Error('Dashboard /:caseReference/dashboard handler not registered');
   }
   return fn as RequestHandler;
 }
@@ -158,7 +158,7 @@ describe('Dashboard Routes', () => {
       expect(mockRouterUse).toHaveBeenCalledTimes(1);
       expect(mockRouterUse).toHaveBeenCalledWith(oidcMiddleware);
       expect(mockRouterParam).not.toHaveBeenCalled();
-      expect((app.use as jest.Mock).mock.calls[0][0]).toBe('/dashboard');
+      expect((app.use as jest.Mock).mock.calls[0][0]).toBe('/case');
       expect((app.use as jest.Mock).mock.calls[0][1]).toBe(mockRouter);
     });
 
@@ -454,7 +454,7 @@ describe('Dashboard Routes', () => {
   describe('getDashboardUrl helper', () => {
     it('should return dashboard URL with valid 16-digit case reference', () => {
       const result = getDashboardUrl('1234567890123456');
-      expect(result).toBe('/dashboard/1234567890123456');
+      expect(result).toBe('/case/1234567890123456/dashboard');
     });
 
     it('should return null for invalid case reference', () => {
@@ -469,7 +469,7 @@ describe('Dashboard Routes', () => {
 
     it('should handle numeric case IDs', () => {
       const result = getDashboardUrl(1771325608502536);
-      expect(result).toBe('/dashboard/1771325608502536');
+      expect(result).toBe('/case/1771325608502536/dashboard');
     });
   });
 });

@@ -118,6 +118,8 @@ module.exports = defineConfig([
       'no-console': 'warn',
       'no-prototype-builtins': 'off',
       'no-return-await': 'error',
+      'no-useless-assignment': 'off', // TODO: Remove this rule once we have a better solution for the issue
+      'preserve-caught-error': 'off', // TODO: Remove this rule once we have a better solution for the issue
 
       'no-unneeded-ternary': [
         'error',

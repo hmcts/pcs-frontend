@@ -12,6 +12,7 @@ import {
   respondPossessionClaimAPIAction,
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
+import { LinkSolicitorAPIAction } from '../actions/custom-actions/linkSolicitorAPI.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -68,6 +69,8 @@ export class ActionRegistry {
     ['selectNoticeDetails', new RespondToClaimAction()],
     ['enterNoticeDateKnown', new RespondToClaimAction()],
     ['enterNoticeDateUnknown', new RespondToClaimAction()],
+    ['selectDoYouHaveASolicitor', new RespondToClaimAction()],
+    ['askYourSolicitorToRespond', new RespondToClaimAction()],
     ['disputeClaimInterstitial', new RespondToClaimAction()],
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['repaymentsMade', new RespondToClaimAction()],
@@ -112,6 +115,8 @@ export class ActionRegistry {
     ['retrieveCYATableDataRTC', new RespondToClaimAction()],
     ['validateCYARTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
+    ['getCaseAPI', new CreateCaseAPIAction()],
+    ['linkSolicitorAPI', new LinkSolicitorAPIAction()],
     ['doYouWantToUploadFiles', new RespondToClaimAction()],
     ['uploadFilesToSupportCounterclaim', new RespondToClaimAction()],
 

@@ -15,7 +15,7 @@ const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  process.env.NOTICE_SERVED = 'NO';
+  process.env.NOTICE_SERVED = 'YES';
   process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
@@ -89,7 +89,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Verify confirm document options based on GenApp type @regression', async () => {
+  test('Verify confirm document options based on GenApp type', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
