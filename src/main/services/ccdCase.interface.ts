@@ -234,11 +234,17 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  statementOfTruth?: StatementOfTruth;
   hasSolicitor?: YesNoValue;
   counterClaimWantToUploadFiles?: YesNoValue;
   statementOfTruthCompletedBy?: string;
   completedSections?: RespondToClaimSectionEnum[];
   status?: 'SUBMITTED' | 'CREATED';
+}
+
+export interface StatementOfTruth {
+  accepted?: YesNoValue;
+  fullName?: string;
 }
 
 export interface PossessionClaimResponse {
