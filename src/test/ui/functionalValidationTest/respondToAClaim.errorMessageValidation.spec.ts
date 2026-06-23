@@ -109,6 +109,7 @@ const NO_EMV_MISSING_DESIGN = 'ErrorMessageValidation(EMV) is missing for this p
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
+  process.env.WALES_POSTCODE = 'NO';
   process.env.CLAIMANT_NAME = claimantName;
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.NOTICE_SERVED = 'NO';
