@@ -102,7 +102,6 @@ test.beforeEach(async ({ page }, testInfo) => {
 
 test.afterEach(async () => {
   finaliseAllValidations();
-  delete process.env.WALES_POSTCODE;
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
