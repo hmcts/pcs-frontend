@@ -21,9 +21,14 @@ import {
   UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
   UPLOAD_MAX_TOTAL_SIZE_BYTES,
   UPLOAD_MAX_TOTAL_SIZE_MB,
+  type UploadValidationError,
+  type UploadValidationOptions,
+  effectivePerFileByteLimit,
   formatSizeForDisplay,
+  getUploadErrorKey,
   isMediaExtension,
   validateFileType,
+  validateUploadedFile,
 } from '@utils/documentUploadValidation';
 
 const logger = Logger.getLogger('document-proxy');
@@ -49,6 +54,12 @@ export function fileFilter(req: Request, file: Express.Multer.File, cb: multer.F
   );
   if (error) {
     cb(new UploadValidationFailure(error));
+    return;
+  }
+
+  const result = validateFileType(file.mimetype, file.originalname);
+  if (result === 'ok') {
+    cb(null, true);
     return;
   }
   if (result === 'filename_too_long') {
@@ -119,6 +130,7 @@ export function handleMulterError(
     next();
     return;
   }
+  const errors = getErrorTranslations(req);
   if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
     const opts = (req as RequestWithUploadValidation).uploadValidation;
     const message = translateValidationError(req, {

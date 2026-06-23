@@ -16,19 +16,6 @@ function getCsrfToken(): string {
   return document.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value || '';
 }
 
-function parseOptionalInt(value: string | undefined): number | undefined {
-  if (!value) {
-    return undefined;
-  }
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) ? parsed : undefined;
-}
-
-function parseOptionalMbToBytes(value: string | undefined): number | undefined {
-  const mb = parseOptionalInt(value);
-  return mb === undefined ? undefined : mb * 1024 * 1024;
-}
-
 // MOJ multi-file-upload error pattern (https://design-patterns.service.justice.gov.uk/components/multi-file-upload/):
 // - Page-level error summary at the top of the grid column / main, linking to the file input.
 // - Inline govuk-error-message inside the input's form-group, with form-group--error and aria-describedby on the input.

@@ -196,14 +196,16 @@ describe('documentUploadValidation', () => {
   });
 
   describe('constants', () => {
-    it('has 100MB max file size per file', () => {
-      expect(UPLOAD_MAX_FILE_SIZE_MB).toBe(100);
-      expect(UPLOAD_MAX_FILE_SIZE_BYTES).toBe(100 * 1024 * 1024);
+    it('has 1024MB max file size per file', () => {
+      expect(UPLOAD_MAX_FILE_SIZE_MB).toBe(1024);
+      expect(UPLOAD_MAX_FILE_SIZE_BYTES).toBe(1024 * 1024 * 1024);
     });
 
     it('has 4GB max total file size', () => {
       expect(UPLOAD_MAX_TOTAL_SIZE_MB).toBe(4096);
       expect(UPLOAD_MAX_TOTAL_SIZE_BYTES).toBe(4096 * 1024 * 1024);
+    });
+
     it('has 500MB max media file size', () => {
       expect(UPLOAD_MAX_MEDIA_FILE_SIZE_MB).toBe(500);
       expect(UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES).toBe(500 * 1024 * 1024);
