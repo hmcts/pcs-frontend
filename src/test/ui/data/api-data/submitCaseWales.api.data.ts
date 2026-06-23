@@ -105,7 +105,7 @@ export const submitCaseApiDataWales = {
 
     walesNoticeServed: 'YES',
     notice_ServiceMethod: 'FIRST_CLASS_POST',
-    notice_PostedDate: '1995-11-10',
+    notice_PostedDate: '2025-11-10',
     notice_AbleToUploadDocument: 'No',
     notice_UnableToUploadReason: 'no documents to upload',
     walesTypeOfNoticeServed: 'terts',
@@ -397,7 +397,7 @@ export const submitCaseApiDataWales = {
     settlementAttempted: 'NO',
     walesNoticeServed: 'YES',
     notice_ServiceMethod: 'FIRST_CLASS_POST',
-    notice_PostedDate: '1995-11-10',
+    notice_PostedDate: '2025-11-10',
     notice_AbleToUploadDocument: 'No',
     notice_UnableToUploadReason: 'no documents to upload',
     claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
