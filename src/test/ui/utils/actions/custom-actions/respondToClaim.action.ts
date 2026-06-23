@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
@@ -1428,19 +1428,30 @@ export class RespondToClaimAction implements IAction {
         .first()
         .waitFor({ state: 'visible', timeout: 15000 });
     }
-    const summaryList = rowsLocator.first().locator('xpath=ancestor::*[contains(@class, "govuk-summary-list")][1]');
-    const rows = summaryList.locator('.govuk-summary-list__row');
-    const rowCount = await rows.count();
+    const summaryLists = sectionData
+      ? rowsLocator.first().locator('xpath=ancestor::*[contains(@class, "govuk-summary-list")][1]')
+      : page.locator('.govuk-summary-list:visible');
+    const summaryListCount = await summaryLists.count();
 
-    if (rowCount === 0) {
+    if (summaryListCount === 0) {
       throw new Error('RTC CYA table not found. Exiting...');
     }
+
+    for (let i = 0; i < summaryListCount; i++) {
+      await this.recordRtcCyaRowsFromSummaryList(summaryLists.nth(i), !sectionData);
+    }
+    console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);
+  }
+
+  private async recordRtcCyaRowsFromSummaryList(summaryList: Locator, isFinalCya: boolean): Promise<void> {
+    const rows = summaryList.locator('.govuk-summary-list__row');
+    const rowCount = await rows.count();
 
     for (let j = 0; j < rowCount; j++) {
       const row = rows.nth(j);
       const displayedKeyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
       const keyText =
-        !sectionData && displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion
+        isFinalCya && displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion
           ? rtcUploadedDocumentsQuestion
           : displayedKeyText;
       const valueCell = row.locator('.govuk-summary-list__value').first();
@@ -1452,8 +1463,6 @@ export class RespondToClaimAction implements IAction {
         rtcCyaMap.set(keyText, valueText);
       }
     }
-
-    console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);
   }
 
   private async validateCYARTC(): Promise<void> {
@@ -1477,6 +1486,7 @@ export class RespondToClaimAction implements IAction {
 
     if (mismatches.length > 0) {
       console.log(`\n❌ RTC CYA differences found: ${mismatches.length}`);
+      this.logRetrievedRtcCyaRows();
       for (const mismatch of mismatches) {
         console.log('============================================================');
         console.log(`• ${mismatch}`);
@@ -1496,6 +1506,18 @@ export class RespondToClaimAction implements IAction {
     }
 
     console.log('\n✅ RTC CHECK YOUR ANSWERS VALIDATION PASSED!\n');
+  }
+
+  private logRetrievedRtcCyaRows(): void {
+    console.log('\nRetrieved RTC CYA rows:');
+    if (rtcCyaMap.size === 0) {
+      console.log('• No RTC CYA rows were retrieved.');
+      return;
+    }
+
+    for (const [key, value] of Array.from(rtcCyaMap.entries())) {
+      console.log(`• ${key}: ${value}`);
+    }
   }
 
   private async validateRTCSectionCYA(sectionData: actionData): Promise<void> {
@@ -1525,6 +1547,7 @@ export class RespondToClaimAction implements IAction {
     }
 
     if (mismatches.length > 0) {
+      this.logRetrievedRtcCyaRows();
       throw new Error(`RTC ${sectionName} section CYA validation failed:\n${mismatches.join('\n')}`);
     }
   }
