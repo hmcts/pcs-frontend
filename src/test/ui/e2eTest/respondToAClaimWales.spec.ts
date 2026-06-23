@@ -2,6 +2,7 @@ import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.dat
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
   checkYourAnswersRTC,
+  confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
@@ -105,7 +106,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @PR @noDefendants @smoke @regression', async () => {
+  test('Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @PR @smoke @regression', async () => {
     //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -163,8 +164,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
-    await performAction('clickRadioButton', rentArrears.yesRadioOption);
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown');
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption,
+    });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -370,8 +376,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
-    await performAction('clickRadioButton', rentArrears.yesRadioOption);
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption,
+    });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -438,7 +445,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Other contract - @noDefendants', async () => {
+  test('Respond to a claim - Wales - Other contract - Rent Arrears @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -492,42 +499,93 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnown');
-    // The below step should be enabled after the bug fix - https://tools.hmcts.net/jira/browse/HDPI-6021
-    // await performAction('selectNoticeDetails', {
-    //   option: confirmationOfNoticeGiven.imNotSureRadioOption,
-    // });
-    //   await performAction('clickRadioButton', rentArrears.yesRadioOption);
-    //   await performAction('clickButton', rentArrears.saveAndContinueButton);
-    //   await performValidation('mainHeader', counterClaim.mainHeader);
-    //   await performAction('clickButton', counterClaim.saveAndContinueButton);
-    //   await performAction('readPaymentInterstitial');
-    //   await performAction('repaymentsMade', {
-    //     question: repaymentsMade.getmainHeader(claimantName),
-    //     repaymentOption: repaymentsMade.noRadioOption,
-    //   });
-    //   await performAction('repaymentsAgreed', {
-    //     repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-    //   });
-    //   await performAction('installmentPayments', {
-    //     question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-    //     radioOption: installmentPayments.noRadioOption,
-    //   });
-    //   await performAction('readYourHouseholdAndCircumstances');
-    //   await performAction('doYouHaveAnyDependantChildren', {
-    //     dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
-    //   });
-    //   await performAction('doYouHaveAnyOtherDependants', {
-    //     otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
-    //     otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
-    //   });
-    //   await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-    //     radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-    //     details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
-    //   });
-    //   await performAction('selectAlternativeAccommodation', {
-    //     radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
-    //   });
-    //   await performValidation('mainHeader', yourCircumstances.mainHeader);
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.imNotSureRadioOption,
+    });
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption,
+    });
+    await performAction('selectCounterClaim', {
+      option: counterClaim.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
+    await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'payments');
+    await performAction('validateRTCSectionCYA', 'payments');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
+    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
+    });
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
+    await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC', 'uploadFiles');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('clickButton', 'Submit');
   });
 
   test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - No @noDefendants @regression', async () => {
@@ -589,6 +647,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       month: '12',
       year: '2025',
     });
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknown');
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -676,6 +738,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       day: '01',
       month: '12',
       year: '2025',
+    });
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
