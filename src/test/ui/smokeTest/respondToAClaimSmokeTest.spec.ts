@@ -31,7 +31,7 @@ test.describe('Respond to a claim - smoke test @health', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
   });
 
-  test('Respond to a claim E2E Journey @regression @crossbrowser @sanity', async () => {
+  test('Respond to a claim E2E Journey @crossbrowser @sanity', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     // Below steps will be unskipped once HDPI-5407 and HDPI-5350 are done
     /*await performAction('confirmDefendantDetails', {
