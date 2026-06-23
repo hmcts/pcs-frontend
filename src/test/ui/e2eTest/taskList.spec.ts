@@ -13,16 +13,13 @@ import {
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
+  doYouHaveASolicitor,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
-  endNow,
-  equalityAndDiversityEnd,
-  equalityAndDiversityStart,
   exceptionalHardship,
   freeLegalAdvice,
   incomeAndExpenses,
-  languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
   priorityDebtDetails,
@@ -36,10 +33,10 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
 let claimantName: string;
@@ -90,7 +87,7 @@ test.afterEach(async () => {
 
 test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim - TaskList @noDefendants @regression @crossbrowser', async () => {
+  test('Respond to a claim - TaskList @noDefendants @regression @crossbrowser @NonAutomaticEMV', async () => {
     //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
     await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
     await performAction('taskListStatus', {
@@ -142,6 +139,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('taskList', { subSection: taskList.readInformationAboutLink });
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('inputDefendantDetails', {
@@ -289,31 +287,18 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('uploadFiles');
     await performAction('clickButton', 'Save and continue');
     await performAction('taskListStatus', {
-      subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
-      status: 'Available',
-    });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performAction('readReasonableAdjustmentsTriage');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
-    });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('clickButton', endNow.continueButton);
-    await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
         taskList.respondToSpecificPartsOfClaimantsClaimLink,
         taskList.incomeAndExpensesLink,
         taskList.uploadDocumentsLink,
         taskList.confirmDetailsLink,
-        taskList.checkYourAnswersAndSubmitHiddenLink,
       ],
       status: 'Done',
+    });
+    await performAction('taskListStatus', {
+      subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
+      status: 'Available',
     });
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
