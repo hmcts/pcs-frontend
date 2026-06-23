@@ -50,10 +50,11 @@ import {
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
+  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 const home_url = process.env.TEST_URL;
@@ -246,6 +247,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performValidation('mainHeader', defendantNameCapture.mainHeader);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -323,6 +325,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -351,6 +354,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -415,7 +419,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -575,7 +585,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -815,7 +831,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1005,7 +1027,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1180,7 +1208,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1378,7 +1412,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1559,7 +1599,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1735,7 +1781,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1881,7 +1933,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
     await performValidation('mainHeader', dashboard.mainHeader);
   });
@@ -2042,7 +2100,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
     await performValidation('mainHeader', dashboard.mainHeader);
   });
