@@ -220,11 +220,11 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
   pushRow(rows, t('viewTheResponse:defendant1.name'), joinName(party?.firstName, party?.lastName));
-  pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
   if (isYes(party?.phoneNumberProvided)) {
     pushRow(rows, t('viewTheResponse:defendant1.phone'), party?.phoneNumber);
   }
   pushRow(rows, t('viewTheResponse:defendant1.address'), addressToString(party?.address));
+  pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
   return { rows };
 }
 

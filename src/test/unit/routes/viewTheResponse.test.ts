@@ -348,6 +348,12 @@ describe('viewTheResponse route', () => {
       ])
     );
     expect(renderArgs.defendant1Details.rows.length).toBeGreaterThan(0);
+    expect(renderArgs.defendant1Details.rows.map((row: { key: { text: string } }) => row.key.text)).toEqual([
+      'viewTheResponse:defendant1.name',
+      'viewTheResponse:defendant1.phone',
+      'viewTheResponse:defendant1.address',
+      'viewTheResponse:defendant1.dateOfBirth',
+    ]);
     expect(renderArgs.additionalDefendantDetails).toHaveLength(1);
     expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
       expect.arrayContaining([
