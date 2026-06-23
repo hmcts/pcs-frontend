@@ -126,18 +126,9 @@
   },
   "documentUpload": {
     "maxFileSizePerFileMB": 1024,
-    "maxTotalFileSizeMB": 4000
-  },
-  "dashboard": {
-    "taskRoutes": {
-      "ViewClaim": "/case/:caseReference/view-the-claim",
-      "RespondToClaim": "/case/:caseReference/respond-to-claim/task-list",
-      "MakeGeneralApplication": "/case/:caseReference/make-an-application/choose-an-application",
-      "ViewAllApplications": "/case/:caseReference/view-all-applications",
-      "ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
-      "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
-      "ViewDocuments": "/case/:caseReference/view-documents"
-    }
+    "maxMediaFileSizeMB": 500,
+    "maxTotalFileSizeMB": 4096,
+    "maxFilenameLength": 255
   },
   "redirects": {
     "manageCaseReturnURL": "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"

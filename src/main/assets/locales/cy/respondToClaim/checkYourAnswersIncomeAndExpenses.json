@@ -65,7 +65,7 @@
       }
     },
     "otherConsiderations": {
-      "label": "cy Is there anything else you want to tell the court?",
+      "label": "cy Is there anything else you want to tell the court as part of your response?",
       "changeHidden": "cy other considerations"
     },
     "otherConsiderationsDetails": {
