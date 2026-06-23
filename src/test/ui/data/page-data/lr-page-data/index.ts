@@ -11,3 +11,7 @@ export * from './confirmationOfNoticeDateWhenNotProvidedLR.page.data';
 export * from './nonRentArrearsDisputeLR.page.data';
 export * from './counterclaimLR.page.data';
 export * from './doYouHaveAnyDependantChildrenLR.page.data';
+export * from './doYouHaveAnyOtherDependantsLR.page.data';
+export * from './doAnyOtherAdultsLiveInYourHomeLR.page.data';
+export * from './wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
+export * from './yourCircumstancesLR.page.data';
