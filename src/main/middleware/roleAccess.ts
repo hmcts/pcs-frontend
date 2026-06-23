@@ -12,6 +12,14 @@ const ROLE_GATED_PATHS: readonly RoleGatedPath[] = [
     pattern: /^\/case\/[^/]+\/respond-to-claim(?:\/.*)?$/,
     allowedRoles: ['citizen', 'caseworker-pcs-solicitor'],
   },
+  {
+    pattern: /^\/case\/[^/]+\/dashboard(?:\/.*)?$/,
+    allowedRoles: ['citizen'],
+  },
+  {
+    pattern: /^\/case\/[^/]+\/make-an-application(?:\/.*)?$/,
+    allowedRoles: ['citizen'],
+  },
 ];
 
 export const roleAccessMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {

@@ -11,6 +11,7 @@ import {
   caseReferenceParamMiddleware,
   legalRepresentativeAccessMiddleware,
   pageTrackingUrlMiddleware,
+  roleAccessMiddleware,
 } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
@@ -48,6 +49,7 @@ app.use((req, res, next) => {
 
 app.use(pageTrackingUrlMiddleware);
 app.use(legalRepresentativeAccessMiddleware);
+app.use(roleAccessMiddleware);
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);
