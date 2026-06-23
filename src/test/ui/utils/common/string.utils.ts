@@ -17,21 +17,6 @@ export function escapeForRegex(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export function getRelativeDate(daysOffset: number = 0): {
-  day: string;
-  month: string;
-  year: string;
-} {
-  const date = new Date();
-  date.setDate(date.getDate() + daysOffset);
-
-  return {
-    day: String(date.getDate()).padStart(2, '0'),
-    month: String(date.getMonth() + 1).padStart(2, '0'),
-    year: String(date.getFullYear()),
-  };
-}
-
 export function exactTextWithOptionalWhitespaceRegex(text: string): RegExp {
   return new RegExp(`^\\s*${escapeForRegex(text)}\\s*$`);
 }
@@ -46,6 +31,54 @@ export function formatCurrency(value: number | string): string {
 
 export function formatTextToLowercaseSeparatedBySpace(value: string): string {
   return value.toLowerCase().replace(/_/g, ' ').trim();
+}
+
+// Converts supported values into a stable string form for storage and comparison.
+export function normalizeValueData(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.map(val => String(val)).join(', ');
+  }
+  if (typeof value === 'object' && value !== null) {
+    return JSON.stringify(value);
+  }
+  return String(value);
+}
+
+// Removes a trailing "(optional)" suffix while keeping any ending question mark.
+export function stripOptionalSuffix(question: string): string {
+  return question.replace(/\s*\(optional\)(\?)?\s*$/i, '$1').trim();
+}
+
+// Removes bracketed helper text when it appears at the end of a label.
+export function removeTrailingBracketedSuffix(value: string): string {
+  return value.replace(/\s*\([^)]*\)\s*$/, '').trim();
+}
+
+// Joins only the non-empty values into a comma-separated string.
+export function joinNonEmptyValues(...values: unknown[]): string {
+  return values
+    .map(value => String(value ?? '').trim())
+    .filter(Boolean)
+    .join(', ');
+}
+
+// Builds a full name without leaving extra spaces for missing parts.
+export function buildFullName(firstName?: unknown, lastName?: unknown): string {
+  return `${String(firstName ?? '').trim()} ${String(lastName ?? '').trim()}`.trim();
+}
+
+// Formats a numeric value as pounds with two decimal places.
+export function formatPoundsValue(value: number | string): string {
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue)) {
+    return String(value);
+  }
+  return `£${numericValue.toFixed(2)}`;
+}
+
+// Normalizes text for case-insensitive comparisons and display formatting.
+export function normalizeLowercaseText(value: unknown): string {
+  return String(value).trim().toLowerCase();
 }
 
 export function generateRandomString(length: string | number): string {
