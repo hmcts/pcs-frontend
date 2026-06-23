@@ -1,9 +1,9 @@
 {
-  "pageTitle": "cyYour client’s name",
-  "nameConfirmationLabel": "cyIs your client’s name {{defendantName}}?",
+  "pageTitle": "Enw eich cleient",
+  "nameConfirmationLabel": "Ai enw eich cleient yw {{defendantName}}?",
   "errors": {
-    "nameConfirmation": "cyYou must say if your client’s name is {{defendantName}}",
-    "firstName": "cyEnter your client’s first name",
-    "lastName": "cyEnter your client’s last name"
+    "nameConfirmation": "Mae'n rhaid i chi ddweud os mai enw eich cleient yw {{defendantName}}",
+    "firstName": "Nodwch enw cyntaf eich cleient",
+    "lastName": "Nodwch cyfenw eich cleient"
   }
 }

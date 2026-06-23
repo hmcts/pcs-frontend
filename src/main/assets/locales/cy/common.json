@@ -1,74 +1,74 @@
 {
   "serviceName": "cyPossession Claims",
-  "phase": "cyALPHA",
-  "feedback": "cyThis is a new service – your <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">feedback (opens in new tab)</a> will help us to improve it.",
+  "phase": "ALPHA",
+  "feedback": "Mae hwn yn wasanaeth newydd, bydd eich <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">adborth (yn agor mewn tab newydd)</a> yn ein helpu i'w wella.",
   "languageToggle": "<a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
-  "logout": "cySign out",
-  "navigationLabel": "cyService navigation",
-  "supportAndContactInformation": "cySupport and contact information",
-  "contactUsForHelp": "cyContact us for help",
-  "contactUsForHelpText": "cyIf you need help using this service, contact us.",
-  "contactUsDetailsEmailHeading": "cyEmail",
-  "contactUsDetailsEmailIntroPrefix": "cyUse the",
-  "contactUsDetailsEmailLinkText": "cyfind a court or tribunal service (opens in new tab)",
-  "contactUsDetailsEmailIntroSuffix": "cyto get your local court’s email address.",
-  "contactUsDetailsEmailHelp": "cyIf you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.",
-  "contactUsDetailsTelephoneHeading": "cyTelephone",
-  "contactUsDetailsTelephoneNumber": "cy0300 123 7050",
-  "contactUsDetailsTelephoneHours": "cyMonday to Friday, 8.30am to 5pm.",
-  "contactUsDetailsCallChargesLinkText": "cyFind out about call charges (opens in new tab)",
+  "logout": "Allgofnodi",
+  "navigationLabel": "Llywio'r gwasanaeth",
+  "supportAndContactInformation": "Cymorth a gwybodaeth gyswllt",
+  "contactUsForHelp": "Cysylltu â ni i gael cymorth",
+  "contactUsForHelpText": "Os oes angen help arnoch i ddefnyddio'r gwasanaeth hwn, cysylltwch â ni.",
+  "contactUsDetailsEmailHeading": "E-bost",
+  "contactUsDetailsEmailIntroPrefix": "Defnyddiwch y",
+  "contactUsDetailsEmailLinkText": "gwasanaeth chwilio am lys neu dribiwnlys (agor mewn tab newydd)",
+  "contactUsDetailsEmailIntroSuffix": "i ddod o hyd i gyfeiriad e-bost eich llys lleol.",
+  "contactUsDetailsEmailHelp": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna'r categori Tai i ddod o hyd iddo.",
+  "contactUsDetailsTelephoneHeading": "Rhif ffôn",
+  "contactUsDetailsTelephoneNumber": "0300 303 5174",
+  "contactUsDetailsTelephoneHours": "Dydd Llun i ddydd Iau 9am - 5pm, dydd Gwener 9am - 4.30pm.",
+  "contactUsDetailsCallChargesLinkText": "Gwybodaeth am gost galwadau (agor mewn ffenestr newydd)",
   "buttons": {
-    "saveAndContinue": "cySave and continue",
-    "continue": "cyContinue",
-    "saveForLater": "cySave for later",
-    "back": "cyBack",
-    "cancel": "cyCancel",
-    "finish": "cyStart a new application",
-    "start": "cyStart",
-    "startNow": "cyStart now",
-    "submit": "cySubmit"
+    "saveAndContinue": "Cadw a pharhau",
+    "continue": "Parhau",
+    "saveForLater": "Cadw at hwyrach ymlaen",
+    "back": "Yn ôl",
+    "cancel": "Canslo",
+    "finish": "Dechrau cais newydd",
+    "start": "Dechrau",
+    "startNow": "Dechrau nawr",
+    "submit": "Cyflwyno"
   },
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "or": "cyor",
-    "imNotSure": "cyI’m not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "imNotSure": "Nid wyf yn siŵr"
   },
-  "change": "cyChange",
-  "back": "cyBack",
+  "change": "Newid",
+  "back": "Yn ôl",
   "noAnswerProvided": "cyNo answer provided",
   "date": {
-    "day": "cyDay",
-    "month": "cyMonth",
-    "year": "cyYear"
+    "day": "Diwrnod",
+    "month": "Mis",
+    "year": "Blwyddyn"
   },
-  "warningHiddenText": "cyWarning",
+  "warningHiddenText": "Rhybudd",
   "errors": {
-    "title": "cyThere is a problem",
-    "required": "cyEnter a value",
-    "defaultRequired": "cyThis field is required",
-    "defaultInvalid": "cyInvalid format",
-    "defaultMaxLength": "cyMust be {max} characters or fewer",
-    "chooseOption": "cyChoose an option",
+    "title": "Mae yna broblem",
+    "required": "Rhowch werth",
+    "defaultRequired": "Rhaid llenwi’r blwch hwn",
+    "defaultInvalid": "Fformat annilys",
+    "defaultMaxLength": "Rhaid iddo fod yn {uchafswm} nod neu lai",
+    "chooseOption": "Dewis opsiwn",
     "email": {
-      "required": "cyEnter an email address",
-      "invalid": "cyEnter a valid email address"
+      "required": "Rhowch gyfeiriad e-bost",
+      "invalid": "Rhowch gyfeiriad e-bost dilys"
     },
     "select": {
-      "invalid": "cySelect a valid option"
+      "invalid": "Dewiswch opsiwn dilys"
     },
     "date": {
-      "day": "cyDay",
-      "month": "cyMonth",
-      "year": "cyYear",
-      "required": "cyEnter a date",
+      "day": "Diwrnod",
+      "month": "Mis",
+      "year": "Blwyddyn",
+      "required": "Rhowch ddyddiad",
       "notRealDate": "cyDate must be a real date",
-      "futureDate": "cyDate must be in the past",
-      "pastDate": "cyDate must be in the future",
-      "invalidValue": "cyEnter a valid value",
-      "yearMustBeSameOrAfter": "cyThe year must be the same as or after {{minYear}}",
-      "missingOne": "cyDate must include a {{missingField}}",
-      "missingTwo": "cyDate must include a {{first}} and {{second}}"
+      "futureDate": "Rhaid i’r dyddiad fod yn y gorffennol",
+      "pastDate": "Rhaid i'r dyddiad fod yn y dyfodol",
+      "invalidValue": "Rhowch werth dilys",
+      "yearMustBeSameOrAfter": "Rhaid i'r flwyddyn fod yr un fath â neu ar ôl {{minYear}}",
+      "missingOne": "Rhaid i'r dyddiad gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i'r dyddiad gynnwys {{first}} a {{second}}"
     },
     "documentUpload": {
       "wrongFileTypeDocStore": "cyThe selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
@@ -78,36 +78,36 @@
       "fileDeleteFailed": "cyThe file could not be removed – try again",
       "documentUrlRequired": "cySelect a file to remove",
       "uploadSuccess": "cy{{filename}} has been uploaded",
-      "errorSummaryTitle": "cyThere is a problem"
+      "errorSummaryTitle": "Mae yna broblem"
     }
   },
   "months": {
-    "1": "cyJanuary",
-    "2": "cyFebruary",
-    "3": "cyMarch",
-    "4": "cyApril",
-    "5": "cyMay",
-    "6": "cyJune",
-    "7": "cyJuly",
-    "8": "cyAugust",
-    "9": "cySeptember",
-    "10": "cyOctober",
-    "11": "cyNovember",
-    "12": "cyDecember"
+    "1": "Ionawr",
+    "2": "Chwefror",
+    "3": "Mawrth",
+    "4": "Ebrill",
+    "5": "Mai",
+    "6": "Mehefin",
+    "7": "Gorffennaf",
+    "8": "Awst",
+    "9": "Medi",
+    "10": "Hydref",
+    "11": "Tachwedd",
+    "12": "Rhagfyr"
   },
   "dateFormatLong": "{{day}} {{month}} {{year}}",
   "timeout": {
-    "title": "cyYou'll be signed out soon",
-    "subtitle": "cyFor your security, you'll be signed out in",
-    "caption": "cyYour previous answers have been saved.",
-    "buttonText": "cyStay signed in",
-    "signOutLinkText": "cySign out"
+    "title": "Byddwch yn cael eich allgofnodi'n fuan",
+    "subtitle": "Am resymau diogelwch, byddwch yn cael eich allgofnodi mewn",
+    "caption": "Mae eich atebion blaenorol wedi cael eu cadw.",
+    "buttonText": "Parhau i fod wedi mewngofnodi",
+    "signOutLinkText": "Allgofnodi"
   },
   "time": {
-    "minute": "cyminute",
-    "minutes": "cyminutes",
-    "second": "cysecond",
-    "seconds": "cyseconds"
+    "minute": "munud",
+    "minutes": "munud",
+    "second": "eiliad",
+    "seconds": "eiliad"
   },
   "characterCount": {
     "charactersUnderLimitText": {
@@ -132,16 +132,16 @@
   },
   "errorPages": {
     "pageNotFound": {
-      "title": "cyPage not found",
+      "title": "Ni ellir dod o hyd i’r dudalen",
       "paragraph": "cyIf you typed the web address, check it is correct.",
       "paragraph2": "cyIf you pasted the web address, check you copied the entire address.",
       "paragraph3": "cyIf the web address is correct or you selected a link or button, contact us by email or telephone.",
-      "heading": "cyEmail",
+      "heading": "E-bost",
       "paragraph4": "cyUse the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
-      "paragraph5": "cyIf you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.",
-      "heading2": "cyTelephone",
-      "paragraph6": "cy0300 123 7050",
-      "paragraph7": "cyMonday to Friday, 8.30am to 5pm.",
+      "paragraph5": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna'r categori Tai i ddod o hyd iddo.",
+      "heading2": "Rhif ffôn",
+      "paragraph6": "0300 303 5174",
+      "paragraph7": "Dydd Llun i ddydd Iau 9am - 5pm, dydd Gwener 9am - 4.30pm.",
       "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "serviceUnavailable": {
@@ -150,12 +150,12 @@
       "paragraphDateAndTime": "cyYou will be able to use the service from {{time}} on {{date}}.",
       "paragraphFallback": "cyTry again later.",
       "paragraph2": "cyFor help with your case, contact us by email or telephone.",
-      "heading": "cyEmail",
+      "heading": "E-bost",
       "paragraph3": "cyUse the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
-      "paragraph4": "cyIf you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.",
-      "heading2": "cyTelephone",
-      "paragraph5": "cy0300 123 7050",
-      "paragraph6": "cyMonday to Friday, 8.30am to 5pm.",
+      "paragraph4": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna'r categori Tai i ddod o hyd iddo.",
+      "heading2": "Rhif ffôn",
+      "paragraph5": "0300 303 5174",
+      "paragraph6": "Dydd Llun i ddydd Iau 9am - 5pm, dydd Gwener 9am - 4.30pm.",
       "paragraph7": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "technicalError": {
@@ -163,23 +163,23 @@
       "paragraph": "cyTry again later.",
       "paragraph2": "cyWe saved your answers. They will be available for 30 days.",
       "paragraph3": "cyFor help with your case, contact us by email or telephone.",
-      "heading": "cyEmail",
+      "heading": "E-bost",
       "paragraph4": "cyUse the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
-      "paragraph5": "cyIf you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.",
-      "heading2": "cyTelephone",
-      "paragraph6": "cy0300 123 7050",
-      "paragraph7": "cyMonday to Friday, 8.30am to 5pm.",
+      "paragraph5": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna'r categori Tai i ddod o hyd iddo.",
+      "heading2": "Rhif ffôn",
+      "paragraph6": "0300 303 5174",
+      "paragraph7": "Dydd Llun i ddydd Iau 9am - 5pm, dydd Gwener 9am - 4.30pm.",
       "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "accessDenied": {
       "title": "cyYou do not have access to this page",
       "paragraph": "cyContact us if you think you should have access, or if you need help with your case.",
-      "heading": "cyEmail",
+      "heading": "E-bost",
       "paragraph2": "cyUse the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
-      "paragraph3": "cyIf you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it.",
-      "heading2": "cyTelephone",
-      "paragraph4": "cy0300 123 7050",
-      "paragraph5": "cyMonday to Friday, 8.30am to 5pm.",
+      "paragraph3": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna'r categori Tai i ddod o hyd iddo.",
+      "heading2": "Rhif ffôn",
+      "paragraph4": "0300 303 5174",
+      "paragraph5": "Dydd Llun i ddydd Iau 9am - 5pm, dydd Gwener 9am - 4.30pm.",
       "paragraph6": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     }
   },
@@ -200,7 +200,7 @@
     "situationAndCircumstances": "cyGive details about your household and circumstances",
     "payments": "cyDeclare recent payments or agreements made",
     "incomeAndExpenditure": "cyGive details about your income and expenses",
-    "uploadFiles": "cyUpload documents",
+    "uploadFiles": "Uwchlwytho dogfennau",
     "checkYourAnswersAndSubmit": "cyCheck your answers and submit"
   }
 }

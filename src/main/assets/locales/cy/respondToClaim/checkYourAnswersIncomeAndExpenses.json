@@ -1,6 +1,6 @@
 {
-  "pageTitle": "cy Check your answers",
-  "cardTitle": "cy Income and expenses",
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "Incwm a chostau",
   "frequencies": {
     "WEEKLY": "cy every week",
     "MONTHLY": "cy every month"
@@ -15,18 +15,18 @@
   },
   "rows": {
     "shareIncomeExpenseDetails": {
-      "label": "cy Do you want to provide details of your income and expenses?",
+      "label": "A ydych eisiau darparu manylion am eich incwm a chostau?",
       "changeHidden": "cy share income and expense details"
     },
     "regularIncome": {
       "label": "cy What regular income do you receive?",
       "changeHidden": "cy regular income",
       "options": {
-        "incomeFromJobs": "cy Income from all jobs you do",
-        "pension": "cy Pension – state and private",
-        "universalCredit": "cy Universal Credit",
-        "otherBenefits": "cy Other benefits and credits",
-        "moneyFromElsewhere": "cy Money from somewhere else (for example, child maintenance payments or someone in your household gives you money)"
+        "incomeFromJobs": "Incwm o bob swydd a wneir gennych",
+        "pension": "Pensiwn, y wladwriaeth a phreifat",
+        "universalCredit": "Credyd Cynhwysol",
+        "otherBenefits": "Budd-daliadau a chredydau eraill",
+        "moneyFromElsewhere": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yn eich cartref yn rhoi arian i chi)"
       }
     },
     "hasAppliedForUniversalCredit": {
@@ -53,15 +53,15 @@
       "label": "cy What other regular expenses do you have?",
       "changeHidden": "cy regular expenses",
       "options": {
-        "householdBills": "cy Household bills (for example, council tax, gas, electricity, water, internet)",
-        "loanPayments": "cy Loan payments",
-        "childSpousalMaintenance": "cy Child or spousal maintenance",
-        "mobilePhone": "cy Mobile phone",
-        "groceryShopping": "cy Grocery shopping",
-        "fuelParkingTransport": "cy Fuel, parking and transport",
-        "schoolCosts": "cy School costs (for example, uniform and school dinners)",
-        "clothing": "cy Clothing",
-        "otherExpenses": "cy Other"
+        "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+        "loanPayments": "Taliadau benthyciadau",
+        "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/gwraig",
+        "mobilePhone": "Ffôn symudol",
+        "groceryShopping": "Siopa bwyd",
+        "fuelParkingTransport": "Tanwydd, parcio a chludiant",
+        "schoolCosts": "Costau ysgol (er enghraifft, gwisg a chinio ysgol)",
+        "clothing": "Dillad",
+        "otherExpenses": "Arall"
       }
     },
     "otherConsiderations": {

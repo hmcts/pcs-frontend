@@ -1,23 +1,23 @@
 {
-  "pageTitle": "cyDisputing the claim",
-  "heading": "cyDisputing other parts of the claim",
-  "introParagraph": "cyYou should <a href=\"/case/{{caseReference}}/view-claim\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">view the claim (opens in new tab)</a> to see if there's any other parts of the claim that are incorrect or you disagree with.",
-  "includesHeading": "cyThis includes:",
-  "includesBullet1": "cy{{claimantName, pluralPossessive}} grounds for possession (their reasons for making the claim)",
-  "includesBullet2": "cyany documents they've uploaded to support their claim",
-  "includesBullet3": "cyany other information they've given as part of their claim",
-  "disputeOtherPartsQuestion": "cyDo you want to dispute any other parts of the claim?",
+  "pageTitle": "Gwrthwynebu’r hawliad",
+  "heading": "Gwrthwynebu rhannau eraill o'r hawliad",
+  "introParagraph": "Dylech <a href=\"/case/{{caseReference}}/view-claim\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> wirio'r hawliad (yn agor mewn tab newydd)</a> i weld os oes yna unrhyw ran arall o'r hawliad sy'n anghywir neu yr ydych yn anghytuno ag ef.",
+  "includesHeading": "Mae hyn yn cynnwys:",
+  "includesBullet1": "{{claimantName, pluralPossessive}} seiliau dros feddiannu (eu rhesymau dros wneud yr hawliad)",
+  "includesBullet2": "unrhyw ddogfennau maent wedi eu huwchlwytho i gefnogi eu hawliad",
+  "includesBullet3": "unrhyw wybodaeth arall a roddwyd ganddynt fel rhan o'u hawliad",
+  "disputeOtherPartsQuestion": "A ydych eisiau gwrthwynebu unrhyw rannau eraill o'r hawliad?",
   "disputeOtherPartsOptions": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
   "disputeDetails": {
-    "label": "cyExplain which parts of the claim you do not agree with"
+    "label": "Eglurwch pa rannau o'r hawliad nad ydych yn cytuno â nhw"
   },
   "errors": {
-    "disputeOtherParts": "cySelect if you want to dispute any other parts of the claim",
+    "disputeOtherParts": "Dewiswch a ydych eisiau gwrthwynebu unrhyw rannau eraill o'r hawliad",
     "disputeDetails": {
-      "required": "cyEnter the parts of the claim you do not agree with"
+      "required": "Nodwch y rhannau o'r hawliad nad ydych yn cytuno â nhw"
     },
     "disputeDetailsMaxLength": "cyExplanation must be 6500 characters or less"
   }
