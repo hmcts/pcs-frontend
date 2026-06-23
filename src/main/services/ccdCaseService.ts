@@ -37,6 +37,7 @@ import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import { GenAppType } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type {
   DashboardNotification,
@@ -54,6 +55,12 @@ const logger = Logger.getLogger('ccdCaseService');
 
 interface EventTokenResponse {
   token: string;
+}
+
+export interface RelatedApplication {
+  id: string;
+  type?: GenAppType;
+  applicationSubmittedDate?: string;
 }
 
 export interface TransformedDashboardData {
@@ -296,6 +303,19 @@ export const ccdCaseService = {
     }
 
     const eventId = 'makeAnApplication';
+    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
+    const eventToken = await getEventToken(accessToken || '', eventUrl);
+    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
+
+    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+  },
+
+  async submitUploadDocuments(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+    if (!ccdCase.id) {
+      throw new HTTPError('Cannot upload documents, case ID not specified', 500);
+    }
+
+    const eventId = 'uploadDocuments';
     const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;

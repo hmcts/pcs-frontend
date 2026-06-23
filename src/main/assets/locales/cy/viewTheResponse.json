@@ -1,0 +1,200 @@
+{
+  "pageTitle": "cyView the response",
+  "heading": "cyView the response",
+  "caption": "cyThe response",
+  "propertyAddressLabel": "cyProperty address:",
+  "caseReferenceLabel": "cyCase number:",
+
+  "summary": {
+    "dateIssued": "cyDate issued",
+    "dateSubmitted": "cyDate submitted"
+  },
+
+  "sections": {
+    "claimantDetails": "cyClaimant details",
+    "defendant1Details": "cyDefendant 1 details",
+    "additionalDefendantDetails": "cyAdditional defendant {{number}} details",
+    "responseToClaim": "cyResponse to the claimant’s claim",
+    "paymentsOrAgreements": "cyPayments or agreements since the claim was made",
+    "householdAndCircumstances": "cyYour household and circumstances",
+    "regularIncome": "cyRegular income",
+    "priorityDebts": "cyPriority debts",
+    "regularExpenses": "cyRegular expenses",
+    "additionalInformation": "cyAdditional information",
+    "counterclaim": "cyCounterclaim",
+    "statementOfTruth": "cyStatement of truth"
+  },
+
+  "claimantDetails": {
+    "organisation": "cyClaimant organisation",
+    "name": "cyName",
+    "address": "cyAddress for service"
+  },
+
+  "defendant1": {
+    "name": "cyName",
+    "dateOfBirth": "cyDate of birth",
+    "email": "cyEmail address",
+    "phone": "cyPhone number",
+    "address": "cyPostal address",
+    "contactPreferences": "cyContact preferences",
+    "freeLegalAdvice": "cyHave you had any free legal advice?",
+    "freeLegalAdviceOptions": {
+      "YES": "cyYes",
+      "NO": "cyNo",
+      "PREFER_NOT_TO_SAY": "cyPrefer not to say"
+    }
+  },
+
+  "contactPreference": {
+    "text": "cyText message",
+    "phone": "cyPhone",
+    "email": "cyEmail",
+    "post": "cyPost"
+  },
+
+  "responseToClaim": {
+    "disputeClaim": "cyDo you dispute any other parts of the claim?",
+    "disputeDetails": "cyExplain which parts of the claim you dispute",
+    "claimGrounds": "cyClaim grounds",
+    "exemptLandlord": "cyIs your landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?",
+    "tenancyTypeConfirmation": "cyIs the tenancy, occupation contract or licence agreement type given by the claimant correct?",
+    "tenancyType": "cyCorrected tenancy, occupation contract or licence agreement type",
+    "tenancyStartDateConfirmation": "cyIs the tenancy, occupation contract or licence agreement start date given by the claimant correct?",
+    "tenancyStartDate": "cyCorrected tenancy, occupation contract or licence agreement start date",
+    "possessionNoticeReceived": "cyDid the claimant give you notice of their intention to begin possession proceedings?",
+    "noticeReceivedDate": "cyWhen did you receive notice from the claimant?",
+    "rentArrearsAmountConfirmation": "cyIs the amount of rent arrears given by the claimant correct?",
+    "rentArrearsAmount": "cyAdmitted amount owed in rent arrears",
+    "landlordRegistered": "cyIs your landlord registered?",
+    "landlordLicensed": "cyIs your landlord licensed?",
+    "writtenTerms": "cyHas your landlord sent you written terms of the occupation contract?"
+  },
+
+  "payments": {
+    "anyPaymentsMade": "cyHave you paid any money to {{claimantName}} since {{claimIssueDate}}?",
+    "paymentDetails": "cyDetails of payments made",
+    "repaymentPlanAgreed": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+    "repaymentAgreedDetails": "cyDetails of repayment agreement",
+    "repayArrearsInstalments": "cyWould you like to offer to pay your arrears in instalments?",
+    "additionalContribution": "cyHow much could you afford to pay in addition to the current rent?",
+    "additionalContributionFrequency": "cyHow frequently could you afford to pay this amount?"
+  },
+
+  "household": {
+    "dependantChildren": "cyDo you have any dependent children?",
+    "dependantChildrenDetails": "cyDetails of dependent children",
+    "otherDependants": "cyDo you have any other dependants?",
+    "otherDependantDetails": "cyDetails of other dependants",
+    "otherTenants": "cyDo any other adults live in your home?",
+    "otherTenantsDetails": "cyDetails of other adults living in your home?",
+    "alternativeAccommodation": "cyWould you have somewhere else to live if you had to leave your home?",
+    "alternativeAccommodationDate": "cyWhen would you be able to move in?",
+    "shareAdditional": "cyWould you like to share anything about your circumstances?",
+    "additionalDetails": "cyDetails about your circumstances",
+    "exceptionalHardship": "cyWould you experience exceptional hardship if you were asked to leave your home?",
+    "exceptionalHardshipDetails": "cyDetails about the exceptional hardship you’d experience"
+  },
+
+  "income": {
+    "fromJobs": "cyIncome from all jobs you do",
+    "pension": "cyPension – state and private",
+    "universalCredit": "cyUniversal Credit",
+    "universalCreditApplied": "cyHave you applied for Universal Credit?",
+    "universalCreditApplicationDate": "cyWhen did you apply?",
+    "otherBenefits": "cyOther benefits and credits",
+    "moneyFromElsewhere": "cyMoney from somewhere else (for example, child maintenance payments or someone in your household gives you money)",
+    "moneyFromElsewhereDetails": "cyGive details about the other sources of income and how much you usually receive",
+    "totalAmountReceived": "cyTotal amount received",
+    "receivedEvery": "cyReceived every"
+  },
+
+  "debts": {
+    "hasPriorityDebts": "cyDo you have any priority debts?",
+    "debtTotal": "cyWhat is the total amount you owe for all your priority debts?",
+    "debtContribution": "cyHow much do you pay towards your priority debts each week or month?",
+    "paidEvery": "cyPaid every"
+  },
+
+  "expenses": {
+    "householdBills": "cyHousehold bills (for example, council tax, gas, electricity, water, internet)",
+    "loanPayments": "cyLoan payments",
+    "childSpousalMaintenance": "cyChild or spousal maintenance",
+    "mobilePhone": "cyMobile phone",
+    "groceryShopping": "cyGrocery shopping",
+    "fuelParkingTransport": "cyFuel, parking and transport",
+    "schoolCosts": "cySchool costs (for example, uniform and school dinners)",
+    "clothing": "cyClothing",
+    "other": "cyOther",
+    "amountPaid": "cyAmount paid",
+    "paidEvery": "cyPaid every"
+  },
+
+  "additional": {
+    "otherConsiderations": "cyIs there anything else you want to tell the court as part of your response?",
+    "otherConsiderationsDetails": "cyDetails of what else you want to tell the court"
+  },
+
+  "counterclaim": {
+    "type": "cyWhat are you claiming for?",
+    "amountKnown": "cyAre you claiming for a specific sum of money?",
+    "amount": "cyHow much are you claiming?",
+    "estimatedMaxAmount": "cyWhat’s the maximum value of your claim?",
+    "against": "cyWho are you making the counterclaim against?",
+    "againstName": "cyWhat is the name of the person or organisation you are making the counterclaim against?",
+    "againstAddress": "cyWhat's their postal address?",
+    "for": "cyWhat is your counterclaim for?",
+    "reasons": "cyWhat are your reasons for making the counterclaim?",
+    "ordersRequested": "cyWhat orders are you asking the court to make?",
+    "factsForCourt": "cyWhat facts would you like the court to consider when deciding the claim?",
+    "needHelpWithFees": "cyDo you need help paying the counterclaim fee?",
+    "appliedForHwf": "cyHave you already applied for help with your counterclaim fee?",
+    "hwfReference": "cyHelp with Fees reference number",
+    "claimTypeOptions": {
+      "PAYMENT_OR_COMPENSATION": "cyA sum of money or compensation",
+      "SOMETHING_ELSE": "cySomething else",
+      "BOTH": "cyBoth"
+    },
+    "needHelpWithFeesOptions": {
+      "YES": "cyI need help paying the fee",
+      "NO": "cyI do not need help paying the fee"
+    }
+  },
+
+  "incomeFrequencies": {
+    "WEEKLY": "cyreceived every week",
+    "MONTHLY": "cyreceived every month"
+  },
+
+  "paymentFrequencies": {
+    "WEEKLY": "cypaid every week",
+    "MONTHLY": "cypaid every month"
+  },
+
+  "frequency": {
+    "weekly": "cyWeekly",
+    "every2Weeks": "cyEvery 2 weeks",
+    "every4Weeks": "cyEvery 4 weeks",
+    "monthly": "cyMonthly"
+  },
+
+  "statementOfTruth": {
+    "body": "cyI believe the facts stated in this defence form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in the truth.",
+    "yourFullName": "cyYour full name"
+  },
+
+  "pdf": {
+    "heading": "cyDownload a PDF copy of the response",
+    "linkText": "cyResponse (PDF)"
+  },
+
+  "closeAndReturn": "cyClose and return to case overview",
+
+  "accordion": {
+    "summary": "cyIf you cannot find a document that you are looking for in this section",
+    "body": "cyAll documents uploaded by you or the claimant are on the",
+    "linkText": "cyDocuments page"
+  },
+
+  "personsUnknown": "cyPersons unknown"
+}
