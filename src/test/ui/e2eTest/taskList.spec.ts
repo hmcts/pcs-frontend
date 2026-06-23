@@ -87,7 +87,7 @@ test.afterEach(async () => {
 
 test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim - TaskList @noDefendants @regression @crossbrowser', async () => {
+  test('Respond to a claim - TaskList @noDefendants @regression @crossbrowser @NonAutomaticEMV', async () => {
     //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
     await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
     await performAction('taskListStatus', {
