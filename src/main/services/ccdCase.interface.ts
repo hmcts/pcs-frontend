@@ -234,10 +234,16 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  statementOfTruth?: StatementOfTruth;
   hasSolicitor?: YesNoValue;
   counterClaimWantToUploadFiles?: YesNoValue;
   completedSections?: RespondToClaimSectionEnum[];
   status?: 'SUBMITTED' | 'CREATED';
+}
+
+export interface StatementOfTruth {
+  accepted?: YesNoValue;
+  fullName?: string;
 }
 
 export interface PossessionClaimResponse {
@@ -289,6 +295,11 @@ export interface CcdCaseData {
   allDefendants?: CcdCollectionItem<CcdParty>[];
   allLinkedDefendants?: CcdCollectionItem<CcdDefendantParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
+  uploadedAdditionalDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
+  // Populated by the uploadDocuments START handler (@JsonUnwrapped on PCSCase).
+  showRelatedApplicationsPage?: YesNoValue;
+  relatedApplicationOptions?: CcdCollectionItem<RelatedApplicationOption>[];
+  selectedRelatedApplicationId?: string;
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
   applicantSurname?: string;
@@ -301,6 +312,19 @@ export interface CcdCaseDocument {
   document_filename?: string;
   upload_timestamp?: string;
   category_id?: string;
+}
+
+export type DocumentUploadCategoryCode =
+  | 'ADJOURN_HEARING_APPLICATION'
+  | 'SUSPEND_EVICTION_APPLICATION'
+  | 'SET_ASIDE_ORDER_APPLICATION'
+  | 'GENERAL_APPLICATION'
+  | 'MAIN_CLAIM_OR_COUNTERCLAIM';
+
+export interface RelatedApplicationOption {
+  genAppId?: string;
+  category: DocumentUploadCategoryCode;
+  submittedDate?: string;
 }
 
 /** Case representation used by services: id + case_data. */
