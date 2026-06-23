@@ -7,7 +7,7 @@ import { sectionIdToBackendEnum } from '../sections.config';
 
 import { buildEndOfJourneyCyaSections } from './buildEndOfJourneyCyaRows';
 
-import { getTranslationFunction } from '@modules/steps';
+import { getTranslationFunction, loadStepNamespaces } from '@modules/steps';
 import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -65,16 +65,20 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     };
   },
   extendGetContent: async (req: Request) => {
-    await req.i18n?.loadNamespaces([
-      'respondToClaim/checkYourAnswersStartNowAndDetails',
-      'respondToClaim/checkYourAnswersPersonalDetails',
-      'respondToClaim/checkYourAnswersYourResponse',
-      'respondToClaim/checkYourAnswersPaymentsAndAgreements',
-      'respondToClaim/checkYourAnswersYourCircumstances',
-      'respondToClaim/checkYourAnswersIncomeAndExpenses',
-      'respondToClaim/checkYourAnswersDocuments',
-      'respondToClaim/checkYourAnswers',
-    ]);
+    await loadStepNamespaces(
+      req,
+      [
+        'checkYourAnswersStartNowAndDetails',
+        'checkYourAnswersPersonalDetails',
+        'checkYourAnswersYourResponse',
+        'checkYourAnswersPaymentsAndAgreements',
+        'checkYourAnswersYourCircumstances',
+        'checkYourAnswersIncomeAndExpenses',
+        'checkYourAnswersDocuments',
+        'checkYourAnswers',
+      ],
+      'respondToClaim'
+    );
     const t: TFunction = getTranslationFunction(req, ['common']);
     const sections = buildEndOfJourneyCyaSections(req, t);
     const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;

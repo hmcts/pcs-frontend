@@ -44,7 +44,7 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
     // When "No", the corrected name is rendered as a separate follow-up row so each
     // answer keeps its own Change link (matches disputeClaim + disputeClaimDetails).
     const questionRow: SummaryListRow = {
-      key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
+      key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName, defendantName: claimDefendantName }) },
       value: { text: yesNoNotSure(nameConfirmation) },
       actions: { items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')] },
     };

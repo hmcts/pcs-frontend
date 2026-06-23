@@ -39,6 +39,7 @@ export {
 export {
   getStepTranslationPath,
   loadStepNamespace,
+  loadStepNamespaces,
   getStepTranslations,
   getTranslationFunction,
   validateTranslationKey,
