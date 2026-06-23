@@ -91,7 +91,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     // Parent step that groups all functional tests for this page
     await test.step(`PFT triggered for page - ${pageName}`, async () => {
-      if (enable_error_message_validation === 'true') {
+      if (enable_error_message_validation === 'true' && !test.info().title.includes('@NonAutomaticEMV')) {
         await test.step(`EMV triggered for page - ${pageName}`, async () => {
           try {
             await this.runErrorMessageValidation(page, pageName, pftFilePath);

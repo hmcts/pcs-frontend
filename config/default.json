@@ -126,7 +126,9 @@
   },
   "documentUpload": {
     "maxFileSizePerFileMB": 1024,
-    "maxTotalFileSizeMB": 4000
+    "maxMediaFileSizeMB": 500,
+    "maxTotalFileSizeMB": 4096,
+    "maxFilenameLength": 255
   },
   "dashboard": {
     "taskRoutes": {
