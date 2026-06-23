@@ -20,7 +20,7 @@
       "futureDate": "Rhaid i ddyddiad dechrau'r denantiaeth fod yn y gorffennol",
       "invalidValue": "Rhaid i ddyddiad dechrau’r denantiaeth fod yn ddyddiad go iawn",
       "missingOne": "Rhaid i ddyddiad dechrau eich tenantiaeth gynnwys {{missingField}}",
-      "missingTwo": "cyTenancy start date must include a  {{first}} and {{second}}"
+      "missingTwo": "Rhaid i ddyddiad dechrau'r denantiaeth gynnwys {{first}} a {{second}}"
     },
     "confirmTenancyDate": "Dewiswch a yw manylion y denantiaeth, drwydded neu gontract meddiannaeth yn gywir"
   }
