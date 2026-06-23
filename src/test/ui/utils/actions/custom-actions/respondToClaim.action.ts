@@ -4,6 +4,8 @@ import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
   accessYourCase,
+  askYourSolicitorToRespond,
+  checkYourAnswersRTC,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -23,6 +25,7 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   doAnyOtherAdultsLiveInYourHome,
+  doYouHaveASolicitor,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
@@ -58,7 +61,18 @@ import {
   yourCircumstances,
   yourHouseholdAndCircumstances,
 } from '../../../data/page-data';
-import { formatCurrency, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
+import { formatDateFromParts } from '../../common/date.utils';
+import {
+  buildFullName,
+  formatCurrency,
+  formatPoundsValue,
+  formatTextToLowercaseSeparatedBySpace,
+  joinNonEmptyValues,
+  normalizeLowercaseText,
+  normalizeValueData,
+  removeTrailingBracketedSuffix,
+  stripOptionalSuffix,
+} from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -69,29 +83,16 @@ const rtcCyaMap = new Map<string, string>();
 const rtcSectionAnswers = new Map<string, Map<string, string>>();
 let activeRtcSection = '';
 const rtcUploadedDocumentsQuestion = 'Uploaded files';
+const rtcFinalCyaUploadedDocumentsQuestion = 'Upload any files that you think are relevant to your response';
 const rtcNoDocumentsUploadedValue = 'No files uploaded';
 const rtcNoAnswerProvidedValue = 'No answer provided';
+const rtcCyaFailurePreviewLimit = 10;
 
 const rtcCyaLabels = {
   contactDetails: 'Contact details',
-  otherConsiderations: 'Is there anything else you want to tell the court?',
+  counterClaimHelpWithFeesReference: 'Enter your Help with Fees reference number',
   universalCreditApplicationDate: 'When did you apply for Universal Credit?',
 } as const;
-
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-] as const;
 
 const rtcSectionByAction = new Map<string, string>([
   ['selectLegalAdvice', 'startNowAndDetails'],
@@ -148,6 +149,8 @@ export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName as actionRecord)],
+      ['selectDoYouHaveASolicitor', () => this.selectDoYouHaveASolicitor(fieldName as actionRecord)],
+      ['askYourSolicitorToRespond', () => this.askYourSolicitorToRespond(fieldName as actionData)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
@@ -219,6 +222,8 @@ export class RespondToClaimAction implements IAction {
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
       ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page, fieldName as actionData)],
       ['validateCYARTC', () => this.validateCYARTC()],
+      ['changeAnswerOnFinalCYA', () => this.changeAnswerOnFinalCYA(page, fieldName as actionData)],
+      ['selectStatementOfTruthRTC', () => this.selectStatementOfTruthRTC(fieldName as actionRecord)],
       ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
       ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
       ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
@@ -233,31 +238,8 @@ export class RespondToClaimAction implements IAction {
     await actionToPerform();
   }
 
-  private normalizeValueData(value: actionData): string {
-    if (Array.isArray(value)) {
-      return value.map(val => String(val)).join(', ');
-    }
-    if (typeof value === 'object' && value !== null) {
-      return JSON.stringify(value);
-    }
-    return String(value);
-  }
-
-  private formatRtcCyaCurrency(value: actionData): string {
-    const numericValue = Number(value);
-    if (Number.isNaN(numericValue)) {
-      return String(value);
-    }
-    return `£${numericValue.toFixed(2)}`;
-  }
-
-  private formatRtcCyaFrequency(value: actionData): string {
-    const normalizedFrequency = String(value).trim().toLowerCase();
-    return normalizedFrequency;
-  }
-
   private getRtcCyaQuestionLabel(question: string): string {
-    return question.replace(/\s*\(optional\)(\?)?\s*$/i, '$1').trim();
+    return stripOptionalSuffix(question);
   }
 
   private getRtcCyaChoiceLabel(choice: actionData): string {
@@ -267,7 +249,7 @@ export class RespondToClaimAction implements IAction {
       return normalizedChoice;
     }
 
-    return normalizedChoice.replace(/\s*\([^)]*\)\s*$/, '').trim();
+    return removeTrailingBracketedSuffix(normalizedChoice);
   }
 
   private buildRtcCyaAmountAndFrequencyValue(
@@ -275,7 +257,7 @@ export class RespondToClaimAction implements IAction {
     frequency: actionData,
     descriptor: string = 'every'
   ): string {
-    return `${this.formatRtcCyaCurrency(amount)} ${descriptor} ${this.formatRtcCyaFrequency(frequency)}`;
+    return `${formatPoundsValue(String(amount))} ${descriptor} ${normalizeLowercaseText(frequency)}`;
   }
 
   private buildRtcCyaDateValue(
@@ -284,44 +266,16 @@ export class RespondToClaimAction implements IAction {
     year?: actionData,
     emptyValue: string = rtcNoAnswerProvidedValue
   ): string {
-    const formattedDate = this.formatRtcCyaDateParts(day, month, year);
+    const formattedDate = formatDateFromParts(day, month, year);
     return formattedDate ?? emptyValue;
   }
 
   private buildRtcCyaAddressValue(...lines: (actionData | undefined)[]): string {
-    return lines
-      .map(line => String(line ?? '').trim())
-      .filter(Boolean)
-      .join(', ');
+    return joinNonEmptyValues(...lines);
   }
 
   private buildRtcCyaFullName(firstName?: actionData, lastName?: actionData): string {
-    return `${String(firstName ?? '').trim()} ${String(lastName ?? '').trim()}`.trim();
-  }
-
-  private formatRtcCyaDateParts(day?: actionData, month?: actionData, year?: actionData): string | undefined {
-    const dayNumber = Number(String(day ?? '').trim());
-    const monthNumber = Number(String(month ?? '').trim());
-    const yearNumber = Number(String(year ?? '').trim());
-
-    if (!Number.isInteger(dayNumber) || !Number.isInteger(monthNumber) || !Number.isInteger(yearNumber)) {
-      return undefined;
-    }
-
-    if (monthNumber < 1 || monthNumber > 12 || dayNumber < 1 || yearNumber < 1) {
-      return undefined;
-    }
-
-    const date = new Date(Date.UTC(yearNumber, monthNumber - 1, dayNumber));
-    if (
-      date.getUTCFullYear() !== yearNumber ||
-      date.getUTCMonth() !== monthNumber - 1 ||
-      date.getUTCDate() !== dayNumber
-    ) {
-      return undefined;
-    }
-
-    return `${dayNumber} ${monthNames[monthNumber - 1]} ${yearNumber}`;
+    return buildFullName(firstName, lastName);
   }
 
   private recordRtcCyaName(label: string, firstName?: actionData, lastName?: actionData): void {
@@ -402,7 +356,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private recordAnswer(key: string, value: actionData): void {
-    const normalizedValue = this.normalizeValueData(value);
+    const normalizedValue = normalizeValueData(value);
     FieldsStore.set(key, normalizedValue);
     if (!activeRtcSection) {
       return;
@@ -431,6 +385,22 @@ export class RespondToClaimAction implements IAction {
       option: legalAdviceData,
     });
     await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
+  }
+
+  private async selectDoYouHaveASolicitor(solicitorData: actionData) {
+    this.recordAnswer(doYouHaveASolicitor.mainHeader, solicitorData);
+    await performAction('clickRadioButton', {
+      question: doYouHaveASolicitor.mainHeader,
+      option: solicitorData,
+    });
+    await performAction('clickButton', doYouHaveASolicitor.saveAndContinueButton);
+  }
+
+  private async askYourSolicitorToRespond(_askYourSolicitorData: actionData) {
+    await performAction('clickButton', {
+      question: askYourSolicitorToRespond.mainHeader,
+      button: askYourSolicitorToRespond.closeAndReturnToTaskListButton,
+    });
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {
@@ -924,26 +894,23 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
-    this.recordAnswer(
-      counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
-      helpWithFee.helpWithFeeOption
-    );
+    const helpWithFeesQuestion =
+      counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion;
+    this.recordAnswer(helpWithFeesQuestion, helpWithFee.helpWithFeeOption);
     await performAction('clickRadioButton', {
-      question: counterClaimHaveYouAppliedForHelp.haveYouAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion,
+      question: helpWithFeesQuestion,
       option: helpWithFee.helpWithFeeOption,
     });
 
     if (helpWithFee.helpWithFeeOption === 'Yes') {
-      this.recordAnswer(
-        counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
-        helpWithFee.feeReference
-      );
+      this.recordAnswer(rtcCyaLabels.counterClaimHelpWithFeesReference, helpWithFee.feeReference);
       await performAction(
         'inputText',
         counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
         helpWithFee.feeReference
       );
     } else {
+      this.deleteAnswer(rtcCyaLabels.counterClaimHelpWithFeesReference);
       this.deleteAnswer(counterclaimYouNeedToApplyForHelpWithYourFees.helpWithFeesLink);
     }
     await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
@@ -1222,7 +1189,7 @@ export class RespondToClaimAction implements IAction {
   private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
     this.recordAnswer(
       priorityDebtDetails.whatIsTheTotalAmountQuestion,
-      this.formatRtcCyaCurrency(priorityDebtDetailsData.totalAmount)
+      formatPoundsValue(String(priorityDebtDetailsData.totalAmount))
     );
     this.recordAnswer(
       priorityDebtDetails.howMuchDoYouPayQuestion,
@@ -1317,9 +1284,52 @@ export class RespondToClaimAction implements IAction {
     });
     await performAction('clickButton', languageUsed.saveAndContinueButton);
   }
+  private async selectStatementOfTruthRTC(sot: actionRecord): Promise<void> {
+    await performValidation('text', { elementType: 'subHeader', text: checkYourAnswersRTC.statementOfTruthHeader });
+    await performValidation('text', { elementType: 'paragraph', text: checkYourAnswersRTC.statementOfTruthParagraph });
+    await performValidation('elementToBeVisible', checkYourAnswersRTC.contemptOfCourtCheckboxLabel);
+    const options = Array.isArray(sot.options) ? sot.options : [sot.option];
+    for (const option of options) {
+      await performAction('check', {
+        question: sot.question,
+        option,
+      });
+    }
+    await performAction('inputText', checkYourAnswersRTC.yourFullNameTextLabel, sot.input);
+    await performAction('clickButton', checkYourAnswersRTC.submitButton);
+  }
+
+  private async changeAnswerOnFinalCYA(page: Page, question: actionData): Promise<void> {
+    await performValidation('mainHeader', checkYourAnswersRTC.mainHeader);
+    const questionText = String(question);
+    const rows = page.locator('.govuk-summary-list__row');
+    const rowCount = await rows.count();
+
+    for (let i = 0; i < rowCount; i++) {
+      const row = rows.nth(i);
+      if (!(await row.isVisible())) {
+        continue;
+      }
+      const keyText = (await row.locator('dt.govuk-summary-list__key').first().innerText()).trim();
+      if (keyText !== questionText) {
+        continue;
+      }
+
+      const changeLink = row.getByRole('link', { name: 'Change' });
+      const href = await changeLink.getAttribute('href');
+      if (!href) {
+        throw new Error(`Missing Change link href for RTC final CYA question "${questionText}"`);
+      }
+
+      await Promise.all([page.waitForURL(new RegExp(href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))), changeLink.click()]);
+      return;
+    }
+
+    throw new Error(`RTC final CYA question "${questionText}" was not found`);
+  }
 
   private async otherConsiderations(otherConsiderationsData: actionRecord): Promise<void> {
-    this.recordAnswer(rtcCyaLabels.otherConsiderations, otherConsiderationsData.option);
+    this.recordAnswer(otherConsiderations.mainHeader, otherConsiderationsData.option);
     await performAction('clickRadioButton', {
       question: otherConsiderationsData.question,
       option: otherConsiderationsData.option,
@@ -1349,7 +1359,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async doYouWantToUploadFiles(uploadOption: actionRecord): Promise<void> {
-    this.recordAnswer(doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader, uploadOption);
+    this.recordAnswer(doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader, uploadOption.option);
     await performAction('clickRadioButton', {
       question: doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader,
       option: uploadOption.option,
@@ -1399,23 +1409,25 @@ export class RespondToClaimAction implements IAction {
   private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
     const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
     rtcCyaMap.clear();
-    const summaryList = page.locator('.govuk-summary-list').first();
-    await summaryList.waitFor({ state: 'visible' });
-
-    const rows = summaryList.locator('.govuk-summary-list__row');
-    const rowCount = await rows.count();
-
-    if (rowCount === 0) {
-      throw new Error('RTC CYA table not found. Exiting...');
+    const rowsLocator = page.locator('.govuk-summary-list__row:visible');
+    await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
+    if (FieldsStore.getAll().has(rtcUploadedDocumentsQuestion)) {
+      const uploadedFilesLabel = sectionData ? rtcUploadedDocumentsQuestion : rtcFinalCyaUploadedDocumentsQuestion;
+      await page
+        .locator('.govuk-summary-list__row:visible')
+        .filter({ has: page.locator('.govuk-summary-list__key', { hasText: uploadedFilesLabel }) })
+        .first()
+        .waitFor({ state: 'visible', timeout: 15000 });
     }
 
+    const rowCount = await rowsLocator.count();
     for (let j = 0; j < rowCount; j++) {
-      const row = rows.nth(j);
-      if (!(await row.isVisible())) {
-        continue;
-      }
-
-      const keyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
+      const row = rowsLocator.nth(j);
+      const displayedKeyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
+      const keyText =
+        !sectionData && displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion
+          ? rtcUploadedDocumentsQuestion
+          : displayedKeyText;
       const valueCell = row.locator('.govuk-summary-list__value').first();
       const innerText = (await valueCell.innerText()).trim();
       const textContent = ((await valueCell.textContent()) ?? '').trim();
@@ -1454,7 +1466,18 @@ export class RespondToClaimAction implements IAction {
         console.log('============================================================');
         console.log(`• ${mismatch}`);
       }
-      throw new Error(`RTC CYA validation failed for ${mismatches.length} item(s)`);
+
+      const mismatchPreview = mismatches
+        .slice(0, rtcCyaFailurePreviewLimit)
+        .map((mismatch, index) => `${index + 1}. ${mismatch}`)
+        .join('\n');
+      const remainingMismatchCount = mismatches.length - rtcCyaFailurePreviewLimit;
+      const remainingMismatchSummary =
+        remainingMismatchCount > 0 ? `\n...and ${remainingMismatchCount} more mismatch(es).` : '';
+
+      throw new Error(
+        `RTC CYA validation failed for ${mismatches.length} item(s).\n${mismatchPreview}${remainingMismatchSummary}`
+      );
     }
 
     console.log('\n✅ RTC CHECK YOUR ANSWERS VALIDATION PASSED!\n');
@@ -1500,21 +1523,27 @@ export class RespondToClaimAction implements IAction {
 
     const defendantDetailsKnown = explicitDefendantDetailsKnown ?? explicitDefendantTypeKnown;
 
-    const pin =
-      typeof defendantDetailsKnown === 'boolean'
-        ? selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin
-        : (getSelectedPinUser()?.pin ?? pins[0]);
+    let pin: string | undefined;
+
+    if (typeof accessCode.pinIndex === 'number') {
+      pin = pins[accessCode.pinIndex];
+    } else if (typeof defendantDetailsKnown === 'boolean') {
+      pin = selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin;
+    } else {
+      pin = getSelectedPinUser()?.pin ?? pins[0];
+    }
 
     if (!pin) {
-      throw new Error('PIN is not available. Ensure fetchPINsAPI is called before accessYourCase');
+      throw new Error(`PIN is not available for index ${accessCode.pinIndex}`);
     }
 
     await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
     await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
     await performAction('clickButton', accessYourCase.continueButton);
   }
+
   private async readReasonableAdjustmentsTriage(): Promise<void> {
-    this.recordAnswer(reasonableAdjustmentsTriage.mainHeader, reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    //this.recordAnswer(reasonableAdjustmentsTriage.mainHeader, reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
   }
 

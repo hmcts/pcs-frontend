@@ -61,6 +61,10 @@ export function initializeExecutor(page: Page): void {
   sauceJourneyScreenshotStep = 0;
 }
 
+export function isExecutorInitialized(): boolean {
+  return !!testExecutor;
+}
+
 /** EMV specs under this folder drive their own checks; skip navigation-triggered PFT even when nightly enables all page functional tests. */
 function isFunctionalValidationTestFile(): boolean {
   try {
@@ -81,7 +85,7 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload'];
+  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload', 'claims'];
   if (!startAxeAudit && testPages.some(page => currentUrl.includes(page))) {
     startAxeAudit = true;
     startFunctionalTests = true;

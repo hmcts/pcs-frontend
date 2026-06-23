@@ -1,6 +1,7 @@
 {
   "pageTitle": "cyCheck your answers",
   "heading": "cyCheck your answers",
-  "placeholderHeading": "cyPlaceholder page",
-  "placeholderBody": "Welsh placeholder: this page is under construction. The review and submit step for additional documents will be added in a follow-up ticket."
+  "relatedApplicationLabel": "cyRelated application",
+  "documentsLabel": "cyUploaded documents",
+  "documentsNone": "cyNo documents uploaded"
 }

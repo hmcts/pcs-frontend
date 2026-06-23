@@ -3,12 +3,12 @@ appVersion: '1.0'
 description: A Helm chart for pcs-frontend App
 name: pcs-frontend
 home: https://github.com/hmcts/pcs-frontend
-version: 0.0.70
+version: 0.0.73
 dependencies:
   - name: nodejs
     version: 3.2.1
     repository: 'oci://hmctsprod.azurecr.io/helm'
   - name: redis
-    version: 27.0.4
+    version: 27.0.12
     repository: 'oci://registry-1.docker.io/bitnamicharts'
     condition: redis.enabled

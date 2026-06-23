@@ -112,7 +112,7 @@ export default function citizenCaseLinkRoutes(app: Application): void {
 
       if (result.valid) {
         logger.info(`Access code validated successfully for case ${caseId}`);
-        return safeRedirect303(res, `/dashboard/${caseId}`, '/', ['/dashboard']);
+        return safeRedirect303(res, `/case/${caseId}/dashboard`, '/', ['/case']);
       }
 
       const { field, text } = API_ERROR_MESSAGES[result.error];
