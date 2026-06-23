@@ -19,12 +19,12 @@ export {
 
 export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizePerFileMB');
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;
+export const UPLOAD_MAX_MEDIA_FILE_SIZE_MB: number = config.get('documentUpload.maxMediaFileSizeMB');
+export const UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES = UPLOAD_MAX_MEDIA_FILE_SIZE_MB * 1024 * 1024;
 export const UPLOAD_MAX_TOTAL_SIZE_MB: number = config.get('documentUpload.maxTotalFileSizeMB');
 export const UPLOAD_MAX_TOTAL_SIZE_BYTES = UPLOAD_MAX_TOTAL_SIZE_MB * 1024 * 1024;
 export const UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB: number = config.get('documentUpload.maxDocumentFileSizeMB');
 export const UPLOAD_MAX_DOCUMENT_FILE_SIZE_BYTES = UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB * 1024 * 1024;
-export const UPLOAD_MAX_MEDIA_FILE_SIZE_MB: number = config.get('documentUpload.maxMediaFileSizeMB');
-export const UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES = UPLOAD_MAX_MEDIA_FILE_SIZE_MB * 1024 * 1024;
 export const UPLOAD_MAX_FILENAME_LENGTH: number = config.get('documentUpload.maxFilenameLength');
 
 const BLOCKED_MEDIA_PREFIXES = ['audio/', 'video/'] as const;
@@ -57,6 +57,12 @@ export const ACCEPT_ATTRIBUTE_EXTENSIONS = Array.from(ALLOWED_EXTENSIONS)
   .sort((a, b) => a.localeCompare(b))
   .join(',');
 
+// Locale messages render sizes as friendly units. Whole gigabytes render as "1GB"; anything
+// else (e.g. 500) renders as "{N}MB". Numbers come from config, the unit is presentation.
+export function formatSizeForDisplay(mb: number): string {
+  return mb > 0 && mb % 1024 === 0 ? `${mb / 1024}GB` : `${mb}MB`;
+}
+
 function isBlockedMedia(mime: string, ext: string): boolean {
   if (BLOCKED_EXTENSIONS.has(ext)) {
     return true;
@@ -72,7 +78,7 @@ function isUnknownMimeType(mime: string): boolean {
   return mime === '' || mime === 'application/octet-stream';
 }
 
-export type FileValidationResult = 'ok' | 'blocked_media' | 'invalid_type';
+export type FileValidationResult = 'ok' | 'blocked_media' | 'invalid_type' | 'filename_too_long';
 
 export function validateFileType(mimetype: string, originalname: string): FileValidationResult {
   const ext = getFileExtensionLower(originalname);
@@ -80,6 +86,10 @@ export function validateFileType(mimetype: string, originalname: string): FileVa
 
   if (isBlockedMedia(mime, ext)) {
     return 'blocked_media';
+  }
+
+  if (originalname.length > UPLOAD_MAX_FILENAME_LENGTH) {
+    return 'filename_too_long';
   }
 
   if (isAllowedMimeType(mime)) {

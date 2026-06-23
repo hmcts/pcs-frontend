@@ -14,14 +14,16 @@ import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.i
 import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 import type { CdamDocument } from '@services/documentUpload.interface';
 import {
+  UPLOAD_MAX_FILENAME_LENGTH,
   UPLOAD_MAX_FILE_SIZE_BYTES,
+  UPLOAD_MAX_FILE_SIZE_MB,
+  UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES,
+  UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
   UPLOAD_MAX_TOTAL_SIZE_BYTES,
   UPLOAD_MAX_TOTAL_SIZE_MB,
-  type UploadValidationError,
-  type UploadValidationOptions,
-  effectivePerFileByteLimit,
-  getUploadErrorKey,
-  validateUploadedFile,
+  formatSizeForDisplay,
+  isMediaExtension,
+  validateFileType,
 } from '@utils/documentUploadValidation';
 
 const logger = Logger.getLogger('document-proxy');
@@ -49,7 +51,11 @@ export function fileFilter(req: Request, file: Express.Multer.File, cb: multer.F
     cb(new UploadValidationFailure(error));
     return;
   }
-  cb(null, true);
+  if (result === 'filename_too_long') {
+    cb(new Error('FILENAME_TOO_LONG'));
+    return;
+  }
+  cb(new Error(result === 'blocked_media' ? 'BLOCKED_MEDIA' : 'INVALID_FILE_TYPE'));
 }
 
 const upload = multer({
@@ -79,8 +85,16 @@ function translateValidationError(req: Request, error: UploadValidationError): s
 function getErrorTranslations(req: Request) {
   const t = req.t;
   return {
+    wrongType: t('errors.documentUpload.wrongFileTypeDocStore'),
+    tooLarge: t('errors.documentUpload.fileTooLargeDocStore', {
+      maxSize: formatSizeForDisplay(UPLOAD_MAX_FILE_SIZE_MB),
+    }),
+    tooLargeMedia: t('errors.documentUpload.fileTooLargeMedia', {
+      maxSize: formatSizeForDisplay(UPLOAD_MAX_MEDIA_FILE_SIZE_MB),
+    }),
+    filenameTooLong: t('errors.documentUpload.filenameTooLong', { maxLength: String(UPLOAD_MAX_FILENAME_LENGTH) }),
     totalTooLarge: t('errors.documentUpload.fileTotalTooLargeDocStore', {
-      maxSize: String(Math.floor(UPLOAD_MAX_TOTAL_SIZE_MB / 1024)),
+      maxSize: formatSizeForDisplay(UPLOAD_MAX_TOTAL_SIZE_MB),
     }),
     noFile: t('errors.documentUpload.noFileSelected'),
     uploadFailed: t('errors.documentUpload.uploadFailed'),
@@ -116,6 +130,10 @@ export function handleMulterError(
   }
   if (err instanceof UploadValidationFailure) {
     res.status(400).json({ error: { message: translateValidationError(req, err.validationError) } });
+    return;
+  }
+  if (err.message === 'FILENAME_TOO_LONG') {
+    res.status(400).json({ error: { message: errors.filenameTooLong } });
     return;
   }
   next(err);
@@ -331,6 +349,12 @@ export default function documentProxyRoutes(app: Application): void {
       try {
         if (!req.file) {
           return res.status(400).json({ error: { message: errors.noFile } });
+        }
+
+        // Image files have a tighter cap than documents. multer.limits.fileSize enforces the larger
+        // (document) cap during streaming; this re-check rejects oversize images before CDAM upload.
+        if (isMediaExtension(req.file.originalname) && req.file.size > UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES) {
+          return res.status(400).json({ error: { message: errors.tooLargeMedia } });
         }
 
         uploadCtx(req);
