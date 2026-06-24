@@ -88,7 +88,7 @@ test.afterEach(async () => {
   finaliseAllValidations();
 });
 
-test.describe('Respond to a claim - TaskList - e2e Journey @nightly @PR', async () => {
+test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
   test('Respond to a claim - TaskList @noDefendants @regression @crossbrowser @NonAutomaticEMV', async () => {
     //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
@@ -168,7 +168,8 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly @PR', async 
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
