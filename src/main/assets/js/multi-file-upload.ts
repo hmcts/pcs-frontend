@@ -16,8 +16,7 @@ function getCsrfToken(): string {
   return document.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value || '';
 }
 
-// Encode document metadata as base64url JSON for the hidden uploadedDocuments[] inputs.
-// Raw JSON on the wire trips Azure Front Door's WAF SQLi rules; the server decodes this.
+// base64url so the WAF doesn't read the JSON as SQLi; the server decodes it (HDPI-5770).
 function encodeUploadedDocument(doc: unknown): string {
   const bytes = new TextEncoder().encode(JSON.stringify(doc));
   let binary = '';

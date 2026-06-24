@@ -9,8 +9,7 @@ import { decodeBase64UrlJson } from '@utils/base64Json';
  *
  * Actual files are uploaded by multer on the step's AJAX `/upload` route; successful uploads are
  * written into hidden `<input name="uploadedDocuments[]">` fields (base64url-encoded JSON) by the
- * MOJ script. The values are encoded so Azure Front Door's WAF doesn't false-positive on raw JSON
- * as SQL injection. On "Save and continue" those arrive as ordinary form fields — not as `req.files`.
+ * MOJ script. On "Save and continue" those arrive as ordinary form fields — not as `req.files`.
  * This helper decodes them so validation-error re-renders can restore the file list.
  */
 export function parseUploadedDocumentsFromBody(body: Record<string, unknown>): Record<string, unknown>[] {

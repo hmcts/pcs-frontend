@@ -1,14 +1,9 @@
-// WAF-safe wire format for hidden form values.
-// Azure Front Door's OWASP CRS SQLi rules false-positive on raw JSON
-// ({ } " : , .pdf) carried as urlencoded POST args, so document metadata in
-// `uploadedDocuments[]` is transported as opaque base64url instead.
-
+// base64url so the WAF doesn't read JSON punctuation as SQLi (HDPI-5770).
 export function encodeBase64UrlJson(value: unknown): string {
   return Buffer.from(JSON.stringify(value), 'utf8').toString('base64url');
 }
 
-// Tolerant: decodes base64url, but still accepts raw JSON (legacy hidden inputs
-// and server-internal values that never crossed the WAF).
+// Accepts base64url or legacy raw JSON.
 export function decodeBase64UrlJson(entry: string): Record<string, unknown> | null {
   const json = /^[A-Za-z0-9_-]+$/.test(entry) ? Buffer.from(entry, 'base64url').toString('utf8') : entry;
   try {
@@ -17,7 +12,7 @@ export function decodeBase64UrlJson(entry: string): Record<string, unknown> | nu
       return doc as Record<string, unknown>;
     }
   } catch {
-    // malformed hidden input
+    // malformed input
   }
   return null;
 }

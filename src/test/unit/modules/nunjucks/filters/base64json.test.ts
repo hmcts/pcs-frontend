@@ -3,9 +3,7 @@ import { Environment } from 'nunjucks';
 import { base64json } from '../../../../../main/modules/nunjucks/filters/base64json';
 import { parseUploadedDocumentsFromBody } from '../../../../../main/modules/steps/formBuilder/fileUploadUtils';
 
-// Locks the server-side contract the WAF fix depends on: the macro encodes the
-// hidden uploadedDocuments[] value with this filter, and parseUploadedDocumentsFromBody
-// must decode it back. Mirrors fileUploadMoj.njk line 69.
+// Locks the macro -> parse contract: filter encodes, parseUploadedDocumentsFromBody decodes.
 function renderHiddenInput(file: unknown): string {
   const env = new Environment(null, { autoescape: true });
   env.addFilter('base64json', base64json as (...args: unknown[]) => unknown);
