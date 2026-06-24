@@ -18,3 +18,5 @@ export * from './yourCircumstancesLR.page.data';
 export * from './exceptionalHardshipLR.page.data';
 export * from './incomeAndExpensesLR.page.data';
 export * from './whatRegularIncomeDoYouReceiveLR.page.data';
+export * from './haveYouAppliedForUniversalCreditLR.page.data';
+export * from './priorityDebtsLR.page.data';
