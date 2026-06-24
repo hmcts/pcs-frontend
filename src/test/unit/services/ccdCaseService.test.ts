@@ -438,6 +438,82 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
     });
+
+    it('overrides RespondToClaim task status to COMPLETED when defendantResponses.status is SUBMITTED', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: {
+              possessionClaimResponse: {
+                defendantResponses: { status: 'SUBMITTED' },
+              },
+              dashboardData: {
+                taskGroups: [
+                  {
+                    id: 'g1',
+                    value: {
+                      groupId: 'RESPONSE',
+                      tasks: [
+                        { id: 't1', value: { templateId: 'RespondToClaim', status: 'IN_PROGRESS' } },
+                        { id: 't2', value: { templateId: 'ViewResponse', status: 'AVAILABLE' } },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      });
+
+      const result = await ccdCaseService.getDashboardView(accessToken, caseId);
+
+      expect(result.taskGroups).toEqual([
+        {
+          groupId: 'RESPONSE',
+          tasks: [
+            { templateId: 'RespondToClaim', status: 'COMPLETED' },
+            { templateId: 'ViewResponse', status: 'AVAILABLE' },
+          ],
+        },
+      ]);
+    });
+
+    it('does not override RespondToClaim task status when defendantResponses.status is not SUBMITTED', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: {
+              possessionClaimResponse: {
+                defendantResponses: { status: 'CREATED' },
+              },
+              dashboardData: {
+                taskGroups: [
+                  {
+                    id: 'g1',
+                    value: {
+                      groupId: 'RESPONSE',
+                      tasks: [
+                        { id: 't1', value: { templateId: 'RespondToClaim', status: 'IN_PROGRESS' } },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      });
+
+      const result = await ccdCaseService.getDashboardView(accessToken, caseId);
+
+      expect(result.taskGroups).toEqual([
+        {
+          groupId: 'RESPONSE',
+          tasks: [{ templateId: 'RespondToClaim', status: 'IN_PROGRESS' }],
+        },
+      ]);
+    });
   });
 });
 
