@@ -504,7 +504,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
-      option: confirmationOfNoticeGiven.imNotSureRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown', {
+      noticePostedDate: submitCaseApiDataWales.submitCaseRentOtherTenancy.notice_PostedDate,
     });
     await performAction('rentArrears', {
       option: rentArrears.yesRadioOption,

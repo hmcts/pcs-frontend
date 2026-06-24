@@ -67,7 +67,6 @@ import { haveYouAppliedForUniversalCreditErrorValidation } from '../functional/h
 import { incomeAndExpensesErrorValidation } from '../functional/incomeAndExpenses.pft';
 import { languageUsedErrorValidation } from '../functional/languageUsed.pft';
 import { nonRentArrearsDisputeErrorValidation } from '../functional/nonRentArrearsDispute.pft';
-import { noticeDateWhenNotProvidedErrorValidation } from '../functional/noticeDateWhenNotProvided.pft';
 import { noticeDateWhenProvidedErrorValidation } from '../functional/noticeDateWhenProvided.pft';
 import { otherConsiderationsErrorValidation } from '../functional/otherConsiderations.pft';
 import { priorityDebtDetailsErrorValidation } from '../functional/priorityDebtDetails.pft';
@@ -574,8 +573,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation(
-      'confirmation-of-notice-date-when-not-provided',
-      noticeDateWhenNotProvidedErrorValidation
+      'confirmation-of-notice-date-when-provided',
+      noticeDateWhenProvidedErrorValidation
     );
     await performAction('enterNoticeDateKnown');
 

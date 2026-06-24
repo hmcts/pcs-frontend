@@ -31,6 +31,7 @@ import {
   doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
   freeLegalAdvice,
+  getNoticeGivenDateLabel,
   haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
   incomeAndExpenses,
@@ -777,7 +778,10 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
-    await performValidation('text', { elementType: 'listItem', text: noticeDateWhenProvided.noticeGivenDateLabel });
+    await performValidation('text', {
+      elementType: 'listItem',
+      text: getNoticeGivenDateLabel(noticeData?.noticePostedDate as string | undefined),
+    });
     this.recordRtcCyaDateFromParts(
       `When did you receive notice from ${claimantsName}?`,
       noticeData?.day,
