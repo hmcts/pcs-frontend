@@ -1,5 +1,19 @@
 {% extends "stepsTemplate.njk" %}
 
+{% block pageTitle %}
+  {% if errorPageKey == 'pageNotFound' %}
+    {{ t('errorPages.pageNotFound.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% elif errorPageKey == 'serviceUnavailable' %}
+    {{ t('errorPages.serviceUnavailable.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% elif errorPageKey == 'technicalError' %}
+    {{ t('errorPages.technicalError.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% elif errorPageKey == 'accessDenied' %}
+    {{ t('errorPages.accessDenied.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% else %}
+    {{ errorTitle or t('errorPages.technicalError.title') or "Something went wrong" }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% endif %}
+{% endblock %}
+
 {% block mainContent %}
   {% if errorPageKey == 'pageNotFound' %}
 
