@@ -20,11 +20,11 @@ jest.mock('../../../../../main/modules/logger', () => {
 
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
-    getDashboardView: jest.fn(),
+    getCaseByIdForEvent: jest.fn(),
   },
 }));
 
-const mockGetDashboardView = ccdCaseService.getDashboardView as jest.Mock;
+const mockGetCaseById = ccdCaseService.getCaseByIdForEvent as jest.Mock;
 const mockLogger = (Logger.getLogger as jest.Mock)() as { warn: jest.Mock };
 
 const formData = {} as Record<string, unknown>;
@@ -52,45 +52,26 @@ const buildRequest = (
 
 describe('isViewAllApplicationsAvailable', () => {
   beforeEach(() => {
-    mockGetDashboardView.mockReset();
+    mockGetCaseById.mockReset();
     mockLogger.warn.mockReset();
   });
 
-  it('returns true when ViewAllApplications is AVAILABLE in the APPLICATIONS group', async () => {
-    mockGetDashboardView.mockResolvedValue({
-      notifications: [],
-      taskGroups: [
-        {
-          groupId: 'APPLICATIONS',
-          tasks: [{ templateId: 'ViewAllApplications', status: 'AVAILABLE' }],
-        },
-      ],
-      propertyAddress: undefined,
+  it('returns true when the START response flags showRelatedApplicationsPage as Yes', async () => {
+    mockGetCaseById.mockResolvedValue({
+      id: '1234567890123456',
+      data: { showRelatedApplicationsPage: 'Yes' },
     });
 
     const result = await isViewAllApplicationsAvailable(buildRequest(), formData, currentStepData);
 
     expect(result).toBe(true);
-    expect(mockGetDashboardView).toHaveBeenCalledWith('access-token-1', '1234567890123456');
+    expect(mockGetCaseById).toHaveBeenCalledWith('access-token-1', '1234567890123456', 'uploadDocuments');
   });
 
-  it('returns true when ViewAllApplications is AVAILABLE in any group', async () => {
-    mockGetDashboardView.mockResolvedValue({
-      notifications: [],
-      taskGroups: [
-        {
-          groupId: 'CLAIM',
-          tasks: [{ templateId: 'ViewClaim', status: 'AVAILABLE' }],
-        },
-        {
-          groupId: 'DOCUMENTS',
-          tasks: [
-            { templateId: 'UploadDocuments', status: 'AVAILABLE' },
-            { templateId: 'ViewAllApplications', status: 'AVAILABLE' },
-          ],
-        },
-      ],
-      propertyAddress: undefined,
+  it('returns true regardless of casing on the Yes value', async () => {
+    mockGetCaseById.mockResolvedValue({
+      id: '1234567890123456',
+      data: { showRelatedApplicationsPage: 'YES' },
     });
 
     const result = await isViewAllApplicationsAvailable(buildRequest(), formData, currentStepData);
@@ -98,16 +79,10 @@ describe('isViewAllApplicationsAvailable', () => {
     expect(result).toBe(true);
   });
 
-  it('returns false when ViewAllApplications is NOT_AVAILABLE', async () => {
-    mockGetDashboardView.mockResolvedValue({
-      notifications: [],
-      taskGroups: [
-        {
-          groupId: 'APPLICATIONS',
-          tasks: [{ templateId: 'ViewAllApplications', status: 'NOT_AVAILABLE' }],
-        },
-      ],
-      propertyAddress: undefined,
+  it('returns false when the START response flags showRelatedApplicationsPage as No', async () => {
+    mockGetCaseById.mockResolvedValue({
+      id: '1234567890123456',
+      data: { showRelatedApplicationsPage: 'No' },
     });
 
     const result = await isViewAllApplicationsAvailable(buildRequest(), formData, currentStepData);
@@ -115,45 +90,24 @@ describe('isViewAllApplicationsAvailable', () => {
     expect(result).toBe(false);
   });
 
-  it('returns false when ViewAllApplications task is missing', async () => {
-    mockGetDashboardView.mockResolvedValue({
-      notifications: [],
-      taskGroups: [
-        {
-          groupId: 'CLAIM',
-          tasks: [{ templateId: 'ViewClaim', status: 'AVAILABLE' }],
-        },
-      ],
-      propertyAddress: undefined,
-    });
+  it('returns false when showRelatedApplicationsPage is absent', async () => {
+    mockGetCaseById.mockResolvedValue({ id: '1234567890123456', data: {} });
 
     const result = await isViewAllApplicationsAvailable(buildRequest(), formData, currentStepData);
 
     expect(result).toBe(false);
   });
 
-  it('returns false when taskGroups is empty', async () => {
-    mockGetDashboardView.mockResolvedValue({
-      notifications: [],
-      taskGroups: [],
-      propertyAddress: undefined,
-    });
-
-    const result = await isViewAllApplicationsAvailable(buildRequest(), formData, currentStepData);
-
-    expect(result).toBe(false);
-  });
-
-  it('returns false and logs a warning when getDashboardView throws', async () => {
+  it('returns false and logs a warning when the START call throws', async () => {
     const error = new Error('boom');
-    mockGetDashboardView.mockRejectedValue(error);
+    mockGetCaseById.mockRejectedValue(error);
 
     const result = await isViewAllApplicationsAvailable(buildRequest(), formData, currentStepData);
 
     expect(result).toBe(false);
     expect(mockLogger.warn).toHaveBeenCalledTimes(1);
     expect(mockLogger.warn.mock.calls[0][0]).toContain(
-      'Failed to resolve VIEW_ALL_APPLICATIONS status for case 1234567890123456'
+      'Failed to resolve uploadDocuments START for case 1234567890123456'
     );
   });
 
@@ -165,7 +119,7 @@ describe('isViewAllApplicationsAvailable', () => {
     );
 
     expect(result).toBe(false);
-    expect(mockGetDashboardView).not.toHaveBeenCalled();
+    expect(mockGetCaseById).not.toHaveBeenCalled();
   });
 
   it('returns false without calling CCD when caseReference is missing', async () => {
@@ -176,6 +130,6 @@ describe('isViewAllApplicationsAvailable', () => {
     );
 
     expect(result).toBe(false);
-    expect(mockGetDashboardView).not.toHaveBeenCalled();
+    expect(mockGetCaseById).not.toHaveBeenCalled();
   });
 });

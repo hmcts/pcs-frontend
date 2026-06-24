@@ -15,13 +15,13 @@
       "changeHidden": "cy name"
     },
     "dateOfBirth": {
-      "label": "cy What is your date of birth?",
+      "label": "cy What’s your date of birth?",
       "changeHidden": "cy date of birth"
     },
     "correspondenceAddressConfirmation": {
-      "label": "cy Is your correspondence address {{address}}?",
-      "fallbackLabel": "cy Correspondence address",
-      "changeHidden": "cy correspondence address"
+      "label": "cy Is your postal address {{address}}?",
+      "fallbackLabel": "cy What’s your postal address?",
+      "changeHidden": "cy postal address"
     },
     "contactByEmailOrPost": {
       "label": "Sut ydych chi eisiau cael diweddariadau?",

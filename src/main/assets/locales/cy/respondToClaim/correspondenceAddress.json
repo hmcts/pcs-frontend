@@ -2,7 +2,7 @@
   "pageTitle": "Eich cyfeiriad post",
   "legend": "Ai dyma yw eich cyfeiriad ar gyfer anfon gohebiaeth {{ formattedAddressStr }}",
   "legendNa": "Beth yw eich cyfeiriad ar gyfer gohebiaeth?",
-  "legend.hint": "Dyma'r cyfeiriad a ddarparwyd gan {{claimantName}}",
+  "legend.hint": "Dyma’r cyfeiriad a ddarparwyd gan {{claimantName}}",
   "legend.hintNa": "Eich cyfeiriad gohebiaeth yw eich cyfeiriad post.",
   "labels": {
     "yes": "Ydy",
