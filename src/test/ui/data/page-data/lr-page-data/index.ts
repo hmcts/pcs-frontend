@@ -15,3 +15,6 @@ export * from './doYouHaveAnyOtherDependantsLR.page.data';
 export * from './doAnyOtherAdultsLiveInYourHomeLR.page.data';
 export * from './wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
 export * from './yourCircumstancesLR.page.data';
+export * from './exceptionalHardshipLR.page.data';
+export * from './incomeAndExpensesLR.page.data';
+export * from './whatRegularIncomeDoYouReceiveLR.page.data';
