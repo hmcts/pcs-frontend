@@ -10,9 +10,11 @@ import {
   counterClaim,
   counterClaimAbout,
   counterClaimAgainstWhom,
+  counterClaimApplicationFeeAmount,
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
+  counterClaimPaymentSuccessful,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   counterclaimYouNeedToApplyForHelpWithYourFees,
@@ -34,6 +36,7 @@ import {
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
+  paymentDetails,
   priorityDebtDetails,
   priorityDebts,
   rentArrears,
@@ -419,6 +422,24 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
+      fee: '35.00',
+    });
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('35.00'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.paymentConfirmationParagraph,
     });
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateCYARTC');

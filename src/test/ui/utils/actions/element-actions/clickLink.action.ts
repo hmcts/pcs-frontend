@@ -35,10 +35,26 @@ export class ClickLinkAction implements IAction {
   }
 
   private async clickLink(page: Page, fieldName: string): Promise<void> {
+    const linkText = await this.getVisibleLinkText(page, fieldName);
     const locator = page
-      .locator(`a:text-is("${fieldName}"), .govuk-details__summary-text:text-is("${fieldName}")`)
+      .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
       .first();
     await locator.click();
+  }
+
+  private async getVisibleLinkText(page: Page, fieldName: string): Promise<string> {
+    const linkTextOptions = [...new Set([fieldName, fieldName.replace(/[.?!]+$/, '')])];
+
+    for (const linkText of linkTextOptions) {
+      const link = page
+        .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
+        .first();
+      if (await link.isVisible({ timeout: VERY_SHORT_TIMEOUT }).catch(() => false)) {
+        return linkText;
+      }
+    }
+
+    return fieldName;
   }
 
   private async clickLinkAndVerifySameTabTitle(
