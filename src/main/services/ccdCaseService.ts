@@ -381,30 +381,13 @@ export const ccdCaseService = {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/dashboardView?ignore-warning=false`;
     try {
       const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
-      const caseData = response.data.case_details?.case_data ?? {};
-      const raw = caseData.dashboardData ?? {};
+      const raw = response.data.case_details?.case_data?.dashboardData ?? {};
 
       const notifications = unwrapNotifications(raw.notifications);
       const taskGroups = unwrapTaskGroups(raw.taskGroups);
       const relatedApplications = unwrapRelatedApplications(raw.relatedApplications);
 
-      const isSubmitted =
-        caseData.possessionClaimResponse?.defendantResponses?.status === 'SUBMITTED';
-      const resolvedTaskGroups = isSubmitted
-        ? taskGroups.map(group => ({
-            ...group,
-            tasks: group.tasks.map(task =>
-              task.templateId === 'RespondToClaim' ? { ...task, status: 'COMPLETED' } : task
-            ),
-          }))
-        : taskGroups;
-
-      return {
-        notifications,
-        taskGroups: resolvedTaskGroups,
-        propertyAddress: formatAddress(raw.propertyAddress),
-        relatedApplications,
-      };
+      return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress), relatedApplications };
     } catch (error) {
       const httpError = convertAxiosErrorToHttpError(error, 'getDashboardView');
       if (httpError.status === 400 || httpError.status === 404) {
