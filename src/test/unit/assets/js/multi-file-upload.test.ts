@@ -2,11 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { TextEncoder } from 'util';
+import { TextDecoder, TextEncoder } from 'util';
 
-// jsdom strips TextEncoder from the global scope; real browsers expose it.
+// jsdom strips TextEncoder/TextDecoder from the global scope; real browsers expose them.
 if (typeof globalThis.TextEncoder === 'undefined') {
   (globalThis as unknown as { TextEncoder: unknown }).TextEncoder = TextEncoder;
+}
+if (typeof globalThis.TextDecoder === 'undefined') {
+  (globalThis as unknown as { TextDecoder: unknown }).TextDecoder = TextDecoder;
 }
 
 let capturedHooks: Record<string, (...args: unknown[]) => void> = {};
@@ -47,7 +50,8 @@ import { initMultiFileUpload } from '../../../../main/assets/js/multi-file-uploa
 // Hidden uploadedDocuments[] inputs carry base64url-encoded JSON (WAF-safe).
 function decodeHiddenValue(value: string): Record<string, unknown> {
   const b64 = value.replace(/-/g, '+').replace(/_/g, '/');
-  return JSON.parse(decodeURIComponent(escape(atob(b64))));
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
 }
 
 function setupDOM() {
