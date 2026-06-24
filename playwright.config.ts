@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
-export const VERY_SHORT_TIMEOUT = 2000;
+export const VERY_SHORT_TIMEOUT = 1000;
 export const SHORT_TIMEOUT = 5000;
 export const actionRetries = 10;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;

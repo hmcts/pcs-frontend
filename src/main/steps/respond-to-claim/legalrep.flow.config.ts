@@ -49,7 +49,7 @@ const legalrepStepOrder = [
   'equality-and-diversity-start',
   'equality-and-diversity-end',
   'language-used',
-  'check-your-answers',
+  'end-of-journey-cya',
   'end-now',
 ] as const satisfies readonly RespondToClaimStepName[];
 
