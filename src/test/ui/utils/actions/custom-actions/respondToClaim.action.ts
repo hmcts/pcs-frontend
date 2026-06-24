@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
@@ -452,40 +452,49 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
+    await performValidation('mainHeader', correspondenceAddress.correspondenceAddressPostalMainHeader);
     await performAction('clickRadioButton', {
       question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
     });
+
     if (addressData.radioOption === correspondenceAddress.noRadioOption) {
-      await this.selectCorrespondenceAddressUnKnown(addressData);
+      this.deleteAnswer(correspondenceAddress.correspondenceAddressPostalMainHeader);
+      if (addressData.addressIndex) {
+        await performActions(
+          'Find Address based on postcode',
+          ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
+          ['clickButton', correspondenceAddress.findAddressHiddenButton],
+          ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
+        );
+      } else if (addressData.addressLine1) {
+        this.recordAnswer(
+          correspondenceAddress.whatsYourPostalAddressQuestion,
+          this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
+        );
+        await performActions(
+          'Enter Address Manually',
+          ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
+          ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
+          ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
+          ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
+        );
+      }
     } else {
-      this.recordAnswer(correspondenceAddress.correspondenceAddressKnownMainHeader, addressData.radioOption);
-      await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+      this.recordAnswer(correspondenceAddress.correspondenceAddressPostalMainHeader, addressData.radioOption);
     }
+
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressUnKnown(addressData: actionRecord) {
-    if (addressData.addressIndex) {
-      await performActions(
-        'Find Address based on postcode',
-        ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
-        ['clickButton', correspondenceAddress.findAddressHiddenButton],
-        ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
-      );
-    } else if (addressData.addressLine1) {
-      this.recordAnswer(
-        correspondenceAddress.correspondenceAddressUnKnownMainHeader,
-        this.buildRtcCyaAddressValue(addressData.addressLine1, addressData.townOrCity, addressData.postcode)
-      );
-      await performActions(
-        'Enter Address Manually',
-        ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
-        ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
-        ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
-        ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
-      );
-    }
-    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await this.selectCorrespondenceAddressKnown({
+      radioOption: addressData.option ?? correspondenceAddress.noRadioOption,
+      addressIndex: addressData.addressIndex,
+      postcode: addressData.postcode,
+      addressLine1: addressData.addressLine1,
+      townOrCity: addressData.townOrCity,
+    });
   }
 
   private async selectContactPreferenceEmailOrPost(contactPreferenceData: actionRecord) {
@@ -1423,13 +1432,30 @@ export class RespondToClaimAction implements IAction {
         .first()
         .waitFor({ state: 'visible', timeout: 15000 });
     }
+    const summaryLists = sectionData
+      ? rowsLocator.first().locator('xpath=ancestor::*[contains(@class, "govuk-summary-list")][1]')
+      : page.locator('.govuk-summary-list:visible');
+    const summaryListCount = await summaryLists.count();
 
-    const rowCount = await rowsLocator.count();
+    if (summaryListCount === 0) {
+      throw new Error('RTC CYA table not found. Exiting...');
+    }
+
+    for (let i = 0; i < summaryListCount; i++) {
+      await this.recordRtcCyaRowsFromSummaryList(summaryLists.nth(i), !sectionData);
+    }
+    console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);
+  }
+
+  private async recordRtcCyaRowsFromSummaryList(summaryList: Locator, isFinalCya: boolean): Promise<void> {
+    const rows = summaryList.locator('.govuk-summary-list__row');
+    const rowCount = await rows.count();
+
     for (let j = 0; j < rowCount; j++) {
-      const row = rowsLocator.nth(j);
+      const row = rows.nth(j);
       const displayedKeyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
       const keyText =
-        !sectionData && displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion
+        isFinalCya && displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion
           ? rtcUploadedDocumentsQuestion
           : displayedKeyText;
       const valueCell = row.locator('.govuk-summary-list__value').first();
@@ -1441,8 +1467,6 @@ export class RespondToClaimAction implements IAction {
         rtcCyaMap.set(keyText, valueText);
       }
     }
-
-    console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);
   }
 
   private async validateCYARTC(): Promise<void> {
@@ -1466,6 +1490,7 @@ export class RespondToClaimAction implements IAction {
 
     if (mismatches.length > 0) {
       console.log(`\n❌ RTC CYA differences found: ${mismatches.length}`);
+      this.logRetrievedRtcCyaRows();
       for (const mismatch of mismatches) {
         console.log('============================================================');
         console.log(`• ${mismatch}`);
@@ -1485,6 +1510,18 @@ export class RespondToClaimAction implements IAction {
     }
 
     console.log('\n✅ RTC CHECK YOUR ANSWERS VALIDATION PASSED!\n');
+  }
+
+  private logRetrievedRtcCyaRows(): void {
+    console.log('\nRetrieved RTC CYA rows:');
+    if (rtcCyaMap.size === 0) {
+      console.log('• No RTC CYA rows were retrieved.');
+      return;
+    }
+
+    for (const [key, value] of Array.from(rtcCyaMap.entries())) {
+      console.log(`• ${key}: ${value}`);
+    }
   }
 
   private async validateRTCSectionCYA(sectionData: actionData): Promise<void> {
@@ -1514,6 +1551,7 @@ export class RespondToClaimAction implements IAction {
     }
 
     if (mismatches.length > 0) {
+      this.logRetrievedRtcCyaRows();
       throw new Error(`RTC ${sectionName} section CYA validation failed:\n${mismatches.join('\n')}`);
     }
   }
