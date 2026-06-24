@@ -4,6 +4,7 @@ import {
   correspondenceAddress,
   defendantDateOfBirth,
   defendantNameConfirmation,
+  doYouHaveASolicitor,
   freeLegalAdvice,
   startNow,
   taskList,
@@ -24,9 +25,11 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
   if (testInfo.title.includes('@noDefendants')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else {
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
@@ -48,6 +51,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 test.describe('Correspondence Address - functional test @nightly', async () => {
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('confirmDefendantDetails', {
@@ -64,7 +68,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.radio,
       inputArray: correspondenceAddress.errorValidationField.errorRadioMsg,
-      question: correspondenceAddress.correspondenceAddressKnownMainHeader,
+      question: correspondenceAddress.correspondenceAddressPostalMainHeader,
       header: correspondenceAddress.errorValidationHeader,
     });
     await performAction('clickRadioButton', correspondenceAddress.noRadioOption);

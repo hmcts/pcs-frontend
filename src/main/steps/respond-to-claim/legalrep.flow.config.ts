@@ -47,7 +47,7 @@ const legalRepStepOrder = [
   'other-considerations',
   'upload-document',
   'language-used',
-  'check-your-answers',
+  'end-of-journey-cya',
   'end-now',
 ] as const satisfies readonly LegalRepRespondToClaimStepName[];
 
