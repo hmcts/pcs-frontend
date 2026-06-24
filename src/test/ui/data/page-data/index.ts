@@ -69,3 +69,4 @@ export * from './endNow.page.data';
 export * from './responseAndCounterClaimSubmitted.page.data';
 export * from './responseSubmitted.page.data';
 export * from './responseSubmittedCounterclaimFeePaymentNeeded.page.data';
+export * from './viewTheResponse.page.data';

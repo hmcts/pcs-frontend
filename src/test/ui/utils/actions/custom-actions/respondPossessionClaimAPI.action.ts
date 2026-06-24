@@ -29,16 +29,11 @@ export class respondPossessionClaimAPIAction implements IAction {
       await respondPossessionClaimApi.get(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiEndPoint())
     ).data.token;
 
-    const respondPossessionClaimPayloadData: actionData =
-      typeof caseData === 'object' && caseData !== null && 'data' in caseData
-        ? (caseData.data as actionData)
-        : caseData;
-
     const type = typeof caseData === 'object' && caseData !== null && 'type' in caseData ? caseData.type : 'both';
 
     switch (type) {
       case 'midEvent':
-        await this.respondPossessionClaimMidEvent(respondPossessionClaimPayloadData);
+        await this.respondPossessionClaimMidEvent(respondPossessionClaimApi);
         break;
 
       case 'submit':
@@ -47,28 +42,32 @@ export class respondPossessionClaimAPIAction implements IAction {
 
       case 'both':
       default:
-        await this.respondPossessionClaimMidEvent(respondPossessionClaimPayloadData);
+        await this.respondPossessionClaimMidEvent(respondPossessionClaimApi);
 
         await this.submitRespondPossessionClaim(respondPossessionClaimApi, RESPONDCLAIM_EVENT_TOKEN);
     }
   }
 
-  private async respondPossessionClaimMidEvent(payload: actionData): Promise<void> {
+  private async respondPossessionClaimMidEvent(
+    respondPossessionClaimMidEventApi: ReturnType<typeof Axios.create>
+  ): Promise<void> {
+    const midEventRequest = {
+      event: {
+        id: 'respondPossessionClaim',
+        summary: 'Citizen respondPossessionClaim draft save summary',
+        description: 'Citizen respondPossessionClaim draft save description',
+      },
+      case_reference: process.env.CASE_NUMBER,
+      event_data: {
+        possessionClaimResponse:
+          respondPossessionClaimMidEventApiData.respondPossessionClaimPayload.event_data.possessionClaimResponse,
+      },
+      ignore_warning: false,
+    };
     try {
-      const respondPossessionClaimMidEventApi = Axios.create(
-        respondPossessionClaimMidEventApiData.respondPossessionClaimMidEventApiInstance()
-      );
-      const caseTypeId = process.env.CASE_TYPE_ID ?? 'PCS';
-      console.log(caseTypeId);
-      const midEventRequest = {
-        event_id: respondPossessionClaimMidEventApiData.respondPossessionClaimEventName,
-        case_details: {
-          id: process.env.CASE_NUMBER,
-          case_type_id: caseTypeId,
-          data: payload,
-        },
-      };
       console.log('RESPONDTOCLAIM MID EVENT REQUEST:\n', JSON.stringify(midEventRequest, null, 2));
+      console.log('MID EVENT ENDPOINT:', respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint());
+      console.log(respondPossessionClaimMidEventApi.defaults.headers);
 
       const midEventResponse = await respondPossessionClaimMidEventApi.post(
         respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint(),

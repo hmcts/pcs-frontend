@@ -1,7 +1,7 @@
 import { Page, expect } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
-import { dashboard } from '../../../data/page-data';
+import { dashboard, viewTheResponse } from '../../../data/page-data';
 import { viewAllApplications } from '../../../data/page-data/genApps-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -20,6 +20,7 @@ export class CitizenDashboardAction implements IAction {
         () => this.verifyNavigationFromNotificationLink(page, fieldName as actionRecord),
       ],
       ['validateViewAllApplications', () => this.validateViewAllApplications()],
+      ['verifyResponseOnViewTheClaimPage', () => this.verifyResponseOnViewTheClaimPage()],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -116,5 +117,60 @@ export class CitizenDashboardAction implements IAction {
       elementType: 'paragraph',
       text: 'Submitted on ' + viewAllApplications.getSubmittedDate(),
     });
+  }
+
+  private async verifyResponseOnViewTheClaimPage() {
+    await performValidation('responseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails);
+    await performValidation('responseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details);
+    await performValidation(
+      'responseTable',
+      viewTheResponse.additionalDefendant1DynamicSubHeader,
+      viewTheResponse.additionalDefendant1Details
+    );
+    await performValidation(
+      'responseTable',
+      viewTheResponse.additionalDefendant2DynamicSubHeader,
+      viewTheResponse.additionalDefendant2Details
+    );
+    await performValidation(
+      'responseTable',
+      viewTheResponse.responseToClaimSubHeader,
+      viewTheResponse.responseToClaimDetails
+    );
+    await performValidation(
+      'responseTable',
+      viewTheResponse.paymentsOrAgreementsSubHeader,
+      viewTheResponse.paymentsOrAgreementsDetails
+    );
+    await performValidation(
+      'responseTable',
+      viewTheResponse.yourHouseholdSubHeader,
+      viewTheResponse.yourHouseholdDetails
+    );
+    await performValidation(
+      'responseTable',
+      viewTheResponse.regularIncomeSubHeader,
+      viewTheResponse.regularIncomeDetails
+    );
+    await performValidation(
+      'responseTable',
+      viewTheResponse.priorityDebtsSubHeader,
+      viewTheResponse.priorityDebtsDetails
+    );
+    await performValidation(
+      'responseTable',
+      viewTheResponse.regularExpensesSubHeader,
+      viewTheResponse.regularExpensesDetails
+    );
+    await performValidation(
+      'responseTable',
+      viewTheResponse.additionalInformationSubHeader,
+      viewTheResponse.additionalInformationDetails
+    );
+    await performValidation(
+      'responseTable',
+      viewTheResponse.counterclaimSubHeader,
+      viewTheResponse.counterclaimDetails
+    );
   }
 }
