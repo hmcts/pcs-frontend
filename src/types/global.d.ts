@@ -1,3 +1,4 @@
+import { PaymentSessionState } from '@services/paymentSessionService';
 import { type Session, type SessionData } from 'express-session';
 import { type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
@@ -23,6 +24,7 @@ interface CustomSessionData extends SessionData {
   returnTo?: string;
   formData?: Record<string, any>;
   uploadedDocs?: Record<string, Record<string, unknown[]>>;
+  returnToCya?: string;
   ccdCase?: CcdCase;
   genApp?: {
     applicationId?: string;
