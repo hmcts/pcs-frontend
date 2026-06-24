@@ -97,13 +97,13 @@ export async function contactPreferenceEmailOrPostNavigationTests(): Promise<voi
     await performValidation(
       'pageNavigation',
       contactPreferenceEmailOrPost.backLink,
-      correspondenceAddress.correspondenceAddressUnKnownMainHeader
+      correspondenceAddress.correspondenceAddressPostalMainHeader
     );
   } else if (process.env.CORRESPONDENCE_ADDRESS === 'KNOWN') {
     await performValidation(
       'pageNavigation',
       contactPreferenceEmailOrPost.backLink,
-      correspondenceAddress.correspondenceAddressKnownMainHeader
+      correspondenceAddress.correspondenceAddressPostalMainHeader
     );
   }
   await performAction('clickRadioButton', contactPreferenceEmailOrPost.byPostRadioOption);
