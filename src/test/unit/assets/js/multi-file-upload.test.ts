@@ -2,6 +2,13 @@
  * @jest-environment jsdom
  */
 
+import { TextEncoder } from 'util';
+
+// jsdom strips TextEncoder from the global scope; real browsers expose it.
+if (typeof globalThis.TextEncoder === 'undefined') {
+  (globalThis as unknown as { TextEncoder: unknown }).TextEncoder = TextEncoder;
+}
+
 let capturedHooks: Record<string, (...args: unknown[]) => void> = {};
 
 jest.mock('@ministryofjustice/frontend', () => ({
@@ -36,6 +43,12 @@ jest.mock('@utils/fileExtensionValidation', () => ({
 }));
 
 import { initMultiFileUpload } from '../../../../main/assets/js/multi-file-upload';
+
+// Hidden uploadedDocuments[] inputs carry base64url-encoded JSON (WAF-safe).
+function decodeHiddenValue(value: string): Record<string, unknown> {
+  const b64 = value.replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(decodeURIComponent(escape(atob(b64))));
+}
 
 function setupDOM() {
   document.body.innerHTML = `
@@ -239,7 +252,7 @@ describe('multi-file-upload', () => {
       const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
       expect(inputs).toHaveLength(1);
       expect((inputs[0] as HTMLInputElement).dataset.documentIndex).toBe('0');
-      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      const value = decodeHiddenValue((inputs[0] as HTMLInputElement).value);
       expect(value.index).toBe(0);
       expect(value.document_filename).toBe('test.pdf');
     });
@@ -337,7 +350,7 @@ describe('multi-file-upload', () => {
 
       const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
       expect(inputs).toHaveLength(1);
-      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      const value = decodeHiddenValue((inputs[0] as HTMLInputElement).value);
       expect(value.document_filename).toBe('remaining.pdf');
       expect(value.index).toBe(0);
     });
@@ -366,7 +379,7 @@ describe('multi-file-upload', () => {
 
       const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
       expect(inputs).toHaveLength(1);
-      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      const value = decodeHiddenValue((inputs[0] as HTMLInputElement).value);
       expect(value.document_filename).toBe('remaining.pdf');
       expect(value.id).toBe('ccd-doc-id');
       expect(value.index).toBeUndefined();
@@ -396,7 +409,7 @@ describe('multi-file-upload', () => {
 
       const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
       expect(inputs).toHaveLength(1);
-      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      const value = decodeHiddenValue((inputs[0] as HTMLInputElement).value);
       expect(value.document_filename).toBe('uploaded.pdf');
       expect(value.id).toBe('ccd-doc-id-2');
     });

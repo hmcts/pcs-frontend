@@ -58,6 +58,18 @@ describe('fileUploadUtils', () => {
       expect(parseUploadedDocumentsFromBody({ 'uploadedDocuments[]': JSON.stringify(doc) })).toEqual([doc]);
     });
 
+    it('parses base64url-encoded JSON (WAF-safe wire format)', () => {
+      const doc = { index: 0, document_filename: 'rentArrears.pdf', id: 'id-1' };
+      const encoded = Buffer.from(JSON.stringify(doc), 'utf8').toString('base64url');
+      expect(parseUploadedDocumentsFromBody({ 'uploadedDocuments[]': encoded })).toEqual([doc]);
+    });
+
+    it('decodes base64url with non-ASCII filenames', () => {
+      const doc = { index: 0, document_filename: 'café-déjà.pdf' };
+      const encoded = Buffer.from(JSON.stringify(doc), 'utf8').toString('base64url');
+      expect(parseUploadedDocumentsFromBody({ 'uploadedDocuments[]': encoded })).toEqual([doc]);
+    });
+
     it('parses an array of JSON strings', () => {
       expect(
         parseUploadedDocumentsFromBody({
