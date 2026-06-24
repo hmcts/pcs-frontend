@@ -35,11 +35,11 @@
       },
       "ResponseNotStarted": {
         "title": "cyYour response",
-        "body": "cyYou should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Start your response</a>"
+        "body": "cyYou should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Start your response</a>"
       },
       "ResponseInProgress": {
         "title": "cyYour response",
-        "body": "cyYou should complete your response before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/start-now\">Continue with your response</a>"
+        "body": "cyYou should complete your response before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Continue with your response</a>"
       },
       "ResponseSubmitted": {
         "title": "cyYour response",
@@ -71,6 +71,7 @@
     "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
     "ViewAllApplications": { "title": "cyView all applications" }
   },
+
   "viewDocuments": {
     "pageTitle": "cyView documents",
     "noDocuments": "cyThere are no documents to display.",
