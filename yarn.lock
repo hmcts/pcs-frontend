@@ -12257,11 +12257,11 @@ __metadata:
   linkType: hard
 
 "protobufjs@npm:^8.0.0":
-  version: 8.6.3
-  resolution: "protobufjs@npm:8.6.3"
+  version: 8.6.4
+  resolution: "protobufjs@npm:8.6.4"
   dependencies:
     long: "npm:^5.3.2"
-  checksum: 10/3a2326c2bf6fa515285dcacd489a35cec68c76427a4d4b327663f2d09fb8b1e1d5717983ba0d9f1c115bcafbaca8316e144bafd663aee112c38d4c396c8cde42
+  checksum: 10/0dfbc2dd78d0014a1aefffff577cbdcef3b2c08cdd404c1c02111e619c3d72e4f399ce361beb87b9ccc9750f42a15158f3a0f1d7ef5f3d971de55a673867b8f0
   languageName: node
   linkType: hard
 
