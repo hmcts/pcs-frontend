@@ -472,12 +472,11 @@ export function collectionAddressesHtml(parties: UnknownRecord[]): string | unde
 
 export function noticeDateTimeValue(data: UnknownRecord): unknown {
   return getFirstValue(data, [
-    'notice_NoticePostedDate',
-    'notice_NoticeDeliveredDate',
-    'notice_NoticeHandedOverDateTime',
     'notice_NoticeEmailSentDateTime',
-    'notice_NoticeOtherElectronicDateTime',
-    'notice_NoticeOtherDateTime',
+    'notice_HandedOverDateTime',
+    'notice_EmailSentDateTime',
+    'notice_OtherElectronicDateTime',
+    'notice_OtherDateTime',
   ]);
 }
 

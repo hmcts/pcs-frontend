@@ -10,9 +10,9 @@ import {
   enumText,
   firstDefendantParty,
   firstUnderlesseeParty,
+  formatTime,
   getArray,
   getFirstString,
-  getFirstValue,
   getString,
   getValue,
   groundLabels,
@@ -20,6 +20,7 @@ import {
   htmlRow,
   linkHtml,
   listHtml,
+  noticeDateTimeValue,
   otherGroundDescriptions,
   partyAddressHtml,
   partyName,
@@ -64,7 +65,10 @@ export function buildClaimantSection(data: UnknownRecord, copy: ViewTheClaimCopy
   const rows = [
     textRow(copy.label('claimantName'), claimantName(data, copy)),
     htmlRow(copy.label('addressForService'), claimantAddressHtml(data)),
-    textRow(copy.label('isExemptLandlord'), yesNoText(getValue(data, 'isExemptLandlord'))),
+    textRow(
+      copy.label('isExemptLandlord'),
+      yesNoText(getValue(data, 'detailsTab_ClaimantRegistrationAndLicensingDetails.isExemptLandlord'))
+    ),
   ];
 
   return section(copy.section('claimantDetails'), rows);
@@ -95,22 +99,11 @@ export function buildAdditionalDefendantSections(
   return defendants
     .map((defendant, index) =>
       section(copy.section('additionalDefendantDetails', { number: index + 1 }), [
-        textRow(copy.label('defendantNameKnown'), yesNoText(getValue(defendant, 'nameKnown'))),
-        textRow(copy.label('defendantFirstName'), getString(defendant, 'firstName')),
-        textRow(copy.label('defendantLastName'), getString(defendant, 'lastName')),
-        textRow(copy.label('defendantAddressKnown'), yesNoText(getValue(defendant, 'addressKnown'))),
-        htmlRow(copy.label('addressForService'), additionalDefendantAddressHtml(defendant, propertyAddress)),
+        textRow(copy.label('defendantName'), partyName(defendant, copy)),
+        htmlRow(copy.label('addressForService'), partyAddressHtml(defendant, propertyAddress)),
       ])
     )
     .filter((sectionItem): sectionItem is ViewTheClaimSection => !!sectionItem);
-}
-
-function additionalDefendantAddressHtml(defendant: UnknownRecord, propertyAddress: unknown): string | undefined {
-  if (getValue(defendant, 'addressKnown') !== 'YES') {
-    return undefined;
-  }
-
-  return partyAddressHtml(defendant, propertyAddress);
 }
 
 export function buildClaimDetailsSection(
@@ -119,13 +112,8 @@ export function buildClaimDetailsSection(
   copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
   const rows = [
-    textRow(copy.label('claimantType'), getString(data, 'detailsTab_ClaimDetails.claimantType')),
-    textRow(copy.label('trespassClaim'), yesNoText(getValue(data, 'detailsTab_ClaimDetails.trespassClaim'))),
     htmlRow(copy.label('propertyAddress'), addressHtml(propertyAddress)),
-    textRow(
-      copy.label('hasGrounds'),
-      yesNoText(getFirstValue(data, ['introGrounds_HasIntroductoryDemotedOtherGroundsForPossession']))
-    ),
+    textRow(copy.label('hasGrounds'), groundLabels(data).length > 0 ? 'Yes' : undefined),
     htmlRow(copy.label('groundsForPossession'), listHtml(groundLabels(data))),
     htmlRow(copy.label('descriptionOfGrounds'), listHtml(otherGroundDescriptions(data))),
     ...groundReasonRows(data, copy),
@@ -144,13 +132,14 @@ export function buildClaimDetailsSection(
 }
 
 export function buildWelshAsbSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
+  const asb = 'detailsTab_AntisocialAndConductDetails';
   const rows = [
-    textRow(copy.label('isASB'), yesNoText(getValue(data, 'walesAntisocialBehaviour'))),
-    textRow(copy.label('asbDetails'), getString(data, 'walesAntisocialBehaviourDetails')),
-    textRow(copy.label('isIllegalPurposes'), yesNoText(getValue(data, 'walesIllegalPurposesUse'))),
-    textRow(copy.label('illegalPurposesDetails'), getString(data, 'walesIllegalPurposesUseDetails')),
-    textRow(copy.label('isOtherProhibitedConduct'), yesNoText(getValue(data, 'walesOtherProhibitedConduct'))),
-    textRow(copy.label('otherProhibitedConductDetails'), getString(data, 'walesOtherProhibitedConductDetails')),
+    textRow(copy.label('isASB'), yesNoText(getValue(data, `${asb}.antiSocialBehaviour`))),
+    textRow(copy.label('asbDetails'), getString(data, `${asb}.antiSocialBehaviourDetails`)),
+    textRow(copy.label('isIllegalPurposes'), yesNoText(getValue(data, `${asb}.propertyUsedIllegally`))),
+    textRow(copy.label('illegalPurposesDetails'), getString(data, `${asb}.propertyUsedIllegallyDetails`)),
+    textRow(copy.label('isOtherProhibitedConduct'), yesNoText(getValue(data, `${asb}.otherProhibitedConduct`))),
+    textRow(copy.label('otherProhibitedConductDetails'), getString(data, `${asb}.otherProhibitedConductDetails`)),
   ];
 
   return section(copy.section('asb'), rows);
@@ -165,7 +154,6 @@ export function buildRentArrearsSection(
   const rows = [
     textRow(copy.label('rentAmount'), getString(data, 'detailsTab_RentArrearsDetails.rentAmount')),
     textRow(copy.label('howIsRentCalculated'), getString(data, 'detailsTab_RentArrearsDetails.calculationFrequency')),
-    textRow(copy.label('dailyRate'), getString(data, 'detailsTab_RentArrearsDetails.dailyRate')),
     textRow(copy.label('totalRentArrears'), getString(data, 'detailsTab_RentArrearsDetails.arrearsTotal')),
     textRow(
       copy.label('previousSteps'),
@@ -224,35 +212,23 @@ export function buildNoticeDetailsSection(
   caseReference: string,
   copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
+  const notice = 'detailsTab_NoticeDetails';
   const rows = [
-    textRow(copy.label('noticeServed'), yesNoText(getValue(data, 'detailsTab_NoticeDetails.noticeServed'))),
-    textRow(
-      copy.label('noticeNotServedReason'),
-      getFirstString(data, [
-        'notice_NoticeNotServedReason',
-        'notice_NoNoticeStatement',
-        'walesNoNoticeStatement',
-        'noticeStatement',
-      ])
-    ),
-    textRow(copy.label('noticeType'), getString(data, 'walesTypeOfNoticeServed')),
-    textRow(copy.label('noticeServiceMethod'), getString(data, 'detailsTab_NoticeDetails.noticeMethod')),
-    textRow(copy.label('noticeDate'), getString(data, 'detailsTab_NoticeDetails.noticeDate')),
-    textRow(copy.label('noticePersonName'), getString(data, 'notice_NoticePersonName')),
-    textRow(copy.label('noticeEmailAddress'), getString(data, 'notice_NoticeEmailAddress')),
-    textRow(copy.label('noticeOtherElectronic'), getString(data, 'notice_NoticeOtherElectronicMethodExplanation')),
-    textRow(copy.label('noticeOtherMeans'), getString(data, 'notice_NoticeOtherExplanation')),
-    textRow(
-      copy.label('canUploadNotice'),
-      yesNoText(getFirstValue(data, ['notice_CanUploadNotice', 'notice_HasNoticeDocuments']))
-    ),
-    textRow(
-      copy.label('cannotUploadNoticeReason'),
-      getFirstString(data, ['notice_UnableToUploadNoticeReason', 'notice_NoNoticeDocumentsReason'])
-    ),
+    textRow(copy.label('noticeServed'), yesNoText(getValue(data, `${notice}.noticeServed`))),
+    textRow(copy.label('noticeNotServedReason'), getString(data, `${notice}.statement`)),
+    textRow(copy.label('noticeType'), getString(data, `${notice}.typeOfNoticeServed`)),
+    textRow(copy.label('noticeServiceMethod'), getString(data, `${notice}.noticeMethod`)),
+    textRow(copy.label('noticeDate'), getString(data, `${notice}.noticeDate`)),
+    textRow(copy.label('noticeTime'), formatTime(noticeDateTimeValue(data))),
+    textRow(copy.label('noticePersonName'), getString(data, `${notice}.noticePersonName`)),
+    textRow(copy.label('noticeEmailAddress'), getString(data, `${notice}.noticeEmailAddress`)),
+    textRow(copy.label('noticeOtherElectronic'), getString(data, `${notice}.noticeOtherElectronicDetails`)),
+    textRow(copy.label('noticeOtherMeans'), getString(data, `${notice}.noticeOtherExplanation`)),
+    textRow(copy.label('canUploadNotice'), yesNoText(getValue(data, `${notice}.noticeUploaded`))),
+    textRow(copy.label('cannotUploadNoticeReason'), getString(data, `${notice}.reasonsForNoNoticeDocument`)),
     htmlRow(
       copy.label('noticeDocument'),
-      collectionDocumentLinksHtml(data, caseReference, 'detailsTab_NoticeDetails.noticeDocuments') ??
+      collectionDocumentLinksHtml(data, caseReference, `${notice}.noticeDocuments`) ??
         documentLinksHtml(documents, caseReference, {
           documentTypes: ['NOTICE_FOR_SERVICE_OUT_OF_JURISDICTION', 'NOTICE', 'CERTIFICATE_OF_SERVICE'],
         })
