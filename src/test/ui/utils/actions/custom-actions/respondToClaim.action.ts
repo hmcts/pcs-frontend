@@ -777,6 +777,7 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
+    await performValidation('text', { elementType: 'listItem', text: noticeDateWhenProvided.noticeGivenDateLabel });
     this.recordRtcCyaDateFromParts(
       `When did you receive notice from ${claimantsName}?`,
       noticeData?.day,
@@ -926,6 +927,9 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
+    const isWalesJourney = process.env.WALES_POSTCODE === 'YES';
+    const payload = isWalesJourney ? submitCaseApiDataWales : submitCaseApiData;
+
     await performValidation('text', {
       elementType: 'subHeader',
       text: `Amount you owe in rent arrears given by ${claimantsName}:`,
@@ -934,7 +938,7 @@ export class RespondToClaimAction implements IAction {
       elementType: 'paragraph',
       text: `When they made their claim, ${claimantsName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
-    const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
+    const rentArrearsAmount = formatCurrency(`${payload.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {
       elementType: 'paragraph',
       text: `${rentArrearsAmount}`,
