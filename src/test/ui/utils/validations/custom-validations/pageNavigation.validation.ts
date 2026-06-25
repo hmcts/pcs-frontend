@@ -55,11 +55,18 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.currentPageUrl = page.url();
     const isBackLink = typeof navigateButton === 'string' && navigateButton.includes('Back');
     const isFeedbackLink = typeof navigateButton === 'string' && navigateButton.includes('feedback');
-    const shouldUseClickNavigation = isBackLink && enable_navigation_tests === 'true' && PageNavigationValidation.isCriticalPage();
+    const isButtonNavigation = typeof navigateButton === 'string' && !isBackLink && !isFeedbackLink;
+    const shouldUseClickNavigation =
+      isBackLink && enable_navigation_tests === 'true' && PageNavigationValidation.isCriticalPage();
 
     try {
       if (isFeedbackLink) {
         await this.validateFeedbackLinkHref(page, navigateButton);
+        return;
+      }
+
+      if (isButtonNavigation) {
+        await this.validateButtonNavigation(page, navigateButton, fieldName);
         return;
       }
 
@@ -69,10 +76,7 @@ export class PageNavigationValidation implements IValidation {
       }
       await this.validateClickedNavigation(page, navigateButton, fieldName);
     } finally {
-      if (
-        PageNavigationValidation.currentPageUrl &&
-        page.url() !== PageNavigationValidation.currentPageUrl
-      ) {
+      if (PageNavigationValidation.currentPageUrl && page.url() !== PageNavigationValidation.currentPageUrl) {
         await performAction('navigateToUrl', PageNavigationValidation.currentPageUrl);
       }
     }
@@ -117,7 +121,16 @@ export class PageNavigationValidation implements IValidation {
     }
   }
 
-  private async validateClickedNavigation(page: Page, navigateButton: string, fieldName: validationRecord): Promise<void> {
+  private async validateButtonNavigation(page: Page, buttonText: string, fieldName: validationRecord): Promise<void> {
+    await performAction('clickButton', buttonText);
+    await this.validatePageNavigation(page, fieldName);
+  }
+
+  private async validateClickedNavigation(
+    page: Page,
+    navigateButton: string,
+    fieldName: validationRecord
+  ): Promise<void> {
     let newPage: Page | null = null;
     let isNewWindow = false;
     const popupPromise = page
