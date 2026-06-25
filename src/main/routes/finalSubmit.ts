@@ -112,7 +112,7 @@ export default function finalSubmitRoutes(app: Application): void {
       return safeRedirect303(res, getRespondToClaimConfirmationPath(caseId, validatedCase.data), '/', ['/case']);
     } catch (error) {
       logger.error(`Failed to submit response for case ${caseId}:`, error);
-      return safeRedirect303(res, `/case/${caseId}/respond-to-claim/check-your-answers?submitError=failed`, '/', [
+      return safeRedirect303(res, `/case/${caseId}/respond-to-claim/end-of-journey-cya?submitError=failed`, '/', [
         '/case',
       ]);
     }
