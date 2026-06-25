@@ -172,7 +172,10 @@ describe('viewTheClaimUtils', () => {
       'No'
     );
     expect(
-      rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Additional defendant’s address for service known?')
+      rowText(
+        sectionByTitle(page, 'Additional defendant 1 details'),
+        'Additional defendant’s address for service known?'
+      )
     ).toBe('No');
     expect(rowText(sectionByTitle(page, 'Claim details'), 'Claimant type')).toBe(
       'Registered provider of social housing or local authority'
