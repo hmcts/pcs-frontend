@@ -77,7 +77,7 @@ test.afterEach(async () => {
   finaliseAllValidations();
 });
 
-test.describe.skip('Respond to a claim LR - e2e Journey @nightly', async () => {
+test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('Respond to claim - NonRentArrears - AssuredTenancy - LR @smoke @regression @PR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
