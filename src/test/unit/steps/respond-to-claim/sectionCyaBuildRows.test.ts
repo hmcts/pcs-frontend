@@ -399,7 +399,7 @@ describe('section-CYA row builders — characterisation', () => {
         reqWith(
           model(
             { possessionNoticeReceived: 'YES', noticeReceivedDate: '2025-05-20' },
-            { notice_NoticePostedDate: '2025-05-01' }
+            { notice_PostedDate: '2025-05-01' }
           )
         ),
         t
@@ -424,7 +424,7 @@ describe('section-CYA row builders — characterisation', () => {
 
     it('notice-date row: "provided" branch shows "No answer provided" when the optional date is blank', () => {
       const rows = buildDisputeRows(
-        reqWith(model({ possessionNoticeReceived: 'YES' }, { notice_NoticePostedDate: '2025-05-01' })),
+        reqWith(model({ possessionNoticeReceived: 'YES' }, { notice_PostedDate: '2025-05-01' })),
         t
       );
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
