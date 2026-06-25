@@ -276,6 +276,43 @@ describe('section-CYA row builders — characterisation', () => {
       expect(addressRow?.value).toEqual({ html: '3 Wiltshire Close<br>WA1 4DA' });
       expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
     });
+
+    it('correspondence-address: shows Yes row using property address when citizen confirmed in fallback scenario', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          propertyAddress: { AddressLine1: '5 Property Lane', PostCode: 'PR1 2OP' },
+          possessionClaimResponse: {
+            defendantResponses: { propertyAddressConfirmation: 'YES' },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.label');
+      expect(addressRow?.value).toEqual({ text: 'options.yes' });
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel')).toBe(false);
+    });
+
+    it('correspondence-address: shows entered address when citizen answered No in fallback scenario', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          propertyAddress: { AddressLine1: '5 Property Lane', PostCode: 'PR1 2OP' },
+          possessionClaimResponse: {
+            defendantResponses: { propertyAddressConfirmation: 'NO' },
+            defendantContactDetails: {
+              party: {
+                address: { AddressLine1: '10 New Street', PostTown: 'Manchester', PostCode: 'M1 1AA' },
+              },
+            },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const addressRow = rows.find(r => r.key.text === 'rows.correspondenceAddressConfirmation.fallbackLabel');
+      expect(addressRow?.value).toEqual({ html: '10 New Street<br>Manchester<br>M1 1AA' });
+      expect(rows.some(r => r.key.text === 'rows.correspondenceAddressConfirmation.label')).toBe(false);
+    });
   });
 
   describe('dispute-and-tenancy', () => {
@@ -362,7 +399,7 @@ describe('section-CYA row builders — characterisation', () => {
         reqWith(
           model(
             { possessionNoticeReceived: 'YES', noticeReceivedDate: '2025-05-20' },
-            { notice_NoticePostedDate: '2025-05-01' }
+            { notice_PostedDate: '2025-05-01' }
           )
         ),
         t
@@ -387,7 +424,7 @@ describe('section-CYA row builders — characterisation', () => {
 
     it('notice-date row: "provided" branch shows "No answer provided" when the optional date is blank', () => {
       const rows = buildDisputeRows(
-        reqWith(model({ possessionNoticeReceived: 'YES' }, { notice_NoticePostedDate: '2025-05-01' })),
+        reqWith(model({ possessionNoticeReceived: 'YES' }, { notice_PostedDate: '2025-05-01' })),
         t
       );
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
