@@ -93,8 +93,8 @@ export function buildViewTheClaimPageData(
   const propertyAddressHtml = addressHtml(propertyAddress);
   const propertyAddressText = addressText(propertyAddress);
   const claimant = claimantName(data, copy);
-  const claimIssueDateText = formatDate(getValue(data, 'claimIssueDate'), locale);
-  const claimSubmittedDateText = formatDate(getFirstValue(data, ['submittedOn', 'claimSubmittedDate']), locale);
+  const claimIssueDateText = formatDate(getValue(data, 'possessionClaimResponse.claimIssuedDate'), locale);
+  const claimSubmittedDateText = formatDate(getValue(data, 'detailsTab_DateClaimSubmitted'), locale);
   const pageMetadataRows = sectionRows([
     claimIssueDateText ? summaryRow(t('viewTheClaim:dateIssued'), { text: claimIssueDateText }) : undefined,
     claimSubmittedDateText ? summaryRow(t('viewTheClaim:dateSubmitted'), { text: claimSubmittedDateText }) : undefined,

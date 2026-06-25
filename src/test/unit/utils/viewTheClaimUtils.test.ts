@@ -15,6 +15,8 @@ const translations: Record<string, string> = {
   'viewTheClaim:labels.claimantName': 'Name',
   'viewTheClaim:labels.addressForService': 'Address for service',
   'viewTheClaim:labels.defendantName': 'Name',
+  'viewTheClaim:labels.claimantType': 'Claimant type',
+  'viewTheClaim:labels.trespassClaim': 'Is your claim a trespass claim?',
   'viewTheClaim:labels.propertyAddress': 'Address of the property the claimant is seeking possession of',
   'viewTheClaim:labels.hasGrounds': 'Does the claimant have grounds for possession?',
   'viewTheClaim:labels.groundsForPossession': 'Grounds for possession',
@@ -26,6 +28,7 @@ const translations: Record<string, string> = {
   'viewTheClaim:labels.additionalReasons': 'Additional reasons for possession',
   'viewTheClaim:labels.rentAmount': 'Rent amount',
   'viewTheClaim:labels.howIsRentCalculated': 'How is rent calculated?',
+  'viewTheClaim:labels.dailyRate': 'Daily rate',
   'viewTheClaim:labels.rentStatement': 'Rent statement',
   'viewTheClaim:labels.underlesseeName': 'Name',
   'viewTheClaim:labels.underlesseeAddress': 'Address for service',
@@ -76,6 +79,11 @@ describe('viewTheClaimUtils', () => {
           PostTown: 'London',
           PostCode: 'W3 7RX',
         },
+        dateSubmitted: '2026-06-24T12:23:59.791346',
+        detailsTab_ClaimDetails: {
+          claimantType: 'Registered provider of social housing or local authority',
+          trespassClaim: 'No',
+        },
         claimantName: 'Treetops Housing',
         isClaimantNameCorrect: 'YES',
         organisationAddress: {
@@ -111,6 +119,9 @@ describe('viewTheClaimUtils', () => {
         rentArrears_Total: '200000',
         rentArrears_RecoveryAttempted: 'NO',
         arrearsJudgmentWanted: 'YES',
+        detailsTab_RentArrearsDetails: {
+          dailyRate: '£40.54',
+        },
         allDocuments: [
           {
             id: '11111111-1111-1111-1111-111111111111',
@@ -140,6 +151,7 @@ describe('viewTheClaimUtils', () => {
 
     expect(page.caseReference).toBe('1234567890123456');
     expect(page.propertyAddressHtml).toBe('2 Second Avenue<br>London<br>W3 7RX');
+    expect(page.pageMetadataRows[0].value.text).toBe('24 June 2026');
     expect(page.claimPdfSection.rows[0].value.html).toContain('Claim (PDF)');
     expect(page.claimPdfSection.rows[0].value.html).not.toContain('generated-claim.pdf');
 
@@ -158,11 +170,16 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
       '2 Second Avenue<br>London<br>W3 7RX'
     );
+    expect(rowText(sectionByTitle(page, 'Claim details'), 'Claimant type')).toBe(
+      'Registered provider of social housing or local authority'
+    );
+    expect(rowText(sectionByTitle(page, 'Claim details'), 'Is your claim a trespass claim?')).toBe('No');
     expect(rowHtml(sectionByTitle(page, 'Claim details'), 'Grounds for possession')).toBe('Rent arrears');
 
     const rentSection = sectionByTitle(page, 'Details of rent arrears - RENT ARREARS CLAIMS ONLY');
     expect(rowText(rentSection, 'Rent amount')).toBe('£1,000.00');
     expect(rowText(rentSection, 'How is rent calculated?')).toBe('Monthly');
+    expect(rowText(rentSection, 'Daily rate')).toBe('£40.54');
     expect(rowHtml(rentSection, 'Rent statement')).toContain('rent-statement.pdf');
   });
 
