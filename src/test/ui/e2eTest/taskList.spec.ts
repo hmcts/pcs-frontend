@@ -10,6 +10,7 @@ import {
   counterClaimFee,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
+  dashboard,
   defendantDateOfBirth,
   defendantNameCapture,
   doAnyOtherAdultsLiveInYourHome,
@@ -33,16 +34,17 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../data/page-data';
+import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';
+import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
 let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  process.env.WALES_POSTCODE = 'NO';
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
   process.env.CLAIMANT_NAME = claimantName;
   if (testInfo.title.includes('NoticeServed - No')) {
@@ -77,8 +79,9 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
-  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('clickButton', startNow.startNowButton);
+  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+  await performAction('clickButton', dashboard.startYourResponseLink);
+  await performValidation('mainHeader', taskList.mainHeader);
 });
 
 test.afterEach(async () => {
@@ -87,8 +90,10 @@ test.afterEach(async () => {
 
 test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim - TaskList @noDefendants @regression @crossbrowser', async () => {
+  test('Respond to a claim - TaskList @noDefendants @regression @crossbrowser @NonAutomaticEMV', async () => {
     //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
+    await performAction('taskList', { subSection: taskList.readInformationAboutLink });
+    await performAction('clickButton', startNow.startNowButton);
     await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
     await performAction('taskListStatus', {
       subSecArray: [
@@ -136,6 +141,18 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       ],
       status: 'In progress',
     });
+    await performAction('clickLink', taskList.backLink);
+    await performValidation('text', { elementType: 'link', text: dashboard.continueYourResponseLink });
+    await performAction('clickButton', dashboard.continueYourResponseLink);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'In progress',
+    });
     await performAction('taskList', { subSection: taskList.readInformationAboutLink });
     await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
@@ -151,7 +168,8 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -286,10 +304,6 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('uploadFiles');
     await performAction('clickButton', 'Save and continue');
     await performAction('taskListStatus', {
-      subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
-      status: 'Available',
-    });
-    await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
         taskList.respondToSpecificPartsOfClaimantsClaimLink,
@@ -298,6 +312,10 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
         taskList.confirmDetailsLink,
       ],
       status: 'Done',
+    });
+    await performAction('taskListStatus', {
+      subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
+      status: 'Available',
     });
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(

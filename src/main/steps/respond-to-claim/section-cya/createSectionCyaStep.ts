@@ -91,6 +91,16 @@ export function createSectionCyaStep({
           }
         }
 
+        // Redirect the user if they arrived here via the end-of-journey CYA change link.
+        // Clear the flag so that future edits from the task-list won't redirect back to the  end-of-journey CYA.
+        if (req.session.returnToCya) {
+          const returnUrl = req.session.returnToCya;
+          delete req.session.returnToCya;
+          if (!isSaveForLater) {
+            return res.redirect(303, returnUrl);
+          }
+        }
+
         // Hub-first: both S&C and SFL land on the task-list for the citizen variant.
         // Status differs (Done vs In progress) via the completedSections write above.
         const activeFlow = resolveFlow(req);
