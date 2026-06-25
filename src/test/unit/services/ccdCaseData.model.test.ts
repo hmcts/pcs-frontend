@@ -429,12 +429,12 @@ describe('CcdCaseModel', () => {
 
   describe('notice date', () => {
     it.each([
-      ['notice_NoticePostedDate', '2024-05-02', '2024-05-02'],
-      ['notice_NoticeDeliveredDate', '2024-05-02', '2024-05-02'],
-      ['notice_NoticeHandedOverDateTime', '2024-05-02T14:30:00', '2024-05-02'],
-      ['notice_NoticeEmailSentDateTime', '2024-05-02T00:30:00', '2024-05-02'],
-      ['notice_NoticeOtherElectronicDateTime', '2024-05-02T23:45:00', '2024-05-02'],
-      ['notice_NoticeOtherDateTime', '2024-05-02T12:00:00', '2024-05-02'],
+      ['notice_PostedDate', '2024-05-02', '2024-05-02'],
+      ['notice_DeliveredDate', '2024-05-02', '2024-05-02'],
+      ['notice_HandedOverDateTime', '2024-05-02T14:30:00', '2024-05-02'],
+      ['notice_EmailSentDateTime', '2024-05-02T00:30:00', '2024-05-02'],
+      ['notice_OtherElectronicDateTime', '2024-05-02T23:45:00', '2024-05-02'],
+      ['notice_OtherDateTime', '2024-05-02T12:00:00', '2024-05-02'],
     ])('returns %s truncated to YYYY-MM-DD', (field, raw, expected) => {
       const model = buildModel({ data: { [field]: raw } });
       expect(model.noticeDate).toBe(expected);
