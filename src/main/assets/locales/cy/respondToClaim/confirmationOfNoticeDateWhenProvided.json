@@ -2,7 +2,7 @@
   "pageTitle": "Dyddiad yr hysbysiad",
   "bulletPointLabel": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:",
   "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}}roi'r dyddiad pan wnaethant roi'r hysbysiad i chi (y dyddiad cyflwyno). Os nad ydych yn siŵr o'r union ddyddiad, gallwch ddod o hyd iddo ar yr hysbysiad.",
-  "listItem1": "Gwnaethant gyflwyno hysbysiad i chi yn ceisio meddiant ar {noticeDate}}",
+  "listItem1": "Gwnaethant gyflwyno hysbysiad i chi yn ceisio meddiant ar {{noticeDate}}",
   "question": "Pryd gawsoch yr hysbysiad gan {{claimantName}} (dewisol)?",
   "noticeDateHint": "Er enghraifft, 27 9 2022",
   "errors": {

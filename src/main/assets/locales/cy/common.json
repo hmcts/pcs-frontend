@@ -49,7 +49,7 @@
     "required": "Rhowch werth",
     "defaultRequired": "Rhaid llenwi’r blwch hwn",
     "defaultInvalid": "Fformat annilys",
-    "defaultMaxLength": "Rhaid iddo fod yn {uchafswm} nod neu lai",
+    "defaultMaxLength": "Rhaid iddo fod yn {max} nod neu lai",
     "defaultSpecialCharacter": "cy{fieldName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
     "chooseOption": "Dewis opsiwn",
     "email": {
