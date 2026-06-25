@@ -45,12 +45,22 @@
     "contemptOption": "I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
     "beliefFieldLabel": "Statement of truth",
     "beliefOption": "I believe that the facts stated in this defence form are true.",
-    "fullNameLabel": "Your full name"
+    "legalRepBeliefOption": "The defendant believes that the facts stated in this defence form are true. I am authorised by the defendant to submit this statement.",
+    "fullNameLabel": "Your full name",
+    "legalRepFullNameLabel": "Full name",
+    "nameOfFirmLabel": "Name of firm",
+    "positionHeldLabel": "Position or office held"
   },
   "errors": {
     "statementOfTruthContempt": "Select if you understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth",
     "statementOfTruthBelief": "Select if you believe that the facts stated in this defence form are true",
+    "legalRepStatementOfTruthBelief": "Select if the defendant believes that the facts stated in this defence form are true and that you are authorised by the defendant to submit this statement",
     "fullName": "Enter your full name",
-    "fullNameMaxLength": "Your full name must be 100 characters or fewer"
+    "fullNameMaxLength": "Your full name must be 100 characters or fewer",
+    "nameOfFirm": "Enter the name of firm",
+    "nameOfFirmMaxLength": "Name of firm must be 100 characters or fewer",
+
+    "positionHeld": "Enter your position or office held",
+    "positionHeldMaxLength": "Position or office held must be 100 characters or fewer"
   }
 }

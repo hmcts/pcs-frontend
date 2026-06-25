@@ -31,7 +31,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     {
       name: 'statementOfTruthContempt',
       type: 'checkbox',
-      required: true,
+      // Change from true to a functional condition:
+      required: formData => formData?.isLegalRepresentative !== 'true',
       errorMessage: 'errors.statementOfTruthContempt',
       translationKey: { label: 'statementOfTruth.contemptFieldLabel' },
       legendClasses: 'govuk-visually-hidden',
@@ -50,21 +51,41 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'fullName',
       type: 'text',
       required: true,
-      maxLength: 100,
+      attributes: { maxlength: '100' },
       errorMessage: 'errors.fullName',
       translationKey: { label: 'statementOfTruth.fullNameLabel' },
+    },
+    {
+      name: 'nameOfFirm',
+      type: 'text',
+      required: formData => formData?.isLegalRepresentative === 'true',
+      attributes: { maxlength: '100' },
+      errorMessage: 'errors.nameOfFirm',
+      translationKey: { label: 'statementOfTruth.nameOfFirmLabel' },
+    },
+    {
+      name: 'positionHeld',
+      type: 'text',
+      required: formData => formData?.isLegalRepresentative === 'true',
+      attributes: { maxlength: '100' },
+      errorMessage: 'errors.positionHeld',
+      translationKey: { label: 'statementOfTruth.positionHeldLabel' },
     },
   ],
   getInitialFormData: (req: Request) => {
     const sot = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.statementOfTruth;
     const accepted = sot?.accepted === 'YES';
     const fullName = sot?.fullName;
+    const nameOfFirm = sot?.nameOfFirm;
+    const positionHeld = sot?.positionHeld;
     return {
       ...(accepted ? { statementOfTruthContempt: ['yes'], statementOfTruthBelief: ['yes'] } : {}),
       ...(fullName ? { fullName } : {}),
+      ...(nameOfFirm ? { nameOfFirm } : {}),
+      ...(positionHeld ? { positionHeld } : {}),
     };
   },
-  extendGetContent: async (req: Request) => {
+  extendGetContent: async (req: Request, formContent) => {
     await loadStepNamespaces(
       req,
       [
@@ -83,9 +104,36 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const sections = buildEndOfJourneyCyaSections(req, t);
     const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
     const submitDisabled = status === 'SUBMITTED';
+    const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
+
+    // For legal reps: mutate the pre-built field components to use legal-rep specific text
+    if (isLegalRepresentative && formContent?.fields?.length) {
+      const tSot = getTranslationFunction(req);
+      const beliefField = formContent.fields.find(f => f.name === 'statementOfTruthBelief');
+      if (beliefField?.component) {
+        const component = beliefField.component as Record<string, unknown>;
+        const items = component.items as Record<string, unknown>[] | undefined;
+        if (items?.[0]) {
+          items[0].text = tSot('statementOfTruth.legalRepBeliefOption');
+        }
+        // Override the error message for belief field
+        if (component.errorMessage) {
+          (component.errorMessage as Record<string, unknown>).text = tSot('errors.legalRepStatementOfTruthBelief');
+        }
+      }
+
+      const fullNameField = formContent.fields.find(f => f.name === 'fullName');
+      if (fullNameField?.component) {
+        const component = fullNameField.component as Record<string, unknown>;
+        const label = component.label as Record<string, unknown> | undefined;
+        if (label) {
+          label.text = tSot('statementOfTruth.legalRepFullNameLabel');
+        }
+      }
+    }
 
     if (req.query.submitError !== 'failed') {
-      return { sections, submitDisabled };
+      return { sections, submitDisabled, isLegalRepresentative };
     }
 
     const tError = getTranslationFunction(req, ['respondToClaim/checkYourAnswers', 'common']);
@@ -97,17 +145,30 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const errorSummary = buildErrorSummary({ submitResponse: message }, submitResponseErrorFields, tError);
 
-    return { sections, submitDisabled, ...(errorSummary ? { errorSummary } : {}) };
+    return { sections, submitDisabled, isLegalRepresentative, ...(errorSummary ? { errorSummary } : {}) };
   },
   beforeRedirect: async (req: Request) => {
     const draft = buildDraftDefendantResponse(req);
 
     const contempt = req.body?.statementOfTruthContempt as string[] | undefined;
     const belief = req.body?.statementOfTruthBelief as string[] | undefined;
-    const bothAccepted = contempt?.includes('yes') && belief?.includes('yes');
+    const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
+
+    // Fix: Condition bothAccepted based on whether they are a Legal Rep
+    const bothAccepted = isLegalRepresentative
+      ? belief?.includes('yes')
+      : contempt?.includes('yes') && belief?.includes('yes');
+
+    // For legal reps, also persist nameOfFirm and positionHeld
     draft.defendantResponses.statementOfTruth = {
       accepted: bothAccepted ? 'YES' : 'NO',
       fullName: (req.body?.fullName as string | undefined)?.trim(),
+      ...(isLegalRepresentative
+        ? {
+            nameOfFirm: (req.body?.nameOfFirm as string | undefined)?.trim(),
+            positionHeld: (req.body?.positionHeld as string | undefined)?.trim(),
+          }
+        : {}),
     };
 
     const enumValue = sectionIdToBackendEnum('checkYourAnswersAndSubmit');
