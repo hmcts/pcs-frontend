@@ -15,6 +15,11 @@ const translations: Record<string, string> = {
   'viewTheClaim:labels.claimantName': 'Name',
   'viewTheClaim:labels.addressForService': 'Address for service',
   'viewTheClaim:labels.defendantName': 'Name',
+  'viewTheClaim:labels.defendantNameKnown': 'Additional defendant’s name known?',
+  'viewTheClaim:labels.defendantFirstName': 'First name',
+  'viewTheClaim:labels.defendantLastName': 'Last name',
+  'viewTheClaim:labels.defendantAddressKnown': 'Additional defendant’s address for service known?',
+  'viewTheClaim:dateSubmitted': 'Date submitted',
   'viewTheClaim:labels.claimantType': 'Claimant type',
   'viewTheClaim:labels.trespassClaim': 'Is your claim a trespass claim?',
   'viewTheClaim:labels.propertyAddress': 'Address of the property the claimant is seeking possession of',
@@ -79,7 +84,7 @@ describe('viewTheClaimUtils', () => {
           PostTown: 'London',
           PostCode: 'W3 7RX',
         },
-        dateSubmitted: '2026-06-24T12:23:59.791346',
+        detailsTab_DateClaimSubmitted: '2026-06-24T12:23:59.791346',
         detailsTab_ClaimDetails: {
           claimantType: 'Registered provider of social housing or local authority',
           trespassClaim: 'No',
@@ -114,12 +119,9 @@ describe('viewTheClaimUtils', () => {
         ],
         introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
         introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS'],
-        rentDetails_CurrentRent: '100000',
-        rentDetails_Frequency: 'MONTHLY',
-        rentArrears_Total: '200000',
-        rentArrears_RecoveryAttempted: 'NO',
-        arrearsJudgmentWanted: 'YES',
         detailsTab_RentArrearsDetails: {
+          rentAmount: '£1,000.00',
+          calculationFrequency: 'Monthly',
           dailyRate: '£40.54',
         },
         allDocuments: [
@@ -166,10 +168,12 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Defendant 1 details'), 'Address for service')).toBe(
       '10 Second Avenue<br>London<br>W3 7RX'
     );
-    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
-      '2 Second Avenue<br>London<br>W3 7RX'
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Additional defendant’s name known?')).toBe(
+      'No'
     );
+    expect(
+      rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Additional defendant’s address for service known?')
+    ).toBe('No');
     expect(rowText(sectionByTitle(page, 'Claim details'), 'Claimant type')).toBe(
       'Registered provider of social housing or local authority'
     );
@@ -258,7 +262,9 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Defendant 1 details'), 'Address for service')).toBe(
       '2 Second Avenue<br>London<br>W3 7RX'
     );
-    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Additional defendant’s name known?')).toBe(
+      'No'
+    );
   });
 
   it('builds underlessee and additional underlessee sections in numerical order', () => {
