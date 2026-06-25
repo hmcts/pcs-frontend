@@ -22,4 +22,5 @@ export const paymentDetails = {
   continueButton: `Continue`,
   confirmPaymentHeader: `Confirm your payment`,
   confirmPaymentButton: `Confirm payment`,
+  startDynamicButton: `Start again`,
 };

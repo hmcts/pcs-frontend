@@ -26,4 +26,5 @@ export const counterClaimSpecificSumOfMoney = {
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `counter-claim-specific-sum`,
   backLink: `Back`,
+  feeHiddenAmount: `£35.00`,
 };

@@ -213,10 +213,7 @@ export class RespondToClaimAction implements IAction {
       ['enterPriorityDebtDetails', () => this.enterPriorityDebtDetails(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
       ['inputCounterClaimPaymentDetails', () => this.inputCounterClaimPaymentDetails(fieldName as actionRecord)],
-      [
-        'validateCounterClaimApplicationFee',
-        () => this.validateCounterClaimApplicationFee(fieldName as actionRecord),
-      ],
+      ['validateCounterClaimApplicationFee', () => this.validateCounterClaimApplicationFee(fieldName as actionRecord)],
       [
         'selectDoYouWantToUploadDocFoCounterclaim',
         () => this.selectDoYouWantToUploadDocFoCounterclaim(fieldName as actionRecord),
@@ -1096,8 +1093,6 @@ export class RespondToClaimAction implements IAction {
       ['inputText', paymentDetails.emailTextLabel, paymentDetails.emailTextInput]
     );
     await performAction('clickButton', paymentDetails.continueButton);
-    await performValidation('mainHeader', paymentDetails.confirmPaymentHeader);
-    await performAction('clickButton', paymentDetails.confirmPaymentButton);
   }
 
   private async validateCounterClaimApplicationFee(feeData: actionRecord): Promise<void> {

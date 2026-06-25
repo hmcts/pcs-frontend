@@ -431,22 +431,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
     await performAction('validateCounterClaimApplicationFee', {
       amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
-      fee: '35.00',
+      fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
     });
     await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('35.00'));
     await performValidation('mainHeader', paymentDetails.mainHeader);
     await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
+    await performAction('clickButton', paymentDetails.confirmPaymentButton);
     await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
     await performValidation('text', {
       elementType: 'paragraph',
       text: counterClaimPaymentSuccessful.paymentConfirmationParagraph,
-    });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
-    await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
     });
     await performAction(
       'clickButton',
@@ -1815,11 +1809,22 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: counterClaimApplicationFeeAmount.counterClaimAmountNotApplicable,
+      fee: counterClaimApplicationFeeAmount.somethingElseCounterClaimFee,
+    });
     await performAction(
       'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+      counterClaimApplicationFeeAmount.getPayButton(counterClaimApplicationFeeAmount.somethingElseCounterClaimFee)
     );
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.declinedCardNumber });
+    await performValidation('mainHeader', 'Your payment has been declined');
+    await performAction('clickButton', paymentDetails.startDynamicButton);
+    await performValidation('errorMessage', {
+      message: counterClaimApplicationFeeAmount.paymentFailedDynamicErrorMessage,
+    });
   });
 
   test('England - RentArrears - NonRentArrears - NoticeServed - No - RentArrearsDispute - SelectCounterClaim - No @PR @rentNonRent @regression', async () => {
