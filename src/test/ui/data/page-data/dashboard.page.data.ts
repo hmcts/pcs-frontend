@@ -42,7 +42,6 @@ export const dashboard = {
   completeClaimBeforeHearingParagraph: `You should complete your response before the hearing.`,
   continueYourResponseLink: `Continue with your response`,
   respondedToClaimParagraph: `You have responded to the claim`,
-  respondToAPropertyHeader: `Respond to a property possession claim online`,
   respondToTheClaimSubHeader: `Respond to the claim`,
   viewTheResponseSubHeader: `View the response`,
   notStartedTag: `Not started`,
