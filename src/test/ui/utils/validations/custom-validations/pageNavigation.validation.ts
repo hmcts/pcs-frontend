@@ -96,7 +96,15 @@ export class PageNavigationValidation implements IValidation {
   }
 
   private async validateFeedbackLinkHref(page: Page, linkText: string): Promise<void> {
-    await this.validateLinkDestination(page, linkText, 'Feedback link', href => href.includes('smartsurvey.co.uk'));
+    await this.validateLinkDestination(page, linkText, 'Feedback link', href => {
+      try {
+        const parsedHref = new URL(href, page.url());
+        const host = parsedHref.hostname.toLowerCase();
+        return host === 'smartsurvey.co.uk' || host.endsWith('.smartsurvey.co.uk');
+      } catch {
+        return false;
+      }
+    });
   }
 
   private async validateLinkDestination(
