@@ -166,7 +166,9 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
       '2 Second Avenue<br>London<br>W3 7RX'
     );
-    expect(rowText(sectionByTitle(page, 'Claim details'), 'Does the claimant have grounds for possession?')).toBe('Yes');
+    expect(rowText(sectionByTitle(page, 'Claim details'), 'Does the claimant have grounds for possession?')).toBe(
+      'Yes'
+    );
     expect(rowHtml(sectionByTitle(page, 'Claim details'), 'Grounds for possession')).toBe('Rent arrears');
 
     const rentSection = sectionByTitle(page, 'Details of rent arrears - RENT ARREARS CLAIMS ONLY');
