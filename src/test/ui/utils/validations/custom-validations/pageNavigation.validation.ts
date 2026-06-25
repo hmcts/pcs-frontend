@@ -201,7 +201,16 @@ export class PageNavigationValidation implements IValidation {
       if (fieldName && typeof fieldName === 'object') {
         const validationData = fieldName as any;
         actualUrl = page.url();
-        const isSmartSurveyPage = actualUrl.includes('smartsurvey.co.uk');
+        let isSmartSurveyPage = false;
+        try {
+          const { hostname } = new URL(actualUrl);
+          const normalizedHostname = hostname.toLowerCase();
+          isSmartSurveyPage =
+            normalizedHostname === 'smartsurvey.co.uk' ||
+            normalizedHostname.endsWith('.smartsurvey.co.uk');
+        } catch {
+          isSmartSurveyPage = false;
+        }
 
         if (validationData.element && !isSmartSurveyPage) {
           expectedElementText = validationData.element;
