@@ -5,7 +5,7 @@ import {
   submitCaseApiData,
 } from '../data/api-data';
 import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
-import { dashboard } from '../data/page-data';
+import { dashboard, taskList } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
@@ -187,11 +187,11 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
       viewResponseHeader: dashboard.viewTheResponseSubHeader,
       tag: dashboard.notStartedTag,
-      nextPageHeader: dashboard.respondToAPropertyHeader,
+      nextPageHeader: taskList.mainHeader,
     });
     await performAction('verifyNavigationFromNotificationLink', {
       responseLink: dashboard.startYourResponseLink,
-      nextPageHeader: dashboard.respondToAPropertyHeader,
+      nextPageHeader: taskList.mainHeader,
     });
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimMidEventApiData.respondPossessionClaimPayload,
@@ -207,7 +207,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
     await performAction('verifyNavigationFromNotificationLink', {
       responseLink: dashboard.continueYourResponseLink,
-      nextPageHeader: dashboard.respondToAPropertyHeader,
+      nextPageHeader: taskList.mainHeader,
     });
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimApiData.respondPossessionClaimPayload,
