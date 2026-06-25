@@ -31,12 +31,10 @@ export const viewTheResponse = {
   additionalDefendant1Details: {
     Name: 'Peter Parker',
     'Postal address': '2 Second Avenue, London, W3 7RX',
-    'Date of birth': '20 May 1990',
   },
   additionalDefendant2Details: {
     Name: 'Jen Parker',
     'Postal address': '2 Second Avenue, London, W3 7RX',
-    'Date of birth': '20 May 1990',
   },
   responseToClaimDetails: {
     'Is the tenancy, occupation contract or licence agreement type given by the claimant correct?': 'Yes',
