@@ -1,4 +1,6 @@
 {
+  "pageTitle": "cyWho the counterclaim is against",
+  "checkboxHint": "cySelect all that apply",
   "heading": "cyWho is the defendant making a counterclaim against?",
   "errors": {
     "counterClaimAgainst": {
