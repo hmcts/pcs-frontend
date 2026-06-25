@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 import { SHORT_TIMEOUT, VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
 import { IAction, actionRecord } from '../../interfaces';
@@ -43,7 +43,7 @@ export class ClickLinkAction implements IAction {
   }
 
   private async getVisibleLinkText(page: Page, fieldName: string): Promise<string> {
-    const linkTextOptions = [...new Set([fieldName, fieldName.replace(/[.?!]+$/, '')])];
+    const linkTextOptions = Array.from(new Set([fieldName, fieldName.replace(/[.?!]+$/, '')]));
 
     for (const linkText of linkTextOptions) {
       const link = page
@@ -73,7 +73,7 @@ export class ClickLinkAction implements IAction {
       expectedHeader = fieldName.header!;
       sectionHeader = fieldName.sectionHeader;
     }
-    let link;
+    let link: Locator;
     if (sectionHeader) {
       const section = page
         .locator(`h2:text-is("${sectionHeader}")`)
