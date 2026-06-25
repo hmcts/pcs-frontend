@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
+import { SHORT_TIMEOUT, VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
 import { IAction, actionRecord } from '../../interfaces';
 
 type ClickLinkParams =
@@ -49,7 +49,7 @@ export class ClickLinkAction implements IAction {
       const link = page
         .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
         .first();
-      if (await link.isVisible({ timeout: VERY_SHORT_TIMEOUT }).catch(() => false)) {
+      if (await link.isVisible({ timeout: SHORT_TIMEOUT }).catch(() => false)) {
         return linkText;
       }
     }
