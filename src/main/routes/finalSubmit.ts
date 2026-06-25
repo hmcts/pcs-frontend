@@ -16,9 +16,12 @@ import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import { requireEventAccess } from '../middleware/requireEventAccess';
 import { http } from '../modules/http';
-import { getRespondToClaimConfirmationPath } from '../steps/utils/postSubmissionRouting';
+import { getCounterClaimAmountInPence } from '../steps/utils/counterClaimAmount';
+import { getRespondToClaimSubmitNavigation } from '../steps/utils/postSubmissionRouting';
 
 import { Logger } from '@modules/logger';
+import type { CcdCase } from '@services/ccdCase.interface';
+import { persistPaymentSessionState } from '@services/paymentSessionService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('finalSubmit');
@@ -36,6 +39,52 @@ function getCaseHeaders(token: string) {
       'Content-Type': 'application/json',
     },
   };
+}
+
+interface ParsedSubmitPaymentPayload {
+  serviceRequestReference: string;
+  feeAmount?: number;
+  counterClaimType?: string;
+}
+
+function parseSubmitPaymentPayload(confirmationBody?: string | null): ParsedSubmitPaymentPayload | undefined {
+  if (!confirmationBody) {
+    return undefined;
+  }
+  try {
+    const parsed = JSON.parse(confirmationBody) as {
+      counterClaim?: {
+        serviceRequestReference?: unknown;
+        feeAmount?: unknown;
+        claimType?: unknown;
+      };
+      serviceRequestReference?: unknown;
+      feeAmount?: unknown;
+      claimType?: unknown;
+    };
+    const paymentDetails = parsed.counterClaim ?? parsed;
+
+    if (
+      typeof paymentDetails.serviceRequestReference !== 'string' ||
+      paymentDetails.serviceRequestReference.trim().length === 0
+    ) {
+      return undefined;
+    }
+
+    const claimType =
+      typeof paymentDetails.claimType === 'string' && paymentDetails.claimType.trim().length > 0
+        ? paymentDetails.claimType
+        : undefined;
+
+    return {
+      serviceRequestReference: paymentDetails.serviceRequestReference,
+      feeAmount: typeof paymentDetails.feeAmount === 'number' ? paymentDetails.feeAmount : undefined,
+      counterClaimType: claimType,
+    };
+  } catch (error) {
+    logger.warn('Unable to parse submit confirmation body JSON for payment payload', error);
+    return undefined;
+  }
 }
 
 export default function finalSubmitRoutes(app: Application): void {
@@ -105,14 +154,33 @@ export default function finalSubmitRoutes(app: Application): void {
       logger.info(`Calling SUBMIT with minimal data: ${submitUrl}`);
       logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
 
-      await http.post(submitUrl, payload, getCaseHeaders(userAccessToken));
+      const submitResponse = await http.post<CcdCase>(submitUrl, payload, getCaseHeaders(userAccessToken));
+      const submittedCase = submitResponse.data;
 
       logger.info(`Response submitted successfully for case ${caseId}`);
 
-      return safeRedirect303(res, getRespondToClaimConfirmationPath(caseId, validatedCase.data), '/', ['/case']);
+      const paymentPayload = parseSubmitPaymentPayload(submittedCase.after_submit_callback_response?.confirmation_body);
+      const { confirmationPath, counterClaimFeePaymentRequired } = getRespondToClaimSubmitNavigation(
+        caseId,
+        validatedCase.data,
+        paymentPayload
+      );
+
+      if (counterClaimFeePaymentRequired) {
+        const counterClaim = validatedCase.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+        await persistPaymentSessionState(req, {
+          caseReference: caseId,
+          serviceRequestReference: paymentPayload!.serviceRequestReference,
+          feeAmount: paymentPayload!.feeAmount,
+          counterClaimAmountInPence: getCounterClaimAmountInPence(counterClaim),
+          counterClaimType: counterClaim?.claimType ?? paymentPayload?.counterClaimType,
+        });
+      }
+
+      return safeRedirect303(res, confirmationPath, '/', ['/case']);
     } catch (error) {
       logger.error(`Failed to submit response for case ${caseId}:`, error);
-      return safeRedirect303(res, `/case/${caseId}/respond-to-claim/check-your-answers?submitError=failed`, '/', [
+      return safeRedirect303(res, `/case/${caseId}/respond-to-claim/end-of-journey-cya?submitError=failed`, '/', [
         '/case',
       ]);
     }

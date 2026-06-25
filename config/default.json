@@ -129,5 +129,8 @@
     "maxMediaFileSizeMB": 500,
     "maxTotalFileSizeMB": 4096,
     "maxFilenameLength": 255
+  },
+  "payment": {
+    "returnUrl": "https://pcs.aat.platform.hmcts.net/payment/return"
   }
 }

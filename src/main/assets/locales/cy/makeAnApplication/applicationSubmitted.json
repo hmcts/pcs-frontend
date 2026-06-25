@@ -1,3 +1,15 @@
 {
-  "pageTitle": "cyApplication submitted"
+  "pageTitle": "cyApplication submitted",
+  "applicationSubmitted": "cyApplication submitted",
+  "paymentBeingProcessed": "cyPayment being processed",
+  "adjournRequestReceived": "cyWe have received your request to adjourn (delay) the court hearing.",
+  "setAsideRequestReceived": "cyWe have received your request to set aside (cancel) the order.",
+  "somethingElseRequestReceived": "cyWe have received your request to ask the court to make an order.",
+  "whatHappensNext": "cyWhat happens next",
+  "youDoNotNeedToDoAnythingElse": "cyYou do not need to do anything else. We will send your application to the judge and we will contact you again when they have made a decision.",
+  "giveFeedbackAboutThisService": "cyGive feedback about this service",
+  "completeThisShortSurvey": "<a href=\"https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">cyComplete this short survey to help us improve this service</a> (usually takes 5 minutes).",
+  "buttons": {
+    "closeAndReturnToCaseOverview": "cyClose and return to case overview"
+  }
 }
