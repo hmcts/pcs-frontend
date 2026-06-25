@@ -203,11 +203,7 @@ export function claimantAddressHtml(data: UnknownRecord): string | undefined {
     collectionAddressesHtml(collectionRecords(getValue(data, 'allClaimants'))) ??
     getFirstAddressHtml(
       data,
-      [
-        'detailsTab_ClaimantAddress',
-        'casePartiesTab_ClaimantDetails.serviceAddress',
-        'organisationAddress',
-      ],
+      ['detailsTab_ClaimantAddress', 'casePartiesTab_ClaimantDetails.serviceAddress', 'organisationAddress'],
       { includeCountry: true }
     ) ??
     formattedAddressHtml(getString(data, 'formattedClaimantContactAddress'))
@@ -364,13 +360,13 @@ export function groundReasonRows(data: UnknownRecord, copy: ViewTheClaimCopy): (
     .filter((value): value is UnknownRecord => !!value)
     .map(value => {
       const label = getStringFromValue(value.label) ?? enumText(value.code, GROUND_LABELS) ?? '';
-      const section = label.match(/\(section ([^)]+)\)/i)?.[1];
+      const sectionNumber = label.match(/\(section ([^)]+)\)/i)?.[1];
       const reason =
         getStringFromValue(value.reason) ??
         (getStringFromValue(value.code)?.toUpperCase() === 'ANTISOCIAL_BEHAVIOUR_S157'
           ? getString(data, 'detailsTab_AntisocialAndConductDetails.antiSocialBehaviourDetails')
-          : section
-            ? getString(data, `detailsTab_ReasonsForPossessionDetails.section${section}`)
+          : sectionNumber
+            ? getString(data, `detailsTab_ReasonsForPossessionDetails.section${sectionNumber}`)
             : undefined);
       return textRow(copy.label('reasonForGround', { ground: label }), reason);
     })
@@ -593,11 +589,7 @@ export function getFirstAddressHtml(
   return paths.map(path => addressHtml(getValue(data, path), options)).find(Boolean);
 }
 
-export function getFirstPartyName(
-  data: UnknownRecord,
-  paths: string[],
-  copy: ViewTheClaimCopy
-): string | undefined {
+export function getFirstPartyName(data: UnknownRecord, paths: string[], copy: ViewTheClaimCopy): string | undefined {
   return paths.map(path => partyName(asRecord(getValue(data, path)), copy)).find(Boolean);
 }
 

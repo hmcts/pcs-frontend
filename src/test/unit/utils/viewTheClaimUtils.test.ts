@@ -443,17 +443,13 @@ describe('viewTheClaimUtils', () => {
 
     const tenancySection = sectionByTitle(page, 'Tenancy, occupation contract or licence details');
     expect(
-      rowText(
-        tenancySection,
-        'What type of tenancy, occupation contract or licence is in place, or was in place?'
-      )
+      rowText(tenancySection, 'What type of tenancy, occupation contract or licence is in place, or was in place?')
     ).toBe('Secure contract');
     expect(rowText(tenancySection, 'Tenancy, occupation contract or licence start date')).toBe('1 January 2020');
     expect(
       tenancySection.rows.some(
         row =>
-          row.key.text ===
-          'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?'
+          row.key.text === 'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?'
       )
     ).toBe(false);
   });
@@ -487,17 +483,11 @@ describe('viewTheClaimUtils', () => {
 
     const tenancySection = sectionByTitle(page, 'Tenancy, occupation contract or licence details');
     expect(
-      rowText(
-        tenancySection,
-        'What type of tenancy, occupation contract or licence is in place, or was in place?'
-      )
+      rowText(tenancySection, 'What type of tenancy, occupation contract or licence is in place, or was in place?')
     ).toBe('Assured tenancy');
     expect(rowText(tenancySection, 'Tenancy, occupation contract or licence start date')).toBe('1 January 2020');
     expect(
-      rowText(
-        tenancySection,
-        'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?'
-      )
+      rowText(tenancySection, 'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?')
     ).toBe('No');
     expect(
       rowText(
@@ -549,7 +539,9 @@ describe('viewTheClaimUtils', () => {
       'Additional underlessee or mortgagee 1 details',
     ]);
     expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe('underlessee 1');
-    expect(rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')).toBe('Acme Mortgagee');
+    expect(rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')).toBe(
+      'Acme Mortgagee'
+    );
   });
 
   it('builds underlessee and additional underlessee sections in numerical order', () => {
