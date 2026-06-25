@@ -360,7 +360,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       'uploadFilesToSupportYourCounterclaim',
       uploadFilesToSupportYourCounterclaimErrorValidation
     );
-    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
+    await performAction('uploadFilesToSupportCounterclaim');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
 
