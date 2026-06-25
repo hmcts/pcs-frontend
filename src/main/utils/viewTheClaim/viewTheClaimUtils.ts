@@ -201,7 +201,15 @@ export function claimantAddressHtml(data: UnknownRecord): string | undefined {
 
   return (
     collectionAddressesHtml(collectionRecords(getValue(data, 'allClaimants'))) ??
-    addressHtml(getValue(data, 'organisationAddress'), { includeCountry: true }) ??
+    getFirstAddressHtml(
+      data,
+      [
+        'detailsTab_ClaimantAddress',
+        'casePartiesTab_ClaimantDetails.serviceAddress',
+        'organisationAddress',
+      ],
+      { includeCountry: true }
+    ) ??
     formattedAddressHtml(getString(data, 'formattedClaimantContactAddress'))
   );
 }
@@ -262,7 +270,12 @@ export function additionalUnderlesseeParties(data: UnknownRecord): UnknownRecord
     return parties.slice(1);
   }
 
-  return collectionRecords(getValue(data, 'additionalUnderlesseeOrMortgagee'));
+  const draftParties = collectionRecords(getValue(data, 'additionalUnderlesseeOrMortgagee'));
+  if (draftParties.length > 0) {
+    return draftParties;
+  }
+
+  return collectionRecords(getValue(data, 'detailsTab_MortgageDetails'));
 }
 
 export function underlesseeParties(data: UnknownRecord): UnknownRecord[] {
@@ -283,10 +296,14 @@ export function partyName(party: UnknownRecord | undefined, copy: ViewTheClaimCo
     return copy.personsUnknown;
   }
 
-  return (
-    [getStringFromValue(party.firstName), getStringFromValue(party.lastName)].filter(Boolean).join(' ') ||
-    getStringFromValue(party.orgName)
-  );
+  const firstName = getStringFromValue(party.firstName);
+  const lastName = getStringFromValue(party.lastName);
+
+  if (firstName === 'Person unknown' && lastName === 'Person unknown') {
+    return copy.personsUnknown;
+  }
+
+  return [firstName, lastName].filter(Boolean).join(' ') || getStringFromValue(party.orgName);
 }
 
 export function underlesseeName(party: UnknownRecord | undefined, copy: ViewTheClaimCopy): string | undefined {
@@ -314,7 +331,12 @@ export function partyAddressHtml(party: UnknownRecord | undefined, propertyAddre
     return addressHtml(propertyAddress);
   }
 
-  return addressHtml(party.correspondenceAddress) ?? addressHtml(party.address);
+  return (
+    addressHtml(party.correspondenceAddress) ??
+    addressHtml(party.address) ??
+    addressHtml(party.addressForService) ??
+    addressHtml(party.serviceAddress)
+  );
 }
 
 export function groundLabels(data: UnknownRecord): string[] {
@@ -340,14 +362,18 @@ export function groundReasonRows(data: UnknownRecord, copy: ViewTheClaimCopy): (
     .map(item => asRecord(item))
     .map(item => asRecord(item?.value))
     .filter((value): value is UnknownRecord => !!value)
-    .map(value =>
-      textRow(
-        copy.label('reasonForGround', {
-          ground: getStringFromValue(value.label) ?? enumText(value.code, GROUND_LABELS) ?? '',
-        }),
-        getStringFromValue(value.reason)
-      )
-    )
+    .map(value => {
+      const label = getStringFromValue(value.label) ?? enumText(value.code, GROUND_LABELS) ?? '';
+      const section = label.match(/\(section ([^)]+)\)/i)?.[1];
+      const reason =
+        getStringFromValue(value.reason) ??
+        (getStringFromValue(value.code)?.toUpperCase() === 'ANTISOCIAL_BEHAVIOUR_S157'
+          ? getString(data, 'detailsTab_AntisocialAndConductDetails.antiSocialBehaviourDetails')
+          : section
+            ? getString(data, `detailsTab_ReasonsForPossessionDetails.section${section}`)
+            : undefined);
+      return textRow(copy.label('reasonForGround', { ground: label }), reason);
+    })
     .filter((row): row is ViewTheClaimSummaryRow => !!row);
 
   if (summaryRows.length > 0) {
@@ -557,6 +583,22 @@ export function enumToSentence(value: string): string {
     .replace(/_/g, ' ')
     .toLowerCase()
     .replace(/^\w/, char => char.toUpperCase());
+}
+
+export function getFirstAddressHtml(
+  data: UnknownRecord,
+  paths: string[],
+  options: { includeCountry?: boolean } = {}
+): string | undefined {
+  return paths.map(path => addressHtml(getValue(data, path), options)).find(Boolean);
+}
+
+export function getFirstPartyName(
+  data: UnknownRecord,
+  paths: string[],
+  copy: ViewTheClaimCopy
+): string | undefined {
+  return paths.map(path => partyName(asRecord(getValue(data, path)), copy)).find(Boolean);
 }
 
 export function getFirstString(data: UnknownRecord, paths: string[]): string | undefined {

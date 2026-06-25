@@ -118,7 +118,7 @@
     "statementOfTruthName": "cyFull name",
     "statementOfTruthFirmName": "cyName of firm",
     "statementOfTruthPosition": "cyPosition or office held",
-    "noticeDocument": "cyNotice or certificate of service",
+    "noticeDocument": "cyNotice",
     "epcDocument": "cyEnergy performance certificate",
     "gasDocument": "cyCurrent gas safety report",
     "eicrDocument": "cyElectrical Installation Condition Report (EICR)",

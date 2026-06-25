@@ -35,6 +35,15 @@ const translations: Record<string, string> = {
   'viewTheClaim:sections.statementOfTruth': 'Statement of truth',
   'viewTheClaim:labels.statementOfTruthCompletedBy': 'Completed by',
   'viewTheClaim:personsUnknown': 'Persons unknown',
+  'viewTheClaim:sections.tenancyDetails': 'Tenancy, occupation contract or licence details',
+  'viewTheClaim:labels.tenancyType':
+    'What type of tenancy, occupation contract or licence is in place, or was in place?',
+  'viewTheClaim:labels.tenancyStartDate': 'Tenancy, occupation contract or licence start date',
+  'viewTheClaim:labels.tenancyCopy':
+    'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?',
+  'viewTheClaim:labels.tenancyNoCopyReason':
+    'Why does the claimant not have a copy of the tenancy, occupation contract or licence agreement?',
+  'viewTheClaim:labels.tenancyDocument': 'Tenancy, occupation contract or licence agreement',
 };
 
 const t = ((key: string, options?: Record<string, unknown>) => {
@@ -256,6 +265,291 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
       '2 Second Avenue<br>London<br>W3 7RX'
     );
+  });
+
+  it('uses casePartiesTab_ClaimantDetails.serviceAddress when detailsTab_ClaimantAddress is empty', () => {
+    const page = buildViewTheClaimPageData(
+      '1782399913518153',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Pentre Street',
+          PostTown: 'Caerdydd',
+          PostCode: 'CF11 6QX',
+        },
+        allClaimants: [
+          {
+            id: 'claimant-1',
+            value: {
+              orgName: 'Possession Claims Solicitor Org',
+            },
+          },
+        ],
+        detailsTab_ClaimantAddress: {
+          AddressLine1: ' ',
+          PostTown: ' ',
+          PostCode: ' ',
+          Country: ' ',
+        },
+        casePartiesTab_ClaimantDetails: {
+          name: 'Possession Claims Solicitor Org',
+          serviceAddress: {
+            AddressLine1: '102 Petty France',
+            PostTown: 'London',
+            PostCode: 'SW1H 9AJ',
+          },
+        },
+      } as never,
+      t
+    );
+
+    expect(rowHtml(sectionByTitle(page, 'Claimant details'), 'Address for service')).toBe(
+      '102 Petty France<br>London<br>SW1H 9AJ'
+    );
+  });
+
+  it('uses detailsTab_ClaimantAddress when allClaimants address is redacted on citizen read', () => {
+    const page = buildViewTheClaimPageData(
+      '1782399913518153',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Pentre Street',
+          PostTown: 'Caerdydd',
+          PostCode: 'CF11 6QX',
+        },
+        allClaimants: [
+          {
+            id: 'claimant-1',
+            value: {
+              orgName: 'Possession Claims Solicitor Org',
+            },
+          },
+        ],
+        detailsTab_ClaimantAddress: {
+          AddressLine1: '102 Petty France',
+          PostTown: 'London',
+          PostCode: 'SW1H 9AJ',
+          Country: 'United Kingdom',
+        },
+      } as never,
+      t
+    );
+
+    expect(rowText(sectionByTitle(page, 'Claimant details'), 'Name')).toBe('Possession Claims Solicitor Org');
+    expect(rowHtml(sectionByTitle(page, 'Claimant details'), 'Address for service')).toBe(
+      '102 Petty France<br>London<br>SW1H 9AJ<br>United Kingdom'
+    );
+  });
+
+  it('uses defendant tab paths when allDefendants is redacted on citizen read', () => {
+    const propertyAddress = {
+      AddressLine1: '2 Pentre Street',
+      PostTown: 'Caerdydd',
+      PostCode: 'CF11 6QX',
+    };
+
+    const page = buildViewTheClaimPageData(
+      '1782399913518153',
+      {
+        propertyAddress,
+        allDefendants: [
+          {
+            id: 'a9a8bf4a-5dc1-4cf8-958c-9734da8d6c1e',
+            value: {
+              firstName: 'z',
+              lastName: 'test',
+              nameKnown: 'YES',
+              addressKnown: 'YES',
+              addressSameAsProperty: 'YES',
+            },
+          },
+          { id: '129fbbfc-3677-46a5-bd88-eb286e3f8792', value: {} },
+          { id: 'b4b7e79c-8ef8-4a3b-a330-2d4597bf8525', value: { firstName: 'y', lastName: 'test' } },
+        ],
+        detailsTab_DefendantInformationDetails: {
+          nameKnown: 'Yes',
+          firstName: 'z',
+          lastName: 'test',
+          addressKnown: 'Yes',
+          addressForService: propertyAddress,
+        },
+        detailsTab_AdditionalDefendants: [],
+        casePartiesTab_DefendantsDetails: [
+          {
+            value: {
+              firstName: 'Person unknown',
+              lastName: 'Person unknown',
+              serviceAddress: propertyAddress,
+            },
+          },
+          {
+            value: {
+              firstName: 'Person unknown',
+              lastName: 'Person unknown',
+              serviceAddress: propertyAddress,
+            },
+          },
+        ],
+      } as never,
+      t
+    );
+
+    expect(rowText(sectionByTitle(page, 'Defendant 1 details'), 'Name')).toBe('z test');
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
+    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
+      '2 Pentre Street<br>Caerdydd<br>CF11 6QX'
+    );
+  });
+
+  it('uses detailsTab_RentArrearsDetails.rentFrequency for Wales rent calculation', () => {
+    const page = buildViewTheClaimPageData(
+      '1782399913518153',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Pentre Street',
+          PostTown: 'Caerdydd',
+          PostCode: 'CF11 6QX',
+        },
+        detailsTab_RentArrearsDetails: {
+          rentAmount: '£1234',
+          rentFrequency: 'Weekly',
+          arrearsTotal: '£12345',
+        },
+      } as never,
+      t
+    );
+
+    const rentSection = sectionByTitle(page, 'Details of rent arrears - RENT ARREARS CLAIMS ONLY');
+    expect(rowText(rentSection, 'How is rent calculated?')).toBe('Weekly');
+  });
+
+  it('builds Wales occupation contract details from detailsTab_OccupationContractLicenceDetails', () => {
+    const page = buildViewTheClaimPageData(
+      '1782399913518153',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Pentre Street',
+          PostTown: 'Caerdydd',
+          PostCode: 'CF11 6QX',
+        },
+        detailsTab_OccupationContractLicenceDetails: {
+          agreementType: 'Secure contract',
+          agreementStartDate: '1 January 2020',
+          documents: [],
+          documentsPlaceholder: ' ',
+        },
+      } as never,
+      t
+    );
+
+    const tenancySection = sectionByTitle(page, 'Tenancy, occupation contract or licence details');
+    expect(
+      rowText(
+        tenancySection,
+        'What type of tenancy, occupation contract or licence is in place, or was in place?'
+      )
+    ).toBe('Secure contract');
+    expect(rowText(tenancySection, 'Tenancy, occupation contract or licence start date')).toBe('1 January 2020');
+    expect(
+      tenancySection.rows.some(
+        row =>
+          row.key.text ===
+          'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?'
+      )
+    ).toBe(false);
+  });
+
+  it('builds England tenancy details from detailsTab_TenancyLicenceDetails', () => {
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Second Avenue',
+          PostTown: 'London',
+          PostCode: 'W3 7RX',
+        },
+        detailsTab_TenancyLicenceDetails: {
+          typeOfTenancyLicence: 'Assured tenancy',
+          tenancyLicenceDate: '1 January 2020',
+          hasCopyOfTenancyLicence: 'No',
+          reasonsForNoTenancyLicenceDocuments: 'Lost in a house move',
+          tenancyLicenceDocuments: [
+            {
+              id: '33333333-3333-3333-3333-333333333333',
+              value: {
+                document_filename: 'Tenancyagreement.pdf',
+              },
+            },
+          ],
+        },
+      } as never,
+      t
+    );
+
+    const tenancySection = sectionByTitle(page, 'Tenancy, occupation contract or licence details');
+    expect(
+      rowText(
+        tenancySection,
+        'What type of tenancy, occupation contract or licence is in place, or was in place?'
+      )
+    ).toBe('Assured tenancy');
+    expect(rowText(tenancySection, 'Tenancy, occupation contract or licence start date')).toBe('1 January 2020');
+    expect(
+      rowText(
+        tenancySection,
+        'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?'
+      )
+    ).toBe('No');
+    expect(
+      rowText(
+        tenancySection,
+        'Why does the claimant not have a copy of the tenancy, occupation contract or licence agreement?'
+      )
+    ).toBe('Lost in a house move');
+    expect(rowHtml(tenancySection, 'Tenancy, occupation contract or licence agreement')).toContain(
+      'Tenancyagreement.pdf'
+    );
+  });
+
+  it('builds underlessee sections from detailsTab_Mortgage paths on read', () => {
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Pentre Street',
+          PostTown: 'Caerdydd',
+          PostCode: 'CF11 6QX',
+        },
+        detailsTab_MortgageOneDetails: {
+          nameKnown: 'Yes',
+          name: 'underlessee 1',
+          addressKnown: 'No',
+        },
+        detailsTab_MortgageDetails: [
+          {
+            value: {
+              nameKnown: 'Yes',
+              name: 'Acme Mortgagee',
+              addressKnown: 'Yes',
+              address: {
+                AddressLine1: '1 Bank Street',
+                PostTown: 'Cardiff',
+                PostCode: 'CF10 1AA',
+              },
+            },
+          },
+        ],
+      } as never,
+      t
+    );
+
+    expect(page.sections.map(section => section.title)).toEqual([
+      'Claim details',
+      'Underlessees or mortgagees entitled to claim relief against forfeiture',
+      'Underlessee or mortgagee 1 details',
+      'Additional underlessee or mortgagee 1 details',
+    ]);
+    expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe('underlessee 1');
+    expect(rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')).toBe('Acme Mortgagee');
   });
 
   it('builds underlessee and additional underlessee sections in numerical order', () => {
