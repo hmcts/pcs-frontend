@@ -199,7 +199,7 @@ describe('finalSubmit routes', () => {
 
       expect(res.redirect).toHaveBeenCalledWith(
         303,
-        '/case/1234567890123456/respond-to-claim/check-your-answers?submitError=failed'
+        '/case/1234567890123456/respond-to-claim/end-of-journey-cya?submitError=failed'
       );
     });
   });
