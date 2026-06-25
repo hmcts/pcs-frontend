@@ -4,7 +4,7 @@ describe('base64Json', () => {
   it('round-trips an object through base64url', () => {
     const doc = { index: 0, id: 'abc', document_filename: 'rentArrears.pdf' };
     const encoded = encodeBase64UrlJson(doc);
-    expect(encoded).toMatch(/^[A-Za-z0-9_-]+$/); // no { } " : , — WAF-safe
+    expect(encoded).toMatch(/^[A-Za-z0-9_-]+$/);
     expect(decodeBase64UrlJson(encoded)).toEqual(doc);
   });
 
