@@ -15,6 +15,7 @@ const translations: Record<string, string> = {
   'viewTheClaim:labels.claimantName': 'Name',
   'viewTheClaim:labels.addressForService': 'Address for service',
   'viewTheClaim:labels.defendantName': 'Name',
+  'viewTheClaim:dateIssued': 'Date issued',
   'viewTheClaim:dateSubmitted': 'Date submitted',
   'viewTheClaim:labels.claimantType': 'Claimant type',
   'viewTheClaim:labels.trespassClaim': 'Is your claim a trespass claim?',
@@ -79,6 +80,22 @@ function rowHtml(section: ViewTheClaimSection, label: string): string | undefine
 }
 
 describe('viewTheClaimUtils', () => {
+  it('shows date issued from top-level claimIssueDate on case data', () => {
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        claimIssueDate: '2026-02-05',
+        detailsTab_DateClaimSubmitted: '2026-06-24T12:23:59.791346',
+      } as never,
+      t
+    );
+
+    expect(page.pageMetadataRows).toHaveLength(2);
+    expect(page.pageMetadataRows[0].key.text).toBe('Date issued');
+    expect(page.pageMetadataRows[0].value.text).toBe('5 February 2026');
+    expect(page.pageMetadataRows[1].key.text).toBe('Date submitted');
+  });
+
   it('builds claim summary sections in mapping order with case data values', () => {
     const page = buildViewTheClaimPageData(
       '1234567890123456',

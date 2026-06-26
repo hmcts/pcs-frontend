@@ -165,8 +165,7 @@ export function buildClaimDetailsSection(
       copy.label('otherInfoAboutReasons'),
       yesNoText(getFirstValue(data, ['detailsTab_ReasonsForPossessionDetails.hasAdditionalReasons'])) ??
         (getFirstString(data, [
-          'detailsTab_ReasonsForPossessionDetails.additionalReasonsDetails',
-          'summaryTab_ReasonsForPossession.additionalReasonsDetails',
+          'detailsTab_ReasonsForPossessionDetails.otherGrounds'
         ])
           ? 'Yes'
           : undefined)
