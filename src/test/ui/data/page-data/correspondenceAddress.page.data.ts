@@ -1,7 +1,30 @@
 import { address } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { createCaseApiData } from '../api-data/createCase.api.data';
+import { createCaseApiWalesData } from '../api-data/createCaseWales.api.data';
+
+function getDefaultPostalAddress(): string {
+  const isWalesJourney = process.env.WALES_POSTCODE && process.env.WALES_POSTCODE.toUpperCase() === 'YES';
+
+  const propertyAddress = isWalesJourney
+    ? createCaseApiWalesData.createCasePayload.propertyAddress
+    : createCaseApiData.createCasePayload.propertyAddress;
+
+  return [
+    propertyAddress.AddressLine1,
+    propertyAddress.AddressLine2,
+    propertyAddress.AddressLine3,
+    propertyAddress.PostTown,
+    propertyAddress.County,
+    propertyAddress.PostCode,
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
 export const correspondenceAddress = {
-  get correspondenceAddressKnownMainHeader(): string {
-    return `Is your correspondence address ${address}?`;
+  get correspondenceAddressPostalMainHeader(): string {
+    const postalAddress = process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN' ? getDefaultPostalAddress() : address;
+    return `Is your postal address ${postalAddress}?`;
   },
   correspondenceAddressUnKnownMainHeader: `What’s your correspondence address?`,
   correspondenceAddressUnKnownParagraph: `Your correspondence address is your postal address.`,
@@ -18,6 +41,7 @@ export const correspondenceAddress = {
   findAddressHiddenButton: `Find address`,
   enterAddressManuallyHiddenLink: `Enter an address manually`,
   addressSelectHiddenLabel: `Select an address`,
+  whatsYourPostalAddressQuestion: `What’s your postal address?`,
   whatsYourAddressHiddenQuestion: `What’s your correspondence address?`,
   addressLine1HiddenTextLabel: `Address Line 1`,
   addressLine2HiddenTextLabel: `Address Line 2 (Optional)`,

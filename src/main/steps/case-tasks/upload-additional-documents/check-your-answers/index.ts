@@ -49,7 +49,23 @@ export const step: StepDefinition = {
   name: stepName,
   view: templatePath,
   stepDir: __dirname,
-  getController: () => createGetController(templatePath, stepName, stepNavigation, getCheckYourAnswersContent),
+  getController: () =>
+    createGetController(templatePath, stepName, stepNavigation, async (req: Request) => {
+      const caseId = req.res?.locals.validatedCase?.id;
+      const documents = toDisplayDocuments(await uploadStorage.read(req));
+      const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
+      const hasRelatedApplication = Boolean(confirmData);
+      const relatedApplicationText = (confirmData?.relatedApplicationText as string) ?? '';
+
+      return {
+        dashboardUrl: getDashboardUrl(caseId),
+        cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
+        url: req.originalUrl || '',
+        documents,
+        hasRelatedApplication,
+        relatedApplicationText,
+      };
+    }),
   postController: {
     post: async (req: Request, res: Response) => {
       const caseId = req.res?.locals.validatedCase?.id;

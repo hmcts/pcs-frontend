@@ -14,63 +14,38 @@
 
   <h1 class="govuk-heading-l">{{ t('heading') }}</h1>
 
-  {% set documentsHtml %}
-    {% if documents.length > 0 %}
-      <ul class="govuk-list">
-        {% for d in documents %}<li>{{ d.document_filename }}</li>{% endfor %}
-      </ul>
-    {% else %}
-      {{ t('documentsNone') }}
+  {# role="list" preserves list semantics in VoiceOver — govuk-summary-list uses
+     display: table on the <ul>, which can otherwise strip them. #}
+  <ul class="govuk-summary-list" role="list">
+    {% if hasRelatedApplication %}
+    <li class="govuk-summary-list__row">
+      <div class="govuk-summary-list__key">{{ t('relatedApplicationLabel') }}</div>
+      <div class="govuk-summary-list__value">{{ relatedApplicationText }}</div>
+      <div class="govuk-summary-list__actions">
+        <a class="govuk-link" href="./confirm-if-these-documents-relate-to-an-application">
+          {{ t('change', { ns: 'common' }) }}<span class="govuk-visually-hidden"> {{ t('relatedApplicationLabel') | lower }}</span>
+        </a>
+      </div>
+    </li>
     {% endif %}
-  {% endset %}
-
-  {% if showRelatedApplication %}
-    {{ govukSummaryList({
-      rows: [
-        {
-          key: { text: t('relatedApplicationLabel') },
-          value: { text: relatedApplicationText },
-          actions: {
-            items: [
-              {
-                href: "./confirm-if-these-documents-relate-to-an-application",
-                text: t('change', { ns: 'common' })
-              }
-            ]
-          }
-        },
-        {
-          key: { text: t('documentsLabel') },
-          value: { html: documentsHtml },
-          actions: {
-            items: [
-              {
-                href: "./upload-your-documents",
-                text: t('change', { ns: 'common' })
-              }
-            ]
-          }
-        }
-      ]
-    }) }}
-  {% else %}
-    {{ govukSummaryList({
-      rows: [
-        {
-          key: { text: t('documentsLabel') },
-          value: { html: documentsHtml },
-          actions: {
-            items: [
-              {
-                href: "./upload-your-documents",
-                text: t('change', { ns: 'common' })
-              }
-            ]
-          }
-        }
-      ]
-    }) }}
-  {% endif %}
+    <li class="govuk-summary-list__row">
+      <div class="govuk-summary-list__key">{{ t('documentsLabel') }}</div>
+      <div class="govuk-summary-list__value">
+        {% if documents.length > 0 %}
+          <ul class="govuk-list">
+            {% for d in documents %}<li>{{ d.document_filename }}</li>{% endfor %}
+          </ul>
+        {% else %}
+          {{ t('documentsNone') }}
+        {% endif %}
+      </div>
+      <div class="govuk-summary-list__actions">
+        <a class="govuk-link" href="./upload-your-documents">
+          {{ t('change', { ns: 'common' }) }}<span class="govuk-visually-hidden"> {{ t('documentsLabel') | lower }}</span>
+        </a>
+      </div>
+    </li>
+  </ul>
 
   <form method="post" action="{{ url }}" novalidate>
     <div class="govuk-button-group">

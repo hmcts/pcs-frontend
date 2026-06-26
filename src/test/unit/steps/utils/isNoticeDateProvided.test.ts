@@ -6,13 +6,13 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 describe('isNoticeDateProvided', () => {
   describe('when notice date is provided', () => {
-    it('should return true when notice_NoticeHandedOverDateTime exists', async () => {
+    it('should return true when notice_HandedOverDateTime exists', async () => {
       const mockReq = {
         res: {
           locals: {
             validatedCase: new CcdCaseModel({
               id: '',
-              data: { notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01' },
+              data: { notice_HandedOverDateTime: '2022-01-01T01:01:01' },
             }),
           },
         },
@@ -29,7 +29,7 @@ describe('isNoticeDateProvided', () => {
           locals: {
             validatedCase: new CcdCaseModel({
               id: '',
-              data: { notice_NoticeHandedOverDateTime: '2023-12-25T23:59:59' },
+              data: { notice_HandedOverDateTime: '2023-12-25T23:59:59' },
             }),
           },
         },
@@ -46,7 +46,7 @@ describe('isNoticeDateProvided', () => {
           locals: {
             validatedCase: new CcdCaseModel({
               id: '',
-              data: { notice_NoticeHandedOverDateTime: '2022-01-01' },
+              data: { notice_HandedOverDateTime: '2022-01-01' },
             }),
           },
         },
@@ -59,7 +59,7 @@ describe('isNoticeDateProvided', () => {
   });
 
   describe('when notice date is not provided', () => {
-    it('should return false when notice_NoticeHandedOverDateTime is undefined', async () => {
+    it('should return false when notice_HandedOverDateTime is undefined', async () => {
       const mockReq = {
         res: {
           locals: {
@@ -73,13 +73,13 @@ describe('isNoticeDateProvided', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false when notice_NoticeHandedOverDateTime is null', async () => {
+    it('should return false when notice_HandedOverDateTime is null', async () => {
       const mockReq = {
         res: {
           locals: {
             validatedCase: new CcdCaseModel({
               id: '',
-              data: { notice_NoticeHandedOverDateTime: null as unknown as string },
+              data: { notice_HandedOverDateTime: null as unknown as string },
             }),
           },
         },
@@ -90,13 +90,13 @@ describe('isNoticeDateProvided', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false when notice_NoticeHandedOverDateTime is empty string', async () => {
+    it('should return false when notice_HandedOverDateTime is empty string', async () => {
       const mockReq = {
         res: {
           locals: {
             validatedCase: new CcdCaseModel({
               id: '',
-              data: { notice_NoticeHandedOverDateTime: '' },
+              data: { notice_HandedOverDateTime: '' },
             }),
           },
         },
@@ -162,7 +162,7 @@ describe('isNoticeDateProvided', () => {
           locals: {
             validatedCase: new CcdCaseModel({
               id: '',
-              data: { notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01' },
+              data: { notice_HandedOverDateTime: '2022-01-01T01:01:01' },
             }),
           },
         },
@@ -185,7 +185,7 @@ describe('isNoticeDateProvided', () => {
                 noticeServed: 'YES',
                 rentArrears_Total: '22222200',
                 legislativeCountry: 'England',
-                notice_NoticeHandedOverDateTime: '2022-01-01T01:01:01',
+                notice_HandedOverDateTime: '2022-01-01T01:01:01',
                 tenancy_TypeOfTenancyLicence: 'SECURE_TENANCY',
               },
             }),

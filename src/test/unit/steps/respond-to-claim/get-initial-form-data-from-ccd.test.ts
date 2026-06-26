@@ -200,6 +200,9 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
           defendantResponses: {
             correspondenceAddressConfirmation: 'NO',
           },
+          claimantEnteredDefendantDetails: {
+            addressKnown: 'YES',
+          },
           defendantContactDetails: {
             party: {
               address: {
