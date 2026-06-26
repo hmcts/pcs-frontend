@@ -134,7 +134,7 @@
     "@typescript-eslint/parser": "8.62.0",
     "allure-commandline": "2.43.0",
     "allure-js-commons": "3.10.1",
-    "allure-playwright": "3.10.0",
+    "allure-playwright": "3.10.1",
     "chokidar": "5.0.0",
     "copy-webpack-plugin": "13.0.1",
     "css-loader": "7.1.4",
