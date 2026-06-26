@@ -206,8 +206,7 @@ export class PageNavigationValidation implements IValidation {
           const { hostname } = new URL(actualUrl);
           const normalizedHostname = hostname.toLowerCase();
           isSmartSurveyPage =
-            normalizedHostname === 'smartsurvey.co.uk' ||
-            normalizedHostname.endsWith('.smartsurvey.co.uk');
+            normalizedHostname === 'smartsurvey.co.uk' || normalizedHostname.endsWith('.smartsurvey.co.uk');
         } catch {
           isSmartSurveyPage = false;
         }
