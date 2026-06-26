@@ -96,15 +96,34 @@ export class PageNavigationValidation implements IValidation {
   }
 
   private async validateFeedbackLinkHref(page: Page, linkText: string): Promise<void> {
-    await this.validateLinkDestination(page, linkText, 'Feedback link', href => {
-      try {
-        const parsedHref = new URL(href, page.url());
-        const host = parsedHref.hostname.toLowerCase();
-        return host === 'smartsurvey.co.uk' || host.endsWith('.smartsurvey.co.uk');
-      } catch {
-        return false;
+    const locatorByName = page.getByRole('link', { name: linkText });
+    const locatorByHref = page.locator('a[href*="smartsurvey.co.uk/s/Poss_feedback/"]').first();
+
+    let href: string | null = null;
+
+    try {
+      href = await locatorByName.getAttribute('href');
+    } catch {
+      href = null;
+    }
+
+    if (!href) {
+      href = await locatorByHref.getAttribute('href').catch(() => null);
+    }
+
+    if (!href) {
+      throw new Error(`Feedback link "${linkText}" does not exist or does not have an href attribute`);
+    }
+
+    try {
+      const parsedHref = new URL(href, page.url());
+      const host = parsedHref.hostname.toLowerCase();
+      if (!(host === 'smartsurvey.co.uk' || host.endsWith('.smartsurvey.co.uk'))) {
+        throw new Error(`Feedback link "${linkText}" does not point to SmartSurvey: ${href}`);
       }
-    });
+    } catch {
+      throw new Error(`Feedback link "${linkText}" does not point to SmartSurvey: ${href}`);
+    }
   }
 
   private async validateLinkDestination(
