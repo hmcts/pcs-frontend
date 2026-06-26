@@ -84,7 +84,7 @@ test.afterEach(async () => {
 
 //selectNoticeDetails= defendant not sure
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('NonRentArrears - AssuredTenancy - LR @smoke @regression @PR @nonRent', async () => {
+  test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: counterClaimAgainstWhom.lrHiddenMainHeader,
@@ -367,7 +367,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('RentArrears - DemotedTenancy - LR @smoke @PR @regression @rent', async () => {
+  test('RentArrears - DemotedTenancy - LR @smoke @regression @rent', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.getLrHiddenMainHeader(pinUser.firstName, pinUser.lastName),
