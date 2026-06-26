@@ -1,40 +1,30 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
+import { findRuleForPath, logAccessDenied } from '../access-control';
 import { getUserRoles } from '../steps/utils';
 
-interface RoleGatedPath {
-  pattern: RegExp;
-  allowedRoles: readonly string[];
-}
-
-const ROLE_GATED_PATHS: readonly RoleGatedPath[] = [
-  {
-    pattern: /^\/case\/[^/]+\/respond-to-claim(?:\/.*)?$/,
-    allowedRoles: ['citizen', 'caseworker-pcs-solicitor'],
-  },
-  {
-    pattern: /^\/case\/[^/]+\/dashboard(?:\/.*)?$/,
-    allowedRoles: ['citizen'],
-  },
-  {
-    pattern: /^\/case\/[^/]+\/make-an-application(?:\/.*)?$/,
-    allowedRoles: ['citizen'],
-  },
-];
-
 export const roleAccessMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
-  const matchedGatedPath = ROLE_GATED_PATHS.find(gatedPath => gatedPath.pattern.test(req.path));
-  if (!matchedGatedPath) {
+  const matchedRule = findRuleForPath(req.path);
+  if (!matchedRule) {
     return next();
   }
   if (!req.session?.user) {
     return next();
   }
   const userRoles = getUserRoles(req);
-  const userHasAllowedRole = userRoles.some(userRole => matchedGatedPath.allowedRoles.includes(userRole));
+  const userHasAllowedRole = userRoles.some(userRole => matchedRule.allowedRoles.includes(userRole));
   if (userHasAllowedRole) {
     return next();
   }
+
+  logAccessDenied({
+    stage: 'request',
+    path: req.path,
+    userId: typeof req.session.user.uid === 'string' ? req.session.user.uid : undefined,
+    userRoles,
+    rule: matchedRule,
+  });
+
   delete req.session.user;
   req.session.save(() => res.redirect('/login'));
 };

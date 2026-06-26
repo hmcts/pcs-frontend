@@ -386,6 +386,100 @@ describe('OIDCModule', () => {
         expect(mockRequest.session).not.toHaveProperty('returnTo');
       });
 
+      describe('role gating at callback', () => {
+        const setupCallbackForUserinfo = (
+          userInfo: Record<string, unknown>,
+          returnTo: string | undefined
+        ): { session: Record<string, unknown>; callbackHandler: (...args: unknown[]) => Promise<void> } => {
+          const mockTokens = {
+            access_token: 'test-token',
+            id_token: 'test-id-token',
+            refresh_token: 'test-refresh-token',
+            claims: jest.fn().mockReturnValue({ sub: 'test-sub' }),
+          };
+          (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
+          (fetchUserInfo as jest.Mock).mockResolvedValue(userInfo);
+
+          const session = createMockSession({
+            codeVerifier: 'test-verifier',
+            nonce: 'test-nonce',
+            returnTo,
+            save: jest.fn().mockImplementation(function (callback: (err: Error | null) => void) {
+              callback(null);
+            }),
+          });
+          mockRequest.session = session;
+
+          oidcModule.enableFor(mockApp);
+          const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
+          return { session, callbackHandler };
+        };
+
+        const expectDeniedAtLogin = async (userInfo: Record<string, unknown>, returnTo: string): Promise<void> => {
+          const { session, callbackHandler } = setupCallbackForUserinfo(userInfo, returnTo);
+          await callbackHandler(mockRequest, mockResponse, mockNext);
+
+          expect(session.user).toBeUndefined();
+          expect(session.returnTo).toBeUndefined();
+          expect(session.codeVerifier).toBeUndefined();
+          expect(session.nonce).toBeUndefined();
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
+          expect(mockNext).not.toHaveBeenCalledWith(expect.any(Error));
+        };
+
+        /* eslint-disable jest/expect-expect */ // assertions are inside expectDeniedAtLogin
+        it('blocks respond-to-claim when user has an unrelated role', async () => {
+          await expectDeniedAtLogin(
+            { sub: 'test-sub', uid: 'u1', roles: ['some-other-role'] },
+            '/case/1234567890123456/respond-to-claim'
+          );
+        });
+
+        it('blocks respond-to-claim when user has no roles at all', async () => {
+          await expectDeniedAtLogin(
+            { sub: 'test-sub', uid: 'u2', roles: [] },
+            '/case/1234567890123456/respond-to-claim/start-now'
+          );
+        });
+
+        it('blocks dashboard when user lacks citizen role', async () => {
+          await expectDeniedAtLogin(
+            { sub: 'test-sub', uid: 'u3', roles: ['caseworker-pcs-solicitor'] },
+            '/case/1234567890123456/dashboard'
+          );
+        });
+
+        it('blocks make-an-application when user lacks citizen role', async () => {
+          await expectDeniedAtLogin(
+            { sub: 'test-sub', uid: 'u4', roles: ['caseworker-pcs-solicitor'] },
+            '/case/1234567890123456/make-an-application'
+          );
+        });
+        /* eslint-enable jest/expect-expect */
+
+        it('allows citizen into the dashboard (positive control)', async () => {
+          const { session, callbackHandler } = setupCallbackForUserinfo(
+            { sub: 'test-sub', uid: 'u5', roles: ['citizen'] },
+            '/case/1234567890123456/dashboard'
+          );
+          await callbackHandler(mockRequest, mockResponse, mockNext);
+
+          expect(session.user).toEqual(expect.objectContaining({ accessToken: 'test-token', roles: ['citizen'] }));
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/case/1234567890123456/dashboard');
+        });
+
+        it('allows pcs solicitor into respond-to-claim (positive control)', async () => {
+          const { session, callbackHandler } = setupCallbackForUserinfo(
+            { sub: 'test-sub', uid: 'u6', roles: ['caseworker-pcs-solicitor'] },
+            '/case/1234567890123456/respond-to-claim'
+          );
+          await callbackHandler(mockRequest, mockResponse, mockNext);
+
+          expect(session.user).toEqual(expect.objectContaining({ roles: ['caseworker-pcs-solicitor'] }));
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/case/1234567890123456/respond-to-claim');
+        });
+      });
+
       it('should handle token exchange errors', async () => {
         (authorizationCodeGrant as jest.Mock).mockRejectedValue(new Error('Token exchange failed'));
 
