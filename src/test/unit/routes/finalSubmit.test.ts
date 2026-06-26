@@ -177,7 +177,7 @@ describe('finalSubmit routes', () => {
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
     });
 
-    it('should redirect to check-your-answers with error when submission fails', async () => {
+    it('should redirect to end-of-journey-cya with error when submission fails', async () => {
       const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       mockHttpGet.mockResolvedValue({ data: { token: 'mock-event-token' } });
@@ -199,7 +199,7 @@ describe('finalSubmit routes', () => {
 
       expect(res.redirect).toHaveBeenCalledWith(
         303,
-        '/case/1234567890123456/respond-to-claim/check-your-answers?submitError=failed'
+        '/case/1234567890123456/respond-to-claim/end-of-journey-cya?submitError=failed'
       );
     });
   });
