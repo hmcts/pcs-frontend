@@ -8,7 +8,6 @@ export const yourCircumstances = {
   childrenInYourHouseholdList: `children in your household attend a local school`,
   irregularHoursList: `you work irregular hours, making it hard to find a new place to live`,
   wouldYouLikeToShareHeader: `Would you like to share anything about your circumstances?`,
-  lrWouldYouLikeToShareHeader: `Would you like to share anything about the defendant’s circumstances?`,
   detailsTextInput: `mentionCircumstances here`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,

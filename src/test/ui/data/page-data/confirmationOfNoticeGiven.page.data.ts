@@ -5,7 +5,7 @@ export const confirmationOfNoticeGiven = {
   getDidClaimantGiveYouQuestion(claimantName: string): string {
     return `Did ${claimantName} give you notice of their intention to begin possession proceedings?`;
   },
-  getLrDidClaimantGiveYouQuestion(claimantName: string): string {
+  getLrHiddenDidClaimantGiveYouQuestion(claimantName: string): string {
     return `Did ${claimantName} give the defendant notice of their intention to begin possession proceedings?`;
   },
   imNotSureRadioOption: `I’m not sure`,

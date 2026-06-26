@@ -11,7 +11,7 @@ export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome = {
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   iamNotSureRadioOption: `I’m not sure`,
-  lrDefendantNotSureRadioOption: `Defendant is not sure`,
+  lrHiddenDefendantNotSureRadioOption: `Defendant is not sure`,
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   saveAndContinueButton: `Save and continue`,

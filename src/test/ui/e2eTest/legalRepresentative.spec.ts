@@ -314,7 +314,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
     });
     await performAction('alternativeAccommodationLR', {
-      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.lrDefendantNotSureRadioOption,
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.lrHiddenDefendantNotSureRadioOption,
     });
     await performAction('circumstancesLR', {
       question: circumstancesLR.lrWouldYouLikeToShareHeader,

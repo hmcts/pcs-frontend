@@ -75,7 +75,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async selectNoticeDetailsLR(noticeGivenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: confirmationOfNoticeGiven.getLrDidClaimantGiveYouQuestion(`${process.env.CLAIMANT_NAME}`),
+      question: confirmationOfNoticeGiven.getLrHiddenDidClaimantGiveYouQuestion(`${process.env.CLAIMANT_NAME}`),
       option: noticeGivenData.option,
     });
     await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
@@ -126,7 +126,9 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async enterTenancyStartDetailsUnKnownLR(tenancyStartData: actionRecord) {
-    const getDidNotProvideParagraph = tenancyDateUnknown.getLrDidNotProvideParagraph(`${process.env.CLAIMANT_NAME}`);
+    const getDidNotProvideParagraph = tenancyDateUnknown.getLrHiddenDidNotProvideParagraph(
+      `${process.env.CLAIMANT_NAME}`
+    );
 
     await performValidation('text', { elementType: 'paragraph', text: getDidNotProvideParagraph });
     if (tenancyStartData?.tsDay && tenancyStartData?.tsMonth && tenancyStartData?.tsYear) {

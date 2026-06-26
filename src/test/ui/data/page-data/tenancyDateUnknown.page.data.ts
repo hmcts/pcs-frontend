@@ -4,7 +4,7 @@ export const tenancyDateUnknown = {
   getDidNotProvideParagraph: (claimantName: string): string => {
     return `${claimantName} did not provide the start date of your tenancy, occupation contract or licence.`;
   },
-  getLrDidNotProvideParagraph: (claimantName: string): string => {
+  getLrHiddenDidNotProvideParagraph: (claimantName: string): string => {
     return `${claimantName} did not provide the start date of the tenancy, licence or occupation contract.`;
   },
   forExampleHintText: 'For example, 27 9 2022',
