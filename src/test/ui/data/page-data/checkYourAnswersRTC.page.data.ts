@@ -1,6 +1,18 @@
 export const checkYourAnswersRTC = {
   mainHeader: `Check your answers`,
+  statementOfTruthHeader: `Statement of truth`,
+  statementOfTruthQuestion: `Statement of truth`,
+  statementOfTruthParagraph: `Please check all the details you have entered for accuracy.`,
+  contemptOfCourtCheckboxLabel: `I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.`,
+  factsTrueCheckboxLabel: `I believe that the facts stated in this defence form are true.`,
+  yourFullNameTextLabel: `Your full name`,
+  yourFullNameTextInput: `James Anderson`,
+  submitButton: `Submit`,
   backLink: `Back`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  ifYouUnderstandErrorMessage: `Select if you understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth`,
+  ifYouBelieveErrorMessage: `Select if you believe that the facts stated in this defence form are true`,
+  yourFullNameErrorMessage: `Enter your full name`,
 };

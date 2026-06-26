@@ -50,10 +50,11 @@ import {
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
+  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 const home_url = process.env.TEST_URL;
@@ -189,12 +190,15 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else if (testInfo.title.includes('@assured')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   } else if (testInfo.title.includes('@secureFlexible')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
   } else if (testInfo.title.includes('@other')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
   } else if (testInfo.title.includes('@rentNonRent')) {
@@ -208,6 +212,11 @@ test.beforeEach(async ({ page }, testInfo) => {
     claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+  } else if (testInfo.title.includes('@secureFlexibleNoticeServedNo')) {
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', {
+      data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancyNoticeServedNo,
+    });
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
@@ -241,6 +250,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'startNowAndDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performValidation('mainHeader', defendantNameCapture.mainHeader);
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
@@ -250,10 +260,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-      postcode: correspondenceAddress.walesPostcodeTextInput,
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
@@ -318,6 +326,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performValidation('mainHeader', yourHouseholdAndCircumstances.mainHeader);
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -346,6 +355,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performValidation('mainHeader', incomeAndExpenses.mainHeader);
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -410,7 +420,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -444,7 +460,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -570,7 +587,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -595,7 +618,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -667,7 +691,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       lName: defendantNameCapture.lastNameTextInput,
     });
     await performAction('enterDateOfBirthDetails');
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -810,7 +835,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -835,7 +866,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -1000,7 +1032,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1008,7 +1046,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @secureFlexible', async () => {
+  test('England - Flexible - NonRentArrears - NoticeServed - No NoticeDateProvided - No - NonRentArrearsDispute - CounterClaimFee - INeedHelp - SelectCounterClaim - Yes @secureFlexibleNoticeServedNo', async () => {
     //Counterclaim - both - I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -1025,7 +1063,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -1043,10 +1082,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(
       'disputeClaimInterstitial', //
-      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
+      submitCaseApiData.submitCasePayloadSecureFlexibleTenancyNoticeServedNo.isClaimantNameCorrect
     );
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancyNoticeServedNo.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
@@ -1175,7 +1214,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1373,7 +1418,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1554,7 +1605,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1730,7 +1787,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
@@ -1876,7 +1939,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
     await performValidation('mainHeader', dashboard.mainHeader);
   });
@@ -1898,7 +1967,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -2037,7 +2107,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      question: checkYourAnswersRTC.statementOfTruthQuestion,
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
     await performValidation('mainHeader', dashboard.mainHeader);
   });

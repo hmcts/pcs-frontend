@@ -1,0 +1,56 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk"  import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk"   import govukSummaryList %}
+{% from "govuk/components/checkboxes/macro.njk"     import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk"          import govukInput %}
+{% from "govuk/components/button/macro.njk"         import govukButton %}
+{% from "macros/csrf.njk"                           import csrfProtection %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  {% for section in sections %}
+    {% if section.rows.length > 0 %}
+      {{ govukSummaryList({
+        card: { title: { text: section.heading } },
+        rows: section.rows
+      }) }}
+    {% endif %}
+  {% endfor %}
+
+  <form method="post" action="/case/{{ ccdId }}/final-submit" novalidate>
+    {{ csrfProtection(csrfToken) }}
+
+    <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>
+    <p class="govuk-body">{{ statementOfTruthHint }}</p>
+
+    {% for field in fields %}
+      {% if field.componentType == 'checkboxes' %}
+        {{ govukCheckboxes(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    {% for field in fields %}
+      {% if field.componentType == 'input' %}
+        {{ govukInput(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.submit', { ns: 'common' }),
+        attributes: { type: 'submit' },
+        preventDoubleClick: true
+      }) }}
+      <p class="govuk-body">
+        <a href="{{ dashboardUrl }}" class="govuk-link">{{ t('buttons.cancel', { ns: 'common' }) }}</a>
+      </p>
+    </div>
+  </form>
+{% endblock %}
