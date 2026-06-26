@@ -50,7 +50,9 @@ const legalRepStepOrder = [
   'equality-and-diversity-end',
   'language-used',
   'end-of-journey-cya',
-  'end-now',
+  'response-submitted',
+  'response-submitted-counter-claim-fee-payment-needed',
+  'response-and-counter-claim-submitted'
 ] as const satisfies readonly LegalRepRespondToClaimStepName[];
 
 // Legal-rep journey is a flat, linear stepOrder. It is intentionally NOT sectionalised
