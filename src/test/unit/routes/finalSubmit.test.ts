@@ -65,6 +65,11 @@ describe('finalSubmit routes', () => {
     return session;
   };
 
+  const bindReqRes = (req: Request, res: Response): Request => {
+    req.res = res;
+    return req;
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -184,6 +189,8 @@ describe('finalSubmit routes', () => {
         redirect: jest.fn(),
       } as unknown as Response;
 
+      req.res = res;
+
       await handler(req, res);
 
       expect(mockHttpGet).toHaveBeenCalled();
@@ -236,6 +243,8 @@ describe('finalSubmit routes', () => {
         locals: { validatedCase },
         redirect: jest.fn(),
       } as unknown as Response;
+
+      bindReqRes(req, res);
 
       await handler(req, res);
 
@@ -295,6 +304,8 @@ describe('finalSubmit routes', () => {
         locals: { validatedCase },
         redirect: jest.fn(),
       } as unknown as Response;
+
+      bindReqRes(req, res);
 
       await handler(req, res);
 
@@ -356,6 +367,8 @@ describe('finalSubmit routes', () => {
         redirect: jest.fn(),
       } as unknown as Response;
 
+      bindReqRes(req, res);
+
       await handler(req, res);
 
       expect(req.session.payment).toEqual(
@@ -385,6 +398,8 @@ describe('finalSubmit routes', () => {
         locals: { validatedCase: { id: '1234567890123456', data: {} } },
         redirect: jest.fn(),
       } as unknown as Response;
+
+      bindReqRes(req, res);
 
       await handler(req, res);
 
