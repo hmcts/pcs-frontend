@@ -5,5 +5,5 @@
   "enterCourtFormNumber": "cyEnter the court form number 'XXX' when asked. This will be one of the first questions when you apply.",
   "afterYouHaveApplied": "cyAfter you have applied you will receive a Help with Fees reference number. You should enter the reference number when you return to this counterclaim.",
   "ifYouReceiveAnyBenefit": "cyIf the defendant receives any benefit that qualifies them for Help with Fees, you must include evidence of it when you apply online for help with their fees.",
-  "ifYouHaveYourHWFReference": "cyIf you have your Help with Fees reference number <a href=\"./counter-claim-have-you-applied-for-help\" rel=\"noopener noreferrer\" class=\"govuk-link\">you can enter it now</a>."
+  "ifYouHaveYourHWFReference": "cyIf you have their Help with Fees reference number <a href=\"./counter-claim-have-you-applied-for-help\" rel=\"noopener noreferrer\" class=\"govuk-link\">you can enter it here</a>."
 }
