@@ -178,6 +178,8 @@ export class ActionRegistry {
     ['previousPaymentsLR', new RespondToClaimLRAction()],
     ['repaymentAgreedLR', new RespondToClaimLRAction()],
     ['selectUniversalCreditLR', new RespondToClaimLRAction()],
+    ['selectCorrespondenceAddressUnknownLR', new RespondToClaimLRAction()],
+    ['enterNoticeDateKnownLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

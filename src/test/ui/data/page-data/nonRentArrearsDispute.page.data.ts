@@ -15,6 +15,7 @@ export const nonRentArrearsDispute = {
   doYouWantToDisputeQuestion: `Do you want to dispute any other parts of the claim?`,
   doesTheDefendantWantToDisputeHiddenQuestion: `Does the defendant dispute any other parts of the claim?`,
   explainPartOfClaimHiddenTextLabel: `Explain which parts of the claim you do not agree with`,
+  lrExplainWhichPartsDefendantHiddenTextLabel: `Explain which parts of the claim the defendant disputes`,
   explainClaimTextInput: `Example - Do not agree with claim 1`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

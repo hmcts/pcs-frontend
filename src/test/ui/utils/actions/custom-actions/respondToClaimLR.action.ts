@@ -4,6 +4,7 @@ import { submitCaseApiData } from '../../../data/api-data';
 import {
   circumstancesLR,
   confirmationOfNoticeGiven,
+  correspondenceAddress,
   counterClaimAgainstWhom,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
@@ -13,6 +14,7 @@ import {
   incomeAndExpenses,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
+  noticeDateWhenProvided,
   otherConsiderations,
   previousPaymentsLR,
   priorityDebtDetails,
@@ -58,6 +60,11 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['previousPaymentsLR', () => this.previousPaymentsLR(fieldName as actionRecord)],
       ['repaymentAgreedLR', () => this.repaymentAgreedLR(fieldName as actionRecord)],
       ['selectUniversalCreditLR', () => this.selectUniversalCreditLR(fieldName as actionRecord)],
+      [
+        'selectCorrespondenceAddressUnknownLR',
+        () => this.selectCorrespondenceAddressUnknownLR(fieldName as actionRecord),
+      ],
+      ['enterNoticeDateKnownLR', () => this.enterNoticeDateKnownLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -72,6 +79,50 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       option: noticeGivenData.option,
     });
     await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
+  }
+
+  private async selectCorrespondenceAddressUnknownLR(addressData: actionRecord) {
+    await performValidation('mainHeader', correspondenceAddress.correspondenceAddressPostalMainHeader);
+    await performAction('clickRadioButton', {
+      question: correspondenceAddress.correspondenceAddressConfirmHintText(),
+      option: addressData.radioOption,
+    });
+
+    if (addressData.radioOption === correspondenceAddress.noRadioOption) {
+      if (addressData.addressIndex) {
+        await performActions(
+          'Find Address based on postcode',
+          ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
+          ['clickButton', correspondenceAddress.findAddressHiddenButton],
+          ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
+        );
+      } else if (addressData.addressLine1) {
+        await performActions(
+          'Enter Address Manually',
+          ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
+          ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
+          ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
+          ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
+        );
+      }
+    }
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  }
+
+  private async enterNoticeDateKnownLR(noticeData: actionRecord): Promise<void> {
+    await performValidation('text', {
+      elementType: 'listItem',
+      text: noticeDateWhenProvided.noticeGivenDateHiddenLabelLR,
+    });
+    if (noticeData?.day && noticeData?.month && noticeData?.year) {
+      await performActions(
+        'Enter Date',
+        ['inputText', noticeDateWhenProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
+      );
+    }
+    await performAction('clickButton', noticeDateWhenProvided.saveAndContinueButton);
   }
 
   private async enterTenancyStartDetailsUnKnownLR(tenancyStartData: actionRecord) {
@@ -98,7 +149,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     if (doYouWantToDisputeOption.disputeOption === 'Yes') {
       await performAction(
         'inputText',
-        nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
+        nonRentArrearsDispute.lrExplainWhichPartsDefendantHiddenTextLabel,
         doYouWantToDisputeOption.disputeInfo
       );
     }
@@ -332,7 +383,9 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       elementType: 'subHeader',
       text: `Amount the defendant owes in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
     });
-    const rentArrearsAmount = formatCurrency(`${submitCaseApiData.submitCasePayload.rentArrears_Total}`);
+    const rentArrearsAmount = formatCurrency(
+      `${submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total}`
+    );
     await performValidation('text', {
       elementType: 'paragraph',
       text: `${rentArrearsAmount}`,

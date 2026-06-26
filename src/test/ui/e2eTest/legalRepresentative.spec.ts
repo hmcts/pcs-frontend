@@ -53,13 +53,13 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   } else if (testInfo.title.includes('RentArrears - DemotedTenancy')) {
-    claimantName = submitCaseApiData.submitCasePayload.claimantName;
+    claimantName = submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.claimantName;
     process.env.CLAIMANT_NAME = claimantName;
-    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
     process.env.GROUNDS = 'RENT_ARREARS';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown });
   }
 
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
@@ -218,14 +218,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('Respond to claim - RentArrears - DemotedTenancy - LR @smoke @PR @regression', async () => {
-    const pin2User = await getPinUserAt(1);
-    await performAction('representationLR', {
-      question: counterClaimAgainstWhom.lrHiddenMainHeader,
-      radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
-    });
+  test('Respond to claim - RentArrears - NonRentArrears - DemotedTenancy - LR @smoke @PR @regression', async () => {
+    const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.getLrHiddenMainHeader(pin2User.firstName, pin2User.lastName),
+      question: defendantNameConfirmation.getLrHiddenMainHeader(pinUser.firstName, pinUser.lastName),
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
@@ -233,7 +229,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressKnown', {
+    await performAction('selectCorrespondenceAddressUnknownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
@@ -244,7 +240,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
+      tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('selectTenancyStartDateKnown', {
@@ -253,7 +249,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectNoticeDetailsLR', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
-    await performAction('enterNoticeDateKnown', {
+    await performAction('enterNoticeDateKnownLR', {
       day: '25',
       month: '2',
       year: '2020',
@@ -261,6 +257,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('rentArrearsLR', {
       option: rentArrears.noRadioOption,
       rentAmount: rentArrears.rentAmountTextInput,
+    });
+    await performAction('disputingOtherPartsOfTheClaimLR', {
+      disputeOption: nonRentArrearsDispute.yesRadioOption,
+      disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
     });
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
