@@ -2040,7 +2040,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(claimantName),
-      repaymentOption: repaymentsMade.noRadioOption,
+      repaymentOption: repaymentsMade.yesRadioOption,
+      repaymentInfo: repaymentsMade.detailsTextInput,
     });
     await performAction('repaymentsAgreed', {
       question: repaymentsAgreed.getMainHeader(claimantName),

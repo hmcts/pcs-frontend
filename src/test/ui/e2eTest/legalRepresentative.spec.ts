@@ -4,6 +4,7 @@ import {
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
+  contactPreferencesTextMessage,
   correspondenceAddress,
   counterClaim,
   counterClaimAgainstWhom,
@@ -45,21 +46,25 @@ let claimantName: string;
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   process.env.NOTICE_SERVED = 'YES';
-  if (testInfo.title.includes('NonRentArrears - AssuredTenancy')) {
+  if (testInfo.title.includes('@nonRent')) {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadAssuredTenancy.claimantName;
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
-  } else if (testInfo.title.includes('RentArrears - DemotedTenancy')) {
+  } else if (testInfo.title.includes('@rentNonRent')) {
     claimantName = submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.claimantName;
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
-    process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
-    process.env.GROUNDS = 'RENT_ARREARS';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown });
+  } else if (testInfo.title.includes('@rent')) {
+    claimantName = submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.claimantName;
+    process.env.CLAIMANT_NAME = claimantName;
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown });
   }
 
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
@@ -77,8 +82,9 @@ test.afterEach(async () => {
   finaliseAllValidations();
 });
 
+//selectNoticeDetails= defendant not sure
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('Respond to claim - NonRentArrears - AssuredTenancy - LR @smoke @regression @PR', async () => {
+  test('NonRentArrears - AssuredTenancy - LR @smoke @regression @PR @nonRent', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: counterClaimAgainstWhom.lrHiddenMainHeader,
@@ -100,7 +106,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
@@ -179,13 +186,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectPriorityDebtsLR', {
       question: priorityDebts.lrDoesDefendantHavePriorityDebtsHiddenQuestion,
-      option: priorityDebts.yesRadioOption,
-    });
-    await performAction('enterPriorityDebtDetailsLR', {
-      totalAmount: priorityDebtDetails.totalAmountTextInput,
-      payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
-      option: priorityDebtDetails.monthRadioOption,
+      option: priorityDebts.noRadioOption,
     });
     await performAction('selectExpensesLR', {
       regularExpensesOptions: [
@@ -218,11 +219,13 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('Respond to claim - RentArrears - NonRentArrears - DemotedTenancy - LR @smoke @PR @regression', async () => {
+  test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.getLrHiddenMainHeader(pinUser.firstName, pinUser.lastName),
-      option: defendantNameConfirmation.yesRadioOption,
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirth.dayInputText,
@@ -237,11 +240,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetails.yesRadioOption,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('selectTenancyStartDateKnown', {
       option: tenancyDateDetails.yesRadioOption,
@@ -257,6 +263,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('rentArrearsLR', {
       option: rentArrears.noRadioOption,
       rentAmount: rentArrears.rentAmountTextInput,
+      rentArrearsTotal: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('disputingOtherPartsOfTheClaimLR', {
       disputeOption: nonRentArrearsDispute.yesRadioOption,
@@ -307,11 +314,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
     });
     await performAction('otherDependantsLR', {
-      otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
     });
     await performAction('otherAdultsLR', {
-      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
     });
     await performAction('alternativeAccommodationLR', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.lrHiddenDefendantNotSureRadioOption,
@@ -322,7 +329,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('exceptionalHardshipLR', {
       question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
     await performAction('selectIncomeAndExpensesLR', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
@@ -344,6 +351,123 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: priorityDebtDetails.weekRadioOption,
     });
     await performAction('selectExpensesLR');
+    await performAction('otherConsiderationsLR', {
+      question: otherConsiderations.lrHiddenMainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('uploadFiles');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.lrHiddenMainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    //await performAction('clickButton', 'Submit');
+  });
+
+  test('RentArrears - DemotedTenancy - LR @smoke @PR @regression @rent', async () => {
+    const pinUser = await getPinUserAt(0);
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.getLrHiddenMainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnknownLR', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+    await performAction('enterTenancyStartDetailsUnKnownLR');
+    await performAction('selectNoticeDetailsLR', {
+      option: confirmationOfNoticeGiven.noRadioOption,
+    });
+    await performAction('rentArrearsLR', {
+      option: rentArrears.yesRadioOption,
+      rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
+    });
+    await performAction('selectCounterClaim', {
+      option: counterClaim.yesRadioOption,
+    });
+    // await performAction('selectWhatAreYouClaimingFor', {
+    //   question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    //   option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    // });
+    // await performAction('counterClaimSpecificSumOfMoney', {
+    //   question: counterClaimSpecificSumOfMoney.mainHeader,
+    //   option: counterClaimSpecificSumOfMoney.yesRadioOption,
+    //   amount: counterClaimSpecificSumOfMoney.claimInput,
+    // });
+    // await performAction('selectCounterClaimFee', {
+    //   radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+    //   typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    //   amount: counterClaimSpecificSumOfMoney.claimInput,
+    // });
+    // const pin2User = await getPinUserAt(1);
+    // await performAction('selectClaimAgainstWhom', {
+    //   question: counterClaimAgainstWhom.mainHeader,
+    //   options: [claimantName, `${pin2User.firstName} ${pin2User.lastName}`],
+    // });
+    // await performAction('counterClaimAbout', {
+    //   counterClaimFor: counterClaimAbout.counterClaimForInput,
+    //   reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    // });
+    // await performAction('doYouWantToUploadFiles', {
+    //   option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    // });
+    await performAction('previousPaymentsLR', {
+      question: previousPaymentsLR.getMainHeader(),
+      repaymentOption: previousPaymentsLR.yesRadioOption,
+      repaymentInfo: previousPaymentsLR.detailsTextInput,
+    });
+    await performAction('repaymentAgreedLR', {
+      question: repaymentsAgreed.lrHiddenMainHeader(),
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
+    });
+    await performAction('doesTheDependantHaveChildrenLR', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('otherDependantsLR', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('otherAdultsLR', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+    });
+    await performAction('alternativeAccommodationLR', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
+    });
+    await performAction('circumstancesLR', {
+      question: circumstancesLR.lrWouldYouLikeToShareHeader,
+      yourCircumstancesOption: circumstancesLR.noRadioOption,
+    });
+    await performAction('exceptionalHardshipLR', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('selectIncomeAndExpensesLR', {
+      incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
+    });
     await performAction('otherConsiderationsLR', {
       question: otherConsiderations.lrHiddenMainHeader,
       option: otherConsiderations.noRadioOption,

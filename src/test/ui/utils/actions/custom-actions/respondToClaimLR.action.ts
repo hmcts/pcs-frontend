@@ -1,6 +1,5 @@
 import { Page } from '@playwright/test';
 
-import { submitCaseApiData } from '../../../data/api-data';
 import {
   circumstancesLR,
   confirmationOfNoticeGiven,
@@ -385,9 +384,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       elementType: 'subHeader',
       text: `Amount the defendant owes in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
     });
-    const rentArrearsAmount = formatCurrency(
-      `${submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total}`
-    );
+    const rentArrearsAmount = formatCurrency(rentArrearsInfo.rentArrearsTotal as string);
     await performValidation('text', {
       elementType: 'paragraph',
       text: `${rentArrearsAmount}`,
