@@ -1,8 +1,11 @@
 import type { Request } from 'express';
 
 import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/storage';
+import { Logger } from '@modules/logger';
 import type { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import { decodeBase64UrlJson } from '@utils/base64Json';
+
+const logger = Logger.getLogger('form-builder-fileUploadUtils');
 
 /**
  * Parses already-uploaded document metadata from POST `req.body`, not from multipart file parts.
@@ -26,6 +29,8 @@ export function parseUploadedDocumentsFromBody(body: Record<string, unknown>): R
     const doc = decodeBase64UrlJson(entry);
     if (doc) {
       parsed.push(doc);
+    } else if (entry !== '') {
+      logger.warn('Dropping uploaded document entry that failed to decode');
     }
   }
   return parsed;

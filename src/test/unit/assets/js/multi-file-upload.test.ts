@@ -45,7 +45,9 @@ jest.mock('@utils/fileExtensionValidation', () => ({
   ),
 }));
 
-import { initMultiFileUpload } from '../../../../main/assets/js/multi-file-upload';
+import { encodeUploadedDocument, initMultiFileUpload } from '../../../../main/assets/js/multi-file-upload';
+
+import { decodeBase64UrlJson } from '@utils/base64Json';
 
 // Hidden uploadedDocuments[] inputs carry base64url-encoded JSON (WAF-safe).
 function decodeHiddenValue(value: string): Record<string, unknown> {
@@ -620,5 +622,23 @@ describe('multi-file-upload', () => {
 
       expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
     });
+  });
+});
+
+// The client encoder and the server decoder are separate implementations; this guards
+// against the two base64url paths drifting apart (HDPI-5770).
+describe('encodeUploadedDocument round-trips through the server decoder', () => {
+  it('decodes back to the original document', () => {
+    const doc = { index: 0, id: 'abc', document_filename: 'rentArrears.pdf' };
+    expect(decodeBase64UrlJson(encodeUploadedDocument(doc))).toEqual(doc);
+  });
+
+  it('survives non-ASCII filenames', () => {
+    const doc = { index: 1, document_filename: 'café-déjà-vu.pdf' };
+    expect(decodeBase64UrlJson(encodeUploadedDocument(doc))).toEqual(doc);
+  });
+
+  it('produces only base64url characters', () => {
+    expect(encodeUploadedDocument({ document_filename: 'x.pdf' })).toMatch(/^[A-Za-z0-9_-]+$/);
   });
 });
