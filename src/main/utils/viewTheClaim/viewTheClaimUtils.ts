@@ -97,7 +97,7 @@ export function buildViewTheClaimPageData(
     getValue(data, 'claimIssueDate') ?? getValue(data, 'possessionClaimResponse.claimIssuedDate'),
     locale
   );
-  const claimSubmittedDateText = formatDate(getValue(data, 'detailsTab_DateClaimSubmitted'), locale);
+  const claimSubmittedDateText = formatDate(getValue(data, 'dateSubmitted'), locale);
   const pageMetadataRows = sectionRows([
     claimIssueDateText ? summaryRow(t('viewTheClaim:dateIssued'), { text: claimIssueDateText }) : undefined,
     claimSubmittedDateText ? summaryRow(t('viewTheClaim:dateSubmitted'), { text: claimSubmittedDateText }) : undefined,

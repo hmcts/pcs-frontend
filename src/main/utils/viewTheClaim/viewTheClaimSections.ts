@@ -246,9 +246,8 @@ export function buildActionTakenSection(data: UnknownRecord, copy: ViewTheClaimC
     textRow(
       copy.label('preActionProtocolReason'),
       getFirstString(data, [
+        'detailsTab_ActionsTakenDetails.preActionProtocolIncompleteExplanation',
         'preActionProtocolIncompleteExplanation',
-        'preActionProtocolNotCompletedReason',
-        'preActionProtocolReason',
       ])
     ),
     textRow(

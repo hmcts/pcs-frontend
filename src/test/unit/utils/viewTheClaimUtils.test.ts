@@ -45,6 +45,9 @@ const translations: Record<string, string> = {
   'viewTheClaim:labels.tenancyNoCopyReason':
     'Why does the claimant not have a copy of the tenancy, occupation contract or licence agreement?',
   'viewTheClaim:labels.tenancyDocument': 'Tenancy, occupation contract or licence agreement',
+  'viewTheClaim:sections.actionTaken': 'Action already taken by the claimant',
+  'viewTheClaim:labels.preActionProtocol': 'Has the pre-action protocol been followed?',
+  'viewTheClaim:labels.preActionProtocolReason': 'Why has the pre-action protocol not been followed?',
 };
 
 const t = ((key: string, options?: Record<string, unknown>) => {
@@ -85,7 +88,7 @@ describe('viewTheClaimUtils', () => {
       '1234567890123456',
       {
         claimIssueDate: '2026-02-05',
-        detailsTab_DateClaimSubmitted: '2026-06-24T12:23:59.791346',
+        dateSubmitted: '2026-06-24T12:23:59.791346',
       } as never,
       t
     );
@@ -94,6 +97,7 @@ describe('viewTheClaimUtils', () => {
     expect(page.pageMetadataRows[0].key.text).toBe('Date issued');
     expect(page.pageMetadataRows[0].value.text).toBe('5 February 2026');
     expect(page.pageMetadataRows[1].key.text).toBe('Date submitted');
+    expect(page.pageMetadataRows[1].value.text).toBe('24 June 2026');
   });
 
   it('builds claim summary sections in mapping order with case data values', () => {
@@ -604,5 +608,22 @@ describe('viewTheClaimUtils', () => {
     expect(rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')).toBe(
       'Acme Mortgagee'
     );
+  });
+
+  it('shows pre-action protocol reason from detailsTab_ActionsTakenDetails', () => {
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        detailsTab_ActionsTakenDetails: {
+          preactionProtocolFollowed: 'No',
+          preActionProtocolIncompleteExplanation: 'awdqwd',
+        },
+      } as never,
+      t
+    );
+
+    const section = sectionByTitle(page, 'Action already taken by the claimant');
+    expect(rowText(section, 'Has the pre-action protocol been followed?')).toBe('No');
+    expect(rowText(section, 'Why has the pre-action protocol not been followed?')).toBe('awdqwd');
   });
 });
