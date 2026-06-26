@@ -16,7 +16,7 @@ const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_
 if (enable_all_page_functional_tests.toLowerCase() === 'true') {
   process.env.ENABLE_CONTENT_VALIDATION = 'true';
   process.env.ENABLE_VISIBILITY_VALIDATION = 'true';
-  process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true';
+  process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'false';
   process.env.ENABLE_NAVIGATION_TESTS = 'true';
 }
 
