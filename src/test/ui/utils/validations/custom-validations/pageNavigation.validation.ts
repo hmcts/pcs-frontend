@@ -96,7 +96,7 @@ export class PageNavigationValidation implements IValidation {
   }
 
   private async validateFeedbackLinkHref(page: Page, linkText: string): Promise<void> {
-    const locatorByName = page.getByRole('link', { name: linkText });
+    const locatorByName = page.getByRole('link', { name: linkText, exact: true });
     const locatorByHref = page.locator('a[href*="smartsurvey.co.uk/s/Poss_feedback/"]').first();
 
     let href: string | null = null;
@@ -132,7 +132,7 @@ export class PageNavigationValidation implements IValidation {
     linkType: 'Back link' | 'Feedback link',
     predicate: (href: string) => boolean
   ): Promise<void> {
-    const locator = page.getByRole('link', { name: linkText });
+    const locator = page.getByRole('link', { name: linkText, exact: true });
     const href = await locator.getAttribute('href');
 
     if (!href) {
