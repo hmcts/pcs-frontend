@@ -469,21 +469,15 @@ describe('viewTheResponse route', () => {
     );
 
     const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant1.name' },
-          value: { text: 'viewTheResponse:personsUnknown' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant1.address' },
-          value: { text: 'Clapping Gate, Knowles Lane, Whitchurch, SY13 2LH' },
-        }),
-      ])
-    );
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual([
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant1.name' },
+        value: { text: 'viewTheResponse:personsUnknown' },
+      }),
+    ]);
   });
 
-  it('should show persons unknown and address unknown for additional defendants when not known', async () => {
+  it('should show persons unknown for additional defendants when name is not known', async () => {
     mockCaseById({
       possessionClaimResponse: {
         defendantResponses: { disputeClaim: 'NO' },
@@ -509,18 +503,40 @@ describe('viewTheResponse route', () => {
     );
 
     const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant1.name' },
-          value: { text: 'viewTheResponse:personsUnknown' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant1.address' },
-          value: { text: 'viewTheResponse:addressUnknown' },
-        }),
-      ])
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual([
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant1.name' },
+        value: { text: 'viewTheResponse:personsUnknown' },
+      }),
+    ]);
+  });
+
+  it('should omit the viewing defendant from additional defendant sections', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        currentDefendantPartyId: 'def-2',
+        defendantResponses: { disputeClaim: 'NO' },
+      },
+      allDefendants: [
+        { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
+        { id: 'def-2', value: { firstName: 'Peter', lastName: 'Parker' } },
+      ],
+    } as CcdCaseData);
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
     );
+
+    expect((res.render as jest.Mock).mock.calls[0][1].additionalDefendantDetails).toEqual([]);
   });
 
   it('should format yes/no values regardless of API casing', async () => {

@@ -53,9 +53,6 @@ interface AdditionalDefendantParty {
   firstName?: string;
   lastName?: string;
   nameKnown?: string;
-  addressKnown?: string;
-  addressSameAsProperty?: string;
-  address?: CcdCaseAddress | Record<string, never>;
 }
 
 function formatGdsDate(value: string | undefined | null): string | null {
@@ -241,27 +238,22 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
     return [];
   }
 
-  return defendants.slice(1).map((defendant, index) => {
-    const party = defendant.value as AdditionalDefendantParty;
-    const rows: SummaryRow[] = [];
+  const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
 
-    pushRow(rows, t('viewTheResponse:defendant1.name'), resolveAdditionalDefendantName(t, party));
+  return defendants
+    .slice(1)
+    .filter(defendant => !currentDefendantPartyId || defendant.id !== currentDefendantPartyId)
+    .map((defendant, index) => {
+      const party = defendant.value as AdditionalDefendantParty;
+      const rows: SummaryRow[] = [];
 
-    let address = '';
-    if (isNo(party.addressKnown)) {
-      address = t('viewTheResponse:addressUnknown');
-    } else if (isYes(party.addressSameAsProperty) || !addressToString(party.address)) {
-      address = caseData.propertyAddress ? (formatAddress(caseData.propertyAddress) ?? '') : '';
-    } else {
-      address = addressToString(party.address);
-    }
-    pushRow(rows, t('viewTheResponse:defendant1.address'), address);
+      pushRow(rows, t('viewTheResponse:defendant1.name'), resolveAdditionalDefendantName(t, party));
 
-    return {
-      sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
-      rows,
-    };
-  });
+      return {
+        sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
+        rows,
+      };
+    });
 }
 
 function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySection {
