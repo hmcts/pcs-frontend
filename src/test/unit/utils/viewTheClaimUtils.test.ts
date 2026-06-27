@@ -48,6 +48,8 @@ const translations: Record<string, string> = {
   'viewTheClaim:sections.actionTaken': 'Action already taken by the claimant',
   'viewTheClaim:labels.preActionProtocol': 'Has the pre-action protocol been followed?',
   'viewTheClaim:labels.preActionProtocolReason': 'Why has the pre-action protocol not been followed?',
+  'viewTheClaim:labels.mediationAttempted': 'Has mediation been attempted?',
+  'viewTheClaim:labels.settlementAttempted': 'Has a settlement tried to be reached?',
 };
 
 const t = ((key: string, options?: Record<string, unknown>) => {
@@ -621,5 +623,26 @@ describe('viewTheClaimUtils', () => {
     const section = sectionByTitle(page, 'Action already taken by the claimant');
     expect(rowText(section, 'Has the pre-action protocol been followed?')).toBe('No');
     expect(rowText(section, 'Why has the pre-action protocol not been followed?')).toBe('awdqwd');
+  });
+
+  it('shows pre-action protocol fields from top-level case data when details tab is absent', () => {
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        preActionProtocolCompleted: 'NO',
+        preActionProtocolIncompleteExplanation: 'This is a private landlord claim.',
+        mediationAttempted: 'NO',
+        settlementAttempted: 'YES',
+      } as never,
+      t
+    );
+
+    const section = sectionByTitle(page, 'Action already taken by the claimant');
+    expect(rowText(section, 'Has the pre-action protocol been followed?')).toBe('No');
+    expect(rowText(section, 'Why has the pre-action protocol not been followed?')).toBe(
+      'This is a private landlord claim.'
+    );
+    expect(rowText(section, 'Has mediation been attempted?')).toBe('No');
+    expect(rowText(section, 'Has a settlement tried to be reached?')).toBe('Yes');
   });
 });
