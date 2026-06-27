@@ -109,7 +109,7 @@ describe('viewTheClaimUtils', () => {
           PostTown: 'London',
           PostCode: 'W3 7RX',
         },
-        detailsTab_DateClaimSubmitted: '2026-06-24T12:23:59.791346',
+        dateSubmitted: '2026-06-24T12:23:59.791346',
         detailsTab_ClaimDetails: {
           claimantType: 'Registered provider of social housing or local authority',
           trespassClaim: 'No',
