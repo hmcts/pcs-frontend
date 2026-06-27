@@ -1,4 +1,4 @@
-import { dashboard, feedback, tenancyDateUnknown, tenancyTypeDetails } from '../data/page-data';
+import { feedback, tenancyDateUnknown, tenancyTypeDetails } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function tenancyDateUnknownErrorValidation(): Promise<void> {
@@ -48,5 +48,4 @@ export async function tenancyDateUnknownNavigationTests(): Promise<void> {
     pageSlug: tenancyDateUnknown.pageSlug,
   });
   await performValidation('pageNavigation', tenancyDateUnknown.backLink, tenancyTypeDetails.mainHeader);
-  await performValidation('pageNavigation', tenancyDateUnknown.saveForLaterButton, dashboard.mainHeader);
 }

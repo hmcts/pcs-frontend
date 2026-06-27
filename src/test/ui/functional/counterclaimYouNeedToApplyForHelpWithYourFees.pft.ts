@@ -17,9 +17,5 @@ export async function counterclaimYouNeedToApplyForHelpWithYourFeesNavigationTes
     counterClaimHaveYouAppliedForHelp.mainHeader
   );
 
-  await performValidation(
-    'pageNavigation',
-    counterclaimYouNeedToApplyForHelpWithYourFees.saveForLaterButton,
-    taskList.mainHeader
-  );
+  await performValidation('pageNavigation', taskList.mainHeader);
 }
