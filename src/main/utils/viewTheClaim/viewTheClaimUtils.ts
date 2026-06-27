@@ -198,6 +198,7 @@ export function claimantName(data: UnknownRecord, copy: ViewTheClaimCopy): strin
 }
 
 export function claimantAddressHtml(data: UnknownRecord): string | undefined {
+  const addressOptions = { includeCountry: true };
   const isCorrectAddressPaths = [
     'isCorrectClaimantContactAddress',
     'claimantContactPreferences.isCorrectClaimantContactAddress',
@@ -208,7 +209,7 @@ export function claimantAddressHtml(data: UnknownRecord): string | undefined {
   ];
 
   if (isCorrectAddressPaths.some(path => normaliseYesNo(getValue(data, path)) === 'NO')) {
-    return getFirstAddressHtml(data, overriddenAddressPaths);
+    return getFirstAddressHtml(data, overriddenAddressPaths, addressOptions);
   }
 
   return (
@@ -221,7 +222,8 @@ export function claimantAddressHtml(data: UnknownRecord): string | undefined {
         'casePartiesTab_ClaimantDetails.serviceAddress',
         'organisationAddress',
         'claimantContactPreferences.organisationAddress',
-      ]
+      ],
+      addressOptions
     ) ??
     formattedAddressHtml(
       getFirstString(data, [

@@ -238,10 +238,7 @@ export function buildActionTakenSection(data: UnknownRecord, copy: ViewTheClaimC
     textRow(
       copy.label('preActionProtocol'),
       yesNoText(
-        getFirstValue(data, [
-          'preActionProtocolCompleted',
-          'detailsTab_ActionsTakenDetails.preactionProtocolFollowed',
-        ])
+        getFirstValue(data, ['preActionProtocolCompleted', 'detailsTab_ActionsTakenDetails.preactionProtocolFollowed'])
       )
     ),
     textRow(
@@ -253,15 +250,11 @@ export function buildActionTakenSection(data: UnknownRecord, copy: ViewTheClaimC
     ),
     textRow(
       copy.label('mediationAttempted'),
-      yesNoText(
-        getFirstValue(data, ['mediationAttempted','detailsTab_ActionsTakenDetails.mediationAttempted'])
-      )
+      yesNoText(getFirstValue(data, ['mediationAttempted', 'detailsTab_ActionsTakenDetails.mediationAttempted']))
     ),
     textRow(
       copy.label('settlementAttempted'),
-      yesNoText(
-        getFirstValue(data, ['settlementAttempted','detailsTab_ActionsTakenDetails.settlementAttempted'])
-      )
+      yesNoText(getFirstValue(data, ['settlementAttempted', 'detailsTab_ActionsTakenDetails.settlementAttempted']))
     ),
   ];
 
