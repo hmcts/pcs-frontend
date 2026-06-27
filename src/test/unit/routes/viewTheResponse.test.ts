@@ -361,10 +361,6 @@ describe('viewTheResponse route', () => {
           key: { text: 'viewTheResponse:defendant1.name' },
           value: { text: 'Peter Parker' },
         }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant1.dateOfBirth' },
-          value: { text: '20 July 1985' },
-        }),
       ])
     );
     expect(renderArgs.responseToClaim.rows.length).toBeGreaterThan(0);

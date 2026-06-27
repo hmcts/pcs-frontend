@@ -56,7 +56,6 @@ interface AdditionalDefendantParty {
   addressKnown?: string;
   addressSameAsProperty?: string;
   address?: CcdCaseAddress | Record<string, never>;
-  dateOfBirth?: string;
 }
 
 function formatGdsDate(value: string | undefined | null): string | null {
@@ -257,7 +256,6 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
       address = addressToString(party.address);
     }
     pushRow(rows, t('viewTheResponse:defendant1.address'), address);
-    pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(party.dateOfBirth) ?? '');
 
     return {
       sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
