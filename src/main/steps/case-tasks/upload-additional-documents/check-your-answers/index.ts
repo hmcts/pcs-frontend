@@ -2,7 +2,6 @@ import type { Request, Response } from 'express';
 
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
 import { flowConfig, uploadYourDocumentsStep } from '../flow.config';
-import { isViewAllApplicationsAvailable } from '../flowConditions';
 
 import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
@@ -32,6 +31,7 @@ async function getCheckYourAnswersContent(req: Request) {
   const caseId = req.res?.locals.validatedCase?.id;
   const documents = toDisplayDocuments(await uploadStorage.read(req));
   const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
+  const hasRelatedApplication = Boolean(confirmData?.relatedApplicationId);
   const relatedApplicationText = (confirmData?.relatedApplicationText as string) ?? '';
 
   return {
@@ -39,8 +39,8 @@ async function getCheckYourAnswersContent(req: Request) {
     cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
     url: req.originalUrl || '',
     documents,
+    hasRelatedApplication,
     relatedApplicationText,
-    showRelatedApplication: await isViewAllApplicationsAvailable(req, {}, {}),
   };
 }
 
@@ -54,7 +54,7 @@ export const step: StepDefinition = {
       const caseId = req.res?.locals.validatedCase?.id;
       const documents = toDisplayDocuments(await uploadStorage.read(req));
       const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
-      const hasRelatedApplication = Boolean(confirmData);
+      const hasRelatedApplication = Boolean(confirmData?.relatedApplicationId);
       const relatedApplicationText = (confirmData?.relatedApplicationText as string) ?? '';
 
       return {
