@@ -31,6 +31,7 @@ export const step: StepDefinition = {
       const caseId = req.res?.locals.validatedCase?.id;
       const documents = toDisplayDocuments(await uploadStorage.read(req));
       const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
+      const hasRelatedApplication = Boolean(confirmData);
       const relatedApplicationText = (confirmData?.relatedApplicationText as string) ?? '';
 
       return {
@@ -38,6 +39,7 @@ export const step: StepDefinition = {
         cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
         url: req.originalUrl || '',
         documents,
+        hasRelatedApplication,
         relatedApplicationText,
       };
     }),
