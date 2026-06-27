@@ -12,7 +12,6 @@ import {
   firstUnderlesseeParty,
   formatTime,
   getArray,
-  getFirstAddressHtml,
   getFirstPartyName,
   getFirstString,
   getFirstValue,
@@ -98,15 +97,7 @@ export function buildDefendantSection(
           copy
         )
     ),
-    htmlRow(
-      copy.label('addressForService'),
-      partyAddressHtml(defendant, propertyAddress) ??
-        getFirstAddressHtml(data, [
-          'detailsTab_DefendantInformationDetails.addressForService',
-          'casePartiesTab_DefendantOneDetails.serviceAddress',
-          'summaryTab_DefendantDetails.addressForService',
-        ])
-    ),
+    htmlRow(copy.label('addressForService'), partyAddressHtml(defendant, propertyAddress)),
   ];
 
   return section(copy.section('defendantDetails'), rows);
@@ -135,15 +126,7 @@ export function buildAdditionalDefendantSections(
               copy
             )
         ),
-        htmlRow(
-          copy.label('addressForService'),
-          partyAddressHtml(defendant, propertyAddress) ??
-            getFirstAddressHtml(data, [
-              `detailsTab_AdditionalDefendants.${index}.value.addressForService`,
-              `casePartiesTab_DefendantsDetails.${index}.value.serviceAddress`,
-              `summaryTab_AdditionalDefendants.${index}.value.addressForService`,
-            ])
-        ),
+        htmlRow(copy.label('addressForService'), partyAddressHtml(defendant, propertyAddress)),
       ])
     )
     .filter((sectionItem): sectionItem is ViewTheClaimSection => !!sectionItem);
@@ -404,12 +387,7 @@ export function buildUnderlesseeSection(
 
   return section(copy.section('underlesseeDetails'), [
     textRow(copy.label('underlesseeName'), underlesseeName(party, copy) ?? underlesseeName(tabParty, copy)),
-    htmlRow(
-      copy.label('underlesseeAddress'),
-      partyAddressHtml(party, propertyAddress) ??
-        partyAddressHtml(tabParty, propertyAddress) ??
-        getFirstAddressHtml(data, ['detailsTab_MortgageOneDetails.address'])
-    ),
+    htmlRow(copy.label('underlesseeAddress'), partyAddressHtml(party, propertyAddress)),
   ]);
 }
 
@@ -426,12 +404,7 @@ export function buildAdditionalUnderlesseeSections(
 
       return section(copy.section('additionalUnderlesseeDetails', { number: index + 1 }), [
         textRow(copy.label('underlesseeName'), underlesseeName(party, copy) ?? underlesseeName(tabParty, copy)),
-        htmlRow(
-          copy.label('underlesseeAddress'),
-          partyAddressHtml(party, propertyAddress) ??
-            partyAddressHtml(tabParty, propertyAddress) ??
-            getFirstAddressHtml(data, [`detailsTab_MortgageDetails.${index}.value.address`])
-        ),
+        htmlRow(copy.label('underlesseeAddress'), partyAddressHtml(party, propertyAddress)),
       ]);
     })
     .filter((sectionItem): sectionItem is ViewTheClaimSection => !!sectionItem);

@@ -409,7 +409,7 @@ describe('viewTheClaimUtils', () => {
     );
   });
 
-  it('uses defendant tab paths when allDefendants is redacted on citizen read', () => {
+  it('does not show other defendant addresses from tab paths when allDefendants is redacted on citizen read', () => {
     const propertyAddress = {
       AddressLine1: '2 Pentre Street',
       PostTown: 'Caerdydd',
@@ -463,10 +463,13 @@ describe('viewTheClaimUtils', () => {
     );
 
     expect(rowText(sectionByTitle(page, 'Defendant 1 details'), 'Name')).toBe('z test');
-    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
+    expect(rowHtml(sectionByTitle(page, 'Defendant 1 details'), 'Address for service')).toBe(
       '2 Pentre Street<br>Caerdydd<br>CF11 6QX'
     );
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
+    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBeUndefined();
+    expect(rowText(sectionByTitle(page, 'Additional defendant 2 details'), 'Name')).toBe('y test');
+    expect(rowHtml(sectionByTitle(page, 'Additional defendant 2 details'), 'Address for service')).toBeUndefined();
   });
 
   it('uses detailsTab_RentArrearsDetails.rentFrequency for Wales rent calculation', () => {
