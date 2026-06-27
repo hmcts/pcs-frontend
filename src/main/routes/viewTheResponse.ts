@@ -154,6 +154,14 @@ function joinName(firstName?: string, lastName?: string): string {
   return [firstName, lastName].filter(Boolean).join(' ').trim();
 }
 
+function resolveAdditionalDefendantName(t: TFunction, party: AdditionalDefendantParty): string {
+  if (isNo(party.nameKnown)) {
+    return t('viewTheResponse:personsUnknown');
+  }
+  const name = joinName(party.firstName, party.lastName);
+  return name || t('viewTheResponse:personsUnknown');
+}
+
 function addressToString(address: CcdCaseAddress | Record<string, never> | undefined): string {
   if (!address || Object.keys(address).length === 0) {
     return '';
@@ -238,11 +246,7 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
     const party = defendant.value as AdditionalDefendantParty;
     const rows: SummaryRow[] = [];
 
-    pushRow(
-      rows,
-      t('viewTheResponse:defendant1.name'),
-      isNo(party.nameKnown) ? t('viewTheResponse:personsUnknown') : joinName(party.firstName, party.lastName)
-    );
+    pushRow(rows, t('viewTheResponse:defendant1.name'), resolveAdditionalDefendantName(t, party));
 
     let address = '';
     if (isNo(party.addressKnown)) {

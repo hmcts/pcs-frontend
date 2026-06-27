@@ -441,6 +441,52 @@ describe('viewTheResponse route', () => {
     );
   });
 
+  it('should show persons unknown when additional defendant name is redacted with no name fields', async () => {
+    mockCaseById({
+      propertyAddress: {
+        AddressLine1: 'Clapping Gate',
+        AddressLine2: 'Knowles Lane',
+        PostTown: 'Whitchurch',
+        PostCode: 'SY13 2LH',
+      },
+      possessionClaimResponse: {
+        defendantResponses: { disputeClaim: 'NO' },
+      },
+      allDefendants: [
+        { id: 'def-1', value: { firstName: 'Deepika', lastName: 'Kaleol' } },
+        { id: 'def-2', value: {} },
+      ],
+    } as CcdCaseData);
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    const next: NextFunction = jest.fn();
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      next
+    );
+
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant1.name' },
+          value: { text: 'viewTheResponse:personsUnknown' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant1.address' },
+          value: { text: 'Clapping Gate, Knowles Lane, Whitchurch, SY13 2LH' },
+        }),
+      ])
+    );
+  });
+
   it('should show persons unknown and address unknown for additional defendants when not known', async () => {
     mockCaseById({
       possessionClaimResponse: {
