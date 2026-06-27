@@ -326,6 +326,56 @@ describe('viewTheClaimUtils', () => {
     );
   });
 
+  it('uses possessionClaimResponse.claimantServiceAddress when party collections have no address', () => {
+    const page = buildViewTheClaimPageData(
+      '1782548060888955',
+      {
+        claimantName: 'John Smith',
+        allClaimants: [
+          {
+            id: 'claimant-1',
+            value: {
+              orgName: 'John Smith',
+            },
+          },
+        ],
+        possessionClaimResponse: {
+          claimantServiceAddress: {
+            AddressLine1: '10 Downing Street',
+            PostTown: 'London',
+            PostCode: 'SW1A 2AA',
+          },
+        },
+      } as never,
+      t
+    );
+
+    expect(rowHtml(sectionByTitle(page, 'Claimant details'), 'Address for service')).toBe(
+      '10 Downing Street<br>London<br>SW1A 2AA'
+    );
+  });
+
+  it('uses claimantContactPreferences.organisationAddress when other claimant address paths are empty', () => {
+    const page = buildViewTheClaimPageData(
+      '1782548060888955',
+      {
+        claimantName: 'John Smith',
+        claimantContactPreferences: {
+          organisationAddress: {
+            AddressLine1: '102 Petty France',
+            PostTown: 'London',
+            PostCode: 'SW1H 9AJ',
+          },
+        },
+      } as never,
+      t
+    );
+
+    expect(rowHtml(sectionByTitle(page, 'Claimant details'), 'Address for service')).toBe(
+      '102 Petty France<br>London<br>SW1H 9AJ'
+    );
+  });
+
   it('uses detailsTab_ClaimantAddress when allClaimants address is redacted on citizen read', () => {
     const page = buildViewTheClaimPageData(
       '1782399913518153',
@@ -605,6 +655,34 @@ describe('viewTheClaimUtils', () => {
     expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe('Persons unknown');
     expect(rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')).toBe(
       'Acme Mortgagee'
+    );
+  });
+
+  it('shows Persons unknown when underlessee name is missing and nameKnown is not set', () => {
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        propertyAddress: {
+          AddressLine1: '2 Pentre Street',
+          PostTown: 'Caerdydd',
+          PostCode: 'CF11 6QX',
+        },
+        hasUnderlesseeOrMortgagee: 'YES',
+        underlesseeOrMortgagee1: {
+          addressKnown: 'YES',
+          address: {
+            AddressLine1: '1 Mortgage Lane',
+            PostTown: 'Cardiff',
+            PostCode: 'CF10 1AA',
+          },
+        },
+      } as never,
+      t
+    );
+
+    expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe('Persons unknown');
+    expect(rowHtml(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Address for service')).toBe(
+      '1 Mortgage Lane<br>Cardiff<br>CF10 1AA'
     );
   });
 

@@ -198,18 +198,37 @@ export function claimantName(data: UnknownRecord, copy: ViewTheClaimCopy): strin
 }
 
 export function claimantAddressHtml(data: UnknownRecord): string | undefined {
-  if (normaliseYesNo(getValue(data, 'isCorrectClaimantContactAddress')) === 'NO') {
-    return addressHtml(getValue(data, 'overriddenClaimantContactAddress'), { includeCountry: true });
+  const isCorrectAddressPaths = [
+    'isCorrectClaimantContactAddress',
+    'claimantContactPreferences.isCorrectClaimantContactAddress',
+  ];
+  const overriddenAddressPaths = [
+    'overriddenClaimantContactAddress',
+    'claimantContactPreferences.overriddenClaimantContactAddress',
+  ];
+
+  if (isCorrectAddressPaths.some(path => normaliseYesNo(getValue(data, path)) === 'NO')) {
+    return getFirstAddressHtml(data, overriddenAddressPaths);
   }
 
   return (
     collectionAddressesHtml(collectionRecords(getValue(data, 'allClaimants'))) ??
     getFirstAddressHtml(
       data,
-      ['detailsTab_ClaimantAddress', 'casePartiesTab_ClaimantDetails.serviceAddress', 'organisationAddress'],
-      { includeCountry: true }
+      [
+        'possessionClaimResponse.claimantServiceAddress',
+        'detailsTab_ClaimantAddress',
+        'casePartiesTab_ClaimantDetails.serviceAddress',
+        'organisationAddress',
+        'claimantContactPreferences.organisationAddress',
+      ]
     ) ??
-    formattedAddressHtml(getString(data, 'formattedClaimantContactAddress'))
+    formattedAddressHtml(
+      getFirstString(data, [
+        'formattedClaimantContactAddress',
+        'claimantContactPreferences.formattedClaimantContactAddress',
+      ])
+    )
   );
 }
 
@@ -314,7 +333,7 @@ export function underlesseeName(party: UnknownRecord | undefined, copy: ViewTheC
     return copy.personsUnknown;
   }
 
-  return getStringFromValue(party.name) ?? partyName(party, copy);
+  return getStringFromValue(party.name) ?? partyName(party, copy) ?? copy.personsUnknown;
 }
 
 export function partyAddressHtml(party: UnknownRecord | undefined, propertyAddress: unknown): string | undefined {
