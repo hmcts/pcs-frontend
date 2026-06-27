@@ -355,6 +355,40 @@ describe('viewTheClaimUtils', () => {
     );
   });
 
+  it('uses organisationAddress when allClaimants is redacted and detailsTab_ClaimantAddress is empty', () => {
+    const page = buildViewTheClaimPageData(
+      '1782548060888955',
+      {
+        allClaimants: [
+          {
+            id: 'claimant-1',
+            value: {
+              orgName: 'Possession Claims Solicitor Org',
+            },
+          },
+        ],
+        organisationAddress: {
+          AddressLine1: '102 Petty France',
+          PostTown: 'London',
+          PostCode: 'SW1H 9AJ',
+          Country: 'United Kingdom',
+        },
+        detailsTab_ClaimantAddress: {
+          AddressLine1: ' ',
+          PostTown: ' ',
+          PostCode: ' ',
+          Country: ' ',
+        },
+      } as never,
+      t
+    );
+
+    expect(rowText(sectionByTitle(page, 'Claimant details'), 'Name')).toBe('Possession Claims Solicitor Org');
+    expect(rowHtml(sectionByTitle(page, 'Claimant details'), 'Address for service')).toBe(
+      '102 Petty France<br>London<br>SW1H 9AJ<br>United Kingdom'
+    );
+  });
+
   it('uses claimantContactPreferences.organisationAddress when other claimant address paths are empty', () => {
     const page = buildViewTheClaimPageData(
       '1782548060888955',

@@ -197,32 +197,32 @@ export function claimantName(data: UnknownRecord, copy: ViewTheClaimCopy): strin
   );
 }
 
+const CLAIMANT_OVERRIDDEN_ADDRESS_PATHS = [
+  'overriddenClaimantContactAddress',
+  'claimantContactPreferences.overriddenClaimantContactAddress',
+];
+
+const CLAIMANT_ADDRESS_PATHS = [
+  'possessionClaimResponse.claimantServiceAddress',
+  'organisationAddress',
+  'claimantContactPreferences.organisationAddress',
+  'overriddenClaimantContactAddress',
+  'claimantContactPreferences.overriddenClaimantContactAddress',
+  'casePartiesTab_ClaimantDetails.serviceAddress',
+  'allClaimants.0.value.address',
+  'detailsTab_ClaimantAddress',
+];
+
 export function claimantAddressHtml(data: UnknownRecord): string | undefined {
   const addressOptions = { includeCountry: true };
-  const isCorrectAddressPaths = [
-    'isCorrectClaimantContactAddress',
-    'claimantContactPreferences.isCorrectClaimantContactAddress',
-  ];
-  const overriddenAddressPaths = [
-    'overriddenClaimantContactAddress',
-    'claimantContactPreferences.overriddenClaimantContactAddress',
-  ];
-
-  if (isCorrectAddressPaths.some(path => normaliseYesNo(getValue(data, path)) === 'NO')) {
-    return getFirstAddressHtml(data, overriddenAddressPaths, addressOptions);
-  }
+  const useOverriddenOnly =
+    normaliseYesNo(getValue(data, 'isCorrectClaimantContactAddress')) === 'NO' ||
+    normaliseYesNo(getValue(data, 'claimantContactPreferences.isCorrectClaimantContactAddress')) === 'NO';
 
   return (
-    collectionAddressesHtml(collectionRecords(getValue(data, 'allClaimants'))) ??
     getFirstAddressHtml(
       data,
-      [
-        'possessionClaimResponse.claimantServiceAddress',
-        'detailsTab_ClaimantAddress',
-        'casePartiesTab_ClaimantDetails.serviceAddress',
-        'organisationAddress',
-        'claimantContactPreferences.organisationAddress',
-      ],
+      useOverriddenOnly ? CLAIMANT_OVERRIDDEN_ADDRESS_PATHS : CLAIMANT_ADDRESS_PATHS,
       addressOptions
     ) ??
     formattedAddressHtml(
