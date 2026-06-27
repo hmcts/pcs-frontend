@@ -193,9 +193,7 @@ describe('viewTheClaimUtils', () => {
       '10 Second Avenue<br>London<br>W3 7RX'
     );
     expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
-      '2 Second Avenue<br>London<br>W3 7RX'
-    );
+    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBeUndefined();
     expect(rowText(sectionByTitle(page, 'Claim details'), 'Does the claimant have grounds for possession?')).toBe(
       'Yes'
     );
@@ -283,9 +281,7 @@ describe('viewTheClaimUtils', () => {
       '2 Second Avenue<br>London<br>W3 7RX'
     );
     expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
-      '2 Second Avenue<br>London<br>W3 7RX'
-    );
+    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBeUndefined();
   });
 
   it('uses casePartiesTab_ClaimantDetails.serviceAddress when detailsTab_ClaimantAddress is empty', () => {

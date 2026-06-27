@@ -322,8 +322,11 @@ export function partyAddressHtml(party: UnknownRecord | undefined, propertyAddre
     return undefined;
   }
 
+  if (normaliseYesNo(party.addressKnown) === 'NO') {
+    return '';
+  }
+
   if (
-    normaliseYesNo(party.addressKnown) === 'NO' ||
     normaliseYesNo(party.addressSameAsPossession) === 'YES' ||
     normaliseYesNo(party.addressSameAsProperty) === 'YES'
   ) {
