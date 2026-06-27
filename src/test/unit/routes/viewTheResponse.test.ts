@@ -78,6 +78,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
       },
     ] as CcdCaseData['allDefendants'],
     possessionClaimResponse: {
+      currentDefendantPartyId: 'def-1',
       claimIssuedDate: '2026-02-05',
       claimantServiceAddress: {
         AddressLine1: '1 Claimant Street',
@@ -446,10 +447,11 @@ describe('viewTheResponse route', () => {
         PostCode: 'SY13 2LH',
       },
       possessionClaimResponse: {
+        currentDefendantPartyId: 'def-1',
         defendantResponses: { disputeClaim: 'NO' },
       },
       allDefendants: [
-        { id: 'def-1', value: { firstName: 'Deepika', lastName: 'Kaleol' } },
+        { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
         { id: 'def-2', value: {} },
       ],
     } as CcdCaseData);
@@ -480,6 +482,7 @@ describe('viewTheResponse route', () => {
   it('should show persons unknown for additional defendants when name is not known', async () => {
     mockCaseById({
       possessionClaimResponse: {
+        currentDefendantPartyId: 'def-1',
         defendantResponses: { disputeClaim: 'NO' },
       },
       allDefendants: [
@@ -511,7 +514,7 @@ describe('viewTheResponse route', () => {
     ]);
   });
 
-  it('should omit the viewing defendant from additional defendant sections', async () => {
+  it('should show other co-defendants as additional defendant sections when viewer is not defendant 1 on the claim', async () => {
     mockCaseById({
       possessionClaimResponse: {
         currentDefendantPartyId: 'def-2',
@@ -536,7 +539,49 @@ describe('viewTheResponse route', () => {
       jest.fn()
     );
 
-    expect((res.render as jest.Mock).mock.calls[0][1].additionalDefendantDetails).toEqual([]);
+    const { additionalDefendantDetails } = (res.render as jest.Mock).mock.calls[0][1];
+    expect(additionalDefendantDetails).toHaveLength(1);
+    expect(additionalDefendantDetails[0].rows).toEqual([
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant1.name' },
+        value: { text: 'Jane Defendant' },
+      }),
+    ]);
+  });
+
+  it('should omit the viewing defendant from additional defendant sections', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        currentDefendantPartyId: 'def-1',
+        defendantResponses: { disputeClaim: 'NO' },
+      },
+      allDefendants: [
+        { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
+        { id: 'def-2', value: { firstName: 'Peter', lastName: 'Parker' } },
+      ],
+    } as CcdCaseData);
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
+    );
+
+    const { additionalDefendantDetails } = (res.render as jest.Mock).mock.calls[0][1];
+    expect(additionalDefendantDetails).toHaveLength(1);
+    expect(additionalDefendantDetails[0].rows).toEqual([
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant1.name' },
+        value: { text: 'Peter Parker' },
+      }),
+    ]);
   });
 
   it('should format yes/no values regardless of API casing', async () => {

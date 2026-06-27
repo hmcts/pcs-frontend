@@ -241,7 +241,6 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
   const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
 
   return defendants
-    .slice(1)
     .filter(defendant => !currentDefendantPartyId || defendant.id !== currentDefendantPartyId)
     .map((defendant, index) => {
       const party = defendant.value as AdditionalDefendantParty;
