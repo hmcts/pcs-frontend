@@ -83,5 +83,4 @@ export async function correspondenceAddressErrorValidation(): Promise<void> {
 
 export async function correspondenceAddressNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', correspondenceAddress.backLink, defendantDateOfBirth.mainHeader);
-  await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
 }

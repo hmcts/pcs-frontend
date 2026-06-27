@@ -20,5 +20,4 @@ export async function counterClaimNavigationTests(): Promise<void> {
   } else {
     await performValidation('pageNavigation', counterClaim.backLink, nonRentArrearsDispute.mainHeader);
   }
-  await performAction('clickRadioButton', counterClaim.noRadioOption);
 }
