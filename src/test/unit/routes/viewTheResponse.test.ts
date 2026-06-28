@@ -176,6 +176,11 @@ function buildComprehensiveCaseData(): CcdCaseData {
           isClaimAmountKnown: 'YES',
           claimAmount: '500000',
           estimatedMaxClaimAmount: '750000',
+          counterClaimAgainst: [{ id: 'claimant-1', value: { orgName: 'Example Claimant Ltd' } }],
+          counterClaimFor: 'Unpaid repair costs',
+          counterClaimReasons: 'The landlord did not carry out agreed repairs',
+          otherOrderRequestDetails: 'Order the claimant to pay compensation',
+          otherOrderRequestFacts: 'Repair invoices were sent on 1 January 2026',
           needHelpWithFees: 'NO',
         },
       },
@@ -375,12 +380,31 @@ describe('viewTheResponse route', () => {
     expect(renderArgs.responseToClaim.rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          key: { text: 'viewTheResponse:responseToClaim.landlordRegistered' },
+          value: { text: 'Yes' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:responseToClaim.landlordLicensed' },
+          value: { text: 'No' },
+        }),
+        expect.objectContaining({
           key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmountConfirmation' },
           value: { text: 'Yes' },
         }),
         expect.objectContaining({
           key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
           value: { text: 'Yes' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:responseToClaim.makeCounterClaim' },
+          value: { text: 'Yes' },
+        }),
+      ])
+    );
+    expect(renderArgs.responseToClaim.rows).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmount' },
         }),
       ])
     );
@@ -431,8 +455,45 @@ describe('viewTheResponse route', () => {
           value: { text: 'Yes' },
         }),
         expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.amount' },
+          value: { text: '£5000.00' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.against' },
+          value: { text: 'Example Claimant Ltd' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.for' },
+          value: { text: 'Unpaid repair costs' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.reasons' },
+          value: { text: 'The landlord did not carry out agreed repairs' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.ordersRequested' },
+          value: { text: 'Order the claimant to pay compensation' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.factsForCourt' },
+          value: { text: 'Repair invoices were sent on 1 January 2026' },
+        }),
+        expect.objectContaining({
           key: { text: 'viewTheResponse:counterclaim.needHelpWithFees' },
           value: { text: 'I do not need help paying the fee' },
+        }),
+      ])
+    );
+    expect(renderArgs.counterclaim.rows).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.estimatedMaxAmount' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.againstName' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.againstAddress' },
         }),
       ])
     );
@@ -582,6 +643,99 @@ describe('viewTheResponse route', () => {
         value: { text: 'Peter Parker' },
       }),
     ]);
+  });
+
+  it('should map counterclaim rows 3 and 4 exclusively by whether the amount is known', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'NO',
+            estimatedMaxClaimAmount: '750000',
+          },
+        },
+      },
+    });
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
+    );
+
+    const { counterclaim } = (res.render as jest.Mock).mock.calls[0][1];
+    expect(counterclaim.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.estimatedMaxAmount' },
+          value: { text: '£7500.00' },
+        }),
+      ])
+    );
+    expect(counterclaim.rows).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.amount' },
+        }),
+      ])
+    );
+  });
+
+  it('should join multiple counterclaim against parties for row 5', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'SOMETHING_ELSE',
+            counterClaimAgainst: [
+              { id: 'c1', value: { orgName: 'Claimant Org' } },
+              { id: 'd2', value: { firstName: 'Peter', lastName: 'Parker' } },
+            ],
+            counterClaimFor: 'An injunction',
+          },
+        },
+      },
+    });
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
+    );
+
+    const { counterclaim } = (res.render as jest.Mock).mock.calls[0][1];
+    expect(counterclaim.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.against' },
+          value: { text: 'Claimant Org, Peter Parker' },
+        }),
+      ])
+    );
+    expect(counterclaim.rows).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.amountKnown' },
+        }),
+      ])
+    );
   });
 
   it('should format yes/no values regardless of API casing', async () => {
