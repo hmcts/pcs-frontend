@@ -372,7 +372,12 @@ export function buildUnderlesseeTriageSection(
     textRow(
       copy.label('hasUnderlesseeOrMortgagee'),
       yesNoText(getFirstValue(data, ['hasUnderlesseeOrMortgagee'])) ??
-        yesNoText(getValue(data, 'detailsTab_MortgageOneDetails.nameKnown'))
+        yesNoText(getValue(data, 'detailsTab_MortgageOneDetails.nameKnown')) ??
+        ([firstUnderlesseeParty(data), ...additionalUnderlesseeParties(data)].some(
+          party => party && (getString(party, 'orgName') || getString(party, 'name'))
+        )
+          ? 'Yes'
+          : undefined)
     ),
   ]);
 }
