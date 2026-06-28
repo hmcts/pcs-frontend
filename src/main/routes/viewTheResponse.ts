@@ -265,11 +265,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.landlordRegistered'),
     yesNoNotSure(t, responses?.landlordRegistered)
   );
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.landlordLicensed'),
-    yesNoNotSure(t, responses?.landlordLicensed)
-  );
+  pushRow(rows, t('viewTheResponse:responseToClaim.landlordLicensed'), yesNoNotSure(t, responses?.landlordLicensed));
   pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(
     rows,
