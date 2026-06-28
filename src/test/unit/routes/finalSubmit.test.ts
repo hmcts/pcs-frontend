@@ -40,6 +40,13 @@ jest.mock('../../../main/modules/http', () => ({
   },
 }));
 
+const mockBuildDraftDefendantResponse = jest.fn(() => ({ defendantResponses: { completedSections: [] } }));
+const mockSaveDraftDefendantResponse = jest.fn().mockResolvedValue(undefined);
+jest.mock('../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
+}));
+
 import type { Application, Request, Response } from 'express';
 
 import finalSubmitRoutes from '../../../main/routes/finalSubmit';
