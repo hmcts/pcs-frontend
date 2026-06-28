@@ -377,7 +377,7 @@ export function buildUnderlesseeTriageSection(
           party => party && (getString(party, 'orgName') || getString(party, 'name'))
         )
           ? 'Yes'
-          : undefined)
+          : 'No')
     ),
   ]);
 }
