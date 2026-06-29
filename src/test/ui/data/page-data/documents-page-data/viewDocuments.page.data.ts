@@ -23,10 +23,10 @@ export const viewDocuments = {
   evidenceSubHeader: `Evidence`,
   correspondenceSubHeader: `Correspondence`,
 
-  noticeServiceJurisdictionLink: `NoticeServiceJurisdiction.docx`,
-  rentStatementLink: `RentStatement.pdf`,
-  witnessStatementLink: `WitnessStatement.png`,
-  certificateOfSuitabilityLink: `CertificateOfSuitability.xlsx`,
+  noticeServiceJurisdictionLink: `NoticeServiceJurisdiction - Claimant 1.docx`,
+  rentStatementLink: `RentStatement - Claimant 1.pdf`,
+  witnessStatementLink: `WitnessStatement - Claimant 1.png`,
+  certificateOfSuitabilityLink: `CertificateOfSuitability - Claimant 1.xlsx`,
 
   pageSlug: `view-documents`,
 };

@@ -17,7 +17,7 @@ function getCsrfToken(): string {
 }
 
 // base64url so the WAF doesn't read the JSON as SQLi; the server decodes it (HDPI-5770).
-function encodeUploadedDocument(doc: unknown): string {
+export function encodeUploadedDocument(doc: unknown): string {
   const bytes = new TextEncoder().encode(JSON.stringify(doc));
   let binary = '';
   bytes.forEach(b => (binary += String.fromCharCode(b)));
