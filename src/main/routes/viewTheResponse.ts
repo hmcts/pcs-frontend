@@ -53,10 +53,6 @@ interface AdditionalDefendantParty {
   firstName?: string;
   lastName?: string;
   nameKnown?: string;
-  addressKnown?: string;
-  addressSameAsProperty?: string;
-  address?: CcdCaseAddress | Record<string, never>;
-  dateOfBirth?: string;
 }
 
 function formatGdsDate(value: string | undefined | null): string | null {
@@ -154,6 +150,14 @@ function joinName(firstName?: string, lastName?: string): string {
   return [firstName, lastName].filter(Boolean).join(' ').trim();
 }
 
+function resolveAdditionalDefendantName(t: TFunction, party: AdditionalDefendantParty): string {
+  if (isNo(party.nameKnown)) {
+    return t('viewTheResponse:personsUnknown');
+  }
+  const name = joinName(party.firstName, party.lastName);
+  return name || t('viewTheResponse:personsUnknown');
+}
+
 function addressToString(address: CcdCaseAddress | Record<string, never> | undefined): string {
   if (!address || Object.keys(address).length === 0) {
     return '';
@@ -180,7 +184,7 @@ function buildStatementOfTruthSummary(t: TFunction, completedByName: string | un
   return {
     rows: [
       {
-        key: summaryKey(t('viewTheResponse:statementOfTruth.yourFullName')),
+        key: summaryKey(t('viewTheResponse:statementOfTruth.completedBy')),
         value: { text: completedByName?.trim() ?? '' },
       },
     ],
@@ -234,32 +238,21 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
     return [];
   }
 
-  return defendants.slice(1).map((defendant, index) => {
-    const party = defendant.value as AdditionalDefendantParty;
-    const rows: SummaryRow[] = [];
+  const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
 
-    pushRow(
-      rows,
-      t('viewTheResponse:defendant1.name'),
-      isNo(party.nameKnown) ? t('viewTheResponse:personsUnknown') : joinName(party.firstName, party.lastName)
-    );
+  return defendants
+    .filter(defendant => !currentDefendantPartyId || defendant.id !== currentDefendantPartyId)
+    .map((defendant, index) => {
+      const party = defendant.value as AdditionalDefendantParty;
+      const rows: SummaryRow[] = [];
 
-    let address = '';
-    if (isNo(party.addressKnown)) {
-      address = t('viewTheResponse:addressUnknown');
-    } else if (isYes(party.addressSameAsProperty) || !addressToString(party.address)) {
-      address = caseData.propertyAddress ? (formatAddress(caseData.propertyAddress) ?? '') : '';
-    } else {
-      address = addressToString(party.address);
-    }
-    pushRow(rows, t('viewTheResponse:defendant1.address'), address);
-    pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(party.dateOfBirth) ?? '');
+      pushRow(rows, t('viewTheResponse:defendant1.name'), resolveAdditionalDefendantName(t, party));
 
-    return {
-      sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
-      rows,
-    };
-  });
+      return {
+        sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
+        rows,
+      };
+    });
 }
 
 function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySection {
@@ -269,21 +262,31 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
   pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNo(t, caseData.isExemptLandlord));
   pushRow(
     rows,
+    t('viewTheResponse:responseToClaim.landlordRegistered'),
+    yesNoNotSure(t, responses?.landlordRegistered)
+  );
+  pushRow(rows, t('viewTheResponse:responseToClaim.landlordLicensed'), yesNoNotSure(t, responses?.landlordLicensed));
+  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
+  pushRow(
+    rows,
     t('viewTheResponse:responseToClaim.tenancyTypeConfirmation'),
     yesNoNotSure(t, responses?.tenancyTypeConfirmation)
   );
-  pushRow(rows, t('viewTheResponse:responseToClaim.tenancyType'), responses?.tenancyType);
+  if (isNo(responses?.tenancyTypeConfirmation)) {
+    pushRow(rows, t('viewTheResponse:responseToClaim.tenancyType'), responses?.tenancyType);
+  }
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.tenancyStartDateConfirmation'),
     yesNoNotSure(t, responses?.tenancyStartDateConfirmation)
   );
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.tenancyStartDate'),
-    formatGdsDate(responses?.tenancyStartDate) ?? ''
-  );
-  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
+  if (isNo(responses?.tenancyStartDateConfirmation)) {
+    pushRow(
+      rows,
+      t('viewTheResponse:responseToClaim.tenancyStartDate'),
+      formatGdsDate(responses?.tenancyStartDate) ?? ''
+    );
+  }
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
@@ -299,13 +302,18 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
     t('viewTheResponse:responseToClaim.rentArrearsAmountConfirmation'),
     yesNoNotSure(t, responses?.rentArrearsAmountConfirmation)
   );
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.rentArrearsAmount'),
-    formatMoneyAmount(responses?.rentArrearsAmount)
-  );
+  if (isNo(responses?.rentArrearsAmountConfirmation)) {
+    pushRow(
+      rows,
+      t('viewTheResponse:responseToClaim.rentArrearsAmount'),
+      formatMoneyAmount(responses?.rentArrearsAmount)
+    );
+  }
   pushRow(rows, t('viewTheResponse:responseToClaim.disputeClaim'), yesNo(t, responses?.disputeClaim));
-  pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
+  if (isYes(responses?.disputeClaim)) {
+    pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
+  }
+  pushRow(rows, t('viewTheResponse:responseToClaim.makeCounterClaim'), yesNo(t, responses?.makeCounterClaim));
   return { rows };
 }
 
@@ -540,7 +548,9 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   }
   if (cc.appliedForHwf) {
     pushRow(rows, t('viewTheResponse:counterclaim.appliedForHwf'), yesNo(t, cc.appliedForHwf));
-    pushRow(rows, t('viewTheResponse:counterclaim.hwfReference'), cc.hwfReferenceNumber);
+    if (isYes(cc.appliedForHwf)) {
+      pushRow(rows, t('viewTheResponse:counterclaim.hwfReference'), cc.hwfReferenceNumber);
+    }
   }
 
   return { rows };
