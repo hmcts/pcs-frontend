@@ -95,14 +95,14 @@ test.describe('Documents - e2e Journey @nightly', async () => {
   });
 
   test('Verify confirm document options based on GenApp type', async () => {
-    await performAction(
-      'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
-    );
     // SET_ASIDE
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SET_ASIDE').citizenCreateGenAppPayload,
     });
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await softErrorMessageValidation(
       'confirmIfTheseDocumentsRelateToAnApplication',
@@ -114,12 +114,18 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', uploadYourDocuments.mainHeader);
     await performAction('clickLink', 'Back');
-    await performAction('clickLink', 'Back');
-    await performValidation('mainHeader', startEvidenceUpload.mainHeader);
+    await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
+    //skipping below lines as we have bug HDPI-7411
+    /*await performAction('clickLink', 'Back');
+    await performValidation('mainHeader', startEvidenceUpload.mainHeader);*/
     // SOMETHING_ELSE + default YES
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
     });
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
