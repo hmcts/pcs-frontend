@@ -7413,9 +7413,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:10.5.0":
-  version: 10.5.0
-  resolution: "eslint@npm:10.5.0"
+"eslint@npm:10.6.0":
+  version: 10.6.0
+  resolution: "eslint@npm:10.6.0"
   dependencies:
     "@eslint-community/eslint-utils": "npm:^4.8.0"
     "@eslint-community/regexpp": "npm:^4.12.2"
@@ -7454,7 +7454,7 @@ __metadata:
       optional: true
   bin:
     eslint: bin/eslint.js
-  checksum: 10/28882f9b00803fca938015894d6e1ac2c80e00c1349385764f54ac4c0707c33fd0e32b678845c54ea0bc8ae04d59d7aa93d68dbd835e5e4833c65bf9b15ea91f
+  checksum: 10/36d02cdbe37668e601f255917c605d10a5d06d278648dc72cec21fe23b7b60a53453241b32c382ba8107533cacba70aeec97581cc4f4bb591544b1ada2516335
   languageName: node
   linkType: hard
 
@@ -8764,15 +8764,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:26.3.2":
-  version: 26.3.2
-  resolution: "i18next@npm:26.3.2"
+"i18next@npm:26.3.3":
+  version: 26.3.3
+  resolution: "i18next@npm:26.3.3"
   peerDependencies:
     typescript: ^5 || ^6
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/935351d4397e88dc3361dd1dde1f9282099836c4fc054a696859687a5e7293f838d2b4af8c301072a8fc3d74895544945edf247512add007aabdf3df516bdf68
+  checksum: 10/b2c3ab2629b7d3b97d14fe36b7076a361a224d201f10abdabb830e63b1d77c058451ecd1fcc49bd2f98a1241cab68e0e6fa996e2e2aaa32de11ab054c425cdf4
   languageName: node
   linkType: hard
 
@@ -11689,7 +11689,7 @@ __metadata:
     date-fns: "npm:4.4.0"
     dotenv: "npm:17.4.2"
     escape-html: "npm:1.0.3"
-    eslint: "npm:10.5.0"
+    eslint: "npm:10.6.0"
     eslint-config-prettier: "npm:10.1.8"
     eslint-import-resolver-typescript: "npm:4.4.5"
     eslint-plugin-import: "npm:2.32.0"
@@ -11704,7 +11704,7 @@ __metadata:
     html-webpack-plugin: "npm:5.6.7"
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
-    i18next: "npm:26.3.2"
+    i18next: "npm:26.3.3"
     i18next-fs-backend: "npm:2.6.6"
     i18next-http-middleware: "npm:3.9.7"
     ioredis: "npm:5.11.1"
