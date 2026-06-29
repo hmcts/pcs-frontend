@@ -1,9 +1,10 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
+import { HTTPError } from '../HttpError';
 import { findRuleForPath, logAccessDenied } from '../access-control';
 import { getUserRoles } from '../steps/utils';
 
-export const roleAccessMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
+export const roleAccessMiddleware: RequestHandler = (req: Request, _res: Response, next: NextFunction): void => {
   const matchedRule = findRuleForPath(req.path);
   if (!matchedRule) {
     return next();
@@ -25,7 +26,5 @@ export const roleAccessMiddleware: RequestHandler = (req: Request, res: Response
     rule: matchedRule,
   });
 
-  delete req.session.user;
-  delete req.session.returnTo;
-  req.session.save(() => res.redirect('/login'));
+  next(new HTTPError('Access denied', 403));
 };

@@ -50,7 +50,7 @@ describe('citizenCaseLink routes', () => {
 
   describe('GET /access-your-case', () => {
     it('should render the form', () => {
-      const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => void;
+      const handler = mockGet.mock.calls[0][mockGet.mock.calls[0].length - 1] as (req: Request, res: Response) => void;
 
       const req = {} as unknown as Request;
       const res = { render: jest.fn() } as unknown as Response;
@@ -68,7 +68,10 @@ describe('citizenCaseLink routes', () => {
 
   describe('POST /access-your-case', () => {
     it('should return 401 when no access token in session', async () => {
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         body: { claimNumber: '1234567890123456', accessCode: 'ABCD12345678' },
@@ -83,7 +86,10 @@ describe('citizenCaseLink routes', () => {
     });
 
     it('should show error when claim number is missing', async () => {
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         body: { claimNumber: '', accessCode: 'ABCD12345678' },
@@ -100,7 +106,10 @@ describe('citizenCaseLink routes', () => {
     });
 
     it('should show error when access code is missing', async () => {
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         body: { claimNumber: '1234567890123456', accessCode: '' },
@@ -117,7 +126,10 @@ describe('citizenCaseLink routes', () => {
     });
 
     it('should show error when access code length is wrong', async () => {
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         body: { claimNumber: '1234567890123456', accessCode: 'ABCD' },
@@ -138,7 +150,10 @@ describe('citizenCaseLink routes', () => {
     it('should redirect to dashboard on successful validation', async () => {
       mockValidateAccessCode.mockResolvedValueOnce({ valid: true });
 
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         body: { claimNumber: '1234567890123456', accessCode: 'ABCD12345678' },
@@ -154,7 +169,10 @@ describe('citizenCaseLink routes', () => {
     it('should strip hyphens from claim number before validating', async () => {
       mockValidateAccessCode.mockResolvedValueOnce({ valid: true });
 
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         body: { claimNumber: '1234-5678-9012-3456', accessCode: 'ABCD12345678' },
@@ -170,7 +188,10 @@ describe('citizenCaseLink routes', () => {
     it('should show field error on validation failure', async () => {
       mockValidateAccessCode.mockResolvedValueOnce({ valid: false, error: 'mismatch' });
 
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         body: { claimNumber: '1234567890123456', accessCode: 'ABCD12345678' },
@@ -189,7 +210,10 @@ describe('citizenCaseLink routes', () => {
     it('should show error when validation throws', async () => {
       mockValidateAccessCode.mockRejectedValueOnce(new Error('Network error'));
 
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         body: { claimNumber: '1234567890123456', accessCode: 'ABCD12345678' },

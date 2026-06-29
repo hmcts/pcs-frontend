@@ -1,10 +1,14 @@
 import type { Application, Request, Response } from 'express';
 
+import { requireRoles } from '../access-control';
 import { oidcMiddleware } from '../middleware/oidc';
+import { CITIZEN_USER_ROLES } from '../steps/utils/userRole';
 
 import { Logger } from '@modules/logger';
 import { type AccessCodeValidationError, validateAccessCode } from '@services/pcsApi/pcsApiService';
 import { safeRedirect303 } from '@utils/safeRedirect';
+
+const accessYourCaseGuard = requireRoles(CITIZEN_USER_ROLES, 'access-your-case');
 
 const logger = Logger.getLogger('citizenCaseLink');
 
@@ -64,11 +68,11 @@ function renderForm(res: Response, errors: FormErrors = {}, claimNumber = '', ac
 }
 
 export default function citizenCaseLinkRoutes(app: Application): void {
-  app.get('/access-your-case', oidcMiddleware, (_req: Request, res: Response) => {
+  app.get('/access-your-case', oidcMiddleware, accessYourCaseGuard, (_req: Request, res: Response) => {
     return renderForm(res);
   });
 
-  app.post('/access-your-case', oidcMiddleware, async (req: Request, res: Response) => {
+  app.post('/access-your-case', oidcMiddleware, accessYourCaseGuard, async (req: Request, res: Response) => {
     const claimNumber = typeof req.body.claimNumber === 'string' ? req.body.claimNumber.trim() : '';
     const accessCode = typeof req.body.accessCode === 'string' ? req.body.accessCode.trim() : '';
     const userAccessToken = req.session.user?.accessToken;

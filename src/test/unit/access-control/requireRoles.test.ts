@@ -6,6 +6,7 @@ jest.mock('../../../main/access-control/logging', () => ({
   logAccessDenied: (...args: unknown[]) => mockLogAccessDenied(...args),
 }));
 
+import { HTTPError } from '../../../main/HttpError';
 import { requireRoles } from '../../../main/access-control/requireRoles';
 
 interface SessionShape {
@@ -30,7 +31,7 @@ const buildReq = (
 
 describe('requireRoles', () => {
   let res: Partial<Response>;
-  let next: NextFunction;
+  let next: jest.MockedFunction<NextFunction>;
   const guard = requireRoles(['citizen'], 'test-rule');
 
   beforeEach(() => {
@@ -42,23 +43,29 @@ describe('requireRoles', () => {
   it('passes through when there is no session user (lets oidc handle login)', () => {
     const { req } = buildReq('/case/1/dashboard');
     guard(req, res as Response, next);
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
   it('allows the user when their roles include an allowed role', () => {
     const { req } = buildReq('/case/1/dashboard', { uid: 'u1', roles: ['citizen'] });
     guard(req, res as Response, next);
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
-  it('blocks the user, clears session+returnTo, and redirects to /login on denial', () => {
+  it('calls next with HTTPError 403, preserves session, and does not redirect on denial', () => {
     const { req, session } = buildReq('/case/1/dashboard', { uid: 'u1', roles: ['other'] }, '/case/1/dashboard');
     guard(req, res as Response, next);
-    expect(session.user).toBeUndefined();
-    expect(session.returnTo).toBeUndefined();
-    expect(res.redirect).toHaveBeenCalledWith('/login');
+
+    expect(session.user).toEqual({ uid: 'u1', roles: ['other'] });
+    expect(session.returnTo).toBe('/case/1/dashboard');
+    expect(res.redirect).not.toHaveBeenCalled();
+
+    const error = next.mock.calls[0][0] as unknown;
+    expect(error).toBeInstanceOf(HTTPError);
+    expect((error as HTTPError).status).toBe(403);
+
     expect(mockLogAccessDenied).toHaveBeenCalledWith(
       expect.objectContaining({
         stage: 'request',

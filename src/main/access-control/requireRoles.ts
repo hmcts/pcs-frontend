@@ -1,11 +1,12 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
+import { HTTPError } from '../HttpError';
 import { getUserRoles } from '../steps/utils';
 
 import { logAccessDenied } from './logging';
 
 export function requireRoles(allowedRoles: readonly string[], ruleName: string): RequestHandler {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     if (!req.session?.user) {
       return next();
     }
@@ -22,8 +23,6 @@ export function requireRoles(allowedRoles: readonly string[], ruleName: string):
       rule: { name: ruleName, pathPattern: /.*/, allowedRoles },
     });
 
-    delete req.session.user;
-    delete req.session.returnTo;
-    req.session.save(() => res.redirect('/login'));
+    next(new HTTPError('Access denied', 403));
   };
 }
