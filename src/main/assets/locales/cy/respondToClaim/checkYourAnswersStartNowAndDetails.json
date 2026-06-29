@@ -1,22 +1,22 @@
 {
-  "pageTitle": "cy Check your answers",
-  "cardTitle": "cy Free legal advice",
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "Cyngor cyfreithiol am ddim",
   "rows": {
     "freeLegalAdvice": {
-      "label": "cy Have you had any free legal advice?",
+      "label": "A ydych wedi cael unrhyw gyngor cyfreithiol am ddim?",
       "changeHidden": "cy free legal advice",
       "options": {
-        "YES": "cy Yes",
-        "NO": "cy No",
-        "PREFER_NOT_TO_SAY": "cy Prefer not to say"
+        "YES": "Ydy",
+        "NO": "Nac ydy",
+        "PREFER_NOT_TO_SAY": "Mae'n well gen i beidio dweud"
       }
     },
     "hasSolicitor": {
       "label": "cy Do you have a solicitor?",
       "changeHidden": "cy do you have a solicitor",
       "options": {
-        "YES": "cy Yes",
-        "NO": "cy No"
+        "YES": "Ydy",
+        "NO": "Nac ydy"
       }
     }
   }
