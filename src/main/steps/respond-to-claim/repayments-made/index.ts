@@ -88,12 +88,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: req => {
     const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
-    // TODO HDPI-5157: hardcode fallback for now, wire claimIssueDate from START callback later
-    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
+    const dateIssued = validatedCase?.dateIssued;
 
     return {
       claimantName,
-      claimIssueDate,
+      dateIssued,
     };
   },
   customTemplate: `${__dirname}/repaymentsMade.njk`,

@@ -3,7 +3,7 @@
   "cardTitle": "Payments and agreements",
   "rows": {
     "anyPaymentsMade": {
-      "label": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
+      "label": "Have you paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}?",
       "changeHidden": "payments made"
     },
     "paymentDetails": {
@@ -11,7 +11,7 @@
       "changeHidden": "payment details"
     },
     "repaymentPlanAgreed": {
-      "label": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+      "label": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}?",
       "changeHidden": "repayment agreement"
     },
     "repaymentAgreedDetails": {

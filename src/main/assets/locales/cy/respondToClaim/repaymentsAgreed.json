@@ -1,7 +1,7 @@
 {
   "pageTitle": "cyAgreements made",
-  "heading": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
-  "question": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+  "heading": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}?",
+  "question": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}?",
   "options": {
     "yes": "cyYes",
     "no": "cyNo",
@@ -11,7 +11,7 @@
   "textAreaLabel": "cyGive details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
   "textAreaHint": "cyYou can enter up to 500 characters",
   "errors": {
-    "repaymentsAgreed": "cySelect if you’ve come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}",
+    "repaymentsAgreed": "cySelect if you’ve come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}",
     "repaymentsAgreed.repaymentsAgreedDetails": "cyGive details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
     "repaymentsAgreedDetailsMaxLength": "cyRepayment agreement details must be 500 characters or less",
     "repaymentsAgreed.repaymentsAgreedDetails.invalid": "cyRepayments agreed details must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
