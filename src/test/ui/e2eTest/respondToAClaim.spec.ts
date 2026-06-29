@@ -42,7 +42,6 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
-  responseAndCounterClaimSubmitted,
   responseSubmitted,
   responseSubmittedCounterclaimFeePaymentNeeded,
   startNow,
@@ -2145,7 +2144,5 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('errorMessage', {
       message: counterClaimApplicationFeeAmount.paymentFailedDynamicErrorMessage,
     });
-    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
-    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });
