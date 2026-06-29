@@ -75,10 +75,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     detailsHeading: 'detailsHeading',
     tenancyType: 'tenancyType',
     tenancyTypeOther: 'tenancyTypeOther',
+    tenancyTypeDocumentLink: 'tenancyTypeDocumentLink'
   },
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
-  getInitialFormData: (req: Request) => {
+  getInitialFormData: async (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const existingTenancyTypeConfirmation =
       caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeConfirmation;
@@ -137,6 +138,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       '';
 
     const caseData = req.res?.locals.validatedCase?.data;
+    const tenancyDocument = (caseData?.allDocuments ?? []).filter(
+      doc => doc.value?.category_id === 'propertyDocuments'
+    )[0] ?? '';
+    //const documentLink = filteredDocuments[0]?.id ?? '';
     const walesProperty = isWalesProperty(caseData);
     const orgName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string;
     const tenancyTypeOfTenancyLicence = caseData?.tenancy_TypeOfTenancyLicence as string;
@@ -178,6 +183,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyTypeAgreementType,
       tenancyTypeConfirm,
       correctType,
+      tenancyDocument
     };
   },
 });

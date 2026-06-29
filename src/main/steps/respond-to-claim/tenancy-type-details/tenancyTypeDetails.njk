@@ -16,8 +16,13 @@
     <h1 class="govuk-heading-l">{{ heading }}</h1>
   {% endif %}
   <form method="post" action="{{ url }}" novalidate>
-    {% if insetText %}
-      {{ govukInsetText({ text: insetText }) }}
+    {% if tenancyDocument %}
+      <div class="govuk-inset-text">
+        <p class="govuk-body">{{ insetText }}</p>
+        <p class="govuk-body">
+          <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ tenancyDocument.id }}" target="_blank" rel="noopener noreferrer">{{ tenancyTypeDocumentLink }}</a>
+        </p>
+      </div>
     {% endif %}
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">{{ detailsHeading }}</p>
       <ul class="govuk-list govuk-list--bullet">
