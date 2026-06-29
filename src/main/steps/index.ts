@@ -10,6 +10,7 @@ import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
 import { getUserType } from './utils';
+import { CITIZEN_USER_ROLES, LEGAL_REPRESENTATIVE_USER_ROLES } from './utils/userRole';
 
 import type { CcdDraftEvent } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
@@ -33,6 +34,8 @@ export interface JourneyConfig {
   legalrep?: ResolvedJourneyConfig;
   // Stacked onto the journey's :caseReference param callback (see registerAllJourneys).
   routeMiddleware?: RequestHandler[];
+  // Roles permitted to access this journey.
+  requiredRoles?: readonly string[];
 }
 
 // JourneyVariant intentionally diverges from UserType ('citizen' | 'legalrep').
@@ -56,6 +59,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       stepRegistry: respondToClaimStepRegistry,
     },
     routeMiddleware: [respondToClaimAccessGuard()],
+    requiredRoles: [...CITIZEN_USER_ROLES, ...LEGAL_REPRESENTATIVE_USER_ROLES],
   },
   makeAnApplication: {
     name: 'makeAnApplication',
@@ -67,6 +71,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       flowConfig: makeAnApplicationFlowConfig,
       stepRegistry: makeAnApplicationStepRegistry,
     },
+    requiredRoles: CITIZEN_USER_ROLES,
   },
   uploadAdditionalDocuments: {
     name: 'uploadAdditionalDocuments',

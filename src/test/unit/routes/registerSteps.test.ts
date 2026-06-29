@@ -541,4 +541,42 @@ describe('registerAllJourneys', () => {
 
     expect(callOrder).toEqual(['caseRef:true', 'tracer:true', 'handler:true']);
   });
+
+  it("fails at boot when a journey's requiredRoles disagree with its accessRule", () => {
+    jest.resetModules();
+    jest.doMock('../../../main/middleware', () => ({
+      oidcMiddleware: jest.fn((req, res, next) => next()),
+      caseReferenceParamMiddleware: mockCaseReferenceParamMiddleware,
+      requireEventAccess: mockRequireEventAccess,
+      legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
+    }));
+    jest.doMock('@steps', () => ({
+      journeyRegistry: {
+        respondToClaim: {
+          name: 'respondToClaim',
+          slug: 'respond-to-claim',
+          default: {
+            flowConfig: {
+              eventId: 'respondPossessionClaim',
+              basePath: '/case/:caseReference/respond-to-claim',
+              stepOrder: [],
+              steps: {},
+            },
+            stepRegistry: {},
+          },
+          requiredRoles: ['definitely-not-the-right-role'],
+        },
+      },
+      getFlowConfigForJourney: () => ({
+        basePath: '/case/:caseReference/respond-to-claim',
+        stepOrder: [],
+        steps: {},
+      }),
+      getStepForJourney: () => undefined,
+      getStepsForJourney: () => [],
+    }));
+
+    const { registerAllJourneys } = require('../../../main/routes/registerSteps');
+    expect(() => registerAllJourneys(app)).toThrow(/Role drift for journey 'respondToClaim'/);
+  });
 });

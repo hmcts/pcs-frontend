@@ -3,8 +3,10 @@ import type { Application, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../HttpError';
+import { requireRoles } from '../access-control';
 import { MAKE_GENERAL_APPLICATION_ROUTE, UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
+import { CITIZEN_USER_ROLES } from '../steps/utils/userRole';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -128,63 +130,67 @@ export default function dashboardRoutes(app: Application): void {
   });
 
   // Route: /case/:caseReference/dashboard
-  dashboardRouter.get('/:caseReference/dashboard', async (req: Request, res: Response, next) => {
-    const rawCaseReference = req.params.caseReference;
-    const caseReference =
-      typeof rawCaseReference === 'string' || typeof rawCaseReference === 'number'
-        ? sanitiseCaseReference(rawCaseReference)
-        : null;
-    if (!caseReference) {
-      logger.error('Invalid case reference format', { caseReference: rawCaseReference });
-      return next(new HTTPError('Invalid case reference format', 404));
+  dashboardRouter.get(
+    '/:caseReference/dashboard',
+    requireRoles(CITIZEN_USER_ROLES, 'dashboard'),
+    async (req: Request, res: Response, next) => {
+      const rawCaseReference = req.params.caseReference;
+      const caseReference =
+        typeof rawCaseReference === 'string' || typeof rawCaseReference === 'number'
+          ? sanitiseCaseReference(rawCaseReference)
+          : null;
+      if (!caseReference) {
+        logger.error('Invalid case reference format', { caseReference: rawCaseReference });
+        return next(new HTTPError('Invalid case reference format', 404));
+      }
+
+      const accessToken = req.session.user?.accessToken;
+      if (!accessToken) {
+        logger.error('Dashboard: user not authenticated - no access token');
+        return next(new HTTPError('Authentication required', 401));
+      }
+
+      const dashboardCaseReference = caseReference.replace(/(\d{4})(?=\d)/g, '$1 ');
+
+      try {
+        const dashboardData = await ccdCaseService.getDashboardView(accessToken, caseReference);
+
+        const t = getTranslationFunction(req, ['dashboard', 'common']);
+
+        const notifications = dashboardData.notifications
+          .map(n => {
+            const resolved = resolveNotification(
+              t,
+              n.templateId,
+              n.templateValues as Record<string, unknown>,
+              caseReference
+            );
+            if (!resolved) {
+              logger.warn(`No dashboard translation for notification templateId=${n.templateId}`);
+            }
+            return resolved;
+          })
+          .filter((x): x is NonNullable<typeof x> => x !== null);
+
+        const taskGroups = dashboardData.taskGroups.map(tg => mapTaskGroup(tg, t, caseReference));
+
+        const propertyAddress = dashboardData.propertyAddress ?? null;
+
+        return res.render('dashboard', {
+          notifications,
+          taskGroups,
+          propertyAddress,
+          dashboardCaseReference,
+          dashboardUrl: getDashboardUrl(caseReference),
+          iWantToLinks: getIWantToLinks(caseReference),
+          helpSupportLinks: HELP_SUPPORT_LINKS,
+        });
+      } catch (e) {
+        logger.error(`Failed to fetch dashboard data for case ${caseReference}. Error was: ${String(e)}`);
+        return next(e);
+      }
     }
-
-    const accessToken = req.session.user?.accessToken;
-    if (!accessToken) {
-      logger.error('Dashboard: user not authenticated - no access token');
-      return next(new HTTPError('Authentication required', 401));
-    }
-
-    const dashboardCaseReference = caseReference.replace(/(\d{4})(?=\d)/g, '$1 ');
-
-    try {
-      const dashboardData = await ccdCaseService.getDashboardView(accessToken, caseReference);
-
-      const t = getTranslationFunction(req, ['dashboard', 'common']);
-
-      const notifications = dashboardData.notifications
-        .map(n => {
-          const resolved = resolveNotification(
-            t,
-            n.templateId,
-            n.templateValues as Record<string, unknown>,
-            caseReference
-          );
-          if (!resolved) {
-            logger.warn(`No dashboard translation for notification templateId=${n.templateId}`);
-          }
-          return resolved;
-        })
-        .filter((x): x is NonNullable<typeof x> => x !== null);
-
-      const taskGroups = dashboardData.taskGroups.map(tg => mapTaskGroup(tg, t, caseReference));
-
-      const propertyAddress = dashboardData.propertyAddress ?? null;
-
-      return res.render('dashboard', {
-        notifications,
-        taskGroups,
-        propertyAddress,
-        dashboardCaseReference,
-        dashboardUrl: getDashboardUrl(caseReference),
-        iWantToLinks: getIWantToLinks(caseReference),
-        helpSupportLinks: HELP_SUPPORT_LINKS,
-      });
-    } catch (e) {
-      logger.error(`Failed to fetch dashboard data for case ${caseReference}. Error was: ${String(e)}`);
-      return next(e);
-    }
-  });
+  );
 
   // Mount the dashboard router at /case
   app.use('/case', dashboardRouter);

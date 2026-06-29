@@ -478,6 +478,50 @@ describe('OIDCModule', () => {
           expect(session.user).toEqual(expect.objectContaining({ roles: ['caseworker-pcs-solicitor'] }));
           expect(mockResponse.redirect).toHaveBeenCalledWith('/case/1234567890123456/respond-to-claim');
         });
+
+        it('allows login through when there is no returnTo, even with no roles', async () => {
+          const { session, callbackHandler } = setupCallbackForUserinfo(
+            { sub: 'test-sub', uid: 'u7', roles: [] },
+            undefined
+          );
+          await callbackHandler(mockRequest, mockResponse, mockNext);
+
+          expect(session.user).toEqual(expect.objectContaining({ accessToken: 'test-token' }));
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/claims');
+        });
+
+        it('treats a non-array roles claim as empty and blocks gated paths', async () => {
+          const { session, callbackHandler } = setupCallbackForUserinfo(
+            { sub: 'test-sub', uid: 'u8', roles: 'citizen' as unknown as string[] },
+            '/case/1234567890123456/dashboard'
+          );
+          await callbackHandler(mockRequest, mockResponse, mockNext);
+
+          expect(session.user).toBeUndefined();
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
+        });
+
+        it('filters out non-string roles before evaluating', async () => {
+          const { session, callbackHandler } = setupCallbackForUserinfo(
+            { sub: 'test-sub', uid: 'u9', roles: [null, 42, 'citizen'] as unknown as string[] },
+            '/case/1234567890123456/dashboard'
+          );
+          await callbackHandler(mockRequest, mockResponse, mockNext);
+
+          expect(session.user).toEqual(expect.objectContaining({ accessToken: 'test-token' }));
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/case/1234567890123456/dashboard');
+        });
+
+        it('matches deep links past the gate path and blocks when role is missing', async () => {
+          const { session, callbackHandler } = setupCallbackForUserinfo(
+            { sub: 'test-sub', uid: 'u10', roles: ['caseworker-pcs-solicitor'] },
+            '/case/1234567890123456/dashboard/section-a/sub/leaf'
+          );
+          await callbackHandler(mockRequest, mockResponse, mockNext);
+
+          expect(session.user).toBeUndefined();
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
+        });
       });
 
       it('should handle token exchange errors', async () => {

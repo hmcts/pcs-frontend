@@ -14,12 +14,18 @@ import { roleAccessMiddleware } from '../../../main/middleware/roleAccess';
 
 interface SessionShape {
   user?: { uid?: string; roles?: string[] };
+  returnTo?: string;
   save: jest.Mock;
 }
 
-const buildReq = (path: string, user?: SessionShape['user']): { req: Request; session: SessionShape } => {
+const buildReq = (
+  path: string,
+  user?: SessionShape['user'],
+  returnTo?: string
+): { req: Request; session: SessionShape } => {
   const session: SessionShape = {
     user,
+    returnTo,
     save: jest.fn((cb: () => void) => cb()),
   };
   const req = { path, session } as unknown as Request;
@@ -85,6 +91,27 @@ describe('roleAccessMiddleware', () => {
 
   it('blocks a user with no matching role from make-an-application', () => {
     const { req, session } = buildReq('/case/1/make-an-application', { uid: 'u2', roles: ['some-other-role'] });
+    invoke(req);
+    expect(session.user).toBeUndefined();
+    expect(res.redirect).toHaveBeenCalledWith('/login');
+  });
+
+  it('clears stale returnTo on denial to prevent a re-auth bounce loop', () => {
+    const { req, session } = buildReq(
+      '/case/1/dashboard',
+      { uid: 'u1', roles: ['caseworker-pcs-solicitor'] },
+      '/case/1/dashboard'
+    );
+    invoke(req);
+    expect(session.returnTo).toBeUndefined();
+    expect(session.user).toBeUndefined();
+  });
+
+  it('matches deep paths past a gated route', () => {
+    const { req, session } = buildReq('/case/1/dashboard/section-a/sub/leaf', {
+      uid: 'u3',
+      roles: ['caseworker-pcs-solicitor'],
+    });
     invoke(req);
     expect(session.user).toBeUndefined();
     expect(res.redirect).toHaveBeenCalledWith('/login');

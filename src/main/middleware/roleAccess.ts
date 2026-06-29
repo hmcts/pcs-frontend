@@ -26,5 +26,6 @@ export const roleAccessMiddleware: RequestHandler = (req: Request, res: Response
   });
 
   delete req.session.user;
+  delete req.session.returnTo;
   req.session.save(() => res.redirect('/login'));
 };

@@ -1,6 +1,7 @@
 import { Application, IRouter, Request, Router } from 'express';
 import type { RequestHandler } from 'express';
 
+import { findRuleForPath, requireRoles } from '../access-control';
 import {
   caseReferenceParamMiddleware,
   legalRepresentativeHeaderMiddleware,
@@ -160,6 +161,34 @@ export function registerSteps(router: IRouter, specificJourney?: string): void {
 }
 
 /**
+ * Verify the journey's runtime requireRoles guard agrees with the URL-pattern
+ * rule used by the OAuth callback gate. If they ever drift, fail at boot.
+ */
+function assertRoleRuleAlignment(
+  journeyName: string,
+  slug: string,
+  basePath: string,
+  requiredRoles: readonly string[]
+): void {
+  const sampleUrl = basePath.replace(':caseReference', '1234567890123456');
+  const rule = findRuleForPath(sampleUrl);
+  if (!rule) {
+    throw new Error(
+      `Journey '${journeyName}' declares requiredRoles but no accessRule matches its basePath '${basePath}'. ` +
+        `Add a rule named '${slug}' in accessRules.ts, or remove requiredRoles from the journey.`
+    );
+  }
+  const a = [...rule.allowedRoles].sort();
+  const b = [...requiredRoles].sort();
+  if (a.length !== b.length || a.some((role, i) => role !== b[i])) {
+    throw new Error(
+      `Role drift for journey '${journeyName}': journey.requiredRoles=[${b.join(', ')}] but ` +
+        `accessRule '${rule.name}' allows [${a.join(', ')}]. Reconcile both before booting.`
+    );
+  }
+}
+
+/**
  * Auto-discovers and registers all journeys from the journey registry.
  * Creates a dedicated router for each journey with journey-specific middleware.
  *
@@ -187,6 +216,16 @@ export function registerAllJourneys(app: Application): void {
     // Apply journey-specific middleware
     // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
     journeyRouter.param('caseReference', caseReferenceParamMiddleware);
+
+    if (journey.requiredRoles) {
+      // Drift guard: the runtime requireRoles guard is the canonical check,
+      // but the OAuth callback still matches on URL pattern via accessRules.
+      // Fail fast at startup if the two ever disagree for this journey.
+      assertRoleRuleAlignment(journeyName, journey.slug, basePath, journey.requiredRoles);
+
+      journeyRouter.use(basePath, requireRoles(journey.requiredRoles, journey.slug));
+    }
+
     journeyRouter.use(basePath, requireEventAccess(eventId));
 
     // Stacked onto the :caseReference param callback so handlers fire after
