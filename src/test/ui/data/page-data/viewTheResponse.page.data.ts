@@ -30,11 +30,13 @@ export const viewTheResponse = {
   },
   additionalDefendant1Details: {
     Name: 'Peter Parker',
-    'Postal address': '2 Second Avenue, London, W3 7RX',
+    // The line below will be commented until the bug HDPI-7401 gets fixed
+    // 'Postal address': '2 Second Avenue, London, W3 7RX',
   },
   additionalDefendant2Details: {
     Name: 'Jen Parker',
-    'Postal address': '2 Second Avenue, London, W3 7RX',
+    // The line below will be commented until the bug HDPI-7401 gets fixed
+    // 'Postal address': '2 Second Avenue, London, W3 7RX',
   },
   responseToClaimDetails: {
     'Is the tenancy, occupation contract or licence agreement type given by the claimant correct?': 'Yes',
