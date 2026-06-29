@@ -1,25 +1,25 @@
 {
-  "pageTitle": "cyRespond to a claim",
-  "title": "cyRespond to a property possession claim online",
-  "description": "cyThere’s no fee to respond to a claim. You must respond within 14 days of receiving the claim pack in the post. </p><p class=\"govuk-body\">cyThis service is also available <a href=\"?lang=en\" class=\"govuk-link language\">in English</a>.",
+  "pageTitle": "Ymateb i hawliad",
+  "title": "Ymateb i hawliad i feddiannu eiddo ar-lein",
+  "description": "Nid oes unrhyw ffi yn daladwy i ymateb i hawliad. Mae'n rhaid i chi ymateb o fewn 14 diwrnod i chi gael y pecyn hawliad drwy'r post. </p><p class=\"govuk-body\">Mae'r gwasanaeth hwn hefyd ar gael <a href=\"?lang=en\" class=\"govuk-link language\">yn Saesneg</a>.",
   "buttons": {
-    "startNow": "cyStart now"
+    "startNow": "Dechrau nawr"
   },
-  "completingYourResponse": "cyCompleting your response",
-  "saveDraftInfo": "cyYou can save your response as a draft and return to it later. You’ll be able to review and edit your answers before you submit them.",
-  "uploadDocumentsInfo": "cyAfter you finish answering the questions, you can upload any documents to support your response.",
-  "claimantVisibilityInfo": "cyThe claimant will be able to see any documents you upload and your answers.",
+  "completingYourResponse": "Cwblhau eich ymateb",
+  "saveDraftInfo": "Gallwch gadw eich ymateb fel drafft a dychwelyd ato nes ymlaen. Byddwch yn gallu adolygu a golygu eich atebion cyn eu cyflwyno.",
+  "uploadDocumentsInfo": "Ar ôl i chi orffen ateb y cwestiynau, gallwch uwchlwytho unrhyw ddogfennau i gefnogi eich ymateb.",
+  "claimantVisibilityInfo": "Bydd yr hawlydd yn gallu gweld unrhyw ddogfennau fyddwch wedi uwchlwytho a'ch atebion.",
   "whatYouWillNeed": "cyWhat you’ll need",
-  "provideDetailsInfo": "cyYou’ll be asked to provide or confirm details, such as:",
+  "provideDetailsInfo": "Gofynnir i chi ddarparu neu gadarnhau manylion, fel:",
   "listItemName": "cyyour name",
   "listItemDateOfBirth": "cyyour date of birth",
-  "listItemDependants": "cyany dependants (people you look after financially)",
-  "listItemCircumstances": "cyyour circumstances and any exceptional hardship you’d experience if you had to leave your home",
-  "shareDetailsInfo": "cyYou can also share details about:",
-  "listItemIncomeExpenses": "cyyour income and expenses",
-  "listItemPriorityDebts": "cyany priority debts you have",
-  "financialSituationInfo": "cyYou do not have to answer questions about your financial situation, but sharing this information can help a judge understand your circumstances.",
-  "supportToUseHmctsServices": "cySupport to use HMCTS services",
-  "hmctsSupportInfo": "cyIf you need support to use HMCTS services, like step-free access to a court for your hearing, you can either request this as part of your response, or at a later time.",
-  "previousStepUrl": "cy/"
+  "listItemDependants": "unrhyw ddibynyddion (pobl rydych yn edrych ar eu hôl yn ariannol)",
+  "listItemCircumstances": "eich amgylchiadau ac unrhyw galedi eithriadol a brofir gennych os byddai'n rhaid i chi adael eich cartref",
+  "shareDetailsInfo": "Gallwch hefyd rannu manylion am:",
+  "listItemIncomeExpenses": "eich incwm a’ch costau",
+  "listItemPriorityDebts": "unrhyw ddyledion blaenoriaeth sydd gennych",
+  "financialSituationInfo": "Nid oes rhaid i chi ateb cwestiynau am eich sefyllfa ariannol, ond gall rannu'r wybodaeth hon helpu barnwr i ddeall eich amgylchiadau.",
+  "supportToUseHmctsServices": "Cymorth i ddefnyddio gwasanaethau GLlTEF",
+  "hmctsSupportInfo": "Os ydych angen cymorth i allu defnyddio gwasanaethau GLlTEF, fel mynediad heb risiau i'r llys ar gyfer eich gwrandawiad, gallwch naill ai ofyn am hyn fel rhan o'ch ymateb, neu yn ddiweddarach.",
+  "previousStepUrl": "/"
 }
