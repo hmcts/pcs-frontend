@@ -1,18 +1,17 @@
 {
   "serviceName": "cyPossession Claims",
-  "caseReferenceLabel": "cyCase number:",
-  "iWantToHeading": "cyI want to...",
-  "askCourtToMakeOrder": "cyAsk the court to make an order (make a general application)",
-  "uploadAdditionalDocuments": "cyUpload additional documents",
-  "helpAndSupportHeading": "cyHelp and support",
-  "contactInformationAriaLabel": "cySupport and contact information",
-  "helpWithFees": "cyHelp with fees",
-  "whatToExpectAtTheHearing": "cyWhat to expect at a hearing",
-  "representMyselfAtTheHearing": "cyRepresent myself at a hearing",
-  "findLegalAdvice": "cyFind legal advice",
-  "getDebtRespite": "cyGet debt respite (Breathing Space)",
-  "findInformation": "cyFind information about my court",
-
+  "caseReferenceLabel": "Rhif yr achos:",
+  "iWantToHeading": "Rwyf eisiau ...",
+  "askCourtToMakeOrder": "Gofyn i'r llys wneud gorchymyn (gwneud cais cyffredinol)",
+  "uploadAdditionalDocuments": "Uwchlwytho dogfennau ychwanegol",
+  "helpAndSupportHeading": "Cymorth a chefnogaeth",
+  "contactInformationAriaLabel": "Cymorth a gwybodaeth gyswllt",
+  "helpWithFees": "Help i dalu ffioedd",
+  "whatToExpectAtTheHearing": "Beth i’w ddisgwyl mewn gwrandawiad",
+  "representMyselfAtTheHearing": "Cynrychioli fy hun mewn gwrandawiad",
+  "findLegalAdvice": "Dod o hyd i gyngor cyfreithiol",
+  "getDebtRespite": "Cael seibiant o ddyled (Lle i Anadlu)",
+  "findInformation": "Dod o hyd i wybodaeth am fy llys",
   "taskGroups": {
     "CLAIM": "cyThe claim against you",
     "HEARING": "cyCourt hearings",
@@ -22,7 +21,6 @@
     "RESPONSE": "cyYour response",
     "APPLICATIONS": "cyApplications"
   },
-
   "notifications": {
     "Defendant": {
       "CaseIssued": {
@@ -51,7 +49,6 @@
       }
     }
   },
-
   "tasks": {
     "statuses": {
       "AVAILABLE": "cyAvailable",
@@ -59,21 +56,43 @@
       "COMPLETED": "cyCompleted",
       "NOT_STARTED": "cyNot started"
     },
-    "ViewClaim": { "title": "cyView the claim" },
-    "RespondToClaim": { "title": "cyRespond to the claim" },
-    "ViewResponse": { "title": "cyView the response" },
-    "ViewDocuments": { "title": "cyView documents" },
-    "ViewHearingDocuments": { "title": "cyView hearing documents" },
-    "ViewOrdersAndNotices": { "title": "cyView orders and notices" },
-    "UploadDocuments": { "title": "cyUpload additional documents" },
-    "ReviewResponse": { "title": "cyReview the response" },
-    "SubmitResponse": { "title": "cySubmit the response" },
-    "MakeGeneralApplication": { "title": "cyAsk the court to make an order (make a general application)" },
-    "ViewAllApplications": { "title": "cyView all applications" }
+    "ViewClaim": {
+      "title": "Gweld yr hawliad"
+    },
+    "RespondToClaim": {
+      "title": "cyRespond to the claim"
+    },
+    "ViewResponse": {
+      "title": "Gweld yr ymateb"
+    },
+    "ViewDocuments": {
+      "title": "Gweld y dogfennau"
+    },
+    "ViewHearingDocuments": {
+      "title": "cyView hearing documents"
+    },
+    "ViewOrdersAndNotices": {
+      "title": "cyView orders and notices"
+    },
+    "UploadDocuments": {
+      "title": "Uwchlwytho dogfennau ychwanegol"
+    },
+    "ReviewResponse": {
+      "title": "cyReview the response"
+    },
+    "SubmitResponse": {
+      "title": "cySubmit the response"
+    },
+    "MakeGeneralApplication": {
+      "title": "Gofyn i'r llys wneud gorchymyn (gwneud cais cyffredinol)"
+    },
+    "ViewAllApplications": {
+      "title": "cyView all applications"
+    }
   },
 
   "viewDocuments": {
-    "pageTitle": "cyView documents",
+    "pageTitle": "Gweld y dogfennau",
     "noDocuments": "cyThere are no documents to display.",
     "submittedOn": "cySubmitted on",
     "folders": {
