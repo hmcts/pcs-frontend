@@ -96,6 +96,22 @@
   border-bottom: 3px solid govuk-colour('blue');
 }
 
+// Document list seperator: mirror the govuk-summary-list row border for each doc listed.
+.pcs-document-list__item {
+  padding-top: govuk-spacing(3);
+  padding-bottom: govuk-spacing(3);
+  border-bottom: 1px solid $govuk-border-colour;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+}
+
 // Task-list status tags: pinned to the Figma palette, bold per the design.
 .pcs-task-list {
   .govuk-tag {
