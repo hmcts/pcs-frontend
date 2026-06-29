@@ -1,25 +1,24 @@
 {
-  "pageTitle": "cyContact preference",
-  "title": "cyContact preference",
+  "pageTitle": "Dewisiadau cyswllt",
+  "title": "Dewisiadau cyswllt",
   "content": "<p class=\"govuk-body\">cyImportant documents like orders will always be sent by post.</p><p class=\"govuk-body\"> cyYou can choose to receive updates about your case by post or email. For example, when a hearing has been scheduled or a document is ready to view online.</p>",
-
   "labels": {
-    "question": "cyHow do you want to receive updates?",
+    "question": "Sut ydych chi eisiau cael diweddariadau?",
     "options": {
-      "byEmail": "cyBy email",
-      "byPost": "cyBy post"
+      "byEmail": "Trwy e-bost",
+      "byPost": "Trwy’r post"
     },
-    "emailLabel": "cyEnter email address"
+    "emailLabel": "Nodwch gyfeiriad e-bost"
   },
   "buttons": {
-    "saveAndContinue": "cySave and continue",
-    "saveForLater": "cySave for later"
+    "saveAndContinue": "Cadw a pharhau",
+    "saveForLater": "Cadw at hwyrach ymlaen"
   },
   "errors": {
-    "contactByEmailOrPost": "cySelect how you want to receive updates",
+    "contactByEmailOrPost": "Dewiswch sut ydych chi eisiau cael diweddariadau",
     "email": {
-      "required": "cyEnter your email address"
+      "required": "Nodwch eich cyfeiriad e-bost"
     },
-    "contactByEmailOrPost.email.invalid": "cyEnter an email address in the correct format, like name@example.com"
+    "contactByEmailOrPost.email.invalid": "Rhowch gyfeiriad e-bost yn y fformat cywir, er enghraifft enw@enghraifft.com"
   }
 }
