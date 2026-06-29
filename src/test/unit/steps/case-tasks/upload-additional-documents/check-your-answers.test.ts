@@ -71,6 +71,33 @@ beforeEach(() => {
   }
 });
 
+describe('upload-additional-documents check-your-answers GET viewmodel', () => {
+  const buildViewmodel = (req: Request) => {
+    const fn = (
+      step as unknown as { getController: () => (req: Request) => Promise<Record<string, unknown>> }
+    ).getController();
+    return fn(req);
+  };
+
+  it('sets hasRelatedApplication=true when the confirm step has form data', async () => {
+    mockGetFormData.mockReturnValue({ relatedApplicationId: 'app-1', relatedApplicationText: 'App one' });
+
+    const vm = await buildViewmodel(buildReq());
+
+    expect(vm.hasRelatedApplication).toBe(true);
+    expect(vm.relatedApplicationText).toBe('App one');
+  });
+
+  it('sets hasRelatedApplication=false when the confirm step was skipped (no genApps)', async () => {
+    mockGetFormData.mockReturnValue(undefined);
+
+    const vm = await buildViewmodel(buildReq());
+
+    expect(vm.hasRelatedApplication).toBe(false);
+    expect(vm.relatedApplicationText).toBe('');
+  });
+});
+
 describe('upload-additional-documents check-your-answers POST', () => {
   it('omits selectedRelatedApplicationId when the sentinel was chosen', async () => {
     mockGetFormData.mockReturnValue({ relatedApplicationId: 'MAIN_CLAIM_OR_COUNTERCLAIM' });
