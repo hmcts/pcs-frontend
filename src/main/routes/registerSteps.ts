@@ -178,8 +178,8 @@ function assertRoleRuleAlignment(
         `Add a rule named '${slug}' in accessRules.ts, or remove requiredRoles from the journey.`
     );
   }
-  const a = [...rule.allowedRoles].sort();
-  const b = [...requiredRoles].sort();
+  const a = [...rule.allowedRoles].sort((x, y) => x.localeCompare(y));
+  const b = [...requiredRoles].sort((x, y) => x.localeCompare(y));
   if (a.length !== b.length || a.some((role, i) => role !== b[i])) {
     throw new Error(
       `Role drift for journey '${journeyName}': journey.requiredRoles=[${b.join(', ')}] but ` +
