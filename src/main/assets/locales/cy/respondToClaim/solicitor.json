@@ -3,8 +3,8 @@
   "heading": "cyDo you have a solicitor?",
   "question": "cyDo you have a solicitor?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
   "errors": {
     "hasSolicitor": "cySelect if you have a solicitor"

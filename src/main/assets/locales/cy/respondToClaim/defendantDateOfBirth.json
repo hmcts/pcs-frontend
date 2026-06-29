@@ -1,18 +1,18 @@
 {
-  "pageTitle": "cyYour date of birth",
-  "dateOfBirthHint": "cyFor example, 31 3 1980",
-  "dateOfBirthLabel": "cyWhat’s your date of birth? (Optional)",
+  "pageTitle": "Eich dyddiad geni",
+  "dateOfBirthHint": "Er enghraifft, 31 3 1980",
+  "dateOfBirthLabel": "Beth yw eich dyddiad geni? (Dewisol)",
   "errors": {
     "date": {
-      "day": "cyDay",
-      "month": "cyMonth",
-      "year": "cyYear",
-      "required": "cyEnter your date of birth",
-      "notRealDate": "cyDate of birth must be a real date",
-      "futureDate": "cyDate of birth must be in the past",
-      "invalidValue": "cyDate of birth must be a real date",
-      "missingOne": "cyYour date of birth must include a {{missingField}}",
-      "missingTwo": "cyYour date of birth must include a {{first}} and {{second}}"
+      "day": "Diwrnod",
+      "month": "Mis",
+      "year": "Blwyddyn",
+      "required": "Nodwch eich dyddiad geni",
+      "notRealDate": "Rhaid i’r dyddiad geni fod yn ddyddiad dilys",
+      "futureDate": "Rhaid i’r dyddiad geni fod yn y gorffennol",
+      "invalidValue": "Rhaid i’r dyddiad geni fod yn ddyddiad dilys",
+      "missingOne": "Rhaid i’ch dyddiad geni gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i’ch dyddiad geni gynnwys {{first}} ac {{second}}"
     }
   }
 }

@@ -1,72 +1,72 @@
 {
-  "pageTitle": "cyCheck your answers",
-  "caption": "cyMake an application",
-  "heading": "cyCheck your answers",
+  "pageTitle": "Gwirio eich atebion",
+  "caption": "Gwneud cais",
+  "heading": "Gwirio eich atebion",
   "buttons": {
-    "submit": "cySubmit",
+    "submit": "Cyflwyno",
     "continueToPayment": "cyContinue to payment"
   },
   "answers": {
     "typeOfApplication": {
-      "label": "cyWhat do you want to apply for?",
+      "label": "Beth ydych chi eisiau gwneud cais amdano?",
       "changeHint": "cyChange what you want to apply for",
       "options": {
-        "ADJOURN": "cyAsk to adjourn the hearing (move it to a later time or date)",
-        "SET_ASIDE": "cyAsk the court to set aside (cancel) a decision the court has made",
-        "SOMETHING_ELSE": "cySomething else"
+        "ADJOURN": "Gofyn i ohirio'r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
+        "SET_ASIDE": "Gofyn i'r llys roi penderfyniad a wnaed gan y llys o'r neilltu (canslo)",
+        "SOMETHING_ELSE": "Rhywbeth arall"
       }
     },
     "hearingInNext14Days": {
-      "label": "cyIs the court hearing in the next 14 days?",
-      "changeHint": "cyChange whether the court hearing is in the next 14 days"
+      "label": "A yw'r gwrandawiad llys yn ystod yr 14 diwrnod nesaf?",
+      "changeHint": "Newid a yw'r gwrandawiad llys yn ystod yr 14 diwrnod nesaf"
     },
     "helpWithFeesNeeded": {
-      "label": "cyDo you need help paying the fee for this application?",
-      "changeHint": "cyChange whether you need help paying the fee for this application",
+      "label": "A ydych angen help i dalu’r ffi am wneud y cais hwn?",
+      "changeHint": "Newid a ydych angen help i dalu’r ffi am wneud y cais hwn",
       "options": {
-        "yes": "cyI need help paying the fee",
-        "no": "cyI do not need help paying the fee"
+        "yes": "Rwyf angen help i dalu’r ffi",
+        "no": "Nid wyf angen help i dalu’r ffi"
       }
     },
     "alreadyAppliedForHwf": {
-      "label": "cyHave you already applied for help with your application fee?",
-      "changeHint": "cyChange whether you have already applied for help with your application fee"
+      "label": "A ydych chi eisoes wedi gwneud cais am help i dalu ffi’r cais?",
+      "changeHint": "Newid a ydych chi eisoes wedi gwneud cais am help i dalu ffi’r cais"
     },
     "hwfReference": {
       "label": "cyWhat is your Help with Fees reference number?",
-      "changeHint": "cyChange your Help with Fees reference number"
+      "changeHint": "Newid eich cyfeirnod Help i Dalu Ffioedd"
     },
     "uploadedDocuments": {
-      "label": "cyUpload documents",
+      "label": "Uwchlwytho dogfennau",
       "changeHint": "cyChange uploaded documents"
     },
     "otherPartiesAgreed": {
-      "label": "cyHave the other parties agreed to this application?",
-      "changeHint": "cyChange whether the other parties have agreed to this application"
+      "label": "A yw'r partïon eraill wedi cydsynio i'r cais hwn?",
+      "changeHint": "Newid a yw'r partïon eraill wedi cydsynio i'r cais hwn"
     },
     "anyReasonNotToShare": {
-      "label": "cyAre there any reasons that this application should not be shared with the other parties?",
-      "changeHint": "cyChange whether there are any reasons that this application should not be shared with the other parties"
+      "label": "A oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill?",
+      "changeHint": "Newid a oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill"
     },
     "reasonForNotSharing": {
-      "label": "cyProvide a reason this application should not be shared with the other party",
-      "changeHint": "cyChange the reason this application should not be shared with the other party"
+      "label": "Rhowch reswm pam na ddylid rhannu'r cais hwn gyda'r parti arall",
+      "changeHint": "Newid y rheswm pam na ddylid rhannu'r cais hwn gyda'r parti arall"
     },
     "whatOrderWanted": {
-      "label": "cyWhat order do you want the court to make and why?",
+      "label": "Pa orchymyn ydych chi eisiau i’r llys ei wneud, a pham?",
       "changeHint": "cyChange what order do you want the court to make and why"
     },
     "hasSupportingDocuments": {
-      "label": "cyDo you want to upload documents to support your application?",
+      "label": "Ydych chi eisiau uwchlwytho dogfennau i gefnogi eich cais?",
       "changeHint": "cyChange whether you want to upload documents to support your application"
     },
     "whichLanguage": {
-      "label": "cyWhich language did you use to complete this service?",
-      "changeHint": "cyChange which language you used to complete this service",
+      "label": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?",
+      "changeHint": "Newid pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn",
       "options": {
-        "ENGLISH": "cyEnglish",
-        "WELSH": "cyWelsh",
-        "ENGLISH_AND_WELSH": "cyEnglish and Welsh"
+        "ENGLISH": "Saesneg",
+        "WELSH": "Cymraeg",
+        "ENGLISH_AND_WELSH": "Saesneg a Cymraeg"
       }
     }
   },
@@ -78,7 +78,7 @@
       "fieldLabel": "cyStatement of truth",
       "value": "cyI believe that the facts stated in this form are true."
     },
-    "understandProceedings": "cyI understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
+    "understandProceedings": "Deallaf y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir.",
     "yourFullName": "cyYour full name"
   },
   "errors": {
