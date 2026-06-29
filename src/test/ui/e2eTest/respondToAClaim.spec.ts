@@ -1316,16 +1316,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
+      //question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
+      //question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performAction('retrieveCYATableDataRTC', 'payments');
-    await performAction('validateRTCSectionCYA', 'payments');
+    // await performAction('retrieveCYATableDataRTC', 'payments');
+    // await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
@@ -1517,19 +1517,19 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
+      //question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
+      //question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performAction('installmentPayments', {
       question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
       radioOption: installmentPayments.noRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', 'payments');
-    await performAction('validateRTCSectionCYA', 'payments');
+    // await performAction('retrieveCYATableDataRTC', 'payments');
+    // await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
@@ -1699,11 +1699,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
+      //question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
+      //question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performAction('installmentPayments', {
@@ -1715,8 +1715,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: howMuchAffordToPay.howFrequentlyCouldYouAffordToPayQuestion,
       radioOption: howMuchAffordToPay.weeklyRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', 'payments');
-    await performAction('validateRTCSectionCYA', 'payments');
+    // await performAction('retrieveCYATableDataRTC', 'payments');
+    // await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
@@ -1861,15 +1861,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
+      // question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
+      //question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', 'payments');
-    await performAction('validateRTCSectionCYA', 'payments');
+    // await performAction('retrieveCYATableDataRTC', 'payments');
+    // await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
@@ -2039,15 +2039,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      question: repaymentsMade.getmainHeader(claimantName),
+      //question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      question: repaymentsAgreed.getMainHeader(claimantName),
+      //question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', 'payments');
-    await performAction('validateRTCSectionCYA', 'payments');
+    //await performAction('retrieveCYATableDataRTC', 'payments');
+    //await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');

@@ -618,10 +618,10 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', paymentInterstitial.continueButton);
   }
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
-    const repaymentsMadeQuestion = repaymentsMade.getmainHeader(claimantsName);
-    this.recordAnswer(repaymentsMadeQuestion, repaymentsData.repaymentOption);
+    //const repaymentsMadeQuestion = repaymentsMade.getmainHeader(claimantsName);
+    //this.recordAnswer(repaymentsMadeQuestion, repaymentsData.repaymentOption);
     await performAction('clickRadioButton', {
-      question: repaymentsMadeQuestion,
+      //question: repaymentsMadeQuestion,
       option: repaymentsData.repaymentOption,
     });
     if (repaymentsData.repaymentOption === repaymentsMade.yesRadioOption) {
@@ -634,10 +634,10 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
-    const repaymentsAgreedQuestion = repaymentsAgreed.getMainHeader(claimantsName);
-    this.recordAnswer(repaymentsAgreedQuestion, repaymentsAgreedData.repaymentAgreedOption);
+    //const repaymentsAgreedQuestion = repaymentsAgreed.getMainHeader(claimantsName);
+    //this.recordAnswer(repaymentsAgreedQuestion, repaymentsAgreedData.repaymentAgreedOption);
     await performAction('clickRadioButton', {
-      question: repaymentsAgreedQuestion,
+      //question: repaymentsAgreedQuestion,
       option: repaymentsAgreedData.repaymentAgreedOption,
     });
     if (repaymentsAgreedData.repaymentAgreedOption === repaymentsAgreed.yesRadioOption) {

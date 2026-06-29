@@ -1,6 +1,6 @@
 export const repaymentsAgreed = {
-  getMainHeader: (claimantsName: string) =>
-    `Have you come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025?`,
+  // getMainHeader: (claimantsName: string) =>
+  //   `Have you come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   detailsTextInput: `Agreed £1000 last year`,

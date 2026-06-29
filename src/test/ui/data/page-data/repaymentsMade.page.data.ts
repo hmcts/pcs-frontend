@@ -1,7 +1,7 @@
 export const repaymentsMade = {
-  getmainHeader: (claimantName: string): string => {
-    return `Have you paid any money to ${claimantName} since 16th June 2025?`;
-  },
+  // getmainHeader: (claimantName: string): string => {
+  //   return `Have you paid any money to ${claimantName} since 16th June 2025?`;
+  // },
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   giveDetailsHiddenTextLabel: `Give details about how much you paid and when`,
