@@ -38,23 +38,24 @@ test.afterEach(async () => {
 });
 
 test.describe('Documents - e2e Journey @nightly', async () => {
-  test('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
+  // The test below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
+  test.skip('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    // The lines below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
-    /*await performAction('verifyDocumentRelatesToApplication', {
+    await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden,
-    });*/
+    });
     await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
 
-  test('Upload documents when GenApps not submitted @regression', async () => {
+  // The test below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
+  test.skip('Upload documents when GenApps not submitted @regression', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
@@ -65,8 +66,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
 
-  // Below test is temporarily skipped until we receive confirmation on why `noticeServiceJurisdictionLink` is appearing under the Property Documents category instead of the Statements of Case category.
-  test.skip('View documents submitted through make a claim @regression', async () => {
+  test('View documents submitted through make a claim @regression', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
     await performAction('validateViewDocuments', {
       caseNumber: viewDocuments.getCaseNumber(),
