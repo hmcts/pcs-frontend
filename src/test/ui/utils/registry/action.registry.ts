@@ -48,6 +48,7 @@ export class ActionRegistry {
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
     ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
+    ['updatePaymentAPI', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
 
