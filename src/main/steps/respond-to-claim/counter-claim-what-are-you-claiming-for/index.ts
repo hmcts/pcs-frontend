@@ -1,8 +1,8 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import type { CcdCounterClaim } from '@services/ccdCase.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CcdCounterClaim } from '@services/ccdCase.interface';
 
 function clearCounterClaimMoneyFields(counterClaim: CcdCounterClaim): void {
   delete counterClaim.isClaimAmountKnown;
