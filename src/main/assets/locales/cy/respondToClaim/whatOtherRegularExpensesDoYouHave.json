@@ -1,101 +1,101 @@
 {
-  "pageTitle": "cyRegular expenses",
-  "heading": "cyWhat other regular expenses do you have? (Optional)",
-  "hintText": "cySelect all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.",
+  "pageTitle": "Costau rheolaidd",
+  "heading": "Pa gostau rheolaidd eraill sydd gennych? (Dewisol)",
+  "hintText": "Dewiswch bopeth sy'n berthnasol. Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148.00 neu £148.50. Rhaid i’r wybodaeth a ddarperir gennych fod yn wir ac yn gywir.",
   "options": {
-    "householdBills": "cyHousehold bills (for example, council tax, gas, electricity, water, internet)",
-    "loanPayments": "cyLoan payments",
-    "childSpousalMaintenance": "cyChild or spousal maintenance",
-    "mobilePhone": "cyMobile phone",
-    "groceryShopping": "cyGrocery shopping",
-    "fuelParkingTransport": "cyFuel, parking and transport",
-    "schoolCosts": "cySchool costs (for example, uniform and school dinners)",
-    "clothing": "cyClothing",
-    "otherExpenses": "cyOther"
+    "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+    "loanPayments": "Taliadau benthyciadau",
+    "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/gwraig",
+    "mobilePhone": "Ffôn symudol",
+    "groceryShopping": "Siopa bwyd",
+    "fuelParkingTransport": "Tanwydd, parcio a chludiant",
+    "schoolCosts": "Costau ysgol (er enghraifft, gwisg a chinio ysgol)",
+    "clothing": "Dillad",
+    "otherExpenses": "Arall"
   },
   "subFields": {
-    "amount": "cyAmount paid",
-    "frequency": "cyPaid every:"
+    "amount": "Swm a dalwyd",
+    "frequency": "Ei dalu:"
   },
   "frequency": {
-    "week": "cyWeek",
-    "month": "cyMonth"
+    "week": "Pob wythnos",
+    "month": "Mis"
   },
   "errors": {
     "householdBillsAmount": {
-      "required": "cyEnter the amount you pay for household bills",
-      "negative": "cyThe amount you pay for household bills each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount you pay for household bills each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn talu am filiau'r cartref",
+      "negative": "Rhaid i'r swm a delir gennych am filiau'r cartref bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gennych am filiau'r cartref bob wythnos neu bob mis fod yn llai na -£1 biliwn"
     },
     "householdBillsFrequency": {
-      "required": "cySelect how frequently you pay household bills"
+      "required": "Dewiswch pa mor aml ydych chi'n talu biliau'r cartref"
     },
     "loanPaymentsAmount": {
-      "required": "cyEnter the amount you pay for loan payments",
-      "negative": "cyThe amount you pay for loan payments each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount you pay for loan payments each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn talu am daliadau benthyciadau",
+      "negative": "Rhaid i'r swm a delir am daliadau benthyciadau bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir am daliadau benthyciadau bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "loanPaymentsFrequency": {
-      "required": "cySelect how frequently you pay loan payments"
+      "required": "Dewiswch pa mor aml ydych chi'n gwneud taliadau benthyciadau"
     },
     "childSpousalMaintenanceAmount": {
-      "required": "cyEnter the amount you pay for child or spousal maintenance",
-      "negative": "cyThe amount you pay for child or spousal maintenance each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount you pay for child or spousal maintenance each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn talu am gynhaliaeth plant neu ŵr/gwraig",
+      "negative": "Rhaid i'r swm a delir gennych am gynhaliaeth plant neu ŵr/gwraig bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gennych am gynhaliaeth plant neu ŵr/gwraig bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "childSpousalMaintenanceFrequency": {
-      "required": "cySelect how frequently you pay child or spousal maintenance"
+      "required": "Dewiswch pa mor aml ydych chi'n talu cynhaliaeth plant neu ŵr/gwraig"
     },
     "mobilePhoneAmount": {
-      "required": "cyEnter the amount you pay for a mobile phone",
-      "negative": "cyThe amount you pay for a mobile phone each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount you pay for a mobile phone each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn talu am ffôn symudol",
+      "negative": "Rhaid i'r swm a delir gennych am ffôn symudol bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gennych am ffôn symudol bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "mobilePhoneFrequency": {
-      "required": "cySelect how frequently you pay for a mobile phone"
+      "required": "Dewiswch pa mor aml ydych chi’n talu am ffôn symudol"
     },
     "groceryShoppingAmount": {
-      "required": "cyEnter the amount you pay for grocery shopping",
-      "negative": "cyThe amount you pay for grocery shopping each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount you pay for grocery shopping each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn talu am siopa bwyd",
+      "negative": "Rhaid i'r swm a delir gennych am siopa bwyd bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gennych am siopa bwyd bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "groceryShoppingFrequency": {
-      "required": "cySelect how frequently you pay for grocery shopping"
+      "required": "Dewiswch pa mor aml ydych chi’n talu am siopa bwyd"
     },
     "fuelParkingTransportAmount": {
-      "required": "cyEnter the amount you pay for fuel, parking and transport",
-      "negative": "cyThe amount you pay for fuel, parking and transport each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount you pay for fuel, parking and transport each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn talu am danwydd, parcio a chludiant",
+      "negative": "Rhaid i'r swm a delir gennych am danwydd, parcio a chludiant bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gennych am danwydd, parcio a chludiant bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "fuelParkingTransportFrequency": {
-      "required": "cySelect how frequently you pay for fuel, parking and transport"
+      "required": "Dewiswch pa mor aml ydych chi’n talu am danwydd, parcio a chludiant"
     },
     "schoolCostsAmount": {
-      "required": "cyEnter the amount you pay for school costs",
-      "negative": "cyThe amount you pay for school costs each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount you pay for school costs each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn talu am gostau ysgol",
+      "negative": "Rhaid i'r swm a delir gennych am gostau ysgol bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gennych am gostau ysgol bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "schoolCostsFrequency": {
-      "required": "cySelect how frequently you pay school costs"
+      "required": "Dewiswch pa mor aml ydych chi'n talu costau ysgol"
     },
     "clothingAmount": {
-      "required": "cyEnter the amount you pay for clothing",
-      "negative": "cyThe amount you pay for clothing each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount you pay for clothing each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn talu am ddillad",
+      "negative": "Rhaid i'r swm a delir gennych am ddillad bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gennych am ddillad bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "clothingFrequency": {
-      "required": "cySelect how frequently you pay for clothing"
+      "required": "Dewiswch pa mor aml ydych chi’n talu am ddillad"
     },
     "otherExpensesAmount": {
-      "required": "cyEnter the amount you pay for other regular expenses",
-      "negative": "cyThe amount you pay for other expenses each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount you pay for other expenses each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn talu am gostau rheolaidd eraill",
+      "negative": "Rhaid i'r swm a delir gennych am gostau eraill bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gennych am gostau eraill bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "otherExpensesFrequency": {
-      "required": "cySelect how frequently you pay for other expenses"
+      "required": "Dewiswch pa mor aml ydych chi’n talu am unrhyw gostau eraill"
     },
     "amount": {
-      "invalidFormat": "cyEnter an amount in the correct format, for example 148.00 or 148.50"
+      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
     }
   }
 }
