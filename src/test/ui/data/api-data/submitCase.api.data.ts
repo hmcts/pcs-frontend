@@ -162,11 +162,11 @@ export const submitCaseApiData = {
           value: {
             documentType: {
               value: {
-                code: '9f510aa7-68c5-430f-947f-201e207c1aa9',
-                label: 'Possession notice',
+                code: 'c0dab8bc-9264-4814-af67-b363af60c646',
+                label: 'Notice for service out of the jurisdiction',
               },
-              valueCode: '9f510aa7-68c5-430f-947f-201e207c1aa9',
-              valueLabel: 'Possession notice',
+              valueCode: 'c0dab8bc-9264-4814-af67-b363af60c646',
+              valueLabel: 'Notice for service out of the jurisdiction',
             },
             description: 'Notice Document',
             document: {
