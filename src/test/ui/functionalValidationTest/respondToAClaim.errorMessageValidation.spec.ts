@@ -375,7 +375,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('repaymentsAgreed', repaymentsAgreedErrorValidation);
     await performAction('repaymentsAgreed', {
-     // question: repaymentsAgreed.getMainHeader(claimantName),
+      // question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
