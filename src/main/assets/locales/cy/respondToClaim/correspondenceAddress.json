@@ -1,35 +1,37 @@
 {
-  "pageTitle": "cyYour postal address",
-  "legend": "cyIs your postal address {{ formattedAddressStr }}",
-  "legend.hint": "cyThis is the address provided by {{claimantName}}",
+  "pageTitle": "Eich cyfeiriad post",
+  "legend": "Ai dyma yw eich cyfeiriad ar gyfer anfon gohebiaeth {{ formattedAddressStr }}",
+  "legendNa": "Beth yw eich cyfeiriad ar gyfer gohebiaeth?",
+  "legend.hint": "Dyma’r cyfeiriad a ddarparwyd gan {{claimantName}}",
+  "legend.hintNa": "Eich cyfeiriad gohebiaeth yw eich cyfeiriad post.",
   "labels": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "enterAddress": "cyEnter postal address",
-    "enterPostcode": "cyEnter a UK postcode",
-    "enterManually": "cyEnter an address manually",
-    "enterManuallySubText": "cyYou can enter your address details in the fields below.",
-    "selectAddress": "cySelect an address",
-    "selectAddressLabel": "cySelect an address",
-    "addressHeading": "cyWhat’s your postal address?",
-    "addressLine1": "cyAddress line 1",
-    "addressLine2": "cyAddress line 2 (optional)",
-    "townOrCity": "cyTown or city",
-    "county": "cyCounty (optional)",
-    "postcode": "cyPostcode"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "enterAddress": "Rhowch gyfeiriad gohebiaeth",
+    "enterPostcode": "Nodwch god post yn y DU",
+    "enterManually": "Teipiwch gyfeiriad â llaw",
+    "enterManuallySubText": "Gallwch roi eich manylion cyfeiriad yn y blychau isod.",
+    "selectAddress": "Dewiswch gyfeiriad",
+    "selectAddressLabel": "Dewiswch gyfeiriad",
+    "addressHeading": "Beth yw eich cyfeiriad ar gyfer gohebiaeth?",
+    "addressLine1": "Llinell cyfeiriad 1",
+    "addressLine2": "Llinell cyfeiriad 2 (dewisol)",
+    "townOrCity": "Tref neu ddinas",
+    "county": "Sir (dewisol)",
+    "postcode": "Cod post"
   },
   "buttons": {
-    "findAddress": "cyFind address",
-    "saveAndContinue": "cySave and continue",
-    "saveForLater": "cySave for later"
+    "findAddress": "Dod o hyd i gyfeiriad",
+    "saveAndContinue": "Cadw a pharhau",
+    "saveForLater": "Cadw at hwyrach ymlaen"
   },
   "errors": {
-    "lookupPostcode": "cyEnter a valid UK postcode",
-    "postcodeNotFound": "cyPostcode not found. Please check and try again.",
-    "selectAddress": "cyPlease select an address",
-    "correspondenceAddressConfirm": "cyPlease confirm your address by selecting the options below",
-    "correspondenceAddressConfirm.addressLine1": "cyEnter address line 1, typically the building and street",
+    "lookupPostcode": "Nodwch god post dilys yn y DU",
+    "postcodeNotFound": "Heb ddod o hyd i god post. Gwiriwch y manylion a rhowch gynnig arall arni.",
+    "selectAddress": "Dewiswch gyfeiriad",
+    "correspondenceAddressConfirm": "Cadarnhewch eich cyfeiriad drwy ddewis yr opsiynau isod",
+    "correspondenceAddressConfirm.addressLine1": "Rhowch linell cyfeiriad 1, fel arfer yr adeilad a'r stryd",
     "correspondenceAddressConfirm.townOrCity": "cyEnter town or city",
-    "correspondenceAddressConfirm.postcode": "cyEnter a valid UK postcode"
+    "correspondenceAddressConfirm.postcode": "Nodwch god post dilys yn y DU"
   }
 }
