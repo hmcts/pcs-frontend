@@ -21,6 +21,5 @@ export async function priorityDebtsNavigationTests(): Promise<void> {
     await performValidation('pageNavigation', priorityDebts.backLink, haveYouAppliedForUniversalCredit.mainHeader);
   }
   await performAction('clickRadioButton', priorityDebts.noRadioOption);
-  await performValidation('pageNavigation', priorityDebts.saveForLaterButton, dashboard.mainHeader);
 }
  */

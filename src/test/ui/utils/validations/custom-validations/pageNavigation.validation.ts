@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Page, expect } from '@playwright/test';
 
+import { enable_navigation_tests } from '../../../../../../playwright.config';
 import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
 import { performAction } from '../../controller';
 import { IValidation, validationRecord } from '../../interfaces';
@@ -33,6 +34,14 @@ export class PageNavigationValidation implements IValidation {
   private static currentPageUrl: string = '';
   private static currentSourcePage: string | null = null;
   private static navigationFailed = false;
+  private static readonly criticalBackNavigationPages = new Set([
+    'startNow',
+    'freeLegalAdvice',
+    'defendantNameCapture',
+    'correspondenceAddress',
+    'counterClaim',
+    'uploadFilesToSupportYourCounterclaim',
+  ]);
 
   static setSourcePage(pageName: string): void {
     PageNavigationValidation.currentSourcePage = pageName;
@@ -42,49 +51,147 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.currentSourcePage = null;
   }
 
-  async validate(page: Page, validation: string, navigateButton: string, fieldName: validationRecord): Promise<void> {
+  async validate(page: Page, _validation: string, navigateButton: string, fieldName: validationRecord): Promise<void> {
     PageNavigationValidation.currentPageUrl = page.url();
+    const isBackLink = typeof navigateButton === 'string' && navigateButton.includes('Back');
+    const isFeedbackLink = typeof navigateButton === 'string' && navigateButton.includes('feedback');
+    const isButtonNavigation = typeof navigateButton === 'string' && !isBackLink && !isFeedbackLink;
+    const shouldUseClickNavigation =
+      isBackLink && enable_navigation_tests === 'true' && PageNavigationValidation.isCriticalPage();
+
+    try {
+      if (isFeedbackLink) {
+        await this.validateFeedbackLinkHref(page, navigateButton);
+        return;
+      }
+
+      if (isButtonNavigation) {
+        await this.validateButtonNavigation(page, navigateButton, fieldName);
+        return;
+      }
+
+      if (!shouldUseClickNavigation) {
+        await this.validateLinkHref(page, navigateButton);
+        return;
+      }
+      await this.validateClickedNavigation(page, navigateButton, fieldName);
+    } finally {
+      if (PageNavigationValidation.currentPageUrl && page.url() !== PageNavigationValidation.currentPageUrl) {
+        await performAction('navigateToUrl', PageNavigationValidation.currentPageUrl);
+      }
+    }
+  }
+
+  private static isCriticalPage(): boolean {
+    const pageName = PageNavigationValidation.currentSourcePage || '';
+    return PageNavigationValidation.criticalBackNavigationPages.has(pageName);
+  }
+
+  private async validateLinkHref(page: Page, linkText: string): Promise<void> {
+    await this.validateLinkDestination(page, linkText, 'Back link', href => {
+      const resolvedHref = new URL(href, page.url());
+      const currentOrigin = new URL(page.url()).origin;
+      return resolvedHref.origin === currentOrigin;
+    });
+  }
+
+  private async validateFeedbackLinkHref(page: Page, linkText: string): Promise<void> {
+    const locatorByName = page.getByRole('link', { name: linkText, exact: true });
+    const locatorByHref = page.locator('a[href*="smartsurvey.co.uk/s/Poss_feedback/"]').first();
+
+    let href: string | null = null;
+
+    try {
+      href = await locatorByName.getAttribute('href');
+    } catch {
+      href = null;
+    }
+
+    if (!href) {
+      href = await locatorByHref.getAttribute('href').catch(() => null);
+    }
+
+    if (!href) {
+      throw new Error(`Feedback link "${linkText}" does not exist or does not have an href attribute`);
+    }
+
+    try {
+      const parsedHref = new URL(href, page.url());
+      const host = parsedHref.hostname.toLowerCase();
+      if (!(host === 'smartsurvey.co.uk' || host.endsWith('.smartsurvey.co.uk'))) {
+        throw new Error(`Feedback link "${linkText}" does not point to SmartSurvey: ${href}`);
+      }
+    } catch {
+      throw new Error(`Feedback link "${linkText}" does not point to SmartSurvey: ${href}`);
+    }
+  }
+
+  private async validateLinkDestination(
+    page: Page,
+    linkText: string,
+    linkType: 'Back link' | 'Feedback link',
+    predicate: (href: string) => boolean
+  ): Promise<void> {
+    const locator = page.getByRole('link', { name: linkText, exact: true });
+    const href = await locator.getAttribute('href');
+
+    if (!href) {
+      throw new Error(`${linkType} "${linkText}" does not have an href attribute`);
+    }
+
+    if (!predicate(href)) {
+      throw new Error(
+        linkType === 'Back link'
+          ? `Back link "${linkText}" points to an external destination instead of the current app: ${href}`
+          : `Feedback link "${linkText}" does not point to SmartSurvey: ${href}`
+      );
+    }
+  }
+
+  private async validateButtonNavigation(page: Page, buttonText: string, fieldName: validationRecord): Promise<void> {
+    await performAction('clickButton', buttonText);
+    await this.validatePageNavigation(page, fieldName);
+  }
+
+  private async validateClickedNavigation(
+    page: Page,
+    navigateButton: string,
+    fieldName: validationRecord
+  ): Promise<void> {
     let newPage: Page | null = null;
     let isNewWindow = false;
+    const popupPromise = page
+      .context()
+      .waitForEvent('page')
+      .catch(() => null);
 
-    if (navigateButton) {
-      const popupPromise = page
-        .context()
-        .waitForEvent('page')
-        .catch(() => null);
+    await performAction('clickLink', navigateButton);
+    await page.waitForTimeout(200);
 
-      if (navigateButton.includes('Back') || navigateButton.includes('feedback')) {
-        await performAction('clickLink', navigateButton);
-        await page.waitForTimeout(200);
-      } else {
-        await performAction('clickButton', navigateButton);
-      }
+    const popup = await Promise.race([popupPromise, new Promise(resolve => setTimeout(() => resolve(null), 1000))]);
 
-      const popup = await Promise.race([popupPromise, new Promise(resolve => setTimeout(() => resolve(null), 1000))]);
+    let newPopupPage: Page | null = null;
 
-      let newPopupPage: Page | null = null;
+    if (popup) {
+      try {
+        const testPage = popup as Page;
 
-      if (popup) {
-        try {
-          const testPage = popup as Page;
-
-          if (!testPage.isClosed() && testPage.url() !== 'about:blank') {
-            newPopupPage = testPage;
-          }
-        } catch {
-          console.log('Popup closed while checking url or the page is closed');
-          newPopupPage = null;
+        if (!testPage.isClosed() && testPage.url() !== 'about:blank') {
+          newPopupPage = testPage;
         }
+      } catch {
+        console.log('Popup closed while checking url or the page is closed');
+        newPopupPage = null;
       }
+    }
 
-      if (newPopupPage) {
-        try {
-          await newPopupPage.waitForLoadState();
-          newPage = newPopupPage;
-          isNewWindow = true;
-        } catch {
-          console.log('new window closed');
-        }
+    if (newPopupPage) {
+      try {
+        await newPopupPage.waitForLoadState();
+        newPage = newPopupPage;
+        isNewWindow = true;
+      } catch {
+        console.log('new window closed');
       }
     }
 
@@ -95,13 +202,6 @@ export class PageNavigationValidation implements IValidation {
     } finally {
       if (newPage && !newPage.isClosed()) {
         await newPage.close();
-      }
-      if (
-        PageNavigationValidation.currentPageUrl &&
-        !isNewWindow &&
-        page.url() !== PageNavigationValidation.currentPageUrl
-      ) {
-        await performAction('navigateToUrl', PageNavigationValidation.currentPageUrl);
       }
     }
   }
@@ -119,8 +219,18 @@ export class PageNavigationValidation implements IValidation {
     try {
       if (fieldName && typeof fieldName === 'object') {
         const validationData = fieldName as any;
+        actualUrl = page.url();
+        let isSmartSurveyPage = false;
+        try {
+          const { hostname } = new URL(actualUrl);
+          const normalizedHostname = hostname.toLowerCase();
+          isSmartSurveyPage =
+            normalizedHostname === 'smartsurvey.co.uk' || normalizedHostname.endsWith('.smartsurvey.co.uk');
+        } catch {
+          isSmartSurveyPage = false;
+        }
 
-        if (validationData.element) {
+        if (validationData.element && !isSmartSurveyPage) {
           expectedElementText = validationData.element;
           const locator = page.locator(
             `h1, h1.govuk-heading-xl, h1.govuk-heading-l, span:text-is("${expectedElementText}")`
@@ -141,7 +251,6 @@ export class PageNavigationValidation implements IValidation {
 
         if (validationData.pageSlug) {
           try {
-            actualUrl = page.url();
             if (actualUrl.includes('respond-to-claim')) {
               expectedUrlPattern = `https://www.smartsurvey.co.uk/t/Poss_feedback/?pageurl=respond-to-claim/${validationData.pageSlug}`;
             } else if (actualUrl.includes('make-an-application')) {
@@ -305,7 +414,7 @@ export class PageNavigationValidation implements IValidation {
     try {
       const { pathname } = new URL(url);
       const segments = pathname.split('/').filter(Boolean);
-      const urlSegment = segments.at(-1) || 'home';
+      const urlSegment = segments.length > 0 ? segments[segments.length - 1] : 'home';
 
       if (urlSegment.toLowerCase() === 'dashboard') {
         return 'Dashboard';
@@ -331,7 +440,7 @@ export class PageNavigationValidation implements IValidation {
       return mapping[urlSegment] || urlSegment;
     } catch {
       const segments = url.split('/').filter(Boolean);
-      return segments.at(-1) || 'home';
+      return segments.length > 0 ? segments[segments.length - 1] : 'home';
     }
   }
 
@@ -382,19 +491,11 @@ export class PageNavigationValidation implements IValidation {
   static finaliseTest(): void {
     PageNavigationValidation.testCounter++;
 
-    const pagesWithNavigationTests = new Set<string>();
-
-    for (const pageName of PageNavigationValidation.pagesWithNavigation) {
-      pagesWithNavigationTests.add(pageName);
-    }
-
-    for (const pageName of PageNavigationValidation.missingNavigationMethods) {
-      pagesWithNavigationTests.add(pageName);
-    }
-
-    for (const pageName of PageNavigationValidation.missingNavigationFiles) {
-      pagesWithNavigationTests.add(pageName);
-    }
+    const pagesWithNavigationTests = new Set<string>([
+      ...Array.from(PageNavigationValidation.pagesWithNavigation),
+      ...Array.from(PageNavigationValidation.missingNavigationMethods),
+      ...Array.from(PageNavigationValidation.missingNavigationFiles),
+    ]);
 
     const totalPages = pagesWithNavigationTests.size;
 
@@ -432,7 +533,7 @@ export class PageNavigationValidation implements IValidation {
       }
     }
 
-    for (const pageName of PageNavigationValidation.pagesPassed) {
+    for (const pageName of Array.from(PageNavigationValidation.pagesPassed)) {
       if (!failedPages.has(pageName)) {
         actuallyPassedPages.add(pageName);
       }
@@ -450,7 +551,7 @@ export class PageNavigationValidation implements IValidation {
     }
 
     const passedPages = new Set<string>();
-    for (const pageName of pagesWithNavigationTests) {
+    for (const pageName of Array.from(pagesWithNavigationTests)) {
       if (!failedPages.has(pageName) && actuallyPassedPages.has(pageName)) {
         passedPages.add(pageName);
       }

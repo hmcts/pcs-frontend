@@ -57,6 +57,7 @@ export class ActionRegistry {
     ['validateViewAllApplications', new CitizenDashboardAction()],
     ['verifyRespondToClaimNotificationAndTag', new CitizenDashboardAction()],
     ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()],
+    ['verifyResponseOnViewTheClaimPage', new CitizenDashboardAction()],
 
     //Respond to claim
     ['selectLegalAdvice', new RespondToClaimAction()],

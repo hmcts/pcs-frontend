@@ -16,6 +16,7 @@ import {
   SummaryListValueValidation,
   TextValidation,
   ValidateDocumentUnderSectionValidation,
+  responseTableValidation,
 } from '../validations/element-validations';
 
 export class ValidationRegistry {
@@ -37,6 +38,7 @@ export class ValidationRegistry {
     ['pageNavigation', new PageNavigationValidation()],
     ['inputTextValue', new InputTextValueValidation()],
     ['validateDocumentUnderSection', new ValidateDocumentUnderSectionValidation()],
+    ['responseTable', new responseTableValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {
