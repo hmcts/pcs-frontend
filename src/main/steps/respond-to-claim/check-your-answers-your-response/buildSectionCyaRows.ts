@@ -39,11 +39,10 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     req,
   };
 
-  addLandlordRegisteredRow(ctx);
-  addLandlordLicensedRow(ctx);
-  addWrittenTermsRow(ctx);
+  addExemptLandlordRow(ctx);
   addTenancyTypeRow(ctx);
   addTenancyStartDateRow(ctx);
+  addWrittenTermsRow(ctx);
   addPossessionNoticeReceivedRow(ctx);
   addNoticeReceivedDateRow(ctx);
   addRentArrearsRow(ctx);
@@ -54,26 +53,11 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
-function addLandlordRegisteredRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
+function addExemptLandlordRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.landlordRegistered) {
     return;
   }
-  pushYesNoRow(
-    rows,
-    'rows.landlordRegistered',
-    responses.landlordRegistered,
-    'landlord-registered',
-    t,
-    yesNoNotSure,
-    change
-  );
-}
-
-function addLandlordLicensedRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
-  if (!responses.landlordLicensed) {
-    return;
-  }
-  pushYesNoRow(rows, 'rows.landlordLicensed', responses.landlordLicensed, 'landlord-licensed', t, yesNoNotSure, change);
+  pushYesNoRow(rows, 'rows.exemptLandlord', responses.landlordRegistered, 'exempt-landlord', t, yesNoNotSure, change);
 }
 
 function addWrittenTermsRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
