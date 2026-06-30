@@ -8,7 +8,7 @@
   "tenancyTypeWalesSecure": "The property is let under a secure occupation contract",
   "tenancyTypeWales": "The property is let under {{welshTenancyTypeAgreementType}} occupation contract",
   "tenancyTypeOther": "The claimant provided the following information about your tenancy, occupation contract or licence agreement type: {{otherTenancyTypeDetails}}",
-  "tenancyTypeDocumentLinkText": "View a copy of the tenancy, occupation contract or licence agreement (opens in new tab)",
+  "tenancyAgreementDocumentLinkText": "View a copy of the tenancy, occupation contract or licence agreement (opens in new tab)",
   "legend": "Is the tenancy, occupation contract or licence agreement type correct?",
   "yes": "Yes",
   "no": "No",
