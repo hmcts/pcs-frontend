@@ -1,9 +1,9 @@
-//import { getCurrentFormattedDate } from '../../utils/common/date.utils';
+import { getCurrentFormattedDate } from '../../utils/common/date.utils';
 
 export const repaymentsMade = {
-  // getmainHeader: (claimantName: string): string => {
-  //   return `Have you paid any money to ${claimantName} since ${getCurrentFormattedDate()}?`;
-  // },
+  getmainHeader: (claimantName: string): string => {
+    return `Have you paid any money to ${claimantName} since ${getCurrentFormattedDate()}?`;
+  },
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   giveDetailsHiddenTextLabel: `Give details about how much you paid and when`,
@@ -13,8 +13,8 @@ export const repaymentsMade = {
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   youHave500CharactersHiddenHintText: `You have 500 characters remaining`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  // getSelectIfYouPaidAnyMoneyErrorMessage: (claimantName: string): string =>
-  //   `Select if you’ve paid any money to ${claimantName} since ${getCurrentFormattedDate()}`,
+  getSelectIfYouPaidAnyMoneyErrorMessage: (claimantName: string): string =>
+    `Select if you’ve paid any money to ${claimantName} since ${getCurrentFormattedDate()}`,
   giveDetailsAboutHowMuchYouPaidErrorMessage: `Give details about how much you paid and when`,
   mustBeUnderCharacterLimitErrorMessage: `Payment details must be 500 characters or less`,
   emojiTextInput: `👉 😄`,

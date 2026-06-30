@@ -225,6 +225,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -369,13 +370,13 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('repaymentsMade', repaymentsMadeErrorValidation);
     await performAction('repaymentsMade', {
-      //question: repaymentsMade.getmainHeader(claimantName),
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
 
     await softErrorMessageValidation('repaymentsAgreed', repaymentsAgreedErrorValidation);
     await performAction('repaymentsAgreed', {
-      // question: repaymentsAgreed.getMainHeader(claimantName),
+      question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });

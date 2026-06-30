@@ -51,7 +51,7 @@ import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
-//let claimantName: string;
+let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -62,7 +62,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
   }
   submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
-  //claimantName = process.env.CLAIMANT_NAME;
+  claimantName = process.env.CLAIMANT_NAME;
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
   if (process.env.OCCUPATION_LICENCE_TYPE === 'SECURE_CONTRACT') {
     process.env.RENT_NON_RENT = 'YES';
@@ -92,6 +92,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -211,7 +212,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      //question: repaymentsMade.getmainHeader(claimantName),
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
@@ -221,8 +222,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
       radioOption: installmentPayments.noRadioOption,
     });
-    // await performAction('retrieveCYATableDataRTC', 'payments');
-    // await performAction('validateRTCSectionCYA', 'payments');
+    await performAction('retrieveCYATableDataRTC', 'payments');
+    await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
@@ -415,7 +416,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      //question: repaymentsMade.getmainHeader(claimantName),
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
@@ -425,8 +426,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
       radioOption: installmentPayments.noRadioOption,
     });
-    // await performAction('retrieveCYATableDataRTC', 'payments');
-    // await performAction('validateRTCSectionCYA', 'payments');
+    await performAction('retrieveCYATableDataRTC', 'payments');
+    await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     //Below code is disabled due to bug https://tools.hmcts.net/jira/browse/HDPI-6339
@@ -518,7 +519,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      //question: repaymentsMade.getmainHeader(claimantName),
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
@@ -528,8 +529,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
       radioOption: installmentPayments.noRadioOption,
     });
-    // await performAction('retrieveCYATableDataRTC', 'payments');
-    // await performAction('validateRTCSectionCYA', 'payments');
+    await performAction('retrieveCYATableDataRTC', 'payments');
+    await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');

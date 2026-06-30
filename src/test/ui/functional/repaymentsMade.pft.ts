@@ -1,13 +1,13 @@
-import { feedback, paymentInterstitial, repaymentsMade, taskList } from '../data/page-data';
-//import { claimantsName } from '../utils/actions/custom-actions';
+import { feedback, paymentInterstitial, repaymentsMade } from '../data/page-data';
+import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function repaymentsMadeErrorValidation(): Promise<void> {
-  // await performAction('clickButton', repaymentsMade.saveAndContinueButton);
-  // await performValidation('errorMessage', {
-  //   header: repaymentsMade.thereIsAProblemErrorMessageHeader,
-  //   message: repaymentsMade.getSelectIfYouPaidAnyMoneyErrorMessage(claimantsName),
-  // });
+  await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: repaymentsMade.thereIsAProblemErrorMessageHeader,
+    message: repaymentsMade.getSelectIfYouPaidAnyMoneyErrorMessage(claimantsName),
+  });
 
   await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
   await performAction('clickButton', repaymentsMade.saveAndContinueButton);
