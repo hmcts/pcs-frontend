@@ -1,6 +1,14 @@
 {
+  "pageTitle": "cyInstalments",
+  "heading": "cyInstalments",
   "amountQuestion": "cyHow much could the defendant afford to pay in addition to the current rent?",
   "frequencyQuestion": "cyHow frequently could the defendant afford to pay this amount?",
+  "frequencyOptions": {
+    "weekly": "cyWeekly",
+    "every2Weeks": "cyEvery 2 weeks",
+    "every4Weeks": "cyEvery 4 weeks",
+    "monthly": "cyMonthly"
+  },
   "amountHint": "",
   "errors": {
     "installmentAmount": "cyEnter how much the defendant could afford to pay in addition to the current rent",

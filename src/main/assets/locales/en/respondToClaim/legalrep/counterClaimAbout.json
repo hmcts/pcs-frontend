@@ -1,14 +1,14 @@
 {
-  "pageTitle": "About the defendant's counterclaim",
-  "heading": "About the defendant's counterclaim",
-  "infoParagraph1": "You will be able to upload any evidence you have on the next page.",
+  "pageTitle": "About the defendant\u2019s counterclaim",
+  "heading": "About the defendant\u2019s counterclaim",
+  "infoParagraph1": "You will be able to upload any evidence the defendant has on the next page.",
   "infoParagraph2": "The claimant will be able to see your answers.",
-  "counterClaimForLabel": "What is the defendant's counterclaim for?",
+  "counterClaimForLabel": "What is the defendant\u2019s counterclaim for?",
   "counterClaimReasonsLabel": "What are their reasons for making the counterclaim?",
   "errors": {
-    "counterClaimForRequired": "Enter what the defendant's counterclaim is for",
-    "counterClaimForMaxLength": "What the defendant's counterclaim is for must be 6800 characters or less",
-    "counterClaimReasonsRequired": "Enter what the defendant's reasons are for making the counterclaim",
-    "counterClaimReasonsMaxLength": "What the defendant's reasons are for making the counterclaim must be 6800 characters or less"
+    "counterClaimForRequired": "Enter what the defendant\u2019s counterclaim is for",
+    "counterClaimForMaxLength": "What the defendant\u2019s counterclaim is for must be 6800 characters or less",
+    "counterClaimReasonsRequired": "Enter what the defendant\u2019s reasons are for making the counterclaim",
+    "counterClaimReasonsMaxLength": "What the defendant\u2019s reasons are for making the counterclaim must be 6800 characters or less"
   }
 }

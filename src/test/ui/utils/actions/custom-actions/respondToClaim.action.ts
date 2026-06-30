@@ -4,6 +4,7 @@ import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
   accessYourCase,
+  askYourSolicitorToRespond,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
   contactPreferencesTelephone,
@@ -23,6 +24,7 @@ import {
   defendantNameConfirmation,
   disputeClaimInterstitial,
   doAnyOtherAdultsLiveInYourHome,
+  doYouHaveASolicitor,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
@@ -148,6 +150,8 @@ export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName as actionRecord)],
+      ['selectDoYouHaveASolicitor', () => this.selectDoYouHaveASolicitor(fieldName as actionRecord)],
+      ['askYourSolicitorToRespond', () => this.askYourSolicitorToRespond(fieldName as actionData)],
       ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
       ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
@@ -431,6 +435,22 @@ export class RespondToClaimAction implements IAction {
       option: legalAdviceData,
     });
     await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
+  }
+
+  private async selectDoYouHaveASolicitor(solicitorData: actionData) {
+    this.recordAnswer(doYouHaveASolicitor.mainHeader, solicitorData);
+    await performAction('clickRadioButton', {
+      question: doYouHaveASolicitor.mainHeader,
+      option: solicitorData,
+    });
+    await performAction('clickButton', doYouHaveASolicitor.saveAndContinueButton);
+  }
+
+  private async askYourSolicitorToRespond(_askYourSolicitorData: actionData) {
+    await performAction('clickButton', {
+      question: askYourSolicitorToRespond.mainHeader,
+      button: askYourSolicitorToRespond.closeAndReturnToTaskListButton,
+    });
   }
 
   private async inputDefendantDetails(defendantData: actionRecord) {
@@ -1399,9 +1419,10 @@ export class RespondToClaimAction implements IAction {
   private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
     const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
     rtcCyaMap.clear();
-    const summaryList = page.locator('.govuk-summary-list').first();
-    await summaryList.waitFor({ state: 'visible' });
+    const rowsLocator = page.locator('.govuk-summary-list__row:visible');
+    await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
 
+    const summaryList = rowsLocator.first().locator('xpath=ancestor::*[contains(@class, "govuk-summary-list")][1]');
     const rows = summaryList.locator('.govuk-summary-list__row');
     const rowCount = await rows.count();
 
@@ -1500,19 +1521,25 @@ export class RespondToClaimAction implements IAction {
 
     const defendantDetailsKnown = explicitDefendantDetailsKnown ?? explicitDefendantTypeKnown;
 
-    const pin =
-      typeof defendantDetailsKnown === 'boolean'
-        ? selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin
-        : (getSelectedPinUser()?.pin ?? pins[0]);
+    let pin: string | undefined;
+
+    if (typeof accessCode.pinIndex === 'number') {
+      pin = pins[accessCode.pinIndex];
+    } else if (typeof defendantDetailsKnown === 'boolean') {
+      pin = selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin;
+    } else {
+      pin = getSelectedPinUser()?.pin ?? pins[0];
+    }
 
     if (!pin) {
-      throw new Error('PIN is not available. Ensure fetchPINsAPI is called before accessYourCase');
+      throw new Error(`PIN is not available for index ${accessCode.pinIndex}`);
     }
 
     await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
     await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
     await performAction('clickButton', accessYourCase.continueButton);
   }
+
   private async readReasonableAdjustmentsTriage(): Promise<void> {
     this.recordAnswer(reasonableAdjustmentsTriage.mainHeader, reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);

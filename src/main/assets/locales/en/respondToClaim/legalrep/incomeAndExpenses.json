@@ -2,7 +2,7 @@
   "pageTitle": "Income and expenses",
   "infoParagraph1": "Details about the defendant’s income and expenses can be used by a judge to reach a decision on their case, and also to decide how much they could afford to repay if they have rent arrears.",
   "infoParagraph2": "Providing details about the defendant’s income and expenses is optional.",
-  "infoParagraph3": "",
+  "infoParagraph3": "The claimant will be able to see the defendant’s answers.",
   "question": "Does the defendant want to provide details of their income and expenses?",
   "errors": {
     "provideFinanceDetails": "Select if the defendant wants to provide details of their income and expenses"

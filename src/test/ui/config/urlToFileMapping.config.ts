@@ -1,7 +1,10 @@
 export default {
+  claims: 'claims',
   'start-now': 'startNow',
   'free-legal-advice': 'freeLegalAdvice',
   home: 'home',
+  solicitor: 'doYouHaveASolicitor',
+  'ask-your-solicitor': 'askYourSolicitorToRespond',
   'what-other-regular-expenses-do-you-have': 'whatOtherRegularExpensesDoYouHave',
   'page-not-found': 'pageNotFound',
   'defendant-name-capture': 'defendantNameCapture',
@@ -71,7 +74,9 @@ export default {
   'counter-claim-other-than-sum': 'counterClaimOtherThanSum',
   'counter-claim-fee': 'counterClaimFee',
   'start-evidence-upload': 'startEvidenceUpload',
-  'reasonable-adjustments-triage': 'reasonableAdjustmentsTriage',
   'task-list': 'taskList',
   'confirm-if-these-documents-relate-to-an-application': 'confirmIfTheseDocumentsRelateToAnApplication',
+  'response-submitted-counter-claim-fee-payment-needed': 'responseSubmittedCounterclaimFeePaymentNeeded',
+  'response-and-counter-claim-submitted': 'responseAndCounterClaimSubmitted',
+  'response-submitted': 'responseSubmitted',
 };
