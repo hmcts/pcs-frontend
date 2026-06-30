@@ -33,6 +33,7 @@
   },
   "ccd": {
     "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
+
     "caseTypeId": "PCS"
   },
   "osPostcodeLookup": {
