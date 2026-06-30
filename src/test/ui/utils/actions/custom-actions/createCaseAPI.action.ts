@@ -190,6 +190,9 @@ export class CreateCaseAPIAction implements IAction {
           throw new Error('No payment information found.');
         }
         const requestReference = paymentInfo[0].serviceRequestReference;
+        if (!requestReference) {
+          throw new Error(`Missing serviceRequestReference in fee payment info: ${JSON.stringify(paymentInfo[0])}`);
+        }
         const updateResponse = await paymentApi.put(
           paymentApiData.updatePaymentApiEndPoint,
           paymentApiData.paymentUpdatePayload(requestReference)
@@ -201,7 +204,14 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw new Error(`Payment API failed after retries: ${error.response?.status}`);
+            throw new Error(
+              `Payment API failed after retries: ${error.response?.status ?? 'NO_STATUS'} ${JSON.stringify(
+                error.response?.data ?? {}
+              )}`
+            );
+          }
+          if (error instanceof Error) {
+            throw new Error(`Payment API failed unexpectedly after retries: ${error.message}`);
           }
           throw new Error('Payment API failed unexpectedly after retries.');
         }
