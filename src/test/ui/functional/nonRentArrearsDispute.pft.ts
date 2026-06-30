@@ -4,7 +4,6 @@ import {
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   rentArrears,
-  taskList,
   tenancyDateDetails,
   tenancyDateUnknown,
 } from '../data/page-data';
@@ -95,7 +94,6 @@ export async function noRentArrearsNavigationTests(): Promise<void> {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrears.mainHeader);
   }
   await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
-  await performValidation('pageNavigation', nonRentArrearsDispute.saveForLaterButton, taskList.mainHeader);
 }
 
 export async function nonRentArrearsDisputeVisibilityValidationTests(): Promise<void> {

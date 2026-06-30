@@ -21,5 +21,6 @@ export const step: StepDefinition = {
   getController: () =>
     createGetController(templatePath, stepName, stepNavigation, (req: Request) => ({
       dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+      backUrl: null,
     })),
 };
