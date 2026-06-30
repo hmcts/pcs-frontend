@@ -226,6 +226,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -2053,15 +2054,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
-      //question: repaymentsMade.getmainHeader(claimantName),
+      question: repaymentsMade.getmainHeader(claimantName),
       repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentsAgreed', {
-      //question: repaymentsAgreed.getMainHeader(claimantName),
+      question: repaymentsAgreed.getMainHeader(claimantName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
-    //await performAction('retrieveCYATableDataRTC', 'payments');
-    //await performAction('validateRTCSectionCYA', 'payments');
+    await performAction('retrieveCYATableDataRTC', 'payments');
+    await performAction('validateRTCSectionCYA', 'payments');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
