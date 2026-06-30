@@ -529,6 +529,21 @@ export function noticeDateTimeValue(data: UnknownRecord): unknown {
   ]);
 }
 
+// Source value for the "Date notice was served" row. Includes the date-only service methods
+// (first-class post, delivered to permitted place) alongside the date-time methods, so the date
+// is shown for every method. The time-only row uses noticeDateTimeValue instead.
+export function noticeDateValue(data: UnknownRecord): unknown {
+  return getFirstValue(data, [
+    'notice_PostedDate',
+    'notice_DeliveredDate',
+    'notice_NoticeEmailSentDateTime',
+    'notice_HandedOverDateTime',
+    'notice_EmailSentDateTime',
+    'notice_OtherElectronicDateTime',
+    'notice_OtherDateTime',
+  ]);
+}
+
 export function formatDate(value: unknown, locale = 'en-gb'): string | undefined {
   const text = getStringFromValue(value);
   if (!text) {
