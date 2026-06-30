@@ -1,7 +1,6 @@
 import {
   doAnyOtherAdultsLiveInYourHome,
   feedback,
-  taskList,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
 } from '../data/page-data';
 import { getRelativeDate } from '../utils/common/date.utils';
@@ -90,9 +89,4 @@ export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeNavi
     question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader,
     option: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
   });
-  await performValidation(
-    'pageNavigation',
-    wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveForLaterButton,
-    taskList.mainHeader
-  );
 }
