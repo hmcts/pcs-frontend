@@ -15,8 +15,10 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
+  <p class="govuk-body">{{ introParagraph1 }}</p>
+
   <p class="govuk-body">
-    {{ introText }}
+    {{ introParagraph2 }}
     <a
       class="govuk-link"
       href="https://rentsmart.gov.wales/en/check-register/"
@@ -36,4 +38,3 @@
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
-

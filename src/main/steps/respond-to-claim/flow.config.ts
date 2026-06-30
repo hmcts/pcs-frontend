@@ -61,10 +61,7 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-text-message': {
       showCondition: (req: Request) => req.res?.locals.validatedCase?.isDefendantContactByPhone === true,
     },
-    'landlord-registered': {
-      showCondition: (req: Request) => isWalesProperty(req),
-    },
-    'landlord-licensed': {
+    'exempt-landlord': {
       showCondition: (req: Request) => isWalesProperty(req),
     },
     'written-terms': {
