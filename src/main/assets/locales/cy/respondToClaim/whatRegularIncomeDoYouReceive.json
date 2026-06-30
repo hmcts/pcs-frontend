@@ -1,65 +1,65 @@
 {
-  "pageTitle": "cyRegular income",
-  "heading": "cyWhat regular income do you receive? (Optional)",
-  "groupName": "cyRegular income options",
-  "hintText": "cySelect all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.",
+  "pageTitle": "Incwm rheolaidd",
+  "heading": "Pa incwm rheolaidd ydych chi’n ei gael? (Dewisol)",
+  "groupName": "Dewisiadau incwm rheolaidd",
+  "hintText": "Dewiswch bopeth sy'n berthnasol. Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148.00 neu £148.50. Rhaid i’r wybodaeth a ddarperir gennych fod yn wir ac yn gywir.",
   "options": {
-    "incomeFromJobs": "cyIncome from all jobs you do",
-    "pension": "cyPension – state and private",
-    "universalCredit": "cyUniversal Credit",
-    "otherBenefits": "cyOther benefits and credits",
-    "moneyFromElsewhere": "cyMoney from somewhere else (for example, child maintenance payments or someone in your household gives you money)"
+    "incomeFromJobs": "Incwm o bob swydd a wneir gennych",
+    "pension": "Pensiwn, y wladwriaeth a phreifat",
+    "universalCredit": "Credyd Cynhwysol",
+    "otherBenefits": "Budd-daliadau a chredydau eraill",
+    "moneyFromElsewhere": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yn eich cartref yn rhoi arian i chi)"
   },
   "subFields": {
-    "amount": "cyTotal amount received",
-    "frequency": "cyReceived every:",
-    "moneyFromElsewhereDetailsLabel": "cyGive details",
-    "moneyFromElsewhereDetailsHint": "cyGive details about the other sources of income and how much you usually receive"
+    "amount": "Cyfanswm a dderbynnir",
+    "frequency": "Derbynnir bob:",
+    "moneyFromElsewhereDetailsLabel": "Rhowch fanylion",
+    "moneyFromElsewhereDetailsHint": "Rhowch fanylion y ffynonellau eraill o incwm a faint rydych fel arfer yn ei gael"
   },
   "frequency": {
-    "week": "cyWeek",
-    "month": "cyMonth"
+    "week": "Pob wythnos",
+    "month": "Mis"
   },
   "errors": {
     "incomeFromJobsAmount": {
-      "required": "cyEnter the total amount you receive from all jobs you do",
-      "negative": "cyThe total amount you receive from all jobs you do each week or month must be £0.00 or above",
-      "largeAmount": "cyThe total amount you receive from all jobs you do each week or month must be less than £1 billion"
+      "required": "Nodwch y cyfanswm rydych yn ei gael o'r holl swyddi a wneir gennych",
+      "negative": "Rhaid i'r cyfanswm rydych yn ei gael o'r holl swyddi a wneir gennych bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r cyfanswm rydych yn ei gael o'r holl swyddi a wneir gennych bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "incomeFromJobsFrequency": {
-      "required": "cySelect how frequently you receive income from all jobs you do"
+      "required": "Dewiswch pa mor aml ydych chi’n cael incwm o’r holl swyddi a wneir gennych"
     },
     "pensionAmount": {
-      "required": "cyEnter the total amount you receive from a state or private pension",
-      "negative": "cyThe total amount you receive from pension (state and private) each week or month must be £0.00 or above",
-      "largeAmount": "cyThe total amount you receive from pension (state and private) each week or month must be less than £1 billion"
+      "required": "Nodwch faint rydych yn ei gael o bensiwn gwladol neu breifat",
+      "negative": "Rhaid i'r cyfanswm rydych yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i'r cyfanswm rydych yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "pensionFrequency": {
-      "required": "cySelect how frequently you receive income from a state or private pension"
+      "required": "Dewiswch pa mor aml rydych yn cael incwm o bensiwn gwladol neu breifat"
     },
     "universalCreditAmount": {
-      "required": "cyEnter the total amount you receive from Universal Credit",
-      "negative": "cyThe total amount you receive from Universal Credit each week or month must be £0.00 or above",
-      "largeAmount": "cyThe total amount you receive from Universal Credit each week or month must be less than £1 billion"
+      "required": "Nodwch faint o Gredyd Cymhwysol rydych yn ei gael",
+      "negative": "Rhaid i faint o Gredyd Cymhwysol rydych yn ei gael bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i faint o Gredyd Cymhwysol rydych yn ei gael bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "universalCreditFrequency": {
-      "required": "cySelect how frequently you receive Universal Credit"
+      "required": "Dewiswch pa mor aml rydych yn cael Credyd Cynhwysol"
     },
     "otherBenefitsAmount": {
-      "required": "cyEnter the total amount you receive from other benefits and credits",
-      "negative": "cyThe total amount you receive from other benefits and credit each week or month must be £0.00 or above",
-      "largeAmount": "cyThe total amount you receive from other benefits and credit each week or month must be less than £1 billion"
+      "required": "Nodwch faint o fudd-daliadau a chredydau eraill rydych yn ei gael",
+      "negative": "Rhaid i faint o fudd-daliadau a chredydau eraill rydych yn ei gael bob wythnos neu bob mis fod yn -£0.00 neu uwch",
+      "largeAmount": "Rhaid i faint o fudd-daliadau a chredydau eraill rydych yn ei gael bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
     },
     "otherBenefitsFrequency": {
-      "required": "cySelect how frequently you receive income from other benefits and credits"
+      "required": "Dewiswch pa mor aml rydych yn cael incwm o fudd-daliadau a chredydau eraill"
     },
     "moneyFromElsewhereDetailsMaxLength": "cyDetails of money from somewhere else must be 500 characters or less",
     "moneyFromElsewhereDetails": {
-      "required": "cyEnter details about the money you receive from somewhere else and how much you usually receive",
-      "invalidCharacters": "cyGive details about the other sources of income and how much you usually receive must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+      "required": "Rhowch fanylion yr arian rydych yn ei gael o rywle arall a faint rydych fel arfer yn ei gael",
+      "invalidCharacters": "Rhowch fanylion am y ffynonellau eraill o incwm a faint rydych fel arfer yn ei gael - dylai gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
     },
     "amount": {
-      "invalidFormat": "cyEnter an amount in the correct format, for example 148.00 or 148.50"
+      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
     }
   }
 }
