@@ -10,6 +10,8 @@ const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
 export const VERY_SHORT_TIMEOUT = 1000;
 export const SHORT_TIMEOUT = 5000;
 export const actionRetries = 10;
+// PIN/access code is generated async after payment issues the case (~10s observed); poll ~30s
+export const pinGenerationPollRetries = 30;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 
 const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';

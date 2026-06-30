@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 // eslint-disable-next-line import/no-named-as-default
 import Axios from 'axios';
 
-import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
+import { VERY_SHORT_TIMEOUT, actionRetries, pinGenerationPollRetries } from '../../../../../../playwright.config';
 import { fetchPINsApiData, validateAccessCodeApiData } from '../../../data/api-data';
 import { IAction } from '../../interfaces';
 
@@ -75,7 +75,8 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
 
   private async fetchPINsAPI(): Promise<void> {
     const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
-    const maxRetries = actionRetries;
+    // PIN appears ~10s after payment issues the case; poll 1s for ~30s, exiting as soon as it lands
+    const maxRetries = pinGenerationPollRetries;
     const delayMs = VERY_SHORT_TIMEOUT;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       const response = await fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint());
