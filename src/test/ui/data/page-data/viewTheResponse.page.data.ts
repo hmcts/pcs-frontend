@@ -29,8 +29,8 @@ export const viewTheResponse = {
     'Date of birth': '20 May 1990',
   },
   additionalDefendant1Details: {
-    Name: 'Peter Parker',
-    // The line below will be commented until the bug HDPI-7401 gets fixed
+    // The lines below will be commented until the bugs HDPI-7401 & HDPI-7360 get fixed
+    // Name: 'Peter Parker',
     // 'Postal address': '2 Second Avenue, London, W3 7RX',
   },
   additionalDefendant2Details: {
