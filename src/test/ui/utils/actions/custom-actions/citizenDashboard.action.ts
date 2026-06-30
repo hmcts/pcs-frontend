@@ -1,9 +1,9 @@
 import { Page, expect } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
-import { dashboard } from '../../../data/page-data';
+import { dashboard, viewTheResponse } from '../../../data/page-data';
 import { viewAllApplications } from '../../../data/page-data/genApps-page-data';
-import { performAction, performValidation } from '../../controller';
+import { performAction, performValidation, performValidations } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
@@ -20,6 +20,7 @@ export class CitizenDashboardAction implements IAction {
         () => this.verifyNavigationFromNotificationLink(page, fieldName as actionRecord),
       ],
       ['validateViewAllApplications', () => this.validateViewAllApplications()],
+      ['verifyResponseOnViewTheClaimPage', () => this.verifyResponseOnViewTheClaimPage()],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -116,5 +117,32 @@ export class CitizenDashboardAction implements IAction {
       elementType: 'paragraph',
       text: 'Submitted on ' + viewAllApplications.getSubmittedDate(),
     });
+  }
+
+  private async verifyResponseOnViewTheClaimPage() {
+    await performValidations(
+      'View the response page validation',
+      ['responseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails],
+      // The line below will be commented until the bug HDPI-7360 gets fixed
+      //['responseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
+      [
+        'responseTable',
+        viewTheResponse.additionalDefendant1DynamicSubHeader,
+        viewTheResponse.additionalDefendant1Details,
+      ],
+      [
+        'responseTable',
+        viewTheResponse.additionalDefendant2DynamicSubHeader,
+        viewTheResponse.additionalDefendant2Details,
+      ],
+      ['responseTable', viewTheResponse.responseToClaimSubHeader, viewTheResponse.responseToClaimDetails],
+      ['responseTable', viewTheResponse.paymentsOrAgreementsSubHeader, viewTheResponse.paymentsOrAgreementsDetails],
+      ['responseTable', viewTheResponse.yourHouseholdSubHeader, viewTheResponse.yourHouseholdDetails],
+      ['responseTable', viewTheResponse.regularIncomeSubHeader, viewTheResponse.regularIncomeDetails],
+      ['responseTable', viewTheResponse.priorityDebtsSubHeader, viewTheResponse.priorityDebtsDetails],
+      ['responseTable', viewTheResponse.regularExpensesSubHeader, viewTheResponse.regularExpensesDetails],
+      ['responseTable', viewTheResponse.additionalInformationSubHeader, viewTheResponse.additionalInformationDetails],
+      ['responseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
+    );
   }
 }
