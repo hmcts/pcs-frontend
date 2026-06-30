@@ -40,6 +40,16 @@ jest.mock('../../../main/modules/http', () => ({
   },
 }));
 
+const mockSaveDraftDefendantResponse = jest.fn().mockResolvedValue(undefined);
+const mockBuildDraftDefendantResponse = jest.fn(() => ({
+  defendantResponses: {},
+  defendantContactDetails: { party: {} },
+}));
+jest.mock('../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
+}));
+
 import type { Application, Request, Response } from 'express';
 
 import finalSubmitRoutes from '../../../main/routes/finalSubmit';
@@ -63,6 +73,11 @@ describe('finalSubmit routes', () => {
     });
 
     return session;
+  };
+
+  const bindReqRes = (req: Request, res: Response): Request => {
+    req.res = res;
+    return req;
   };
 
   beforeEach(() => {
@@ -174,6 +189,11 @@ describe('finalSubmit routes', () => {
 
       const req = {
         params: { caseReference: '1234567890123456' },
+        body: {
+          statementOfTruthContempt: ['yes'],
+          statementOfTruthBelief: ['yes'],
+          fullName: 'Jane Defendant',
+        },
         session: {
           user: { accessToken: 'mock-token' },
         },
@@ -184,8 +204,22 @@ describe('finalSubmit routes', () => {
         redirect: jest.fn(),
       } as unknown as Response;
 
+      req.res = res;
+
       await handler(req, res);
 
+      expect(mockBuildDraftDefendantResponse).toHaveBeenCalledWith(req);
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
+        expect.objectContaining({
+          defendantResponses: expect.objectContaining({
+            statementOfTruth: {
+              accepted: 'YES',
+              fullName: 'Jane Defendant',
+            },
+          }),
+        })
+      );
       expect(mockHttpGet).toHaveBeenCalled();
       expect(mockHttpPost).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
@@ -236,6 +270,8 @@ describe('finalSubmit routes', () => {
         locals: { validatedCase },
         redirect: jest.fn(),
       } as unknown as Response;
+
+      bindReqRes(req, res);
 
       await handler(req, res);
 
@@ -295,6 +331,8 @@ describe('finalSubmit routes', () => {
         locals: { validatedCase },
         redirect: jest.fn(),
       } as unknown as Response;
+
+      bindReqRes(req, res);
 
       await handler(req, res);
 
@@ -356,6 +394,8 @@ describe('finalSubmit routes', () => {
         redirect: jest.fn(),
       } as unknown as Response;
 
+      bindReqRes(req, res);
+
       await handler(req, res);
 
       expect(req.session.payment).toEqual(
@@ -385,6 +425,8 @@ describe('finalSubmit routes', () => {
         locals: { validatedCase: { id: '1234567890123456', data: {} } },
         redirect: jest.fn(),
       } as unknown as Response;
+
+      bindReqRes(req, res);
 
       await handler(req, res);
 

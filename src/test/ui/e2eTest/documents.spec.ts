@@ -24,6 +24,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  await performAction('updatePaymentAPI');
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
@@ -45,11 +46,10 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    // The lines below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
-    /*await performAction('verifyDocumentRelatesToApplication', {
+    await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden,
-    });*/
+    });
     await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
@@ -65,8 +65,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
   });
 
-  // Below test is temporarily skipped until we receive confirmation on why `noticeServiceJurisdictionLink` is appearing under the Property Documents category instead of the Statements of Case category.
-  test.skip('View documents submitted through make a claim @regression', async () => {
+  test('View documents submitted through make a claim @regression', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
     await performAction('validateViewDocuments', {
       caseNumber: viewDocuments.getCaseNumber(),
@@ -95,16 +94,15 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
   });
 
-  // The test below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
-  test.skip('Verify confirm document options based on GenApp type', async () => {
-    await performAction(
-      'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
-    );
+  test('Verify confirm document options based on GenApp type', async () => {
     // SET_ASIDE
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SET_ASIDE').citizenCreateGenAppPayload,
     });
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await softErrorMessageValidation(
       'confirmIfTheseDocumentsRelateToAnApplication',
@@ -116,12 +114,18 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', uploadYourDocuments.mainHeader);
     await performAction('clickLink', 'Back');
-    await performAction('clickLink', 'Back');
-    await performValidation('mainHeader', startEvidenceUpload.mainHeader);
+    await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
+    //skipping below lines as we have bug HDPI-7411
+    /*await performAction('clickLink', 'Back');
+    await performValidation('mainHeader', startEvidenceUpload.mainHeader);*/
     // SOMETHING_ELSE + default YES
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
     });
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,

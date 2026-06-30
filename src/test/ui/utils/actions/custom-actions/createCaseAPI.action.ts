@@ -11,6 +11,7 @@ import {
   submitCaseEventTokenApiData,
 } from '../../../data/api-data';
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
+import { paymentApiData } from '../../../data/api-data/payment.api.data';
 import { user } from '../../../data/user-data';
 import { performAction } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -20,6 +21,7 @@ export class CreateCaseAPIAction implements IAction {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['createCaseAPI', () => this.createCaseAPI(fieldName)],
       ['submitCaseAPI', () => this.submitCaseAPI(fieldName)],
+      ['updatePaymentAPI', () => this.updatePaymentAPI()],
       ['deleteCaseRole', () => this.deleteCaseRole(fieldName)],
       ['getCaseAPI', () => this.getCaseAPI()],
     ]);
@@ -148,6 +150,39 @@ export class CreateCaseAPIAction implements IAction {
       await new Promise(res => setTimeout(res, delayMs));
     }
     throw new Error('Submit case API failed after multiple retries');
+  }
+
+  private async updatePaymentAPI(): Promise<void> {
+    const paymentApi = Axios.create(paymentApiData.paymentApiInstance());
+    const maxRetries = actionRetries;
+    const delayMs = VERY_SHORT_TIMEOUT;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await paymentApi.get(paymentApiData.getFeePaymentInfoApiEndPoint());
+        const paymentInfo = response.data;
+        if (!paymentInfo?.length) {
+          throw new Error('No payment information found.');
+        }
+        const requestReference = paymentInfo[0].serviceRequestReference;
+        const updateResponse = await paymentApi.put(
+          paymentApiData.updatePaymentApiEndPoint,
+          paymentApiData.paymentUpdatePayload(requestReference)
+        );
+        if (updateResponse.status === 200 || updateResponse.status === 204) {
+          return;
+        }
+        throw new Error(`Payment update failed with status ${updateResponse.status}`);
+      } catch (error: unknown) {
+        if (attempt === maxRetries) {
+          if (Axios.isAxiosError(error)) {
+            throw new Error(`Payment API failed after retries: ${error.response?.status}`);
+          }
+          throw new Error('Payment API failed unexpectedly after retries.');
+        }
+        await new Promise(res => setTimeout(res, delayMs));
+      }
+    }
+    throw new Error('Payment API failed after multiple retries');
   }
 
   private async deleteCaseRole(roleData: actionData): Promise<void> {

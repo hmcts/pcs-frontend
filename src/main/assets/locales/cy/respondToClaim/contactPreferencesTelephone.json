@@ -1,22 +1,22 @@
 {
-  "pageTitle": "cyContact by telephone",
-  "heading": "cyContact by telephone",
-  "subtitle": "cyWe might need to contact you by telephone with urgent updates about your case.",
+  "pageTitle": "Cyswllt dros y ffôn",
+  "heading": "Cyswllt dros y ffôn",
+  "subtitle": "Efallai y byddwn angen cysylltu â chi dros y ffôn gyda diweddariadau brys am eich achos.",
   "labels": {
-    "question": "cyAre you happy to be contacted by telephone?",
+    "question": "Ydych chi'n hapus i ni gysylltu â chi dros y ffôn?",
     "options": {
-      "yes": "cyYes",
-      "no": "cyNo"
+      "yes": "Ydy",
+      "no": "Nac ydy"
     },
-    "phoneNumberLabel": "cyUK phone number"
+    "phoneNumberLabel": "Rhif ffôn yn y DU"
   },
   "buttons": {
-    "saveAndContinue": "cySave and continue",
-    "saveForLater": "cySave for later"
+    "saveAndContinue": "Cadw a pharhau",
+    "saveForLater": "Cadw at hwyrach ymlaen"
   },
   "errors": {
-    "contactByTelephone": "cySelect whether you’re happy to be contacted by telephone",
-    "contactByTelephone.phoneNumber": "cyEnter a UK phone number",
-    "contactByTelephone.phoneNumber.invalid": "cyEnter a phone number, like 01632 960 001 or 07700 900 982"
+    "contactByTelephone": "Dewiswch a ydych chi'n hapus i ni gysylltu â chi dros y ffôn",
+    "contactByTelephone.phoneNumber": "Nodwch rif ffôn yn y DU",
+    "contactByTelephone.phoneNumber.invalid": "Nodwch rif ffôn fel 01632 960 001 neu 07700 900 982"
   }
 }
