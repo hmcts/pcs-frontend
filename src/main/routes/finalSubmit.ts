@@ -16,6 +16,7 @@ import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import { requireEventAccess } from '../middleware/requireEventAccess';
 import { http } from '../modules/http';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../steps/utils/buildDraftDefendantResponse';
 import { getRespondToClaimConfirmationPath } from '../steps/utils/postSubmissionRouting';
 
 import { Logger } from '@modules/logger';
@@ -76,6 +77,17 @@ export default function finalSubmitRoutes(app: Application): void {
 
     try {
       logger.info(`Submitting response to claim for case ${caseId}`);
+
+      const draft = buildDraftDefendantResponse(req);
+      const contempt = req.body?.statementOfTruthContempt as string[] | undefined;
+      const belief = req.body?.statementOfTruthBelief as string[] | undefined;
+      const bothAccepted = contempt?.includes('yes') && belief?.includes('yes');
+      draft.defendantResponses.statementOfTruth = {
+        accepted: bothAccepted ? 'YES' : 'NO',
+        fullName: (req.body?.fullName as string | undefined)?.trim(),
+      };
+      await saveDraftDefendantResponse(req, draft);
+
       // Phase 1: START - Get event token from CCD
       const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/respondPossessionClaim`;
       logger.info(`Calling START callback: ${eventUrl}`);
@@ -112,7 +124,7 @@ export default function finalSubmitRoutes(app: Application): void {
       return safeRedirect303(res, getRespondToClaimConfirmationPath(caseId, validatedCase.data), '/', ['/case']);
     } catch (error) {
       logger.error(`Failed to submit response for case ${caseId}:`, error);
-      return safeRedirect303(res, `/case/${caseId}/respond-to-claim/check-your-answers?submitError=failed`, '/', [
+      return safeRedirect303(res, `/case/${caseId}/respond-to-claim/end-of-journey-cya?submitError=failed`, '/', [
         '/case',
       ]);
     }
