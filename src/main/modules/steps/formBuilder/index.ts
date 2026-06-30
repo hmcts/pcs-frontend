@@ -18,6 +18,37 @@ import type { BuiltFormContent, FormBuilderConfig } from '@modules/steps/formBui
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
+import { type UploadValidationOptions, bytesToMb } from '@utils/documentUploadValidation';
+
+export function applyUploadValidationToComponent(
+  component: Record<string, unknown>,
+  opts: UploadValidationOptions | undefined,
+  t: TFunction
+): void {
+  if (!opts) {
+    return;
+  }
+  if (opts.maxFilenameLength !== undefined) {
+    component.maxFilenameLength = opts.maxFilenameLength;
+    component.errorFilenameTooLong = t('common:errors.documentUpload.filenameTooLong', {
+      maxLength: opts.maxFilenameLength,
+    });
+  }
+  if (opts.maxDocumentBytes !== undefined) {
+    const maxDocumentMB = bytesToMb(opts.maxDocumentBytes);
+    component.maxDocumentMB = maxDocumentMB;
+    component.errorFileTooLargeDocument = t('common:errors.documentUpload.fileTooLargeDocument', {
+      maxSize: maxDocumentMB,
+    });
+  }
+  if (opts.maxMediaBytes !== undefined) {
+    const maxMediaMB = bytesToMb(opts.maxMediaBytes);
+    component.maxMediaMB = maxMediaMB;
+    component.errorFileTooLargeMedia = t('common:errors.documentUpload.fileTooLargeMedia', {
+      maxSize: maxMediaMB,
+    });
+  }
+}
 
 export type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
@@ -60,6 +91,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     customTemplate,
     basePath: configuredBasePath,
     documentStorage,
+    uploadValidation,
     isAnswered,
   } = config;
 
@@ -80,6 +112,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     stepDir,
     showCancelButton,
     documentStorage,
+    uploadValidation,
     isAnswered,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
@@ -111,6 +144,12 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         ) as BuiltFormContent;
 
         wireFileUploadUrls(formContent, req, documentStorage);
+        if (documentStorage) {
+          const fileField = formContent.fields?.find(f => f.componentType === 'fileUpload');
+          if (fileField?.component) {
+            applyUploadValidationToComponent(fileField.component, uploadValidation, t);
+          }
+        }
 
         const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
         const result = extraContent ? { ...formContent, ...extraContent } : formContent;
