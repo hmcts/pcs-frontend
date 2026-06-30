@@ -1,7 +1,7 @@
 {
   "pageTitle": "Cytundebau a wnaed",
-  "heading": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}?",
-  "question": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}?",
+  "heading": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
+  "question": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
   "options": {
     "yes": "Ydy",
     "no": "Nac ydy",
@@ -11,7 +11,7 @@
   "textAreaLabel": "Rhowch fanylion faint rydych wedi cytuno i'w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
   "textAreaHint": "Gallwch nodi hyd at 500 o nodau.",
   "errors": {
-    "repaymentsAgreed": "Dewiswch a ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}",
+    "repaymentsAgreed": "Dewiswch a ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}",
     "repaymentsAgreed.repaymentsAgreedDetails": "Rhowch fanylion faint rydych wedi cytuno i'w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
     "repaymentsAgreedDetailsMaxLength": "cyRepayment agreement details must be 500 characters or less",
     "repaymentsAgreed.repaymentsAgreedDetails.invalid": "cyRepayments agreed details must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"

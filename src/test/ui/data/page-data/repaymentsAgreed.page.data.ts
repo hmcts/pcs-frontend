@@ -1,6 +1,6 @@
 export const repaymentsAgreed = {
-  getMainHeader: (claimantsName: string) =>
-    `Have you come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025?`,
+  // getMainHeader: (claimantsName: string) =>
+  //   `Have you come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   detailsTextInput: `Agreed £1000 last year`,
@@ -12,8 +12,8 @@ export const repaymentsAgreed = {
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   backLink: `Back`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  getSelectAgreementErrorMessage: (claimantsName: string) =>
-    `Select if you’ve come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025`,
+  // getSelectAgreementErrorMessage: (claimantsName: string) =>
+  //   `Select if you’ve come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025`,
   mustBe500CharactersOrFewerErrorMessage: `Repayment agreement details must be 500 characters or less`,
   emojiTextInput: `👉 😄`,
   emojiErrorMessage: `Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,

@@ -41,7 +41,7 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
 const t = ((key: string) => {
   const translations: Record<string, string> = {
     pageTitle: 'Repayments agreed',
-    question: 'Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?',
+    question: 'Have you come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued}}?',
     'options.yes': 'Yes',
     'options.no': 'No',
     'options.or': 'or',

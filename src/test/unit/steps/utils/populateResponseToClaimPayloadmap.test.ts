@@ -116,7 +116,7 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
           validatedCase: {
             id: '1773071952538472',
             data: {
-              claimIssueDate: '2025-06-16',
+              dateIssued: '2025-06-16',
               possessionClaimResponse: {
                 claimantOrganisations: [{ value: 'Possession Claims Solicitor Org' }],
                 defendantResponses: {
@@ -136,7 +136,7 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
     });
 
     expect(req.res?.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
-    expect(req.res?.locals?.validatedCase?.claimIssueDate).toBe('2025-06-16');
+    expect(req.res?.locals?.validatedCase?.dateIssued).toEqual(new Date('2025-06-16'));
     expect(req.res?.locals?.validatedCase?.claimantName).toBe('Possession Claims Solicitor Org');
     expect(req.res?.locals?.validatedCase?.defendantResponsesDefendantNameConfirmation).toBe('YES');
     expect(req.res?.locals?.validatedCase?.defendantResponsesFreeLegalAdvice).toBe('NO');

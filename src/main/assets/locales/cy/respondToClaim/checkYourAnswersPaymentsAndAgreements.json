@@ -3,7 +3,7 @@
   "cardTitle": "cy Payments and agreements",
   "rows": {
     "anyPaymentsMade": {
-      "label": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}?",
+      "label": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
       "changeHidden": "cy payments made"
     },
     "paymentDetails": {
@@ -11,7 +11,7 @@
       "changeHidden": "cy payment details"
     },
     "repaymentPlanAgreed": {
-      "label": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}?",
+      "label": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
       "changeHidden": "cy repayment agreement"
     },
     "repaymentAgreedDetails": {
