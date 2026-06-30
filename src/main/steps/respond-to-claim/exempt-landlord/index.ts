@@ -6,7 +6,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoNotSureValue } from '@services/ccdCase.interface';
 
-const STEP_NAME = 'landlord-registered';
+const STEP_NAME = 'exempt-landlord';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
@@ -18,12 +18,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const landlordRegistered = req.res?.locals.validatedCase?.defendantResponses?.landlordRegistered;
     return landlordRegistered ? { landlordRegistered } : {};
   },
-  customTemplate: `${__dirname}/landlordRegistered.njk`,
+  customTemplate: `${__dirname}/exemptLandlord.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     question: 'question',
+    introParagraph1: 'introParagraph1',
+    introParagraph2: 'introParagraph2',
     publicRegisterLinkText: 'publicRegisterLinkText',
-    introText: 'introText',
   },
   fields: [
     {
@@ -52,10 +53,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       delete response.defendantResponses.landlordRegistered;
     }
 
-    await saveDraftDefendantResponse(
-      req,
+    delete response.defendantResponses.landlordLicensed;
 
-      response
-    );
+    await saveDraftDefendantResponse(req, response);
   },
 });
