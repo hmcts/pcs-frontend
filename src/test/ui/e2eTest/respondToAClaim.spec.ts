@@ -189,9 +189,10 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
-    await performAction('updatePaymentAPI');
+    //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction(
+      'submitCaseApiTestSupport',
+      { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else if (testInfo.title.includes('@assured')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
