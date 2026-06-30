@@ -1,6 +1,6 @@
 {
   "pageTitle": "cyYour tasks",
-  "caseNumberLabel": "cyCase number:",
+  "caseNumberLabel": "Rhif yr achos:",
   "sidebarLabel": "cySupport and additional actions",
   "opensInNewTab": "cyopens in new tab",
   "taskList": {
@@ -18,18 +18,18 @@
     }
   },
   "iWantTo": {
-    "heading": "cyI want to...",
+    "heading": "Rwyf eisiau ...",
     "makeApplication": "cyMake a general application",
     "breathingSpace": "cyInform the court of a breathing space debt respite",
     "legalAdviser": "cyGet free help from a legal adviser"
   },
   "helpSupport": {
-    "heading": "cyHelp and support",
-    "fees": "cyHelp with fees",
+    "heading": "Cymorth a chefnogaeth",
+    "fees": "Help i dalu ffioedd",
     "mediation": "cyFind out about mediation",
-    "hearing": "cyWhat to expect at a hearing",
-    "representYourself": "cyRepresent myself at a hearing",
-    "findLegalAdvice": "cyFind legal advice",
-    "findCourt": "cyFind information about my court"
+    "hearing": "Beth i’w ddisgwyl mewn gwrandawiad",
+    "representYourself": "Cynrychioli fy hun mewn gwrandawiad",
+    "findLegalAdvice": "Dod o hyd i gyngor cyfreithiol",
+    "findCourt": "Dod o hyd i wybodaeth am fy llys"
   }
 }
