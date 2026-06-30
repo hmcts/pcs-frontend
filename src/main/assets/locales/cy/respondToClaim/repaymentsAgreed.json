@@ -1,18 +1,18 @@
 {
-  "pageTitle": "cyAgreements made",
-  "heading": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
-  "question": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+  "pageTitle": "Cytundebau a wnaed",
+  "heading": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}?",
+  "question": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "or": "cyor",
-    "imNotSure": "cyI’m not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "imNotSure": "Nid wyf yn siŵr"
   },
-  "textAreaLabel": "cyGive details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
-  "textAreaHint": "cyYou can enter up to 500 characters",
+  "textAreaLabel": "Rhowch fanylion faint rydych wedi cytuno i'w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
+  "textAreaHint": "Gallwch nodi hyd at 500 o nodau.",
   "errors": {
-    "repaymentsAgreed": "cySelect if you’ve come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}",
-    "repaymentsAgreed.repaymentsAgreedDetails": "cyGive details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
+    "repaymentsAgreed": "Dewiswch a ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}",
+    "repaymentsAgreed.repaymentsAgreedDetails": "Rhowch fanylion faint rydych wedi cytuno i'w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
     "repaymentsAgreedDetailsMaxLength": "cyRepayment agreement details must be 500 characters or less",
     "repaymentsAgreed.repaymentsAgreedDetails.invalid": "cyRepayments agreed details must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
