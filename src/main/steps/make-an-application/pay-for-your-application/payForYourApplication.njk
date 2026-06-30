@@ -1,0 +1,24 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  <div class="govuk-inset-text">
+    <p class="govuk-body">{{ applicationFee }}
+    <span class="govuk-!-font-weight-bold">{{ formattedFeeAmount }}</span>
+    </p>
+  </div>
+
+  <p class="govuk-body">{{ youWillBeRedirected }}</p>
+  <p class="govuk-body">{{ govPayIsASecureService }}</p>
+
+  <a href="{{ paymentRedirectUrl }}" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+      {{ continueToPayment }}
+  </a>
+
+{% endblock %}

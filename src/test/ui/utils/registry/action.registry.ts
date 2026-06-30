@@ -111,6 +111,8 @@ export class ActionRegistry {
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
+    ['inputCounterClaimPaymentDetails', new RespondToClaimAction()],
+    ['validateCounterClaimApplicationFee', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
     ['taskList', new RespondToClaimAction()],
@@ -156,6 +158,10 @@ export class ActionRegistry {
     ['counterClaimAbout', new RespondToClaimAction()],
     ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
+    ['payForApplication', new GenAppsAction()],
+    ['inputPaymentDetails', new GenAppsAction()],
+    ['confirmPayment', new GenAppsAction()],
+    ['verifyApplicationSubmitted', new GenAppsAction()],
   ]);
 
   static getAction(actionName: string): IAction {

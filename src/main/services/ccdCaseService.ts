@@ -37,7 +37,7 @@ import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import { GenAppType } from '@services/ccdCase.interface';
+import { GenAppType, MakeAnApplicationResponse } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type {
   DashboardNotification,
@@ -323,7 +323,10 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
   },
 
-  async submitGeneralApplication(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+  async submitGeneralApplication(
+    accessToken: string | undefined,
+    ccdCase: CcdCase
+  ): Promise<MakeAnApplicationResponse> {
     if (!ccdCase.id) {
       throw new HTTPError('Cannot submit general application, case ID not specified', 500);
     }
@@ -333,7 +336,14 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
-    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data).then(responseData => {
+      const confirmationBodyJson = responseData.after_submit_callback_response?.confirmation_body;
+      if (confirmationBodyJson) {
+        return JSON.parse(confirmationBodyJson) as MakeAnApplicationResponse;
+      } else {
+        throw new HTTPError('No confirmation body found in response data', 500);
+      }
+    });
   },
 
   async submitUploadDocuments(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {

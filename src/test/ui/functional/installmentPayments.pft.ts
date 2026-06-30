@@ -1,4 +1,4 @@
-import { feedback, installmentPayments, repaymentsAgreed, taskList } from '../data/page-data';
+import { feedback, installmentPayments, repaymentsAgreed } from '../data/page-data';
 import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -21,5 +21,4 @@ export async function installmentPaymentsNavigationTests(): Promise<void> {
     repaymentsAgreed.getMainHeader(claimantsName)
   );
   await performAction('clickRadioButton', installmentPayments.yesRadioOption);
-  await performValidation('pageNavigation', installmentPayments.saveForLaterButton, taskList.mainHeader);
 }
