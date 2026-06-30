@@ -18,6 +18,10 @@
   }
 }
 
+.view-the-response .govuk-summary-list__key {
+  @include govuk-typography-weight-regular($important: true);
+}
+
 .govuk-header__content {
   display: flex;
   align-items: center;
