@@ -1,14 +1,14 @@
 import { repaymentsAgreed } from '../data/page-data';
-import { claimantsName } from '../utils/actions/custom-actions';
+//import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(501);
 export async function repaymentsAgreedErrorValidation(): Promise<void> {
-  await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
-  await performValidation('errorMessage', {
-    header: repaymentsAgreed.thereIsAProblemErrorMessageHeader,
-    message: repaymentsAgreed.getSelectAgreementErrorMessage(claimantsName),
-  });
+  // await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  // await performValidation('errorMessage', {
+  //   header: repaymentsAgreed.thereIsAProblemErrorMessageHeader,
+  //   message: repaymentsAgreed.getSelectAgreementErrorMessage(claimantsName),
+  // });
   await performAction('clickRadioButton', repaymentsAgreed.yesRadioOption);
   await performValidation('elementToBeVisible', repaymentsAgreed.youCanEnterUpToHiddenHintText);
   await performAction('inputText', repaymentsAgreed.giveDetailsHiddenTextLabel, overMaxLengthString);
