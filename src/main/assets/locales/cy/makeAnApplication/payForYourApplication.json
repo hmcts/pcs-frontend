@@ -1,0 +1,11 @@
+{
+  "pageTitle": "cyPay for your application",
+  "heading": "cyPay for your application",
+  "applicationFee": "cyApplication fee:",
+  "formattedFeeAmount": "{{feeAmount, currency(currency: GBP)}}",
+  "youWillBeRedirected": "cyYou will be redirected to GOV.UK Pay to complete your payment securely.",
+  "govPayIsASecureService": "cyGOV.UK Pay is a secure payment service used by government services.",
+  "buttons": {
+    "continueToPayment": "cyContinue to payment"
+  }
+}

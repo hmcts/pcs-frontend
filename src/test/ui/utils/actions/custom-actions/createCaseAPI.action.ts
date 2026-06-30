@@ -57,7 +57,7 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw new Error(`Create case failed after retries: ${error.response?.status}`);
+            throw error;
           }
           throw new Error('Create case failed unexpectedly.');
         }
@@ -86,25 +86,24 @@ export class CreateCaseAPIAction implements IAction {
         await performAction('linkSolicitorAPI');
       }
       console.log(`\n✅ GET DEFENDANT ID SUCCESSFUL : STATUS ${createResponse.status}`);
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const responseBody = error?.response?.data;
+    } catch (error: unknown) {
+      if (Axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const responseBody = error.response?.data;
 
-      console.error('=== ERROR RESPONSE ===');
-      console.error('HTTP Status:', status);
-      console.error('Exception:', responseBody?.exception);
-      console.error('Error:', responseBody?.error);
-      console.error('Message:', responseBody?.message);
-      console.error('Path:', responseBody?.path);
-      console.error('Timestamp:', responseBody?.timestamp);
-      console.error('Full response body:', JSON.stringify(responseBody, null, 2));
+        console.error('=== ERROR RESPONSE ===');
+        console.error('HTTP Status:', status);
+        console.error('Exception:', responseBody?.exception);
+        console.error('Error:', responseBody?.error);
+        console.error('Message:', responseBody?.message);
+        console.error('Path:', responseBody?.path);
+        console.error('Timestamp:', responseBody?.timestamp);
+        console.error('Full response body:', JSON.stringify(responseBody, null, 2));
 
-      if (!status) {
-        throw new Error('Defendant id not retrieved: no response from server.');
+        throw error;
       }
-      throw new Error(
-        `Retrieving defendant id  failed with status ${status}.Response received is ${responseBody?.message}}`
-      );
+
+      throw new Error('Defendant id not retrieved due to an unexpected error.');
     }
   }
 
@@ -143,7 +142,7 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw new Error(`Submit case failed after retries: ${error.response?.status}`);
+            throw error;
           }
           throw new Error('Submit case failed unexpectedly.');
         }

@@ -9,6 +9,10 @@
   border: 1px solid govuk-colour('blue');
 }
 
+.panel-error {
+  background: $govuk-error-colour;
+}
+
 .dashboard-notifications {
   .govuk-notification-banner {
     margin-bottom: govuk-spacing(4);
@@ -132,5 +136,19 @@
   .govuk-tag--grey {
     color: #383f43;
     background-color: #eeefef;
+  }
+}
+
+// Fee breakdown summary list: Figma uses an even key/value split rather than the
+// default GOV.UK one-third key column, which leaves values too close to labels.
+.pcs-fee-summary-list {
+  @include govuk-media-query($from: tablet) {
+    .govuk-summary-list__key {
+      width: 50%;
+    }
+
+    .govuk-summary-list__value {
+      width: 50%;
+    }
   }
 }
