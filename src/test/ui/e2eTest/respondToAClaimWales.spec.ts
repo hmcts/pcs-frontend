@@ -46,7 +46,6 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
-import { FieldsStore } from '../utils/actions/custom-actions/recordAnsweredFields.action';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -56,7 +55,7 @@ let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  FieldsStore.clear();
+  await performAction('resetRTCAnswerStore');
   process.env.WALES_POSTCODE = 'YES';
   process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
   process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
