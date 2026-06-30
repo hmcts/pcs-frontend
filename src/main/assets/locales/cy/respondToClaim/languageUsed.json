@@ -1,13 +1,13 @@
 {
-  "pageTitle": "cyLanguage used",
-  "heading": "cyWhich language did you use to complete your response?",
-  "languageUsedHint": "cyIf someone else helped you to answer a question in this service, ask them if they answered any questions in Welsh. We’ll use this to make sure your response is processed correctly",
+  "pageTitle": "Iaith a ddefnyddiwyd",
+  "heading": "Pa iaith a ddefnyddiwyd gennych i lenwi eich ymateb?",
+  "languageUsedHint": "Os yw rhywun arall wedi eich helpu i ateb cwestiwn yn y gwasanaeth hwn, gofynnwch iddynt a wnaethant ateb unrhyw gwestiynau yn Gymraeg. Byddwn yn defnyddio hwn i sicrhau bod eich ymateb yn cael ei brosesu'n gywir",
   "language": {
-    "english": "cyEnglish",
-    "welsh": "cyWelsh",
-    "englishAndWelsh": "cyEnglish and Welsh"
+    "english": "Saesneg",
+    "welsh": "Cymraeg",
+    "englishAndWelsh": "Saesneg a Cymraeg"
   },
   "errors": {
-    "languageUsed": "cySelect which language you used to complete this service"
+    "languageUsed": "Dewiswch pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn"
   }
 }

@@ -9,6 +9,7 @@ import { Router as createRouter } from 'express';
 import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import { requireEventAccess } from '../middleware/requireEventAccess';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../steps/utils/buildDraftDefendantResponse';
 import {
   RespondToClaimFinalSubmitError,
   getEndOfJourneyCyaSubmitErrorPath,
@@ -45,6 +46,16 @@ export default function finalSubmitRoutes(app: Application): void {
     }
 
     try {
+      const draft = buildDraftDefendantResponse(req);
+      const contempt = req.body?.statementOfTruthContempt as string[] | undefined;
+      const belief = req.body?.statementOfTruthBelief as string[] | undefined;
+      const bothAccepted = contempt?.includes('yes') && belief?.includes('yes');
+      draft.defendantResponses.statementOfTruth = {
+        accepted: bothAccepted ? 'YES' : 'NO',
+        fullName: (req.body?.fullName as string | undefined)?.trim(),
+      };
+      await saveDraftDefendantResponse(req, draft);
+
       req.res = res;
       const { confirmationPath } = await submitRespondToClaimResponse(req);
       return safeRedirect303(res, confirmationPath, '/', ['/case']);
