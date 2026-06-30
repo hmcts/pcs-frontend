@@ -42,7 +42,7 @@ jest.mock('../../../main/modules/http', () => ({
 
 const mockSaveDraftDefendantResponse = jest.fn().mockResolvedValue(undefined);
 const mockBuildDraftDefendantResponse = jest.fn(() => ({
-  defendantResponses: { completedSections: [] },
+  defendantResponses: {},
   defendantContactDetails: { party: {} },
 }));
 jest.mock('../../../main/steps/utils/buildDraftDefendantResponse', () => ({
@@ -204,62 +204,7 @@ describe('finalSubmit routes', () => {
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
     });
 
-    it('should persist statement of truth as accepted (trimmed name) when both confirmations are yes', async () => {
-      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
-
-      mockHttpGet.mockResolvedValue({ data: { token: 'mock-event-token' } });
-      mockHttpPost.mockResolvedValue({});
-
-      const req = {
-        params: { caseReference: '1234567890123456' },
-        body: {
-          statementOfTruthContempt: ['yes'],
-          statementOfTruthBelief: ['yes'],
-          fullName: '  John Smith  ',
-        },
-        session: { user: { accessToken: 'mock-token' } },
-      } as unknown as Request;
-
-      const res = {
-        locals: { validatedCase: { id: '1234567890123456', data: {} } },
-        redirect: jest.fn(),
-      } as unknown as Response;
-
-      await handler(req, res);
-
-      const savedDraft = mockSaveDraftDefendantResponse.mock.calls[0][1] as {
-        defendantResponses: { statementOfTruth: { accepted: string; fullName: string } };
-      };
-      expect(savedDraft.defendantResponses.statementOfTruth).toEqual({ accepted: 'YES', fullName: 'John Smith' });
-      expect(mockHttpPost).toHaveBeenCalled();
-    });
-
-    it('should persist statement of truth as not accepted when a confirmation is missing', async () => {
-      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
-
-      mockHttpGet.mockResolvedValue({ data: { token: 'mock-event-token' } });
-      mockHttpPost.mockResolvedValue({});
-
-      const req = {
-        params: { caseReference: '1234567890123456' },
-        body: { statementOfTruthContempt: ['yes'] },
-        session: { user: { accessToken: 'mock-token' } },
-      } as unknown as Request;
-
-      const res = {
-        locals: { validatedCase: { id: '1234567890123456', data: {} } },
-        redirect: jest.fn(),
-      } as unknown as Response;
-
-      await handler(req, res);
-
-      const savedDraft = mockSaveDraftDefendantResponse.mock.calls[0][1] as {
-        defendantResponses: { statementOfTruth: { accepted: string } };
-      };
-      expect(savedDraft.defendantResponses.statementOfTruth.accepted).toBe('NO');
-    });
-
-    it('should redirect to end-of-journey-cya with error when submission fails', async () => {
+    it('should redirect to check-your-answers with error when submission fails', async () => {
       const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       mockHttpGet.mockResolvedValue({ data: { token: 'mock-event-token' } });

@@ -16,7 +16,6 @@ import { caseReferenceParamMiddleware } from '../middleware/caseReference';
 import { oidcMiddleware } from '../middleware/oidc';
 import { requireEventAccess } from '../middleware/requireEventAccess';
 import { http } from '../modules/http';
-import { sectionIdToBackendEnum } from '../steps/respond-to-claim/sections.config';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../steps/utils/buildDraftDefendantResponse';
 import { getRespondToClaimConfirmationPath } from '../steps/utils/postSubmissionRouting';
 
@@ -87,11 +86,6 @@ export default function finalSubmitRoutes(app: Application): void {
         accepted: bothAccepted ? 'YES' : 'NO',
         fullName: (req.body?.fullName as string | undefined)?.trim(),
       };
-      const sotSection = sectionIdToBackendEnum('checkYourAnswersAndSubmit');
-      const completed = draft.defendantResponses.completedSections ?? [];
-      if (!completed.includes(sotSection)) {
-        draft.defendantResponses.completedSections = [...completed, sotSection];
-      }
       await saveDraftDefendantResponse(req, draft);
 
       // Phase 1: START - Get event token from CCD
