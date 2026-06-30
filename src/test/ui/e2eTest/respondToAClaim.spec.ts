@@ -191,26 +191,32 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@assured')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@secureFlexible')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@other')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@rentNonRent')) {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     process.env.TENANCY_START_DATE_KNOWN = 'YES';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@multiParty')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
+    await performAction('updatePaymentAPI');
     claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
@@ -219,10 +225,12 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', {
       data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancyNoticeServedNo,
     });
+    await performAction('updatePaymentAPI');
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+    await performAction('updatePaymentAPI');
   }
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
