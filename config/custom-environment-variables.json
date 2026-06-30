@@ -81,8 +81,11 @@
   "documentUpload": {
     "maxFileSizePerFileMB": "DOCUMENT_UPLOAD_MAX_FILE_SIZE_PER_FILE_MB",
     "maxMediaFileSizeMB": "DOCUMENT_UPLOAD_MAX_MEDIA_FILE_SIZE_MB",
-    "maxTotalFileSizeMB": "DOCUMENT_UPLOAD_MAX_TOTAL_FILE_SIZE_MB",
+    "maxTotalFileSizeMB": "DOCUMENT_UPLOAD_MAX_TOTAL_FILE_SIZE_MB"
     "maxDocumentFileSizeMB": "DOCUMENT_UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB",
     "maxFilenameLength": "DOCUMENT_UPLOAD_MAX_FILENAME_LENGTH"
+  },
+  "payment": {
+    "returnUrl": "PAYMENT_RETURN_URL"
   }
 }

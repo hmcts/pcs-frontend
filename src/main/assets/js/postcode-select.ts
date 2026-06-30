@@ -16,16 +16,17 @@ export function initPostcodeSelection(): void {
     byIdOrName<HTMLSelectElement>(`${prefix}-selectedAddress`) ?? byIdOrName<HTMLSelectElement>('selectedAddress');
 
   // Focus the dropdown if we just came from a postcode lookup
-  let href = '';
-  if ((window as { __testHref?: string }).__testHref) {
-    href = (window as { __testHref?: string }).__testHref as string;
-  } else {
-    try {
-      href = (window as { location?: { href?: string } })?.location?.href || '';
-    } catch {
-      href = '';
+  const getHref = (): string => {
+    if ((window as { __testHref?: string }).__testHref) {
+      return (window as { __testHref?: string }).__testHref as string;
     }
-  }
+    try {
+      return (window as { location?: { href?: string } })?.location?.href || '';
+    } catch {
+      return '';
+    }
+  };
+  const href = getHref();
   const isLookup = /(^|[?&])lookup=1(&|$)/.test(href);
 
   if (isLookup && addressSelect) {

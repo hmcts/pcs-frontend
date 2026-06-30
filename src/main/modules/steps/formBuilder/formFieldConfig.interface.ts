@@ -136,6 +136,7 @@ export interface FormBuilderConfig {
   journeyFolder: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
+  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>;
   beforeGet?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
   // Prepopulates form fields from CCD on GET requests (e.g., when user returns to edit their answer).

@@ -80,6 +80,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     journeyFolder,
     fields,
     beforeRedirect,
+    resolveRedirectAfterPost,
     beforeGet,
     extendGetContent,
     getInitialFormData,
@@ -179,7 +180,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       translationKeys,
       showCancelButton,
       extendGetContent,
-      documentStorage
+      documentStorage,
+      resolveRedirectAfterPost
     ),
   };
 }
