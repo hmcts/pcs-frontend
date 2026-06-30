@@ -252,9 +252,9 @@ export class PageNavigationValidation implements IValidation {
         if (validationData.pageSlug) {
           try {
             if (actualUrl.includes('respond-to-claim')) {
-              expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=respond-to-claim/${validationData.pageSlug}`;
+              expectedUrlPattern = `https://www.smartsurvey.co.uk/t/Poss_feedback/?pageurl=respond-to-claim/${validationData.pageSlug}`;
             } else if (actualUrl.includes('make-an-application')) {
-              expectedUrlPattern = `https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl=make-an-application/${validationData.pageSlug}`;
+              expectedUrlPattern = `https://www.smartsurvey.co.uk/t/Poss_feedback/?pageurl=make-an-application/${validationData.pageSlug}`;
             }
             if (actualUrl !== expectedUrlPattern) {
               urlPassed = false;
