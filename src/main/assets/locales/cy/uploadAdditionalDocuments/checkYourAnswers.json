@@ -5,5 +5,8 @@
   "placeholderBody": "Welsh placeholder: this page is under construction. The review and submit step for additional documents will be added in a follow-up ticket.",
   "relatedApplicationLabel": "cyRelated application",
   "documentsLabel": "cyUploaded documents",
-  "documentsNone": "cyNo documents uploaded"
+  "documentsNone": "cyNo documents uploaded",
+  "errors": {
+    "submitFailed": "cyYour files were not submitted. Try again."
+  }
 }

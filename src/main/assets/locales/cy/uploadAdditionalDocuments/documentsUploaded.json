@@ -1,0 +1,10 @@
+{
+  "pageTitle": "cyDocuments uploaded",
+  "panelTitle": "cyDocuments uploaded",
+  "confirmationBody": "cyWe have received the documents you uploaded",
+  "whatHappensNext": {
+    "heading": "cyWhat happens next",
+    "body": "cyYou do not need to do anything else. We will review the documents."
+  },
+  "closeLink": "cyClose and return to case overview"
+}

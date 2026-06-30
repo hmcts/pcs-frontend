@@ -18,6 +18,7 @@ nodejs:
     CCD_URL: '${DATA_STORE_URL_BASE}'
     CASE_TYPE_ID: '${CASE_TYPE_ID}'
     XUI_BASE_URI: '${XUI_BASE_URI}'
+    PAYMENT_RETURN_URL: 'https://${SERVICE_FQDN}/payment/return'
 redis:
   image:
     registry: hmctsprod.azurecr.io
