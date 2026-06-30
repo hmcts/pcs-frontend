@@ -42,6 +42,7 @@ export const flowConfig: JourneyFlowConfig = {
         }
         return 'start-evidence-upload';
       },
+      defaultNext: checkYourAnswersStep,
     },
     [checkYourAnswersStep]: { routes: [{ nextStep: documentsUploadedStep }] },
     [documentsUploadedStep]: {},
