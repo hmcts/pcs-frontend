@@ -69,41 +69,15 @@ export class CreateCaseAPIAction implements IAction {
 
   private async getCaseAPI(): Promise<void> {
     const getCaseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
-    const maxRetries = actionRetries;
-    const delayMs = VERY_SHORT_TIMEOUT;
 
     //process.env.CREATE_EVENT_TOKEN = (await getCaseApi.get(createCaseEventTokenApiData.createCaseEventTokenApiEndPoint)).data.token;
     try {
-      let createResponse;
-      let caseStatus = '';
-
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        createResponse = await getCaseApi.get(getCaseApiData.getCaseApiEndPoint());
-        const caseData = createResponse.data?.data ?? createResponse.data;
-        caseStatus = String(caseData?.state ?? caseData?.status ?? '').toUpperCase();
-
-        if (caseStatus === 'ISSUED') {
-          break;
-        }
-
-        if (attempt === maxRetries) {
-          throw new Error(
-            `Case did not reach ISSUED status after multiple retries. Last observed status: ${caseStatus || 'UNKNOWN'}`
-          );
-        }
-
-        await new Promise(res => setTimeout(res, delayMs));
-      }
-
-      if (!createResponse) {
-        throw new Error('Unable to load case data.');
-      }
-
+      const createResponse = await getCaseApi.get(getCaseApiData.getCaseApiEndPoint());
       await this.generateSolicitorAccessToken();
       const allDefendants = createResponse.data.data.allDefendants;
       const defendantIds = allDefendants.map((d: any) => d.id);
       if (defendantIds.length === 0) {
-        throw new Error(`No Defendants ID retrieved and the case status is ${caseStatus || 'UNKNOWN'}`);
+        throw new Error(`No Defendants ID retrieved and the status is ${createResponse.status}`);
       }
 
       for (const defendantId of defendantIds) {
@@ -111,7 +85,7 @@ export class CreateCaseAPIAction implements IAction {
 
         await performAction('linkSolicitorAPI');
       }
-      console.log(`\n✅ GET DEFENDANT ID SUCCESSFUL : CASE STATUS ${caseStatus}`);
+      console.log(`\n✅ GET DEFENDANT ID SUCCESSFUL : STATUS ${createResponse.status}`);
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
         const status = error.response?.status;
@@ -190,9 +164,6 @@ export class CreateCaseAPIAction implements IAction {
           throw new Error('No payment information found.');
         }
         const requestReference = paymentInfo[0].serviceRequestReference;
-        if (!requestReference) {
-          throw new Error(`Missing serviceRequestReference in fee payment info: ${JSON.stringify(paymentInfo[0])}`);
-        }
         const updateResponse = await paymentApi.put(
           paymentApiData.updatePaymentApiEndPoint,
           paymentApiData.paymentUpdatePayload(requestReference)
@@ -204,14 +175,7 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw new Error(
-              `Payment API failed after retries: ${error.response?.status ?? 'NO_STATUS'} ${JSON.stringify(
-                error.response?.data ?? {}
-              )}`
-            );
-          }
-          if (error instanceof Error) {
-            throw new Error(`Payment API failed unexpectedly after retries: ${error.message}`);
+            throw new Error(`Payment API failed after retries: ${error.response?.status}`);
           }
           throw new Error('Payment API failed unexpectedly after retries.');
         }
