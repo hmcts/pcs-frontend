@@ -5,6 +5,7 @@ import {
   CcdClaimGroundSummaryItem,
   CcdClaimantEnteredDefendantDetails,
   CcdCollectionItem,
+  CcdCounterClaim,
   CcdDefendantParty,
   CcdDefendantResponses,
   PossessionClaimResponse,
@@ -257,6 +258,10 @@ export class CcdCaseModel {
 
   get defendantResponsesCounterClaimWantToUploadFiles(): string | undefined {
     return this.defendantResponses?.counterClaimWantToUploadFiles ?? undefined;
+  }
+
+  get defendantResponsesCounterClaim(): CcdCounterClaim | undefined {
+    return this.defendantResponses?.counterClaim ?? undefined;
   }
 
   get introGroundsIntroductoryDemotedOrOtherGrounds(): string[] {

@@ -1,15 +1,15 @@
 {
-  "pageTitle": "cyNotice details",
-  "question": "cyDid {{ claimantName }} give you notice of their intention to begin possession proceedings?",
-  "hintText": "cyA notice is a formal document from your landlord or mortgage provider saying they plan to take legal action to repossess the property, which must follow certain legal requirements",
+  "pageTitle": "Manylion yr hysbysiad",
+  "question": "A wnaeth {{ claimantName }} eich hysbysu am eu bwriad i ddechrau achos meddiannu?",
+  "hintText": "Mae hysbysiad yn ddogfen ffurfiol gan eich landlord neu ddarparwr morgais yn dweud eu bod yn bwriadu cymryd camau cyfreithiol i ailfeddiannu'r eiddo, sy'n rhaid dilyn rhai gofynion cyfreithiol",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "or": "cyor",
-    "imNotSure": "cyI’m not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "imNotSure": "Nid wyf yn siŵr"
   },
   "noticeDateLabel": " ",
   "errors": {
-    "possessionNoticeReceived": "cySelect if {{claimantName}} gave you notice of their intention to begin possession proceedings"
+    "possessionNoticeReceived": "Dewiswch a wnaeth {{ claimantName }} eich hysbysu am eu bwriad i ddechrau achos meddiannu"
   }
 }

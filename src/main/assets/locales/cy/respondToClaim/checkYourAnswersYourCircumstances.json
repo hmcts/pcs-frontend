@@ -1,6 +1,6 @@
 {
-  "pageTitle": "cy Check your answers",
-  "cardTitle": "cy Your circumstances",
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "Eich amgylchiadau",
   "rows": {
     "dependantChildren": {
       "label": "cy Do you have any dependent children?",
@@ -11,23 +11,23 @@
       "changeHidden": "cy dependent children details"
     },
     "otherDependants": {
-      "label": "cy Do you have any other dependants?",
+      "label": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
       "changeHidden": "cy other dependants"
     },
     "otherDependantsDetails": {
-      "label": "cy Give details about your other dependants",
+      "label": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnoch",
       "changeHidden": "cy other dependants details"
     },
     "otherTenants": {
-      "label": "cy Do any other adults live in your home?",
+      "label": "A oes yna unrhyw oedolion eraill yn byw yn eich cartref?",
       "changeHidden": "cy other adults in your home"
     },
     "otherTenantsDetails": {
-      "label": "cy Give details about the other adults living in your home",
+      "label": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",
       "changeHidden": "cy other adults details"
     },
     "alternativeAccommodation": {
-      "label": "cy Would you have somewhere else to live if you had to leave your home?",
+      "label": "A fyddai gennych rywle arall i fyw os byddai'n rhaid i chi adael eich cartref?",
       "changeHidden": "cy alternative accommodation"
     },
     "alternativeAccommodationDate": {
@@ -35,19 +35,19 @@
       "changeHidden": "cy alternative accommodation move-in date"
     },
     "shareAdditionalCircumstances": {
-      "label": "cy Would you like to share anything about your circumstances?",
+      "label": "Hoffech chi rannu unrhyw beth am eich amgylchiadau?",
       "changeHidden": "cy additional circumstances"
     },
     "shareAdditionalCircumstancesDetails": {
-      "label": "cy Give details about your circumstances",
+      "label": "Rhowch fanylion am eich amgylchiadau",
       "changeHidden": "cy additional circumstances details"
     },
     "exceptionalHardship": {
-      "label": "cy Would you experience exceptional hardship if you were asked to leave your home?",
+      "label": "A fyddech yn profi caledi eithriadol os gofynnir i chi adael eich cartref?",
       "changeHidden": "cy exceptional hardship"
     },
     "exceptionalHardshipDetails": {
-      "label": "cy Give details about the exceptional hardship you’d experience",
+      "label": "Rhowch fanylion am y caledi eithriadol y byddech yn ei brofi",
       "changeHidden": "cy exceptional hardship details"
     }
   }

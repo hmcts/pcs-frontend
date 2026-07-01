@@ -216,14 +216,12 @@ function checkDateRestrictions(
   today.setHours(0, 0, 0, 0);
   inputDate.setHours(0, 0, 0, 0);
 
-  let isInvalid = false;
-
   if (noFutureDate) {
     // noCurrentDate determines whether to include todays date in the valid range
-    isInvalid = noCurrentDate ? inputDate >= today : inputDate > today;
+    const isInvalid = noCurrentDate ? inputDate >= today : inputDate > today;
     return isInvalid ? getDateErrorMessage(t, 'futureDate', translations) : null;
   } else if (noPastDate) {
-    isInvalid = noCurrentDate ? inputDate <= today : inputDate < today;
+    const isInvalid = noCurrentDate ? inputDate <= today : inputDate < today;
     return isInvalid ? getDateErrorMessage(t, 'pastDate', translations) : null;
   }
 
