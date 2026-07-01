@@ -139,6 +139,11 @@ export interface CcdParty {
   firstName?: string;
   lastName?: string;
   orgName?: string;
+  nameKnown?: string;
+  address?: CcdCaseAddress | Record<string, never>;
+  addressKnown?: string;
+  addressSameAsProperty?: string;
+  dateOfBirth?: string;
 }
 
 /** Claimant-entered defendant details captured when the claim was created. */
