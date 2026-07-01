@@ -69,7 +69,7 @@ async function waitUntilCaseIssued(): Promise<void> {
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     const response = await getCaseApi.get(getCaseApiData.getCaseApiEndPoint());
-    caseStatus = String(response?.data?.state ?? response?.data?.status ?? response?.status ?? '')
+    caseStatus = String(response?.data?.state)
       .trim()
       .toUpperCase();
 
