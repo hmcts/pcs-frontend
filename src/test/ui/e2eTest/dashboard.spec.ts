@@ -238,7 +238,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('verifyResponseDetailsOnViewTheResponsePage');
   });
 
-  test('Validate View the claim page data @PR @regression @crossbrowser', async () => {
+  test('Validate View the claim page data @regression @crossbrowser', async () => {
     await performAction('clickLink', dashboard.viewTheClaimLink);
     await performValidation('mainHeader', viewTheClaim.mainHeader);
     await performAction('verifyClaimDetailsOnViewTheClaimPage');
