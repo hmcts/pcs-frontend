@@ -7,7 +7,7 @@ import {
 import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
 import { dashboard, taskList } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
-import { viewDocuments } from '../data/page-data/documents-page-data';
+import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
@@ -24,6 +24,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  await performAction('updatePaymentAPI');
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
@@ -47,16 +48,15 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
           fieldName: dashboard.askTheCourtToMakeAnOrderLink,
           header: chooseAnApplication.mainHeader,
         },
-      ]
-      // The lines below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
-      /*[
+      ],
+      [
         'clickLinkAndVerifySameTabTitle',
         {
           sectionHeader: dashboard.iWantToHeader,
           fieldName: dashboard.uploadAdditionalDocumentsLink,
           header: startEvidenceUpload.mainHeader,
         },
-      ]*/
+      ]
     );
     await performActions(
       'Validate Help and Support links',
@@ -114,12 +114,11 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       fieldName: dashboard.viewTheClaimLink,
       header: viewTheClaim.mainHeader,
     });
-    // The lines below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
-    /*await performAction('clickLinkAndVerifySameTabTitle', {
+    await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.documentsSubHeader,
       fieldName: dashboard.uploadAdditionalDocumentsLink,
       header: startEvidenceUpload.mainHeader,
-    });*/
+    });
     await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.documentsSubHeader,
       fieldName: dashboard.viewDocumentsLink,
@@ -223,5 +222,19 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       tag: dashboard.completedTag,
       viewResponseTag: dashboard.availableTag,
     });
+  });
+
+  // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
+  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
+    await performValidation('mainHeader', dashboard.mainHeader);
+    await performAction('reloadPage');
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      type: 'both',
+    });
+    await performAction('reloadPage');
+    await performAction('clickButton', dashboard.viewTheResponseSubHeader);
+    await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+    await performAction('verifyResponseOnViewTheClaimPage');
   });
 });

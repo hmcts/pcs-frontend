@@ -22,5 +22,8 @@
   },
   "redirects": {
     "manageCaseReturnURL": "http://localhost:3000/cases/case-details/PCS/PCS"
+  },
+  "payment": {
+    "returnUrl": "http://localhost:3209/payment/return"
   }
 }

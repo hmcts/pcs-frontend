@@ -1,10 +1,10 @@
 {
-  "pageTitle": "cyIs the court hearing in the next 14 days?",
-  "caption": "cyMake an application",
-  "heading": "cyIs the court hearing in the next 14 days?",
-  "question": "cyIs the court hearing in the next 14 days?",
-  "hintText": "cyThis will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away.",
+  "pageTitle": "A yw'r gwrandawiad llys yn ystod yr 14 diwrnod nesaf?",
+  "caption": "Gwneud cais",
+  "heading": "A yw'r gwrandawiad llys yn ystod yr 14 diwrnod nesaf?",
+  "question": "A yw'r gwrandawiad llys yn ystod yr 14 diwrnod nesaf?",
+  "hintText": "Bydd hyn yn effeithio ar y ffi y byddwch yn ei thalu. Nid ydych angen talu ffi os yw eich gwrandawiad llys (o leiaf) 14 diwrnod i ffwrdd.",
   "errors": {
-    "inNext14Days": "cyConfirm whether the court hearing is in the next 14 days"
+    "inNext14Days": "Cadarnhewch a yw'r gwrandawiad llys yn ystod yr 14 diwrnod nesaf"
   }
 }

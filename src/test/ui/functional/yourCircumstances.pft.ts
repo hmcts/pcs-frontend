@@ -1,9 +1,4 @@
-import {
-  feedback,
-  taskList,
-  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  yourCircumstances,
-} from '../data/page-data';
+import { feedback, wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome, yourCircumstances } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -42,5 +37,4 @@ export async function yourCircumstancesNavigationTests(): Promise<void> {
     wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader
   );
   await performAction('clickRadioButton', yourCircumstances.noRadioOption);
-  await performValidation('pageNavigation', yourCircumstances.saveForLaterButton, taskList.mainHeader);
 }

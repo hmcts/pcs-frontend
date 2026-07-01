@@ -28,15 +28,50 @@ export function shouldShowCounterClaimFeePaymentNeededConfirmationStep(caseData:
   return !defendantResponses.counterClaim?.hwfReferenceNumber?.trim();
 }
 
+export interface SubmitPaymentPayload {
+  serviceRequestReference?: string;
+  feeAmount?: number;
+}
+
+export interface RespondToClaimSubmitNavigation {
+  confirmationPath: string;
+  counterClaimFeePaymentRequired: boolean;
+}
+
 // Final submit route handler function used to determine which confirmation page to show after response submission
 export function getRespondToClaimConfirmationPath(caseId: string, caseData: CcdCaseData | undefined): string {
+  return getRespondToClaimSubmitNavigation(caseId, caseData).confirmationPath;
+}
+
+export function getRespondToClaimSubmitNavigation(
+  caseId: string,
+  caseData: CcdCaseData | undefined,
+  paymentPayload?: SubmitPaymentPayload
+): RespondToClaimSubmitNavigation {
   const base = `/case/${caseId}/respond-to-claim`;
+  const paymentRequired = Boolean(paymentPayload?.serviceRequestReference?.trim());
+
+  if (paymentRequired) {
+    return {
+      confirmationPath: `${base}/response-submitted-counter-claim-fee-payment-needed`,
+      counterClaimFeePaymentRequired: true,
+    };
+  }
 
   if (shouldShowResponseSubmittedConfirmationStep(caseData)) {
-    return `${base}/response-submitted`;
+    return {
+      confirmationPath: `${base}/response-submitted`,
+      counterClaimFeePaymentRequired: false,
+    };
   }
   if (shouldShowResponseAndCounterClaimSubmittedConfirmationStep(caseData)) {
-    return `${base}/response-and-counter-claim-submitted`;
+    return {
+      confirmationPath: `${base}/response-and-counter-claim-submitted`,
+      counterClaimFeePaymentRequired: false,
+    };
   }
-  return `${base}/response-submitted-counter-claim-fee-payment-needed`;
+  return {
+    confirmationPath: `${base}/response-submitted-counter-claim-fee-payment-needed`,
+    counterClaimFeePaymentRequired: false,
+  };
 }

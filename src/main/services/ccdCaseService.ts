@@ -38,6 +38,7 @@ import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import { GenAppType, MakeAnApplicationResponse } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type {
   DashboardNotification,
@@ -55,6 +56,12 @@ const logger = Logger.getLogger('ccdCaseService');
 
 interface EventTokenResponse {
   token: string;
+}
+
+export interface RelatedApplication {
+  id: string;
+  type?: GenAppType;
+  applicationSubmittedDate?: string;
 }
 
 export interface TransformedDashboardData {
@@ -93,6 +100,31 @@ function getCaseHeaders(token: string): CaseHeaders {
   };
 }
 
+interface CcdErrorResponseData {
+  callbackErrors?: string[];
+  callbackWarnings?: string[];
+  exception?: string;
+  message?: string;
+}
+
+function isAccessDeniedCallbackFailure(
+  status: number | undefined,
+  responseData: CcdErrorResponseData | undefined
+): boolean {
+  if (status !== 502 || !responseData) {
+    return false;
+  }
+
+  const exception = responseData.exception ?? '';
+  const message = responseData.message ?? '';
+
+  return (
+    exception.includes('CallbackException') &&
+    message.includes('Callback to service has been unsuccessful') &&
+    message.includes('about-to-start')
+  );
+}
+
 function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPError {
   // HttpService throws HTTPError(401) directly for user-token 401s - propagate as-is
   if (error instanceof HTTPError) {
@@ -101,9 +133,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
-  const responseData = axiosError.response?.data as
-    | { callbackErrors?: string[]; callbackWarnings?: string[] }
-    | undefined;
+  const responseData = axiosError.response?.data as CcdErrorResponseData | undefined;
 
   logger.error(`Error in ${context}: ${axiosError.message}`);
   if (responseData) {
@@ -112,6 +142,10 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   if (status === 403) {
     return new HTTPError('Not authorised to access CCD case service', 403);
+  }
+
+  if (isAccessDeniedCallbackFailure(status, responseData)) {
+    return new HTTPError('Access denied', 403);
   }
 
   const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
@@ -126,6 +160,16 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
       : undefined;
 
   return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500, retryAfter);
+}
+
+// Read endpoints coerce 400/404 to a 403 so the client sees an access-denied page
+// rather than leaking case existence (404 -> pageNotFound) or a bad-request.
+function convertReadErrorToHttpError(error: unknown, context: string): HTTPError {
+  const httpError = convertAxiosErrorToHttpError(error, context);
+  if (httpError.status === 400 || httpError.status === 404) {
+    return new HTTPError('Access denied', 403);
+  }
+  return httpError;
 }
 
 /**
@@ -226,13 +270,7 @@ export const ccdCaseService = {
         data: caseData,
       };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getCaseByIdForEvent');
-
-      // coerce 400 and 404 to 404 so we can return a 404 error to the client
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getCaseByIdForEvent');
     }
   },
 
@@ -250,12 +288,7 @@ export const ccdCaseService = {
         data: caseData,
       };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
-
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getCaseById');
     }
   },
 
@@ -313,7 +346,10 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
   },
 
-  async submitGeneralApplication(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+  async submitGeneralApplication(
+    accessToken: string | undefined,
+    ccdCase: CcdCase
+  ): Promise<MakeAnApplicationResponse> {
     if (!ccdCase.id) {
       throw new HTTPError('Cannot submit general application, case ID not specified', 500);
     }
@@ -323,7 +359,14 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
-    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data).then(responseData => {
+      const confirmationBodyJson = responseData.after_submit_callback_response?.confirmation_body;
+      if (confirmationBodyJson) {
+        return JSON.parse(confirmationBodyJson) as MakeAnApplicationResponse;
+      } else {
+        throw new HTTPError('No confirmation body found in response data', 500);
+      }
+    });
   },
 
   async submitUploadDocuments(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
@@ -346,11 +389,7 @@ export const ccdCaseService = {
       const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
       return response.data;
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getExistingCaseDataError');
     }
   },
 
@@ -408,11 +447,7 @@ export const ccdCaseService = {
 
       return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress), relatedApplications };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getDashboardView');
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getDashboardView');
     }
   },
 };
