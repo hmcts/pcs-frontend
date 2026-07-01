@@ -55,7 +55,7 @@ describe('paymentReturn routes', () => {
   describe('GET /payment/return', () => {
     it('registers route with oidc middleware', () => {
       expect(mockRouterGet).toHaveBeenCalledWith(
-        '/payment/return/:internalReference/confirmation',
+        '/payment/return/:internalReference/confirmation{/:confirmationToken}',
         mockOidcMiddleware,
         expect.any(Function)
       );
@@ -140,6 +140,45 @@ describe('paymentReturn routes', () => {
       expect(req.session.payment).toEqual({
         paymentReference: 'RC-123',
       });
+    });
+
+    it('redirects to success URL when Demo-style confirmation token is present in path', async () => {
+      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      mockGetCardPaymentStatus.mockResolvedValue({ status: 'Success' });
+
+      const req = {
+        session: {
+          user: { accessToken: 'token-123' },
+          payment: {
+            paymentReference: 'RC-123',
+            caseReference: '1234567890123456',
+            successRedirectUrl: '/case/1234567890123456/respond-to-claim/counter-claim-payment-successful',
+            failureRedirectUrl:
+              '/case/1234567890123456/respond-to-claim/counter-claim-application-fee-amount?payment=failed',
+          },
+          save: jest.fn(callback => {
+            callback?.(undefined);
+            return req.session;
+          }),
+        },
+        params: {
+          internalReference: '1f905214-3af0-4f11-a9e7-8b37133bb645',
+          confirmationToken: 'ec9f7e96489a51cd71aa68464833da6597211d811add8f279a6f2423ab58f74f',
+        },
+      } as unknown as Request;
+
+      const res = {
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(mockGetCardPaymentStatus).toHaveBeenCalledWith('token-123', '1f905214-3af0-4f11-a9e7-8b37133bb645');
+      expect(res.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1234567890123456/respond-to-claim/counter-claim-payment-successful'
+      );
     });
 
     it('redirects to failure URL and clears payment reference on failed status', async () => {
