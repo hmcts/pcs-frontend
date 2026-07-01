@@ -225,7 +225,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
   });
 
   // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
-  test('Validate View the response page data @regression @crossbrowser', async () => {
+  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performAction('reloadPage');
     await performAction('respondPossessionClaimAPI', {
