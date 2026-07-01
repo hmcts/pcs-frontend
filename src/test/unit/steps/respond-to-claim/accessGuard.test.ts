@@ -38,7 +38,7 @@ interface MakeReqArgs {
 }
 
 const makeReq = ({
-  path = '/case/123/respond-to-claim/landlord-registered',
+  path = '/case/123/respond-to-claim/exempt-landlord',
   method = 'GET',
   caseId = '123',
   query = {},
@@ -148,29 +148,29 @@ describe('respondToClaimAccessGuard', () => {
   it('redirects CYA without answers to the first VISIBLE step (not section.steps[0])', async () => {
     mockGetAllSectionStatuses.mockResolvedValue(new Map([['disputeAndTenancy', 'AVAILABLE']]));
     mockSafeIsAnswered.mockReturnValue(false);
-    mockGetFirstVisibleStep.mockReturnValue('landlord-registered');
+    mockGetFirstVisibleStep.mockReturnValue('exempt-landlord');
     const req = makeReq({ path: '/case/123/respond-to-claim/check-your-answers-your-response' });
     const res = makeRes();
     await respondToClaimAccessGuard()(req, res, next);
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/landlord-registered');
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/exempt-landlord');
     expect(next).not.toHaveBeenCalled();
   });
 
   it('redirects a directly-accessed CYA to the first visible step', async () => {
     mockGetAllSectionStatuses.mockResolvedValue(new Map([['disputeAndTenancy', 'IN_PROGRESS']]));
     mockSafeIsAnswered.mockReturnValue(true);
-    mockGetFirstVisibleStep.mockReturnValue('landlord-registered');
+    mockGetFirstVisibleStep.mockReturnValue('exempt-landlord');
     const req = makeReq({ path: '/case/123/respond-to-claim/check-your-answers-your-response' });
     const res = makeRes();
     await respondToClaimAccessGuard()(req, res, next);
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/landlord-registered');
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/exempt-landlord');
     expect(next).not.toHaveBeenCalled();
   });
 
   it('passes through a CYA reached via internal navigation (?nav=1)', async () => {
     mockGetAllSectionStatuses.mockResolvedValue(new Map([['disputeAndTenancy', 'IN_PROGRESS']]));
     mockSafeIsAnswered.mockReturnValue(true);
-    mockGetFirstVisibleStep.mockReturnValue('landlord-registered');
+    mockGetFirstVisibleStep.mockReturnValue('exempt-landlord');
     const req = makeReq({
       path: '/case/123/respond-to-claim/check-your-answers-your-response',
       query: { nav: '1' },
@@ -183,7 +183,7 @@ describe('respondToClaimAccessGuard', () => {
 
   it('redirects a directly-accessed mid-section step to the first visible step', async () => {
     mockGetFirstVisibleStep.mockReturnValue('dispute-claim-interstitial');
-    const req = makeReq({ path: '/case/123/respond-to-claim/landlord-registered' });
+    const req = makeReq({ path: '/case/123/respond-to-claim/exempt-landlord' });
     const res = makeRes();
     await respondToClaimAccessGuard()(req, res, next);
     expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/dispute-claim-interstitial');
@@ -191,8 +191,8 @@ describe('respondToClaimAccessGuard', () => {
   });
 
   it('passes through a section first visible step accessed directly', async () => {
-    mockGetFirstVisibleStep.mockReturnValue('landlord-registered');
-    const req = makeReq({ path: '/case/123/respond-to-claim/landlord-registered' });
+    mockGetFirstVisibleStep.mockReturnValue('exempt-landlord');
+    const req = makeReq({ path: '/case/123/respond-to-claim/exempt-landlord' });
     const res = makeRes();
     await respondToClaimAccessGuard()(req, res, next);
     expect(next).toHaveBeenCalledTimes(1);
@@ -201,7 +201,7 @@ describe('respondToClaimAccessGuard', () => {
 
   it('passes through a mid-section step reached via internal navigation (?nav=1)', async () => {
     mockGetFirstVisibleStep.mockReturnValue('dispute-claim-interstitial');
-    const req = makeReq({ path: '/case/123/respond-to-claim/landlord-registered', query: { nav: '1' } });
+    const req = makeReq({ path: '/case/123/respond-to-claim/exempt-landlord', query: { nav: '1' } });
     const res = makeRes();
     await respondToClaimAccessGuard()(req, res, next);
     expect(next).toHaveBeenCalledTimes(1);
@@ -211,7 +211,7 @@ describe('respondToClaimAccessGuard', () => {
   it('passes through a mid-section step reached via a CYA change link (?edit)', async () => {
     mockGetFirstVisibleStep.mockReturnValue('dispute-claim-interstitial');
     const req = makeReq({
-      path: '/case/123/respond-to-claim/landlord-registered',
+      path: '/case/123/respond-to-claim/exempt-landlord',
       query: { edit: 'disputeAndTenancy' },
     });
     const res = makeRes();
@@ -223,7 +223,7 @@ describe('respondToClaimAccessGuard', () => {
   it('passes through a CYA reached via the language toggle (?lang=cy)', async () => {
     mockGetAllSectionStatuses.mockResolvedValue(new Map([['disputeAndTenancy', 'IN_PROGRESS']]));
     mockSafeIsAnswered.mockReturnValue(true);
-    mockGetFirstVisibleStep.mockReturnValue('landlord-registered');
+    mockGetFirstVisibleStep.mockReturnValue('exempt-landlord');
     const req = makeReq({
       path: '/case/123/respond-to-claim/check-your-answers-your-response',
       query: { lang: 'cy' },
@@ -237,7 +237,7 @@ describe('respondToClaimAccessGuard', () => {
   it('passes through a mid-section step reached via the language toggle (?lang=cy)', async () => {
     mockGetFirstVisibleStep.mockReturnValue('dispute-claim-interstitial');
     const req = makeReq({
-      path: '/case/123/respond-to-claim/landlord-registered',
+      path: '/case/123/respond-to-claim/exempt-landlord',
       query: { lang: 'cy' },
     });
     const res = makeRes();

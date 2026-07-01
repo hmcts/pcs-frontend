@@ -320,6 +320,20 @@ describe('section-CYA row builders — characterisation', () => {
       expect(buildDisputeRows(reqWith(undefined), t)).toEqual([]);
     });
 
+    it('renders exempt-landlord row when landlordRegistered is answered', () => {
+      const rows = buildDisputeRows(reqWith(model({ landlordRegistered: 'NO' })), t);
+      const row = rows.find(r => r.key.text === 'rows.exemptLandlord.label');
+      expect(row?.value).toEqual({ text: 'options.no' });
+      expect(row?.actions?.items[0].href).toBe(
+        '/case/1234123412341234/respond-to-claim/exempt-landlord?edit=disputeAndTenancy'
+      );
+    });
+
+    it('does not render licensed-landlord row', () => {
+      const rows = buildDisputeRows(reqWith(model({ landlordLicensed: 'YES', landlordRegistered: 'YES' })), t);
+      expect(rows.some(r => r.key.text === 'rows.landlordLicensed.label')).toBe(false);
+    });
+
     it('renders tenancy-type and counterclaim rows from defendant responses', () => {
       const rows = buildDisputeRows(reqWith(model({ tenancyTypeConfirmation: 'YES', makeCounterClaim: 'NO' })), t);
       const keys = rows.map(r => r.key.text);
