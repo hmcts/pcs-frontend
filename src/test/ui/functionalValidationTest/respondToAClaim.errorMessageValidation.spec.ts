@@ -207,6 +207,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   } else if (testInfo.title.includes('@secureFlexible')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
   } else if (testInfo.title.includes('@other')) {
