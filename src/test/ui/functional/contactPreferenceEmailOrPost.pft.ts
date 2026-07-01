@@ -107,6 +107,5 @@ export async function contactPreferenceEmailOrPostNavigationTests(): Promise<voi
     );
   }
   await performAction('clickRadioButton', contactPreferenceEmailOrPost.byPostRadioOption);
-  await performValidation('pageNavigation', contactPreferenceEmailOrPost.saveForLaterButton, dashboard.mainHeader);
    */
 }

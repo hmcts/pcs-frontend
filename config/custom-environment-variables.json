@@ -79,10 +79,15 @@
     "url": "CDAM_URL"
   },
   "documentUpload": {
-    "maxFileSizePerFileMB": "DOCUMENT_UPLOAD_MAX_FILE_SIZE_PER_FILE_MB",
-    "maxTotalFileSizeMB": "DOCUMENT_UPLOAD_MAX_TOTAL_FILE_SIZE_MB"
+    "maxMediaFileSizeMB": "DOCUMENT_UPLOAD_MAX_MEDIA_FILE_SIZE_MB",
+    "maxTotalFileSizeMB": "DOCUMENT_UPLOAD_MAX_TOTAL_FILE_SIZE_MB",
+    "maxDocumentFileSizeMB": "DOCUMENT_UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB",
+    "maxFilenameLength": "DOCUMENT_UPLOAD_MAX_FILENAME_LENGTH"
   },
   "redirects": {
     "manageCaseReturnURL": "REDIRECTS_MANAGE_CASE_RETURN_URL"
+  },
+  "payment": {
+    "returnUrl": "PAYMENT_RETURN_URL"
   }
 }
