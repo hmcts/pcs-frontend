@@ -122,51 +122,79 @@ export const submitCaseApiData = {
       additionalDocuments: [
         {
           value: {
-            documentType: 'WITNESS_STATEMENT',
+            documentType: {
+              value: {
+                code: '8bc45a2f-f2e7-40dd-9857-20582cc1c4dd',
+                label: 'Witness statement',
+              },
+              valueCode: '8bc45a2f-f2e7-40dd-9857-20582cc1c4dd',
+              valueLabel: 'Witness statement',
+            },
             description: 'Witness Document',
             document: {
-              document_url: `${process.env.DM_STORE_URL}/documents/e49660db-7a90-4532-ae67-092aa67604d7`,
-              document_binary_url: `${process.env.DM_STORE_URL}/documents/e49660db-7a90-4532-ae67-092aa67604d7/binary`,
+              document_url: `${process.env.DM_STORE_URL}/documents/92d43d06-eeae-4040-a701-cab327ff51f4`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/92d43d06-eeae-4040-a701-cab327ff51f4/binary`,
               document_filename: 'WitnessStatement.png',
             },
           },
-          id: 'e29294e8-2f34-4a7f-992a-4a494596912b',
+          id: '1dcfc731-e227-4ff6-8e9d-7cac99d3766b',
         },
         {
           value: {
-            documentType: 'RENT_STATEMENT',
+            documentType: {
+              value: {
+                code: 'fdc09fcb-45ce-461b-9819-63186c34755a',
+                label: 'Rent statement',
+              },
+              valueCode: 'fdc09fcb-45ce-461b-9819-63186c34755a',
+              valueLabel: 'Rent statement',
+            },
             description: 'Rent Document',
             document: {
-              document_url: `${process.env.DM_STORE_URL}/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e`,
-              document_binary_url: `${process.env.DM_STORE_URL}/documents/a426dc69-b7d3-4420-920c-2fb4cd55ca3e/binary`,
+              document_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78/binary`,
               document_filename: 'RentStatement.pdf',
             },
           },
-          id: 'de2256bc-69ef-4b8e-a485-32d7902cfba8',
+          id: '900165ec-9475-40ab-b9af-e1aa00ae03fb',
         },
         {
           value: {
-            documentType: 'NOTICE_FOR_SERVICE_OUT_OF_JURISDICTION',
+            documentType: {
+              value: {
+                code: 'c0dab8bc-9264-4814-af67-b363af60c646',
+                label: 'Notice for service out of the jurisdiction',
+              },
+              valueCode: 'c0dab8bc-9264-4814-af67-b363af60c646',
+              valueLabel: 'Notice for service out of the jurisdiction',
+            },
             description: 'Notice Document',
             document: {
-              document_url: `${process.env.DM_STORE_URL}/documents/d5936738-2338-4c9b-918c-33f7cd199dca`,
-              document_binary_url: `${process.env.DM_STORE_URL}/documents/d5936738-2338-4c9b-918c-33f7cd199dca/binary`,
+              document_url: `${process.env.DM_STORE_URL}/documents/1fd71cc5-9a91-4d86-85b8-652636cb9b88`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/1fd71cc5-9a91-4d86-85b8-652636cb9b88/binary`,
               document_filename: 'NoticeServiceJurisdiction.docx',
             },
           },
-          id: '4917573c-18aa-4cd4-aec9-b7fb761a1035',
+          id: '6bb963c4-c8d5-4f5e-9559-3cf414cb6483',
         },
         {
           value: {
-            documentType: 'CERTIFICATE_OF_SUITABILITY_AS_LF',
+            documentType: {
+              value: {
+                code: 'e4983a7d-1430-4c6b-ac50-94669e757248',
+                label: 'Certificate of suitability as litigation friend',
+              },
+              valueCode: 'e4983a7d-1430-4c6b-ac50-94669e757248',
+              valueLabel: 'Certificate of suitability as litigation friend',
+            },
             description: 'Certificate of Suitability',
             document: {
-              document_url: `${process.env.DM_STORE_URL}/documents/17f75c63-488a-4404-afd2-0aa3a9d65170`,
-              document_binary_url: `${process.env.DM_STORE_URL}/documents/17f75c63-488a-4404-afd2-0aa3a9d65170/binary`,
+              document_url: `${process.env.DM_STORE_URL}/documents/5a5ecc30-321d-4a86-8487-059ff04ec480`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/5a5ecc30-321d-4a86-8487-059ff04ec480/binary`,
               document_filename: 'CertificateOfSuitability.xlsx',
             },
           },
-          id: 'c681d9af-67eb-4298-87b6-e539fc1b6370',
+          id: '6b38e3e8-eae8-442f-9355-ca5e479c45e4',
         },
       ],
       statementOfTruth: {
@@ -546,8 +574,12 @@ export const submitCaseApiData = {
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
       noticeServed: process.env.NOTICE_SERVED,
+      notice_PostedDate: '2025-11-10',
+      notice_AbleToUploadDocument: 'No',
+      notice_UnableToUploadReason: 'no documents to upload',
       notice_ServiceMethod: 'EMAIL',
-      claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
+      notice_EmailSentDateTime: '2025-11-10T10:11:20',
+      notice_EmailAddress: 'test@gmail.com',
       claimantCircumstancesSelect: 'NO',
       hasDefendantCircumstancesInfo: 'NO',
       suspensionOfRTB_ShowHousingActsPage: 'NO',
@@ -556,10 +588,6 @@ export const submitCaseApiData = {
       hasUnderlesseeOrMortgagee: 'NO',
       wantToUploadDocuments: 'NO',
       applicationWithClaim: 'NO',
-      notice_EmailAddress: null,
-      notice_EmailSentDateTime: null,
-      notice_AbleToUploadDocument: 'No',
-      notice_UnableToUploadReason: 'no documents to upload',
       alternativesToPossession: [],
       additionalReasonsForPossession: {
         hasReasons: 'NO',

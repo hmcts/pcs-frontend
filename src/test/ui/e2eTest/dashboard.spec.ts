@@ -5,9 +5,9 @@ import {
   submitCaseApiData,
 } from '../data/api-data';
 import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
-import { dashboard } from '../data/page-data';
+import { dashboard, taskList } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
-import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
+import { viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
@@ -47,15 +47,16 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
           fieldName: dashboard.askTheCourtToMakeAnOrderLink,
           header: chooseAnApplication.mainHeader,
         },
-      ],
-      [
+      ]
+      // The lines below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
+      /*[
         'clickLinkAndVerifySameTabTitle',
         {
           sectionHeader: dashboard.iWantToHeader,
           fieldName: dashboard.uploadAdditionalDocumentsLink,
           header: startEvidenceUpload.mainHeader,
         },
-      ]
+      ]*/
     );
     await performActions(
       'Validate Help and Support links',
@@ -113,11 +114,12 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       fieldName: dashboard.viewTheClaimLink,
       header: viewTheClaim.mainHeader,
     });
-    await performAction('clickLinkAndVerifySameTabTitle', {
+    // The lines below need to be enabled once we have a workaround to change the case status to "Case Issued" as part of HDPI-7163.
+    /*await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.documentsSubHeader,
       fieldName: dashboard.uploadAdditionalDocumentsLink,
       header: startEvidenceUpload.mainHeader,
-    });
+    });*/
     await performAction('clickLinkAndVerifySameTabTitle', {
       sectionHeader: dashboard.documentsSubHeader,
       fieldName: dashboard.viewDocumentsLink,
@@ -187,11 +189,11 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
       viewResponseHeader: dashboard.viewTheResponseSubHeader,
       tag: dashboard.notStartedTag,
-      nextPageHeader: dashboard.respondToAPropertyHeader,
+      nextPageHeader: taskList.mainHeader,
     });
     await performAction('verifyNavigationFromNotificationLink', {
       responseLink: dashboard.startYourResponseLink,
-      nextPageHeader: dashboard.respondToAPropertyHeader,
+      nextPageHeader: taskList.mainHeader,
     });
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimMidEventApiData.respondPossessionClaimPayload,
@@ -207,7 +209,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
     await performAction('verifyNavigationFromNotificationLink', {
       responseLink: dashboard.continueYourResponseLink,
-      nextPageHeader: dashboard.respondToAPropertyHeader,
+      nextPageHeader: taskList.mainHeader,
     });
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimApiData.respondPossessionClaimPayload,
