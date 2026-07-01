@@ -156,7 +156,7 @@ export class CitizenDashboardAction implements IAction {
     );
   }
 
-  private async verifyClaimDetailsOnViewTheClaimPage() {
+  private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.possessionClaimParagraph });
     await performValidations(
       'View the claim page validation',
@@ -188,10 +188,10 @@ export class CitizenDashboardAction implements IAction {
         viewTheClaim.defendantCircumstancesDetails,
       ],
       ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails],
-      //['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
+      ['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
     );
-    //await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
-    //await performValidation('text', { elementType: 'link', text: viewTheClaim.claimPDFLink });
+    await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
+    await performValidation('text', { elementType: 'link', text: viewTheClaim.claimPDFLink });
     await performAction('clickButton', viewTheClaim.closeAndReturnButton);
   }
 }

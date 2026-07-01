@@ -12,7 +12,14 @@ export class viewClaimOrResponseTableValidation implements IValidation {
       if (subheaderCount === 0) {
         throw new Error(`Subheader "${subHeaderName}" not found on the page`);
       }
-
+      if (subHeaderName === 'Statement of truth') {
+        await page.locator('h2.govuk-heading-m', {
+          hasText: 'Statement of truth',
+        }).waitFor({
+          state: 'visible',
+          timeout: 30000,
+        });
+      }
       const keyLocator = page.locator(
         `xpath=//h2[normalize-space()="${subHeaderName}"]/following-sibling::dl[1]//dt[normalize-space()="${key}"]`
       );
