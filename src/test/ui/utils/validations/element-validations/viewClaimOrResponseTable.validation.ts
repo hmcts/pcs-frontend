@@ -16,10 +16,7 @@ export class viewClaimOrResponseTableValidation implements IValidation {
       const dd = dt.locator('xpath=following-sibling::dd[1]');
       await expect(dd).toBeVisible();
       const actualText = (await dd.textContent())?.trim().replace(/\s+/g, ' ');
-      expect(
-        actualText,
-        `"${key}" under "${subHeaderName}"`
-      ).toBe(String(value).trim().replace(/\s+/g, ' '));
+      expect(actualText, `"${key}" under "${subHeaderName}"`).toBe(String(value).trim().replace(/\s+/g, ' '));
     }
   }
 }
