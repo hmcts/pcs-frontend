@@ -16,6 +16,14 @@ function getCsrfToken(): string {
   return document.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value || '';
 }
 
+// base64url so the WAF doesn't read the JSON as SQLi; the server decodes it (HDPI-5770).
+export function encodeUploadedDocument(doc: unknown): string {
+  const bytes = new TextEncoder().encode(JSON.stringify(doc));
+  let binary = '';
+  bytes.forEach(b => (binary += String.fromCharCode(b)));
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
 // MOJ multi-file-upload error pattern (https://design-patterns.service.justice.gov.uk/components/multi-file-upload/):
 // - Page-level error summary at the top of the grid column / main, linking to the file input.
 // - Inline govuk-error-message inside the input's form-group, with form-group--error and aria-describedby on the input.
@@ -275,7 +283,7 @@ function initContainer(container: HTMLElement): void {
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'uploadedDocuments[]';
-            input.value = JSON.stringify(doc);
+            input.value = encodeUploadedDocument(doc);
             input.dataset.documentIndex = String(doc.index);
             hiddenContainer.appendChild(input);
           }
@@ -431,7 +439,7 @@ function rebuildHiddenInputs(hiddenContainer: HTMLElement, uploadContainer: HTML
     const input = document.createElement('input');
     input.type = 'hidden';
     input.name = 'uploadedDocuments[]';
-    input.value = JSON.stringify({
+    input.value = encodeUploadedDocument({
       ...(documentId ? { id: documentId } : { index }),
       document_filename,
     });
