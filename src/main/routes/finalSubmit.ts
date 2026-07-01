@@ -17,7 +17,6 @@ import {
 } from '../steps/utils/respondToClaimFinalSubmit';
 
 import { Logger } from '@modules/logger';
-import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('finalSubmit');

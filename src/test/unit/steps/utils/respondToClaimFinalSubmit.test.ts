@@ -23,6 +23,11 @@ jest.mock('config', () => ({
   get: jest.fn(() => 'http://ccd.test'),
 }));
 
+const mockClientContextClearer = jest.fn(req => req);
+jest.mock('@utils/clientContextSessionClearer', () => ({
+  clientContextSessionClearer: mockClientContextClearer,
+}));
+
 import type { Request } from 'express';
 
 import {
@@ -105,6 +110,34 @@ describe('respondToClaimFinalSubmit', () => {
 
       expect(result.confirmationPath).toBe('/case/1234567890123456/respond-to-claim/response-submitted');
       expect(mockHttpPost).toHaveBeenCalled();
+      expect(mockClientContextClearer).not.toHaveBeenCalled();
+    });
+
+    it('submits to CCD and returns confirmation path with client context header', async () => {
+      mockHttpGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockHttpPost.mockResolvedValue({ data: {} });
+
+      const req = {
+        session: { user: { accessToken: 'mock-token' }, clientContext: { selectedPartyId: 'partyId' } },
+        res: {
+          locals: {
+            validatedCase: {
+              id: '1234567890123456',
+              data: {
+                possessionClaimResponse: {
+                  defendantResponses: { makeCounterClaim: 'NO' },
+                },
+              },
+            },
+          },
+        },
+      } as unknown as Request;
+
+      const result = await submitRespondToClaimResponse(req);
+
+      expect(result.confirmationPath).toBe('/case/1234567890123456/respond-to-claim/response-submitted');
+      expect(mockHttpPost).toHaveBeenCalled();
+      expect(mockClientContextClearer).toHaveBeenCalledWith(req);
     });
 
     it('persists payment session when counterclaim fee payment is required', async () => {
