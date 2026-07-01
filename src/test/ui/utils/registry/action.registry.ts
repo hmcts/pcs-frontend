@@ -13,6 +13,7 @@ import {
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
 import { LinkSolicitorAPIAction } from '../actions/custom-actions/linkSolicitorAPI.action';
+import { RespondToClaimLRAction } from '../actions/custom-actions/respondToClaimLR.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -162,6 +163,31 @@ export class ActionRegistry {
     ['inputPaymentDetails', new GenAppsAction()],
     ['confirmPayment', new GenAppsAction()],
     ['verifyApplicationSubmitted', new GenAppsAction()],
+
+    //LR details below
+    ['selectNoticeDetailsLR', new RespondToClaimLRAction()],
+    ['enterTenancyStartDetailsUnKnownLR', new RespondToClaimLRAction()],
+    ['disputingOtherPartsOfTheClaimLR', new RespondToClaimLRAction()],
+    ['enterNoticeDateUnknownLR', new RespondToClaimLRAction()],
+    ['doesTheDependantHaveChildrenLR', new RespondToClaimLRAction()],
+    ['otherDependantsLR', new RespondToClaimLRAction()],
+    ['otherAdultsLR', new RespondToClaimLRAction()],
+    ['alternativeAccommodationLR', new RespondToClaimLRAction()],
+    ['circumstancesLR', new RespondToClaimLRAction()],
+    ['exceptionalHardshipLR', new RespondToClaimLRAction()],
+    ['selectIncomeAndExpensesLR', new RespondToClaimLRAction()],
+    ['representationLR', new RespondToClaimLRAction()],
+    ['selectWhatRegularIncomeDoTheyReceiveLR', new RespondToClaimLRAction()],
+    ['selectPriorityDebtsLR', new RespondToClaimLRAction()],
+    ['enterPriorityDebtDetailsLR', new RespondToClaimLRAction()],
+    ['selectExpensesLR', new RespondToClaimLRAction()],
+    ['otherConsiderationsLR', new RespondToClaimLRAction()],
+    ['rentArrearsLR', new RespondToClaimLRAction()],
+    ['previousPaymentsLR', new RespondToClaimLRAction()],
+    ['repaymentAgreedLR', new RespondToClaimLRAction()],
+    ['selectUniversalCreditLR', new RespondToClaimLRAction()],
+    ['selectCorrespondenceAddressUnknownLR', new RespondToClaimLRAction()],
+    ['enterNoticeDateKnownLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

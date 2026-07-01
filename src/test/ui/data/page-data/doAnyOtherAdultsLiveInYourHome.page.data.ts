@@ -1,7 +1,10 @@
 export const doAnyOtherAdultsLiveInYourHome = {
   mainHeader: `Do any other adults live in your home?`,
+  lrMainHeader: `Other adults`,
+  lrHiddenParagraph: `Do any other adults live in the defendant’s home?`,
   backLink: `Back`,
   giveDetailsAboutOtherAdultsHiddenTextLabel: `Give details about the other adults living in your home`,
+  lrGiveDetailsHiddenTextLabel: `Give details about the other adults living in the defendant’s home`,
   youShouldIncludeDetailsHiddenHintText: `You should include details about how many adults live in your home, their relationship to you, as well as anything else you think the court should know about them`,
   detailsAboutAdultsTextInput: `I live with 2 adults, parents`,
   yesRadioOption: `Yes`,

@@ -6,6 +6,7 @@ export const installmentPayments = {
   atTheHearingParagraph: `At the hearing, the judge will look at your offer and the details of your income and expenses you choose to share. They will decide if your offer is affordable.`,
   youBeAbleToTellTheJudgeParagraph: `You’ll be able to tell the judge if the amount you can afford to pay has changed.`,
   wouldYouLikeToOfferToPayQuestion: `Would you like to offer to pay your arrears in instalments?`,
+  lrHiddenWouldTheDefendantLikeToOfferQuestion: `Would the defendant like to offer to pay off their arrears in instalments?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   saveAndContinueButton: `Save and continue`,

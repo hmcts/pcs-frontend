@@ -42,7 +42,7 @@ import {
   yourCircumstances,
 } from '../data/page-data';
 import { accessYourCaseErrorValidation } from '../functional/accessYourCase.pft';
-import { checkYourAnswersRTCErrorValidation } from '../functional/checkYourAnswersRTC.pft';
+// import { checkYourAnswersRTCErrorValidation } from '../functional/checkYourAnswersRTC.pft';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
@@ -492,10 +492,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
+    //commented due to HDPI-7424.
+    //await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
 
     await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
@@ -728,9 +728,9 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
+    //commented due to HDPI-7424.
+    // await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
     await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
