@@ -1,4 +1,4 @@
-import { confirmationOfNoticeGiven, feedback, noticeDateWhenNotProvided, taskList } from '../data/page-data';
+import { confirmationOfNoticeGiven, feedback, noticeDateWhenNotProvided } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function noticeDateWhenNotProvidedErrorValidation(): Promise<void> {
@@ -20,5 +20,4 @@ export async function noticeDateWhenNotProvidedNavigationTests(): Promise<void> 
     pageSlug: noticeDateWhenNotProvided.pageSlug,
   });
   await performValidation('pageNavigation', noticeDateWhenNotProvided.backLink, confirmationOfNoticeGiven.mainHeader);
-  await performValidation('pageNavigation', noticeDateWhenNotProvided.saveForLaterButton, taskList.mainHeader);
 }

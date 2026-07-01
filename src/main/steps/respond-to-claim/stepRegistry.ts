@@ -18,10 +18,12 @@ import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
 import { step as counterClaimAbout } from './counter-claim-about';
 import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
+import { step as counterClaimApplicationFeeAmount } from './counter-claim-application-fee-amount';
 import { step as counterClaimDoYouWantToUploadFiles } from './counter-claim-do-you-want-to-upload-files';
 import { step as counterClaimFee } from './counter-claim-fee';
 import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
 import { step as counterClaimOrderOtherThanSum } from './counter-claim-order-other-than-sum';
+import { step as counterClaimPaymentSuccessful } from './counter-claim-payment-successful';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
 import { step as counterClaimUploadFiles } from './counter-claim-upload-files';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
@@ -107,9 +109,11 @@ export const stepRegistry = {
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'upload-document': uploadDocument,
   'counter-claim': counterClaim,
+  'counter-claim-application-fee-amount': counterClaimApplicationFeeAmount,
   'counter-claim-what-are-you-claiming-for': counterClaimWhatAreYouClaimingFor,
   'counter-claim-specific-sum': counterClaimSpecificSum,
   'counter-claim-fee': counterClaimFee,
+  'counter-claim-payment-successful': counterClaimPaymentSuccessful,
   'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
   'counter-claim-you-need-to-apply-for-help-with-your-fees': counterClaimYouNeedToApplyForHelpWithYourFees,
   'counter-claim-against-whom': counterClaimAgainstWhom,

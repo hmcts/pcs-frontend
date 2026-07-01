@@ -1,4 +1,7 @@
-import { getRespondToClaimConfirmationPath } from '../../../../main/steps/utils/postSubmissionRouting';
+import {
+  getRespondToClaimConfirmationPath,
+  getRespondToClaimSubmitNavigation,
+} from '../../../../main/steps/utils/postSubmissionRouting';
 
 import type { CcdCaseData } from '@services/ccdCase.interface';
 
@@ -40,6 +43,34 @@ describe('postSubmissionRouting', () => {
           },
         } as CcdCaseData)
       ).toBe(`${journeyBase}/response-submitted-counter-claim-fee-payment-needed`);
+    });
+  });
+
+  describe('getRespondToClaimSubmitNavigation', () => {
+    it('marks payment required when submit payload includes a service request reference', () => {
+      const navigation = getRespondToClaimSubmitNavigation(caseId, undefined, {
+        serviceRequestReference: 'SR-123',
+        feeAmount: 404,
+      });
+
+      expect(navigation).toEqual({
+        confirmationPath: `${journeyBase}/response-submitted-counter-claim-fee-payment-needed`,
+        counterClaimFeePaymentRequired: true,
+      });
+    });
+
+    it('does not mark payment required when no submit payment payload is present', () => {
+      const navigation = getRespondToClaimSubmitNavigation(caseId, {
+        possessionClaimResponse: {
+          defendantResponses: {
+            makeCounterClaim: 'YES',
+            counterClaim: { hwfReferenceNumber: ' ' },
+          },
+        },
+      } as CcdCaseData);
+
+      expect(navigation.counterClaimFeePaymentRequired).toBe(false);
+      expect(navigation.confirmationPath).toBe(`${journeyBase}/response-submitted-counter-claim-fee-payment-needed`);
     });
   });
 });
