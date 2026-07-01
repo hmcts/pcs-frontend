@@ -4,19 +4,34 @@ import { IValidation, validationRecord } from '../../interfaces';
 
 export class viewClaimOrResponseTableValidation implements IValidation {
   async validate(page: Page, validation: string, subHeaderName: string, data: validationRecord): Promise<void> {
-    const sectionHeader = page
-      .locator('h2.govuk-heading-m, h2.govuk-heading-l')
-      .filter({ hasText: subHeaderName })
-      .first();
-    await expect(sectionHeader).toBeVisible();
-    const dl = sectionHeader.locator('xpath=following-sibling::dl[1]');
-    for (const [key, value] of Object.entries(data)) {
-      const dt = dl.locator(`dt:text-is("${key}")`).first();
-      await expect(dt).toBeVisible();
-      const dd = dt.locator('xpath=following-sibling::dd[1]');
-      await expect(dd).toBeVisible();
-      const actualText = (await dd.textContent())?.trim().replace(/\s+/g, ' ');
-      expect(actualText, `"${key}" under "${subHeaderName}"`).toBe(String(value).trim().replace(/\s+/g, ' '));
+    const entries = Object.entries(data);
+    for (const [key, value] of entries) {
+      const subheaderLocator = page.locator(`h2:has-text("${subHeaderName}")`);
+      const subheaderCount = await subheaderLocator.count();
+
+      if (subheaderCount === 0) {
+        throw new Error(`Subheader "${subHeaderName}" not found on the page`);
+      }
+
+      const keyLocator = page.locator(
+        `xpath=//h2[normalize-space()="${subHeaderName}"]/following-sibling::dl[1]//dt[normalize-space()="${key}"]`
+      );
+      const keyCount = await keyLocator.count();
+
+      if (keyCount === 0) {
+        throw new Error(`Key "${key}" not found under subheader "${subHeaderName}"`);
+      }
+
+      const valueLocator = page.locator(
+        `xpath=//h2[normalize-space()="${subHeaderName}"]/following-sibling::dl[1]//dt[normalize-space()="${key}"]/following-sibling::dd[1]`
+      );
+
+      const actualText = await valueLocator.first().textContent();
+
+      expect(
+        actualText?.trim().replace(/\s+/g, ' '),
+        `"${key}" under "${subHeaderName}"\nExpected: "${value}"\nActual:   "${actualText?.trim().replace(/\s+/g, ' ')}"`
+      ).toBe((value as string).trim().replace(/\s+/g, ' '));
     }
   }
 }

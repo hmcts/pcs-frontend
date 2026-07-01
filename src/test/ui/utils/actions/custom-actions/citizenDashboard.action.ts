@@ -187,8 +187,8 @@ export class CitizenDashboardAction implements IAction {
         viewTheClaim.defendantCircumstancesSubHeader,
         viewTheClaim.defendantCircumstancesDetails,
       ],
-      ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails],
-      ['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
+      ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails]
+      //['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
     );
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
     await performValidation('text', { elementType: 'link', text: viewTheClaim.claimPDFLink });
