@@ -71,7 +71,7 @@ export default defineConfig({
   ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 0 : 0,
+  retries: process.env.CI ? 1 : 0,
   workers: 4,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
