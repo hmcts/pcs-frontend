@@ -5,7 +5,7 @@ import { step as noticeReceivedDateWhenProvidedStep } from '../../../../main/ste
 import { step as contactByEmailOrPostStep } from '../../../../main/steps/respond-to-claim/contact-preferences-email-or-post';
 import { step as contactByTelephoneStep } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
 import { step as correspondenceAddressStep } from '../../../../main/steps/respond-to-claim/correspondence-address';
-import { step as landlordLicensedStep } from '../../../../main/steps/respond-to-claim/landlord-licensed';
+import { step as exemptLandlordStep } from '../../../../main/steps/respond-to-claim/exempt-landlord';
 import { step as tenancyDateDetailsStep } from '../../../../main/steps/respond-to-claim/tenancy-date-details';
 
 import type { CcdCase } from '@services/ccdCase.interface';
@@ -133,28 +133,27 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     expect(dateItems[2].value).toBe('2025');
   });
 
-  it('prefills landlord-licensed from validatedCase instead of session', async () => {
+  it('prefills exempt-landlord from validatedCase instead of session', async () => {
     const validatedCase = new CcdCaseModel({
       id: '1771325608502536',
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            landlordLicensed: 'NOT_SURE',
+            landlordRegistered: 'NOT_SURE',
           },
         },
       },
     } as CcdCase);
     const { req, res } = createReqRes(validatedCase, {
-      'landlord-licensed': { confirmLandlordLicensed: 'yes' },
+      'exempt-landlord': { landlordRegistered: 'YES' },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const controller = (landlordLicensedStep.getController as any)();
+    const controller = (exemptLandlordStep.getController as any)();
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ confirmLandlordLicensed: 'notSure' }));
-    expect(renderData.confirmLandlordLicensed).toBe('notSure');
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ landlordRegistered: 'NOT_SURE' }));
   });
 
   it('populates page heading from CCD without pre-selecting yes or filling address form', async () => {

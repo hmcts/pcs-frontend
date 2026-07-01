@@ -86,10 +86,18 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
     // dispute-claim-interstitial is now the first step of disputeAndTenancy; the
-    // non-Wales back-walk lands on it after the hidden landlord-* steps are skipped.
+    // non-Wales back-walk lands on it after the hidden exempt-landlord step is skipped.
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
       'dispute-claim-interstitial'
     );
+  });
+
+  it('routes Wales dispute interstitial forward to exempt landlord and then written terms', async () => {
+    const welshReq = createReq({ legislativeCountry: 'Wales' });
+
+    await expect(getNextStep(welshReq, 'dispute-claim-interstitial', flowConfig, {})).resolves.toBe('exempt-landlord');
+    await expect(getNextStep(welshReq, 'exempt-landlord', flowConfig, {})).resolves.toBe('written-terms');
+    await expect(getPreviousStep(welshReq, 'written-terms', flowConfig, {})).resolves.toBe('exempt-landlord');
   });
 
   it('derives date-of-birth back navigation from CCD defendant name-known state', async () => {
