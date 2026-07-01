@@ -55,6 +55,7 @@ let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  await performAction('resetRTCAnswerStore');
   process.env.WALES_POSTCODE = 'YES';
   process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
   process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
