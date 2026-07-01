@@ -17,6 +17,7 @@
         text: component.label.text,
         classes: component.label.classes
       },
+      hint: component.hint,
       errorMessage: component.errorMessage,
       attributes: {
         accept: component.accept,
@@ -51,13 +52,15 @@
       "data-upload-url": component.uploadUrl,
       "data-delete-url": component.deleteUrl,
       "data-max-file-size-mb": component.maxFileSize,
-      "data-max-media-mb": component.maxMediaMB,
       "data-max-filename-length": component.maxFilenameLength,
-      "data-error-wrong-type": component.errorWrongType or "",
-      "data-error-file-too-large": component.errorFileTooLarge or "",
-      "data-error-file-too-large-media": component.errorFileTooLargeMedia or "",
-      "data-error-filename-too-long": component.errorFilenameTooLong or "",
-      "data-error-delete": component.errorDelete or "",
+      "data-max-document-mb": component.maxDocumentMB,
+      "data-max-media-mb": component.maxMediaMB,
+      "data-error-wrong-type": component.errorWrongType,
+      "data-error-file-too-large": component.errorFileTooLarge,
+      "data-error-filename-too-long": component.errorFilenameTooLong,
+      "data-error-file-too-large-document": component.errorFileTooLargeDocument,
+      "data-error-file-too-large-media": component.errorFileTooLargeMedia,
+      "data-error-delete": component.errorDelete,
       "data-delete-button-text": component.deleteButtonText or "Remove",
       "data-error-summary-title": component.errorSummaryTitle or "There is a problem"
     }
@@ -66,7 +69,7 @@
   <div id="uploaded-documents-container">
     {% if uploadedFiles %}
       {% for file in uploadedFiles %}
-        <input type="hidden" name="uploadedDocuments[]" value="{{ file | dump }}" data-document-url="{{ file.document_url }}" />
+        <input type="hidden" name="uploadedDocuments[]" value="{{ file | base64json }}" data-document-url="{{ file.document_url }}" />
       {% endfor %}
     {% endif %}
   </div>
