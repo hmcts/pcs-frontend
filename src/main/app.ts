@@ -7,12 +7,7 @@ import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
-import {
-  caseReferenceParamMiddleware,
-  legalRepresentativeAccessMiddleware,
-  pageTrackingUrlMiddleware,
-  roleAccessMiddleware,
-} from './middleware';
+import { caseReferenceParamMiddleware, pageTrackingUrlMiddleware, roleAccessMiddleware } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import { registerAllJourneys } from './routes/registerSteps';
@@ -48,7 +43,6 @@ app.use((req, res, next) => {
 });
 
 app.use(pageTrackingUrlMiddleware);
-app.use(legalRepresentativeAccessMiddleware);
 app.use(roleAccessMiddleware);
 
 // param middleware for caseReference
