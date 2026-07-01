@@ -3,6 +3,7 @@ import { Page, expect } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import { dashboard, viewTheResponse } from '../../../data/page-data';
 import { viewAllApplications } from '../../../data/page-data/genApps-page-data';
+import { viewTheClaim } from '../../../data/page-data/theClaim-page-data';
 import { performAction, performValidation, performValidations } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -20,7 +21,8 @@ export class CitizenDashboardAction implements IAction {
         () => this.verifyNavigationFromNotificationLink(page, fieldName as actionRecord),
       ],
       ['validateViewAllApplications', () => this.validateViewAllApplications()],
-      ['verifyResponseOnViewTheClaimPage', () => this.verifyResponseOnViewTheClaimPage()],
+      ['verifyResponseDetailsOnViewTheResponsePage', () => this.verifyResponseDetailsOnViewTheResponsePage()],
+      ['verifyClaimDetailsOnViewTheClaimPage', () => this.verifyClaimDetailsOnViewTheClaimPage()],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -119,30 +121,77 @@ export class CitizenDashboardAction implements IAction {
     });
   }
 
-  private async verifyResponseOnViewTheClaimPage() {
+  private async verifyResponseDetailsOnViewTheResponsePage() {
     await performValidations(
       'View the response page validation',
-      ['responseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails],
+      ['viewClaimOrResponseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails],
       // The line below will be commented until the bug HDPI-7360 gets fixed
-      //['responseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
+      //['viewClaimOrResponseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
       [
-        'responseTable',
+        'viewClaimOrResponseTable',
         viewTheResponse.additionalDefendant1DynamicSubHeader,
         viewTheResponse.additionalDefendant1Details,
       ],
       [
-        'responseTable',
+        'viewClaimOrResponseTable',
         viewTheResponse.additionalDefendant2DynamicSubHeader,
         viewTheResponse.additionalDefendant2Details,
       ],
-      ['responseTable', viewTheResponse.responseToClaimSubHeader, viewTheResponse.responseToClaimDetails],
-      ['responseTable', viewTheResponse.paymentsOrAgreementsSubHeader, viewTheResponse.paymentsOrAgreementsDetails],
-      ['responseTable', viewTheResponse.yourHouseholdSubHeader, viewTheResponse.yourHouseholdDetails],
-      ['responseTable', viewTheResponse.regularIncomeSubHeader, viewTheResponse.regularIncomeDetails],
-      ['responseTable', viewTheResponse.priorityDebtsSubHeader, viewTheResponse.priorityDebtsDetails],
-      ['responseTable', viewTheResponse.regularExpensesSubHeader, viewTheResponse.regularExpensesDetails],
-      ['responseTable', viewTheResponse.additionalInformationSubHeader, viewTheResponse.additionalInformationDetails],
-      ['responseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
+      ['viewClaimOrResponseTable', viewTheResponse.responseToClaimSubHeader, viewTheResponse.responseToClaimDetails],
+      [
+        'viewClaimOrResponseTable',
+        viewTheResponse.paymentsOrAgreementsSubHeader,
+        viewTheResponse.paymentsOrAgreementsDetails,
+      ],
+      ['viewClaimOrResponseTable', viewTheResponse.yourHouseholdSubHeader, viewTheResponse.yourHouseholdDetails],
+      ['viewClaimOrResponseTable', viewTheResponse.regularIncomeSubHeader, viewTheResponse.regularIncomeDetails],
+      ['viewClaimOrResponseTable', viewTheResponse.priorityDebtsSubHeader, viewTheResponse.priorityDebtsDetails],
+      ['viewClaimOrResponseTable', viewTheResponse.regularExpensesSubHeader, viewTheResponse.regularExpensesDetails],
+      [
+        'viewClaimOrResponseTable',
+        viewTheResponse.additionalInformationSubHeader,
+        viewTheResponse.additionalInformationDetails,
+      ],
+      ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
     );
+  }
+
+  private async verifyClaimDetailsOnViewTheClaimPage() {
+    await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.possessionClaimParagraph });
+    await performValidations(
+      'View the claim page validation',
+      ['viewClaimOrResponseTable', viewTheClaim.claimantDetailsSubHeader, viewTheClaim.claimantDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.defendant1SubHeader, viewTheClaim.defendant1Details],
+      [
+        'viewClaimOrResponseTable',
+        viewTheClaim.additionalDefendant1SubHeader,
+        viewTheClaim.additionalDefendant1Details,
+      ],
+      [
+        'viewClaimOrResponseTable',
+        viewTheClaim.additionalDefendant2SubHeader,
+        viewTheClaim.additionalDefendant2Details,
+      ],
+      ['viewClaimOrResponseTable', viewTheClaim.claimDetailsSubHeader, viewTheClaim.claimDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.rentArrearsSubHeader, viewTheClaim.rentArrearsDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.actionTakenSubHeader, viewTheClaim.actionTakenDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.noticeDetailsSubHeader, viewTheClaim.noticeDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.tenancyDetailsSubHeader, viewTheClaim.tenancyDetails],
+      [
+        'viewClaimOrResponseTable',
+        viewTheClaim.claimantCircumstancesSubHeader,
+        viewTheClaim.claimantCircumstancesDetails,
+      ],
+      [
+        'viewClaimOrResponseTable',
+        viewTheClaim.defendantCircumstancesSubHeader,
+        viewTheClaim.defendantCircumstancesDetails,
+      ],
+      ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
+    );
+    await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
+    await performValidation('text', { elementType: 'link', text: viewTheClaim.claimPDFLink });
+    await performAction('clickButton', viewTheClaim.closeAndReturnButton);
   }
 }
