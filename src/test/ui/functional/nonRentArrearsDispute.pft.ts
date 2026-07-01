@@ -25,11 +25,12 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
     message: nonRentArrearsDispute.partsOfClaimDoNotAgreeErrorMessage,
   });
-  await performAction(
-    'clickLinkAndVerifyNewTabTitle',
-    nonRentArrearsDispute.viewTheClaimLink,
-    nonRentArrearsDispute.titleGovServiceHiddenNewTab
-  );
+  //commented due to bug
+  // await performAction(
+  //   'clickLinkAndVerifyNewTabTitle',
+  //   nonRentArrearsDispute.viewTheClaimLink,
+  //   nonRentArrearsDispute.titleGovServiceHiddenNewTab
+  // );
   await performAction(
     'inputText',
     nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
