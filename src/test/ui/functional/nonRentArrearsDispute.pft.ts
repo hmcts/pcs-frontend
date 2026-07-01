@@ -25,7 +25,7 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
     message: nonRentArrearsDispute.partsOfClaimDoNotAgreeErrorMessage,
   });
-  //commented due to bug
+  //commented due to bug HDPI-7442
   // await performAction(
   //   'clickLinkAndVerifyNewTabTitle',
   //   nonRentArrearsDispute.viewTheClaimLink,

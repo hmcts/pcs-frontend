@@ -495,6 +495,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+    //commented due to bug HDPI-7424
     //await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
 
     await performAction('selectStatementOfTruthRTC', {
@@ -730,6 +731,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+    // commented due to bug HDPI-7424
     // await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
     await performAction('selectStatementOfTruthRTC', {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
