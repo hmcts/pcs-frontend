@@ -3,5 +3,8 @@
   "heading": "Check your answers",
   "relatedApplicationLabel": "Related application",
   "documentsLabel": "Uploaded documents",
-  "documentsNone": "No documents uploaded"
+  "documentsNone": "No documents uploaded",
+  "errors": {
+    "submitFailed": "Your files were not submitted. Try again."
+  }
 }

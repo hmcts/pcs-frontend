@@ -14,6 +14,7 @@ import {
   counterClaim,
   counterClaimAbout,
   counterClaimAgainstWhom,
+  counterClaimApplicationFeeAmount,
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
@@ -42,6 +43,7 @@ import {
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   otherConsiderations,
+  paymentDetails,
   paymentInterstitial,
   priorityDebtDetails,
   priorityDebts,
@@ -210,6 +212,8 @@ export class RespondToClaimAction implements IAction {
       ['selectPriorityDebts', () => this.selectPriorityDebts(fieldName as actionRecord)],
       ['enterPriorityDebtDetails', () => this.enterPriorityDebtDetails(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
+      ['inputCounterClaimPaymentDetails', () => this.inputCounterClaimPaymentDetails(fieldName as actionRecord)],
+      ['validateCounterClaimApplicationFee', () => this.validateCounterClaimApplicationFee(fieldName as actionRecord)],
       [
         'selectDoYouWantToUploadDocFoCounterclaim',
         () => this.selectDoYouWantToUploadDocFoCounterclaim(fieldName as actionRecord),
@@ -1077,6 +1081,36 @@ export class RespondToClaimAction implements IAction {
       option: counterClaimFeeOption.radioOption,
     });
     await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+  }
+
+  private async inputCounterClaimPaymentDetails(paymentData: actionRecord): Promise<void> {
+    await performActions(
+      'Enter counterclaim payment details',
+      ['inputText', paymentDetails.cardNumberTextLabel, paymentData.cardNumber],
+      ['inputText', paymentDetails.monthTextLabel, paymentDetails.monthTextInput],
+      ['inputText', paymentDetails.yearTextLabel, paymentDetails.yearTextInput],
+      ['inputText', paymentDetails.nameOnCardTextLabel, paymentDetails.nameOnCardTextInput],
+      ['inputText', paymentDetails.cardSecurityCodeTextLabel, paymentDetails.cardSecurityCodeTextInput],
+      ['inputText', paymentDetails.addressLine1TextLabel, paymentDetails.addressLine1TextInput],
+      ['inputText', paymentDetails.townOrCityTextLabel, paymentDetails.townOrCityTextInput],
+      ['inputText', paymentDetails.postcodeTextLabel, paymentDetails.postcodeTextInput],
+      ['inputText', paymentDetails.emailTextLabel, paymentDetails.emailTextInput]
+    );
+    await performAction('clickButton', paymentDetails.continueButton);
+  }
+
+  private async validateCounterClaimApplicationFee(feeData: actionRecord): Promise<void> {
+    await performValidation('mainHeader', counterClaimApplicationFeeAmount.mainHeader);
+    await performValidation('summaryListValue', counterClaimApplicationFeeAmount.counterClaimAmountLabel, {
+      value: feeData.amount ?? '',
+    });
+    await performValidation('summaryListValue', counterClaimApplicationFeeAmount.counterClaimFeeLabel, {
+      value: `£${String(feeData.fee)}`,
+    });
+    await performValidation('text', {
+      elementType: 'link',
+      text: counterClaimApplicationFeeAmount.getPayButton(String(feeData.fee)),
+    });
   }
 
   private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {

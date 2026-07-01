@@ -57,6 +57,7 @@ export { counterClaimUploadWanted } from './counterClaimUploadWanted';
 export { hasMultipleParties } from './hasMultipleParties';
 export {
   getRespondToClaimConfirmationPath,
+  getRespondToClaimSubmitNavigation,
   shouldShowCounterClaimFeePaymentNeededConfirmationStep,
   shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
   shouldShowResponseSubmittedConfirmationStep,

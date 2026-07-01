@@ -24,6 +24,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  await performAction('updatePaymentAPI');
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
@@ -221,5 +222,19 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       tag: dashboard.completedTag,
       viewResponseTag: dashboard.availableTag,
     });
+  });
+
+  // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
+  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
+    await performValidation('mainHeader', dashboard.mainHeader);
+    await performAction('reloadPage');
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      type: 'both',
+    });
+    await performAction('reloadPage');
+    await performAction('clickButton', dashboard.viewTheResponseSubHeader);
+    await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+    await performAction('verifyResponseOnViewTheClaimPage');
   });
 });
