@@ -64,6 +64,7 @@ let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  await performAction('resetRTCAnswerStore');
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
   process.env.CLAIMANT_NAME = claimantName;
   if (testInfo.title.includes('NoticeServed - No')) {
