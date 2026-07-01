@@ -159,7 +159,6 @@ export const step: StepDefinition = {
         } as Response;
 
         await getController.get(req, captureRes);
-
         const t = pageContent.t as TFunction;
         const errorMessage = t('errors.relatedApplicationId.required');
 
@@ -195,7 +194,6 @@ export const step: StepDefinition = {
       });
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
-
       if (!redirectPath) {
         return res.status(404).render('not-found');
       }
