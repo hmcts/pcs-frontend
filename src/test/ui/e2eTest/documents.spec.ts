@@ -72,6 +72,11 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       documents: [
         {
           sectionHeader: viewDocuments.statementsOfCaseSubHeader,
+          documentName: viewDocuments.claimFormLink,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+        {
+          sectionHeader: viewDocuments.statementsOfCaseSubHeader,
           documentName: viewDocuments.noticeServiceJurisdictionLink,
           submittedDate: viewDocuments.getSubmittedDate(),
         },
