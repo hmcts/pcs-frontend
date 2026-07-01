@@ -1,6 +1,5 @@
 export const checkYourAnswersRTC = {
   mainHeader: `Check your answers`,
-  statementOfTruthHeader: `Statement of truth`,
   statementOfTruthQuestion: `Statement of truth`,
   statementOfTruthParagraph: `Please check all the details you have entered for accuracy.`,
   contemptOfCourtCheckboxLabel: `I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.`,

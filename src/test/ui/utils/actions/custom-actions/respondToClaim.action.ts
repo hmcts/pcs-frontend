@@ -1332,7 +1332,6 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', languageUsed.saveAndContinueButton);
   }
   private async selectStatementOfTruthRTC(sot: actionRecord): Promise<void> {
-    await performValidation('text', { elementType: 'subHeader', text: checkYourAnswersRTC.statementOfTruthHeader });
     await performValidation('text', { elementType: 'paragraph', text: checkYourAnswersRTC.statementOfTruthParagraph });
     await performValidation('elementToBeVisible', checkYourAnswersRTC.contemptOfCourtCheckboxLabel);
     const options = Array.isArray(sot.options) ? sot.options : [sot.option];
