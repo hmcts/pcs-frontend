@@ -1,0 +1,14 @@
+{
+  "pageTitle": "cyWhat is the defendant claiming for?",
+  "heading": "cyWhat is the defendant claiming for?",
+  "options": {
+    "paymentOrCompensation": "cyA sum of money or compensation",
+    "somethingElse": "cySomething else",
+    "both": "cyBoth"
+  },
+  "errors": {
+    "claimType": {
+      "required": "cySelect if the defendant is claiming for a sum of money or compensation, both or something else"
+    }
+  }
+}

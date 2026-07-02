@@ -1,0 +1,25 @@
+{
+  "pageTitle": "cySum of counterclaim",
+  "heading": "cyIs the defendant claiming for a specific sum of money?",
+  "claimAmountLabel": "cyHow much is the defendant claiming for?",
+  "maxClaimAmountLabel": "cyWhat’s the maximum value of their claim?",
+  "specificFeeText": "<p class=\"govuk-body\">cyThe defendant’s counterclaim fee (the fee the defendant will pay to make the counterclaim) depends on the amount they're claiming for.</p><p class=\"govuk-body\">If you want to check how much the defendant’s fee will be, you can <a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">estimate how much it will cost the defendant to make their counterclaim (opens in new tab)</a></p>",
+  "noSpecificFeeText": "<p class=\"govuk-body\">cyIf you do not know the specific sum the defendant is claiming for, the court needs to know what they believe the maximum value of the claim will be.</p><p class=\"govuk-body\">cyIf you do not know the exact amount, give an estimate.</p>",
+  "errors": {
+    "isClaimAmountKnown": {
+      "required": "cySelect if the defendant is claiming for a specific sum of money"
+    },
+    "claimAmount": {
+      "required": "cyEnter how much the defendant is claiming for",
+      "largeAmount": "cyThe amount the defendant is claiming for must be less than £1 billion",
+      "negative": "cyThe amount the defendant is claiming for must be £0.00 or above",
+      "invalidFormat": "cyEnter how much the defendant is claiming for in the correct format, for example 148.00 or 148.50"
+    },
+    "estimatedMaxClaimAmount": {
+      "required": "cyEnter the maximum value of the defendant’s claim",
+      "largeAmount": "cyThe maximum value the defendant is claiming for must be less than £1 billion",
+      "negative": "cyThe maximum value the defendant is claiming for must be £0.00 or above",
+      "invalidFormat": "cyEnter the maximum value of the defendant’s claim in the correct format, for example 148.00 or 148.50"
+    }
+  }
+}
