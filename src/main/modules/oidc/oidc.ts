@@ -4,8 +4,13 @@ import * as jose from 'jose';
 import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'openid-client';
 import * as client from 'openid-client';
 
+import { evaluateLoginAccess, logAccessDenied } from '../../access-control';
+import { normaliseRoles } from '../../steps/utils/userRole';
+
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
+
+import { Logger } from '@modules/logger';
 
 export interface RefreshTokenResult {
   accessToken: string;
@@ -13,8 +18,6 @@ export interface RefreshTokenResult {
   idToken?: string;
   accessTokenExp?: number;
 }
-
-import { Logger } from '@modules/logger';
 
 export class OIDCModule {
   private clientConfig!: Configuration;
@@ -205,6 +208,25 @@ export class OIDCModule {
 
         const { sub } = claims;
         const user: UserInfoResponse = await client.fetchUserInfo(this.clientConfig, access_token, sub);
+
+        const userRoles = normaliseRoles(user.roles);
+        const accessDecision = evaluateLoginAccess(req.session.returnTo, userRoles);
+
+        if (!accessDecision.allowed) {
+          logAccessDenied({
+            stage: 'login',
+            path: req.session.returnTo ?? '',
+            userId: typeof user.uid === 'string' ? user.uid : undefined,
+            userRoles,
+            rule: accessDecision.rule,
+          });
+
+          delete req.session.codeVerifier;
+          delete req.session.nonce;
+          delete req.session.returnTo;
+          req.session.save(() => res.redirect('/login'));
+          return;
+        }
 
         req.session.user = {
           accessToken: access_token,

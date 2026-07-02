@@ -1,20 +1,29 @@
 import type { Request } from 'express';
 
-export const LEGAL_REPRESENTATIVE_USER_ROLES = ['solicitor'] as const;
+export const ROLE_CITIZEN = 'citizen';
+export const ROLE_PCS_SOLICITOR = 'caseworker-pcs-solicitor';
+
+export const CITIZEN_USER_ROLES = [ROLE_CITIZEN] as const;
+export const LEGAL_REPRESENTATIVE_USER_ROLES = [ROLE_PCS_SOLICITOR] as const;
 
 export type UserType = 'citizen' | 'legalrep';
 
-export function getUserRoles(req: Request): string[] {
-  const roles = req.session?.user?.roles;
-
+export function normaliseRoles(roles: unknown): string[] {
   if (!Array.isArray(roles)) {
     return [];
   }
-
   return roles
     .filter((role): role is string => typeof role === 'string')
     .map(role => role.trim().toLowerCase())
     .filter(Boolean);
+}
+
+export function getUserRoles(req: Request): string[] {
+  return normaliseRoles(req.session?.user?.roles);
+}
+
+export function isCitizenUser(req: Request): boolean {
+  return getUserRoles(req).some(role => CITIZEN_USER_ROLES.includes(role as (typeof CITIZEN_USER_ROLES)[number]));
 }
 
 export function isLegalRepresentativeUser(req: Request): boolean {

@@ -41,7 +41,8 @@ function dashboardCaseRequest(options: {
 }
 
 function getDashboardCaseHandler(): RequestHandler {
-  const fn = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference/dashboard')?.[1];
+  const call = mockRouterGet.mock.calls.find(c => c[0] === '/:caseReference/dashboard');
+  const fn = call?.[call.length - 1];
   if (typeof fn !== 'function') {
     throw new Error('Dashboard /:caseReference/dashboard handler not registered');
   }

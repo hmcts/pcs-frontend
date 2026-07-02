@@ -26,7 +26,8 @@ function buildApp(): Application {
 }
 
 function getHandler(app: Application): RequestHandler {
-  return (app.get as jest.Mock).mock.calls[0][2] as RequestHandler;
+  const call = (app.get as jest.Mock).mock.calls[0];
+  return call[call.length - 1] as RequestHandler;
 }
 
 function buildReq(sessionOverrides: Record<string, unknown> = {}): Request {
@@ -53,11 +54,11 @@ describe('claimList route', () => {
     jest.clearAllMocks();
   });
 
-  it('registers GET /claims with oidcMiddleware', () => {
+  it('registers GET /claims with oidcMiddleware and a citizen-role guard', () => {
     const app = buildApp();
     claimListRoutes(app);
 
-    expect(app.get).toHaveBeenCalledWith(CLAIM_LIST_ROUTE, expect.anything(), expect.anything());
+    expect(app.get).toHaveBeenCalledWith(CLAIM_LIST_ROUTE, expect.anything(), expect.anything(), expect.anything());
     expect(CLAIM_LIST_ROUTE).toBe('/claims');
   });
 
