@@ -69,6 +69,11 @@ properties([
       defaultValue: false,
       description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
     ),
+    booleanParam(
+      name: 'RTC_UPLOAD_FILES',
+      defaultValue: false,
+      description: 'Enable file uploads in respond-to-claim upload steps. Off by default.'
+    ),
     string(
       name: 'SAUCE_GREP',
       defaultValue: '@crossbrowser',
@@ -171,6 +176,7 @@ def handleEnvironmentSetting() {
 def setFunctionalTestEnvVars() {
   env.PCS_API_URL = "http://pcs-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
   env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
+  env.RTC_UPLOAD_FILES = params.RTC_UPLOAD_FILES ? 'YES' : 'NO'
   env.SAUCE_GREP = (params.SAUCE_GREP?.trim()) ?: '@crossbrowser'
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
   env.ENABLE_AXE_AUDIT = params.ENABLE_AXE_AUDIT

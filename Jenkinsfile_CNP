@@ -38,6 +38,7 @@ withPipeline(type, product, component) {
   env.CDAM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
   env.XUI_BASE_URI = "https://manage-case.aat.platform.hmcts.net"
   env.CASE_TYPE_ID = "PCS"
+  env.RTC_UPLOAD_FILES = 'NO'
   onPR() {
     env.E2E_TEST_SCOPE = '@sanity'
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_critical_test").size() > 0) {

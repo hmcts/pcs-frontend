@@ -89,6 +89,7 @@ const rtcFinalCyaUploadedDocumentsQuestion = 'Upload any files that you think ar
 const rtcNoDocumentsUploadedValue = 'No files uploaded';
 const rtcNoAnswerProvidedValue = 'No answer provided';
 const rtcCyaFailurePreviewLimit = 10;
+const rtcUploadFilesToggleEnvKey = 'RTC_UPLOAD_FILES';
 
 const rtcCyaLabels = {
   contactDetails: 'Contact details',
@@ -1395,7 +1396,9 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
-    if (uploadDocs?.files) {
+    const shouldUploadFiles = process.env[rtcUploadFilesToggleEnvKey] === 'YES';
+
+    if (shouldUploadFiles && uploadDocs?.files) {
       const uploadedFiles = Array.isArray(uploadDocs.files) ? uploadDocs.files.join(', ') : String(uploadDocs.files);
       this.recordAnswer(rtcUploadedDocumentsQuestion, uploadedFiles);
       await performAction('uploadFile', uploadDocs.files);
@@ -1415,7 +1418,11 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async uploadFilesToSupportCounterclaim(uploadCounterClaimFiles: actionRecord): Promise<void> {
-    await performAction('uploadFile', uploadCounterClaimFiles.files);
+    const shouldUploadFiles = process.env[rtcUploadFilesToggleEnvKey] === 'YES';
+
+    if (shouldUploadFiles) {
+      await performAction('uploadFile', uploadCounterClaimFiles.files);
+    }
     await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   }
 
