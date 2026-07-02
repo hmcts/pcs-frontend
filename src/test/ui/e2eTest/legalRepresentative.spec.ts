@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   await performAction('getCaseAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login', user.defendantSolicitor.email);
@@ -28,5 +28,5 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test.skip('Respond to claim - LR  @noDefendants @smoke @regression @PR', async () => {});
+  test('Respond to claim - LR  @noDefendants @smoke @regression @PR', async () => {});
 });
