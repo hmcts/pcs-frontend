@@ -3177,58 +3177,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-darwin-arm64@npm:18.1.0":
-  version: 18.1.0
-  resolution: "@pact-foundation/pact-cli-darwin-arm64@npm:18.1.0"
+"@pact-foundation/pact-cli-darwin-arm64@npm:18.1.1":
+  version: 18.1.1
+  resolution: "@pact-foundation/pact-cli-darwin-arm64@npm:18.1.1"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-darwin-x64@npm:18.1.0":
-  version: 18.1.0
-  resolution: "@pact-foundation/pact-cli-darwin-x64@npm:18.1.0"
+"@pact-foundation/pact-cli-darwin-x64@npm:18.1.1":
+  version: 18.1.1
+  resolution: "@pact-foundation/pact-cli-darwin-x64@npm:18.1.1"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-linux-arm64@npm:18.1.0":
-  version: 18.1.0
-  resolution: "@pact-foundation/pact-cli-linux-arm64@npm:18.1.0"
+"@pact-foundation/pact-cli-linux-arm64@npm:18.1.1":
+  version: 18.1.1
+  resolution: "@pact-foundation/pact-cli-linux-arm64@npm:18.1.1"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-linux-x64@npm:18.1.0":
-  version: 18.1.0
-  resolution: "@pact-foundation/pact-cli-linux-x64@npm:18.1.0"
+"@pact-foundation/pact-cli-linux-x64@npm:18.1.1":
+  version: 18.1.1
+  resolution: "@pact-foundation/pact-cli-linux-x64@npm:18.1.1"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-windows-arm64@npm:18.1.0":
-  version: 18.1.0
-  resolution: "@pact-foundation/pact-cli-windows-arm64@npm:18.1.0"
+"@pact-foundation/pact-cli-windows-arm64@npm:18.1.1":
+  version: 18.1.1
+  resolution: "@pact-foundation/pact-cli-windows-arm64@npm:18.1.1"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli-windows-x64@npm:18.1.0":
-  version: 18.1.0
-  resolution: "@pact-foundation/pact-cli-windows-x64@npm:18.1.0"
+"@pact-foundation/pact-cli-windows-x64@npm:18.1.1":
+  version: 18.1.1
+  resolution: "@pact-foundation/pact-cli-windows-x64@npm:18.1.1"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-cli@npm:18.1.0":
-  version: 18.1.0
-  resolution: "@pact-foundation/pact-cli@npm:18.1.0"
+"@pact-foundation/pact-cli@npm:18.1.1":
+  version: 18.1.1
+  resolution: "@pact-foundation/pact-cli@npm:18.1.1"
   dependencies:
-    "@pact-foundation/pact-cli-darwin-arm64": "npm:18.1.0"
-    "@pact-foundation/pact-cli-darwin-x64": "npm:18.1.0"
-    "@pact-foundation/pact-cli-linux-arm64": "npm:18.1.0"
-    "@pact-foundation/pact-cli-linux-x64": "npm:18.1.0"
-    "@pact-foundation/pact-cli-windows-arm64": "npm:18.1.0"
-    "@pact-foundation/pact-cli-windows-x64": "npm:18.1.0"
+    "@pact-foundation/pact-cli-darwin-arm64": "npm:18.1.1"
+    "@pact-foundation/pact-cli-darwin-x64": "npm:18.1.1"
+    "@pact-foundation/pact-cli-linux-arm64": "npm:18.1.1"
+    "@pact-foundation/pact-cli-linux-x64": "npm:18.1.1"
+    "@pact-foundation/pact-cli-windows-arm64": "npm:18.1.1"
+    "@pact-foundation/pact-cli-windows-x64": "npm:18.1.1"
   dependenciesMeta:
     "@pact-foundation/pact-cli-darwin-arm64":
       optional: true
@@ -3250,7 +3250,7 @@ __metadata:
     pact-stub-server: bin/pact-stub-server.js
     pact-verifier: bin/pact-verifier.js
     pactflow: bin/pactflow.js
-  checksum: 10/21009c91e2920146fa380ab3a1a8877028d51b5100e5d7aeb6cd28ef8f4eae82f16d496ec4c840d3f0dbb75e68bed3d9e4c9dbb26a18e76cc38fc46447d07164
+  checksum: 10/dda416017eadcc930605ac5787977ee710deabe1d288483bb21bf4d0cb4ce9a959f07b8c33e99ab52ff4cb52e4e7b6ad620dd4771153302336646353ef4a9579
   conditions: (os=darwin | os=linux | os=win32) & (cpu=x64 | cpu=arm64)
   languageName: node
   linkType: hard
@@ -7329,9 +7329,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:29.15.3":
-  version: 29.15.3
-  resolution: "eslint-plugin-jest@npm:29.15.3"
+"eslint-plugin-jest@npm:29.15.4":
+  version: 29.15.4
+  resolution: "eslint-plugin-jest@npm:29.15.4"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.0.0"
   peerDependencies:
@@ -7346,7 +7346,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10/de57d25fe8eb02ec17c6552a4a77d64773aa9cf2f4bc312bdac736e7756f23c7a98afe217cbd09c2cb4fc4a37894e3542e7f0b93f44cb4fe7450ed95300134b6
+  checksum: 10/5b8e710828983fd1b1093fbe85248ebced7650ddc9d953cba8840cce89a43fd040be23848b47b26a68e2bebe9395e9acc3c64577f39a78c6b4dde0659636b764
   languageName: node
   linkType: hard
 
@@ -11672,7 +11672,7 @@ __metadata:
     "@opentelemetry/api": "npm:1.9.1"
     "@opentelemetry/instrumentation-winston": "npm:0.63.0"
     "@pact-foundation/pact": "npm:17.0.0"
-    "@pact-foundation/pact-cli": "npm:18.1.0"
+    "@pact-foundation/pact-cli": "npm:18.1.1"
     "@playwright/test": "npm:1.61.1"
     "@types/body-parser": "npm:1.19.6"
     "@types/config": "npm:4.4.0"
@@ -11715,7 +11715,7 @@ __metadata:
     eslint-config-prettier: "npm:10.1.8"
     eslint-import-resolver-typescript: "npm:4.4.5"
     eslint-plugin-import: "npm:2.32.0"
-    eslint-plugin-jest: "npm:29.15.3"
+    eslint-plugin-jest: "npm:29.15.4"
     express: "npm:5.2.1"
     express-session: "npm:1.19.0"
     git-rev-sync: "npm:3.0.2"
@@ -11750,7 +11750,7 @@ __metadata:
     prettier: "npm:3.8.4"
     sass: "npm:1.101.0"
     sass-loader: "npm:17.0.0"
-    saucectl: "npm:^0.206.0"
+    saucectl: "npm:^0.210.0"
     serve-favicon: "npm:2.5.1"
     style-loader: "npm:4.0.0"
     stylelint: "npm:17.14.0"
@@ -12780,14 +12780,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"saucectl@npm:^0.206.0":
-  version: 0.206.0
-  resolution: "saucectl@npm:0.206.0"
+"saucectl@npm:^0.210.0":
+  version: 0.210.0
+  resolution: "saucectl@npm:0.210.0"
   dependencies:
     "@saucelabs/bin-wrapper": "npm:^2.1.0"
   bin:
     saucectl: index.js
-  checksum: 10/2a2b0c2441b2680e1dbe2de0c5b24f82d02abec01c28e5f033e7b1c8817816861e8646e20b247b6dc032fc68d5780fd087c6b08274b0bf51282a15bf1066636f
+  checksum: 10/4131bfcf6a90e5b5461709766263f4e5f4ee616f6d9cad6aaec575c4857184c19a0ef4543cf3fc4cf2578492add089eeb4c7e6909dc2b65d26f22a524731b34c
   languageName: node
   linkType: hard
 
