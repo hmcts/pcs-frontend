@@ -1,8 +1,13 @@
+import { formatDateFromParts, getRelativeDate } from '../../utils/common/date.utils';
+
+const claimIssueDate = (): string => {
+  const today = getRelativeDate();
+  return formatDateFromParts(today.day, today.month, today.year) ?? '20 May 2025';
+};
+
 export const repaymentsAgreed = {
   getMainHeader: (claimantsName: string) =>
-    `Have you come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025?`,
-  lrHiddenMainHeader: () =>
-    `Has the defendant come to any agreement with ${process.env.CLAIMANT_NAME} to repay the arrears since 20th May 2025?`,
+    `Have you come to any agreement with ${claimantsName} to repay the arrears since ${claimIssueDate()}?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   detailsTextInput: `Agreed £1000 last year`,
@@ -16,7 +21,7 @@ export const repaymentsAgreed = {
   backLink: `Back`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   getSelectAgreementErrorMessage: (claimantsName: string) =>
-    `Select if you’ve come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025`,
+    `Select if you’ve come to any agreement with ${claimantsName} to repay the arrears since ${claimIssueDate()}`,
   mustBe500CharactersOrFewerErrorMessage: `Repayment agreement details must be 500 characters or less`,
   emojiTextInput: `👉 😄`,
   emojiErrorMessage: `Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
