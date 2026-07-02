@@ -2,8 +2,8 @@
   "pageTitle": "Sum of counterclaim",
   "heading": "Is the defendant claiming for a specific sum of money?",
   "claimAmountLabel": "How much is the defendant claiming for?",
-  "maxClaimAmountLabel": "What’s the maximum value of the defendant’s claim?",
-  "specificFeeText": "<p class=\"govuk-body\">The defendant’s counterclaim fee (the fee the defendant will pay to make this counterclaim) depends on the amount the defendant is claiming for.</p><p class=\"govuk-body\">If you want to check how much the defendant’s fee will be, you can <a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">estimate how much it will cost the defendant to make their counterclaim (opens in new tab)</a></p>",
+  "maxClaimAmountLabel": "What’s the maximum value of their claim?",
+  "specificFeeText": "<p class=\"govuk-body\">The defendant’s counterclaim fee (the fee the defendant will pay to make the counterclaim) depends on the amount they're claiming for.</p><p class=\"govuk-body\">If you want to check how much the defendant’s fee will be, you can <a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">estimate how much it will cost the defendant to make their counterclaim (opens in new tab)</a></p>",
   "noSpecificFeeText": "<p class=\"govuk-body\">If you do not know the specific sum the defendant is claiming for, the court needs to know what they believe the maximum value of the claim will be.</p><p class=\"govuk-body\">If you do not know the exact amount, give an estimate.</p>",
   "errors": {
     "isClaimAmountKnown": {
