@@ -111,6 +111,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
   process.env.WALES_POSTCODE = 'NO';
   process.env.CLAIMANT_NAME = claimantName;
+  process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.NOTICE_SERVED = 'NO';
   } else {
