@@ -1,6 +1,13 @@
+import { formatDateFromParts, getRelativeDate } from '../../utils/common/date.utils';
+
+const claimIssueDate = (): string => {
+  const today = getRelativeDate();
+  return formatDateFromParts(today.day, today.month, today.year) ?? '16 June 2025';
+};
+
 export const repaymentsMade = {
   getmainHeader: (claimantName: string): string => {
-    return `Have you paid any money to ${claimantName} since 16 June 2025?`;
+    return `Have you paid any money to ${claimantName} since ${claimIssueDate()}?`;
   },
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
@@ -12,7 +19,7 @@ export const repaymentsMade = {
   youHave500CharactersHiddenHintText: `You have 500 characters remaining`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   getSelectIfYouPaidAnyMoneyErrorMessage: (claimantName: string): string =>
-    `Select if you’ve paid any money to ${claimantName} since 16 June 2025`,
+    `Select if you’ve paid any money to ${claimantName} since ${claimIssueDate()}`,
   giveDetailsAboutHowMuchYouPaidErrorMessage: `Give details about how much you paid and when`,
   mustBeUnderCharacterLimitErrorMessage: `Payment details must be 500 characters or less`,
   emojiTextInput: `👉 😄`,
