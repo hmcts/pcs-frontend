@@ -55,6 +55,7 @@ let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  await performAction('resetRTCAnswerStore');
   process.env.WALES_POSTCODE = 'YES';
   process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
   process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
@@ -92,6 +93,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);

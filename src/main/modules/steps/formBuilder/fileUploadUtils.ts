@@ -1,15 +1,19 @@
 import type { Request } from 'express';
 
 import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/storage';
+import { Logger } from '@modules/logger';
 import type { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import { decodeBase64UrlJson } from '@utils/base64Json';
+
+const logger = Logger.getLogger('form-builder-fileUploadUtils');
 
 /**
  * Parses already-uploaded document metadata from POST `req.body`, not from multipart file parts.
  *
  * Actual files are uploaded by multer on the step's AJAX `/upload` route; successful uploads are
- * written into hidden `<input name="uploadedDocuments[]">` fields (JSON strings) by the MOJ script.
- * On "Save and continue" those arrive as ordinary form fields — not as `req.files`. This helper
- * decodes them so validation-error re-renders can restore the file list on the MOJ multi-file-upload.
+ * written into hidden `<input name="uploadedDocuments[]">` fields (base64url-encoded JSON) by the
+ * MOJ script. On "Save and continue" those arrive as ordinary form fields — not as `req.files`.
+ * This helper decodes them so validation-error re-renders can restore the file list.
  */
 export function parseUploadedDocumentsFromBody(body: Record<string, unknown>): Record<string, unknown>[] {
   const raw = body['uploadedDocuments[]'];
@@ -22,13 +26,11 @@ export function parseUploadedDocumentsFromBody(body: Record<string, unknown>): R
     if (typeof entry !== 'string') {
       continue;
     }
-    try {
-      const doc = JSON.parse(entry) as unknown;
-      if (doc !== null && typeof doc === 'object' && !Array.isArray(doc)) {
-        parsed.push(doc as Record<string, unknown>);
-      }
-    } catch {
-      // ignore malformed hidden input
+    const doc = decodeBase64UrlJson(entry);
+    if (doc) {
+      parsed.push(doc);
+    } else if (entry !== '') {
+      logger.warn('Dropping uploaded document entry that failed to decode');
     }
   }
   return parsed;
