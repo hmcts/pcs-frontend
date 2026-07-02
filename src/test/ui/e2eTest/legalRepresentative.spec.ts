@@ -219,8 +219,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  //@PR
-  test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @regression @rentNonRent', async () => {
+  test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.getLrHiddenMainHeader(pinUser.firstName, pinUser.lastName),
