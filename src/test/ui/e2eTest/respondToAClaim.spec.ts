@@ -54,6 +54,7 @@ import {
   yourCircumstances,
   yourHouseholdAndCircumstances,
 } from '../data/page-data';
+import { viewDocuments } from '../data/page-data/documents-page-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
@@ -456,6 +457,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
     await performValidation('mainHeader', dashboard.mainHeader);
+    await performAction('clickLink', `view-documents`);
+    await performAction('validateViewDocuments', {
+      documents: [
+        {
+          sectionHeader: viewDocuments.evidenceSubHeader,
+          documentName: 'rentArrears - Defendant 1.pdf',
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+      ],
+    });
   });
 
   test('Respond to a claim - Solicitor journey returns to task list when Yes is selected for Do you have a solicitor? @noDefendants @crossbrowser @regression', async () => {
