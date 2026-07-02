@@ -159,6 +159,18 @@ export function registerSteps(router: IRouter, specificJourney?: string): void {
   });
 }
 
+// requireEventAccess loads validatedCase and the access guard reads it, so mount them as one
+// ordered chain — guard after loader. Don't move the guard to a :caseReference param callback:
+// param callbacks run before .use() middleware, so it would read validatedCase as undefined.
+function mountCaseAccessChain(
+  router: IRouter,
+  basePath: string,
+  eventId: string,
+  routeMiddleware: RequestHandler[]
+): void {
+  router.use(basePath, requireEventAccess(eventId), ...routeMiddleware);
+}
+
 /**
  * Auto-discovers and registers all journeys from the journey registry.
  * Creates a dedicated router for each journey with journey-specific middleware.
@@ -187,13 +199,7 @@ export function registerAllJourneys(app: Application): void {
     // Apply journey-specific middleware
     // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
     journeyRouter.param('caseReference', caseReferenceParamMiddleware);
-    journeyRouter.use(basePath, requireEventAccess(eventId));
-
-    // Stacked onto the :caseReference param callback so handlers fire after
-    // validatedCase loads, before per-step middleware. Mounting via .use() would fire too early.
-    for (const handler of journey.routeMiddleware ?? []) {
-      journeyRouter.param('caseReference', (req, res, next) => handler(req, res, next));
-    }
+    mountCaseAccessChain(journeyRouter, basePath, eventId, journey.routeMiddleware ?? []);
 
     // Register all steps for this journey on the journey router
     registerSteps(journeyRouter, journeyName);

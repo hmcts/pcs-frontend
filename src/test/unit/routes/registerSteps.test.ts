@@ -454,12 +454,25 @@ describe('registerAllJourneys', () => {
     expect(mockUse).toHaveBeenCalled();
   });
 
-  it('routeMiddleware fires AFTER caseReferenceParamMiddleware loads validatedCase, BEFORE per-step middleware', async () => {
+  // Mirrors production wiring: caseReferenceParamMiddleware only sanitises the reference,
+  // requireEventAccess loads validatedCase. routeMiddleware (the access guard) must run AFTER
+  // requireEventAccess and see validatedCase. Under the old `.param('caseReference', guard)`
+  // wiring this failed — the param callback fired before requireEventAccess, so the guard saw
+  // validatedCase = undefined and waved every request through. See HDPI-5718 regression.
+  it('routeMiddleware runs AFTER requireEventAccess loads validatedCase, BEFORE per-step middleware', async () => {
     const callOrder: string[] = [];
 
+    // Sanitise only — does NOT set validatedCase (matches the real param middleware).
     const caseRefMw = jest.fn((req, res, next, value) => {
-      res.locals.validatedCase = { id: value };
-      callOrder.push(`caseRef:${!!res.locals.validatedCase}`);
+      req.params.caseReference = value;
+      callOrder.push('caseRef');
+      next();
+    });
+
+    // The real loader of validatedCase.
+    const requireEventAccessHandler = jest.fn((req, res, next) => {
+      res.locals.validatedCase = { id: req.params.caseReference };
+      callOrder.push(`eventAccess:${!!res.locals.validatedCase}`);
       next();
     });
 
@@ -477,7 +490,7 @@ describe('registerAllJourneys', () => {
     jest.doMock('../../../main/middleware', () => ({
       oidcMiddleware: jest.fn((req, res, next) => next()),
       caseReferenceParamMiddleware: caseRefMw,
-      requireEventAccess: jest.fn(() => jest.fn((req, res, next) => next())),
+      requireEventAccess: jest.fn(() => requireEventAccessHandler),
       legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
     }));
 
@@ -529,7 +542,7 @@ describe('registerAllJourneys', () => {
 
     // Fire a request through the captured router by calling .handle() directly.
     // No supertest needed — Express routers expose .handle(req, res, next).
-    const req = { url: '/case/abc-999/wiring-test/step-a', method: 'GET' } as unknown as Request;
+    const req = { url: '/case/abc-999/wiring-test/step-a', method: 'GET', params: {} } as unknown as Request;
     const res = { locals: {}, end: jest.fn() } as unknown as Response;
 
     await new Promise<void>((resolve, reject) => {
@@ -539,6 +552,7 @@ describe('registerAllJourneys', () => {
       setImmediate(() => resolve());
     });
 
-    expect(callOrder).toEqual(['caseRef:true', 'tracer:true', 'handler:true']);
+    // tracer:true is the assertion that broke under the old param-callback wiring.
+    expect(callOrder).toEqual(['caseRef', 'eventAccess:true', 'tracer:true', 'handler:true']);
   });
 });
