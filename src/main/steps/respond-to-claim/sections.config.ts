@@ -49,8 +49,7 @@ const sectionDefs = [
     titleKey: 'taskList.disputeAndTenancy',
     steps: [
       'dispute-claim-interstitial',
-      'landlord-registered',
-      'landlord-licensed',
+      'exempt-landlord',
       'written-terms',
       'tenancy-type-details',
       'tenancy-date-details',

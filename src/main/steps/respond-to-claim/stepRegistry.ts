@@ -39,12 +39,11 @@ import { step as endOfJourneyCya } from './end-of-journey-cya';
 import { step as equalityAndDiversityEnd } from './equality-and-diversity-end';
 import { step as equalityAndDiversityStart } from './equality-and-diversity-start';
 import { step as exceptionalHardship } from './exceptional-hardship';
+import { step as exemptLandlord } from './exempt-landlord';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as howMuchAffordToPay } from './how-much-afford-to-pay';
 import { step as incomeAndExpenses } from './income-and-expenditure';
 import { step as installmentPayments } from './installment-payments';
-import { step as landlordLicensed } from './landlord-licensed';
-import { step as landlordRegistered } from './landlord-registered';
 import { step as languageUsed } from './language-used';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
@@ -96,8 +95,7 @@ export const stepRegistry = {
   'check-your-answers-your-circumstances': checkYourAnswersYourCircumstances,
   'check-your-answers-income-and-expenses': checkYourAnswersIncomeAndExpenses,
   'check-your-answers-documents': checkYourAnswersDocuments,
-  'landlord-registered': landlordRegistered,
-  'landlord-licensed': landlordLicensed,
+  'exempt-landlord': exemptLandlord,
   'written-terms': writtenTerms,
   'tenancy-type-details': tenancyTypeDetails,
   'tenancy-date-details': tenancyDateDetails,

@@ -66,8 +66,6 @@
     "noticeReceivedDate": "cyWhen did you receive notice from the claimant?",
     "rentArrearsAmountConfirmation": "cyIs the amount of rent arrears given by the claimant correct?",
     "rentArrearsAmount": "cyAdmitted amount owed in rent arrears",
-    "landlordRegistered": "cyIs your landlord registered?",
-    "landlordLicensed": "cyIs your landlord licensed?",
     "writtenTerms": "cyHas your landlord sent you written terms of the occupation contract?",
     "makeCounterClaim": "cyDo you want to make a counterclaim?"
   },
