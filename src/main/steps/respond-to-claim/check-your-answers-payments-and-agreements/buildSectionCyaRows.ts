@@ -58,7 +58,7 @@ function addAnyPaymentsMadeRows({
     return;
   }
   // TODO HDPI-5157: hardcode fallback matching the repayments-made step until claimIssueDate is wired from START callback
-  const issueDate = claimIssueDate || '16th June 2025';
+  const issueDate = claimIssueDate || '16 June 2025';
   const questionRow: SummaryListRow = {
     key: { text: t('rows.anyPaymentsMade.label', { claimantName, claimIssueDate: issueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
@@ -92,7 +92,7 @@ function addRepaymentPlanAgreedRows({
     return;
   }
   // TODO HDPI-5157: hardcode fallback matching the repayments-agreed step until claimIssueDate is wired from START callback
-  const issueDate = claimIssueDate || '20th May 2025';
+  const issueDate = claimIssueDate || '20 May 2025';
   const questionRow: SummaryListRow = {
     key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, claimIssueDate: issueDate }) },
     value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
