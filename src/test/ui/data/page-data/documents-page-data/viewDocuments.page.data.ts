@@ -23,6 +23,7 @@ export const viewDocuments = {
   evidenceSubHeader: `Evidence`,
   correspondenceSubHeader: `Correspondence`,
 
+  claimFormLink: `Claim form.pdf`,
   noticeServiceJurisdictionLink: `NoticeServiceJurisdiction - Claimant 1.docx`,
   rentStatementLink: `RentStatement - Claimant 1.pdf`,
   witnessStatementLink: `WitnessStatement - Claimant 1.png`,
