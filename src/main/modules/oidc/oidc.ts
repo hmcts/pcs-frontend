@@ -22,9 +22,7 @@ export class OIDCModule {
   private oidcConfig: OIDCConfig = config.get<OIDCConfig>('oidc');
   private readonly logger = Logger.getLogger('oidc');
 
-  constructor() {
-    this.setupClient();
-  }
+  // discovery runs lazily on first request via enableFor, so a boot-time IDAM blip can't crash us
 
   private async setupClient(): Promise<Configuration> {
     if (this.clientConfigPromise) {
