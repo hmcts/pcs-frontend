@@ -3341,9 +3341,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact@npm:17.0.0":
-  version: 17.0.0
-  resolution: "@pact-foundation/pact@npm:17.0.0"
+"@pact-foundation/pact@npm:17.0.1":
+  version: 17.0.1
+  resolution: "@pact-foundation/pact@npm:17.0.1"
   dependencies:
     "@pact-foundation/pact-core": "npm:^19.2.0"
     "@scarf/scarf": "npm:^1.4.0"
@@ -3361,7 +3361,7 @@ __metadata:
     randexp: "npm:^0.5.3"
     router: "npm:^2.2.0"
     stack-utils: "npm:^2.0.6"
-  checksum: 10/50b7723ab848e0f54924b75ad6a65c224aa6c43d2ea4bb61630c7d9c891d3d8b372a943ac888e7be846ec3470fab751c72ff10a06a70044d90ae02f9cc2a599f
+  checksum: 10/922e12ffa07045bcefa58d1d08aef06793ee200eac7a4451ffefcb2e8089dc44b41ce3ea30bce42d4ce41318ac09c0e6d2d538990c7c2c873458672dbac2f92c
   languageName: node
   linkType: hard
 
@@ -11790,7 +11790,7 @@ __metadata:
     "@ministryofjustice/frontend": "npm:^9.0.0"
     "@opentelemetry/api": "npm:1.9.1"
     "@opentelemetry/instrumentation-winston": "npm:0.63.0"
-    "@pact-foundation/pact": "npm:17.0.0"
+    "@pact-foundation/pact": "npm:17.0.1"
     "@pact-foundation/pact-cli": "npm:18.1.1"
     "@playwright/test": "npm:1.61.1"
     "@types/body-parser": "npm:1.19.6"
