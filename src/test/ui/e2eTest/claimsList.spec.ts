@@ -26,6 +26,7 @@ test.describe('Claims list - e2e Journey @nightly', async () => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
     console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
+    await performAction('updatePaymentAPI');
     await performAction('fetchPINsAPI');
     await performAction('validateAccessCodeAPI');
     await performAction('reloadPage');
