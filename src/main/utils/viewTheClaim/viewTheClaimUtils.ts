@@ -76,6 +76,7 @@ export interface ViewTheClaimCopy {
   label: (key: string, options?: Record<string, unknown>) => string;
   text: (key: string, options?: Record<string, unknown>) => string;
   personsUnknown: string;
+  addressUnknown: string;
   locale: string;
 }
 
@@ -147,6 +148,7 @@ function createViewTheClaimCopy(t: TFunction, locale: string): ViewTheClaimCopy 
     label: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:labels.${key}`, options),
     text: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:${key}`, options),
     personsUnknown: t('viewTheClaim:personsUnknown'),
+    addressUnknown: t('viewTheClaim:addressUnknown'),
     locale,
   };
 }
@@ -344,7 +346,7 @@ export function partyAddressHtml(party: UnknownRecord | undefined, propertyAddre
   }
 
   if (normaliseYesNo(party.addressKnown) === 'NO') {
-    return '';
+    return undefined;
   }
 
   if (
@@ -359,6 +361,51 @@ export function partyAddressHtml(party: UnknownRecord | undefined, propertyAddre
     addressHtml(party.address) ??
     addressHtml(party.addressForService) ??
     addressHtml(party.serviceAddress)
+  );
+}
+
+export function partyAddressRow(
+  party: UnknownRecord | undefined,
+  propertyAddress: unknown,
+  label: string,
+  copy: ViewTheClaimCopy
+): ViewTheClaimSummaryRow | undefined {
+  if (!party) {
+    return undefined;
+  }
+
+  if (normaliseYesNo(party.addressKnown) === 'NO') {
+    return textRow(label, copy.addressUnknown);
+  }
+
+  return htmlRow(label, partyAddressHtml(party, propertyAddress));
+}
+
+export function additionalDefendantName(
+  defendant: UnknownRecord | undefined,
+  data: UnknownRecord,
+  index: number,
+  copy: ViewTheClaimCopy
+): string {
+  if (!defendant || Object.keys(defendant).length === 0) {
+    return copy.personsUnknown;
+  }
+
+  const name = partyName(defendant, copy);
+  if (name) {
+    return name;
+  }
+
+  return (
+    getFirstPartyName(
+      data,
+      [
+        `detailsTab_AdditionalDefendants.${index}.value`,
+        `casePartiesTab_DefendantsDetails.${index}.value`,
+        `summaryTab_AdditionalDefendants.${index}.value`,
+      ],
+      copy
+    ) ?? copy.personsUnknown
   );
 }
 
