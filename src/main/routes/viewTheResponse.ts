@@ -165,19 +165,19 @@ function resolveDefendantPostalAddress(
     return t('viewTheResponse:addressUnknown');
   }
 
-  if (isYes(party?.addressSameAsProperty) && propertyAddress) {
-    return formatAddress(propertyAddress) ?? '';
+  if (isYes(party?.addressSameAsProperty)) {
+    return formatAddress(propertyAddress) ?? t('viewTheResponse:addressUnknown');
   }
 
   const addressText = addressToString(party?.address);
   return addressText || t('viewTheResponse:addressUnknown');
 }
 
-function addressToString(address: CcdCaseAddress | Record<string, never> | undefined): string {
+function addressToString(address: CcdCaseAddress | undefined): string {
   if (!address || Object.keys(address).length === 0) {
     return '';
   }
-  return formatAddress(address as CcdCaseAddress) ?? '';
+  return formatAddress(address) ?? '';
 }
 
 function pushRow(rows: SummaryRow[], label: string, value: string | null | undefined): void {

@@ -140,7 +140,7 @@ export interface CcdParty {
   lastName?: string;
   orgName?: string;
   nameKnown?: string;
-  address?: CcdCaseAddress | Record<string, never>;
+  address?: CcdCaseAddress;
   addressKnown?: string;
   addressSameAsProperty?: string;
   dateOfBirth?: string;
@@ -151,7 +151,7 @@ export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
   firstName?: string;
   lastName?: string;
-  address?: CcdCaseAddress | Record<string, never>;
+  address?: CcdCaseAddress;
   addressKnown?: YesNoValue;
   addressSameAsProperty?: YesNoValue;
 }
@@ -162,7 +162,7 @@ export interface CcdDefendantParty {
   lastName?: string;
   nameKnown?: string;
   emailAddress?: string;
-  address?: CcdCaseAddress | Record<string, never>;
+  address?: CcdCaseAddress;
   addressKnown?: string;
   addressSameAsProperty?: string;
   phoneNumberProvided?: YesNoValue;
