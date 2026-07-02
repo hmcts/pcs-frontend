@@ -496,7 +496,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
 
     await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
@@ -731,7 +730,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
     await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
