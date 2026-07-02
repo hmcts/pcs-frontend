@@ -50,7 +50,7 @@ const t = ((key: string) => {
       "Give details about how much you've agreed to pay, how often you'll pay and when the agreement was made",
     textAreaHint: 'You can enter up to 500 characters',
     'errors.repaymentsAgreed':
-      "Select if you've come to any agreement with Treetops Housing to repay the arrears since 20th May 2025",
+      "Select if you've come to any agreement with Treetops Housing to repay the arrears since 20 May 2025",
     'errors.repaymentsAgreed.repaymentsAgreedDetails':
       "Give details about how much you've agreed to pay, how often you'll pay and when the agreement was made",
     'buttons.saveAndContinue': 'Save and continue',

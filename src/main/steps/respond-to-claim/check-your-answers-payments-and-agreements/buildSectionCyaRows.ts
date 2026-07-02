@@ -57,7 +57,6 @@ function addAnyPaymentsMadeRows({
   if (!paymentAgreement.anyPaymentsMade) {
     return;
   }
-
   const questionRow: SummaryListRow = {
     key: { text: t('rows.anyPaymentsMade.label', { claimantName, dateIssued }) },
     value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
@@ -90,7 +89,6 @@ function addRepaymentPlanAgreedRows({
   if (!paymentAgreement.repaymentPlanAgreed) {
     return;
   }
-
   const questionRow: SummaryListRow = {
     key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, dateIssued }) },
     value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
