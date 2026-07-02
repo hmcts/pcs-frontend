@@ -132,6 +132,9 @@
     "maxDocumentFileSizeMB": 1024,
     "maxFilenameLength": 255
   },
+  "redirects": {
+    "manageCaseReturnURL": "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
+  },
   "payment": {
     "returnUrl": "https://pcs.aat.platform.hmcts.net/payment/return"
   }

@@ -1,0 +1,20 @@
+{
+  "pageTitle": "Instalments",
+  "heading": "Instalments",
+  "amountQuestion": "How much could the defendant afford to pay in addition to the current rent?",
+  "frequencyQuestion": "How frequently could the defendant afford to pay this amount?",
+  "amountHint": "",
+  "frequencyOptions": {
+    "weekly": "Weekly",
+    "every2Weeks": "Every 2 weeks",
+    "every4Weeks": "Every 4 weeks",
+    "monthly": "Monthly"
+  },
+  "errors": {
+    "installmentAmount": "Enter how much the defendant could afford to pay in addition to the current rent",
+    "installmentAmountFormat": "Enter an amount in the correct format, for example 148.00 or 148.50",
+    "installmentAmountMax": "The amount the defendant could afford to pay in addition to the current rent must be less than £1 billion",
+    "installmentAmountMin": "The amount the defendant could afford to pay in addition to the current rent must be £0.00 or above",
+    "installmentFrequency": "Select how frequently the defendant could afford to pay this amount"
+  }
+}
