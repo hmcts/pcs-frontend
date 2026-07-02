@@ -9,6 +9,7 @@ import {
   createCaseEventTokenApiData,
   submitCaseApiData,
   submitCaseEventTokenApiData,
+  submitCaseTestSupportApiInstance,
 } from '../../../data/api-data';
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
 import { paymentApiData } from '../../../data/api-data/payment.api.data';
@@ -188,44 +189,28 @@ export class CreateCaseAPIAction implements IAction {
     caseData: actionData,
     options?: actionData
   ): Promise<void> {
-    const submitCaseApi = Axios.create(submitCaseEventTokenApiData.createCaseApiInstance());
-    const maxRetries = actionRetries;
-    const delayMs = VERY_SHORT_TIMEOUT;
+    const submitCaseApi = Axios.create(submitCaseTestSupportApiInstance.headerTokens());
     const issueAndGenerateAccessCodes =
       typeof options === 'object' && options !== null && 'issueAndGenerateAccessCodes' in options
         ? (options as Record<string, actionData>).issueAndGenerateAccessCodes !== false
         : true;
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const tokenResponse = await submitCaseApi.get(submitCaseEventTokenApiData.submitCaseEventTokenApiEndPoint());
-        if (tokenResponse.status !== 200) {
-          throw new Error('Failed to get submit token');
-        }
-        const SUBMIT_EVENT_TOKEN = tokenResponse.data.token;
-        const submitCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
-        const response = await submitCaseApi.post(
-          submitCaseApiData.submitCaseTestSupportApiEndPoint(issueAndGenerateAccessCodes),
-          {
-            data: submitCasePayloadData,
-            event: { id: submitCaseApiData.submitCaseEventName },
-            event_token: SUBMIT_EVENT_TOKEN,
-          }
-        );
-        if (response.status === 200 || response.status === 201) {
-          return;
-        }
-      } catch (error: unknown) {
-        if (attempt === maxRetries) {
-          if (Axios.isAxiosError(error)) {
-            throw error;
-          }
-          throw new Error('Submit case test support failed unexpectedly.');
-        }
+    try {
+      const submitCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
+      const response = await submitCaseApi.post(
+        submitCaseTestSupportApiInstance.submitCaseTestSupportApiEndPoint(issueAndGenerateAccessCodes),
+        submitCasePayloadData
+      );
+      if (response.status === 200 || response.status === 201) {
+        return;
       }
-      await new Promise(res => setTimeout(res, delayMs));
+      throw new Error(`Submit case test support failed with status ${response.status}`);
+    } catch (error: unknown) {
+      if (Axios.isAxiosError(error)) {
+        throw error;
+      }
+      throw new Error('Submit case test support failed unexpectedly.');
     }
-    throw new Error('Submit case test support API failed after multiple retries');
   }
 
   private async updatePaymentAPI(): Promise<void> {
