@@ -68,7 +68,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
-
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('getCaseAPI');
   //await performAction('navigateToUrl', home_url);
