@@ -1,0 +1,8 @@
+{
+  "heading": "Upload files to support the counterclaim",
+  "guidanceText": "You should only upload files that are relevant to the counterclaim.",
+  "guidanceText2": "All parties will be able to see any files you upload.",
+  "errors": {
+    "documents": "Select a file to support the counterclaim"
+  }
+}
