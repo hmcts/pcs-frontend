@@ -190,7 +190,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    //await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseApiTestSupport', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else if (testInfo.title.includes('@assured')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
@@ -227,7 +227,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
-  await performAction('updatePaymentAPI');
+  //await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);

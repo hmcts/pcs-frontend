@@ -13,6 +13,7 @@ export const submitCaseEventTokenApiData = {
   submitCaseEventTokenApiEndPoint: (): string =>
     `/cases/${process.env.CASE_NUMBER}/event-triggers/resumePossessionClaim`,
 };
+
 export const submitCaseTestSupportApiInstance = {
   headerTokens: (): Record<string, unknown> => ({
     baseURL: process.env.PCS_API_URL,

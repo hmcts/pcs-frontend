@@ -153,7 +153,7 @@ export class CreateCaseAPIAction implements IAction {
   }
 
   private async submitCaseAPI(caseData: actionData): Promise<void> {
-    const submitCaseApi = Axios.create(submitCaseApiData.submitCaseTestSupportApiInstance());
+    const submitCaseApi = Axios.create(submitCaseEventTokenApiData.createCaseApiInstance());
     const maxRetries = actionRetries;
     const delayMs = VERY_SHORT_TIMEOUT;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -185,10 +185,7 @@ export class CreateCaseAPIAction implements IAction {
     throw new Error('Submit case API failed after multiple retries');
   }
 
-  private async submitCaseApiTestSupport(
-    caseData: actionData,
-    options?: actionData
-  ): Promise<void> {
+  private async submitCaseApiTestSupport(caseData: actionData, options?: actionData): Promise<void> {
     const submitCaseApi = Axios.create(submitCaseTestSupportApiInstance.headerTokens());
     const issueAndGenerateAccessCodes =
       typeof options === 'object' && options !== null && 'issueAndGenerateAccessCodes' in options
@@ -202,15 +199,39 @@ export class CreateCaseAPIAction implements IAction {
         submitCasePayloadData
       );
       if (response.status === 200 || response.status === 201) {
+        const responseData = response.data?.data ?? response.data;
+        const caseId = String(
+          responseData?.caseId ??
+            responseData?.id ??
+            responseData?.caseReference ??
+            responseData?.case_number ??
+            responseData
+        );
+        if (!caseId || caseId === '[object Object]') {
+          throw new Error(
+            `Submit case test support response did not include a case id: ${JSON.stringify(response.data)}`
+          );
+        }
+        process.env.CASE_NUMBER = caseId;
+        process.env.CASE_FID = caseId.replace(/(.{4})(?=.)/g, '$1 ');
         return;
       }
       throw new Error(`Submit case test support failed with status ${response.status}`);
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
-        throw error;
+        const responseBody = error.response?.data;
+        throw new Error(
+          `Submit case test support failed with status ${error.response?.status ?? 'UNKNOWN'}: ${
+            typeof responseBody === 'string' ? responseBody : JSON.stringify(responseBody)
+          }`
+        );
+      }
+      if (error instanceof Error) {
+        throw new Error(`Submit case test support failed unexpectedly: ${error.message}`);
       }
       throw new Error('Submit case test support failed unexpectedly.');
     }
+    throw new Error('Submit case test support API failed after multiple retries');
   }
 
   private async updatePaymentAPI(): Promise<void> {
