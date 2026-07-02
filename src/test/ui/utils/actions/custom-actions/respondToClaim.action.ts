@@ -1338,7 +1338,6 @@ export class RespondToClaimAction implements IAction {
     const options = Array.isArray(sot.options) ? sot.options : [sot.option];
     for (const option of options) {
       await performAction('check', {
-        question: sot.question,
         option,
       });
     }
