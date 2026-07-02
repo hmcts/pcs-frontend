@@ -2,7 +2,7 @@ import { Page, expect } from '@playwright/test';
 
 import { IValidation, validationRecord } from '../../interfaces';
 
-export class responseTableValidation implements IValidation {
+export class viewClaimOrResponseTableValidation implements IValidation {
   async validate(page: Page, validation: string, subHeaderName: string, data: validationRecord): Promise<void> {
     const entries = Object.entries(data);
     for (const [key, value] of entries) {
