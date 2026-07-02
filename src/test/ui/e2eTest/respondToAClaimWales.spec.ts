@@ -93,6 +93,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -312,7 +313,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateCYARTC');
     await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });

@@ -1,6 +1,8 @@
 export const repaymentsAgreed = {
   getMainHeader: (claimantsName: string) =>
     `Have you come to any agreement with ${claimantsName} to repay the arrears since 20th May 2025?`,
+  lrHiddenMainHeader: () =>
+    `Has the defendant come to any agreement with ${process.env.CLAIMANT_NAME} to repay the arrears since 20th May 2025?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   detailsTextInput: `Agreed £1000 last year`,
@@ -8,6 +10,7 @@ export const repaymentsAgreed = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   giveDetailsHiddenTextLabel: `Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made`,
+  lrGiveDetailsHiddenTextLabel: `Give details about how much they’ve agreed to pay and when`,
   youCanEnterUpToHiddenHintText: `You can enter up to 500 characters`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   backLink: `Back`,

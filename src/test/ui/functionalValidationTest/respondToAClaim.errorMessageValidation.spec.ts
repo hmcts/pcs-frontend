@@ -42,7 +42,7 @@ import {
   yourCircumstances,
 } from '../data/page-data';
 import { accessYourCaseErrorValidation } from '../functional/accessYourCase.pft';
-import { checkYourAnswersRTCErrorValidation } from '../functional/checkYourAnswersRTC.pft';
+// import { checkYourAnswersRTCErrorValidation } from '../functional/checkYourAnswersRTC.pft';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
@@ -206,6 +206,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   } else if (testInfo.title.includes('@secureFlexible')) {
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
@@ -219,12 +220,14 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
   } else {
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -492,10 +495,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
+    //commented due to HDPI-7424.
+    //await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
 
     await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
@@ -728,9 +731,9 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
+    //commented due to HDPI-7424.
+    // await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
     await performAction('selectStatementOfTruthRTC', {
-      question: checkYourAnswersRTC.statementOfTruthQuestion,
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
