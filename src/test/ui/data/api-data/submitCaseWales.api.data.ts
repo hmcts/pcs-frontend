@@ -3,6 +3,7 @@ export const submitCaseApiDataWales = {
 
   submitCasePayload: {
     legislativeCountry: 'Wales',
+    regionId: 7,
     caseManagementLocationNumber: 366572,
     claimantType: {
       value: {
@@ -149,6 +150,7 @@ export const submitCaseApiDataWales = {
 
   submitCaseRentNonRentStandard: {
     legislativeCountry: 'Wales',
+    regionId: 7,
     caseManagementLocationNumber: 366572,
     claimantType: {
       value: {
@@ -241,6 +243,7 @@ export const submitCaseApiDataWales = {
 
   submitCaseRentOtherTenancy: {
     legislativeCountry: 'Wales',
+    regionId: 7,
     caseManagementLocationNumber: 366572,
     claimantType: {
       value: {
@@ -330,6 +333,7 @@ export const submitCaseApiDataWales = {
 
   submitCaseNonRentStandard: {
     legislativeCountry: 'Wales',
+    regionId: 7,
     caseManagementLocationNumber: 366572,
     claimantType: {
       value: {
