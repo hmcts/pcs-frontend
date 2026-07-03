@@ -30,3 +30,4 @@ export * from './languageUsedLR.page.data';
 export * from './rentArrearsDisputeLR.page.data';
 export * from './confirmationOfNoticeDateWhenProvidedLR.page.data';
 export * from './repaymentsMadeLR.page.data';
+export * from './repaymentsAgreedLR.page.data';
