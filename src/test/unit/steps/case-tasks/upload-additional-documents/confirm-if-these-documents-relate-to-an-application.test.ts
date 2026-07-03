@@ -65,7 +65,13 @@ const GEN_APP_2 = '22222222-2222-2222-2222-222222222222';
 const GEN_APP_NO_ID = '';
 const CLAIM_OR_COUNTERCLAIM_TEXT = 'No, the documents I’m uploading relate to the main claim or counterclaim';
 
-const t = (key: string, vars?: Record<string, string>) => (vars ? `${key}|${JSON.stringify(vars)}` : key);
+const t = (key: string, vars?: Record<string, string>) => {
+  if (key === 'optionClaimOrCounterclaim') {
+    return CLAIM_OR_COUNTERCLAIM_TEXT;
+  }
+
+  return vars ? `${key}|${JSON.stringify(vars)}` : key;
+};
 
 const buildReq = (
   overrides: Partial<{ formData: Record<string, unknown>; body: Record<string, unknown> }> = {}
