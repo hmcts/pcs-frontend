@@ -3,6 +3,7 @@ import { Request } from 'express';
 const eventIdMappings: Record<string, string> = {
   'make-an-application': 'makeAnApplication',
   'respond-to-claim': 'respondPossessionClaim',
+  'upload-additional-documents': 'uploadDocuments',
 };
 
 export const getEventIdFromPath = (req: Request): string | undefined => {

@@ -1,36 +1,36 @@
 {
-  "pageTitle": "cy Check your answers",
+  "pageTitle": "Gwirio eich atebion",
   "cardTitle": "cy Response",
   "options": {
-    "yes": "cy Yes",
-    "no": "cy No",
-    "imNotSure": "cy I’m not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "imNotSure": "Nid wyf yn siŵr"
   },
   "rows": {
     "landlordRegistered": {
-      "label": "cy Is your landlord registered?",
+      "label": "A yw eich landlord wedi'i gofrestru?",
       "changeHidden": "cy landlord registered"
     },
     "landlordLicensed": {
-      "label": "cy Is your landlord licensed?",
+      "label": "A yw eich landlord wedi'i drwyddedu?",
       "changeHidden": "cy landlord licensed"
     },
     "writtenTerms": {
-      "label": "cy Has your landlord sent you written terms of the occupation contract?",
+      "label": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth?",
       "changeHidden": "cy written terms"
     },
     "tenancyTypeCorrect": {
-      "label": "cy Is the tenancy, occupation contract or licence agreement type correct?",
+      "label": "A yw'r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
       "changeHidden": "cy tenancy type"
     },
     "tenancyTypeDetails": {
-      "label": "cy Give the correct tenancy, occupation contract or licence type",
+      "label": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded",
       "changeHidden": "cy corrected tenancy type"
     },
     "tenancyStartDate": {
       "changeHidden": "cy tenancy start date",
       "confirm": {
-        "label": "cy Is the tenancy, licence or occupation contract start date correct?",
+        "label": "A yw dyddiad dechrau'r denantiaeth, drwydded neu gontract meddiannaeth yn gywir?",
         "changeHidden": "cy tenancy start date"
       },
       "correctDate": {
@@ -48,19 +48,19 @@
       "changeHidden": "cy notice received date"
     },
     "rentArrearsAmountConfirmation": {
-      "label": "cy Do you owe this amount in rent arrears?",
+      "label": "A yw'r swm hwn yn ddyledus gennych mewn ôl-ddyledion rhent?",
       "changeHidden": "cy rent arrears amount"
     },
     "rentArrearsAmountDetails": {
-      "label": "cy How much do you believe you owe in rent arrears?",
+      "label": "Faint ydych chi'n credu sy'n ddyledus gennych mewn ôl-ddyledion rhent?",
       "changeHidden": "cy rent arrears amount details"
     },
     "disputeClaim": {
-      "label": "cy Do you want to dispute any other parts of the claim?",
+      "label": "A ydych eisiau gwrthwynebu unrhyw rannau eraill o'r hawliad?",
       "changeHidden": "cy dispute other parts of the claim"
     },
     "disputeClaimDetails": {
-      "label": "cy Explain which parts of the claim you do not agree with",
+      "label": "Eglurwch pa rannau o'r hawliad nad ydych yn cytuno â nhw",
       "changeHidden": "cy dispute details"
     },
     "makeCounterClaim": {
@@ -72,7 +72,7 @@
       "changeHidden": "cy counterclaim type",
       "options": {
         "PAYMENT_OR_COMPENSATION": "cy A sum of money or compensation",
-        "SOMETHING_ELSE": "cy Something else",
+        "SOMETHING_ELSE": "Rhywbeth arall",
         "BOTH": "cy Both"
       }
     },
@@ -92,8 +92,8 @@
       "label": "cy Do you need help paying the counterclaim fee?",
       "changeHidden": "cy help paying the counterclaim fee",
       "options": {
-        "YES": "cy I need help paying the fee",
-        "NO": "cy I do not need help paying the fee"
+        "YES": "Rwyf angen help i dalu’r ffi",
+        "NO": "Nid wyf angen help i dalu’r ffi"
       }
     },
     "counterClaimAppliedForHwf": {
@@ -101,7 +101,7 @@
       "changeHidden": "cy applied for help with fees"
     },
     "counterClaimHwfReference": {
-      "label": "cy Enter your Help with Fees reference number",
+      "label": "Nodwch eich cyfeirnod Help i Dalu Ffioedd",
       "changeHidden": "cy Help with Fees reference number"
     },
     "counterClaimFor": {

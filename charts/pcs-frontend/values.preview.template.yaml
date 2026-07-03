@@ -19,6 +19,7 @@ nodejs:
     CASE_TYPE_ID: '${CASE_TYPE_ID}'
     XUI_BASE_URI: '${XUI_BASE_URI}'
     REDIRECTS_MANAGE_CASE_RETURN_URL: '${REDIRECTS_MANAGE_CASE_RETURN_URL}'
+    PAYMENT_RETURN_URL: 'https://${SERVICE_FQDN}/payment/return'
 redis:
   image:
     registry: hmctsprod.azurecr.io

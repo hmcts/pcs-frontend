@@ -19,8 +19,8 @@
   "counterClaimFeesCourtFeesLinkText": "cy<a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about court fees (opens in new tab)</a>.",
   "question": "cyDo you want to make a counterclaim?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
   "errors": {
     "makeCounterClaim": "cySelect if you’re planning to make a counterclaim"

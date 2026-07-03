@@ -44,8 +44,8 @@ export class ErrorMessageValidation implements IValidation {
 
     const scenario = 'Error message validation';
     let expected = '';
-    let actualText: string | null = null;
-    let passed = false;
+    let actualText: string | null;
+    let passed: boolean;
 
     try {
       // Handle string error message

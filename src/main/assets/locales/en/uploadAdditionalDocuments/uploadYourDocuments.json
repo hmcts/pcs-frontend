@@ -1,5 +1,17 @@
 {
   "pageTitle": "Upload your documents",
   "heading": "Upload your documents",
-  "body": "Placeholder content: document upload will be added here. When you continue, you will return to your dashboard."
+  "guidanceText": "You should only upload documents that are relevant to the claim.",
+  "beforeUploadText": "Before you upload the document, give it a name that tells the court what it is, for example ‘witness statement’, or ‘tenancy agreement’.",
+  "fileTypesText": "You can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.",
+  "uploadLabel": "Upload a file",
+  "filesAddedHeading": "Files added",
+  "uploadButton": "Upload file",
+  "deleteButton": "Remove",
+  "noFilesUploaded": "No files uploaded",
+  "errors": {
+    "documents": {
+      "required": "Select a file"
+    }
+  }
 }

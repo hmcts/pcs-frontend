@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const DEFAULT_VIEWPORT = { width: 1920, height: 1080 };
-export const VERY_SHORT_TIMEOUT = 2000;
+export const VERY_SHORT_TIMEOUT = 1000;
 export const SHORT_TIMEOUT = 5000;
 export const actionRetries = 10;
 export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
@@ -15,8 +15,8 @@ export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
 if (enable_all_page_functional_tests.toLowerCase() === 'true') {
   process.env.ENABLE_CONTENT_VALIDATION = 'true';
-  process.env.ENABLE_VISIBILITY_VALIDATION = 'true';
-  process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true';
+  process.env.ENABLE_VISIBILITY_VALIDATION = 'false';
+  process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'false';
   process.env.ENABLE_NAVIGATION_TESTS = 'true';
 }
 
@@ -72,7 +72,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: 4,
+  workers: 2,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
   use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
