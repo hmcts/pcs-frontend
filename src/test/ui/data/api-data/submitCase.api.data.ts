@@ -4,6 +4,8 @@ export const submitCaseApiData = {
   get submitCasePayload() {
     return {
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
@@ -208,6 +210,8 @@ export const submitCaseApiData = {
   get submitCasePayloadNoDefendants() {
     return {
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
@@ -284,6 +288,8 @@ export const submitCaseApiData = {
   get submitCasePayloadRentNonRent() {
     return {
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
@@ -412,6 +418,8 @@ export const submitCaseApiData = {
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'YES',
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
@@ -513,6 +521,8 @@ export const submitCaseApiData = {
   get submitCasePayloadSecureFlexibleTenancy() {
     return {
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
@@ -606,6 +616,8 @@ export const submitCaseApiData = {
   get submitCasePayloadSecureFlexibleTenancyNoticeServedNo() {
     return {
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
@@ -698,6 +710,8 @@ export const submitCaseApiData = {
   get submitCasePayloadOtherTenancy() {
     return {
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
@@ -783,6 +797,8 @@ export const submitCaseApiData = {
   get submitCasePayloadDefault() {
     return {
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
