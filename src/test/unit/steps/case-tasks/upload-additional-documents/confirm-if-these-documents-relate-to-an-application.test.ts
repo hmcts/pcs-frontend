@@ -41,7 +41,13 @@ import type { Request, Response } from 'express';
 import { step } from '../../../../../main/steps/case-tasks/upload-additional-documents/confirm-if-these-documents-relate-to-an-application';
 
 import { date } from '@modules/nunjucks/filters/date';
-import { createGetController, getFormData, getTranslationFunction, loadStepNamespace, setFormData } from '@modules/steps';
+import {
+  createGetController,
+  getFormData,
+  getTranslationFunction,
+  loadStepNamespace,
+  setFormData,
+} from '@modules/steps';
 import type { CcdCase, CcdCollectionItem, RelatedApplicationOption } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
@@ -57,16 +63,9 @@ const TOKEN = 'access-token-1';
 const GEN_APP_1 = '11111111-1111-1111-1111-111111111111';
 const GEN_APP_2 = '22222222-2222-2222-2222-222222222222';
 const GEN_APP_NO_ID = '';
-const CLAIM_OR_COUNTERCLAIM_TEXT =
-  'No, the documents I’m uploading relate to the main claim or counterclaim';
+const CLAIM_OR_COUNTERCLAIM_TEXT = 'No, the documents I’m uploading relate to the main claim or counterclaim';
 
-const t = (key: string, vars?: Record<string, string>) => {
-  if (key === 'optionClaimOrCounterclaim') {
-    return CLAIM_OR_COUNTERCLAIM_TEXT;
-  }
-
-  return vars ? `${key}|${JSON.stringify(vars)}` : key;
-};
+const t = (key: string, vars?: Record<string, string>) => (vars ? `${key}|${JSON.stringify(vars)}` : key);
 
 const buildReq = (
   overrides: Partial<{ formData: Record<string, unknown>; body: Record<string, unknown> }> = {}
