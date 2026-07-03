@@ -208,6 +208,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   } else if (testInfo.title.includes('@secureFlexible')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
   } else if (testInfo.title.includes('@other')) {
@@ -221,6 +222,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
@@ -494,7 +496,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //commented due to HDPI-7424.
+    //commented due to bug HDPI-7424
     //await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
 
     await performAction('selectStatementOfTruthRTC', {
@@ -730,7 +732,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //commented due to HDPI-7424.
+    // commented due to bug HDPI-7424
     // await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
     await performAction('selectStatementOfTruthRTC', {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],

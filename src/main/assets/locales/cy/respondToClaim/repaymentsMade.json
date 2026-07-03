@@ -1,6 +1,6 @@
 {
   "pageTitle": "Taliadau a wnaed",
-  "question": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}?",
+  "question": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
   "options": {
     "yes": "Ydy",
     "no": "Nac ydy"
@@ -10,6 +10,6 @@
   "errors": {
     "repaymentsInfo": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
     "repaymentsInfoMaxLength": "cyPayment details must be 500 characters or less",
-    "confirmRepaymentsMade": "Dewiswch a ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}"
+    "confirmRepaymentsMade": "Dewiswch a ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}"
   }
 }
