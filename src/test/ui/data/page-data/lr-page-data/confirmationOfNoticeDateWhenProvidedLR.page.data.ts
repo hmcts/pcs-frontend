@@ -1,6 +1,5 @@
 import { submitCaseApiData } from '../../api-data';
 
-
 export const noticeDateWhenProvided = {
   mainHeader: `Notice date`,
   backLink: `Back`,
