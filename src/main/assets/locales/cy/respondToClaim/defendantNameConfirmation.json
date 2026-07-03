@@ -1,17 +1,17 @@
 {
-  "pageTitle": "cyYour name",
-  "nameConfirmationLabel": "cyIs your name {{defendantName}}?",
-  "nameConfirmationHint": "cyThis is the name provided by {{organisationName}}",
-  "yesOption": "cyYes",
-  "noOption": "cyNo",
-  "firstNameLabel": "cyFirst name",
-  "lastNameLabel": "cyLast name",
-  "contactUs": "cyContact us for help",
+  "pageTitle": "Eich enw",
+  "nameConfirmationLabel": "Ai eich enw yw {{defendantName}}?",
+  "nameConfirmationHint": "Dyma'r enw a ddarparwyd gan {{organisationName}}",
+  "yesOption": "Ydy",
+  "noOption": "Nac ydy",
+  "firstNameLabel": "Enw cyntaf",
+  "lastNameLabel": "Cyfenw",
+  "contactUs": "Cysylltu â ni i gael cymorth",
   "errors": {
-    "nameConfirmation": "cyYou must say if your name is {{defendantName}}",
-    "firstName": "cyEnter your first name",
-    "firstNameMaxLength": "cyFirst name must be 60 characters or less",
-    "lastName": "cyEnter your last name",
-    "lastNameMaxLength": "cyLast name must be 60 characters or less"
+    "nameConfirmation": "Mae'n rhaid i chi ddweud os mai eich enw yw {{defendantName}}",
+    "firstName": "Nodwch eich enw cyntaf",
+    "firstNameMaxLength": "Rhaid i’r enw cyntaf fod yn 60 nod neu lai",
+    "lastName": "Nodwch eich cyfenw",
+    "lastNameMaxLength": "Rhaid i’r cyfenw fod yn 60 nod neu lai"
   }
 }

@@ -70,6 +70,8 @@ describe('respond-to-claim sections config', () => {
       'end-of-journey-cya',
       'response-submitted',
       'response-submitted-counter-claim-fee-payment-needed',
+      'counter-claim-application-fee-amount',
+      'counter-claim-payment-successful',
       'response-and-counter-claim-submitted',
     ]);
   });

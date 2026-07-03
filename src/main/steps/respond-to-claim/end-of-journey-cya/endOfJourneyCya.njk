@@ -1,10 +1,10 @@
 {% extends "stepsTemplate.njk" %}
 {% from "govuk/components/error-summary/macro.njk"  import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk"   import govukSummaryList %}
-{% from "govuk/components/checkboxes/macro.njk"     import govukCheckboxes %}
-{% from "govuk/components/input/macro.njk"          import govukInput %}
-{% from "govuk/components/button/macro.njk"         import govukButton %}
-{% from "macros/csrf.njk"                           import csrfProtection %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
@@ -24,7 +24,7 @@
     {% endif %}
   {% endfor %}
 
-  <form method="post" action="{{ url }}" novalidate>
+  <form method="post" action="/case/{{ ccdId }}/final-submit" novalidate>
     {{ csrfProtection(csrfToken) }}
 
     <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>

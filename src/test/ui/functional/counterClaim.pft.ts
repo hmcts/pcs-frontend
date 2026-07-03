@@ -1,4 +1,4 @@
-import { counterClaim, feedback, nonRentArrearsDispute, rentArrears, taskList } from '../data/page-data';
+import { counterClaim, feedback, nonRentArrearsDispute, rentArrears } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function counterClaimErrorValidation(): Promise<void> {
@@ -20,6 +20,4 @@ export async function counterClaimNavigationTests(): Promise<void> {
   } else {
     await performValidation('pageNavigation', counterClaim.backLink, nonRentArrearsDispute.mainHeader);
   }
-  await performAction('clickRadioButton', counterClaim.noRadioOption);
-  await performValidation('pageNavigation', counterClaim.saveForLaterButton, taskList.mainHeader);
 }

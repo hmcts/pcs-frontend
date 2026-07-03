@@ -1,7 +1,7 @@
 {
-  "listItemName": "cyyour client's name",
-  "listItemDateOfBirth": "cyyour client’s date of birth",
-  "listItemCircumstances": "cyyour client's circumstances and any exceptional hardship they would experience if they had to leave their home",
-  "listItemIncomeExpenses": "cyyour client's income and expenses",
-  "financialSituationInfo": "cyYou do not have to answer questions about your client's financial situation, but sharing this information can help a judge understand your client's circumstances."
+  "listItemName": "enw eich cleient",
+  "listItemDateOfBirth": "dyddiad geni eich cleient",
+  "listItemCircumstances": "amgylchiadau eich cleient ac unrhyw galedi eithriadol a brofir ganddynt os byddai'n rhaid iddynt adael eu cartref",
+  "listItemIncomeExpenses": "incwm a chostau eich cleient",
+  "financialSituationInfo": "Nid oes rhaid i chi ateb cwestiynau am sefyllfa ariannol eich cleient, ond gall rannu'r wybodaeth hon helpu barnwr i ddeall amgylchiadau eich cleient."
 }

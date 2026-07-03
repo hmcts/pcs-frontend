@@ -238,6 +238,7 @@ export interface CcdDefendantResponses {
   statementOfTruth?: StatementOfTruth;
   hasSolicitor?: YesNoValue;
   counterClaimWantToUploadFiles?: YesNoValue;
+  statementOfTruthCompletedBy?: string;
   completedSections?: RespondToClaimSectionEnum[];
   status?: 'SUBMITTED' | 'CREATED';
 }
@@ -249,12 +250,15 @@ export interface StatementOfTruth {
 
 export interface PossessionClaimResponse {
   claimantOrganisations?: CcdClaimantOrganisation[];
+  claimantName?: string;
+  claimantServiceAddress?: CcdCaseAddress;
   defendantContactDetails?: {
     party?: CcdDefendantParty;
   };
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
+  claimIssuedDate?: string;
 }
 
 export type CaseData = CcdCaseData;
@@ -262,12 +266,14 @@ export type CaseData = CcdCaseData;
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
   claimIssueDate?: string;
+  dateSubmitted?: string;
   claimantName?: string;
   isClaimantNameCorrect?: YesNoValue;
   overriddenClaimantName?: string;
   defendantName?: string;
   defendantAddress?: string;
   rentArrears_Total?: string;
+  isExemptLandlord?: YesNoValue;
   introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
   secureGroundsWales_DiscretionaryGrounds?: string[];
   noticeServed?: string;
@@ -331,6 +337,10 @@ export interface RelatedApplicationOption {
 export interface CcdCase {
   id: string;
   data: CcdCaseData;
+  after_submit_callback_response?: {
+    confirmation_header?: string | null;
+    confirmation_body?: string | null;
+  };
 }
 
 /** Links object in CCD START callback response. */
@@ -431,4 +441,15 @@ export interface ClaimSummary {
   caseReference?: string;
   claimantName?: string;
   propertyPostcode?: string;
+}
+
+export enum GenAppState {
+  PENDING_GEN_APP_ISSUED = 'PENDING_GEN_APP_ISSUED',
+  GEN_APP_ISSUED = 'GEN_APP_ISSUED',
+}
+
+export interface MakeAnApplicationResponse {
+  state?: GenAppState;
+  serviceRequestReference?: string;
+  feeAmount?: number;
 }

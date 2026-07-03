@@ -8,7 +8,12 @@ export class ValidateDocumentUnderSectionValidation implements IValidation {
       has: page.locator(`.govuk-summary-card__title:text-is("${data.sectionHeader}")`),
     });
     await expect(sectionCard).toBeVisible();
-    await expect(sectionCard.locator(`a.govuk-link:text-is("${data.documentName}")`)).toBeVisible();
-    await expect(sectionCard.locator(`.govuk-hint:text-is("Submitted on ${data.submittedDate}")`)).toBeVisible();
+    const documentLink = sectionCard.getByRole('link', {
+      name: data.documentName as string,
+    });
+    await expect(documentLink).toBeVisible();
+    const documentRow = documentLink.locator('..');
+    const hint = documentRow.locator('.govuk-hint');
+    await expect(hint).toHaveText(`Submitted on ${data.submittedDate}`);
   }
 }

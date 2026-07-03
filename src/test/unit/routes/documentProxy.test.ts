@@ -49,9 +49,14 @@ jest.mock('../../../main/middleware', () => ({
 import type { Application, Request, Response } from 'express';
 import multer from 'multer';
 
-import documentProxyRoutes, { fileFilter, handleMulterError } from '../../../main/routes/documentProxy';
+import documentProxyRoutes, {
+  UploadValidationFailure,
+  fileFilter,
+  handleMulterError,
+} from '../../../main/routes/documentProxy';
 
 import { deleteDocument, uploadDocument } from '@services/cdamService';
+import { UPLOAD_MAX_TOTAL_SIZE_BYTES } from '@utils/documentUploadValidation';
 
 const mockUploadDocument = uploadDocument as jest.Mock;
 const mockDeleteDocument = deleteDocument as jest.Mock;
@@ -220,18 +225,35 @@ describe('documentProxyRoutes', () => {
       expect(cb).toHaveBeenCalledWith(null, true);
     });
 
-    it('rejects blocked media with BLOCKED_MEDIA error', () => {
+    it('rejects blocked media with UploadValidationFailure(blocked_media)', () => {
       const cb = jest.fn();
       const file = { mimetype: 'video/mp4', originalname: 'video.mp4' } as Express.Multer.File;
       fileFilter({} as Request, file, cb);
-      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ message: 'BLOCKED_MEDIA' }));
+      const arg = (cb as jest.Mock).mock.calls[0][0];
+      expect(arg).toBeInstanceOf(UploadValidationFailure);
+      expect(arg.validationError).toEqual({ kind: 'blocked_media' });
     });
 
-    it('rejects invalid file types with INVALID_FILE_TYPE error', () => {
+    it('rejects invalid file types with UploadValidationFailure(invalid_type)', () => {
       const cb = jest.fn();
       const file = { mimetype: 'application/x-executable', originalname: 'malware.exe' } as Express.Multer.File;
       fileFilter({} as Request, file, cb);
-      expect(cb).toHaveBeenCalledWith(expect.objectContaining({ message: 'INVALID_FILE_TYPE' }));
+      const arg = (cb as jest.Mock).mock.calls[0][0];
+      expect(arg).toBeInstanceOf(UploadValidationFailure);
+      expect(arg.validationError).toEqual({ kind: 'invalid_type' });
+    });
+
+    it('rejects long filenames when req.uploadValidation.maxFilenameLength is set', () => {
+      const cb = jest.fn();
+      const file = {
+        mimetype: 'application/pdf',
+        originalname: 'a'.repeat(260) + '.pdf',
+      } as Express.Multer.File;
+      const req = { uploadValidation: { maxFilenameLength: 255 } } as unknown as Request;
+      fileFilter(req, file, cb);
+      const arg = (cb as jest.Mock).mock.calls[0][0];
+      expect(arg).toBeInstanceOf(UploadValidationFailure);
+      expect(arg.validationError).toEqual({ kind: 'filename_too_long', maxLength: 255 });
     });
 
     it('rejects overlong filenames with FILENAME_TOO_LONG error', () => {
@@ -252,7 +274,7 @@ describe('documentProxyRoutes', () => {
       expect(next).toHaveBeenCalledWith();
     });
 
-    it('returns 400 with tooLarge for file size limit', () => {
+    it('returns 400 with fileTooLargeDocStore translation for LIMIT_FILE_SIZE', () => {
       const err = new multer.MulterError('LIMIT_FILE_SIZE');
       const req = { t: mockT } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
@@ -261,11 +283,14 @@ describe('documentProxyRoutes', () => {
       handleMulterError(err, req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: { message: 'errors.documentUpload.fileTooLargeDocStore' },
+      });
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('returns 400 with wrongType for INVALID_FILE_TYPE', () => {
-      const err = new Error('INVALID_FILE_TYPE');
+    it('returns 400 with wrongFileTypeDocStore translation for invalid_type', () => {
+      const err = new UploadValidationFailure({ kind: 'invalid_type' });
       const req = { t: mockT } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
       const next = jest.fn();
@@ -273,11 +298,14 @@ describe('documentProxyRoutes', () => {
       handleMulterError(err, req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: { message: 'errors.documentUpload.wrongFileTypeDocStore' },
+      });
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('returns 400 with wrongType for BLOCKED_MEDIA', () => {
-      const err = new Error('BLOCKED_MEDIA');
+    it('returns 400 with wrongFileTypeDocStore translation for blocked_media', () => {
+      const err = new UploadValidationFailure({ kind: 'blocked_media' });
       const req = { t: mockT } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
       const next = jest.fn();
@@ -285,6 +313,24 @@ describe('documentProxyRoutes', () => {
       handleMulterError(err, req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: { message: 'errors.documentUpload.wrongFileTypeDocStore' },
+      });
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 with filenameTooLong translation for filename_too_long', () => {
+      const err = new UploadValidationFailure({ kind: 'filename_too_long', maxLength: 255 });
+      const req = { t: mockT } as unknown as Request;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      handleMulterError(err, req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: { message: 'errors.documentUpload.filenameTooLong' },
+      });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -357,6 +403,29 @@ describe('documentProxyRoutes', () => {
       middleware(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it("sets req.uploadValidation from the step's uploadValidation", () => {
+      const stepOpts = {
+        maxFilenameLength: 255,
+        maxDocumentBytes: 1024 * 1024 * 1024,
+        maxMediaBytes: 500 * 1024 * 1024,
+      };
+      const { findStep } = require('../../../main/steps/index');
+      (findStep as jest.Mock).mockReturnValue({
+        documentStorage: { read: jest.fn(), readFresh: jest.fn(), save: jest.fn() },
+        uploadValidation: stepOpts,
+      });
+      const req = {
+        t: mockT,
+        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
+      } as unknown as Request;
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      middleware(req, res, next);
+
+      expect((req as unknown as { uploadValidation: unknown }).uploadValidation).toEqual(stepOpts);
     });
   });
 
@@ -581,6 +650,81 @@ describe('documentProxyRoutes', () => {
       expect(mockDeleteDocument).toHaveBeenCalledWith('http://dm/doc/new-after-cap', 'token');
       expect(mockSave).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    describe('post-upload validation via req.uploadValidation', () => {
+      const MB = 1024 * 1024;
+      const stepUploadValidation = {
+        maxFilenameLength: 255,
+        maxDocumentBytes: 1024 * MB,
+        maxMediaBytes: 500 * MB,
+      };
+
+      it('rejects an image over the media cap before calling CDAM', async () => {
+        const req = makeReqWithDocs({
+          file: {
+            originalname: 'photo.jpg',
+            mimetype: 'image/jpeg',
+            buffer: Buffer.from(''),
+            size: 501 * MB,
+          },
+          uploadValidation: stepUploadValidation,
+        });
+        const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+        await handler(req, res);
+
+        expect(mockUploadDocument).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+          error: { message: 'errors.documentUpload.fileTooLargeMedia' },
+        });
+      });
+
+      it('rejects a document over the document cap before calling CDAM', async () => {
+        const req = makeReqWithDocs({
+          file: {
+            originalname: 'huge.pdf',
+            mimetype: 'application/pdf',
+            buffer: Buffer.from(''),
+            size: 1025 * MB,
+          },
+          uploadValidation: stepUploadValidation,
+        });
+        const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
+
+        await handler(req, res);
+
+        expect(mockUploadDocument).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+          error: { message: 'errors.documentUpload.fileTooLargeDocument' },
+        });
+      });
+
+      it('allows a 600MB document under the document cap even though it exceeds the media cap', async () => {
+        mockUploadDocument.mockResolvedValue({
+          document_url: 'http://dm/doc/ok',
+          document_binary_url: 'http://dm/doc/ok/binary',
+          document_filename: 'doc.pdf',
+          content_type: 'application/pdf',
+          size: 600 * MB,
+        });
+        const req = makeReqWithDocs({
+          file: {
+            originalname: 'doc.pdf',
+            mimetype: 'application/pdf',
+            buffer: Buffer.from(''),
+            size: 600 * MB,
+          },
+          uploadValidation: stepUploadValidation,
+        });
+        const res = { json: jest.fn() } as unknown as Response;
+
+        await handler(req, res);
+
+        expect(mockUploadDocument).toHaveBeenCalled();
+      });
     });
   });
 
@@ -892,21 +1036,9 @@ describe('documentProxyRoutes', () => {
     });
 
     it('parallel uploads are capped using fresh total — second saves fails and deletes orphan CDAM doc', async () => {
-      const threeThousandSevenHundredMb = 3700 * 1024 * 1024;
-      const twoHundredMb = 200 * 1024 * 1024;
-      const hugeSeedDoc = {
-        id: 'huge-seed-id',
-        value: {
-          document: {
-            document_url: 'http://dm/doc/huge-seed',
-            document_binary_url: 'http://dm/doc/huge-seed/binary',
-            document_filename: 'huge.pdf',
-          },
-          contentType: 'application/pdf',
-          sizeInBytes: threeThousandSevenHundredMb,
-        },
-      };
-      const persisted: unknown[] = [hugeSeedDoc];
+      // Each upload is just over half the total cap, so two of them must exceed it.
+      const overHalfCapBytes = Math.floor(UPLOAD_MAX_TOTAL_SIZE_BYTES / 2) + 1024;
+      const persisted: unknown[] = [];
       const { findStep } = require('../../../main/steps/index');
 
       const readFresh = jest.fn().mockImplementation(async () => [...persisted]);
@@ -916,16 +1048,12 @@ describe('documentProxyRoutes', () => {
       });
 
       (findStep as jest.Mock).mockReturnValue({
-        documentStorage: {
-          read: jest.fn().mockResolvedValue([hugeSeedDoc]),
-          readFresh,
-          save,
-        },
+        documentStorage: { read: jest.fn().mockResolvedValue([]), readFresh, save },
       });
 
       mockUploadDocument
-        .mockResolvedValueOnce(makeCdamDoc('first', 'first.pdf', twoHundredMb))
-        .mockResolvedValueOnce(makeCdamDoc('second', 'second.pdf', twoHundredMb));
+        .mockResolvedValueOnce(makeCdamDoc('first', 'first.pdf', overHalfCapBytes))
+        .mockResolvedValueOnce(makeCdamDoc('second', 'second.pdf', overHalfCapBytes));
       mockDeleteDocument.mockResolvedValue(undefined);
 
       const baseReq = {
@@ -939,15 +1067,12 @@ describe('documentProxyRoutes', () => {
       const resB = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await Promise.all([
-        uploadHandler({ ...baseReq, file: makeFile('first.pdf', twoHundredMb) } as unknown as Request, resA),
-        uploadHandler({ ...baseReq, file: makeFile('second.pdf', twoHundredMb) } as unknown as Request, resB),
+        uploadHandler({ ...baseReq, file: makeFile('first.pdf', overHalfCapBytes) } as unknown as Request, resA),
+        uploadHandler({ ...baseReq, file: makeFile('second.pdf', overHalfCapBytes) } as unknown as Request, resB),
       ]);
 
-      expect(persisted).toHaveLength(2);
-      const sizes = persisted
-        .map(d => (d as { value: { sizeInBytes?: number } }).value.sizeInBytes)
-        .sort((a, b) => (a ?? 0) - (b ?? 0));
-      expect(sizes).toEqual([twoHundredMb, threeThousandSevenHundredMb]);
+      expect(persisted).toHaveLength(1);
+      expect((persisted[0] as { value: { sizeInBytes?: number } }).value.sizeInBytes).toBe(overHalfCapBytes);
       expect(mockDeleteDocument).toHaveBeenCalledTimes(1);
       const rejected = [resA, resB].filter(r =>
         (r.status as jest.Mock).mock.calls.some(([code]: [number]) => code === 400)

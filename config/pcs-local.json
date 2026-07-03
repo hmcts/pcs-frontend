@@ -19,5 +19,8 @@
   },
   "feeService": {
     "url": "http://localhost:8180"
+  },
+  "payment": {
+    "returnUrl": "http://localhost:3209/payment/return"
   }
 }

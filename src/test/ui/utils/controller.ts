@@ -104,6 +104,15 @@ async function validatePageIfNavigated(action: string): Promise<void> {
     const pageNavigated = await detectPageNavigation();
     const executor = getExecutor();
     if (pageNavigated) {
+      if (
+        startFunctionalTests &&
+        !isFunctionalValidationTestFile() &&
+        (enable_content_validation === 'true' ||
+          enable_error_message_validation === 'true' ||
+          enable_navigation_tests === 'true')
+      ) {
+        await performAction('triggerFunctionalTests');
+      }
       if (startAxeAudit && enable_axe_audit === 'true') {
         try {
           const { AxeUtils } = await import('@hmcts/playwright-common');
@@ -124,15 +133,6 @@ async function validatePageIfNavigated(action: string): Promise<void> {
             throw error;
           }
         }
-      }
-      if (
-        startFunctionalTests &&
-        !isFunctionalValidationTestFile() &&
-        (enable_content_validation === 'true' ||
-          enable_error_message_validation === 'true' ||
-          enable_navigation_tests === 'true')
-      ) {
-        await performAction('triggerFunctionalTests');
       }
     }
   }

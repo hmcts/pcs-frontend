@@ -10,9 +10,11 @@ import {
   counterClaim,
   counterClaimAbout,
   counterClaimAgainstWhom,
+  counterClaimApplicationFeeAmount,
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
+  counterClaimPaymentSuccessful,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   counterclaimYouNeedToApplyForHelpWithYourFees,
@@ -34,12 +36,12 @@ import {
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
+  paymentDetails,
   priorityDebtDetails,
   priorityDebts,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
-  responseAndCounterClaimSubmitted,
   responseSubmitted,
   responseSubmittedCounterclaimFeePaymentNeeded,
   startNow,
@@ -62,6 +64,7 @@ let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  await performAction('resetRTCAnswerStore');
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
   process.env.CLAIMANT_NAME = claimantName;
   if (testInfo.title.includes('NoticeServed - No')) {
@@ -189,26 +192,32 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@assured')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@secureFlexible')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@other')) {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@rentNonRent')) {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     process.env.TENANCY_START_DATE_KNOWN = 'YES';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
+    await performAction('updatePaymentAPI');
   } else if (testInfo.title.includes('@multiParty')) {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
+    await performAction('updatePaymentAPI');
     claimantName = submitCaseApiData.submitCasePayloadDefault.overriddenClaimantName;
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
@@ -217,13 +226,16 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', {
       data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancyNoticeServedNo,
     });
+    await performAction('updatePaymentAPI');
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+    await performAction('updatePaymentAPI');
   }
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -420,12 +432,24 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
     await performAction('selectStatementOfTruthRTC', {
       question: checkYourAnswersRTC.statementOfTruthQuestion,
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
+      fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
+    });
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('35.00'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
+    await performAction('clickButton', paymentDetails.confirmPaymentButton);
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.paymentConfirmationParagraph,
     });
     await performAction(
       'clickButton',
@@ -2114,7 +2138,21 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: counterClaimApplicationFeeAmount.counterClaimAmountNotApplicable,
+      fee: counterClaimApplicationFeeAmount.somethingElseCounterClaimFee,
+    });
+    await performAction(
+      'clickButton',
+      counterClaimApplicationFeeAmount.getPayButton(counterClaimApplicationFeeAmount.somethingElseCounterClaimFee)
+    );
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.declinedCardNumber });
+    await performValidation('mainHeader', 'Your payment has been declined');
+    await performAction('clickButton', paymentDetails.startDynamicButton);
+    await performValidation('errorMessage', {
+      message: counterClaimApplicationFeeAmount.paymentFailedDynamicErrorMessage,
+    });
   });
 });

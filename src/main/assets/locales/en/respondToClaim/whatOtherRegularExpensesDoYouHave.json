@@ -36,7 +36,7 @@
       "largeAmount": "The amount you pay for loan payments each week or month must be less than £1 billion"
     },
     "loanPaymentsFrequency": {
-      "required": "Select how frequently you make loan payments"
+      "required": "Select how frequently you pay loan payments"
     },
     "childSpousalMaintenanceAmount": {
       "required": "Enter the amount you pay for child or spousal maintenance",

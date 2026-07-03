@@ -52,7 +52,8 @@ export function createPostHandler(
   translationKeys?: TranslationKeys,
   showCancelButton?: boolean,
   extendGetContent?: ExtendGetContent,
-  documentStorage?: DocumentStorage
+  documentStorage?: DocumentStorage,
+  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -185,6 +186,13 @@ export function createPostHandler(
       if (isSaveForLater) {
         delete req.session.returnToCya;
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
+      }
+
+      if (resolveRedirectAfterPost) {
+        const customRedirectPath = await resolveRedirectAfterPost(req);
+        if (customRedirectPath) {
+          return safeRedirect303(res, customRedirectPath, '/', ['/case']);
+        }
       }
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
