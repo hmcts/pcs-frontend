@@ -1,12 +1,87 @@
 {% extends "template.njk" %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
+{% set backUrl = dashboardUrl %}
 
 {% block pageTitle %}
-View the claim
+  {{ t('viewTheClaim:pageTitle') }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
 
+{% macro claimSummarySection(summarySection) %}
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-3">{{ summarySection.title }}</h2>
+  {% if summarySection.title == t('viewTheClaim:sections.statementOfTruth') %}
+    <p class="govuk-body">{{ t('viewTheClaim:statementOfTruthBody') }}</p>
+  {% endif %}
+  {{ govukSummaryList({
+    rows: summarySection.rows,
+    classes: 'govuk-!-margin-bottom-6'
+  }) }}
+{% endmacro %}
+
+{% macro claimPdfBlock(summarySection) %}
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-3">{{ summarySection.title }}</h2>
+  {% if summarySection.rows[0].value.html %}
+    <p class="govuk-body govuk-!-margin-bottom-6">{{ summarySection.rows[0].value.html | safe }}</p>
+  {% else %}
+    <p class="govuk-body govuk-!-margin-bottom-6">{{ summarySection.rows[0].value.text }}</p>
+  {% endif %}
+{% endmacro %}
+
 {% block content %}
-  <h1 class="govuk-heading-l">View the claim</h1>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds view-the-claim">
+      <span class="govuk-caption-l">{{ t('viewTheClaim:theClaimEyebrow') }}</span>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ t('viewTheClaim:pageTitle') }}</h1>
 
+      {% if propertyAddressText %}
+        <p class="govuk-body-l govuk-!-margin-bottom-2">
+          <span>{{ t('viewTheClaim:propertyAddressLabel') }}</span> {{ propertyAddressText }}
+        </p>
+      {% endif %}
 
+      <p class="govuk-body-l govuk-!-margin-bottom-6">
+        <span>{{ t('viewTheClaim:caseNumberLabel') }}</span> {{ caseReference | caseReferenceDisplay }}
+      </p>
+
+      <p class="govuk-body govuk-!-margin-bottom-6">{{ introText }}</p>
+
+      {% if pageMetadataRows.length > 0 %}
+        {{ govukSummaryList({
+          rows: pageMetadataRows,
+          classes: 'govuk-!-margin-bottom-6'
+        }) }}
+      {% endif %}
+
+      {% for section in sections %}
+        {{ claimSummarySection(section) }}
+      {% endfor %}
+
+      {{ claimPdfBlock(claimPdfSection) }}
+
+      {{ govukButton({
+        text: t('viewTheClaim:closeAndReturn'),
+        href: dashboardUrl
+      }) }}
+
+      {{ govukDetails({
+        id: 'view-the-claim-help',
+        summaryText: t('viewTheClaim:documentsHelpSummary'),
+        open: true,
+        html: '<p class="govuk-body">'
+              + t('viewTheClaim:documentsHelpTextBeforeLink')
+              + ' <a class="govuk-link" href="' + documentsUrl + '">'
+              + t('viewTheClaim:documentsHelpLinkText')
+              + '</a></p>'
+      }) }}
+
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <aside class="app-related-items" aria-label="{{ t('common:supportAndContactInformation') }}">
+        {% include "components/contact-us-details.njk" %}
+      </aside>
+    </div>
+  </div>
 {% endblock %}
