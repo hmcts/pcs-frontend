@@ -4,6 +4,7 @@ export const submitCaseApiData = {
   get submitCasePayload() {
     return {
       legislativeCountry: 'England',
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
