@@ -10,7 +10,7 @@ export const viewAllApplications = {
   getCaseNumber: () => `Case number: ${process.env.CASE_FID}`,
   getSubmittedDate: formatSubmittedDate,
   yourApplicationsSubHeader: `Your applications`,
-  generalApplicationGA1Defendant1Link: `General Application GA1 - Defendant 1.pdf`,
-  generalApplicationGA1Defendant2Link: `General Application GA1 - Defendant 2.pdf`,
-  generalApplicationGA1Defendant3Link: `General Application GA1 - Defendant 3.pdf`,
+  generalApplicationGA1Defendant1Link: `General Application GA1 - Defendant 1.pdf (opens in new tab)`,
+  generalApplicationGA1Defendant2Link: `General Application GA1 - Defendant 2.pdf (opens in new tab)`,
+  generalApplicationGA1Defendant3Link: `General Application GA1 - Defendant 3.pdf (opens in new tab)`,
 };

@@ -1526,6 +1526,105 @@ describe('formBuilder helpers', () => {
         const errors = validateForm(req, fields, translations);
         expect(errors['contactMethod.emailAddress']).toBe('Email address is required');
       });
+
+      it('should pass plain-text XSS-style payload unchanged in nested radio subField (xss spike gap)', () => {
+        const req = createMockRequest({
+          tenancyTypeConfirm: 'no',
+          'tenancyTypeConfirm.correctType': '" onfocus="alert(1)',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'tenancyTypeConfirm',
+            type: 'radio',
+            required: true,
+            options: [
+              { value: 'yes' },
+              {
+                value: 'no',
+                subFields: {
+                  correctType: {
+                    name: 'correctType',
+                    type: 'text',
+                    required: true,
+                  },
+                },
+              },
+              { value: 'notSure' },
+            ],
+          },
+        ];
+
+        const errors = validateForm(req, fields, {});
+
+        expect(errors['tenancyTypeConfirm.correctType']).toBeUndefined();
+        expect(req.body['tenancyTypeConfirm.correctType']).toBe('" onfocus="alert(1)');
+      });
+
+      it('should strip HTML tags silently in nested radio subField and write back to req.body', () => {
+        const req = createMockRequest({
+          tenancyTypeConfirm: 'no',
+          'tenancyTypeConfirm.correctType': '<script>alert(1)</script>hello',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'tenancyTypeConfirm',
+            type: 'radio',
+            required: true,
+            options: [
+              { value: 'yes' },
+              {
+                value: 'no',
+                subFields: {
+                  correctType: {
+                    name: 'correctType',
+                    type: 'text',
+                    required: true,
+                  },
+                },
+              },
+              { value: 'notSure' },
+            ],
+          },
+        ];
+
+        const errors = validateForm(req, fields, {});
+
+        expect(errors['tenancyTypeConfirm.correctType']).toBeUndefined();
+        expect(req.body['tenancyTypeConfirm.correctType']).toBe('hello');
+      });
+
+      it('should fail validation if required field becomes empty after stripping HTML tags', () => {
+        const req = createMockRequest({
+          tenancyTypeConfirm: 'no',
+          'tenancyTypeConfirm.correctType': '<script>alert(1)</script>',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'tenancyTypeConfirm',
+            type: 'radio',
+            required: true,
+            options: [
+              { value: 'yes' },
+              {
+                value: 'no',
+                subFields: {
+                  correctType: {
+                    name: 'correctType',
+                    type: 'text',
+                    required: true,
+                  },
+                },
+              },
+              { value: 'notSure' },
+            ],
+          },
+        ];
+
+        const errors = validateForm(req, fields, {});
+
+        expect(errors['tenancyTypeConfirm.correctType']).toBeDefined();
+        expect(req.body['tenancyTypeConfirm.correctType']).toBe('');
+      });
     });
 
     describe('nested date subField validation', () => {

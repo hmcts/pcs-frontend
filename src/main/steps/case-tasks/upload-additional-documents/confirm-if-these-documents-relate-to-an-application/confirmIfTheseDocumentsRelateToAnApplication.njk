@@ -33,6 +33,9 @@
       {{ govukButton({
         text: t('buttons.continue', 'Continue')
       }) }}
+      <p class="govuk-body">
+        <a href="{{ cancelUrl }}" class="govuk-link">{{ t('buttons.cancel', { ns: 'common' }) }}</a>
+      </p>
     </div>
     {{ csrfProtection(csrfToken) }}
   </form>

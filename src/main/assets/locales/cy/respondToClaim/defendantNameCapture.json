@@ -1,15 +1,15 @@
 {
-  "heading": "cyWhat’s your name?",
-  "pageTitle": "cyYour name",
-  "firstNameLabel": "cyFirst name",
-  "lastNameLabel": "cyLast name",
-  "contactUs": "cyContact us for help",
+  "heading": "Beth yw eich enw?",
+  "pageTitle": "Eich enw",
+  "firstNameLabel": "Enw cyntaf",
+  "lastNameLabel": "Cyfenw",
+  "contactUs": "Cysylltu â ni i gael cymorth",
   "errors": {
-    "firstName": "cyEnter your first name",
-    "firstNameMaxLength": "cyFirst name must be 60 characters or less",
+    "firstName": "Nodwch eich enw cyntaf",
+    "firstNameMaxLength": "Rhaid i’r enw cyntaf fod yn 60 nod neu lai",
     "firstNameInvalidCharacters": "cyFirst name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
-    "lastName": "cyEnter your last name",
-    "lastNameMaxLength": "cyLast name must be 60 characters or less",
+    "lastName": "Nodwch eich cyfenw",
+    "lastNameMaxLength": "Rhaid i’r cyfenw fod yn 60 nod neu lai",
     "lastNameInvalidCharacters": "cyLast name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }

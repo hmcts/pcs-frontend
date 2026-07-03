@@ -1,10 +1,10 @@
 {
-  "pageTitle": "cyYou need to apply for help with your application fee",
-  "caption": "cyMake an application",
-  "heading": "cyYou need to apply for help with your application fee",
-  "youNeedToApplyBeforeContinuing": "cyYou need to apply for <a href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Help with Fees (GOV.UK, opens in a new tab)</a> before you can continue with this application.",
-  "enterCourtFormNumber": "cyEnter the court form number ‘N244’ when asked. This will be one of the first questions when you apply for help with your fees.",
-  "afterYouHaveApplied": "cyAfter you have applied you will receive a Help with Fees reference number. You should enter the reference number when you return to this application.",
-  "ifYouReceiveAnyBenefit": "cyIf you receive any benefit that qualifies you for Help with Fees, you must include evidence of it when you apply online for Help with Fees.",
-  "ifYouHaveYourHWFReference": "cyIf you have your Help with Fees reference number you can <a href=\"./have-you-already-applied-for-help-with-fees\" rel=\"noopener noreferrer\" class=\"govuk-link\">enter it here</a>."
+  "pageTitle": "Mae arnoch angen gwneud cais am help i dalu ffi eich cais",
+  "caption": "Gwneud cais",
+  "heading": "Mae arnoch angen gwneud cais am help i dalu ffi eich cais",
+  "youNeedToApplyBeforeContinuing": "Mae arnoch angen gwneud cais am <a href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Help i Dalu Ffioedd (GOV.UK, yn agor mewn tab newydd)</a> cyn y gallwch barhau â'r cais hwn.",
+  "enterCourtFormNumber": "Nodwch y rhif ffurflen llys 'ÄòN244' pan ofynnir amdano. Dyma fydd un o’r cwestiynau cyntaf pan fyddwch yn gwneud cais am help i dalu ffioedd.",
+  "afterYouHaveApplied": "Ar ôl i chi wneud cais, byddwch yn cael cyfeirnod Help i Dalu Ffioedd. Dylech nodi’r cyfeirnod pan fyddwch yn dychwelyd i’r cais hwn.",
+  "ifYouReceiveAnyBenefit": "Os ydych yn cael unrhyw fudd-dâl sy'n gymwys ar gyfer Help i Dalu Ffioedd, mae'n rhaid i chi gynnwys tystiolaeth pan fyddwch yn gwneud cais ar-lein ar gyfer Help i Dalu Ffioedd.",
+  "ifYouHaveYourHWFReference": "Os oes gennych eich cyfeirnod Help i Dalu Ffioedd gallwch ei<a href=\"./have-you-already-applied-for-help-with-fees\" rel=\"noopener noreferrer\" class=\"govuk-link\">gynnwys yma</a>."
 }

@@ -1,4 +1,5 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { formatIsoDate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -91,7 +92,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
     // TODO HDPI-5157: hardcode fallback for now, wire claimIssueDate from START callback later
-    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
+    const claimIssueDate = validatedCase?.claimIssueDate ? formatIsoDate(validatedCase.claimIssueDate) : '16 June 2025';
 
     return {
       claimantName,

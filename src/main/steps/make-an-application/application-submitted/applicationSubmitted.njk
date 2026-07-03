@@ -5,9 +5,26 @@
 
 {% block mainContent %}
 
-{{ govukPanel({
-  titleText: 'Placeholder Confirmation',
-  html: 'Placeholder reference number'
-}) }}
+  {{ govukPanel({
+    titleText: confirmationPanelTitle
+  }) }}
+
+  <p class="govuk-body">
+   {{ receivedYourApplicationMessage }}
+  </p>
+
+  <h2 class="govuk-heading-m">{{ whatHappensNext }}</h2>
+  <p class="govuk-body">
+   {{ youDoNotNeedToDoAnythingElse }}
+  </p>
+
+  <h2 class="govuk-heading-m">{{ giveFeedbackAboutThisService }}</h2>
+  <p class="govuk-body">
+   {{ completeThisShortSurvey | safe }}
+  </p>
+
+  <a href="{{ dashboardUrl }}" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+      {{ closeAndReturnToCaseOverview }}
+  </a>
 
 {% endblock %}

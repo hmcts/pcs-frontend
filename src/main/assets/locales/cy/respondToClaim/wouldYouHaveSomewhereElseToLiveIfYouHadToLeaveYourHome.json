@@ -1,24 +1,24 @@
 {
-  "pageTitle": "cySomewhere else to live",
-  "question": "cyWould you have somewhere else to live if you had to leave your home?",
-  "dateLabel": "cyWhen would you be able to move in (optional)?",
+  "pageTitle": "Rhywle arall i fyw",
+  "question": "A fyddai gennych rywle arall i fyw os byddai'n rhaid i chi adael eich cartref?",
+  "dateLabel": "Pryd fyddech yn gallu symud i mewn (dewisol)?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "or": "cyor",
-    "notSure": "cyI’m not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "notSure": "Nid wyf yn siŵr"
   },
   "errors": {
     "date": {
-      "day": "cyDay",
-      "month": "cyMonth",
-      "year": "cyYear",
-      "notRealDate": "cyThe date you’d be able to move in must be a real date ",
-      "pastDate": "cyThe date you’d be able to move in must be in the future",
-      "invalidValue": "cyThe date you’d be able to move in must be a real date ",
-      "missingOne": "cyThe date you’d be able to move in must include a {{missingField}}",
-      "missingTwo": "cyThe date you’d be able to move in must include a {{first}} and {{second}}"
+      "day": "Diwrnod",
+      "month": "Mis",
+      "year": "Blwyddyn",
+      "notRealDate": "Rhaid i’r dyddiad y byddech yn gallu symud i mewn fod yn ddyddiad go iawn",
+      "pastDate": "Rhaid i’r dyddiad y byddech yn gallu symud i mewn fod yn y dyfodol",
+      "invalidValue": "Rhaid i’r dyddiad y byddech yn gallu symud i mewn fod yn ddyddiad go iawn",
+      "missingOne": "Rhaid i’r dyddiad y byddech yn gallu symud i mewn gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i’r dyddiad y byddech yn gallu symud i mewn gynnwys {{first}} a {{second}}"
     },
-    "confirmAlternativeAccommodation": "cySelect if you’d have somewhere else to live if you had to leave your home"
+    "confirmAlternativeAccommodation": "Dewiswch a oes gennych rywle arall i fyw os fyddai'n rhaid i chi adael eich cartref"
   }
 }
