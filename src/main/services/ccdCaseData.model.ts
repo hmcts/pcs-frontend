@@ -4,9 +4,11 @@ import {
   CcdCaseData,
   CcdClaimGroundSummaryItem,
   CcdClaimantEnteredDefendantDetails,
+  CcdCollectionItem,
   CcdCounterClaim,
   CcdDefendantParty,
   CcdDefendantResponses,
+  Document,
   PossessionClaimResponse,
   YesNoEnum,
 } from '@services/ccdCase.interface';
@@ -94,6 +96,30 @@ export class CcdCaseModel {
 
   get notice_OtherDateTime(): string | undefined {
     return this.data.notice_OtherDateTime;
+  }
+
+  get notice_ServiceMethod(): string | undefined {
+    return this.data.notice_ServiceMethod;
+  }
+
+  get notice_PersonName(): string | undefined {
+    return this.data.notice_PersonName;
+  }
+
+  get notice_EmailAddress(): string | undefined {
+    return this.data.notice_EmailAddress;
+  }
+
+  get notice_OtherExplanation(): string | undefined {
+    return this.data.notice_OtherExplanation;
+  }
+
+  get notice_OtherElectronicExplanation(): string | undefined {
+    return this.data.notice_OtherElectronicExplanation;
+  }
+
+  get noticeDocument(): CcdCollectionItem<Document> | undefined {
+    return this.data.notice_Documents?.find(item => item.id && item.value?.document_filename);
   }
 
   get tenancy_TypeOfTenancyLicence(): string | undefined {
