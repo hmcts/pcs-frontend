@@ -69,6 +69,15 @@ type TenancyTypeDetailsStep = {
               tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
               occupationLicenceTypeWales?: string;
               otherLicenceTypeDetails?: string;
+              allDocumentsWithType?: {
+                id: string;
+                value: {
+                  type?: string;
+                  document?: {
+                    document_filename?: string;
+                  };
+                };
+              }[];
             };
           };
         };
@@ -454,6 +463,72 @@ describe('respond-to-claim tenancy-type-details step', () => {
         );
 
         expect(content.tenancyType).toBe('original tenancy text');
+      });
+    });
+
+    describe('tenancy agreement document link', () => {
+      const makeReq = (allDocumentsWithType?: {
+        id: string;
+        value: {
+          type?: string;
+          document?: {
+            document_filename?: string;
+          };
+        };
+      }[]) => ({
+        body: {},
+        res: {
+          locals: {
+            validatedCase: {
+              data: {
+                possessionClaimResponse: {
+                  claimantOrganisations: [{ value: 'Acme Housing' }],
+                },
+                allDocumentsWithType,
+              },
+            },
+          },
+        },
+      });
+
+      it('provides tenancyDocument when a TENANCY_AGREEMENT document is present', async () => {
+        const tenancyDocument = {
+          id: 'tenancy-document-id',
+          value: {
+            type: 'TENANCY_AGREEMENT',
+            document: {
+              document_filename: 'tenancy-agreement.pdf',
+            },
+          },
+        };
+
+        const content = await testedStep.extendGetContent(
+          makeReq([
+            {
+              id: 'other-document-id',
+              value: { type: 'RENT_STATEMENT' },
+            },
+            tenancyDocument,
+          ]),
+          { detailsHeading: 'Details given by ' }
+        );
+
+        expect(content.tenancyDocument).toEqual(tenancyDocument);
+      });
+
+      it.each([
+        ['the document collection is missing', undefined],
+        [
+          'only documents of another type are present',
+          [{ id: 'rent-statement-id', value: { type: 'RENT_STATEMENT' } }],
+        ],
+      ])('does not provide tenancyDocument when %s', async (_description, documents) => {
+        const content = await testedStep.extendGetContent(
+          makeReq(documents),
+          { detailsHeading: 'Details given by ' }
+        );
+
+        expect(content.tenancyDocument).toBe('');
       });
     });
 
