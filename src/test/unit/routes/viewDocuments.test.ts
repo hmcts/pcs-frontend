@@ -347,5 +347,55 @@ describe('viewDocuments route', () => {
       stream.emit('error', new Error('stream failed'));
       expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Failed to stream document', status: 502 }));
     });
+
+    it('streams document binary from detailsTab_NoticeDetails.noticeDocuments when not in allDocuments', async () => {
+      const stream = new PassThrough();
+      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
+      (getDocumentBinary as jest.Mock).mockResolvedValue({
+        stream,
+        contentType: 'application/rtf',
+      });
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [],
+          notice_Documents: [],
+          detailsTab_NoticeDetails: {
+            noticeDocuments: [
+              {
+                id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+                value: {
+                  document_filename: 'DocUploaded - Claimant 1.rtf',
+                  document_binary_url: 'http://dm-store/documents/notice-52/binary',
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
+      const res = {
+        setHeader: jest.fn(),
+      } as unknown as Response;
+      const next = jest.fn();
+
+      await handler(
+        {
+          params: {
+            caseReference: '1777570813792018',
+            documentId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+          },
+          session: { user: { accessToken: 'token' } },
+        } as unknown as Request,
+        res,
+        next
+      );
+
+      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/notice-52/binary', 'token');
+      expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/rtf');
+      expect(pipeSpy).toHaveBeenCalledWith(res);
+      expect(next).not.toHaveBeenCalled();
+    });
   });
 });

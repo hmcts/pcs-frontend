@@ -113,7 +113,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const caseData = (validatedCase?.data as Record<string, unknown>) ?? {};
     const documents = extractCaseDocuments(caseData);
-    const noticeDoc = documents.find(d => d.sourceField === 'notice_Documents');
+    const noticeDoc =
+      documents.find(d => d.sourceField === 'detailsTab_NoticeDetails.noticeDocuments') ??
+      documents.find(d => d.sourceField === 'notice_Documents');
     const noticeDocumentId = noticeDoc?.id;
     const noticeDocumentFilename = noticeDoc?.filename;
 

@@ -318,6 +318,9 @@ export interface CcdCaseData {
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+  detailsTab_NoticeDetails?: {
+    noticeDocuments?: CcdCollectionItem<Document>[];
+  };
 }
 
 export interface CcdCaseDocument {

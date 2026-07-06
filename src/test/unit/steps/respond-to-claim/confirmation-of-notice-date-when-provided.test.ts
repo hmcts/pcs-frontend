@@ -74,6 +74,71 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       expect(content.noticeDocumentFilename).toBe('notice.pdf');
     });
 
+    it('sets noticeDocumentId from detailsTab_NoticeDetails.noticeDocuments for submitted cases', () => {
+      const content = testedStep.extendGetContent({
+        res: {
+          locals: {
+            validatedCase: makeValidatedCase({
+              claimantName: 'Test Claimant',
+              notice_Documents: [],
+              detailsTab_NoticeDetails: {
+                noticeDocuments: [
+                  {
+                    id: 'entity-uuid-52',
+                    value: {
+                      document_filename: 'DocUploaded - Claimant 1.rtf',
+                      document_url: 'http://doc-store/notice',
+                      document_binary_url: 'http://doc-store/notice/binary',
+                    },
+                  },
+                ],
+              },
+            }),
+          },
+        },
+      });
+
+      expect(content.noticeDocumentId).toBe('entity-uuid-52');
+      expect(content.noticeDocumentFilename).toBe('DocUploaded - Claimant 1.rtf');
+    });
+
+    it('prefers detailsTab_NoticeDetails.noticeDocuments over notice_Documents when both exist', () => {
+      const content = testedStep.extendGetContent({
+        res: {
+          locals: {
+            validatedCase: makeValidatedCase({
+              claimantName: 'Test Claimant',
+              notice_Documents: [
+                {
+                  id: 'draft-doc-id',
+                  value: {
+                    document_filename: 'draft-notice.pdf',
+                    document_url: 'http://doc-store/draft',
+                    document_binary_url: 'http://doc-store/draft/binary',
+                  },
+                },
+              ],
+              detailsTab_NoticeDetails: {
+                noticeDocuments: [
+                  {
+                    id: 'submitted-doc-id',
+                    value: {
+                      document_filename: 'submitted-notice.pdf',
+                      document_url: 'http://doc-store/submitted',
+                      document_binary_url: 'http://doc-store/submitted/binary',
+                    },
+                  },
+                ],
+              },
+            }),
+          },
+        },
+      });
+
+      expect(content.noticeDocumentId).toBe('submitted-doc-id');
+      expect(content.noticeDocumentFilename).toBe('submitted-notice.pdf');
+    });
+
     it('omits noticeDocumentId when no notice document is uploaded', () => {
       const content = testedStep.extendGetContent({
         res: {
