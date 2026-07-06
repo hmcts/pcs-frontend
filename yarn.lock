@@ -11778,7 +11778,7 @@ __metadata:
     prettier: "npm:3.9.4"
     sass: "npm:1.101.0"
     sass-loader: "npm:17.0.0"
-    saucectl: "npm:^0.210.0"
+    saucectl: "npm:^0.211.0"
     serve-favicon: "npm:2.5.1"
     style-loader: "npm:4.0.0"
     stylelint: "npm:17.14.0"
@@ -11792,8 +11792,8 @@ __metadata:
     typescript: "npm:6.0.3"
     uuid: "npm:14.0.1"
     validator: "npm:13.15.35"
-    webpack: "npm:5.108.3"
-    webpack-cli: "npm:7.1.0"
+    webpack: "npm:5.108.4"
+    webpack-cli: "npm:7.2.1"
     webpack-dev-middleware: "npm:8.0.3"
     webpack-hot-middleware: "npm:2.26.1"
     winston: "npm:3.19.0"
@@ -12225,11 +12225,11 @@ __metadata:
   linkType: hard
 
 "protobufjs@npm:^8.0.0":
-  version: 8.6.5
-  resolution: "protobufjs@npm:8.6.5"
+  version: 8.6.6
+  resolution: "protobufjs@npm:8.6.6"
   dependencies:
     long: "npm:^5.3.2"
-  checksum: 10/5252ae235328c1cb478d1fa8a2332f812cea5006fafd54453c92c3a8284d65ea7ecd5271c0bc4d7de30f5234d14873c39ac07f010bc612462c9440a233d3bf76
+  checksum: 10/d3a60d06182ebb89bb688c70914867813dcf37ba5983f6b3d45d44ccb326b039f832d054013669da561e6b8caf20b1bc01fca47ae71a46c9c5ffda575511f3c7
   languageName: node
   linkType: hard
 
@@ -12815,14 +12815,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"saucectl@npm:^0.210.0":
-  version: 0.210.0
-  resolution: "saucectl@npm:0.210.0"
+"saucectl@npm:^0.211.0":
+  version: 0.211.0
+  resolution: "saucectl@npm:0.211.0"
   dependencies:
     "@saucelabs/bin-wrapper": "npm:^2.1.0"
   bin:
     saucectl: index.js
-  checksum: 10/4131bfcf6a90e5b5461709766263f4e5f4ee616f6d9cad6aaec575c4857184c19a0ef4543cf3fc4cf2578492add089eeb4c7e6909dc2b65d26f22a524731b34c
+  checksum: 10/c07bc61cb241bf87b9e344b997676448ced19775014d9d2ef2790e550b492a489491a78f6a1d8e955cf79d6277eefc972757d415ca5549dd8d059313de6b3da1
   languageName: node
   linkType: hard
 
@@ -14597,9 +14597,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-cli@npm:7.1.0":
-  version: 7.1.0
-  resolution: "webpack-cli@npm:7.1.0"
+"webpack-cli@npm:7.2.1":
+  version: 7.2.1
+  resolution: "webpack-cli@npm:7.2.1"
   dependencies:
     "@discoveryjs/json-ext": "npm:^1.1.0"
     commander: "npm:^14.0.3"
@@ -14615,7 +14615,7 @@ __metadata:
     toml: ^3.0.0 || ^4.0.0
     webpack: ^5.101.0
     webpack-bundle-analyzer: ^4.0.0 || ^5.0.0
-    webpack-dev-server: ^5.0.0
+    webpack-dev-server: ^5.0.0 || ^6.0.0
   peerDependenciesMeta:
     js-yaml:
       optional: true
@@ -14629,7 +14629,7 @@ __metadata:
       optional: true
   bin:
     webpack-cli: bin/cli.js
-  checksum: 10/74d404728b057e5887a822dc5abb41b825e2a819da26891ecb7eb125282d5041b99c8d0f90f3e910c128813ddfe5d5d946ce0106aab1fb7bbb236a94223f897a
+  checksum: 10/0dd3e550549b5b5a693621f5f26b5621a0344bce195d977882aa97ad6c3262d056d637b9b140ae52608b72958d4b15c89458e1b73da087cef3bcec9bd7994711
   languageName: node
   linkType: hard
 
@@ -14680,9 +14680,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.108.3":
-  version: 5.108.3
-  resolution: "webpack@npm:5.108.3"
+"webpack@npm:5.108.4":
+  version: 5.108.4
+  resolution: "webpack@npm:5.108.4"
   dependencies:
     "@types/estree": "npm:^1.0.8"
     "@types/json-schema": "npm:^7.0.15"
@@ -14711,7 +14711,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10/1333c3cf78c9cc2d99c1b8d4ac1415f8303022af1e46508fa942d59757fc4b30e4f96cdd60a803bbd84c295486c7ee5554e6ec4a42b8cf39e8372b2a94d50423
+  checksum: 10/f93cbd33e76a0ba8b708600ca0be66f172dda8f3eff5d201e4a1021af38a5c5d6b57a5d7eaf9a525fbd383907a05d92c2a04b21839e509a03bcbd61f13fa6093
   languageName: node
   linkType: hard
 
