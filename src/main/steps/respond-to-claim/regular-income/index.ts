@@ -148,10 +148,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       flagKey: 'incomeFromJobs' | 'pension' | 'universalCredit' | 'otherBenefits',
       amountKey: 'incomeFromJobsAmount' | 'pensionAmount' | 'universalCreditAmount' | 'otherBenefitsAmount',
       frequencyKey:
-        | 'incomeFromJobsFrequency'
-        | 'pensionFrequency'
-        | 'universalCreditFrequency'
-        | 'otherBenefitsFrequency',
+        'incomeFromJobsFrequency' | 'pensionFrequency' | 'universalCreditFrequency' | 'otherBenefitsFrequency',
       amountBodyKey: string,
       frequencyBodyKey: string
     ) => {
