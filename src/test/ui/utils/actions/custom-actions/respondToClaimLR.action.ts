@@ -416,7 +416,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async repaymentAgreedLR(repaymentsAgreedData: actionRecord): Promise<void> {
-    const repaymentsAgreedQuestion = repaymentsAgreed.lrHiddenMainHeader();
+    const repaymentsAgreedQuestion = repaymentsAgreed.lrGiveDetailsHiddenTextLabel;
     await performAction('clickRadioButton', {
       question: repaymentsAgreedQuestion,
       option: repaymentsAgreedData.repaymentAgreedOption,
