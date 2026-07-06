@@ -2,7 +2,8 @@ import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from
 import { dashboard } from '../data/page-data';
 import {
   checkYourAnswers,
-  confirmIfTheseDocumentsRelateToAnApplication, documentsUploaded,
+  confirmIfTheseDocumentsRelateToAnApplication,
+  documentsUploaded,
   startEvidenceUpload,
   uploadYourDocuments,
   viewDocuments,

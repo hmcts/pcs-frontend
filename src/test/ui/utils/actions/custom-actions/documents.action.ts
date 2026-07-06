@@ -43,23 +43,15 @@ export class DocumentsAction implements IAction {
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
 
     if (data.relatedApplication) {
-      await performValidation(
-        'summaryRow',
-        checkYourAnswers.relatedApplicationKey,
-        {
-          value: data.relatedApplication,
-          linkText: 'Change',
-        }
-      );
-    }
-    await performValidation(
-      'summaryRow',
-      checkYourAnswers.uploadedDocumentsKey,
-      {
-        value: data.fileName,
+      await performValidation('summaryRow', checkYourAnswers.relatedApplicationKey, {
+        value: data.relatedApplication,
         linkText: 'Change',
-      }
-    );
+      });
+    }
+    await performValidation('summaryRow', checkYourAnswers.uploadedDocumentsKey, {
+      value: data.fileName,
+      linkText: 'Change',
+    });
     await performValidation('text', {
       elementType: 'link',
       text: 'Cancel',
