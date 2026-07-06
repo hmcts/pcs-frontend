@@ -75,7 +75,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     detailsHeading: 'detailsHeading',
     tenancyType: 'tenancyType',
     tenancyTypeOther: 'tenancyTypeOther',
-    tenancyAgreementDocumentLinkText: 'tenancyAgreementDocumentLinkText'
+    tenancyAgreementDocumentLinkText: 'tenancyAgreementDocumentLinkText',
   },
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
@@ -170,9 +170,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     //TODO: Add document type to document and check for TENANCY_AGREEMENT
-    const tenancyDocument = (caseData?.allDocuments ?? []).filter(
-      doc => doc.value?.category_id === 'propertyDocuments'
-    )[0] ?? '';
+    const tenancyDocument =
+      (caseData?.allDocumentsWithTypes ?? []).filter(doc => doc.value?.type === 'TENANCY_AGREEMENT')[0] ?? '';
 
     return {
       ...formContent,
@@ -184,7 +183,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyTypeAgreementType,
       tenancyTypeConfirm,
       correctType,
-      tenancyDocument
+      tenancyDocument,
     };
   },
 });

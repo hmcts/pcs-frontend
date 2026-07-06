@@ -305,6 +305,7 @@ export interface CcdCaseData {
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+  allDocumentsWithTypes?: CcdCollectionItem<CcdCaseDocumentWithTypes>[];
 }
 
 export interface CcdCaseDocument {
@@ -312,6 +313,11 @@ export interface CcdCaseDocument {
   document_filename?: string;
   upload_timestamp?: string;
   category_id?: string;
+}
+
+export interface  CcdCaseDocumentWithTypes {
+  document?: CcdCaseDocument;
+  type?: string;
 }
 
 export type DocumentUploadCategoryCode =

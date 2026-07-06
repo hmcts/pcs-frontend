@@ -78,9 +78,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
 
     //TODO: Add document type to document and check for RENT_STATEMENT
-    const rentStatementDocument = (caseData?.allDocuments ?? []).filter(
-      doc => doc.value?.category_id === 'propertyDocuments'
-    )[0]?.id;
+    const rentStatementDocument = (caseData?.allDocumentsWithTypes ?? []).filter(doc => doc.value?.type === 'RENT_STATEMENT')[0] ?? '';
 
     return {
       insetIntroText,
@@ -88,7 +86,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       amountOwedHeading,
       rentArrearsAmount,
       rentArrearsAmountCorrection,
-      rentStatementDocument
+      rentStatementDocument,
     };
   },
   fields: [
