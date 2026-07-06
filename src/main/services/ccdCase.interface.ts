@@ -305,7 +305,7 @@ export interface CcdCaseData {
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
-  allDocumentsWithTypes?: CcdCollectionItem<CcdCaseDocumentWithTypes>[];
+  allDocumentsWithType?: CcdCollectionItem<CcdCaseDocumentWithType>[];
 }
 
 export interface CcdCaseDocument {
@@ -315,7 +315,7 @@ export interface CcdCaseDocument {
   category_id?: string;
 }
 
-export interface  CcdCaseDocumentWithTypes {
+export interface  CcdCaseDocumentWithType {
   document?: CcdCaseDocument;
   type?: string;
 }
