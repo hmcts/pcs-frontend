@@ -1,5 +1,3 @@
-// import { submitCaseApiData } from '../api-data';
-
 export const confirmationOfNoticeDateWhenNotProvided = {
   mainHeader: `Notice date`,
   backLink: `Back`,
