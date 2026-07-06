@@ -913,6 +913,8 @@ export const submitCaseApiData = {
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'YES',
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
@@ -1031,6 +1033,8 @@ export const submitCaseApiData = {
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'YES',
       legislativeCountry: 'England',
+      regionId: 1,
+      caseManagementLocationNumber: 20262,
       claimantType: {
         value: {
           code: 'PROVIDER_OF_SOCIAL_HOUSING',
