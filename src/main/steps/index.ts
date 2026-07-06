@@ -1,5 +1,7 @@
 import type { Request, RequestHandler } from 'express';
 
+import { rolesForRule } from '../access-control';
+
 import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/upload-additional-documents/flow.config';
 import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
@@ -10,7 +12,6 @@ import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
 import { getUserType } from './utils';
-import { CITIZEN_USER_ROLES, LEGAL_REPRESENTATIVE_USER_ROLES } from './utils/userRole';
 
 import type { CcdDraftEvent } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
@@ -59,7 +60,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       stepRegistry: respondToClaimStepRegistry,
     },
     routeMiddleware: [respondToClaimAccessGuard()],
-    requiredRoles: [...CITIZEN_USER_ROLES, ...LEGAL_REPRESENTATIVE_USER_ROLES],
+    requiredRoles: rolesForRule('respond-to-claim'),
   },
   makeAnApplication: {
     name: 'makeAnApplication',
@@ -71,7 +72,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       flowConfig: makeAnApplicationFlowConfig,
       stepRegistry: makeAnApplicationStepRegistry,
     },
-    requiredRoles: CITIZEN_USER_ROLES,
+    requiredRoles: rolesForRule('make-an-application'),
   },
   uploadAdditionalDocuments: {
     name: 'uploadAdditionalDocuments',
@@ -80,7 +81,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       flowConfig: uploadAdditionalDocumentsFlowConfig,
       stepRegistry: uploadAdditionalDocumentsStepRegistry,
     },
-    requiredRoles: CITIZEN_USER_ROLES,
+    requiredRoles: rolesForRule('upload-additional-documents'),
   },
 };
 

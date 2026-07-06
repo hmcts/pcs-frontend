@@ -1,7 +1,7 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
-import { findRuleForPath, logAccessDenied } from '../access-control';
+import { findRuleForPath, logAccessDenied, userMayAccessPath } from '../access-control';
 import { getUserRoles } from '../steps/utils';
 
 export const roleAccessMiddleware: RequestHandler = (req: Request, _res: Response, next: NextFunction): void => {
@@ -13,8 +13,7 @@ export const roleAccessMiddleware: RequestHandler = (req: Request, _res: Respons
     return next();
   }
   const userRoles = getUserRoles(req);
-  const userHasAllowedRole = userRoles.some(userRole => matchedRule.allowedRoles.includes(userRole));
-  if (userHasAllowedRole) {
+  if (userMayAccessPath(userRoles, req.path)) {
     return next();
   }
 
