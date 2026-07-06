@@ -10,7 +10,7 @@
   "applicationOptionGeneric": "cyYes, the documents I’m uploading relate to the application submitted on {{date}}",
   "optionClaimOrCounterclaim": "cyNo, the documents I’m uploading relate to the main claim or counterclaim",
   "errors": {
-    "title": "cyThere is a problem",
+    "title": "Mae yna broblem",
     "relatedApplicationId": {
       "required": "cyConfirm if these documents relate to an existing application"
     }

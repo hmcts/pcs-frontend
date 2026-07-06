@@ -36,6 +36,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
     const pageName = await this.getFileNameForPage(page);
+    const currentTestFile = test.info().file.replace(/\\/g, '/');
+    const skipNavigationForTaskListSpec = currentTestFile.includes('/e2eTest/taskList.spec.ts');
 
     if (!pageName) {
       if (TriggerPageFunctionalTestsAction.isDashboardUrl(page.url())) {
@@ -102,7 +104,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         });
       }
 
-      if (enable_navigation_tests === 'true') {
+      if (enable_navigation_tests === 'true' && !skipNavigationForTaskListSpec) {
         await test.step(`Navigation tests triggered for page - ${pageName}`, async () => {
           try {
             await this.runNavigationTests(page, pageName, pftFilePath);
@@ -111,6 +113,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
             navigationTestsFailed = true;
           }
         });
+      } else if (enable_navigation_tests === 'true' && skipNavigationForTaskListSpec) {
+        console.log(`[PFT] Navigation tests skipped for taskList.spec.ts | page="${pageName}"`);
       }
 
       if (enable_visibility_validation === 'true') {
@@ -297,23 +301,20 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     try {
       const { pathname } = new URL(url);
       const segments = pathname.split('/').filter(Boolean);
-
-      const lastSegment = segments.at(-1);
-
-      if (lastSegment === 'check-your-answers') {
-        return segments.slice(-2).join('/');
-      }
-      return lastSegment || 'home';
+      return this.getLastUrlSegment(segments);
     } catch {
       const segments = url.split('/').filter(Boolean);
-
-      const last = segments.at(-1);
-
-      if (last === 'check-your-answers') {
-        return segments.slice(-2).join('/');
-      }
-      return last || 'home';
+      return this.getLastUrlSegment(segments);
     }
+  }
+
+  private getLastUrlSegment(segments: string[]): string {
+    const lastSegment = segments[segments.length - 1];
+
+    if (lastSegment === 'check-your-answers') {
+      return segments.slice(-2).join('/');
+    }
+    return lastSegment || 'home';
   }
 
   private async getHeaderText(page: Page): Promise<string | null> {

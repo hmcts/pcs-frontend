@@ -1,11 +1,11 @@
 {
-  "heading": "cyWhat is your client’s name?",
-  "pageTitle": "cyYour client’s name",
+  "heading": "Beth yw enw eich cleient?",
+  "pageTitle": "Enw eich cleient",
   "errors": {
-    "firstName": "cyEnter your client’s first name",
+    "firstName": "Nodwch enw cyntaf eich cleient",
     "firstNameMaxLength": "cyClient’s first name must be 60 characters or less",
     "firstNameInvalidCharacters": "cyClient’s first name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
-    "lastName": "cyEnter your client’s last name",
+    "lastName": "Nodwch cyfenw eich cleient",
     "lastNameMaxLength": "cyClient’s last name must be 60 characters or less",
     "lastNameInvalidCharacters": "cyClient’s last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }

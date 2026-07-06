@@ -2,6 +2,11 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY,
+  getEndOfJourneyCyaSubmitErrorPath,
+  submitRespondToClaimResponse,
+} from '../../utils/respondToClaimFinalSubmit';
 import { createRespondToClaimFormStep } from '../formStep';
 import { sectionIdToBackendEnum } from '../sections.config';
 
@@ -112,5 +117,25 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       draft.defendantResponses.completedSections = [...current, enumValue];
     }
     await saveDraftDefendantResponse(req, draft);
+
+    const caseId = req.res?.locals.validatedCase?.id;
+    if (!caseId) {
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaSubmitErrorPath(
+        String(req.params?.caseReference ?? '')
+      );
+      return;
+    }
+
+    try {
+      const { confirmationPath } = await submitRespondToClaimResponse(req);
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = confirmationPath;
+    } catch {
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaSubmitErrorPath(caseId);
+    }
+  },
+  resolveRedirectAfterPost: async (req: Request) => {
+    const redirectPath = req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] as string | undefined;
+    delete req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY];
+    return redirectPath;
   },
 });

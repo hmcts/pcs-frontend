@@ -1,11 +1,11 @@
 {
-  "pageTitle": "cyUniversal Credit",
+  "pageTitle": "Credyd Cynhwysol",
   "heading": "cyHave you applied for Universal Credit?",
   "dateLabel": "cyWhen did you apply?",
-  "dateHint": "cyFor example, 27 9 2022",
+  "dateHint": "Er enghraifft, 27 9 2022",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
   "errors": {
     "haveAppliedForUniversalCredit": "cySelect if you’ve applied for Universal Credit",

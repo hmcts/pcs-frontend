@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import type { FormBuilderFlowConfig } from './flowConfig';
 
 import type { DocumentStorage } from '@modules/documents/storage';
+import type { UploadValidationOptions } from '@utils/documentUploadValidation';
 
 export type FormFieldType =
   | 'radio'
@@ -135,6 +136,7 @@ export interface FormBuilderConfig {
   journeyFolder: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
+  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>;
   beforeGet?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
   // Prepopulates form fields from CCD on GET requests (e.g., when user returns to edit their answer).
@@ -149,6 +151,9 @@ export interface FormBuilderConfig {
   // Storage adapter for upload steps. When set, formBuilder auto-wires uploadUrl/deleteUrl
   // onto the fileUpload field component from req.originalUrl.
   documentStorage?: DocumentStorage;
+  // Per-step upload validation. When set, formBuilder auto-wires matching macro params
+  // (caps + translated error messages) onto the fileUpload field component.
+  uploadValidation?: UploadValidationOptions;
   isAnswered?: (req: Request) => boolean;
 }
 

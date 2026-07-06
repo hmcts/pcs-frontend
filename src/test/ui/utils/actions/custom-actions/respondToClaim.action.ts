@@ -14,6 +14,7 @@ import {
   counterClaim,
   counterClaimAbout,
   counterClaimAgainstWhom,
+  counterClaimApplicationFeeAmount,
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
   counterClaimOrderOtherThanSum,
@@ -42,6 +43,7 @@ import {
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
   otherConsiderations,
+  paymentDetails,
   paymentInterstitial,
   priorityDebtDetails,
   priorityDebts,
@@ -210,6 +212,8 @@ export class RespondToClaimAction implements IAction {
       ['selectPriorityDebts', () => this.selectPriorityDebts(fieldName as actionRecord)],
       ['enterPriorityDebtDetails', () => this.enterPriorityDebtDetails(fieldName as actionRecord)],
       ['languageUsed', () => this.languageUsed(fieldName as actionRecord)],
+      ['inputCounterClaimPaymentDetails', () => this.inputCounterClaimPaymentDetails(fieldName as actionRecord)],
+      ['validateCounterClaimApplicationFee', () => this.validateCounterClaimApplicationFee(fieldName as actionRecord)],
       [
         'selectDoYouWantToUploadDocFoCounterclaim',
         () => this.selectDoYouWantToUploadDocFoCounterclaim(fieldName as actionRecord),
@@ -743,8 +747,10 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
-    const getDetailsGivenByParagraph = tenancyDateDetails.getDetailsGivenByParagraph(claimantsName);
-    await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: tenancyDateDetails.getDetailsGivenByParagraph(),
+    });
     this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);
     await performAction('clickRadioButton', {
       question: tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion,
@@ -1079,6 +1085,36 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   }
 
+  private async inputCounterClaimPaymentDetails(paymentData: actionRecord): Promise<void> {
+    await performActions(
+      'Enter counterclaim payment details',
+      ['inputText', paymentDetails.cardNumberTextLabel, paymentData.cardNumber],
+      ['inputText', paymentDetails.monthTextLabel, paymentDetails.monthTextInput],
+      ['inputText', paymentDetails.yearTextLabel, paymentDetails.yearTextInput],
+      ['inputText', paymentDetails.nameOnCardTextLabel, paymentDetails.nameOnCardTextInput],
+      ['inputText', paymentDetails.cardSecurityCodeTextLabel, paymentDetails.cardSecurityCodeTextInput],
+      ['inputText', paymentDetails.addressLine1TextLabel, paymentDetails.addressLine1TextInput],
+      ['inputText', paymentDetails.townOrCityTextLabel, paymentDetails.townOrCityTextInput],
+      ['inputText', paymentDetails.postcodeTextLabel, paymentDetails.postcodeTextInput],
+      ['inputText', paymentDetails.emailTextLabel, paymentDetails.emailTextInput]
+    );
+    await performAction('clickButton', paymentDetails.continueButton);
+  }
+
+  private async validateCounterClaimApplicationFee(feeData: actionRecord): Promise<void> {
+    await performValidation('mainHeader', counterClaimApplicationFeeAmount.mainHeader);
+    await performValidation('summaryListValue', counterClaimApplicationFeeAmount.counterClaimAmountLabel, {
+      value: feeData.amount ?? '',
+    });
+    await performValidation('summaryListValue', counterClaimApplicationFeeAmount.counterClaimFeeLabel, {
+      value: `£${String(feeData.fee)}`,
+    });
+    await performValidation('text', {
+      elementType: 'link',
+      text: counterClaimApplicationFeeAmount.getPayButton(String(feeData.fee)),
+    });
+  }
+
   private async exceptionalHardship(exceptionalHardshipData: actionRecord): Promise<void> {
     this.recordAnswer(
       exceptionalHardship.wouldYouExperienceExceptionalHardshipParagraph,
@@ -1225,6 +1261,7 @@ export class RespondToClaimAction implements IAction {
     });
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
   }
+
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
     const regularExpensesQuestionLabel = this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader);
 
@@ -1298,13 +1335,11 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', languageUsed.saveAndContinueButton);
   }
   private async selectStatementOfTruthRTC(sot: actionRecord): Promise<void> {
-    await performValidation('text', { elementType: 'subHeader', text: checkYourAnswersRTC.statementOfTruthHeader });
     await performValidation('text', { elementType: 'paragraph', text: checkYourAnswersRTC.statementOfTruthParagraph });
     await performValidation('elementToBeVisible', checkYourAnswersRTC.contemptOfCourtCheckboxLabel);
     const options = Array.isArray(sot.options) ? sot.options : [sot.option];
     for (const option of options) {
       await performAction('check', {
-        question: sot.question,
         option,
       });
     }
@@ -1347,7 +1382,7 @@ export class RespondToClaimAction implements IAction {
       question: otherConsiderationsData.question,
       option: otherConsiderationsData.option,
     });
-    if (otherConsiderationsData.option === otherConsiderations.yesRadioOption) {
+    if (otherConsiderationsData.option === 'Yes') {
       this.recordAnswer(otherConsiderations.giveDetailsHiddenTextLabel, otherConsiderationsData.courtInfo);
       await performAction(
         'inputText',

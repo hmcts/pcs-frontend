@@ -5,7 +5,13 @@ import { flowConfig, uploadYourDocumentsStep } from '../flow.config';
 
 import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
-import { createGetController, createStepNavigation, getFormData } from '@modules/steps';
+import {
+  createGetController,
+  createStepNavigation,
+  getFormData,
+  getTranslationFunction,
+  loadStepNamespace,
+} from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '@routes/cancelUploadAdditionalDocuments';
 import { getDashboardUrl } from '@routes/dashboard';
@@ -21,6 +27,23 @@ const templatePath = 'case-tasks/upload-additional-documents/check-your-answers/
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 const uploadStorage = sessionDocs({ stepName: uploadYourDocumentsStep });
 
+async function getCheckYourAnswersContent(req: Request) {
+  const caseId = req.res?.locals.validatedCase?.id;
+  const documents = toDisplayDocuments(await uploadStorage.read(req));
+  const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
+  const hasRelatedApplication = Boolean(confirmData?.relatedApplicationId);
+  const relatedApplicationText = (confirmData?.relatedApplicationText as string) ?? '';
+
+  return {
+    dashboardUrl: getDashboardUrl(caseId),
+    cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
+    url: req.originalUrl || '',
+    documents,
+    hasRelatedApplication,
+    relatedApplicationText,
+  };
+}
+
 export const step: StepDefinition = {
   url: `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/${stepName}`,
   name: stepName,
@@ -31,7 +54,7 @@ export const step: StepDefinition = {
       const caseId = req.res?.locals.validatedCase?.id;
       const documents = toDisplayDocuments(await uploadStorage.read(req));
       const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
-      const hasRelatedApplication = Boolean(confirmData);
+      const hasRelatedApplication = Boolean(confirmData?.relatedApplicationId);
       const relatedApplicationText = (confirmData?.relatedApplicationText as string) ?? '';
 
       return {
@@ -52,6 +75,10 @@ export const step: StepDefinition = {
       }
 
       const uploadedAdditionalDocuments = await uploadStorage.read(req);
+      if (uploadedAdditionalDocuments.length === 0) {
+        return res.redirect(303, './upload-your-documents');
+      }
+
       const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
       const relatedApplicationId = confirmData?.relatedApplicationId as string | undefined;
       const selectedRelatedApplicationId =
@@ -71,14 +98,30 @@ export const step: StepDefinition = {
         }
       } catch (error) {
         logger.error(`Failed to submit uploadDocuments for case ${caseId}: ${String(error)}`);
-        throw error;
+        await loadStepNamespace(req);
+        const t = getTranslationFunction(req);
+
+        return res.status(500).render(templatePath, {
+          ...(await getCheckYourAnswersContent(req)),
+          t,
+          errorSummary: {
+            titleText: t('errors.title', { ns: 'common' }),
+            errorList: [
+              {
+                text: t('errors.submitFailed'),
+                href: '#submit',
+              },
+            ],
+          },
+        });
       }
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName);
       if (!redirectPath) {
         return res.status(404).render('not-found');
       }
-      res.redirect(303, redirectPath);
+
+      return res.redirect(303, redirectPath);
     },
   },
 };

@@ -10,7 +10,7 @@ import type { Environment } from 'nunjucks';
 import { z } from 'zod';
 import { makeZodI18nMap } from 'zod-i18n-map';
 
-import { pluralPossessive } from './formatters';
+import { ordinalDate, pluralPossessive } from './formatters';
 
 import { Logger } from '@modules/logger';
 
@@ -220,6 +220,7 @@ export class I18n {
       });
 
     pluralPossessive(i18next);
+    ordinalDate(i18next);
 
     app.use(i18nextHandle(i18next));
 
