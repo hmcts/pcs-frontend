@@ -41,20 +41,21 @@ export class DocumentsAction implements IAction {
 
   private async verifyCheckYourAnswers(data: actionRecord): Promise<void> {
     await performValidation('mainHeader', checkYourAnswers.mainHeader);
-    await performValidation('viewClaimOrResponseTable', '', {
-      [checkYourAnswers.uploadedDocumentsKey]: data.fileName,
+    await performValidation('text', {
+      elementType: 'inlineText',
+      text: checkYourAnswers.uploadedDocumentsKey,
+    });
+    await performValidation('text', {
+      elementType: 'listItem',
+      text: data.fileName,
     });
     await performValidation('text', {
       elementType: 'link',
-      text: checkYourAnswers.changeLink,
-    });
-    await performValidation('text', {
-      elementType: 'button',
-      text: checkYourAnswers.submitButton,
+      text: 'Change',
     });
     await performValidation('text', {
       elementType: 'link',
-      text: checkYourAnswers.cancelLink,
+      text: 'Cancel',
     });
   }
 

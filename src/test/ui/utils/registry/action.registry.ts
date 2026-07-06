@@ -132,6 +132,7 @@ export class ActionRegistry {
     //Documents
     ['startEvidenceUpload', new DocumentsAction()],
     ['uploadDocuments', new DocumentsAction()],
+    ['verifyCheckYourAnswers', new DocumentsAction()],
     ['validateViewDocuments', new DocumentsAction()],
     ['verifyDocumentRelatesToApplication', new DocumentsAction()],
 
