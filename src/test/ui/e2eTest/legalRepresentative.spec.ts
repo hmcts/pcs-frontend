@@ -303,7 +303,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       repaymentOption: previousPaymentsLR.noRadioOption,
     });
     await performAction('repaymentAgreedLR', {
-      question: repaymentsAgreed.lrHiddenMainHeader(),
+      question: repaymentsAgreed.lrGiveDetailsHiddenTextLabel,
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performAction('installmentPayments', {
@@ -440,7 +440,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       repaymentInfo: previousPaymentsLR.detailsTextInput,
     });
     await performAction('repaymentAgreedLR', {
-      question: repaymentsAgreed.lrHiddenMainHeader(),
+      question: repaymentsAgreed.lrGiveDetailsHiddenTextLabel,
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
