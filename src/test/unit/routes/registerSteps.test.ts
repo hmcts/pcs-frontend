@@ -579,4 +579,80 @@ describe('registerAllJourneys', () => {
     const { registerAllJourneys } = require('../../../main/routes/registerSteps');
     expect(() => registerAllJourneys(app)).toThrow(/Role drift for journey 'respondToClaim'/);
   });
+
+  it('runs oidcMiddleware before requireEventAccess on the journey router (auth-first)', async () => {
+    const callOrder: string[] = [];
+
+    jest.resetModules();
+    jest.doMock('../../../main/middleware', () => ({
+      oidcMiddleware: jest.fn((req, res, next) => {
+        callOrder.push('oidc');
+        next();
+      }),
+      caseReferenceParamMiddleware: jest.fn((req, res, next) => next()),
+      requireEventAccess: jest.fn(() =>
+        jest.fn((req, res, next) => {
+          callOrder.push('requireEventAccess');
+          next();
+        })
+      ),
+      legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
+    }));
+
+    const testStep = {
+      url: '/case/:caseReference/respond-to-claim/step-a',
+      name: 'step-a',
+      getController: () => ({ get: (req: Request, res: Response) => res.end() }),
+    };
+
+    jest.doMock('@steps', () => ({
+      journeyRegistry: {
+        respondToClaim: {
+          name: 'respondToClaim',
+          slug: 'respond-to-claim',
+          default: {
+            flowConfig: {
+              eventId: 'respondPossessionClaim',
+              basePath: '/case/:caseReference/respond-to-claim',
+              stepOrder: ['step-a'],
+              steps: { 'step-a': { requiresAuth: false } },
+            },
+            stepRegistry: { 'step-a': testStep },
+          },
+          requiredRoles: ['citizen', 'caseworker-pcs-solicitor'],
+        },
+      },
+      getFlowConfigForJourney: () => ({
+        basePath: '/case/:caseReference/respond-to-claim',
+        stepOrder: ['step-a'],
+        steps: { 'step-a': { requiresAuth: false } },
+      }),
+      getStepForJourney: () => testStep,
+      getStepsForJourney: () => [testStep],
+    }));
+
+    let capturedRouter: unknown;
+    const captureApp = {
+      use: jest.fn((router: unknown) => {
+        capturedRouter = router;
+      }),
+      param: jest.fn(),
+    } as unknown as Application;
+
+    const { registerAllJourneys } = require('../../../main/routes/registerSteps');
+    registerAllJourneys(captureApp);
+
+    const req = { url: '/case/abc-999/respond-to-claim/step-a', method: 'GET', session: {} } as unknown as Request;
+    const res = { locals: {}, end: jest.fn() } as unknown as Response;
+
+    await new Promise<void>((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (capturedRouter as any).handle(req, res, (err: unknown) => (err ? reject(err) : resolve()));
+      setImmediate(() => resolve());
+    });
+
+    expect(callOrder).toContain('oidc');
+    expect(callOrder).toContain('requireEventAccess');
+    expect(callOrder.indexOf('oidc')).toBeLessThan(callOrder.indexOf('requireEventAccess'));
+  });
 });

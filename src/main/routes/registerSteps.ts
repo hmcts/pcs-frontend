@@ -217,6 +217,11 @@ export function registerAllJourneys(app: Application): void {
     // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
     journeyRouter.param('caseReference', caseReferenceParamMiddleware);
 
+    // Authenticate before any role or case-access guard. requireRoles skips
+    // unauthenticated users and requireEventAccess 401s them, so without this an
+    // unauthenticated request would hit a 401/403 instead of being redirected to login.
+    journeyRouter.use(basePath, oidcMiddleware);
+
     if (journey.requiredRoles) {
       // Drift guard: the runtime requireRoles guard is the canonical check,
       // but the OAuth callback still matches on URL pattern via accessRules.
