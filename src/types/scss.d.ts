@@ -1,3 +1,5 @@
-// Side-effect scss imports are handled by webpack (style/css/sass loaders);
-// typed as an opaque module so tsc doesn't error on them (TS2882 under TS 6+).
+// Lets TypeScript accept `import 'file.scss'` statements.
+// Stylesheets are compiled by webpack (sass/css/style loaders), not by tsc, so
+// they have no types. Declaring them as empty modules avoids the compile error
+// TS2882 "Cannot find module or type declarations for ...".
 declare module '*.scss';
