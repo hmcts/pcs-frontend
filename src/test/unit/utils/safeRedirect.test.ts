@@ -1,6 +1,6 @@
 import type { Response } from 'express';
 
-import { safeRedirect303 } from '@utils/safeRedirect';
+import { safeRedirect303, safeRedirect307 } from '@utils/safeRedirect';
 
 describe('safeRedirect303', () => {
   let mockRes: Partial<Response>;
@@ -131,5 +131,27 @@ describe('safeRedirect303', () => {
       safeRedirect303(mockRes as Response, '/dashboard/../../etc/passwd', '/', ['/dashboard']);
       expect(redirectSpy).toHaveBeenCalledWith(303, '/');
     });
+  });
+});
+
+describe('safeRedirect307', () => {
+  let mockRes: Partial<Response>;
+  let redirectSpy: jest.Mock;
+
+  beforeEach(() => {
+    redirectSpy = jest.fn();
+    mockRes = {
+      redirect: redirectSpy,
+    };
+  });
+
+  it('should redirect with status 307 for a valid path', () => {
+    safeRedirect307(mockRes as Response, '/case/123/final-submit', '/', ['/case']);
+    expect(redirectSpy).toHaveBeenCalledWith(307, '/case/123/final-submit');
+  });
+
+  it('should redirect with status 307 to fallback for an invalid path', () => {
+    safeRedirect307(mockRes as Response, 'http://evil.com', '/fallback', ['/case']);
+    expect(redirectSpy).toHaveBeenCalledWith(307, '/fallback');
   });
 });

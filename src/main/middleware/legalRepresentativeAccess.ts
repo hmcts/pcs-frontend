@@ -5,6 +5,7 @@ import { isLegalRepresentativeUser } from '../steps/utils';
 const LEGAL_REPRESENTATIVE_ALLOWED_PATHS = [
   /^\/case\/[^/]+\/respond-to-claim(?:\/.*)?$/,
   /^\/api\/postcode-lookup(?:\/.*)?$/,
+  /^\/case\/[^/]+\/final-submit(?:\/.*)?$/,
 ];
 
 export const legalRepresentativeAccessMiddleware: RequestHandler = (

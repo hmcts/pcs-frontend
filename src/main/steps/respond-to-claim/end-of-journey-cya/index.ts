@@ -11,6 +11,7 @@ import { getTranslationFunction, loadStepNamespaces } from '@modules/steps';
 import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { safeRedirect307 } from '@utils/safeRedirect';
 
 const STEP_NAME = 'end-of-journey-cya';
 
@@ -31,7 +32,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     {
       name: 'statementOfTruthContempt',
       type: 'checkbox',
-      // Change from true to a functional condition:
       required: formData => formData?.isLegalRepresentative !== 'true',
       errorMessage: 'errors.statementOfTruthContempt',
       translationKey: { label: 'statementOfTruth.contemptFieldLabel' },
@@ -51,7 +51,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'fullName',
       type: 'text',
       required: true,
-      attributes: { maxlength: '100' },
+      maxLength: 100,
       errorMessage: 'errors.fullName',
       translationKey: { label: 'statementOfTruth.fullNameLabel' },
     },
@@ -59,7 +59,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'nameOfFirm',
       type: 'text',
       required: formData => formData?.isLegalRepresentative === 'true',
-      attributes: { maxlength: '100' },
+      maxLength: 100,
       errorMessage: 'errors.nameOfFirm',
       translationKey: { label: 'statementOfTruth.nameOfFirmLabel' },
     },
@@ -67,7 +67,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'positionHeld',
       type: 'text',
       required: formData => formData?.isLegalRepresentative === 'true',
-      attributes: { maxlength: '100' },
+      maxLength: 100,
       errorMessage: 'errors.positionHeld',
       translationKey: { label: 'statementOfTruth.positionHeldLabel' },
     },
@@ -177,5 +177,15 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       draft.defendantResponses.completedSections = [...current, enumValue];
     }
     await saveDraftDefendantResponse(req, draft);
+
+    const caseId = req.res?.locals.validatedCase?.id;
+    if (caseId && req.res) {
+      safeRedirect307(
+        req.res,
+        `/case/${caseId}/final-submit`,
+        `/case/${caseId}/respond-to-claim/end-of-journey-cya`,
+        ['/case']
+      );
+    }
   },
 });
