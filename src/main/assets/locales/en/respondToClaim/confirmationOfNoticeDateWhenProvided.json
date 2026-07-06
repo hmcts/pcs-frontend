@@ -3,6 +3,15 @@
   "bulletPointLabel": "Notice details given by {{claimantName}}:",
   "hintText": "When making the claim, {{claimantName}} had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.",
   "listItem1": "They served you with a notice seeking possession on {{noticeDate}}",
+  "viewNoticeLinkText": "View a copy of the notice (opens in a new tab)",
+  "methodOfService": {
+    "PERSONALLY_HANDED": "the notice was served by personally handing it to or leaving it with {{name}}",
+    "EMAIL": "the notice was served by email to {{emailAddress}}",
+    "DELIVERED_PERMITTED_PLACE": "the notice was served by delivering it to or leaving it at a permitted place on {{date}}",
+    "FIRST_CLASS_POST": "the notice was served by first class post or other service which provides for delivery on the next working day",
+    "OTHER_ELECTRONIC": "the notice was served by other electronic method: {{details}}",
+    "OTHER": "the notice was served by other means: {{details}}"
+  },
   "question": "When did you receive notice from {{claimantName}} (optional)?",
   "noticeDateHint": "For example, 27 9 2022",
   "errors": {

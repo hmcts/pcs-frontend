@@ -3,6 +3,15 @@
   "bulletPointLabel": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:",
   "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}}roi'r dyddiad pan wnaethant roi'r hysbysiad i chi (y dyddiad cyflwyno). Os nad ydych yn siŵr o'r union ddyddiad, gallwch ddod o hyd iddo ar yr hysbysiad.",
   "listItem1": "Gwnaethant gyflwyno hysbysiad i chi yn ceisio meddiant ar {{noticeDate}}",
+  "viewNoticeLinkText": "cyView a copy of the notice (opens in a new tab)",
+  "methodOfService": {
+    "PERSONALLY_HANDED": "cythe notice was served by personally handing it to or leaving it with {{name}}",
+    "EMAIL": "cythe notice was served by email to {{emailAddress}}",
+    "DELIVERED_PERMITTED_PLACE": "cythe notice was served by delivering it to or leaving it at a permitted place on {{date}}",
+    "FIRST_CLASS_POST": "cythe notice was served by first class post or other service which provides for delivery on the next working day",
+    "OTHER_ELECTRONIC": "cythe notice was served by other electronic method: {{details}}",
+    "OTHER": "cythe notice was served by other means: {{details}}"
+  },
   "question": "Pryd gawsoch yr hysbysiad gan {{claimantName}} (dewisol)?",
   "noticeDateHint": "Er enghraifft, 27 9 2022",
   "errors": {
