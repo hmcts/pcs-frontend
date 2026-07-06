@@ -26,6 +26,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     bulletPointLabel: 'bulletPointLabel',
     noticeDateHint: 'noticeDateHint',
     question: 'question',
+    viewNoticeLinkText: 'viewNoticeLinkText',
   },
   fields: [
     {
@@ -109,12 +110,58 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const hintText = t('hintText', { returnObjects: true, claimantName });
     const listItem1 = t('listItem1', { returnObjects: true, noticeDate });
 
+    const noticeDocument = validatedCase?.noticeDocument;
+    const noticeDocumentId = noticeDocument?.id;
+    const noticeDocumentFilename = noticeDocument?.value?.document_filename;
+
+    const formatNoticeDate = (raw?: string): string =>
+      raw ? DateTime.fromISO(raw).setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y') : '';
+
+    const serviceMethod = validatedCase?.notice_ServiceMethod;
+    let noticeMethodText: string | undefined;
+
+    switch (serviceMethod) {
+      case 'PERSONALLY_HANDED':
+        noticeMethodText = t('methodOfService.PERSONALLY_HANDED', {
+          name: validatedCase?.notice_PersonName ?? '',
+        });
+        break;
+      case 'EMAIL':
+        noticeMethodText = t('methodOfService.EMAIL', {
+          emailAddress: validatedCase?.notice_EmailAddress ?? '',
+        });
+        break;
+      case 'DELIVERED_PERMITTED_PLACE':
+        noticeMethodText = t('methodOfService.DELIVERED_PERMITTED_PLACE', {
+          date: formatNoticeDate(validatedCase?.notice_DeliveredDate),
+        });
+        break;
+      case 'FIRST_CLASS_POST':
+        noticeMethodText = t('methodOfService.FIRST_CLASS_POST');
+        break;
+      case 'OTHER_ELECTRONIC':
+        noticeMethodText = t('methodOfService.OTHER_ELECTRONIC', {
+          details: validatedCase?.notice_OtherElectronicExplanation ?? '',
+        });
+        break;
+      case 'OTHER':
+        noticeMethodText = t('methodOfService.OTHER', {
+          details: validatedCase?.notice_OtherExplanation ?? '',
+        });
+        break;
+      default:
+        noticeMethodText = undefined;
+    }
+
     return {
       claimantName,
       noticeDate,
       bulletPointLabel,
       hintText,
       listItem1,
+      noticeDocumentId,
+      noticeDocumentFilename,
+      noticeMethodText,
     };
   },
 });

@@ -17,10 +17,22 @@
 
   {{ govukInsetText({ text: hintText }) }}
 
+  {% if noticeDocumentId %}
+    <a
+      class="govuk-link"
+      href="/case/{{ caseReference }}/view-documents/{{ noticeDocumentId }}"
+      target="_blank"
+      rel="noopener noreferrer"
+    >{{ viewNoticeLinkText }}</a>
+  {% endif %}
+
   <h3 class="govuk-heading-s">{{ bulletPointLabel }}</h3>
 
   <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
     <li>{{ listItem1 }}</li>
+    {% if noticeMethodText %}
+      <li>{{ noticeMethodText }}</li>
+    {% endif %}
   </ul>
 
   <form method="post" action="{{ url }}" novalidate>
