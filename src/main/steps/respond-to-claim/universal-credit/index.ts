@@ -55,8 +55,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   getInitialFormData: req => {
     const householdCircumstances = getValidatedCaseHouseholdCircumstances(req) as
-      | { hasAppliedForUniversalCredit?: string; ucApplicationDate?: string }
-      | undefined;
+      { hasAppliedForUniversalCredit?: string; ucApplicationDate?: string } | undefined;
 
     const data: Record<string, unknown> = {};
     const savedAnswer = fromYesNoEnum(householdCircumstances?.hasAppliedForUniversalCredit);
