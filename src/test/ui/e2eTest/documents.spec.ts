@@ -62,7 +62,9 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await softErrorMessageValidation('uploadYourDocuments', uploadYourDocumentsErrorValidation);
     await performAction('uploadDocuments', { files: ['uploadYourDocuments.ppt'] });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('verifyCheckYourAnswers', {
+      fileName: 'uploadYourDocuments.ppt',
+    });
   });
 
   test('View documents submitted through make a claim @regression', async () => {
