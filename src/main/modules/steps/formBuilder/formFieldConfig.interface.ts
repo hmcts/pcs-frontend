@@ -6,23 +6,9 @@ import type { DocumentStorage } from '@modules/documents/storage';
 import type { UploadValidationOptions } from '@utils/documentUploadValidation';
 
 export type FormFieldType =
-  | 'radio'
-  | 'checkbox'
-  | 'text'
-  | 'date'
-  | 'textarea'
-  | 'character-count'
-  | 'postcodeLookup'
-  | 'file';
+  'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup' | 'file';
 export type ComponentType =
-  | 'input'
-  | 'textarea'
-  | 'characterCount'
-  | 'radios'
-  | 'checkboxes'
-  | 'dateInput'
-  | 'postcodeLookup'
-  | 'fileUpload';
+  'input' | 'textarea' | 'characterCount' | 'radios' | 'checkboxes' | 'dateInput' | 'postcodeLookup' | 'fileUpload';
 
 export interface FormFieldOption {
   value?: string;
