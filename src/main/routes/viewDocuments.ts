@@ -88,7 +88,13 @@ export default function viewDocumentsRoutes(app: Application): void {
           id?: string;
           value?: { document_filename?: string; document_binary_url?: string };
         }[];
-        const document = allDocuments.find(item => item.id === documentId)?.value;
+        const noticeDocuments = (ccdCase.data?.notice_Documents ?? []) as {
+          id?: string;
+          value?: { document_filename?: string; document_binary_url?: string };
+        }[];
+        const document =
+          allDocuments.find(item => item.id === documentId)?.value ??
+          noticeDocuments.find(item => item.id === documentId)?.value;
         const filename = document?.document_filename?.trim() || 'document';
         const binaryUrl = document?.document_binary_url?.trim();
 

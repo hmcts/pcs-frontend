@@ -82,6 +82,7 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   const seen = new Set<string>();
 
   addFlatDocuments(documents, seen, caseData, 'allDocuments');
+  addFlatDocuments(documents, seen, caseData, 'notice_Documents');
 
   return documents;
 }

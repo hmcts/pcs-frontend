@@ -10,6 +10,7 @@ import { Logger } from '@modules/logger';
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData } from '@services/ccdCase.interface';
+import { extractCaseDocuments } from '@utils/documentUtils';
 
 const logger = Logger.getLogger('confirmation-of-notice-date-when-provided');
 
@@ -110,9 +111,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const hintText = t('hintText', { returnObjects: true, claimantName });
     const listItem1 = t('listItem1', { returnObjects: true, noticeDate });
 
-    const noticeDocument = validatedCase?.noticeDocument;
-    const noticeDocumentId = noticeDocument?.id;
-    const noticeDocumentFilename = noticeDocument?.value?.document_filename;
+    const caseData = (validatedCase?.data as Record<string, unknown>) ?? {};
+    const documents = extractCaseDocuments(caseData);
+    const noticeDoc = documents.find(d => d.sourceField === 'notice_Documents');
+    const noticeDocumentId = noticeDoc?.id;
+    const noticeDocumentFilename = noticeDoc?.filename;
 
     const formatNoticeDate = (raw?: string): string =>
       raw ? DateTime.fromISO(raw).setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y') : '';
