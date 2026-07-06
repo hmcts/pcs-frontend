@@ -4,6 +4,7 @@ export {
   accessRules,
   evaluateLoginAccess,
   findRuleForPath,
+  rolesForRule,
   userMayAccessPath,
 } from './accessRules';
 export type { AccessRule, LoginAccessDecision } from './accessRules';

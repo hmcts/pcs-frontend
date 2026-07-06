@@ -80,6 +80,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       flowConfig: uploadAdditionalDocumentsFlowConfig,
       stepRegistry: uploadAdditionalDocumentsStepRegistry,
     },
+    requiredRoles: CITIZEN_USER_ROLES,
   },
 };
 

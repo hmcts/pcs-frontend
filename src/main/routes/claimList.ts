@@ -1,8 +1,7 @@
 import type { Application, NextFunction, Request, Response } from 'express';
 
-import { requireRoles } from '../access-control';
+import { requireRoles, rolesForRule } from '../access-control';
 import { oidcMiddleware } from '../middleware/oidc';
-import { CITIZEN_USER_ROLES } from '../steps/utils/userRole';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -16,7 +15,7 @@ export default function claimListRoutes(app: Application): void {
   app.get(
     CLAIM_LIST_ROUTE,
     oidcMiddleware,
-    requireRoles(CITIZEN_USER_ROLES, 'claims'),
+    requireRoles(rolesForRule('claims'), 'claims'),
     async (req: Request, res: Response, next: NextFunction) => {
       const accessToken = req.session.user?.accessToken;
 

@@ -1,14 +1,13 @@
 import type { Application, Request, Response } from 'express';
 
-import { requireRoles } from '../access-control';
+import { requireRoles, rolesForRule } from '../access-control';
 import { oidcMiddleware } from '../middleware/oidc';
-import { CITIZEN_USER_ROLES } from '../steps/utils/userRole';
 
 import { Logger } from '@modules/logger';
 import { type AccessCodeValidationError, validateAccessCode } from '@services/pcsApi/pcsApiService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
-const accessYourCaseGuard = requireRoles(CITIZEN_USER_ROLES, 'access-your-case');
+const accessYourCaseGuard = requireRoles(rolesForRule('access-your-case'), 'access-your-case');
 
 const logger = Logger.getLogger('citizenCaseLink');
 

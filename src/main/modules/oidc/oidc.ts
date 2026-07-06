@@ -239,6 +239,7 @@ export class OIDCModule {
           delete req.session.codeVerifier;
           delete req.session.nonce;
 
+          // Citizen-only default. Unreachable for solicitors in practice
           const returnTo = req.session.returnTo || '/claims';
           delete req.session.returnTo;
           res.redirect(returnTo);

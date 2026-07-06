@@ -3,10 +3,9 @@ import type { Application, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../HttpError';
-import { requireRoles } from '../access-control';
+import { requireRoles, rolesForRule } from '../access-control';
 import { MAKE_GENERAL_APPLICATION_ROUTE, UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
-import { CITIZEN_USER_ROLES } from '../steps/utils/userRole';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -132,7 +131,7 @@ export default function dashboardRoutes(app: Application): void {
   // Route: /case/:caseReference/dashboard
   dashboardRouter.get(
     '/:caseReference/dashboard',
-    requireRoles(CITIZEN_USER_ROLES, 'dashboard'),
+    requireRoles(rolesForRule('dashboard'), 'dashboard'),
     async (req: Request, res: Response, next) => {
       const rawCaseReference = req.params.caseReference;
       const caseReference =

@@ -28,6 +28,11 @@ export const accessRules: readonly AccessRule[] = [
     allowedRoles: CITIZEN_USER_ROLES,
   },
   {
+    name: 'upload-additional-documents',
+    pathPattern: /^\/case\/[^/]+\/upload-additional-documents(?:\/.*)?$/,
+    allowedRoles: CITIZEN_USER_ROLES,
+  },
+  {
     name: 'claims',
     pathPattern: /^\/claims(?:\/.*)?$/,
     allowedRoles: CITIZEN_USER_ROLES,
@@ -41,6 +46,15 @@ export const accessRules: readonly AccessRule[] = [
 
 export function findRuleForPath(path: string): AccessRule | undefined {
   return accessRules.find(rule => rule.pathPattern.test(path));
+}
+
+export function rolesForRule(name: string): readonly string[] {
+  const rule = accessRules.find(r => r.name === name);
+  if (!rule) {
+    const available = accessRules.map(r => r.name).join(', ');
+    throw new Error(`No accessRule named '${name}'. Available rules: ${available}`);
+  }
+  return rule.allowedRoles;
 }
 
 export function userMayAccessPath(userRoles: readonly string[], path: string): boolean {

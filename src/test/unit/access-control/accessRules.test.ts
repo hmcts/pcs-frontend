@@ -2,6 +2,7 @@ import {
   accessRules,
   evaluateLoginAccess,
   findRuleForPath,
+  rolesForRule,
   userMayAccessPath,
 } from '../../../main/access-control/accessRules';
 
@@ -14,6 +15,8 @@ describe('accessRules', () => {
       ['/case/1234567890123456/dashboard/something', 'dashboard'],
       ['/case/1234567890123456/make-an-application', 'make-an-application'],
       ['/case/1234567890123456/make-an-application/select-type', 'make-an-application'],
+      ['/case/1234567890123456/upload-additional-documents', 'upload-additional-documents'],
+      ['/case/1234567890123456/upload-additional-documents/start-evidence-upload', 'upload-additional-documents'],
       ['/claims', 'claims'],
       ['/claims/anything', 'claims'],
       ['/access-your-case', 'access-your-case'],
@@ -48,8 +51,13 @@ describe('accessRules', () => {
       expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/case/1/respond-to-claim')).toBe(true);
       expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/case/1/dashboard')).toBe(false);
       expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/case/1/make-an-application')).toBe(false);
+      expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/case/1/upload-additional-documents')).toBe(false);
       expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/claims')).toBe(false);
       expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/access-your-case')).toBe(false);
+    });
+
+    it('allows citizens into upload-additional-documents', () => {
+      expect(userMayAccessPath(['citizen'], '/case/1/upload-additional-documents')).toBe(true);
     });
 
     it('blocks users with no matching role', () => {
@@ -60,6 +68,17 @@ describe('accessRules', () => {
 
   it('exposes a non-empty rules list', () => {
     expect(accessRules.length).toBeGreaterThan(0);
+  });
+
+  describe('rolesForRule', () => {
+    it('returns the allowed roles for a known rule', () => {
+      expect(rolesForRule('dashboard')).toEqual(['citizen']);
+      expect(rolesForRule('respond-to-claim')).toEqual(['citizen', 'caseworker-pcs-solicitor']);
+    });
+
+    it('throws for an unknown rule name so renames fail fast at boot', () => {
+      expect(() => rolesForRule('does-not-exist')).toThrow(/No accessRule named 'does-not-exist'/);
+    });
   });
 
   describe('evaluateLoginAccess', () => {
