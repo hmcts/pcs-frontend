@@ -94,29 +94,25 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       [
         'PERSONALLY_HANDED',
         { notice_ServiceMethod: 'PERSONALLY_HANDED', notice_PersonName: 'Jane Doe' },
-        'methodOfService.PERSONALLY_HANDED',
-        { name: 'Jane Doe' },
+        ['methodOfService.PERSONALLY_HANDED', { name: 'Jane Doe' }],
         'PERSONALLY_HANDED[name=Jane Doe]',
       ],
       [
         'EMAIL',
         { notice_ServiceMethod: 'EMAIL', notice_EmailAddress: 'jane@example.com' },
-        'methodOfService.EMAIL',
-        { emailAddress: 'jane@example.com' },
+        ['methodOfService.EMAIL', { emailAddress: 'jane@example.com' }],
         'EMAIL[emailAddress=jane@example.com]',
       ],
       [
         'DELIVERED_PERMITTED_PLACE',
         { notice_ServiceMethod: 'DELIVERED_PERMITTED_PLACE', notice_DeliveredDate: '2024-01-15' },
-        'methodOfService.DELIVERED_PERMITTED_PLACE',
-        { date: '15 January 2024' },
+        ['methodOfService.DELIVERED_PERMITTED_PLACE', { date: '15 January 2024' }],
         'DELIVERED_PERMITTED_PLACE[date=15 January 2024]',
       ],
       [
         'FIRST_CLASS_POST',
         { notice_ServiceMethod: 'FIRST_CLASS_POST' },
-        'methodOfService.FIRST_CLASS_POST',
-        undefined,
+        ['methodOfService.FIRST_CLASS_POST'],
         'FIRST_CLASS_POST',
       ],
       [
@@ -125,36 +121,27 @@ describe('confirmation-of-notice-date-when-provided step', () => {
           notice_ServiceMethod: 'OTHER_ELECTRONIC',
           notice_OtherElectronicExplanation: 'via secure portal',
         },
-        'methodOfService.OTHER_ELECTRONIC',
-        { details: 'via secure portal' },
+        ['methodOfService.OTHER_ELECTRONIC', { details: 'via secure portal' }],
         'OTHER_ELECTRONIC[details=via secure portal]',
       ],
       [
         'OTHER',
         { notice_ServiceMethod: 'OTHER', notice_OtherExplanation: 'handed to neighbour' },
-        'methodOfService.OTHER',
-        { details: 'handed to neighbour' },
+        ['methodOfService.OTHER', { details: 'handed to neighbour' }],
         'OTHER[details=handed to neighbour]',
       ],
-    ] as const)(
-      'returns noticeMethodText for %s',
-      (_label, caseData, translationKey, translationOptions, expectedText) => {
-        const content = testedStep.extendGetContent({
-          res: {
-            locals: {
-              validatedCase: makeValidatedCase(caseData),
-            },
+    ] as const)('returns noticeMethodText for %s', (_label, caseData, expectedTranslationCall, expectedText) => {
+      const content = testedStep.extendGetContent({
+        res: {
+          locals: {
+            validatedCase: makeValidatedCase(caseData),
           },
-        });
+        },
+      });
 
-        if (translationOptions) {
-          expect(tMock).toHaveBeenCalledWith(translationKey, translationOptions);
-        } else {
-          expect(tMock).toHaveBeenCalledWith(translationKey);
-        }
-        expect(content.noticeMethodText).toBe(expectedText);
-      }
-    );
+      expect(tMock).toHaveBeenCalledWith(...expectedTranslationCall);
+      expect(content.noticeMethodText).toBe(expectedText);
+    });
 
     it('omits noticeMethodText when service method is missing or unknown', () => {
       const missingMethodContent = testedStep.extendGetContent({
