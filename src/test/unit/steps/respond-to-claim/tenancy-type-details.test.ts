@@ -467,15 +467,17 @@ describe('respond-to-claim tenancy-type-details step', () => {
     });
 
     describe('tenancy agreement document link', () => {
-      const makeReq = (allDocumentsWithType?: {
-        id: string;
-        value: {
-          type?: string;
-          document?: {
-            document_filename?: string;
+      const makeReq = (
+        allDocumentsWithType?: {
+          id: string;
+          value: {
+            type?: string;
+            document?: {
+              document_filename?: string;
+            };
           };
-        };
-      }[]) => ({
+        }[]
+      ) => ({
         body: {},
         res: {
           locals: {
@@ -523,10 +525,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
           [{ id: 'rent-statement-id', value: { type: 'RENT_STATEMENT' } }],
         ],
       ])('does not provide tenancyDocument when %s', async (_description, documents) => {
-        const content = await testedStep.extendGetContent(
-          makeReq(documents),
-          { detailsHeading: 'Details given by ' }
-        );
+        const content = await testedStep.extendGetContent(makeReq(documents), { detailsHeading: 'Details given by ' });
 
         expect(content.tenancyDocument).toBe('');
       });

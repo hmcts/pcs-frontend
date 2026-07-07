@@ -315,7 +315,7 @@ export interface CcdCaseDocument {
   category_id?: string;
 }
 
-export interface  CcdCaseDocumentWithType {
+export interface CcdCaseDocumentWithType {
   document?: CcdCaseDocument;
   type?: string;
 }
