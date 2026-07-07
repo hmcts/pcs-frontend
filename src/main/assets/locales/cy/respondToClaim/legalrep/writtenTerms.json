@@ -1,0 +1,16 @@
+{
+  "pageTitle": "cyWritten terms",
+  "introText": "cyIt is required under the Renting Homes Wales Act 2016 for a landlord to send the defendant written terms of the occupation contract.",
+  "question": "cyHas the landlord sent the defendant written terms of the occupation contract?",
+  "heading": "cyWritten terms",
+  "termsQuestion": "cyHas the landlord sent the defendant written terms of the occupation contract?",
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "or": "cyor",
+    "imNotSure": "cyDefendant is not sure"
+  },
+  "errors": {
+    "writtenTerms": "cySelect if the landlord has sent the defendant written terms of the occupation contract"
+  }
+}

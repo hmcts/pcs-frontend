@@ -64,7 +64,28 @@ describe('requireEventAccess', () => {
       const middleware = requireEventAccess(eventId);
       await middleware(mockReq as Request, mockRes as Response, next);
 
-      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, eventId);
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, eventId, undefined);
+      expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
+      expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(next).toHaveBeenCalledWith();
+    });
+
+    it('should hydrate res.locals.validatedCase 2 and call next()', async () => {
+      const mockCase = { id: validCaseRef, data: {} };
+      const clientContext = { selectedPartyId: 'abc' };
+
+      mockReq.session = {
+        user: { accessToken: mockAccessToken },
+        clientContext,
+      } as MockSession as Request['session'];
+
+      mockGetCaseByIdForEvent.mockResolvedValue(mockCase);
+
+      const middleware = requireEventAccess(eventId);
+      await middleware(mockReq as Request, mockRes as Response, next);
+
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, eventId, clientContext);
       expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
       expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
       expect(next).toHaveBeenCalledTimes(1);
@@ -78,7 +99,12 @@ describe('requireEventAccess', () => {
       const middleware = requireEventAccess('makeAnApplication');
       await middleware(mockReq as Request, mockRes as Response, next);
 
-      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, 'makeAnApplication');
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(
+        mockAccessToken,
+        validCaseRef,
+        'makeAnApplication',
+        undefined
+      );
     });
   });
 
