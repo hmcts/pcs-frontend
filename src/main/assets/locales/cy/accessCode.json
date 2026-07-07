@@ -9,5 +9,8 @@
     "label": "cyEnter your access code",
     "hint": "cyThis has 12 characters"
   },
-  "errorPrefix": "cyError:"
+  "errorPrefix": "cyError:",
+  "errors": {
+    "respondToClaimUnavailable": "cyYou cannot access a case to respond to a claim right now. Try again later."
+  }
 }

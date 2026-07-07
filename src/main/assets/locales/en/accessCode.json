@@ -9,5 +9,8 @@
     "label": "Enter your access code",
     "hint": "This has 12 characters"
   },
-  "errorPrefix": "Error:"
+  "errorPrefix": "Error:",
+  "errors": {
+    "respondToClaimUnavailable": "You cannot access a case to respond to a claim right now. Try again later."
+  }
 }
