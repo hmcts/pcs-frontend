@@ -1,12 +1,12 @@
 {
   "pageTitle": "Uwchlwytho dogfennau",
-  "heading": "cy Upload files (optional)",
-  "guidanceText": "cy Upload any files that you think are relevant to your response. The claimant will be able to see the files you upload.",
-  "beforeUploadHeading": "cy Before you upload your files",
-  "beforeUploadText": "cy Give your file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
-  "uploadLabel": "cy Upload a file",
-  "filesAddedHeading": "cy Files added",
-  "uploadButton": "cy Upload file",
+  "heading": "cy Upload additional documents (optional)",
+  "guidanceText": "cy Upload any documents that you think are relevant to the response. The claimant will be able to see any documents you upload.",
+  "beforeUploadHeading": "cy Before you upload your documents",
+  "beforeUploadText": "cy Give your document a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "cy Upload a document",
+  "filesAddedHeading": "cy Documents added",
+  "uploadButton": "cy Upload document",
   "deleteButton": "cy Remove",
-  "noFilesUploaded": "cy No files uploaded"
+  "noFilesUploaded": "cy No documents uploaded"
 }
