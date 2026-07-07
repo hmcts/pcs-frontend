@@ -2,7 +2,7 @@ import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps';
+import { getTranslation, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
 
@@ -37,6 +37,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               attributes: {
                 rows: 5,
               },
+              labelClasses: 'govuk-label--s',
             },
           },
         },
@@ -53,7 +54,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       introParagraph1: t('introParagraph1'),
-      introParagraph2: t('introParagraph2'),
+      introParagraph2: getTranslation(t, 'introParagraph2', '') ?? '',
       forExample: t('forExample'),
       bullet1: t('bullet1'),
       bullet2: t('bullet2'),

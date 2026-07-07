@@ -54,3 +54,28 @@ export function formatDateFromParts(day?: unknown, month?: unknown, year?: unkno
 
   return `${dayNumber} ${monthNames[monthNumber - 1]} ${yearNumber}`;
 }
+
+const getOrdinal = (value: number): string => {
+  if (value >= 11 && value <= 13) {
+    return 'th';
+  }
+
+  switch (value % 10) {
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
+  }
+};
+
+export function getCurrentFormattedDate(): string {
+  const date = new Date();
+  const day = date.getDate();
+  return `${day}${getOrdinal(day)} ${date.toLocaleString('en-GB', {
+    month: 'long',
+  })} ${date.getFullYear()}`;
+}

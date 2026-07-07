@@ -265,6 +265,7 @@ export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
+  dateIssued?: string;
   claimIssueDate?: string;
   dateSubmitted?: string;
   claimantName?: string;
@@ -300,6 +301,7 @@ export interface CcdCaseData {
   genApps?: CcdCollectionItem<GenApp>[];
   allClaimants?: CcdCollectionItem<CcdParty>[];
   allDefendants?: CcdCollectionItem<CcdParty>[];
+  allLinkedDefendants?: CcdCollectionItem<CcdDefendantParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
   uploadedAdditionalDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   // Populated by the uploadDocuments START handler (@JsonUnwrapped on PCSCase).
