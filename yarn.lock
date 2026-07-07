@@ -2164,7 +2164,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:0.220.0":
+"@opentelemetry/api-logs@npm:0.220.0, @opentelemetry/api-logs@npm:^0.220.0":
   version: 0.220.0
   resolution: "@opentelemetry/api-logs@npm:0.220.0"
   dependencies:
@@ -2714,16 +2714,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.67.0":
-  version: 0.67.0
-  resolution: "@opentelemetry/instrumentation-redis@npm:0.67.0"
+"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.68.0":
+  version: 0.68.0
+  resolution: "@opentelemetry/instrumentation-redis@npm:0.68.0"
   dependencies:
-    "@opentelemetry/instrumentation": "npm:^0.219.0"
+    "@opentelemetry/instrumentation": "npm:^0.220.0"
     "@opentelemetry/redis-common": "npm:^0.38.3"
     "@opentelemetry/semantic-conventions": "npm:^1.27.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/db946c5d4a372cb6a2f80ed7cff5654b97afb3d55b4e8680c133406ee710fec66c2e5e54002bf45e18444fad1418005bb6f93e3bd715f3e87acc258a4cf801e8
+  checksum: 10/11d13d553faf4626e0edec1578ab0a5e2033c688863bd7de6a8ccb451210342783e3d20a41df1faf690f88e81ca92f63f3e93ae5d306d401522e2a254ba84713
   languageName: node
   linkType: hard
 
@@ -2765,15 +2765,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-winston@npm:0.63.0":
-  version: 0.63.0
-  resolution: "@opentelemetry/instrumentation-winston@npm:0.63.0"
+"@opentelemetry/instrumentation-winston@npm:0.64.0":
+  version: 0.64.0
+  resolution: "@opentelemetry/instrumentation-winston@npm:0.64.0"
   dependencies:
-    "@opentelemetry/api-logs": "npm:^0.219.0"
-    "@opentelemetry/instrumentation": "npm:^0.219.0"
+    "@opentelemetry/api-logs": "npm:^0.220.0"
+    "@opentelemetry/instrumentation": "npm:^0.220.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/ade3e0f326a79526c55af4fb3d66d1e65056c468c79bb029a87c3e9ad5844d714b9b8fe252117920db15b080192a29e80920bb9f5b828b4cb5b4abdae6b2db37
+  checksum: 10/e01c664365ac5ca8dcfd66f22114ee659b791805c3837302f74e5dfe92233705d292259e54835d9fed496deb559bcb605998ce5c237cc05169136c7e94ba2dbb
   languageName: node
   linkType: hard
 
@@ -11789,7 +11789,7 @@ __metadata:
     "@launchdarkly/node-server-sdk": "npm:9.11.3"
     "@ministryofjustice/frontend": "npm:^9.0.0"
     "@opentelemetry/api": "npm:1.9.1"
-    "@opentelemetry/instrumentation-winston": "npm:0.63.0"
+    "@opentelemetry/instrumentation-winston": "npm:0.64.0"
     "@pact-foundation/pact": "npm:17.0.1"
     "@pact-foundation/pact-cli": "npm:18.1.1"
     "@playwright/test": "npm:1.61.1"
