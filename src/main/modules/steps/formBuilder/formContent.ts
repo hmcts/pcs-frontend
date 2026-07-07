@@ -5,11 +5,14 @@ import { type FormError, buildErrorSummary } from './errorUtils';
 import { buildFieldValues, translateFields } from './fieldTranslation';
 import { getTranslation } from './helpers';
 
+import { Logger } from '@modules/logger';
 import type {
   BuiltFormContent,
   FormFieldConfig,
   TranslationKeys,
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
+
+const logger = Logger.getLogger('form-builder-content');
 
 export function buildFormContent(
   fields: FormFieldConfig[],
@@ -52,7 +55,14 @@ export function buildFormContent(
   if (translationKeys) {
     for (const [key, value] of Object.entries(translationKeys)) {
       if (value) {
-        translatedContent[key] = interpolation ? t(value, interpolation) : t(value);
+        const translated = getTranslation(t, value, undefined, interpolation);
+        if (translated !== undefined) {
+          translatedContent[key] = translated;
+        } else {
+          logger.warn(
+            `Missing translation for form content key "${key}" using translation key "${value}". Key will be omitted from template context.`
+          );
+        }
       }
     }
   }

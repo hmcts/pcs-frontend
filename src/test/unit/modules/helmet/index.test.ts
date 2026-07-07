@@ -42,6 +42,9 @@ describe('Helmet Module', () => {
         if (key === 'oidc.issuer') {
           return 'https://idam.example.com/oauth2';
         }
+        if (key === 'redirects.manageCaseReturnURL') {
+          return 'https://manage.example.com/return';
+        }
         return undefined;
       });
 
@@ -58,7 +61,7 @@ describe('Helmet Module', () => {
             scriptSrc: ["'self'", '*.google-analytics.com', "'unsafe-eval'", "'unsafe-inline'"],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://pcq.example.com', 'https://idam.example.com'],
+            formAction: ["'self'", 'https://pcq.example.com', 'https://idam.example.com', 'https://manage.example.com'],
           },
         },
         referrerPolicy: { policy: 'origin' },
@@ -72,6 +75,9 @@ describe('Helmet Module', () => {
         if (key === 'oidc.issuer') {
           return 'https://idam.example.com/oauth2';
         }
+        if (key === 'redirects.manageCaseReturnURL') {
+          return 'https://manage.example.com/return';
+        }
         return undefined;
       });
 
@@ -88,7 +94,7 @@ describe('Helmet Module', () => {
             scriptSrc: ["'self'", '*.google-analytics.com', "'unsafe-eval'", "'unsafe-inline'"],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://idam.example.com'],
+            formAction: ["'self'", 'https://idam.example.com', 'https://manage.example.com'],
           },
         },
         referrerPolicy: { policy: 'origin' },
@@ -101,10 +107,30 @@ describe('Helmet Module', () => {
         if (key === 'pcq.url') {
           return 'https://pcq.example.com';
         }
+        if (key === 'redirects.manageCaseReturnURL') {
+          return 'https://manage.example.com/return';
+        }
         return undefined;
       });
 
       // This should throw an error when trying to create a URL from undefined
+      expect(() => {
+        helmetInstance.enableFor(mockApp);
+      }).toThrow('Invalid URL');
+    });
+
+    it('should throw when manage case return URL is missing in development mode', () => {
+      const helmetInstance = new Helmet(true);
+      mockConfigGet.mockImplementation((key: string) => {
+        if (key === 'pcq.url') {
+          return 'https://pcq.example.com';
+        }
+        if (key === 'oidc.issuer') {
+          return 'https://idam.example.com/oauth2';
+        }
+        return undefined;
+      });
+
       expect(() => {
         helmetInstance.enableFor(mockApp);
       }).toThrow('Invalid URL');
@@ -131,35 +157,8 @@ describe('Helmet Module', () => {
         if (key === 'oidc.issuer') {
           return 'https://idam.example.com/oauth2';
         }
-        return undefined;
-      });
-
-      helmetInstance.enableFor(mockApp);
-
-      expect(helmet).toHaveBeenCalledWith({
-        contentSecurityPolicy: {
-          directives: {
-            connectSrc: ["'self'"],
-            defaultSrc: ["'none'"],
-            fontSrc: ["'self'", 'data:'],
-            imgSrc: ["'self'", '*.google-analytics.com'],
-            objectSrc: ["'self'"],
-            scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
-            styleSrc: ["'self'"],
-            manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://pcq.example.com', 'https://idam.example.com'],
-          },
-        },
-        referrerPolicy: { policy: 'origin' },
-      });
-      expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function));
-    });
-
-    it('should handle missing PCQ URL in production mode', () => {
-      const helmetInstance = new Helmet(false);
-      mockConfigGet.mockImplementation((key: string) => {
-        if (key === 'oidc.issuer') {
-          return 'https://idam.example.com/oauth2';
+        if (key === 'redirects.manageCaseReturnURL') {
+          return 'https://manage.example.com/return';
         }
         return undefined;
       });
@@ -177,7 +176,40 @@ describe('Helmet Module', () => {
             scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://idam.example.com'],
+            formAction: ["'self'", 'https://pcq.example.com', 'https://idam.example.com', 'https://manage.example.com'],
+          },
+        },
+        referrerPolicy: { policy: 'origin' },
+      });
+      expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    it('should handle missing PCQ URL in production mode', () => {
+      const helmetInstance = new Helmet(false);
+      mockConfigGet.mockImplementation((key: string) => {
+        if (key === 'oidc.issuer') {
+          return 'https://idam.example.com/oauth2';
+        }
+        if (key === 'redirects.manageCaseReturnURL') {
+          return 'https://manage.example.com/return';
+        }
+        return undefined;
+      });
+
+      helmetInstance.enableFor(mockApp);
+
+      expect(helmet).toHaveBeenCalledWith({
+        contentSecurityPolicy: {
+          directives: {
+            connectSrc: ["'self'"],
+            defaultSrc: ["'none'"],
+            fontSrc: ["'self'", 'data:'],
+            imgSrc: ["'self'", '*.google-analytics.com'],
+            objectSrc: ["'self'"],
+            scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
+            styleSrc: ["'self'"],
+            manifestSrc: ["'self'"],
+            formAction: ["'self'", 'https://idam.example.com', 'https://manage.example.com'],
           },
         },
         referrerPolicy: { policy: 'origin' },
@@ -194,6 +226,23 @@ describe('Helmet Module', () => {
       });
 
       // This should throw an error when trying to create a URL from undefined
+      expect(() => {
+        helmetInstance.enableFor(mockApp);
+      }).toThrow('Invalid URL');
+    });
+
+    it('should throw when manage case return URL is missing in production mode', () => {
+      const helmetInstance = new Helmet(false);
+      mockConfigGet.mockImplementation((key: string) => {
+        if (key === 'pcq.url') {
+          return 'https://pcq.example.com';
+        }
+        if (key === 'oidc.issuer') {
+          return 'https://idam.example.com/oauth2';
+        }
+        return undefined;
+      });
+
       expect(() => {
         helmetInstance.enableFor(mockApp);
       }).toThrow('Invalid URL');
@@ -231,6 +280,9 @@ describe('Helmet Module', () => {
         if (key === 'oidc.issuer') {
           return 'https://idam.example.com/oauth2';
         }
+        if (key === 'redirects.manageCaseReturnURL') {
+          return 'https://manage.example.com/return';
+        }
         return undefined;
       });
 
@@ -247,7 +299,7 @@ describe('Helmet Module', () => {
             scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://idam.example.com'],
+            formAction: ["'self'", 'https://idam.example.com', 'https://manage.example.com'],
           },
         },
         referrerPolicy: { policy: 'origin' },
