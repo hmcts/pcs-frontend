@@ -204,6 +204,7 @@ export interface CcdCollectionItem<T> {
 
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
+  propertyAddressConfirmation?: YesNoValue;
   tenancyTypeConfirmation?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
@@ -235,7 +236,9 @@ export interface CcdDefendantResponses {
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
   statementOfTruth?: StatementOfTruth;
+  hasSolicitor?: YesNoValue;
   counterClaimWantToUploadFiles?: YesNoValue;
+  statementOfTruthCompletedBy?: string;
   completedSections?: RespondToClaimSectionEnum[];
   status?: 'SUBMITTED' | 'CREATED';
 }
@@ -249,25 +252,31 @@ export interface StatementOfTruth {
 
 export interface PossessionClaimResponse {
   claimantOrganisations?: CcdClaimantOrganisation[];
+  claimantName?: string;
+  claimantServiceAddress?: CcdCaseAddress;
   defendantContactDetails?: {
     party?: CcdDefendantParty;
   };
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
+  claimIssuedDate?: string;
 }
 
 export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
+  dateIssued?: string;
   claimIssueDate?: string;
+  dateSubmitted?: string;
   claimantName?: string;
   isClaimantNameCorrect?: YesNoValue;
   overriddenClaimantName?: string;
   defendantName?: string;
   defendantAddress?: string;
   rentArrears_Total?: string;
+  isExemptLandlord?: YesNoValue;
   introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
   secureGroundsWales_DiscretionaryGrounds?: string[];
   noticeServed?: string;
@@ -278,12 +287,12 @@ export interface CcdCaseData {
   userPcqIdSet?: string;
   tenancy_TenancyLicenceDate?: string;
   legislativeCountry?: string;
-  notice_NoticeHandedOverDateTime?: string;
-  notice_NoticePostedDate?: string;
-  notice_NoticeDeliveredDate?: string;
-  notice_NoticeEmailSentDateTime?: string;
-  notice_NoticeOtherElectronicDateTime?: string;
-  notice_NoticeOtherDateTime?: string;
+  notice_HandedOverDateTime?: string;
+  notice_PostedDate?: string;
+  notice_DeliveredDate?: string;
+  notice_EmailSentDateTime?: string;
+  notice_OtherElectronicDateTime?: string;
+  notice_OtherDateTime?: string;
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
@@ -296,6 +305,11 @@ export interface CcdCaseData {
   allDefendants?: CcdCollectionItem<CcdParty>[];
   allLinkedDefendants?: CcdCollectionItem<CcdDefendantParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
+  uploadedAdditionalDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
+  // Populated by the uploadDocuments START handler (@JsonUnwrapped on PCSCase).
+  showRelatedApplicationsPage?: YesNoValue;
+  relatedApplicationOptions?: CcdCollectionItem<RelatedApplicationOption>[];
+  selectedRelatedApplicationId?: string;
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
   applicantSurname?: string;
@@ -310,10 +324,27 @@ export interface CcdCaseDocument {
   category_id?: string;
 }
 
+export type DocumentUploadCategoryCode =
+  | 'ADJOURN_HEARING_APPLICATION'
+  | 'SUSPEND_EVICTION_APPLICATION'
+  | 'SET_ASIDE_ORDER_APPLICATION'
+  | 'GENERAL_APPLICATION'
+  | 'MAIN_CLAIM_OR_COUNTERCLAIM';
+
+export interface RelatedApplicationOption {
+  genAppId?: string;
+  category: DocumentUploadCategoryCode;
+  submittedDate?: string;
+}
+
 /** Case representation used by services: id + case_data. */
 export interface CcdCase {
   id: string;
   data: CcdCaseData;
+  after_submit_callback_response?: {
+    confirmation_header?: string | null;
+    confirmation_body?: string | null;
+  };
 }
 
 /** Links object in CCD START callback response. */
@@ -414,4 +445,15 @@ export interface ClaimSummary {
   caseReference?: string;
   claimantName?: string;
   propertyPostcode?: string;
+}
+
+export enum GenAppState {
+  PENDING_GEN_APP_ISSUED = 'PENDING_GEN_APP_ISSUED',
+  GEN_APP_ISSUED = 'GEN_APP_ISSUED',
+}
+
+export interface MakeAnApplicationResponse {
+  state?: GenAppState;
+  serviceRequestReference?: string;
+  feeAmount?: number;
 }

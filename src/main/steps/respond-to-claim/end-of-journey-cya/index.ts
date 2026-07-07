@@ -2,6 +2,11 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY,
+  getEndOfJourneyCyaSubmitErrorPath,
+  submitRespondToClaimResponse,
+} from '../../utils/respondToClaimFinalSubmit';
 import { createRespondToClaimFormStep } from '../formStep';
 import { sectionIdToBackendEnum } from '../sections.config';
 
@@ -11,7 +16,7 @@ import { getTranslationFunction, loadStepNamespaces } from '@modules/steps';
 import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { safeRedirect307 } from '@utils/safeRedirect';
+// import { safeRedirect307 } from '@utils/safeRedirect';
 
 const STEP_NAME = 'end-of-journey-cya';
 
@@ -133,6 +138,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     if (req.query.submitError !== 'failed') {
+      return { sections, submitDisabled };
       return { sections, submitDisabled, isLegalRepresentative };
     }
 
@@ -179,10 +185,28 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, draft);
 
     const caseId = req.res?.locals.validatedCase?.id;
-    if (caseId && req.res) {
-      safeRedirect307(req.res, `/case/${caseId}/final-submit`, `/case/${caseId}/respond-to-claim/end-of-journey-cya`, [
-        '/case',
-      ]);
+    if (!caseId) {
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaSubmitErrorPath(
+        String(req.params?.caseReference ?? '')
+      );
+      return;
     }
+    // if (caseId && req.res) {
+    //   safeRedirect307(req.res, `/case/${caseId}/final-submit`, `/case/${caseId}/respond-to-claim/end-of-journey-cya`, [
+    //     '/case',
+    //   ]);
+    // }
+
+    try {
+      const { confirmationPath } = await submitRespondToClaimResponse(req);
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = confirmationPath;
+    } catch {
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaSubmitErrorPath(caseId);
+    }
+  },
+  resolveRedirectAfterPost: async (req: Request) => {
+    const redirectPath = req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] as string | undefined;
+    delete req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY];
+    return redirectPath;
   },
 });

@@ -16,7 +16,6 @@ export async function counterclaimYouNeedToApplyForHelpWithYourFeesNavigationTes
     counterclaimYouNeedToApplyForHelpWithYourFees.backLink,
     counterClaimHaveYouAppliedForHelp.mainHeader
   );
-
   await performValidation(
     'pageNavigation',
     counterclaimYouNeedToApplyForHelpWithYourFees.saveForLaterButton,

@@ -31,13 +31,13 @@ export type EndOfJourneyCyaSection = {
 };
 
 export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJourneyCyaSection[] {
-  const tStartNow = getTranslationFunction(req, 'checkYourAnswersStartNowAndDetails');
-  const tPersonal = getTranslationFunction(req, 'checkYourAnswersPersonalDetails');
-  const tResponse = getTranslationFunction(req, 'checkYourAnswersYourResponse');
-  const tPayments = getTranslationFunction(req, 'checkYourAnswersPaymentsAndAgreements');
-  const tCircumstances = getTranslationFunction(req, 'checkYourAnswersYourCircumstances');
-  const tIncome = getTranslationFunction(req, 'checkYourAnswersIncomeAndExpenses');
-  const tDocuments = getTranslationFunction(req, 'checkYourAnswersDocuments');
+  const tStartNow = getTranslationFunction(req, ['checkYourAnswersStartNowAndDetails', 'common']);
+  const tPersonal = getTranslationFunction(req, ['checkYourAnswersPersonalDetails', 'common']);
+  const tResponse = getTranslationFunction(req, ['checkYourAnswersYourResponse', 'common']);
+  const tPayments = getTranslationFunction(req, ['checkYourAnswersPaymentsAndAgreements', 'common']);
+  const tCircumstances = getTranslationFunction(req, ['checkYourAnswersYourCircumstances', 'common']);
+  const tIncome = getTranslationFunction(req, ['checkYourAnswersIncomeAndExpenses', 'common']);
+  const tDocuments = getTranslationFunction(req, ['endOfJourneyCya', 'checkYourAnswersDocuments', 'common']);
 
   const claimantName = getValidatedCase(req)?.claimantName ?? '';
   const sections: EndOfJourneyCyaSection[] = [];

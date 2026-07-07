@@ -1,32 +1,32 @@
 {
-  "pageTitle": "cyChoose an application",
-  "caption": "cyMake an application",
-  "heading": "cyChoose an application",
-  "noticeText": "cyYou cannot apply to suspend (stop or delay) the eviction online.",
-  "noticeTextByPost": "cyYou must apply by post: ",
+  "pageTitle": "Dewis cais",
+  "caption": "Gwneud cais",
+  "heading": "Dewis cais",
+  "noticeText": "Ni allwch wneud cais i atal (stopio neu ohirio) y troi allan ar-lein.",
+  "noticeTextByPost": "Rhaid i chi wneud cais drwy'r post:",
   "noticeTextList": {
     "readTheGuidance": "<a href=\"https://www.gov.uk/repossession/delay-eviction\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">cyRead the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)</a>",
     "fillInTheForm": "<a href=\"https://www.gov.uk/government/publications/form-n244-application-notice\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">cyFill in the N244a form</a>",
     "findYourLocalCourt": "<a href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">cyFind your local court</a>",
-    "sendTheFormToTheCourt": "cySend the completed form to the court, or deliver it by hand"
+    "sendTheFormToTheCourt": "Anfonwch y ffurflen wedi’i llenwi i’r llys, neu ei danfon â llaw"
   },
-  "question": "cyWhat do you want to apply for?",
-  "hintText": "cySome optional hint text here (placeholder)",
+  "question": "Beth ydych chi eisiau gwneud cais amdano?",
+  "hintText": "Rhywfaint o destun awgrymog dewisol yma (deiliad lle)",
   "options": {
     "adjourn": {
-      "label": "cyAsk to adjourn the hearing (move it to a later time or date)",
-      "hint": "cyYou can apply to change the court hearing until a later time or date"
+      "label": "Gofyn i ohirio'r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
+      "hint": "Gallwch wneud cais i newid y gwrandawiad llys i amser neu ddyddiad diweddarach"
     },
     "setAside": {
-      "label": "cyAsk the court to set aside (cancel) a decision the court has made",
-      "hint": "cyYou can ask the court to set aside its order if you have good reason. For example, if you were unable to attend the court hearing because you were ill"
+      "label": "Gofyn i'r llys roi penderfyniad a wnaed gan y llys o'r neilltu (canslo)",
+      "hint": "Gallwch ofyn i'r llys roi ei orchymyn o'r neilltu os oes gennych reswm da. Er enghraifft, os nad oeddech yn gallu mynychu'r gwrandawiad llys oherwydd eich bod yn sâl."
     },
     "somethingElse": {
-      "label": "cySomething else",
-      "hint": "cyMake an application for something that is not listed above"
+      "label": "Rhywbeth arall",
+      "hint": "Gwneud cais am rywbeth na restrwyd uchod"
     }
   },
   "errors": {
-    "typeOfApplication": "cyChoose what you want to apply for"
+    "typeOfApplication": "Dewiswch beth rydych eisiau gwneud cais amdano"
   }
 }

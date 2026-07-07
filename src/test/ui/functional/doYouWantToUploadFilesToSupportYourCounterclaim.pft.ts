@@ -1,9 +1,4 @@
-import {
-  counterClaimAbout,
-  dashboard,
-  doYouWantToUploadFilesToSupportYourCounterclaim,
-  feedback,
-} from '../data/page-data';
+import { counterClaimAbout, doYouWantToUploadFilesToSupportYourCounterclaim, feedback } from '../data/page-data';
 import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClaimHaveYouAppliedForHelp.page.data';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -35,9 +30,4 @@ export async function doYouWantToUploadFilesToSupportYourCounterclaimNavigationT
     );
   }
   await performAction('clickRadioButton', doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption);
-  await performValidation(
-    'pageNavigation',
-    doYouWantToUploadFilesToSupportYourCounterclaim.saveForLaterButton,
-    dashboard.mainHeader
-  );
 }

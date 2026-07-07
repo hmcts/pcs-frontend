@@ -38,6 +38,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               attributes: {
                 rows: 5,
               },
+              labelClasses: 'govuk-label--s',
             },
           },
         },

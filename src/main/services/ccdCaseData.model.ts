@@ -5,6 +5,7 @@ import {
   CcdClaimGroundSummaryItem,
   CcdClaimantEnteredDefendantDetails,
   CcdCollectionItem,
+  CcdCounterClaim,
   CcdDefendantParty,
   CcdDefendantResponses,
   PossessionClaimResponse,
@@ -28,8 +29,8 @@ export class CcdCaseModel {
     return this.validatedCase.id ?? '';
   }
 
-  get claimIssueDate(): string {
-    return this.data.claimIssueDate ?? '';
+  get dateIssued(): Date | undefined {
+    return this.data.dateIssued ? new Date(this.data.dateIssued) : undefined;
   }
 
   get defendantName(): string {
@@ -72,28 +73,28 @@ export class CcdCaseModel {
     return this.data.legislativeCountry;
   }
 
-  get notice_NoticeHandedOverDateTime(): string | undefined {
-    return this.data.notice_NoticeHandedOverDateTime;
+  get notice_HandedOverDateTime(): string | undefined {
+    return this.data.notice_HandedOverDateTime;
   }
 
-  get notice_NoticePostedDate(): string | undefined {
-    return this.data.notice_NoticePostedDate;
+  get notice_PostedDate(): string | undefined {
+    return this.data.notice_PostedDate;
   }
 
-  get notice_NoticeOtherElectronicDateTime(): string | undefined {
-    return this.data.notice_NoticeOtherElectronicDateTime;
+  get notice_OtherElectronicDateTime(): string | undefined {
+    return this.data.notice_OtherElectronicDateTime;
   }
 
-  get notice_NoticeDeliveredDate(): string | undefined {
-    return this.data.notice_NoticeDeliveredDate;
+  get notice_DeliveredDate(): string | undefined {
+    return this.data.notice_DeliveredDate;
   }
 
-  get notice_NoticeEmailSentDateTime(): string | undefined {
-    return this.data.notice_NoticeEmailSentDateTime;
+  get notice_EmailSentDateTime(): string | undefined {
+    return this.data.notice_EmailSentDateTime;
   }
 
-  get notice_NoticeOtherDateTime(): string | undefined {
-    return this.data.notice_NoticeOtherDateTime;
+  get notice_OtherDateTime(): string | undefined {
+    return this.data.notice_OtherDateTime;
   }
 
   get tenancy_TypeOfTenancyLicence(): string | undefined {
@@ -259,6 +260,10 @@ export class CcdCaseModel {
     return this.defendantResponses?.counterClaimWantToUploadFiles ?? undefined;
   }
 
+  get defendantResponsesCounterClaim(): CcdCounterClaim | undefined {
+    return this.defendantResponses?.counterClaim ?? undefined;
+  }
+
   get introGroundsIntroductoryDemotedOrOtherGrounds(): string[] {
     return this.data.introGrounds_IntroductoryDemotedOrOtherGrounds ?? [];
   }
@@ -301,12 +306,12 @@ export class CcdCaseModel {
 
   get noticeDate(): string | undefined {
     const populatedNoticeField = [
-      this.notice_NoticePostedDate,
-      this.notice_NoticeDeliveredDate,
-      this.notice_NoticeHandedOverDateTime,
-      this.notice_NoticeEmailSentDateTime,
-      this.notice_NoticeOtherElectronicDateTime,
-      this.notice_NoticeOtherDateTime,
+      this.notice_PostedDate,
+      this.notice_DeliveredDate,
+      this.notice_HandedOverDateTime,
+      this.notice_EmailSentDateTime,
+      this.notice_OtherElectronicDateTime,
+      this.notice_OtherDateTime,
     ].find(Boolean);
 
     return populatedNoticeField?.slice(0, 10);

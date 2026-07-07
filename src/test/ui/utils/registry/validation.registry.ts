@@ -13,8 +13,10 @@ import {
   MainHeaderValidation,
   OptionListValidation,
   RadioButtonValidation,
+  SummaryListValueValidation,
   TextValidation,
   ValidateDocumentUnderSectionValidation,
+  viewClaimOrResponseTableValidation,
 } from '../validations/element-validations';
 
 export class ValidationRegistry {
@@ -23,6 +25,7 @@ export class ValidationRegistry {
     ['textNotVisible', new TextValidation()],
     ['bannerAlert', new BannerAlertValidation()],
     ['formLabelValue', new FormLabelValueValidation()],
+    ['summaryListValue', new SummaryListValueValidation()],
     ['optionList', new OptionListValidation()],
     ['mainHeader', new MainHeaderValidation()],
     ['errorMessage', new ErrorMessageValidation()],
@@ -35,6 +38,7 @@ export class ValidationRegistry {
     ['pageNavigation', new PageNavigationValidation()],
     ['inputTextValue', new InputTextValueValidation()],
     ['validateDocumentUnderSection', new ValidateDocumentUnderSectionValidation()],
+    ['viewClaimOrResponseTable', new viewClaimOrResponseTableValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {

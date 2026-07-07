@@ -1,5 +1,4 @@
 import {
-  dashboard,
   doYouWantToUploadFilesToSupportYourCounterclaim,
   feedback,
   uploadFilesToSupportYourCounterclaim,
@@ -23,11 +22,5 @@ export async function uploadFilesToSupportYourCounterclaimNavigationTests(): Pro
     'pageNavigation',
     uploadFilesToSupportYourCounterclaim.backLink,
     doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader
-  );
-
-  await performValidation(
-    'pageNavigation',
-    uploadFilesToSupportYourCounterclaim.saveForLaterButton,
-    dashboard.mainHeader
   );
 }

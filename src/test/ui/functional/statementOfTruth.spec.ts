@@ -1,4 +1,3 @@
-
 import { expect } from '@playwright/test';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';

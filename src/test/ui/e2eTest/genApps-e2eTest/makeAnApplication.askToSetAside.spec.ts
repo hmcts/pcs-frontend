@@ -8,6 +8,7 @@ import {
   doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
+  paymentDetails,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
@@ -24,6 +25,7 @@ test.beforeEach(async ({ page }) => {
   FieldsStore.clear();
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -94,6 +96,32 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
+    await performAction('payForApplication');
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputPaymentDetails', {
+      question: paymentDetails.mainHeader,
+      cardNumberLabel: paymentDetails.cardNumberTextLabel,
+      cardNumber: paymentDetails.cardNumberTextInput,
+      monthLabel: paymentDetails.monthTextLabel,
+      month: paymentDetails.monthTextInput,
+      yearLabel: paymentDetails.yearTextLabel,
+      year: paymentDetails.yearTextInput,
+      nameOnCardLabel: paymentDetails.nameOnCardTextLabel,
+      nameOnCard: paymentDetails.nameOnCardTextInput,
+      cardSecurityCodeLabel: paymentDetails.cardSecurityCodeTextLabel,
+      cardSecurityCode: paymentDetails.cardSecurityCodeTextInput,
+      addressLine1Label: paymentDetails.addressLine1TextLabel,
+      addressLine1: paymentDetails.addressLine1TextInput,
+      townOrCityLabel: paymentDetails.townOrCityTextLabel,
+      townOrCity: paymentDetails.townOrCityTextInput,
+      postcodeLabel: paymentDetails.postcodeTextLabel,
+      postcode: paymentDetails.postcodeTextInput,
+      emailLabel: paymentDetails.emailTextLabel,
+      email: paymentDetails.emailTextInput,
+    });
+    await performAction('confirmPayment');
+    await performAction('verifyApplicationSubmitted');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Select an Application - Ask to Set aside - You need to apply for application fee', async () => {

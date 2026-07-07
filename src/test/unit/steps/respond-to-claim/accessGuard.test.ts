@@ -262,4 +262,33 @@ describe('respondToClaimAccessGuard', () => {
     await respondToClaimAccessGuard()(req, res, next);
     expect(res.redirect).toHaveBeenCalledWith(303, expect.stringContaining(`/${flowConfig.hubStepName}`));
   });
+
+  describe('solicitor screens (startNowAndDetails)', () => {
+    it('redirects a directly-typed solicitor URL to the section first visible step', async () => {
+      mockGetFirstVisibleStep.mockReturnValue('start-now');
+      const req = makeReq({ path: '/case/123/respond-to-claim/solicitor' });
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/start-now');
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('redirects ask-your-solicitor to hub when its showCondition is false (no solicitor)', async () => {
+      mockShouldShowStep.mockReturnValue(false);
+      const req = makeReq({ path: '/case/123/respond-to-claim/ask-your-solicitor-to-respond-to-the-claim' });
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/task-list');
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('passes through a solicitor step reached via internal navigation (?nav=1)', async () => {
+      mockGetFirstVisibleStep.mockReturnValue('start-now');
+      const req = makeReq({ path: '/case/123/respond-to-claim/solicitor', query: { nav: '1' } });
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(res.redirect).not.toHaveBeenCalled();
+    });
+  });
 });
