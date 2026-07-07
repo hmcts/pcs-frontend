@@ -3,7 +3,7 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../u
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps';
+import { getTranslation, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
 
@@ -79,7 +79,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const t = getTranslationFunction(req);
 
     return {
-      paragraph1: t('paragraph1', { claimantName }),
+      paragraph1: getTranslation(t, 'paragraph1', '', { claimantName }) ?? '',
     };
   },
 });

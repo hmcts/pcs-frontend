@@ -39,6 +39,8 @@ export class TextValidation implements IValidation {
       case 'taskListStatus':
         data.elementType = `li:has(a:has-text("${fieldName}")) .govuk-tag`;
         break;
+      case 'legend':
+        data.elementType = 'legend';
     }
     const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
     if (validation === 'textNotVisible') {
