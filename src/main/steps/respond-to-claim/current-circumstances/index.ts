@@ -13,6 +13,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
+    circumstanceQuestion: 'circumstanceQuestion',
   },
   fields: [
     {
@@ -37,6 +38,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               attributes: {
                 rows: 5,
               },
+              labelClasses: 'govuk-label--s',
             },
           },
         },

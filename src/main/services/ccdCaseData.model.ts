@@ -4,6 +4,8 @@ import {
   CcdCaseData,
   CcdClaimGroundSummaryItem,
   CcdClaimantEnteredDefendantDetails,
+  CcdCollectionItem,
+  CcdCounterClaim,
   CcdDefendantParty,
   CcdDefendantResponses,
   PossessionClaimResponse,
@@ -27,8 +29,8 @@ export class CcdCaseModel {
     return this.validatedCase.id ?? '';
   }
 
-  get claimIssueDate(): string {
-    return this.data.claimIssueDate ?? '';
+  get dateIssued(): Date | undefined {
+    return this.data.dateIssued ? new Date(this.data.dateIssued) : undefined;
   }
 
   get defendantName(): string {
@@ -143,6 +145,10 @@ export class CcdCaseModel {
       return this.data.claimantName.trim();
     }
 
+    return this.orgName;
+  }
+
+  get orgName(): string {
     return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
   }
 
@@ -254,6 +260,10 @@ export class CcdCaseModel {
     return this.defendantResponses?.counterClaimWantToUploadFiles ?? undefined;
   }
 
+  get defendantResponsesCounterClaim(): CcdCounterClaim | undefined {
+    return this.defendantResponses?.counterClaim ?? undefined;
+  }
+
   get introGroundsIntroductoryDemotedOrOtherGrounds(): string[] {
     return this.data.introGrounds_IntroductoryDemotedOrOtherGrounds ?? [];
   }
@@ -305,5 +315,9 @@ export class CcdCaseModel {
     ].find(Boolean);
 
     return populatedNoticeField?.slice(0, 10);
+  }
+
+  get allLinkedDefendants(): CcdCollectionItem<CcdDefendantParty>[] | undefined {
+    return this.data.allLinkedDefendants;
   }
 }

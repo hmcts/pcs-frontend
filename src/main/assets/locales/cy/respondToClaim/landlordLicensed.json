@@ -1,15 +1,14 @@
 {
-  "pageTitle": "cyLicensed landlord",
-  "paragraph": "cyYou can check if your landlord is licensed by searching the <a href=\"https://rentsmart.gov.wales/en/check-register/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Public Register (opens in new tab)</a>.",
-  "question": "cyIs your landlord licensed?",
-
+  "pageTitle": "Landlord trwyddedig",
+  "paragraph": "Gallwch wirio a yw eich landlord wedi'i drwyddedu drwy chwilio'r <a href=\"https://rentsmart.gov.wales/en/check-register/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Gofrestr Gyhoeddus (yn agor mewn tab newydd)</a>.",
+  "question": "A yw eich landlord wedi'i drwyddedu?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "or": "cyor",
-    "imNotSure": "cyI’m not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "imNotSure": "Nid wyf yn siŵr"
   },
   "errors": {
-    "confirmLandlordLicensed": "cySelect if you agree with the landlord’s claim to be licensed"
+    "confirmLandlordLicensed": "Dewiswch a ydych yn cytuno â hawliad y landlord iddo gael ei drwyddedu"
   }
 }

@@ -1,9 +1,10 @@
 import { Page, expect } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
-import { dashboard } from '../../../data/page-data';
+import { dashboard, viewTheResponse } from '../../../data/page-data';
 import { viewAllApplications } from '../../../data/page-data/genApps-page-data';
-import { performAction, performValidation } from '../../controller';
+import { viewTheClaim } from '../../../data/page-data/theClaim-page-data';
+import { performAction, performValidation, performValidations } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
@@ -20,6 +21,8 @@ export class CitizenDashboardAction implements IAction {
         () => this.verifyNavigationFromNotificationLink(page, fieldName as actionRecord),
       ],
       ['validateViewAllApplications', () => this.validateViewAllApplications()],
+      ['verifyResponseDetailsOnViewTheResponsePage', () => this.verifyResponseDetailsOnViewTheResponsePage()],
+      ['verifyClaimDetailsOnViewTheClaimPage', () => this.verifyClaimDetailsOnViewTheClaimPage()],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -116,5 +119,79 @@ export class CitizenDashboardAction implements IAction {
       elementType: 'paragraph',
       text: 'Submitted on ' + viewAllApplications.getSubmittedDate(),
     });
+  }
+
+  private async verifyResponseDetailsOnViewTheResponsePage() {
+    await performValidations(
+      'View the response page validation',
+      ['viewClaimOrResponseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails],
+      // The line below will be commented until the bug HDPI-7360 gets fixed
+      //['viewClaimOrResponseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
+      [
+        'viewClaimOrResponseTable',
+        viewTheResponse.additionalDefendant1DynamicSubHeader,
+        viewTheResponse.additionalDefendant1Details,
+      ],
+      [
+        'viewClaimOrResponseTable',
+        viewTheResponse.additionalDefendant2DynamicSubHeader,
+        viewTheResponse.additionalDefendant2Details,
+      ],
+      ['viewClaimOrResponseTable', viewTheResponse.responseToClaimSubHeader, viewTheResponse.responseToClaimDetails],
+      [
+        'viewClaimOrResponseTable',
+        viewTheResponse.paymentsOrAgreementsSubHeader,
+        viewTheResponse.paymentsOrAgreementsDetails,
+      ],
+      ['viewClaimOrResponseTable', viewTheResponse.yourHouseholdSubHeader, viewTheResponse.yourHouseholdDetails],
+      ['viewClaimOrResponseTable', viewTheResponse.regularIncomeSubHeader, viewTheResponse.regularIncomeDetails],
+      ['viewClaimOrResponseTable', viewTheResponse.priorityDebtsSubHeader, viewTheResponse.priorityDebtsDetails],
+      ['viewClaimOrResponseTable', viewTheResponse.regularExpensesSubHeader, viewTheResponse.regularExpensesDetails],
+      [
+        'viewClaimOrResponseTable',
+        viewTheResponse.additionalInformationSubHeader,
+        viewTheResponse.additionalInformationDetails,
+      ],
+      ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
+    );
+  }
+
+  private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
+    await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.possessionClaimParagraph });
+    await performValidations(
+      'View the claim page validation',
+      ['viewClaimOrResponseTable', viewTheClaim.claimantDetailsSubHeader, viewTheClaim.claimantDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.defendant1SubHeader, viewTheClaim.defendant1Details],
+      [
+        'viewClaimOrResponseTable',
+        viewTheClaim.additionalDefendant1SubHeader,
+        viewTheClaim.additionalDefendant1Details,
+      ],
+      [
+        'viewClaimOrResponseTable',
+        viewTheClaim.additionalDefendant2SubHeader,
+        viewTheClaim.additionalDefendant2Details,
+      ],
+      ['viewClaimOrResponseTable', viewTheClaim.claimDetailsSubHeader, viewTheClaim.claimDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.rentArrearsSubHeader, viewTheClaim.rentArrearsDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.actionTakenSubHeader, viewTheClaim.actionTakenDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.noticeDetailsSubHeader, viewTheClaim.noticeDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.tenancyDetailsSubHeader, viewTheClaim.tenancyDetails],
+      [
+        'viewClaimOrResponseTable',
+        viewTheClaim.claimantCircumstancesSubHeader,
+        viewTheClaim.claimantCircumstancesDetails,
+      ],
+      [
+        'viewClaimOrResponseTable',
+        viewTheClaim.defendantCircumstancesSubHeader,
+        viewTheClaim.defendantCircumstancesDetails,
+      ],
+      ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails]
+      //['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
+    );
+    //await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
+    await performValidation('text', { elementType: 'link', text: viewTheClaim.claimPDFLink });
+    await performAction('clickButton', viewTheClaim.closeAndReturnButton);
   }
 }

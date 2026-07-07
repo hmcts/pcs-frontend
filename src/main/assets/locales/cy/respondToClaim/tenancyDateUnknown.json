@@ -1,19 +1,19 @@
 {
-  "pageTitle": "cyRental agreement start",
-  "heading": "cyTenancy, occupation contract or licence start date",
-  "question": "cyWhen did your tenancy, occupation contract or licence start (optional)?",
-  "hint": "cyFor example, 27 9 2022",
-  "paragraph": "cy{{claimantName}} did not provide the start date of your tenancy, occupation contract or licence.",
+  "pageTitle": "Dechrau cytundeb rhent",
+  "heading": "Dyddiad dechrau tenantiaeth, contract meddiannaeth neu drwydded",
+  "question": "Pryd wnaeth eich tenantiaeth, contract meddiannaeth neu drwydded ddechrau (dewisol)?",
+  "hint": "Er enghraifft, 27 9 2022",
+  "paragraph": "Ni wnaeth {{claimantName}} ddarparu dyddiad dechrau eich tenantiaeth, contract meddiannaeth neu drwydded.",
   "errors": {
     "date": {
-      "day": "cyDay",
-      "month": "cyMonth",
-      "year": "cyYear",
-      "required": "cyYour tenancy start date must include a day, month and year",
-      "notRealDate": "cyTenancy start date must be a real date",
-      "futureDate": "cyTenancy start date must be in the past",
-      "missingOne": "cyYour tenancy start date must include a {{missingField}}",
-      "missingTwo": "cyYour tenancy start date must include a {{first}} and {{second}}"
+      "day": "Diwrnod",
+      "month": "Mis",
+      "year": "Blwyddyn",
+      "required": "Rhaid i ddyddiad dechrau eich tenantiaeth gynnwys diwrnod, mis a blwyddyn",
+      "notRealDate": "Rhaid i ddyddiad dechrau’r denantiaeth fod yn ddyddiad go iawn",
+      "futureDate": "Rhaid i ddyddiad dechrau'r denantiaeth fod yn y gorffennol",
+      "missingOne": "Rhaid i ddyddiad dechrau eich tenantiaeth gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i ddyddiad dechrau eich tenantiaeth gynnwys {{first}} a {{second}}"
     }
   }
 }

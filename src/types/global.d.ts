@@ -1,3 +1,4 @@
+import { PaymentSessionState } from '@services/paymentSessionService';
 import { type Session, type SessionData } from 'express-session';
 import { type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
@@ -7,12 +8,17 @@ import { S2S } from '../main/modules/s2s';
 import { OIDCModule } from '../main/modules/oidc';
 import { type TFunction } from 'i18next';
 import { type CcdCaseModel } from '@services/ccdCaseData.model';
+import { type PaymentSessionState } from '@services/paymentSessionService';
 import { type StepContext } from '../main/modules/steps/stepContext';
 
 export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
   idToken: string;
   refreshToken: string;
+}
+
+export interface ClientContextHeaders {
+  selectedPartyId: string;
 }
 
 interface CustomSessionData extends SessionData {
@@ -23,12 +29,15 @@ interface CustomSessionData extends SessionData {
   formData?: Record<string, any>;
   uploadedDocs?: Record<string, Record<string, unknown[]>>;
   returnToCya?: string;
+  respondToClaimPostSubmitRedirect?: string;
   ccdCase?: CcdCase;
   genApp?: {
     applicationId?: string;
     showDuplicateSubmissionPage?: boolean;
   };
+  payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
+  clientContext?: ClientContextHeaders;
 }
 
 declare module 'express-session' {

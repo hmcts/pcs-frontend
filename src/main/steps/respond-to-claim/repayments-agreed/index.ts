@@ -11,6 +11,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.repaymentPlanAgreed),
   showCancelButton: false,
   stepDir: __dirname,
+  customTemplate: `${__dirname}/repaymentsAgreed.njk`,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
@@ -40,7 +41,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
+    heading: 'heading',
     question: 'question',
+    repaymentsAgreedQuestion: 'repaymentsAgreedQuestion',
   },
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
@@ -81,12 +84,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
-    // TODO HDPI-5157: hardcode for now, wire claimIssueDate from START callback later
-    const claimIssueDate = '20th May 2025';
+    const dateIssued = caseData?.dateIssued;
 
     return {
       claimantName,
-      claimIssueDate,
+      dateIssued,
     };
   },
   fields: [
@@ -120,5 +122,4 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
-  customTemplate: `${__dirname}/repaymentsAgreed.njk`,
 });

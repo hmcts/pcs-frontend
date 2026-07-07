@@ -33,10 +33,12 @@
 import { AxiosError } from 'axios';
 import config from 'config';
 
+import { ClientContextHeaders } from '../../types/global';
 import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
+import { GenAppType, MakeAnApplicationResponse } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type {
   DashboardNotification,
@@ -56,6 +58,12 @@ interface EventTokenResponse {
   token: string;
 }
 
+export interface RelatedApplication {
+  id: string;
+  type?: GenAppType;
+  applicationSubmittedDate?: string;
+}
+
 export interface TransformedDashboardData {
   notifications: DashboardNotification[];
   taskGroups: DashboardTaskGroup[];
@@ -71,7 +79,17 @@ function getCaseTypeId(): string {
   return config.get('ccd.caseTypeId');
 }
 
-function getCaseHeaders(token: string) {
+export type CaseHeaders = {
+  headers: {
+    Authorization: string;
+    experimental: boolean;
+    Accept: string;
+    'Content-Type': string;
+    'Client-Context'?: string;
+  };
+};
+
+function getCaseHeaders(token: string): CaseHeaders {
   return {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -82,6 +100,31 @@ function getCaseHeaders(token: string) {
   };
 }
 
+interface CcdErrorResponseData {
+  callbackErrors?: string[];
+  callbackWarnings?: string[];
+  exception?: string;
+  message?: string;
+}
+
+function isAccessDeniedCallbackFailure(
+  status: number | undefined,
+  responseData: CcdErrorResponseData | undefined
+): boolean {
+  if (status !== 502 || !responseData) {
+    return false;
+  }
+
+  const exception = responseData.exception ?? '';
+  const message = responseData.message ?? '';
+
+  return (
+    exception.includes('CallbackException') &&
+    message.includes('Callback to service has been unsuccessful') &&
+    message.includes('about-to-start')
+  );
+}
+
 function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPError {
   // HttpService throws HTTPError(401) directly for user-token 401s - propagate as-is
   if (error instanceof HTTPError) {
@@ -90,9 +133,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
-  const responseData = axiosError.response?.data as
-    | { callbackErrors?: string[]; callbackWarnings?: string[] }
-    | undefined;
+  const responseData = axiosError.response?.data as CcdErrorResponseData | undefined;
 
   logger.error(`Error in ${context}: ${axiosError.message}`);
   if (responseData) {
@@ -101,6 +142,10 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   if (status === 403) {
     return new HTTPError('Not authorised to access CCD case service', 403);
+  }
+
+  if (isAccessDeniedCallbackFailure(status, responseData)) {
+    return new HTTPError('Access denied', 403);
   }
 
   const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
@@ -115,6 +160,16 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
       : undefined;
 
   return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500, retryAfter);
+}
+
+// Read endpoints coerce 400/404 to a 403 so the client sees an access-denied page
+// rather than leaking case existence (404 -> pageNotFound) or a bad-request.
+function convertReadErrorToHttpError(error: unknown, context: string): HTTPError {
+  const httpError = convertAxiosErrorToHttpError(error, context);
+  if (httpError.status === 400 || httpError.status === 404) {
+    return new HTTPError('Access denied', 403);
+  }
+  return httpError;
 }
 
 /**
@@ -189,27 +244,33 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseByIdForEvent(accessToken: string, caseId: string, eventId: string): Promise<CcdCase> {
+  async getCaseByIdForEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string = 'respondPossessionClaim',
+    clientContextHeaders?: ClientContextHeaders
+  ): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
       logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
-      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
+      const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
+
+      if (clientContextHeaders) {
+        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+      }
+
+      const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
       logger.info(`Case access validated successfully for caseId: ${caseId}`);
 
       const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
+
       return {
         id: caseId,
         data: caseData,
       };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getCaseByIdForEvent');
-
-      // coerce 400 and 404 to 404 so we can return a 404 error to the client
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getCaseByIdForEvent');
     }
   },
 
@@ -227,12 +288,7 @@ export const ccdCaseService = {
         data: caseData,
       };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getCaseById');
-
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getCaseById');
     }
   },
 
@@ -290,7 +346,10 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
   },
 
-  async submitGeneralApplication(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
+  async submitGeneralApplication(
+    accessToken: string | undefined,
+    ccdCase: CcdCase
+  ): Promise<MakeAnApplicationResponse> {
     if (!ccdCase.id) {
       throw new HTTPError('Cannot submit general application, case ID not specified', 500);
     }
@@ -300,7 +359,14 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
-    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data).then(responseData => {
+      const confirmationBodyJson = responseData.after_submit_callback_response?.confirmation_body;
+      if (confirmationBodyJson) {
+        return JSON.parse(confirmationBodyJson) as MakeAnApplicationResponse;
+      } else {
+        throw new HTTPError('No confirmation body found in response data', 500);
+      }
+    });
   },
 
   async submitUploadDocuments(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
@@ -323,11 +389,7 @@ export const ccdCaseService = {
       const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
       return response.data;
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getExistingCaseDataError');
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getExistingCaseDataError');
     }
   },
 
@@ -335,7 +397,8 @@ export const ccdCaseService = {
     draftEvent: { id: string; pageId: string },
     accessToken: string | undefined,
     caseId: string,
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
+    clientContextHeaders?: ClientContextHeaders
   ): Promise<CcdCase> {
     if (!caseId) {
       throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
@@ -355,8 +418,14 @@ export const ccdCaseService = {
       ignore_warning: false,
     };
 
+    const caseHeaders: CaseHeaders = getCaseHeaders(accessToken || '');
+
+    if (clientContextHeaders) {
+      caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+    }
+
     try {
-      const response = await http.post<{ data: CcdCaseData }>(url, payload, getCaseHeaders(accessToken || ''));
+      const response = await http.post<{ data: CcdCaseData }>(url, payload, caseHeaders);
       return {
         id: caseId,
         data: response.data?.data ?? {},
@@ -378,11 +447,7 @@ export const ccdCaseService = {
 
       return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress), relatedApplications };
     } catch (error) {
-      const httpError = convertAxiosErrorToHttpError(error, 'getDashboardView');
-      if (httpError.status === 400 || httpError.status === 404) {
-        throw new HTTPError('Case not found', 404);
-      }
-      throw httpError;
+      throw convertReadErrorToHttpError(error, 'getDashboardView');
     }
   },
 };

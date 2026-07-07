@@ -1,6 +1,8 @@
+import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { isLegalRepresentativeUser } from '../../../steps/utils/userRole';
 import { createStepNavigation, getStepUrl } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
@@ -52,7 +54,8 @@ export function createPostHandler(
   translationKeys?: TranslationKeys,
   showCancelButton?: boolean,
   extendGetContent?: ExtendGetContent,
-  documentStorage?: DocumentStorage
+  documentStorage?: DocumentStorage,
+  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -184,7 +187,25 @@ export function createPostHandler(
 
       if (isSaveForLater) {
         delete req.session.returnToCya;
+        const caseId = req.res?.locals.validatedCase?.id;
+
+        if (isLegalRepresentativeUser(req)) {
+          const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
+            ? config.get<string>('redirects.manageCaseReturnURL')
+            : null;
+          if (caseDetailsBaseUrl) {
+            const caseDetailsUrl = `${caseDetailsBaseUrl}/${caseId}`;
+            return res.redirect(caseDetailsUrl);
+          }
+        }
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
+      }
+
+      if (resolveRedirectAfterPost) {
+        const customRedirectPath = await resolveRedirectAfterPost(req);
+        if (customRedirectPath) {
+          return safeRedirect303(res, customRedirectPath, '/', ['/case']);
+        }
       }
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);
