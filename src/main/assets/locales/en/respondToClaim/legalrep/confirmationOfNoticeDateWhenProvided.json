@@ -1,0 +1,20 @@
+{
+  "pageTitle": "Notice date",
+  "bulletPointLabel": "Notice details given by {{claimantName}}:",
+  "hintText": "When making the claim, {{claimantName}} had to say the date they gave the defendant notice (the date of service).",
+  "listItem1": "They served the defendant with a notice seeking possession on {{noticeDate}}",
+  "question": "When did the defendant receive notice from {{claimantName}} (optional)?",
+  "noticeDateHint": "For example, 27 9 2022",
+  "errors": {
+    "date": {
+      "day": "Day",
+      "month": "Month",
+      "year": "Year",
+      "notRealDate": "The date the defendant received notice must be a real date",
+      "futureDate": "The date the defendant received notice must either be today’s date or in the past",
+      "invalidValue": "The date the defendant received notice must be a real date",
+      "missingOne": "The date the defendant received notice must include a {{missingField}}",
+      "missingTwo": "The date defendant received notice must include a {{first}} and {{second}}"
+    }
+  }
+}

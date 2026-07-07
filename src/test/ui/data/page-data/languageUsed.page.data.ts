@@ -1,5 +1,6 @@
 export const languageUsed = {
   mainHeader: `Which language did you use to complete your response?`,
+  lrHiddenMainHeader: `Which language did you use to complete this service?`,
   ifSomeoneElseHintText: `If someone else helped you to answer a question in this service, ask them if they answered any questions in Welsh. We’ll use this to make sure your response is processed correctly`,
   englishRadioOption: `English`,
   welshRadioOption: `Welsh`,

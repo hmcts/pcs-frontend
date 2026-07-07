@@ -94,7 +94,7 @@ function resolveLabel(
   translations: Record<string, string>,
   fallback: string
 ): string {
-  if (!label) {
+  if (label === undefined) {
     return fallback;
   }
 
@@ -190,17 +190,14 @@ function processField(
   const fieldName = fieldNameOverride || field.name;
 
   // Resolve label (function or string)
-  let label = resolveLabel(
-    field.label,
-    translations,
-    field.translationKey?.label
-      ? getTranslation(t, field.translationKey.label, undefined, interpolation) || fieldName
-      : fieldName
-  );
+  const translatedFieldLabel = field.translationKey?.label
+    ? getTranslation(t, field.translationKey.label, undefined, interpolation)
+    : undefined;
+  let label = resolveLabel(field.label, translations, translatedFieldLabel ?? fieldName);
 
   // Fallback to translation key or field name if label is still empty
-  if (!label || label === fieldName) {
-    label = getTranslation(t, `${fieldName}Label`, fieldName, interpolation) || fieldName;
+  if (label === fieldName) {
+    label = getTranslation(t, `${fieldName}Label`, fieldName, interpolation) ?? fieldName;
   }
 
   let hint = field.hint;
