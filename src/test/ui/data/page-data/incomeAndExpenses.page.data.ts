@@ -1,7 +1,11 @@
 export const incomeAndExpenses = {
   mainHeader: `Income and expenses`,
   doYouWantToProvideDetailsHeader: `Do you want to provide details of your income and expenses?`,
+  lrDoesDefendantWantToProvideDetailsHiddenHeader: `Does the defendant want to provide details of their income and expenses?`,
+  lrDoesDefendantWantToProvideHiddenHeader: `Does the defendant want to provide details of their income and expenses?`,
   detailsAboutYourIncomeParagraph: `Details about your income and expenses can be used by a judge to reach a decision on your case, and also to decide how much you could afford to repay if you have rent arrears.`,
+  lrDetailsAboutDefendantIncomeHiddenParagraph: `Details about the defendant’s income and expenses can be used by a judge to reach a decision on their case, and also to decide how much they could afford to repay if they have rent arrears.`,
+  lrProvidingDetailsHiddenParagraph: `Providing details about the defendant’s income and expenses is optional.`,
   onTheDayOfHearingParagraph: `On the day of the hearing, there may be a duty adviser at the court who can give you advice and represent you for free. They can also use this information to see if there’s any additional benefits or support you might be entitled to.`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,

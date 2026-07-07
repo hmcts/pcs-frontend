@@ -8,6 +8,7 @@
     "or": "neu",
     "imNotSure": "Nid wyf yn siŵr"
   },
+  "noticeDateLabel": " ",
   "errors": {
     "possessionNoticeReceived": "Dewiswch a wnaeth {{ claimantName }} eich hysbysu am eu bwriad i ddechrau achos meddiannu"
   }
