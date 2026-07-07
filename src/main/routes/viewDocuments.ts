@@ -92,10 +92,9 @@ export default function viewDocumentsRoutes(app: Application): void {
           id?: string;
           value?: { document_filename?: string; document_binary_url?: string };
         }[];
-        const detailsTabNoticeDocuments = (
-          (ccdCase.data?.detailsTab_NoticeDetails as { noticeDocuments?: typeof noticeDocuments } | undefined)
-            ?.noticeDocuments ?? []
-        ) as typeof noticeDocuments;
+        const detailsTabNoticeDocuments = ((
+          ccdCase.data?.detailsTab_NoticeDetails as { noticeDocuments?: typeof noticeDocuments } | undefined
+        )?.noticeDocuments ?? []) as typeof noticeDocuments;
         const document =
           allDocuments.find(item => item.id === documentId)?.value ??
           noticeDocuments.find(item => item.id === documentId)?.value ??
