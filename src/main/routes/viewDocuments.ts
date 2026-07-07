@@ -85,7 +85,6 @@ export default function viewDocumentsRoutes(app: Application): void {
       try {
         const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
 
-
         let document = ccdCase.data?.allDocuments?.find(item => item.id === documentId)?.value;
         if (!document) {
           document = ccdCase.data?.allDocumentsWithType?.find(item => item.id === documentId)?.value?.document;
