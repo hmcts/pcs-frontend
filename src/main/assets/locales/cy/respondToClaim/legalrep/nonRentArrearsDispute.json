@@ -1,0 +1,24 @@
+{
+  "pageTitle": "cyDisputing the claim",
+  "heading": "cy{{claimantName}}\u2019s claim",
+  "disputeOtherPartsQuestion": "cyDoes the defendant dispute any other parts of the claim?",
+  "disputeDetails": {
+    "label": "cyExplain which parts of the claim the defendant does not agree with"
+  },
+  "disputeOtherPartsOptions": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
+  "introParagraph": "",
+  "includesHeading": "",
+  "includesBullet1": "",
+  "includesBullet2": "",
+  "includesBullet3": "",
+  "errors": {
+    "disputeOtherParts": "cySelect if the defendant wants to dispute any other parts of the claim",
+    "disputeDetails": {
+      "required": "cyEnter the parts of the claim the defendant disputes"
+    },
+    "disputeDetailsMaxLength": "cyExplanation must be 6500 characters or less"
+  }
+}

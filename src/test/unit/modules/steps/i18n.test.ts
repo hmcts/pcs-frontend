@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -209,7 +211,7 @@ describe('steps/i18n', () => {
 
       expect(addResourceBundle).toHaveBeenCalledWith(
         'en',
-        'testFolder/testStep',
+        'testFolder/legalrep/testStep',
         {
           title: 'Professional title',
           nested: {
@@ -349,9 +351,26 @@ describe('steps/i18n', () => {
         step: { name: 'start-now', journey: 'uploadAdditionalDocuments' },
       });
 
-      const result = getTranslationFunction(req);
+      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
 
-      expect(getFixedT).toHaveBeenCalledWith('en', ['uploadAdditionalDocuments/startNow', 'common']);
+      expect(getFixedT).toHaveBeenCalledWith('en', ['testFolder/testStep', 'common']);
+      expect(result).toBe(mockFixedT);
+    });
+
+    it('should return fixedT with legalrep namespace when user is legalrep', () => {
+      const mockFixedT = jest.fn();
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+      mockGetUserType.mockReturnValue('legalrep');
+
+      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
+
+      const req = {
+        i18n: { getFixedT },
+      } as any;
+
+      const result = getTranslationFunction(req, 'test-step', ['common'], 'testFolder');
+
+      expect(getFixedT).toHaveBeenCalledWith('en', ['testFolder/legalrep/testStep', 'common']);
       expect(result).toBe(mockFixedT);
     });
 
@@ -388,6 +407,24 @@ describe('steps/i18n', () => {
 
       expect(mainI18n.getTranslationFunction).toHaveBeenCalledWith(req, ['common']);
       expect(result).toBe(mockT);
+    });
+  });
+
+  describe('getTranslationFunction with step context', () => {
+    it('should use step namespace from req.res.locals.step when journeyFolder is not passed', () => {
+      const mockFixedT = jest.fn();
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+      const getFixedT = jest.fn().mockReturnValue(mockFixedT);
+
+      const req = {
+        i18n: { getFixedT },
+        res: { locals: { step: { journey: 'testFolder' } } },
+      } as any;
+
+      const result = getTranslationFunction(req, 'test-step');
+
+      expect(getFixedT).toHaveBeenCalledWith('en', ['testFolder/testStep', 'common']);
+      expect(result).toBe(mockFixedT);
     });
   });
 

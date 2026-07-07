@@ -747,8 +747,10 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
-    const getDetailsGivenByParagraph = tenancyDateDetails.getDetailsGivenByParagraph(claimantsName);
-    await performValidation('text', { elementType: 'paragraph', text: getDetailsGivenByParagraph });
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: tenancyDateDetails.getDetailsGivenByParagraph(),
+    });
     this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);
     await performAction('clickRadioButton', {
       question: tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion,
@@ -1259,6 +1261,7 @@ export class RespondToClaimAction implements IAction {
     });
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
   }
+
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
     const regularExpensesQuestionLabel = this.getRtcCyaQuestionLabel(whatOtherRegularExpensesDoYouHave.mainHeader);
 
@@ -1379,7 +1382,7 @@ export class RespondToClaimAction implements IAction {
       question: otherConsiderationsData.question,
       option: otherConsiderationsData.option,
     });
-    if (otherConsiderationsData.option === otherConsiderations.yesRadioOption) {
+    if (otherConsiderationsData.option === 'Yes') {
       this.recordAnswer(otherConsiderations.giveDetailsHiddenTextLabel, otherConsiderationsData.courtInfo);
       await performAction(
         'inputText',

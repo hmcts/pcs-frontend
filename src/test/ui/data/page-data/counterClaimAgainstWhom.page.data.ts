@@ -1,5 +1,6 @@
 export const counterClaimAgainstWhom = {
   mainHeader: `Who are you making the counterclaim against?`,
+  lrHiddenMainHeader: `Which defendant are you completing this response on behalf of?`,
   selectAllHintText: `Select all that apply`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
