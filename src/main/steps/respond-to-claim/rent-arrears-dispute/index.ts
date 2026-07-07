@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import { currency } from '../../../modules/nunjucks/filters/currency';
-import { getTranslationFunction } from '../../../modules/steps';
+import { getTranslation, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -72,8 +72,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const t = getTranslationFunction(req);
 
-    const insetIntroText = t('insetIntroText');
-    const insetDetailsText = t('insetDetailsText', { claimantName });
+    const insetIntroText = getTranslation(t, 'insetIntroText', '') ?? '';
+    const insetDetailsText = getTranslation(t, 'insetDetailsText', '', { claimantName }) ?? '';
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
     return {

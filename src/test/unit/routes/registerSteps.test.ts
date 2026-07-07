@@ -198,11 +198,13 @@ describe('registerSteps', () => {
 
     const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedPostCall).toBeDefined();
-    // [url, stepContext, handler]
-    expect(protectedPostCall!).toHaveLength(3);
+    // [url, stepContext, legalRepHeaders, handler]
+    // Auth runs once at the journey basePath (see registerAllJourneys), not per step.
+    expect(protectedPostCall!).toHaveLength(4);
     expect(protectedPostCall![0]).toBe('/steps/protected');
     expect(typeof protectedPostCall![1]).toBe('function');
-    expect(typeof protectedPostCall![2]).toBe('function');
+    expect(protectedPostCall![2]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(typeof protectedPostCall![3]).toBe('function');
   });
 
   it('registers GET and POST without middlewares for unprotected steps', () => {
@@ -220,18 +222,19 @@ describe('registerSteps', () => {
 
     const unprotectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/unprotected');
     expect(unprotectedPostCall).toBeDefined();
-    // [url, stepContext, handler]
-    expect(unprotectedPostCall!).toHaveLength(3);
+    // [url, stepContext, legalRepHeaders, handler]
+    expect(unprotectedPostCall!).toHaveLength(4);
     expect(unprotectedPostCall![0]).toBe('/steps/unprotected');
     expect(typeof unprotectedPostCall![1]).toBe('function');
-    expect(typeof unprotectedPostCall![2]).toBe('function');
+    expect(unprotectedPostCall![2]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(typeof unprotectedPostCall![3]).toBe('function');
   });
 
   it('delegates POST handlers to the resolved step definition', () => {
     registerSteps(app);
 
     const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
-    // [url, stepContext, handler] — the last entry is the route handler.
+    // [url, stepContext, legalRepHeaders, handler] — the last entry is the route handler.
     const handler = protectedPostCall?.[protectedPostCall.length - 1];
     const req = createMockRequest('/steps/protected');
     const res = createMockResponse();
