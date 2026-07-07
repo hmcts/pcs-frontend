@@ -45,6 +45,7 @@ export class ActionRegistry {
     ['navigateToUrl', new NavigateToUrlAction()],
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
+    ['submitCaseApiTestSupport', new CreateCaseAPIAction()],
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
     ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
