@@ -1,6 +1,6 @@
 {
   "pageTitle": "Agreements made",
-  "question": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+  "question": "Have you come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}?",
   "options": {
     "yes": "Yes",
     "no": "No",
@@ -10,7 +10,7 @@
   "textAreaLabel": "Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
   "textAreaHint": "You can enter up to 500 characters",
   "errors": {
-    "repaymentsAgreed": "Select if you’ve come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}",
+    "repaymentsAgreed": "Select if you’ve come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}",
     "repaymentsAgreed.repaymentsAgreedDetails": "Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made",
     "repaymentsAgreedDetailsMaxLength": "Repayment agreement details must be 500 characters or less",
     "repaymentsAgreed.repaymentsAgreedDetails.invalid": "Repayments agreed details must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"

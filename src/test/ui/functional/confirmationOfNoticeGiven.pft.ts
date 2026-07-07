@@ -6,7 +6,6 @@ function getClaimantName(): string {
   if (process.env.CLAIMANT_NAME_OVERRIDDEN === 'YES') {
     return submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
   }
-
   return process.env.CLAIMANT_NAME ?? submitCaseApiData.submitCasePayloadNoDefendants.claimantName;
 }
 
