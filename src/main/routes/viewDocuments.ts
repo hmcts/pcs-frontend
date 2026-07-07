@@ -84,11 +84,13 @@ export default function viewDocumentsRoutes(app: Application): void {
 
       try {
         const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
-        const allDocuments = (ccdCase.data?.allDocuments ?? []) as {
-          id?: string;
-          value?: { document_filename?: string; document_binary_url?: string };
-        }[];
-        const document = allDocuments.find(item => item.id === documentId)?.value;
+
+
+        let document = ccdCase.data?.allDocuments?.find(item => item.id === documentId)?.value;
+        if (!document) {
+          document = ccdCase.data?.allDocumentsWithType?.find(item => item.id === documentId)?.value?.document;
+        }
+
         const filename = document?.document_filename?.trim() || 'document';
         const binaryUrl = document?.document_binary_url?.trim();
         if (!binaryUrl) {
