@@ -12,7 +12,7 @@ export const askTheCourtToSetAsideTheOrder = {
   onceYouStartYourApplicationParagraph: `Once you start your application, you cannot save your progress as a draft.`,
   thisMeansThatIfYouLeaveYourApplicationParagraph: `This means that if you leave your application before submitting, we will not save your answers so that you can return to them later.`,
   howMuchItWillCostHeader: `How much it will cost`,
-  itUsuallyCostParagraph: `It usually costs £123 to apply. The fee will increase to £313 if:`,
+  itUsuallyCostParagraph: `It usually costs £126 to apply. The fee will increase to £321 if:`,
   youHaveAlreadyToldList: `you have already told the other party that you are making this application, and`,
   theyDidNotAgreeList: `they did not agree to it (this means that they have objected to it)`,
   youSeeFinalApplicationFeeParagraph: `You’ll see the final application fee before you pay.`,
