@@ -18,6 +18,9 @@
   {% if noticeDocumentId %}
     {% set insetHtml %}<p class="govuk-body">{{ hintText }}</p><a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ noticeDocumentId }}" target="_blank" rel="noopener noreferrer">{{ viewNoticeLinkText }}</a>{% endset %}
     {{ govukInsetText({ html: insetHtml }) }}
+  {% elif noticeAbleToUpload %}
+    {% set insetHtml %}<p class="govuk-body">{{ hintText }}</p><a class="govuk-link" href="/case/{{ caseReference }}/view-documents" target="_blank" rel="noopener noreferrer">{{ viewNoticeLinkText }}</a>{% endset %}
+    {{ govukInsetText({ html: insetHtml }) }}
   {% else %}
     {{ govukInsetText({ text: hintText }) }}
   {% endif %}

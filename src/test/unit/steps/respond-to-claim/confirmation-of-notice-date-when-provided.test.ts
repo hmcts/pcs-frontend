@@ -16,7 +16,7 @@ type ConfirmationOfNoticeDateWhenProvidedStep = {
         validatedCase?: CcdCaseModel;
       };
     };
-  }) => Record<string, string | undefined>;
+  }) => Record<string, string | boolean | undefined>;
 };
 
 const makeValidatedCase = (data: CcdCaseData = {}) =>
@@ -151,6 +151,24 @@ describe('confirmation-of-notice-date-when-provided step', () => {
         },
       });
 
+      expect(content.noticeDocumentId).toBeUndefined();
+      expect(content.noticeDocumentFilename).toBeUndefined();
+    });
+
+    it('sets noticeAbleToUpload when notice_AbleToUploadDocument is Yes and no notice document exists', () => {
+      const content = testedStep.extendGetContent({
+        res: {
+          locals: {
+            validatedCase: makeValidatedCase({
+              claimantName: 'Test Claimant',
+              notice_Documents: [],
+              notice_AbleToUploadDocument: 'Yes',
+            } as CcdCaseData),
+          },
+        },
+      });
+
+      expect(content.noticeAbleToUpload).toBe(true);
       expect(content.noticeDocumentId).toBeUndefined();
       expect(content.noticeDocumentFilename).toBeUndefined();
     });
