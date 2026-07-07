@@ -180,12 +180,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const caseId = req.res?.locals.validatedCase?.id;
     if (caseId && req.res) {
-      safeRedirect307(
-        req.res,
-        `/case/${caseId}/final-submit`,
-        `/case/${caseId}/respond-to-claim/end-of-journey-cya`,
-        ['/case']
-      );
+      safeRedirect307(req.res, `/case/${caseId}/final-submit`, `/case/${caseId}/respond-to-claim/end-of-journey-cya`, [
+        '/case',
+      ]);
     }
   },
 });
