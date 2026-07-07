@@ -1,12 +1,12 @@
 {
   "pageTitle": "Upload documents",
-  "heading": "Upload additional documents (optional)",
-  "guidanceText": "Upload any documents that you think are relevant to the response. The claimant will be able to see any documents you upload.",
-  "beforeUploadHeading": "Before you upload your documents",
-  "beforeUploadText": "Give your document a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
-  "uploadLabel": "Upload a document",
-  "filesAddedHeading": "Documents added",
-  "uploadButton": "Upload document",
+  "heading": "Upload files (optional)",
+  "guidanceText": "Upload any files that you think are relevant to your response. The claimant will be able to see the files you upload.",
+  "beforeUploadHeading": "Before you upload your files",
+  "beforeUploadText": "Give your file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "Upload a file",
+  "filesAddedHeading": "Files added",
+  "uploadButton": "Upload file",
   "deleteButton": "Remove",
-  "noFilesUploaded": "No documents uploaded"
+  "noFilesUploaded": "No files uploaded"
 }
