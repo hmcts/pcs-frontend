@@ -137,7 +137,7 @@ const mockStepsData = {
 
 import { Application, Request, Response } from 'express';
 
-import { legalRepresentativeHeaderMiddleware, oidcMiddleware } from '../../../main/middleware';
+import { legalRepresentativeHeaderMiddleware } from '../../../main/middleware';
 import { registerSteps } from '../../../main/routes/registerSteps';
 
 describe('registerSteps', () => {
@@ -187,23 +187,22 @@ describe('registerSteps', () => {
     const protectedGetCall = mockGet.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedGetCall).toBeDefined();
 
-    // [url, stepContext, oidc, dependencyCheck, legalRepHeaders, handler]
-    expect(protectedGetCall!).toHaveLength(6);
+    // [url, stepContext, dependencyCheck, legalRepHeaders, handler]
+    // Auth runs once at the journey basePath (see registerAllJourneys), not per step.
+    expect(protectedGetCall!).toHaveLength(5);
     expect(protectedGetCall![0]).toBe('/steps/protected');
     expect(typeof protectedGetCall![1]).toBe('function');
-    expect(protectedGetCall![2]).toBe(oidcMiddleware);
-    expect(protectedGetCall![3]).toBe(mockStepDependencyCheck);
-    expect(protectedGetCall![4]).toBe(legalRepresentativeHeaderMiddleware);
-    expect(typeof protectedGetCall![5]).toBe('function');
+    expect(protectedGetCall![2]).toBe(mockStepDependencyCheck);
+    expect(protectedGetCall![3]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(typeof protectedGetCall![4]).toBe('function');
 
     const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedPostCall).toBeDefined();
-    // [url, stepContext, oidc, handler]
-    expect(protectedPostCall!).toHaveLength(4);
+    // [url, stepContext, handler]
+    expect(protectedPostCall!).toHaveLength(3);
     expect(protectedPostCall![0]).toBe('/steps/protected');
     expect(typeof protectedPostCall![1]).toBe('function');
-    expect(protectedPostCall![2]).toBe(oidcMiddleware);
-    expect(typeof protectedPostCall![3]).toBe('function');
+    expect(typeof protectedPostCall![2]).toBe('function');
   });
 
   it('registers GET and POST without middlewares for unprotected steps', () => {
@@ -232,7 +231,7 @@ describe('registerSteps', () => {
     registerSteps(app);
 
     const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
-    // [url, stepContext, oidc, handler] — the last entry is the route handler.
+    // [url, stepContext, handler] — the last entry is the route handler.
     const handler = protectedPostCall?.[protectedPostCall.length - 1];
     const req = createMockRequest('/steps/protected');
     const res = createMockResponse();
@@ -259,15 +258,14 @@ describe('registerSteps', () => {
     const stepWithMiddlewareCall = mockGet.mock.calls.find(call => call[0] === '/steps/with-middleware');
 
     expect(stepWithMiddlewareCall).toBeDefined();
-    // [url, stepContext, oidc, dependencyCheck, customMiddleware, legalRepHeaders, handler]
-    expect(stepWithMiddlewareCall!).toHaveLength(7);
+    // [url, stepContext, dependencyCheck, customMiddleware, legalRepHeaders, handler]
+    expect(stepWithMiddlewareCall!).toHaveLength(6);
     expect(stepWithMiddlewareCall![0]).toBe('/steps/with-middleware');
     expect(typeof stepWithMiddlewareCall![1]).toBe('function');
-    expect(stepWithMiddlewareCall![2]).toBe(oidcMiddleware);
-    expect(stepWithMiddlewareCall![3]).toBe(mockStepDependencyCheck);
-    expect(stepWithMiddlewareCall![4]).toBe(mockStepsData.stepWithMiddleware.middleware![0]);
-    expect(stepWithMiddlewareCall![5]).toBe(legalRepresentativeHeaderMiddleware);
-    expect(typeof stepWithMiddlewareCall![6]).toBe('function');
+    expect(stepWithMiddlewareCall![2]).toBe(mockStepDependencyCheck);
+    expect(stepWithMiddlewareCall![3]).toBe(mockStepsData.stepWithMiddleware.middleware![0]);
+    expect(stepWithMiddlewareCall![4]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(typeof stepWithMiddlewareCall![5]).toBe('function');
   });
 
   it('calls getValidatedLanguage for each GET route', () => {

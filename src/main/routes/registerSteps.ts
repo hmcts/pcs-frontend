@@ -43,17 +43,15 @@ function getJourneysToRegister(specificJourney?: string): [string, (typeof journ
  * Build GET middleware array for a step
  */
 function buildGetMiddleware(
-  requiresAuth: boolean,
   flowConfig: JourneyFlowConfig | ((req: Request) => JourneyFlowConfig),
   stepContext: RequestHandler,
   stepMiddleware?: RequestHandler[]
 ): RequestHandler[] {
-  const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
   const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
 
   return stepMiddleware
-    ? [stepContext, ...authMiddlewares, dependencyCheck, ...stepMiddleware, legalRepresentativeHeaderMiddleware]
-    : [stepContext, ...authMiddlewares, dependencyCheck, legalRepresentativeHeaderMiddleware];
+    ? [stepContext, dependencyCheck, ...stepMiddleware, legalRepresentativeHeaderMiddleware]
+    : [stepContext, dependencyCheck, legalRepresentativeHeaderMiddleware];
 }
 
 /**
@@ -96,16 +94,15 @@ function registerStepRoutes(
   const flowConfigResolver = (req: Request) => getFlowConfigForJourney(journeyName, req) || flowConfig;
   const stepConfig = flowConfig.steps[step.name];
   const requiresAuth = stepConfig?.requiresAuth !== false;
-  const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
   const stepContext = withStepContext({ name: step.name, journey: journeyName });
 
   if (step.getController) {
-    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfigResolver, stepContext, step.middleware);
+    const allGetMiddleware = buildGetMiddleware(flowConfigResolver, stepContext, step.middleware);
     router.get(step.url, ...allGetMiddleware, createGetHandler(step, journeyName));
   }
 
   if (step.postController?.post) {
-    router.post(step.url, stepContext, ...authMiddlewares, (req, res, next) => {
+    router.post(step.url, stepContext, (req, res, next) => {
       const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
       return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
     });
