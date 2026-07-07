@@ -64,7 +64,7 @@ const t = ((key: string) => {
     contactUsForHelp: 'Contact us for help',
     contactUsForHelpText: 'You can contact us for help.',
   };
-  return translations[key] || key;
+  return key in translations ? translations[key] : key;
 }) as unknown as (key: string, options?: unknown) => string;
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';

@@ -1,0 +1,15 @@
+{
+  "pageTitle": "cyPriority debt details",
+  "caption": "cyRespond to a property possession claim",
+  "totalQuestion": "cyWhat is the total amount the defendant owes for all their priority debts?",
+  "contributionQuestion": "cyHow much does the defendant pay towards their priority debts each week or month?",
+  "errors": {
+    "priorityDebtTotal": "cyEnter the total amount the defendant owes for all their priority debts",
+    "priorityDebtTotalMin": "cyThe total amount the defendant owes for all their priority debts must be £0.00 or above",
+    "priorityDebtTotalMax": "cyThe total amount the defendant owes for all their priority debts must be less than £1 billion",
+    "priorityDebtContribution": "cyEnter the amount the defendant pays towards their priority debts each week or month",
+    "priorityDebtContributionMin": "cyThe amount the defendant pays towards their priority debts each week or month must be £0.00 or above",
+    "priorityDebtContributionMax": "cyThe amount the defendant pays towards their priority debts each week or month must be less than £1 billion",
+    "priorityDebtContributionFrequency": "cySelect how frequently the defendant pays the amount they entered above"
+  }
+}

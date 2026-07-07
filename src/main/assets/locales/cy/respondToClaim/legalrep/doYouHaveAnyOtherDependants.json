@@ -1,0 +1,11 @@
+{
+  "heading": "cyOther dependants",
+  "otherDependantsParagraph": "",
+  "dependantQuestion": "cyDoes the defendant have any other dependants?",
+  "otherDependantDetailsLabel": "cyGive details about their other dependants",
+  "otherDependantDetailsHint": "",
+  "errors": {
+    "otherDependants": "cySelect if they have any other dependants",
+    "otherDependantDetails": "cyGive details about their other dependants"
+  }
+}

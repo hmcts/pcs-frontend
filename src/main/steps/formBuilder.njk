@@ -31,6 +31,10 @@
     <h1 class="govuk-heading-l">{{ title }}</h1>
   {% endif %}
 
+  {% if subheading %}
+    <p class="govuk-heading-m">{{ subheading }}</p>
+  {% endif %}
+
   {% if content %}
     <p class="govuk-body">{{ content | safe }}</p>
   {% endif %}
