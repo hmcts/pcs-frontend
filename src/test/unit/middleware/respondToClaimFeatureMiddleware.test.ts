@@ -7,6 +7,7 @@ jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
 
 jest.mock('../../../main/steps/utils/userRole', () => ({
   getUserType: jest.fn(),
+  isLegalRepresentativeUser: jest.fn(),
 }));
 
 jest.mock('../../../main/middleware/handleRespondToClaimDisabled', () => ({
@@ -14,6 +15,7 @@ jest.mock('../../../main/middleware/handleRespondToClaimDisabled', () => ({
 }));
 
 import { handleRespondToClaimDisabled, respondToClaimFeatureMiddleware } from '../../../main/middleware';
+import { isLegalRepresentativeUser } from '../../../main/steps/utils';
 
 import {
   isRespondToClaimEnabledForRelease,
@@ -31,6 +33,10 @@ const mockHandleRespondToClaimDisabled = handleRespondToClaimDisabled as jest.Mo
   typeof handleRespondToClaimDisabled
 >;
 
+const mockIsLegalRepresentativeUser = isLegalRepresentativeUser as jest.MockedFunction<
+  typeof isLegalRepresentativeUser
+>;
+
 interface MakeReqArgs {
   caseReference?: string;
   validatedCaseId?: string;
@@ -42,66 +48,95 @@ const makeReq = ({ caseReference = '1234567890123456', validatedCaseId }: MakeRe
     res: validatedCaseId === undefined ? { locals: {} } : { locals: { validatedCase: { id: validatedCaseId } } },
   }) as unknown as Request;
 
-const makeRes = (): Response =>
-  ({
-    redirect: jest.fn(),
-    status: jest.fn().mockReturnThis(),
-    send: jest.fn(),
-  }) as unknown as Response;
-
 describe('respondToClaimFeatureMiddleware', () => {
-  let next: jest.MockedFunction<NextFunction>;
+  let res: Partial<Response>;
+  let next: NextFunction;
+
+  // Changed to an async function that awaits the middleware execution
+  const invokeMiddleware = async (req: Request): Promise<void> => {
+    await (respondToClaimFeatureMiddleware as any)(req, res as Response, next);
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     next = jest.fn();
+    res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
   });
 
-  it('calls next when respond-to-claim is enabled for the user and release', async () => {
-    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
+  it('calls next when citizen respond-to-claim is enabled for the user', async () => {
     mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
-
+    mockIsLegalRepresentativeUser.mockReturnValue(false);
     const req = makeReq();
-    const res = makeRes();
-    await respondToClaimFeatureMiddleware()(req, res, next);
+
+    await invokeMiddleware(req);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(mockHandleRespondToClaimDisabled).not.toHaveBeenCalled();
+    expect(mockIsRespondToClaimEnabledForRelease).not.toHaveBeenCalled();
+  });
+
+  it('redirects when citizen respond-to-claim is disabled for the user', async () => {
+    mockIsRespondToClaimEnabledForUser.mockResolvedValue(false);
+    mockIsLegalRepresentativeUser.mockReturnValue(false);
+    const req = makeReq();
+
+    await invokeMiddleware(req);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(mockHandleRespondToClaimDisabled).toHaveBeenCalled();
+    expect(mockIsRespondToClaimEnabledForRelease).not.toHaveBeenCalled();
+  });
+
+
+  it('redirects when legal rep and disabled for user and enabled for release', async () => {
+    mockIsLegalRepresentativeUser.mockReturnValue(true);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
+    mockIsRespondToClaimEnabledForUser.mockResolvedValue(false);
+    const req = makeReq();
+
+    await invokeMiddleware(req);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(mockHandleRespondToClaimDisabled).toHaveBeenCalled();
+  });
+
+  it('redirects when legal rep and  enabled for user and disabled for release', async () => {
+    mockIsLegalRepresentativeUser.mockReturnValue(true);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
+    mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
+    const req = makeReq();
+
+    await invokeMiddleware(req);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(mockHandleRespondToClaimDisabled).toHaveBeenCalled();
+  });
+
+  it('redirects when legal rep and  disabled for user and disabled for release', async () => {
+    mockIsLegalRepresentativeUser.mockReturnValue(true);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
+    mockIsRespondToClaimEnabledForUser.mockResolvedValue(false);
+    const req = makeReq();
+
+    await invokeMiddleware(req);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(mockHandleRespondToClaimDisabled).toHaveBeenCalled();
+  });
+
+  it('calls next when legal respond-to-claim is enabled for the user and release', async () => {
+    mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
+    mockIsLegalRepresentativeUser.mockReturnValue(true);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
+    const req = makeReq();
+
+    await invokeMiddleware(req);
 
     expect(next).toHaveBeenCalledTimes(1);
     expect(mockHandleRespondToClaimDisabled).not.toHaveBeenCalled();
   });
 
-  it('redirects when disabled for user and enabled for release', async () => {
-    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
-    mockIsRespondToClaimEnabledForUser.mockResolvedValue(false);
-
-    const req = makeReq();
-    const res = makeRes();
-    await respondToClaimFeatureMiddleware()(req, res, next);
-
-    expect(next).not.toHaveBeenCalled();
-    expect(mockHandleRespondToClaimDisabled).toHaveBeenCalled();
-  });
-
-  it('redirects when enabled for user and disabled for release', async () => {
-    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
-    mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
-
-    const req = makeReq();
-    const res = makeRes();
-    await respondToClaimFeatureMiddleware()(req, res, next);
-
-    expect(next).not.toHaveBeenCalled();
-    expect(mockHandleRespondToClaimDisabled).toHaveBeenCalled();
-  });
-
-  it('redirects when disabled for user and disabled for release', async () => {
-    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
-    mockIsRespondToClaimEnabledForUser.mockResolvedValue(false);
-
-    const req = makeReq();
-    const res = makeRes();
-    await respondToClaimFeatureMiddleware()(req, res, next);
-
-    expect(next).not.toHaveBeenCalled();
-    expect(mockHandleRespondToClaimDisabled).toHaveBeenCalled();
-  });
 });

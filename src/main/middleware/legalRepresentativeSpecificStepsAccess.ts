@@ -6,13 +6,13 @@ import { handleRespondToClaimDisabled } from './handleRespondToClaimDisabled';
 
 const LEGAL_REPRESENTATIVE_SPECIFC_ALLOWED_PATHS = [/^\/case\/[^/]+\/respond-to-claim\/select-defendant$/];
 
-export const legalRepresentativeSpecificStepsAccessMiddleware: RequestHandler = (
+export const legalRepresentativeSpecificStepsAccessMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
+): Promise<void> => {
   if (isLegalRepresentativeUser(req)) {
-    return next();
+     return next();
   }
 
   const isLegalRepresentativeSpecificPath = LEGAL_REPRESENTATIVE_SPECIFC_ALLOWED_PATHS.some(pattern =>
