@@ -8,6 +8,7 @@
     "or": "or",
     "imNotSure": "I’m not sure"
   },
+  "noticeDateLabel": " ",
   "errors": {
     "possessionNoticeReceived": "Select if {{claimantName}} gave you notice of their intention to begin possession proceedings"
   }
