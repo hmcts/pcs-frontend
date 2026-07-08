@@ -11,6 +11,6 @@
   },
   "errorPrefix": "Error:",
   "errors": {
-    "respondToClaimUnavailable": "You cannot access a case to respond to a claim right now. Try again later."
+    "respondToClaimUnavailable": "The option to respond to a claim is not available at the moment."
   }
 }

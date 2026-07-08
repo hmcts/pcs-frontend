@@ -33,8 +33,7 @@ jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
 jest.mock('@modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => {
     const strings: Record<string, string> = {
-      'accessCode:errors.respondToClaimUnavailable':
-        'You cannot access a case to respond to a claim right now. Try again later.',
+      'accessCode:errors.respondToClaimUnavailable': 'The option to respond to a claim is not available at the moment.',
     };
     return ((key: string) => strings[key] ?? key) as import('i18next').TFunction;
   }),
@@ -97,10 +96,10 @@ describe('citizenCaseLink routes', () => {
         'accessCode',
         expect.objectContaining({
           respondToClaimBlocked: true,
-          blockedMessage: 'You cannot access a case to respond to a claim right now. Try again later.',
+          blockedMessage: 'The option to respond to a claim is not available at the moment.',
           errorList: [
             {
-              text: 'You cannot access a case to respond to a claim right now. Try again later.',
+              text: 'The option to respond to a claim is not available at the moment.',
             },
           ],
         })

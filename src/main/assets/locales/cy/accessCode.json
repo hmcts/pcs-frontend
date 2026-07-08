@@ -11,6 +11,6 @@
   },
   "errorPrefix": "cyError:",
   "errors": {
-    "respondToClaimUnavailable": "cyYou cannot access a case to respond to a claim right now. Try again later."
+    "respondToClaimUnavailable": "cyThe option to respond to a claim is not available at the moment."
   }
 }
