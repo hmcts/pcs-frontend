@@ -73,12 +73,3 @@ export function safeRedirect303(
   return res.redirect(303, path);
 }
 
-export function safeRedirect307(
-  res: Response,
-  target: unknown,
-  fallback = '/',
-  allowedPrefixes: string[] = ['/']
-): void {
-  const path = getSafeRedirectPath(target, fallback, allowedPrefixes, 'safeRedirect307');
-  return res.redirect(307, path);
-}
