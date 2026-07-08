@@ -38,7 +38,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
 
 function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   const nameConfirmation = validatedCase.defendantResponsesDefendantNameConfirmation;
-  const claimDefendantName = validatedCase.claimantEnteredDefendantDetailsName;
+  const claimDefendantName = validatedCase.claimantEnteredDefendantDetailsName || validatedCase.defendantName?.trim();
   if (nameConfirmation && claimDefendantName) {
     // Branch 1: claim recorded the defendant name — user confirmed (Y/N).
     // When "No", the corrected name is rendered as a separate follow-up row so each
@@ -75,7 +75,7 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
   // The row stands alone with no confirmation question above it, so it mirrors the
   // capture page's own question ("What's your name?") rather than the bare "Name" noun
   // label used for the corrected-name row in branch 1.
-  const partyName = validatedCase.defendantContactDetailsPartyName?.trim();
+  const partyName = validatedCase.defendantContactDetailsPartyName?.trim() || validatedCase.defendantName?.trim();
   if (!partyName) {
     return;
   }

@@ -16,7 +16,6 @@ import { getTranslationFunction, loadStepNamespaces } from '@modules/steps';
 import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-// import { safeRedirect307 } from '@utils/safeRedirect';
 
 const STEP_NAME = 'end-of-journey-cya';
 
@@ -138,7 +137,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     if (req.query.submitError !== 'failed') {
-      return { sections, submitDisabled };
       return { sections, submitDisabled, isLegalRepresentative };
     }
 
@@ -191,11 +189,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       );
       return;
     }
-    // if (caseId && req.res) {
-    //   safeRedirect307(req.res, `/case/${caseId}/final-submit`, `/case/${caseId}/respond-to-claim/end-of-journey-cya`, [
-    //     '/case',
-    //   ]);
-    // }
 
     try {
       const { confirmationPath } = await submitRespondToClaimResponse(req);
