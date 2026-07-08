@@ -72,4 +72,3 @@ export function safeRedirect303(
   const path = getSafeRedirectPath(target, fallback, allowedPrefixes, 'safeRedirect303');
   return res.redirect(303, path);
 }
-

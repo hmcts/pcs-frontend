@@ -2,7 +2,6 @@ import type { Response } from 'express';
 
 import { safeRedirect303 } from '@utils/safeRedirect';
 
-
 describe('safeRedirect303', () => {
   let mockRes: Partial<Response>;
   let redirectSpy: jest.Mock;
@@ -134,4 +133,3 @@ describe('safeRedirect303', () => {
     });
   });
 });
-
