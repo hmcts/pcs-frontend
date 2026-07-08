@@ -7,6 +7,7 @@ import {
 } from '../validations/custom-validations';
 import {
   BannerAlertValidation,
+  CheckYourAnswersSummaryRowValidation,
   FormLabelValueValidation,
   InputErrorValidation,
   InputTextValueValidation,
@@ -39,6 +40,7 @@ export class ValidationRegistry {
     ['inputTextValue', new InputTextValueValidation()],
     ['validateDocumentUnderSection', new ValidateDocumentUnderSectionValidation()],
     ['viewClaimOrResponseTable', new viewClaimOrResponseTableValidation()],
+    ['summaryRow', new CheckYourAnswersSummaryRowValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {

@@ -1045,7 +1045,7 @@ export class RespondToClaimAction implements IAction {
   private async selectCounterClaimFee(counterClaimFeeOption: actionRecord) {
     let counterClaimFeeValue: number | string = 0;
     if (counterClaimFeeOption.typeOfClaim === 'Something else') {
-      counterClaimFeeValue = 377;
+      counterClaimFeeValue = 387;
     } else if (
       counterClaimFeeOption.typeOfClaim === 'A sum of money or compensation' ||
       counterClaimFeeOption.typeOfClaim === 'Both'
