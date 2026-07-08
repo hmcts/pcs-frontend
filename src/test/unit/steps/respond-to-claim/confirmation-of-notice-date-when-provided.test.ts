@@ -155,7 +155,7 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       expect(content.noticeDocumentFilename).toBeUndefined();
     });
 
-    it('sets noticeAbleToUpload when notice_AbleToUploadDocument is Yes and no notice document exists', () => {
+    it('does not expose a notice link when able to upload but no notice document exists', () => {
       const content = testedStep.extendGetContent({
         res: {
           locals: {
@@ -168,7 +168,6 @@ describe('confirmation-of-notice-date-when-provided step', () => {
         },
       });
 
-      expect(content.noticeAbleToUpload).toBe(true);
       expect(content.noticeDocumentId).toBeUndefined();
       expect(content.noticeDocumentFilename).toBeUndefined();
     });

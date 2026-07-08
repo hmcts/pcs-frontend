@@ -179,7 +179,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       listItem1,
       noticeDocumentId,
       noticeDocumentFilename,
-      noticeAbleToUpload,
       noticeMethodText,
     };
   },
