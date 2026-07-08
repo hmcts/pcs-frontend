@@ -13,8 +13,7 @@ jest.mock('../../../main/middleware/handleRespondToClaimDisabled', () => ({
   handleRespondToClaimDisabled: jest.fn(),
 }));
 
-
-import { handleRespondToClaimDisabled , respondToClaimFeatureMiddleware } from '../../../main/middleware';
+import { handleRespondToClaimDisabled, respondToClaimFeatureMiddleware } from '../../../main/middleware';
 
 import {
   isRespondToClaimEnabledForRelease,

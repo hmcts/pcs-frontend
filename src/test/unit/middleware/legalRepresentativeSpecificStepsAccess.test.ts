@@ -6,15 +6,12 @@ jest.mock('../../../main/steps/utils', () => ({
   isLegalRepresentativeUser: (...args: unknown[]) => mockIsLegalRepresentativeUser(...args),
 }));
 
-
 jest.mock('../../../main/middleware/handleRespondToClaimDisabled', () => ({
   handleRespondToClaimDisabled: jest.fn(),
 }));
 
 import { handleRespondToClaimDisabled } from '../../../main/middleware';
-import {
-  legalRepresentativeSpecificStepsAccessMiddleware
-} from '../../../main/middleware/legalRepresentativeSpecificStepsAccess';
+import { legalRepresentativeSpecificStepsAccessMiddleware } from '../../../main/middleware/legalRepresentativeSpecificStepsAccess';
 
 const mockHandleRespondToClaimDisabled = handleRespondToClaimDisabled as jest.MockedFunction<
   typeof handleRespondToClaimDisabled

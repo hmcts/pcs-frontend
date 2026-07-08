@@ -34,7 +34,9 @@ jest.mock('../../../main/middleware', () => ({
     mockLegalRepresentativeHeaderMiddleware(req, res, next)
   ),
   respondToClaimFeatureMiddleware: jest.fn((req, res, next) => mockRespondToClaimFeatureMiddleware(req, res, next)),
-  legalRepresentativeSpecificStepsAccessMiddleware: jest.fn((req, res, next) => mockLegalRepresentativeSpecificStepsAccessMiddleware(req, res, next)),
+  legalRepresentativeSpecificStepsAccessMiddleware: jest.fn((req, res, next) =>
+    mockLegalRepresentativeSpecificStepsAccessMiddleware(req, res, next)
+  ),
 }));
 
 const mockFlowConfig = {

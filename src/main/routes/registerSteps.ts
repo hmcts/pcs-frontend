@@ -116,20 +116,23 @@ function registerStepRoutes(
   const stepContext = withStepContext({ name: step.name, journey: journeyName });
 
   if (step.getController) {
-    const allGetMiddleware = buildGetMiddleware(
-      requiresAuth,
-      flowConfigResolver,
-      stepContext,
-      step.middleware
-    );
+    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfigResolver, stepContext, step.middleware);
     router.get(step.url, ...allGetMiddleware, createGetHandler(step, journeyName));
   }
 
   if (step.postController?.post) {
-    router.post(step.url, stepContext, ...authMiddlewares, legalRepresentativeSpecificStepsAccessMiddleware, legalRepresentativeHeaderMiddleware, respondToClaimFeatureMiddleware, (req, res, next) => {
-      const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
-      return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
-    });
+    router.post(
+      step.url,
+      stepContext,
+      ...authMiddlewares,
+      legalRepresentativeSpecificStepsAccessMiddleware,
+      legalRepresentativeHeaderMiddleware,
+      respondToClaimFeatureMiddleware,
+      (req, res, next) => {
+        const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
+        return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
+      }
+    );
   }
 
   stats.totalSteps++;

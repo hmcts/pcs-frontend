@@ -2,7 +2,10 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { handleRespondToClaimDisabled } from './handleRespondToClaimDisabled';
 
-import { isRespondToClaimEnabledForRelease, isRespondToClaimEnabledForUser } from '@utils/isRespondToClaimEnabledForUser';
+import {
+  isRespondToClaimEnabledForRelease,
+  isRespondToClaimEnabledForUser,
+} from '@utils/isRespondToClaimEnabledForUser';
 
 export function respondToClaimFeatureMiddleware(): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {

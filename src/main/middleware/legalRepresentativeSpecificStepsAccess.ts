@@ -4,9 +4,7 @@ import { isLegalRepresentativeUser } from '../steps/utils';
 
 import { handleRespondToClaimDisabled } from './handleRespondToClaimDisabled';
 
-const LEGAL_REPRESENTATIVE_SPECIFC_ALLOWED_PATHS = [
-  /^\/case\/[^/]+\/respond-to-claim\/select-defendant$/
-];
+const LEGAL_REPRESENTATIVE_SPECIFC_ALLOWED_PATHS = [/^\/case\/[^/]+\/respond-to-claim\/select-defendant$/];
 
 export const legalRepresentativeSpecificStepsAccessMiddleware: RequestHandler = (
   req: Request,
@@ -17,7 +15,9 @@ export const legalRepresentativeSpecificStepsAccessMiddleware: RequestHandler = 
     return next();
   }
 
-  const isLegalRepresentativeSpecificPath = LEGAL_REPRESENTATIVE_SPECIFC_ALLOWED_PATHS.some(pattern => pattern.test(req.path));
+  const isLegalRepresentativeSpecificPath = LEGAL_REPRESENTATIVE_SPECIFC_ALLOWED_PATHS.some(pattern =>
+    pattern.test(req.path)
+  );
 
   if (!isLegalRepresentativeSpecificPath) {
     return next();
