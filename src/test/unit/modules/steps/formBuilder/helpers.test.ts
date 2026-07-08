@@ -39,6 +39,15 @@ describe('formBuilder helpers', () => {
       const result = getTranslation(mockT, 'nonexistent.key');
       expect(result).toBeUndefined();
     });
+
+    it('should preserve an explicit empty translation', () => {
+      const mockT = jest.fn((key: string) => (key === 'empty.key' ? '' : key)) as unknown as TFunction;
+
+      const result = getTranslation(mockT, 'empty.key', 'Fallback Text');
+
+      expect(result).toBe('');
+      expect(mockT).toHaveBeenCalledWith('empty.key', { returnObjects: true, returnEmptyString: true });
+    });
   });
 
   describe('processFieldData', () => {

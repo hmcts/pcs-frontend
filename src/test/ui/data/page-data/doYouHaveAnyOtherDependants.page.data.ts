@@ -1,9 +1,12 @@
 export const doYouHaveAnyOtherDependants = {
   mainHeader: `Do you have any other dependants?`,
+  lrHiddenMainHeader: `Other dependants`,
   dependantArePeopleParagraph: `Dependants are people you look after financially, like elderly relatives.`,
+  lrHiddenParagraph: `Does the defendant have any other dependants?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   giveDetailsHiddenTextLabel: `Give details about your other dependants`,
+  lrHiddenTextLabel: `Give details about their other dependants`,
   detailsTextInput: `1 dependant elderly - Name:Johnson and Age :70`,
   saveAndContinueButton: `Save and continue`,
   youShouldIncludeHiddenHintText: `You should include details about how many other dependants you have, how old they are and anything else you think the court should know about them`,
