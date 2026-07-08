@@ -1,5 +1,6 @@
 export const whatOtherRegularExpensesDoYouHave = {
   mainHeader: `What other regular expenses do you have? (Optional)`,
+  lrHiddenMainHeader: `What regular monthly expenses does the defendant have? (Optional)`,
   selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.`,
 
   // Household Bills
@@ -89,7 +90,7 @@ export const whatOtherRegularExpensesDoYouHave = {
 
   // Mandatory Field Errors - Frequency Missing
   householdBillsFrequencyErrorMessage: `Select how frequently you pay household bills`,
-  loanPaymentsFrequencyErrorMessage: `Select how frequently you make loan payments`,
+  loanPaymentsFrequencyErrorMessage: `Select how frequently you pay loan payments`,
   childSpousalMaintenanceFrequencyErrorMessage: `Select how frequently you pay child or spousal maintenance`,
   mobilePhoneFrequencyErrorMessage: `Select how frequently you pay for a mobile phone`,
   groceryShoppingFrequencyErrorMessage: `Select how frequently you pay for grocery shopping`,
