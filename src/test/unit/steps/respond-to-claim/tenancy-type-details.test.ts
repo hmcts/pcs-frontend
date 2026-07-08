@@ -51,7 +51,7 @@ type TenancyTypeDetailsStep = {
         };
       };
     };
-  }) => Record<string, unknown>;
+  }) => Promise<Record<string, unknown>>;
   beforeRedirect: (req: { body?: Record<string, unknown> }) => Promise<void>;
   extendGetContent: (
     req: {
@@ -117,26 +117,26 @@ describe('respond-to-claim tenancy-type-details step', () => {
       ['YES', 'yes'],
       ['NO', 'no'],
       ['NOT_SURE', 'notSure'],
-    ])('returns tenancyTypeConfirm=%s when CCD has %s', (ccdValue, formValue) => {
-      const result = testedStep.getInitialFormData(makeReq(ccdValue));
+    ])('returns tenancyTypeConfirm=%s when CCD has %s', async (ccdValue, formValue) => {
+      const result = await testedStep.getInitialFormData(makeReq(ccdValue));
       expect(result).toMatchObject({ tenancyTypeConfirm: formValue });
     });
 
-    it('also returns correctType when CCD value is NO and tenancyType is set', () => {
-      const result = testedStep.getInitialFormData(makeReq('NO', 'Assured shorthold'));
+    it('also returns correctType when CCD value is NO and tenancyType is set', async () => {
+      const result = await testedStep.getInitialFormData(makeReq('NO', 'Assured shorthold'));
       expect(result).toEqual({
         tenancyTypeConfirm: 'no',
         'tenancyTypeConfirm.correctType': 'Assured shorthold',
       });
     });
 
-    it('returns empty object when CCD has no tenancyTypeConfirmation', () => {
-      const result = testedStep.getInitialFormData(makeReq(undefined));
+    it('returns empty object when CCD has no tenancyTypeConfirmation', async () => {
+      const result = await testedStep.getInitialFormData(makeReq(undefined));
       expect(result).toEqual({});
     });
 
-    it('returns empty object when tenancyTypeConfirmation is an unrecognised value', () => {
-      const result = testedStep.getInitialFormData(makeReq('UNKNOWN' as YesNoNotSureValue));
+    it('returns empty object when tenancyTypeConfirmation is an unrecognised value', async () => {
+      const result = await testedStep.getInitialFormData(makeReq('UNKNOWN' as YesNoNotSureValue));
       expect(result).toEqual({});
     });
   });
