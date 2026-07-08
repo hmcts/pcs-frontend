@@ -74,6 +74,34 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       expect(content.noticeDocumentFilename).toBe('notice.pdf');
     });
 
+    it('resolves the notice document from notice_Documents when the details tab is stripped to empty', () => {
+      const content = testedStep.extendGetContent({
+        res: {
+          locals: {
+            validatedCase: makeValidatedCase({
+              claimantName: 'Test Claimant',
+              // Submitted-case event-trigger payload: the case-details tab comes back empty
+              // for the party read path, so the doc must be resolved from notice_Documents.
+              detailsTab_NoticeDetails: {},
+              notice_Documents: [
+                {
+                  id: 'notice-doc-77',
+                  value: {
+                    document_filename: 'possession-notice.pdf',
+                    document_url: 'http://doc-store/notice',
+                    document_binary_url: 'http://doc-store/notice/binary',
+                  },
+                },
+              ],
+            } as CcdCaseData),
+          },
+        },
+      });
+
+      expect(content.noticeDocumentId).toBe('notice-doc-77');
+      expect(content.noticeDocumentFilename).toBe('possession-notice.pdf');
+    });
+
     it('sets noticeDocumentId from detailsTab_NoticeDetails.noticeDocuments for submitted cases', () => {
       const content = testedStep.extendGetContent({
         res: {

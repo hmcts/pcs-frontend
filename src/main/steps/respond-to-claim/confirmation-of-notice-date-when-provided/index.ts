@@ -112,25 +112,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const listItem1 = t('listItem1', { returnObjects: true, noticeDate });
 
     const caseData = (validatedCase?.data as Record<string, unknown>) ?? {};
-    const noticeAbleToUpload = caseData?.notice_AbleToUploadDocument === 'Yes';
     const documents = extractCaseDocuments(caseData);
     const noticeDoc =
       documents.find(d => d.sourceField === 'detailsTab_NoticeDetails.noticeDocuments') ??
       documents.find(d => d.sourceField === 'notice_Documents');
     const noticeDocumentId = noticeDoc?.id;
     const noticeDocumentFilename = noticeDoc?.filename;
-
-    logger.info('Notice document diagnostic', {
-      caseId: validatedCase?.id,
-      detailsTab_NoticeDetails: caseData.detailsTab_NoticeDetails,
-      noticeServed: caseData.noticeServed,
-      notice_Documents: caseData.notice_Documents,
-      notice_AbleToUploadDocument: caseData.notice_AbleToUploadDocument,
-      notice_ServiceMethod: caseData.notice_ServiceMethod,
-      noticeDocumentId,
-      noticeDocumentFilename,
-      noticeAbleToUpload,
-    });
 
     const formatNoticeDate = (raw?: string): string =>
       raw ? DateTime.fromISO(raw).setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y') : '';
