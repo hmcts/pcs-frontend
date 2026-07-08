@@ -11,8 +11,15 @@ jest.mock('../../../main/steps/utils/userRole', () => ({
 import { getUserType } from '../../../main/steps/utils/userRole';
 
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { isRespondToClaimEnabledForUser } from '@utils/isRespondToClaimEnabledForUser';
-import { ENABLE_CUI_RESPOND_TO_CLAIM, ENABLE_CUI_RESPOND_TO_CLAIM_LR } from '@utils/respondToClaimFlags';
+import {
+  isRespondToClaimEnabledForRelease,
+  isRespondToClaimEnabledForUser,
+} from '@utils/isRespondToClaimEnabledForUser';
+import {
+  CUI_RESPOND_TO_CLAIM_ENABLED,
+  CUI_RESPOND_TO_CLAIM_LR_ENABLED,
+  RELEASE_1_2_ENABLED,
+} from '@utils/respondToClaimFlags';
 
 const mockGetLaunchDarklyFlag = getLaunchDarklyFlag as jest.MockedFunction<typeof getLaunchDarklyFlag>;
 const mockGetUserType = getUserType as jest.MockedFunction<typeof getUserType>;
@@ -24,7 +31,7 @@ describe('isRespondToClaimEnabledForUser', () => {
     jest.clearAllMocks();
   });
 
-  it('evaluates citizens against enable_cui_respond_to_claim', async () => {
+  it('evaluates citizens against cui-respond-to-claim-enabled', async () => {
     mockGetUserType.mockReturnValue('citizen');
     mockGetLaunchDarklyFlag.mockResolvedValue(true);
 
@@ -32,10 +39,10 @@ describe('isRespondToClaimEnabledForUser', () => {
     const result = await isRespondToClaimEnabledForUser(req);
 
     expect(result).toBe(true);
-    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, ENABLE_CUI_RESPOND_TO_CLAIM, false);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, CUI_RESPOND_TO_CLAIM_ENABLED, false);
   });
 
-  it('evaluates legal representatives against enable_cui_respond_to_claim_lr', async () => {
+  it('evaluates legal representatives against cui-respond-to-claim-lr-enabled', async () => {
     mockGetUserType.mockReturnValue('legalrep');
     mockGetLaunchDarklyFlag.mockResolvedValue(false);
 
@@ -43,7 +50,7 @@ describe('isRespondToClaimEnabledForUser', () => {
     const result = await isRespondToClaimEnabledForUser(req);
 
     expect(result).toBe(false);
-    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, ENABLE_CUI_RESPOND_TO_CLAIM_LR, false);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, CUI_RESPOND_TO_CLAIM_LR_ENABLED, false);
   });
 
   it('defaults to false when LaunchDarkly returns false', async () => {
@@ -51,6 +58,30 @@ describe('isRespondToClaimEnabledForUser', () => {
     mockGetLaunchDarklyFlag.mockResolvedValue(false);
 
     const result = await isRespondToClaimEnabledForUser(makeReq());
+
+    expect(result).toBe(false);
+  });
+});
+
+describe('isRespondToClaimEnabledForRelease', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('evaluates against cui-respond-to-claim-enabled', async () => {
+    mockGetLaunchDarklyFlag.mockResolvedValue(true);
+
+    const req = makeReq();
+    const result = await isRespondToClaimEnabledForRelease(req);
+
+    expect(result).toBe(true);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, RELEASE_1_2_ENABLED, false);
+  });
+
+  it('defaults to false when LaunchDarkly returns false', async () => {
+    mockGetLaunchDarklyFlag.mockResolvedValue(false);
+
+    const result = await isRespondToClaimEnabledForRelease(makeReq());
 
     expect(result).toBe(false);
   });

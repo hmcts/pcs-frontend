@@ -4,8 +4,10 @@ import type { RequestHandler } from 'express';
 import {
   caseReferenceParamMiddleware,
   legalRepresentativeHeaderMiddleware,
+  legalRepresentativeSpecificStepsAccessMiddleware,
   oidcMiddleware,
   requireEventAccess,
+  respondToClaimFeatureMiddleware,
 } from '../middleware';
 
 import { Logger } from '@modules/logger';
@@ -51,8 +53,23 @@ function buildGetMiddleware(
   const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
 
   return stepMiddleware
-    ? [stepContext, ...authMiddlewares, dependencyCheck, ...stepMiddleware, legalRepresentativeHeaderMiddleware]
-    : [stepContext, ...authMiddlewares, dependencyCheck, legalRepresentativeHeaderMiddleware];
+    ? [
+        stepContext,
+        ...authMiddlewares,
+        dependencyCheck,
+        ...stepMiddleware,
+        legalRepresentativeSpecificStepsAccessMiddleware,
+        legalRepresentativeHeaderMiddleware,
+        respondToClaimFeatureMiddleware,
+      ]
+    : [
+        stepContext,
+        ...authMiddlewares,
+        dependencyCheck,
+        legalRepresentativeSpecificStepsAccessMiddleware,
+        legalRepresentativeHeaderMiddleware,
+        respondToClaimFeatureMiddleware,
+      ];
 }
 
 /**
@@ -99,12 +116,17 @@ function registerStepRoutes(
   const stepContext = withStepContext({ name: step.name, journey: journeyName });
 
   if (step.getController) {
-    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfigResolver, stepContext, step.middleware);
+    const allGetMiddleware = buildGetMiddleware(
+      requiresAuth,
+      flowConfigResolver,
+      stepContext,
+      step.middleware
+    );
     router.get(step.url, ...allGetMiddleware, createGetHandler(step, journeyName));
   }
 
   if (step.postController?.post) {
-    router.post(step.url, stepContext, ...authMiddlewares, legalRepresentativeHeaderMiddleware, (req, res, next) => {
+    router.post(step.url, stepContext, ...authMiddlewares, legalRepresentativeSpecificStepsAccessMiddleware, legalRepresentativeHeaderMiddleware, respondToClaimFeatureMiddleware, (req, res, next) => {
       const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
       return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
     });

@@ -4,6 +4,7 @@ import { getUserType } from '../steps/utils';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import { sanitiseCaseReference } from '@utils/caseReference';
+import { redirectToCaseManagement } from '@utils/legalRepresentativeRedirectHandler';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 function getCaseReferenceFromRequest(req: Request): string | undefined {
@@ -22,7 +23,7 @@ function getCaseReferenceFromRequest(req: Request): string | undefined {
 
 export function handleRespondToClaimDisabled(req: Request, res: Response): void {
   if (getUserType(req) === 'legalrep') {
-    res.status(404).send('Not Found');
+    redirectToCaseManagement(res, getCaseReferenceFromRequest(req));
     return;
   }
 

@@ -1,3 +1,5 @@
-export const ENABLE_CUI_RESPOND_TO_CLAIM = 'enable_cui_respond_to_claim';
+export const CUI_RESPOND_TO_CLAIM_ENABLED = 'cui-respond-to-claim-enabled';
 
-export const ENABLE_CUI_RESPOND_TO_CLAIM_LR = 'enable_cui_respond_to_claim_lr';
+export const CUI_RESPOND_TO_CLAIM_LR_ENABLED = 'cui-respond-to-claim-lr-enabled';
+
+export const RELEASE_1_2_ENABLED = 'release-1.2-enabled';
