@@ -11,7 +11,6 @@ import { getStepUrl } from '@modules/steps/flow';
 import type { SectionConfig } from '@modules/steps/stepFlow.interface';
 import { getAllSectionStatuses, getFirstVisibleStep, safeIsAnswered } from '@services/sectionStatus';
 import { shouldShowStep } from '@steps';
-import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('respondToClaimAccessGuard');
 
@@ -45,17 +44,17 @@ export function respondToClaimAccessGuard(): RequestHandler {
 
     try {
       if (sectionId && (await isSectionUnavailable(sectionId, req))) {
-        return safeRedirect303(res, hubUrl, '/', ['/case/']);
+        return res.redirect(303, hubUrl);
       }
 
       if (!shouldShowStep(req, stepName, flowConfig)) {
-        return safeRedirect303(res, hubUrl, '/', ['/case/']);
+        return res.redirect(303, hubUrl);
       }
 
       if (sectionId && isCyaStep(stepName)) {
         const redirectTarget = getCyaRedirectIfBlocked(sectionId, caseId, hubUrl, req);
         if (redirectTarget) {
-          return safeRedirect303(res, redirectTarget, hubUrl, ['/case/']);
+          return res.redirect(303, redirectTarget);
         }
       }
 
@@ -64,14 +63,14 @@ export function respondToClaimAccessGuard(): RequestHandler {
         const section = sectionById.get(sectionId);
         const firstVisibleStep = section && getFirstVisibleStep(section, flowConfig, req);
         if (firstVisibleStep) {
-          return safeRedirect303(res, getStepUrl(firstVisibleStep, flowConfig, caseId), hubUrl, ['/case/']);
+          return res.redirect(303, getStepUrl(firstVisibleStep, flowConfig, caseId));
         }
       }
 
       return next();
     } catch (err) {
       logger.warn(`accessGuard predicate threw for ${stepName}, failing closed to hub`, err);
-      return safeRedirect303(res, hubUrl, '/', ['/case/']);
+      return res.redirect(303, hubUrl);
     }
   };
 }
