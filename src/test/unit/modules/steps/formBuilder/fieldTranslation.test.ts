@@ -162,4 +162,46 @@ describe('translateFields', () => {
       },
     ]);
   });
+
+  it('preserves an explicit empty field label translation', () => {
+    mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        question: '',
+        'options.yes': 'Yes',
+        'options.no': 'No',
+      };
+      return key in translations ? translations[key] : key;
+    });
+
+    const result = translateFields(
+      [
+        {
+          name: 'confirmOtherAdults',
+          type: 'radio',
+          translationKey: {
+            label: 'question',
+          },
+          options: [
+            { value: 'yes', translationKey: 'options.yes' },
+            { value: 'no', translationKey: 'options.no' },
+          ],
+        },
+      ],
+      mockT as unknown as TFunction,
+      {},
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+
+    expect(result[0].component?.fieldset).toEqual({
+      legend: {
+        text: '',
+        isPageHeading: false,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    });
+  });
 });

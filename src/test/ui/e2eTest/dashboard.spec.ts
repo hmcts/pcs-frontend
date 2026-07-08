@@ -24,8 +24,8 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
-  await performAction('updatePaymentAPI');
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -235,6 +235,13 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('reloadPage');
     await performAction('clickButton', dashboard.viewTheResponseSubHeader);
     await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
-    await performAction('verifyResponseOnViewTheClaimPage');
+    await performAction('verifyResponseDetailsOnViewTheResponsePage');
+  });
+
+  test('Validate View the claim page data @regression @crossbrowser', async () => {
+    await performAction('clickLink', dashboard.viewTheClaimLink);
+    await performValidation('mainHeader', viewTheClaim.mainHeader);
+    await performAction('verifyClaimDetailsOnViewTheClaimPage');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });

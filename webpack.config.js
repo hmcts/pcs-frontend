@@ -49,7 +49,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'src/main/public/'),
-    publicPath: '',
+    publicPath: '/',
     filename,
   },
 };

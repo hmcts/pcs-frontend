@@ -30,31 +30,37 @@
 
   <h1 class="govuk-heading-l">{{ title }}</h1>
 
-  <p class="govuk-body">{{ description | safe }}</p>
+  {% if description %}
+    <p class="govuk-body">{{ description | safe }}</p>
+  {% endif %}
 
-  {% if not isLegalRepresentative %}
+  {% if completingYourResponse %}
     <h2 class="govuk-heading-m">{{completingYourResponse}}</h2>
   {% endif %}
 
   <p class="govuk-body">
-  {{saveDraftInfo}}
+    {{saveDraftInfo}}
   </p>
+
+  {% if completingYourResponse %}
+    <p class="govuk-body">
+      {{uploadDocumentsInfo}}
+    </p>
+  {% endif %}
 
   <p class="govuk-body">
-  {{uploadDocumentsInfo}}
+    {{claimantVisibilityInfo}}
   </p>
 
-  {% if not isLegalRepresentative %}
-    <p class="govuk-body">
-    {{claimantVisibilityInfo}}
-    </p>
-
+  {% if whatYouWillNeed %}
     <h2 class="govuk-heading-m">{{whatYouWillNeed}}</h2>
+  {% endif %}
 
     <p class="govuk-body">
-    {{provideDetailsInfo}}
+    {{provideDetailsInfo | safe}}
     </p>
 
+  {% if not isLegalRepresentative %}
     <ul class="govuk-list govuk-list--bullet">
       <li>{{listItemName}}</li>
       <li>{{listItemDateOfBirth}}</li>

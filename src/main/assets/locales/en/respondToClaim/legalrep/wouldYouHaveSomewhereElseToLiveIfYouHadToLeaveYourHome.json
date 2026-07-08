@@ -1,0 +1,19 @@
+{
+  "question": "",
+  "heading": "Alternative accommodation",
+  "accommodationQuestion": "Would the defendant have somewhere else to live if they had to leave their home?",
+  "dateLabel": "When would they be able to move in? (Optional)",
+  "options": {
+    "notSure": "Defendant is not sure"
+  },
+  "errors": {
+    "date": {
+      "notRealDate": "The date the defendant would be able to move in must be a real date ",
+      "pastDate": "The date the defendant would be able to move in must be in the future",
+      "invalidValue": "The date the defendant would be able to move in must be a real date ",
+      "missingOne": "The date the defendant would be able to move in must include a {{missingField}}",
+      "missingTwo": "The date the defendant would be able to move in must include a {{first}} and {{second}}"
+    },
+    "confirmAlternativeAccommodation": "Select if the defendant would have somewhere else to live if they had to leave their home"
+  }
+}

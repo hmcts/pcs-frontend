@@ -16,6 +16,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     question: 'question',
     hintText: 'hintText',
+    noticeDateHint: 'noticeDateHint',
   },
   fields: [
     {
