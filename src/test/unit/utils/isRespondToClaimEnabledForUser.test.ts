@@ -24,7 +24,7 @@ describe('isRespondToClaimEnabledForUser', () => {
     jest.clearAllMocks();
   });
 
-  it('evaluates citizens against enable_cui_respond_to_claim', async () => {
+  it('evaluates citizens against cui-respond-to-claim-enabled', async () => {
     mockGetUserType.mockReturnValue('citizen');
     mockGetLaunchDarklyFlag.mockResolvedValue(true);
 
@@ -35,7 +35,7 @@ describe('isRespondToClaimEnabledForUser', () => {
     expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, ENABLE_CUI_RESPOND_TO_CLAIM, false);
   });
 
-  it('evaluates legal representatives against enable_cui_respond_to_claim_lr', async () => {
+  it('evaluates legal representatives against cui-respond-to-claim-lr-enabled', async () => {
     mockGetUserType.mockReturnValue('legalrep');
     mockGetLaunchDarklyFlag.mockResolvedValue(false);
 
