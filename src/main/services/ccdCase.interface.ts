@@ -258,6 +258,7 @@ export interface PossessionClaimResponse {
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
+  responseDocumentId?: string;
   claimIssuedDate?: string;
 }
 

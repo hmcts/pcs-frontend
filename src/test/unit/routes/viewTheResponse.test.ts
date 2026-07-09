@@ -994,4 +994,72 @@ describe('viewTheResponse route', () => {
 
     expect(next).toHaveBeenCalledWith(serviceError);
   });
+
+  async function renderResponse(data: CcdCaseData) {
+    mockCaseById(data);
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    await handler(
+      viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }),
+      res,
+      jest.fn()
+    );
+    return (res.render as jest.Mock).mock.calls[0][1];
+  }
+
+  it('should build responsePdfUrl when the defence document is present in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'doc-response-1',
+          value: {
+            document_filename: 'Defence - Defendant 2.pdf',
+            document_binary_url: 'http://dm-store/doc-response-1/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        responseDocumentId: 'doc-response-1',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBe(`/case/${caseReference}/view-documents/doc-response-1`);
+  });
+
+  it('should not build responsePdfUrl when responseDocumentId does not match a document in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'some-other-doc',
+          value: {
+            document_filename: 'Defence - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/some-other-doc/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        responseDocumentId: 'not-present',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
+
+  it('should not build responsePdfUrl when the response PDF has not been generated yet', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      possessionClaimResponse: {
+        defendantResponses: {},
+      },
+    } as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
 });
