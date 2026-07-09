@@ -9,7 +9,6 @@ import {
   counterClaim,
   counterClaimAgainstWhom,
   defendantDateOfBirth,
-  defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
@@ -34,6 +33,7 @@ import {
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
 } from '../data/page-data';
+import { defendantNameConfirmation } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
@@ -91,7 +91,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.getLrHiddenMainHeader(pin2User.firstName, pin2User.lastName),
+      question: defendantNameConfirmation.mainHeader(pin2User.firstName, pin2User.lastName),
       option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
@@ -222,7 +222,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.getLrHiddenMainHeader(pinUser.firstName, pinUser.lastName),
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
       option: defendantNameConfirmation.noRadioOption,
       fName: defendantNameConfirmation.firstNameInputText,
       lName: defendantNameConfirmation.lastNameInputText,
@@ -370,7 +370,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('RentArrears - DemotedTenancy - LR @smoke @regression @rent', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.getLrHiddenMainHeader(pinUser.firstName, pinUser.lastName),
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
       option: defendantNameConfirmation.noRadioOption,
       fName: defendantNameConfirmation.firstNameInputText,
       lName: defendantNameConfirmation.lastNameInputText,
