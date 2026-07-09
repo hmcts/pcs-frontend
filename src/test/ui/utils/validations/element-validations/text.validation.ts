@@ -24,6 +24,15 @@ export class TextValidation implements IValidation {
       case 'paragraph':
         data.elementType = 'p';
         break;
+      case 'paragraphWithLink': {
+        const locator = page.locator(`p:text("${data.text}")`).filter({ visible: true }).first();
+        if (validation === 'textNotVisible') {
+          await expect(locator).toHaveCount(0);
+          return;
+        }
+        await expect(locator).toContainText(data.text as string);
+        return;
+      }
       case 'inlineText':
         data.elementType = 'span';
         break;
