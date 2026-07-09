@@ -13,9 +13,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.exemptLandlord),
   stepDir: __dirname,
   getInitialFormData: async (req: Request) => {
-    // Pre-populate from the saved draft (CCD + draft merge). Option values are the
-    // backend enum (YES/NO/NOT_SURE), so the stored value maps to the radio directly.
-    const exemptLandlord = req.res?.locals.validatedCase?.defendantResponses?.exemptLandlord;
+    const caseData = req.res?.locals.validatedCase?.data;
+    const exemptLandlord = caseData?.possessionClaimResponse?.defendantResponses?.exemptLandlord as
+      | YesNoNotSureValue
+      | undefined;
+
     return exemptLandlord ? { exemptLandlord } : {};
   },
   customTemplate: `${__dirname}/exemptLandlord.njk`,
@@ -52,8 +54,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     } else {
       delete response.defendantResponses.exemptLandlord;
     }
-
-    delete response.defendantResponses.landlordLicensed;
 
     await saveDraftDefendantResponse(req, response);
   },
