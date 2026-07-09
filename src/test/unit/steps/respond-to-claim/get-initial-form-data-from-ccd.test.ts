@@ -139,13 +139,13 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
       data: {
         possessionClaimResponse: {
           defendantResponses: {
-            landlordRegistered: 'NOT_SURE',
+            exemptLandlord: 'NOT_SURE',
           },
         },
       },
-    } as CcdCase);
+    });
     const { req, res } = createReqRes(validatedCase, {
-      'exempt-landlord': { landlordRegistered: 'YES' },
+      'exempt-landlord': { exemptLandlord: 'YES' },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -153,7 +153,7 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ landlordRegistered: 'NOT_SURE' }));
+    expect(renderData.fieldValues).toEqual(expect.objectContaining({ exemptLandlord: 'NOT_SURE' }));
   });
 
   it('populates page heading from CCD without pre-selecting yes or filling address form', async () => {
