@@ -119,7 +119,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         noticeReceivedDate: '2025-12-01',
         rentArrearsAmountConfirmation: 'YES',
         rentArrearsAmount: '125000',
-        landlordRegistered: 'YES',
+        exemptLandlord: 'YES',
         landlordLicensed: 'NO',
         writtenTerms: 'NOT_SURE',
         paymentAgreement: {
@@ -208,7 +208,7 @@ function buildAlternateBranchesCaseData(): CcdCaseData {
         disputeClaim: 'NO',
         tenancyTypeConfirmation: 'NO',
         possessionNoticeReceived: 'NOT_SURE',
-        landlordRegistered: undefined,
+        exemptLandlord: undefined,
         householdCircumstances: {
           incomeFromJobs: 'NO',
           universalCredit: 'NO',

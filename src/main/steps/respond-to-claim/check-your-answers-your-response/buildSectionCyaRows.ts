@@ -54,10 +54,10 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
 }
 
 function addExemptLandlordRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
-  if (!responses.landlordRegistered) {
+  if (!responses.exemptLandlord) {
     return;
   }
-  pushYesNoRow(rows, 'rows.exemptLandlord', responses.landlordRegistered, 'exempt-landlord', t, yesNoNotSure, change);
+  pushYesNoRow(rows, 'rows.exemptLandlord', responses.exemptLandlord, 'exempt-landlord', t, yesNoNotSure, change);
 }
 
 function addWrittenTermsRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {

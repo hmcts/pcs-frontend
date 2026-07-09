@@ -290,7 +290,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
-  pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNoNotSure(t, responses?.landlordRegistered));
+  pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNoNotSure(t, responses?.exemptLandlord));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.tenancyTypeConfirmation'),
