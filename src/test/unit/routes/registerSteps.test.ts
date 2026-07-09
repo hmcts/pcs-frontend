@@ -245,8 +245,8 @@ describe('registerSteps', () => {
     expect(typeof unprotectedPostCall![1]).toBe('function');
     expect(unprotectedPostCall![2]).toBe(legalRepresentativeSpecificStepsAccessMiddleware);
     expect(unprotectedPostCall![3]).toBe(legalRepresentativeHeaderMiddleware);
-    expect(typeof unprotectedPostCall![4]).toBe('function');
-    expect(unprotectedGetCall![5]).toBe(respondToClaimFeatureMiddleware);
+    expect(unprotectedPostCall![4]).toBe(respondToClaimFeatureMiddleware);
+    expect(typeof unprotectedPostCall![5]).toBe('function');
   });
 
   it('delegates POST handlers to the resolved step definition', () => {
