@@ -1,8 +1,10 @@
 export const haveYouAppliedForUniversalCredit = {
   mainHeader: `Have you applied for Universal Credit?`,
+  lrHiddenmainHeader: `Has the defendant applied for Universal Credit?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   whenDidYouApplyHiddenQuestion: `When did you apply?`,
+  lrHiddenWhenDidDefendantApplyQuestion: `When did the defendant apply?`,
   dayHiddenTextLabel: `Day`,
   monthHiddenTextLabel: `Month`,
   yearHiddenTextLabel: `Year`,
@@ -20,5 +22,5 @@ export const haveYouAppliedForUniversalCredit = {
   dayMissingErrorMessage: `The date you applied for Universal Credit must include a day`,
   monthMissingErrorMessage: `The date you applied for Universal Credit must include a month`,
   yearMissingErrorMessage: `The date you applied for Universal Credit must include a year`,
-  futureDateErrorMessage: `The date you applied for Universal Credit must must either be today’s date or in the past`,
+  futureDateErrorMessage: `The date you applied for Universal Credit must either be today’s date or in the past`,
 };

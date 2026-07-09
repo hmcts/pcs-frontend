@@ -314,17 +314,17 @@ describe('GetController', () => {
     expect(res.render).toHaveBeenCalledWith('test.njk', { title: 'Test' });
   });
 
-  it('should render view with generated content and extra headers when present', async () => {
+  it('should render view with generated content and ignore unrelated res.locals values', async () => {
     const mockGenerateContent = jest.fn(() => ({ title: 'Test' }));
     const controller = new GetController('test.njk', mockGenerateContent);
     const req = {} as Request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { render: jest.fn(), locals: { extraHeaders: { headers: 'testHeaders' } } } as any;
+    const res = { render: jest.fn(), locals: { isLegalRepresentative: true, headerModel: { name: 'xui' } } } as any;
 
     await controller.get(req, res);
 
     expect(mockGenerateContent).toHaveBeenCalledWith(req);
-    expect(res.render).toHaveBeenCalledWith('test.njk', { title: 'Test', headers: 'testHeaders' });
+    expect(res.render).toHaveBeenCalledWith('test.njk', { title: 'Test' });
   });
 });
 
