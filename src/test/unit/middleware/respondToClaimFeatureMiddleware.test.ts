@@ -54,7 +54,7 @@ describe('respondToClaimFeatureMiddleware', () => {
 
   // Changed to an async function that awaits the middleware execution
   const invokeMiddleware = async (req: Request): Promise<void> => {
-    await (respondToClaimFeatureMiddleware as any)(req, res as Response, next);
+    await respondToClaimFeatureMiddleware(req, res as Response, next);
   };
 
   beforeEach(() => {
