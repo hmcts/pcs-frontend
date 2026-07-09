@@ -16,8 +16,8 @@ import {
   isRespondToClaimEnabledForUser,
 } from '@utils/isRespondToClaimEnabledForUser';
 import {
-  CUI_RESPOND_TO_CLAIM_ENABLED,
-  CUI_RESPOND_TO_CLAIM_LR_ENABLED,
+  ENABLE_CUI_RESPOND_TO_CLAIM,
+  ENABLE_CUI_RESPOND_TO_CLAIM_LR,
   RELEASE_1_2_ENABLED,
 } from '@utils/respondToClaimFlags';
 
@@ -39,7 +39,7 @@ describe('isRespondToClaimEnabledForUser', () => {
     const result = await isRespondToClaimEnabledForUser(req);
 
     expect(result).toBe(true);
-    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, CUI_RESPOND_TO_CLAIM_ENABLED, false);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, ENABLE_CUI_RESPOND_TO_CLAIM, false);
   });
 
   it('evaluates legal representatives against cui-respond-to-claim-lr-enabled', async () => {
@@ -50,7 +50,7 @@ describe('isRespondToClaimEnabledForUser', () => {
     const result = await isRespondToClaimEnabledForUser(req);
 
     expect(result).toBe(false);
-    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, CUI_RESPOND_TO_CLAIM_LR_ENABLED, false);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, ENABLE_CUI_RESPOND_TO_CLAIM_LR, false);
   });
 
   it('defaults to false when LaunchDarkly returns false', async () => {

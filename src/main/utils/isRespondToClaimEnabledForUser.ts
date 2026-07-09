@@ -4,13 +4,13 @@ import { getUserType } from '../steps/utils';
 
 import { getLaunchDarklyFlag } from './getLaunchDarklyFlag';
 import {
-  CUI_RESPOND_TO_CLAIM_ENABLED,
-  CUI_RESPOND_TO_CLAIM_LR_ENABLED,
+  ENABLE_CUI_RESPOND_TO_CLAIM,
+  ENABLE_CUI_RESPOND_TO_CLAIM_LR,
   RELEASE_1_2_ENABLED,
 } from './respondToClaimFlags';
 
 export async function isRespondToClaimEnabledForUser(req: Request): Promise<boolean> {
-  const flagName = getUserType(req) === 'legalrep' ? CUI_RESPOND_TO_CLAIM_LR_ENABLED : CUI_RESPOND_TO_CLAIM_ENABLED;
+  const flagName = getUserType(req) === 'legalrep' ? ENABLE_CUI_RESPOND_TO_CLAIM_LR : ENABLE_CUI_RESPOND_TO_CLAIM;
 
   return getLaunchDarklyFlag(req, flagName, false);
 }
