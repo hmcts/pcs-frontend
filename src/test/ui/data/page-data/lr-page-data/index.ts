@@ -31,3 +31,5 @@ export * from './rentArrearsDisputeLR.page.data';
 export * from './confirmationOfNoticeDateWhenProvidedLR.page.data';
 export * from './repaymentsMadeLR.page.data';
 export * from './repaymentsAgreedLR.page.data';
+export * from './selectDefendantLR.page.data';
+export * from './contactPreferencesTextMessageLR.page.data';

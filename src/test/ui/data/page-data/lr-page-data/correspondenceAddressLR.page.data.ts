@@ -1,6 +1,6 @@
 import { address } from '../../../utils/actions/custom-actions';
 
-export const correspondenceAddress = {
+export const correspondenceAddressLR = {
   get correspondenceAddressKnownMainHeader(): string {
     return `Is your correspondence address ${address}?`;
   },

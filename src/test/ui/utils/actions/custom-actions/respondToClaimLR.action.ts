@@ -4,7 +4,6 @@ import {
   circumstancesLR,
   confirmationOfNoticeGiven,
   correspondenceAddress,
-  counterClaimAgainstWhom,
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
@@ -26,6 +25,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
 } from '../../../data/page-data';
+import { selectDefendantLR } from '../../../data/page-data/lr-page-data';
 import { formatCurrency } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -279,7 +279,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       question: representationOption.question,
       option: representationOption.radioOption,
     });
-    await performAction('clickButton', counterClaimAgainstWhom.saveAndContinueButton);
+    await performAction('clickButton', selectDefendantLR.saveAndContinueButton);
   }
 
   private async selectWhatRegularIncomeDoTheyReceiveLR(regularIncome?: actionRecord): Promise<void> {

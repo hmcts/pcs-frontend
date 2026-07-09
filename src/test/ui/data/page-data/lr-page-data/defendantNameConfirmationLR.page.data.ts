@@ -1,4 +1,4 @@
-export const defendantNameConfirmation = {
+export const defendantNameConfirmationLR = {
   mainHeader(clientFirstName: string, clientLastName: string): string {
     return `Is your client’s name ${clientFirstName} ${clientLastName}?`;
   },
