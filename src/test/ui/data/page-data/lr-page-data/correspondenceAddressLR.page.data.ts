@@ -1,9 +1,31 @@
-import { address } from '../../../utils/actions/custom-actions';
+// import { address } from '../../../utils/actions/custom-actions';
+// import { createCaseApiData } from '../../api-data';
+// import { createCaseApiWalesData } from '../../api-data/createCaseWales.api.data';
+//
+// function getDefaultPostalAddressLR(): string {
+//   const isWalesJourney = process.env.WALES_POSTCODE && process.env.WALES_POSTCODE.toUpperCase() === 'YES';
+//
+//   const propertyAddress = isWalesJourney
+//     ? createCaseApiWalesData.createCasePayload.propertyAddress
+//     : createCaseApiData.createCasePayload.propertyAddress;
+//
+//   return [
+//     propertyAddress.AddressLine1,
+//     propertyAddress.AddressLine2,
+//     propertyAddress.AddressLine3,
+//     propertyAddress.PostTown,
+//     propertyAddress.County,
+//     propertyAddress.PostCode,
+//   ]
+//     .filter(Boolean)
+//     .join(', ');
+// }
 
 export const correspondenceAddressLR = {
-  get correspondenceAddressKnownMainHeader(): string {
-    return `Is your correspondence address ${address}?`;
-  },
+  // get correspondenceAddressPostalMainHeader(): string {
+  //   const postalAddress = process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN' ? getDefaultPostalAddressLR() : address;
+  //   return `Is your postal address ${postalAddress}?`;
+  // },
   correspondenceAddressUnKnownMainHeader: `What’s your correspondence address?`,
   correspondenceAddressUnKnownParagraph: `Your correspondence address is your postal address.`,
   respondToClaimParagraph: `Respond to a property possession claim`,

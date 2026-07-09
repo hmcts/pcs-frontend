@@ -1,4 +1,4 @@
-export const incomeAndExpenses = {
+export const incomeAndExpensesLR = {
   mainHeader: `Income and expenses`,
   doesDefendantWantToProvideDetailsHeader: `Does the defendant want to provide details of their income and expenses?`,
   detailsAboutDefendantIncomeParagraph: `Details about the defendant’s income and expenses can be used by a judge to reach a decision on their case, and also to decide how much they could afford to repay if they have rent arrears.`,

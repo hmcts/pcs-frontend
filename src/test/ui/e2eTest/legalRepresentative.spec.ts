@@ -27,13 +27,32 @@ import {
   rentArrears,
   repaymentsAgreed,
   startNow,
-  tenancyDateDetails,
   tenancyTypeDetails,
-  whatOtherRegularExpensesDoYouHave,
-  whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
 } from '../data/page-data';
-import { selectDefendantLR } from '../data/page-data/lr-page-data';
+import { confirmationOfNoticeGivenLR } from '../data/page-data/lr-page-data/confirmationOfNoticeGivenLR.page.data';
+import { contactPreferenceEmailOrPostLR } from '../data/page-data/lr-page-data/contactPreferenceEmailOrPostLR.page.data';
+import { contactPreferencesTelephoneLR } from '../data/page-data/lr-page-data/contactPreferencesTelephoneLR.page.data';
+import { contactPreferencesTextMessageLR } from '../data/page-data/lr-page-data/contactPreferencesTextMessageLR.page.data';
+import { correspondenceAddressLR } from '../data/page-data/lr-page-data/correspondenceAddressLR.page.data';
+import { counterClaimLR } from '../data/page-data/lr-page-data/counterclaimLR.page.data';
+import { defendantDateOfBirthLR } from '../data/page-data/lr-page-data/defendantDateOfBirthLR.page.data';
+import { defendantNameConfirmationLR } from '../data/page-data/lr-page-data/defendantNameConfirmationLR.page.data';
+import { doAnyOtherAdultsLiveInYourHomeLR } from '../data/page-data/lr-page-data/doAnyOtherAdultsLiveInYourHomeLR.page.data';
+import { doYouHaveAnyDependantChildrenLR } from '../data/page-data/lr-page-data/doYouHaveAnyDependantChildrenLR.page.data';
+import { doYouHaveAnyOtherDependantsLR } from '../data/page-data/lr-page-data/doYouHaveAnyOtherDependantsLR.page.data';
+import { exceptionalHardshipLR } from '../data/page-data/lr-page-data/exceptionalHardshipLR.page.data';
+import { incomeAndExpensesLR } from '../data/page-data/lr-page-data/incomeAndExpensesLR.page.data';
+import { languageUsedLR } from '../data/page-data/lr-page-data/languageUsedLR.page.data';
+import { nonRentArrearsDisputeLR } from '../data/page-data/lr-page-data/nonRentArrearsDisputeLR.page.data';
+import { otherConsiderationsLR } from '../data/page-data/lr-page-data/otherConsiderationsLR.page.data';
+import { priorityDebtsLR } from '../data/page-data/lr-page-data/priorityDebtsLR.page.data';
+import { rentArrearsLR } from '../data/page-data/lr-page-data/rentArrearsDisputeLR.page.data';
+import { selectDefendantLR } from '../data/page-data/lr-page-data/selectDefendantLR.page.data';
+import { tenancyTypeDetailsLR } from '../data/page-data/lr-page-data/tenancyTypeDetailsLR.page.data';
+import { whatOtherRegularExpensesDoYouHaveLR } from '../data/page-data/lr-page-data/whatOtherRegularExpensesDoYouHaveLR.page.data';
+import { whatRegularIncomeDoYouReceiveLR } from '../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
+import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR } from '../data/page-data/lr-page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
@@ -91,30 +110,30 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.getLrHiddenMainHeader(pin2User.firstName, pin2User.lastName),
-      option: defendantNameConfirmation.yesRadioOption,
+      question: defendantNameConfirmationLR.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmationLR.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirth.dayInputText,
-      dobMonth: defendantDateOfBirth.monthInputText,
-      dobYear: defendantDateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirthLR.dayInputText,
+      dobMonth: defendantDateOfBirthLR.monthInputText,
+      dobYear: defendantDateOfBirthLR.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-      postcode: correspondenceAddress.walesPostcodeTextInput,
+      addressLine1: correspondenceAddressLR.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddressLR.walesTownOrCityTextInput,
+      postcode: correspondenceAddressLR.walesPostcodeTextInput,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
-      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPostLR.byEmailCheckbox,
+      emailAddress: contactPreferenceEmailOrPostLR.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.noRadioOption,
+      radioOption: contactPreferencesTelephoneLR.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetails.yesRadioOption,
+      tenancyOption: tenancyTypeDetailsLR.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR', {
       tsDay: '15',
@@ -122,14 +141,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       tsYear: '2024',
     });
     await performAction('selectNoticeDetailsLR', {
-      option: confirmationOfNoticeGiven.yesRadioOption,
+      option: confirmationOfNoticeGivenLR.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknownLR');
     await performAction('disputingOtherPartsOfTheClaimLR', {
-      disputeOption: nonRentArrearsDispute.noRadioOption,
+      disputeOption: nonRentArrearsDisputeLR.noRadioOption,
     });
     await performAction('selectCounterClaim', {
-      option: counterClaim.yesRadioOption,
+      option: counterClaimLR.yesRadioOption,
     });
     // await performAction('selectWhatAreYouClaimingFor', {
     //   question: counterClaimWhatAreYouClaimingFor.mainHeader,
@@ -150,18 +169,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //   reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     // });
     await performAction('doesTheDependantHaveChildrenLR', {
-      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
-      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+      dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
     });
     await performAction('otherDependantsLR', {
-      otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
+      otherDependantsOption: doYouHaveAnyOtherDependantsLR.noRadioOption,
     });
     await performAction('otherAdultsLR', {
-      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+      radioOption: doAnyOtherAdultsLiveInYourHomeLR.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHomeLR.detailsAboutAdultsTextInput,
     });
     await performAction('alternativeAccommodationLR', {
-      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.yesRadioOption,
       ...getRelativeDate(5),
     });
     await performAction('circumstancesLR', {
@@ -169,43 +188,43 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       yourCircumstancesOption: circumstancesLR.yesRadioOption,
     });
     await performAction('exceptionalHardshipLR', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
+      question: exceptionalHardshipLR.mainHeader,
+      exceptionalHardshipOption: exceptionalHardshipLR.yesRadioOption,
     });
     await performAction('selectIncomeAndExpensesLR', {
-      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+      incomeAndExpensesOption: incomeAndExpensesLR.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
       regularIncomeOptions: [
         [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+          whatRegularIncomeDoYouReceiveLR.universalCreditParagraph,
+          whatRegularIncomeDoYouReceiveLR.universalCreditTextInput,
+          whatRegularIncomeDoYouReceiveLR.monthHiddenRadioOption,
         ],
       ],
     });
     await performAction('selectPriorityDebtsLR', {
-      question: priorityDebts.lrDoesDefendantHavePriorityDebtsHiddenQuestion,
-      option: priorityDebts.noRadioOption,
+      question: priorityDebtsLR.doesDefendantHaveAnyPriorityDebtsQuestion,
+      option: priorityDebtsLR.noRadioOption,
     });
     await performAction('selectExpensesLR', {
       regularExpensesOptions: [
         [
-          whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
-          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
-          whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingWeekHiddenRadioOption,
         ],
         [
-          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsParagraph,
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsTotalAmountInput,
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsMonthHiddenRadioOption,
         ],
       ],
     });
     await performAction('otherConsiderationsLR', {
-      question: otherConsiderations.lrHiddenMainHeader,
-      option: otherConsiderations.yesRadioOption,
-      courtInfo: otherConsiderations.detailsTextInput,
+      question: otherConsiderationsLR.isThereAnythingElseParagraph,
+      option: otherConsiderationsLR.yesRadioOption,
+      courtInfo: otherConsiderationsLR.detailsTextInput,
     });
     await performAction('uploadFiles');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -213,7 +232,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
-      question: languageUsed.lrHiddenMainHeader,
+      question: languageUsedLR.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
     //await performAction('clickButton', 'Submit');
@@ -222,38 +241,38 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.getLrHiddenMainHeader(pinUser.firstName, pinUser.lastName),
-      option: defendantNameConfirmation.noRadioOption,
-      fName: defendantNameConfirmation.firstNameInputText,
-      lName: defendantNameConfirmation.lastNameInputText,
+      question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmationLR.noRadioOption,
+      fName: defendantNameConfirmationLR.firstNameInputText,
+      lName: defendantNameConfirmationLR.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirth.dayInputText,
-      dobMonth: defendantDateOfBirth.monthInputText,
-      dobYear: defendantDateOfBirth.yearInputText,
+      dobDay: defendantDateOfBirthLR.dayInputText,
+      dobMonth: defendantDateOfBirthLR.monthInputText,
+      dobYear: defendantDateOfBirthLR.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnknownLR', {
-      radioOption: correspondenceAddress.yesRadioOption,
+      radioOption: correspondenceAddressLR.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
+      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPostLR.byPostCheckbox,
     });
     await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephone.yesRadioOption,
-      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+      radioOption: contactPreferencesTelephoneLR.yesRadioOption,
+      phoneNumber: contactPreferencesTelephoneLR.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetails.noRadioOption,
-      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetailsLR.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetailsLR.giveCorrectTenancyTypeTextInput,
     });
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyDateDetails.yesRadioOption,
+      option: tenancyTypeDetailsLR.yesRadioOption,
     });
     await performAction('selectNoticeDetailsLR', {
-      option: confirmationOfNoticeGiven.yesRadioOption,
+      option: confirmationOfNoticeGivenLR.yesRadioOption,
     });
     await performAction('enterNoticeDateKnownLR', {
       day: '25',
@@ -261,8 +280,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       year: '2020',
     });
     await performAction('rentArrearsLR', {
-      option: rentArrears.noRadioOption,
-      rentAmount: rentArrears.rentAmountTextInput,
+      option: rentArrearsLR.noRadioOption,
+      rentAmount: rentArrearsLR.rentAmountTextInput,
       rentArrearsTotal: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('disputingOtherPartsOfTheClaimLR', {
@@ -361,8 +380,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
-      question: languageUsed.lrHiddenMainHeader,
-      radioOption: languageUsed.englishRadioOption,
+      question: languageUsedLR.mainHeader,
+      radioOption: languageUsedLR.englishRadioOption,
     });
     //await performAction('clickButton', 'Submit');
   });
@@ -370,7 +389,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('RentArrears - DemotedTenancy - LR @smoke @regression @rent', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.getLrHiddenMainHeader(pinUser.firstName, pinUser.lastName),
+      question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
       option: defendantNameConfirmation.noRadioOption,
       fName: defendantNameConfirmation.firstNameInputText,
       lName: defendantNameConfirmation.lastNameInputText,
@@ -478,8 +497,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
-      question: languageUsed.lrHiddenMainHeader,
-      radioOption: languageUsed.englishRadioOption,
+      question: languageUsedLR.mainHeader,
+      radioOption: languageUsedLR.englishRadioOption,
     });
     //await performAction('clickButton', 'Submit');
   });
