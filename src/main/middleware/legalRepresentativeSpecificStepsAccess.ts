@@ -12,7 +12,7 @@ export const legalRepresentativeSpecificStepsAccessMiddleware: RequestHandler = 
   next: NextFunction
 ): Promise<void> => {
   if (isLegalRepresentativeUser(req)) {
-     return next();
+    return next();
   }
 
   const isLegalRepresentativeSpecificPath = LEGAL_REPRESENTATIVE_SPECIFC_ALLOWED_PATHS.some(pattern =>

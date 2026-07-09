@@ -90,7 +90,6 @@ describe('respondToClaimFeatureMiddleware', () => {
     expect(mockIsRespondToClaimEnabledForRelease).not.toHaveBeenCalled();
   });
 
-
   it('redirects when legal rep and disabled for user and enabled for release', async () => {
     mockIsLegalRepresentativeUser.mockReturnValue(true);
     mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
@@ -138,5 +137,4 @@ describe('respondToClaimFeatureMiddleware', () => {
     expect(next).toHaveBeenCalledTimes(1);
     expect(mockHandleRespondToClaimDisabled).not.toHaveBeenCalled();
   });
-
 });

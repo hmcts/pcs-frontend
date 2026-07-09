@@ -9,23 +9,22 @@ import {
   isRespondToClaimEnabledForUser,
 } from '@utils/isRespondToClaimEnabledForUser';
 
-
 export const respondToClaimFeatureMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-    if (isLegalRepresentativeUser(req)) {
-      const isReleaseEnabled = await isRespondToClaimEnabledForRelease(req);
-      if (!isReleaseEnabled) {
-        return handleRespondToClaimDisabled(req, res);
-      }
-    }
-
-    const isUserEnabled = await isRespondToClaimEnabledForUser(req);
-    if (!isUserEnabled) {
+  if (isLegalRepresentativeUser(req)) {
+    const isReleaseEnabled = await isRespondToClaimEnabledForRelease(req);
+    if (!isReleaseEnabled) {
       return handleRespondToClaimDisabled(req, res);
     }
+  }
 
-    next();
+  const isUserEnabled = await isRespondToClaimEnabledForUser(req);
+  if (!isUserEnabled) {
+    return handleRespondToClaimDisabled(req, res);
+  }
+
+  next();
 };
