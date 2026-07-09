@@ -20,6 +20,6 @@
       "futureDate": "cyThe date must be in the past",
       "missingOne": "cyThe date must include a {{missingField}}",
       "missingTwo": "cyThe date must include a {{first}} and {{second}}"
-    } 
+    }
   }
 }
