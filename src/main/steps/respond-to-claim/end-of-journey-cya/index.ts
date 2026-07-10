@@ -171,6 +171,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         ? {
             nameOfFirm: (req.body?.nameOfFirm as string | undefined)?.trim(),
             positionHeld: (req.body?.positionHeld as string | undefined)?.trim(),
+            hasLegalRepresentation: 'YES',
           }
         : {}),
     };

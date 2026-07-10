@@ -248,6 +248,7 @@ export interface StatementOfTruth {
   fullName?: string;
   nameOfFirm?: string;
   positionHeld?: string;
+  hasLegalRepresentation?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
