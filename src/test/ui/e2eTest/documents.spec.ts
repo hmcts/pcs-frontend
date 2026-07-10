@@ -1,7 +1,9 @@
 import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { dashboard } from '../data/page-data';
 import {
   checkYourAnswers,
   confirmIfTheseDocumentsRelateToAnApplication,
+  documentsUploaded,
   startEvidenceUpload,
   uploadYourDocuments,
   viewDocuments,
@@ -51,7 +53,24 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden,
     });
     await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('verifyCheckYourAnswers', {
+      relatedApplication: checkYourAnswers.getRelatedApplicationAdjournValue(),
+      fileName: 'uploadYourDocuments.docx',
+    });
+    await performAction('clickLink', checkYourAnswers.changeLink);
+    await performAction('clickRadioButton', {
+      question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
+      option: confirmIfTheseDocumentsRelateToAnApplication.noRadioOption,
+    });
+    await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
+    await performAction('clickButton', uploadYourDocuments.continueButton);
+    await performAction('verifyCheckYourAnswers', {
+      relatedApplication: checkYourAnswers.relatedApplicationNoValue,
+      fileName: 'uploadYourDocuments.docx',
+    });
+    await performAction('clickButton', checkYourAnswers.submitButton);
+    await performAction('clickLink', documentsUploaded.closeAndReturnToCaseOverviewLink);
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Upload documents when GenApps not submitted @regression', async () => {
@@ -62,7 +81,17 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await softErrorMessageValidation('uploadYourDocuments', uploadYourDocumentsErrorValidation);
     await performAction('uploadDocuments', { files: ['uploadYourDocuments.ppt'] });
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performAction('verifyCheckYourAnswers', {
+      fileName: 'uploadYourDocuments.ppt',
+    });
+    await performAction('clickLink', checkYourAnswers.changeLink);
+    await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
+    await performAction('verifyCheckYourAnswers', {
+      fileName: 'uploadYourDocuments.docx',
+    });
+    await performAction('clickButton', checkYourAnswers.submitButton);
+    await performAction('clickLink', documentsUploaded.closeAndReturnToCaseOverviewLink);
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('View documents submitted through make a claim @regression', async () => {
