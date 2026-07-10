@@ -217,10 +217,7 @@ describe('PostHandler - Save for Later Fix', () => {
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       expect(flowModule.getStepUrl).toHaveBeenCalledWith('task-list', hubFlowConfig, '1771325608502536');
-      expect(mockResponse.redirect).toHaveBeenCalledWith(
-        303,
-        '/case/1771325608502536/respond-to-claim/task-list'
-      );
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/case/1771325608502536/respond-to-claim/task-list');
     });
 
     it('should save valid data and redirect to dashboard', async () => {
