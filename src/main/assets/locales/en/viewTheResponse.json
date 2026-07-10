@@ -31,7 +31,7 @@
     "address": "Address for service"
   },
 
-  "defendant1": {
+  "defendant": {
     "name": "Name",
     "dateOfBirth": "Date of birth",
     "email": "Email address",

@@ -49,12 +49,6 @@ interface TitledSummarySection extends SummarySection {
   sectionTitle: string;
 }
 
-interface AdditionalDefendantParty {
-  firstName?: string;
-  lastName?: string;
-  nameKnown?: string;
-}
-
 function formatGdsDate(value: string | undefined | null): string | null {
   if (!value) {
     return null;
@@ -150,19 +144,40 @@ function joinName(firstName?: string, lastName?: string): string {
   return [firstName, lastName].filter(Boolean).join(' ').trim();
 }
 
-function resolveAdditionalDefendantName(t: TFunction, party: AdditionalDefendantParty): string {
-  if (isNo(party.nameKnown)) {
+function resolveAdditionalDefendantName(t: TFunction, party: CcdParty | undefined): string {
+  if (!party || Object.keys(party).length === 0 || isNo(party.nameKnown)) {
     return t('viewTheResponse:personsUnknown');
   }
-  const name = joinName(party.firstName, party.lastName);
-  return name || t('viewTheResponse:personsUnknown');
+
+  if (party.firstName === 'Person unknown' && party.lastName === 'Person unknown') {
+    return t('viewTheResponse:personsUnknown');
+  }
+
+  return joinName(party.firstName, party.lastName) || t('viewTheResponse:personsUnknown');
 }
 
-function addressToString(address: CcdCaseAddress | Record<string, never> | undefined): string {
+function resolveDefendantPostalAddress(
+  t: TFunction,
+  party: CcdDefendantParty | CcdParty | undefined,
+  propertyAddress?: CcdCaseAddress
+): string {
+  if (isNo(party?.addressKnown)) {
+    return t('viewTheResponse:addressUnknown');
+  }
+
+  if (isYes(party?.addressSameAsProperty)) {
+    return formatAddress(propertyAddress) ?? t('viewTheResponse:addressUnknown');
+  }
+
+  const addressText = addressToString(party?.address);
+  return addressText || t('viewTheResponse:addressUnknown');
+}
+
+function addressToString(address: CcdCaseAddress | undefined): string {
   if (!address || Object.keys(address).length === 0) {
     return '';
   }
-  return formatAddress(address as CcdCaseAddress) ?? '';
+  return formatAddress(address) ?? '';
 }
 
 function pushRow(rows: SummaryRow[], label: string, value: string | null | undefined): void {
@@ -222,13 +237,20 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
   const rows: SummaryRow[] = [];
   const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
   const responses = caseData.possessionClaimResponse?.defendantResponses;
+  const addressUnknown = isNo(party?.addressKnown);
 
-  pushRow(rows, t('viewTheResponse:defendant1.name'), joinName(party?.firstName, party?.lastName));
-  if (isYes(party?.phoneNumberProvided)) {
-    pushRow(rows, t('viewTheResponse:defendant1.phone'), party?.phoneNumber);
+  pushRow(rows, t('viewTheResponse:defendant.name'), joinName(party?.firstName, party?.lastName));
+  if (!addressUnknown && isYes(party?.phoneNumberProvided)) {
+    pushRow(rows, t('viewTheResponse:defendant.phone'), party?.phoneNumber);
   }
-  pushRow(rows, t('viewTheResponse:defendant1.address'), addressToString(party?.address));
-  pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
+  pushRow(
+    rows,
+    t('viewTheResponse:defendant.address'),
+    resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
+  );
+  if (!addressUnknown) {
+    pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
+  }
   return { rows };
 }
 
@@ -243,10 +265,19 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
   return defendants
     .filter(defendant => !currentDefendantPartyId || defendant.id !== currentDefendantPartyId)
     .map((defendant, index) => {
-      const party = defendant.value as AdditionalDefendantParty;
+      const party = defendant.value;
       const rows: SummaryRow[] = [];
+      const addressUnknown = isNo(party.addressKnown);
 
-      pushRow(rows, t('viewTheResponse:defendant1.name'), resolveAdditionalDefendantName(t, party));
+      pushRow(rows, t('viewTheResponse:defendant.name'), resolveAdditionalDefendantName(t, party));
+      pushRow(
+        rows,
+        t('viewTheResponse:defendant.address'),
+        resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
+      );
+      if (!addressUnknown) {
+        pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(party.dateOfBirth) ?? '');
+      }
 
       return {
         sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
