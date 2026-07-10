@@ -215,6 +215,55 @@ describe('PostHandler - Save for Later Fix', () => {
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/case/1771325608502536/dashboard');
     });
 
+    it('redirects legal representative users to a validated Manage Case URL on save for later', async () => {
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
+
+      mockRequest.session = {
+        ...mockRequest.session,
+        user: {
+          ...mockRequest.session?.user,
+          roles: ['caseworker-pcs-solicitor'],
+        },
+      } as unknown as Request['session'];
+      mockRequest.body = {
+        hadLegalAdvice: 'yes',
+        action: 'saveForLater',
+      };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith(
+        303,
+        'https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS/1771325608502536'
+      );
+    });
+
+    it('does not use an invalid case ID in the legal representative Manage Case redirect', async () => {
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
+
+      mockRequest.session = {
+        ...mockRequest.session,
+        user: {
+          ...mockRequest.session?.user,
+          roles: ['caseworker-pcs-solicitor'],
+        },
+      } as unknown as Request['session'];
+      mockRequest.res = {
+        locals: {
+          validatedCase: { id: 'https://example.com' },
+        },
+      } as unknown as Response;
+      (dashboardModule.getDashboardUrl as jest.Mock).mockReturnValue('/');
+      mockRequest.body = {
+        hadLegalAdvice: 'yes',
+        action: 'saveForLater',
+      };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/');
+    });
+
     it('should use case ID from res.locals.validatedCase', async () => {
       const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
 

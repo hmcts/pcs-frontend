@@ -44,6 +44,27 @@ function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig
   return (caseId && getDashboardUrl(caseId)) || '/';
 }
 
+function buildManageCaseDetailsRedirect(caseDetailsBaseUrl: string | null, caseId: unknown): string | undefined {
+  if (!caseDetailsBaseUrl || typeof caseId !== 'string' || !/^\d+$/.test(caseId)) {
+    return undefined;
+  }
+
+  try {
+    const url = new URL(caseDetailsBaseUrl);
+    const isAllowedProtocol = url.protocol === 'https:' || url.protocol === 'http:';
+    if (!isAllowedProtocol || !url.pathname.startsWith('/cases/case-details/')) {
+      return undefined;
+    }
+
+    url.pathname = `${url.pathname.replace(/\/+$/, '')}/${encodeURIComponent(caseId)}`;
+    url.search = '';
+    url.hash = '';
+    return url.toString();
+  } catch {
+    return undefined;
+  }
+}
+
 export function createPostHandler(
   fields: FormFieldConfig[],
   stepName: string,
@@ -193,9 +214,9 @@ export function createPostHandler(
           const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
             ? config.get<string>('redirects.manageCaseReturnURL')
             : null;
-          if (caseDetailsBaseUrl) {
-            const caseDetailsUrl = `${caseDetailsBaseUrl}/${caseId}`;
-            return res.redirect(caseDetailsUrl);
+          const caseDetailsUrl = buildManageCaseDetailsRedirect(caseDetailsBaseUrl, caseId);
+          if (caseDetailsUrl) {
+            return res.redirect(303, caseDetailsUrl);
           }
         }
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
