@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 
 import * as flowModule from '@modules/steps/flow';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
-import { createPostHandler } from '@modules/steps/formBuilder/postHandler';
+import { buildManageCaseDetailsRedirect, createPostHandler } from '@modules/steps/formBuilder/postHandler';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import * as dashboardModule from '@routes/dashboard';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -52,6 +52,7 @@ describe('PostHandler - Save for Later Fix', () => {
       redirect: jest.fn(),
       render: jest.fn(),
       status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
       locals: {
         validatedCase: new CcdCaseModel({ id: '1771325608502536', data: {} }),
       },
@@ -86,6 +87,7 @@ describe('PostHandler - Save for Later Fix', () => {
       getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
       getNextStepUrl: jest.fn().mockResolvedValue('/next-step'),
     });
+    (flowModule.getStepUrl as jest.Mock).mockReturnValue('/case/1771325608502536/respond-to-claim/task-list');
   });
 
   afterEach(() => {
@@ -93,6 +95,28 @@ describe('PostHandler - Save for Later Fix', () => {
   });
 
   describe('Fix #3: Save for Later Functionality', () => {
+    describe('buildManageCaseDetailsRedirect', () => {
+      it('builds a validated Manage Case case-details URL', () => {
+        expect(
+          buildManageCaseDetailsRedirect(
+            'https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS/',
+            '1771325608502536'
+          )
+        ).toBe('https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS/1771325608502536');
+      });
+
+      it.each([
+        [null, '1771325608502536'],
+        ['https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS', undefined],
+        ['https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS', 'https://example.com'],
+        ['javascript:alert(1)', '1771325608502536'],
+        ['https://manage-case.aat.platform.hmcts.net/redirect', '1771325608502536'],
+        ['not a url', '1771325608502536'],
+      ])('rejects unsafe Manage Case redirect inputs', (baseUrl, caseId) => {
+        expect(buildManageCaseDetailsRedirect(baseUrl, caseId)).toBeUndefined();
+      });
+    });
+
     it('passes current step post payload to navigation for forward routing', async () => {
       const getNextStepUrl = jest.fn().mockResolvedValue('/case/1771325608502536/respond-to-claim/contact-preferences');
       (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
@@ -180,6 +204,23 @@ describe('PostHandler - Save for Later Fix', () => {
 
       expect(mockResponse.render).not.toHaveBeenCalled();
       expect(mockResponse.redirect).toHaveBeenCalled();
+    });
+
+    it('redirects save for later to the configured hub step when present', async () => {
+      const hubFlowConfig: JourneyFlowConfig = {
+        ...flowConfig,
+        hubStepName: 'task-list',
+      };
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', hubFlowConfig);
+      mockRequest.body = { action: 'saveForLater' };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(flowModule.getStepUrl).toHaveBeenCalledWith('task-list', hubFlowConfig, '1771325608502536');
+      expect(mockResponse.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1771325608502536/respond-to-claim/task-list'
+      );
     });
 
     it('should save valid data and redirect to dashboard', async () => {
@@ -346,6 +387,101 @@ describe('PostHandler - Save for Later Fix', () => {
 
       // Should NOT redirect
       expect(mockResponse.redirect).not.toHaveBeenCalled();
+    });
+
+    it('stops processing when beforeRedirect has already sent a response', async () => {
+      const mockBeforeRedirect = jest.fn().mockImplementation((_req: Request) => {
+        Object.defineProperty(mockResponse, 'headersSent', {
+          configurable: true,
+          value: true,
+        });
+      });
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        flowConfig,
+        mockBeforeRedirect
+      );
+
+      mockRequest.body = {
+        hadLegalAdvice: 'yes',
+      };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(mockBeforeRedirect).toHaveBeenCalledWith(mockRequest);
+      expect(mockResponse.redirect).not.toHaveBeenCalled();
+    });
+
+    it('uses a custom redirect path after post when provided', async () => {
+      const resolveRedirectAfterPost = jest.fn().mockResolvedValue('/case/1771325608502536/custom-next');
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        flowConfig,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        resolveRedirectAfterPost
+      );
+
+      mockRequest.body = {
+        hadLegalAdvice: 'yes',
+      };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(resolveRedirectAfterPost).toHaveBeenCalledWith(mockRequest);
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/case/1771325608502536/custom-next');
+    });
+
+    it('falls back to step navigation when custom redirect resolver returns no path', async () => {
+      const resolveRedirectAfterPost = jest.fn().mockResolvedValue(undefined);
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        flowConfig,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        resolveRedirectAfterPost
+      );
+
+      mockRequest.body = {
+        hadLegalAdvice: 'yes',
+      };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(resolveRedirectAfterPost).toHaveBeenCalledWith(mockRequest);
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/next-step');
+    });
+
+    it('returns a 500 response when navigation cannot determine the next step', async () => {
+      (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
+        getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
+        getNextStepUrl: jest.fn().mockResolvedValue(undefined),
+      });
+      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
+
+      mockRequest.body = {
+        hadLegalAdvice: 'yes',
+      };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.send).toHaveBeenCalledWith('Unable to determine next step');
     });
   });
 });

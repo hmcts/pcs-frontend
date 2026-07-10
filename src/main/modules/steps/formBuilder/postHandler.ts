@@ -36,6 +36,14 @@ function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
   return flowConfig?.useSessionFormData !== false;
 }
 
+function trimTrailingSlashes(pathname: string): string {
+  let end = pathname.length;
+  while (end > 1 && pathname.charCodeAt(end - 1) === 47) {
+    end -= 1;
+  }
+  return pathname.slice(0, end);
+}
+
 function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig | undefined): string {
   const caseId = req.res?.locals.validatedCase?.id;
   if (flowConfig?.hubStepName && caseId) {
@@ -44,7 +52,7 @@ function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig
   return (caseId && getDashboardUrl(caseId)) || '/';
 }
 
-function buildManageCaseDetailsRedirect(caseDetailsBaseUrl: string | null, caseId: unknown): string | undefined {
+export function buildManageCaseDetailsRedirect(caseDetailsBaseUrl: string | null, caseId: unknown): string | undefined {
   if (!caseDetailsBaseUrl || typeof caseId !== 'string' || !/^\d+$/.test(caseId)) {
     return undefined;
   }
@@ -56,7 +64,7 @@ function buildManageCaseDetailsRedirect(caseDetailsBaseUrl: string | null, caseI
       return undefined;
     }
 
-    url.pathname = `${url.pathname.replace(/\/+$/, '')}/${encodeURIComponent(caseId)}`;
+    url.pathname = `${trimTrailingSlashes(url.pathname)}/${encodeURIComponent(caseId)}`;
     url.search = '';
     url.hash = '';
     return url.toString();
