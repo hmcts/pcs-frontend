@@ -1,5 +1,6 @@
 import { STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS } from './viewTheClaimLabels';
 import {
+  additionalDefendantName,
   additionalDefendantParties,
   additionalUnderlesseeParties,
   addressHtml,
@@ -26,7 +27,7 @@ import {
   noticeDateTimeValue,
   noticeDateValue,
   otherGroundDescriptions,
-  partyAddressHtml,
+  partyAddressRow,
   partyName,
   section,
   summaryRow,
@@ -99,7 +100,7 @@ export function buildDefendantSection(
           copy
         )
     ),
-    htmlRow(copy.label('addressForService'), partyAddressHtml(defendant, propertyAddress)),
+    partyAddressRow(defendant, propertyAddress, copy.label('addressForService'), copy),
   ];
 
   return section(copy.section('defendantDetails'), rows);
@@ -115,20 +116,8 @@ export function buildAdditionalDefendantSections(
   return defendants
     .map((defendant, index) =>
       section(copy.section('additionalDefendantDetails', { number: index + 1 }), [
-        textRow(
-          copy.label('defendantName'),
-          partyName(defendant, copy) ??
-            getFirstPartyName(
-              data,
-              [
-                `detailsTab_AdditionalDefendants.${index}.value`,
-                `casePartiesTab_DefendantsDetails.${index}.value`,
-                `summaryTab_AdditionalDefendants.${index}.value`,
-              ],
-              copy
-            )
-        ),
-        htmlRow(copy.label('addressForService'), partyAddressHtml(defendant, propertyAddress)),
+        textRow(copy.label('defendantName'), additionalDefendantName(defendant, data, index, copy)),
+        partyAddressRow(defendant, propertyAddress, copy.label('addressForService'), copy),
       ])
     )
     .filter((sectionItem): sectionItem is ViewTheClaimSection => !!sectionItem);
@@ -394,7 +383,7 @@ export function buildUnderlesseeSection(
 
   return section(copy.section('underlesseeDetails'), [
     textRow(copy.label('underlesseeName'), underlesseeName(party, copy) ?? underlesseeName(tabParty, copy)),
-    htmlRow(copy.label('underlesseeAddress'), partyAddressHtml(party, propertyAddress)),
+    partyAddressRow(party ?? tabParty, propertyAddress, copy.label('underlesseeAddress'), copy),
   ]);
 }
 
@@ -411,7 +400,7 @@ export function buildAdditionalUnderlesseeSections(
 
       return section(copy.section('additionalUnderlesseeDetails', { number: index + 1 }), [
         textRow(copy.label('underlesseeName'), underlesseeName(party, copy) ?? underlesseeName(tabParty, copy)),
-        htmlRow(copy.label('underlesseeAddress'), partyAddressHtml(party, propertyAddress)),
+        partyAddressRow(party ?? tabParty, propertyAddress, copy.label('underlesseeAddress'), copy),
       ]);
     })
     .filter((sectionItem): sectionItem is ViewTheClaimSection => !!sectionItem);
