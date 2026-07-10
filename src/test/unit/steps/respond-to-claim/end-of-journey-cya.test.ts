@@ -33,6 +33,7 @@ const t = (key: string) => translations[key] || key;
 
 jest.mock('../../../../main/modules/steps/i18n', () => ({
   loadStepNamespace: jest.fn(),
+  loadStepNamespaces: jest.fn().mockResolvedValue(undefined),
   getStepTranslations: jest.fn(() => ({})),
   getTranslationFunction: jest.fn(() => t),
 }));

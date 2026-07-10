@@ -10,12 +10,12 @@ jest.mock('@modules/logger', () => ({
   },
 }));
 
-const mockOidcMiddleware = jest.fn((req, res, next) => next());
+const mockOidcMiddleware = jest.fn((_req, res, next) => next());
 jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: mockOidcMiddleware,
 }));
 
-const mockCaseReferenceParamMiddleware = jest.fn((req, res, next) => {
+const mockCaseReferenceParamMiddleware = jest.fn((_req, _res, next) => {
   next();
 });
 jest.mock('../../../main/middleware/caseReference', () => ({
@@ -50,9 +50,19 @@ jest.mock('../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
+const mockSubmitRespondToClaimResponse = jest.fn();
+jest.mock('../../../main/steps/utils/respondToClaimFinalSubmit', () => {
+  const actual = jest.requireActual('../../../main/steps/utils/respondToClaimFinalSubmit');
+  return {
+    ...actual,
+    submitRespondToClaimResponse: (...args: unknown[]) => mockSubmitRespondToClaimResponse(...args),
+  };
+});
+
 import type { Application, Request, Response } from 'express';
 
 import finalSubmitRoutes from '../../../main/routes/finalSubmit';
+import { RespondToClaimFinalSubmitError } from '../../../main/steps/utils/respondToClaimFinalSubmit';
 
 describe('finalSubmit routes', () => {
   let app: Application;
@@ -82,6 +92,9 @@ describe('finalSubmit routes', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSubmitRespondToClaimResponse.mockReset();
+    const actual = jest.requireActual('../../../main/steps/utils/respondToClaimFinalSubmit');
+    mockSubmitRespondToClaimResponse.mockImplementation(actual.submitRespondToClaimResponse);
 
     mockRouterPost = jest.fn();
     mockRouterParam = jest.fn();
@@ -223,6 +236,123 @@ describe('finalSubmit routes', () => {
       expect(mockHttpGet).toHaveBeenCalled();
       expect(mockHttpPost).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
+    });
+
+    it('should submit to CCD as legal representative and redirect to response-submitted confirmation', async () => {
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      mockHttpGet.mockResolvedValue({
+        data: { token: 'mock-event-token' },
+      });
+
+      mockHttpPost.mockResolvedValue({ data: {} });
+
+      const validatedCase = {
+        id: '1234567890123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { makeCounterClaim: 'NO' },
+          },
+        },
+      };
+
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        body: {
+          statementOfTruthBelief: ['yes'],
+          fullName: 'Jane LegalRep',
+          nameOfFirm: 'Firm Name',
+          positionHeld: 'Position',
+        },
+        session: {
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: { validatedCase, isLegalRepresentative: true },
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      req.res = res;
+
+      await handler(req, res);
+
+      expect(mockBuildDraftDefendantResponse).toHaveBeenCalledWith(req);
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
+        expect.objectContaining({
+          defendantResponses: expect.objectContaining({
+            statementOfTruth: {
+              accepted: 'YES',
+              fullName: 'Jane LegalRep',
+              nameOfFirm: 'Firm Name',
+              positionHeld: 'Position',
+              hasLegalRepresentation: 'YES',
+            },
+          }),
+        })
+      );
+      expect(mockHttpGet).toHaveBeenCalled();
+      expect(mockHttpPost).toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
+    });
+
+    it('should submit to CCD as legal representative with belief unaccepted and set accepted to NO', async () => {
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      mockHttpGet.mockResolvedValue({
+        data: { token: 'mock-event-token' },
+      });
+
+      mockHttpPost.mockResolvedValue({ data: {} });
+
+      const validatedCase = {
+        id: '1234567890123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { makeCounterClaim: 'NO' },
+          },
+        },
+      };
+
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        body: {
+          statementOfTruthBelief: [],
+          fullName: 'Jane LegalRep',
+          nameOfFirm: 'Firm Name',
+          positionHeld: 'Position',
+        },
+        session: {
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: { validatedCase, isLegalRepresentative: true },
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      req.res = res;
+
+      await handler(req, res);
+
+      expect(mockBuildDraftDefendantResponse).toHaveBeenCalledWith(req);
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
+        expect.objectContaining({
+          defendantResponses: expect.objectContaining({
+            statementOfTruth: {
+              accepted: 'NO',
+              fullName: 'Jane LegalRep',
+              nameOfFirm: 'Firm Name',
+              positionHeld: 'Position',
+              hasLegalRepresentation: 'YES',
+            },
+          }),
+        })
+      );
     });
 
     it('stores submit-time payment data in session for counterclaim payment-needed path', async () => {
@@ -434,6 +564,34 @@ describe('finalSubmit routes', () => {
         303,
         '/case/1234567890123456/respond-to-claim/end-of-journey-cya?submitError=failed'
       );
+    });
+
+    it('should return 401 when submitRespondToClaimResponse throws RespondToClaimFinalSubmitError with no user access token', async () => {
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      mockSubmitRespondToClaimResponse.mockRejectedValue(
+        new RespondToClaimFinalSubmitError('No user access token in session')
+      );
+
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        session: {
+          user: { accessToken: 'mock-token' },
+        },
+      } as unknown as Request;
+
+      const res = {
+        locals: { validatedCase: { id: '1234567890123456', data: {} } },
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn(),
+      } as unknown as Response;
+
+      bindReqRes(req, res);
+
+      await handler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.render).toHaveBeenCalledWith('error', { error: 'Authentication required' });
     });
   });
 });
