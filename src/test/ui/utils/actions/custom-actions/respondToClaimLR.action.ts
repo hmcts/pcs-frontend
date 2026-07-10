@@ -209,7 +209,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async otherAdultsLR(adultsInHouseDetails: actionRecord) {
     await performAction('clickRadioButton', {
-      question: doAnyOtherAdultsLiveInYourHome.lrMainHeader,
+      question: doAnyOtherAdultsLiveInYourHome.lrHiddenMainHeader,
       option: adultsInHouseDetails.radioOption,
     });
 
