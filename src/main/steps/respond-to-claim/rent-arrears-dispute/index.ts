@@ -19,6 +19,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    rentStatementDocumentLinkText: 'rentStatementDocumentLinkText',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
