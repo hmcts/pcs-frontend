@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 
 import * as flowModule from '@modules/steps/flow';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
-import { buildManageCaseDetailsRedirect, createPostHandler } from '@modules/steps/formBuilder/postHandler';
+import { createPostHandler } from '@modules/steps/formBuilder/postHandler';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import * as dashboardModule from '@routes/dashboard';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -95,28 +95,6 @@ describe('PostHandler - Save for Later Fix', () => {
   });
 
   describe('Fix #3: Save for Later Functionality', () => {
-    describe('buildManageCaseDetailsRedirect', () => {
-      it('builds a validated Manage Case case-details URL', () => {
-        expect(
-          buildManageCaseDetailsRedirect(
-            'https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS/',
-            '1771325608502536'
-          )
-        ).toBe('https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS/1771325608502536');
-      });
-
-      it.each([
-        [null, '1771325608502536'],
-        ['https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS', undefined],
-        ['https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS', 'https://example.com'],
-        ['javascript:alert(1)', '1771325608502536'],
-        ['https://manage-case.aat.platform.hmcts.net/redirect', '1771325608502536'],
-        ['not a url', '1771325608502536'],
-      ])('rejects unsafe Manage Case redirect inputs', (baseUrl, caseId) => {
-        expect(buildManageCaseDetailsRedirect(baseUrl, caseId)).toBeUndefined();
-      });
-    });
-
     it('passes current step post payload to navigation for forward routing', async () => {
       const getNextStepUrl = jest.fn().mockResolvedValue('/case/1771325608502536/respond-to-claim/contact-preferences');
       (flowModule.createStepNavigation as jest.Mock).mockReturnValue({

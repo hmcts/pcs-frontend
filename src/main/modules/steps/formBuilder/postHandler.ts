@@ -30,18 +30,11 @@ import type {
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import { getDashboardUrl } from '@routes/dashboard';
+import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
   return flowConfig?.useSessionFormData !== false;
-}
-
-function trimTrailingSlashes(pathname: string): string {
-  let end = pathname.length;
-  while (end > 1 && pathname.charCodeAt(end - 1) === 47) {
-    end -= 1;
-  }
-  return pathname.slice(0, end);
 }
 
 function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig | undefined): string {
@@ -50,27 +43,6 @@ function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig
     return getStepUrl(flowConfig.hubStepName, flowConfig, caseId);
   }
   return (caseId && getDashboardUrl(caseId)) || '/';
-}
-
-export function buildManageCaseDetailsRedirect(caseDetailsBaseUrl: string | null, caseId: unknown): string | undefined {
-  if (!caseDetailsBaseUrl || typeof caseId !== 'string' || !/^\d+$/.test(caseId)) {
-    return undefined;
-  }
-
-  try {
-    const url = new URL(caseDetailsBaseUrl);
-    const isAllowedProtocol = url.protocol === 'https:' || url.protocol === 'http:';
-    if (!isAllowedProtocol || !url.pathname.startsWith('/cases/case-details/')) {
-      return undefined;
-    }
-
-    url.pathname = `${trimTrailingSlashes(url.pathname)}/${encodeURIComponent(caseId)}`;
-    url.search = '';
-    url.hash = '';
-    return url.toString();
-  } catch {
-    return undefined;
-  }
 }
 
 export function createPostHandler(
