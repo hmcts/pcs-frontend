@@ -1006,7 +1006,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/eslintrc@npm:3.3.5, @eslint/eslintrc@npm:^3.3.1":
+"@eslint/eslintrc@npm:3.3.6":
+  version: 3.3.6
+  resolution: "@eslint/eslintrc@npm:3.3.6"
+  dependencies:
+    ajv: "npm:^6.14.0"
+    debug: "npm:^4.3.2"
+    espree: "npm:^10.0.1"
+    globals: "npm:^14.0.0"
+    ignore: "npm:^5.2.0"
+    import-fresh: "npm:^3.2.1"
+    js-yaml: "npm:^4.3.0"
+    minimatch: "npm:^3.1.5"
+    strip-json-comments: "npm:^3.1.1"
+  checksum: 10/8d1d501069faf7c1c73e37181ec403dd2d1509f8da85f226531f6a7fdd9a9326fc6d2ea2e8192515992578cf9e7ed87f9d7ce3f1bfc6d0f0e77796d18e0e8ef6
+  languageName: node
+  linkType: hard
+
+"@eslint/eslintrc@npm:^3.3.1":
   version: 3.3.5
   resolution: "@eslint/eslintrc@npm:3.3.5"
   dependencies:
@@ -11778,7 +11795,7 @@ __metadata:
     "@axe-core/playwright": "npm:4.12.1"
     "@azure/monitor-opentelemetry": "npm:1.18.2"
     "@eslint/compat": "npm:2.1.0"
-    "@eslint/eslintrc": "npm:3.3.5"
+    "@eslint/eslintrc": "npm:3.3.6"
     "@eslint/js": "npm:10.0.1"
     "@eslint/plugin-kit": "npm:0.7.2"
     "@hmcts-cft/cft-ui-component-lib": "npm:0.1.0-alpha.4"
