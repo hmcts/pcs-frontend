@@ -313,7 +313,8 @@ export interface CcdCaseData {
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
-  allDocumentsWithType?: CcdCollectionItem<CcdCaseDocumentWithType>[];
+  detailsTab_TenancyLicenceDetails?: any;
+  detailsTab_RentArrearsDetails?: any;
 }
 
 export interface CcdCaseDocument {
@@ -321,11 +322,6 @@ export interface CcdCaseDocument {
   document_filename?: string;
   upload_timestamp?: string;
   category_id?: string;
-}
-
-export interface CcdCaseDocumentWithType {
-  document?: CcdCaseDocument;
-  type?: string;
 }
 
 export type DocumentUploadCategoryCode =

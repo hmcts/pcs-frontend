@@ -77,8 +77,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
 
-    const rentStatementDocument =
-      (caseData?.allDocumentsWithType ?? []).filter(doc => doc.value?.type === 'RENT_STATEMENT')[0] ?? '';
+    const rentStatementDocument = caseData?.detailsTab_RentArrearsDetails?.rentStatement?.[0] ?? '';
 
     return {
       insetIntroText,
