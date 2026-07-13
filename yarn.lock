@@ -8883,15 +8883,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:26.3.4":
-  version: 26.3.4
-  resolution: "i18next@npm:26.3.4"
+"i18next@npm:26.3.6":
+  version: 26.3.6
+  resolution: "i18next@npm:26.3.6"
   peerDependencies:
-    typescript: ^5 || ^6
+    typescript: ^5 || ^6 || ^7
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/133ba9a5f76c1d57337f0dcc1b0ab0ff987714a1863813dcc95024531074c6d92603a19b0bac9c16a6b04c734742d8d098da0c222bef5a9562bdde231ea4b221
+  checksum: 10/529f1dbfae6b0fe98d997af98af5d6d0a0e27ddf5b91b81c5dfccad94e3a66dceeba2d1b7327f0045085bc4d552abbf4a1efbfadd4bbb98d13a54e3310eae428
   languageName: node
   linkType: hard
 
@@ -11862,7 +11862,7 @@ __metadata:
     html-webpack-plugin: "npm:5.6.7"
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
-    i18next: "npm:26.3.4"
+    i18next: "npm:26.3.6"
     i18next-fs-backend: "npm:2.6.6"
     i18next-http-middleware: "npm:3.9.7"
     ioredis: "npm:5.11.1"
