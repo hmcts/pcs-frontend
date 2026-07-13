@@ -4,6 +4,6 @@
   "whatHappensNext": "cyWhat happens next",
   "youCanTryToMakeACardPayment": "cyYou can try to <a href=\"{{ payForYourApplicationUrl }}\" class=\"govuk-link\">make a card payment</a> again.",
   "buttons": {
-    "closeAndReturnToCaseOverview": "cyClose and return to case overview"
+    "closeAndReturnToCaseOverview": "Cau a dychwelyd i drosolwg o’r achos"
   }
 }

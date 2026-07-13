@@ -2,7 +2,7 @@
   "title": "Ôl-ddyledion rhent",
   "pageTitle": "Ôl-ddyledion rhent",
   "insetIntroText": "Ôl-ddyledion rhent yw'r arian sy'n ddyledus gennych mewn taliadau rhent.",
-  "insetDetailsText": "cyWhen they made their claim, {{claimantName}} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.",
+  "insetDetailsText": "Wrth wneud eu hawliad, roedd yn rhaid i {{claimantName}} ddarparu copi o'u datganiad rhent ar gyfer eich eiddo, yn dangos y cyfanswm ôl-ddyledion rhent sy'n ddyledus gennych.",
   "amountOwedHeading": "Swm sy'n ddyledus gennych mewn ôl-ddyledion rhent a roddwyd gan{{claimantName}}:",
   "rentArrearsQuestion": "A yw'r swm hwn yn ddyledus gennych mewn ôl-ddyledion rhent?",
   "rentArrearsOptions": {

@@ -13,7 +13,7 @@
     "possessionNoticeReceived": "cySelect if {{claimantName}} gave the defendant notice of their intention to begin possession proceedings",
     "date": {
       "day": "cyDay",
-      "month": "cyMonth",
+      "month": "Mis",
       "year": "cyYear",
       "required": "cyThe date must include a day, month and year",
       "notRealDate": "cyThe date must be a real date",

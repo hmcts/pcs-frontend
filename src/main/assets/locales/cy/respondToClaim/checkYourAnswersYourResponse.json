@@ -64,32 +64,32 @@
       "changeHidden": "cy dispute details"
     },
     "makeCounterClaim": {
-      "label": "cy Do you want to make a counterclaim?",
+      "label": "Ydych chi eisiau gwneud gwrth-hawliad?",
       "changeHidden": "cy make a counterclaim"
     },
     "counterClaimType": {
-      "label": "cy What are you claiming for?",
+      "label": "Beth ydych chi’n ei hawlio?",
       "changeHidden": "cy counterclaim type",
       "options": {
-        "PAYMENT_OR_COMPENSATION": "cy A sum of money or compensation",
+        "PAYMENT_OR_COMPENSATION": "Swm o arian neu iawndal",
         "SOMETHING_ELSE": "Rhywbeth arall",
-        "BOTH": "cy Both"
+        "BOTH": "Y ddau"
       }
     },
     "isClaimAmountKnown": {
-      "label": "cy Are you claiming for a specific sum of money?",
+      "label": "Ydych chi'n hawlio ar gyfer swm penodol o arian?",
       "changeHidden": "cy claim amount known"
     },
     "claimAmount": {
-      "label": "cy How much are you claiming?",
+      "label": "Faint ydych chi'n ei hawlio?",
       "changeHidden": "cy claim amount"
     },
     "estimatedMaxClaimAmount": {
-      "label": "cy What’s the maximum value of your claim?",
+      "label": "Beth yw uchafswm gwerth eich hawliad?",
       "changeHidden": "cy estimated maximum claim amount"
     },
     "counterClaimNeedHelpWithFees": {
-      "label": "cy Do you need help paying the counterclaim fee?",
+      "label": "Ydych chi angen help i dalu'r ffi gwrth-hawliad?",
       "changeHidden": "cy help paying the counterclaim fee",
       "options": {
         "YES": "Rwyf angen help i dalu’r ffi",
@@ -97,7 +97,7 @@
       }
     },
     "counterClaimAppliedForHwf": {
-      "label": "cy Have you already applied for help with your counterclaim fee?",
+      "label": "A ydych chi eisoes wedi gwneud cais am help gyda'ch ffi gwrth-hawliad?",
       "changeHidden": "cy applied for help with fees"
     },
     "counterClaimHwfReference": {
@@ -105,33 +105,33 @@
       "changeHidden": "cy Help with Fees reference number"
     },
     "counterClaimFor": {
-      "label": "cy What is your counterclaim for?",
+      "label": "Ar gyfer beth mae eich gwrth-hawliad?",
       "changeHidden": "cy counterclaim subject"
     },
     "counterClaimReasons": {
-      "label": "cy What are your reasons for making the counterclaim?",
+      "label": "Beth yw eich rhesymau dros wneud y gwrth-hawliad?",
       "changeHidden": "cy counterclaim reasons"
     },
     "counterClaimAgainst": {
-      "label": "cy Who are you making the counterclaim against?",
+      "label": "Yn erbyn pwy ydych chi'n gwneud y gwrth-hawliad?",
       "changeHidden": "cy counterclaim against"
     },
     "otherOrderRequestDetails": {
-      "label": "cy What orders are you asking the court to make?",
+      "label": "Pa orchymyn ydych chi’n gofyn i’r tribiwnlys ei wneud?",
       "changeHidden": "cy orders requested"
     },
     "otherOrderRequestFacts": {
-      "label": "cy What facts would you like the court to consider when deciding the claim?",
+      "label": "Pa ffeithiau hoffech chi i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
       "changeHidden": "cy facts for the court"
     },
     "counterClaimWantToUploadFiles": {
-      "label": "cy Do you want to upload files to support your counterclaim?",
+      "label": "Ydych chi eisiau uwchlwytho ffeiliau i gefnogi eich gwrth-hawliad?",
       "changeHidden": "cy upload files for counterclaim"
     },
     "counterClaimDocuments": {
       "label": "cy Uploaded files",
       "changeHidden": "cy uploaded files for counterclaim",
-      "none": "cy No files uploaded"
+      "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     }
   }
 }

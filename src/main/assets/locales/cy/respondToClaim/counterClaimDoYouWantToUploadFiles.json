@@ -1,9 +1,9 @@
 {
-  "pageTitle": "cyDo you want to upload files?",
-  "heading": "cyDo you want to upload files to support your counterclaim?",
-  "paragraph1": "cyWitness statements do not need to be uploaded at this stage, directions for the exchange of witness statements will be given later.",
-  "paragraph2": "cyThe claimant will be able to see these files.",
+  "pageTitle": "Ydych chi eisiau uwchlwytho ffeiliau?",
+  "heading": "Ydych chi eisiau uwchlwytho ffeiliau i gefnogi eich gwrth-hawliad?",
+  "paragraph1": "Nid oes angen uwchlwytho datganiadau tyst ar hyn o bryd, rhoddir cyfarwyddiadau ar gyfer cyfnewid datganiadau tyst yn nes ymlaen.",
+  "paragraph2": "Bydd yr hawlydd yn gallu gweld y ffeiliau hyn.",
   "errors": {
-    "counterClaimWantToUploadFiles": "cySelect if you want to upload files to support your counterclaim"
+    "counterClaimWantToUploadFiles": "Dewiswch os ydych eisiau uwchlwytho ffeiliau i gefnogi eich gwrth-hawliad"
   }
 }

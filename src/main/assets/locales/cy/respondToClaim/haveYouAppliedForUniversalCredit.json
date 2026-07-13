@@ -1,20 +1,20 @@
 {
   "pageTitle": "Credyd Cynhwysol",
-  "heading": "cyHave you applied for Universal Credit?",
-  "dateLabel": "cyWhen did you apply?",
+  "heading": "Ydych chi wedi gwneud cais am Gredyd Cynhwysol?",
+  "dateLabel": "Pryd wnaethoch chi wneud cais?",
   "dateHint": "Er enghraifft, 27 9 2022",
   "options": {
     "yes": "Ydy",
     "no": "Nac ydy"
   },
   "errors": {
-    "haveAppliedForUniversalCredit": "cySelect if you’ve applied for Universal Credit",
+    "haveAppliedForUniversalCredit": "Dewiswch os ydych chi wedi gwneud cais am Gredyd Cynhwysol",
     "date": {
-      "required": "cyEnter the date you applied for Universal Credit",
-      "missingOne": "cyThe date you applied for Universal Credit must include a {{missingField}}",
-      "missingTwo": "cyThe date you applied for Universal Credit must include a {{first}} and {{second}}",
-      "notRealDate": "cyThe date you applied for Universal Credit must be a real date",
-      "futureDate": "cyThe date you applied for Universal Credit must either be today’s date or in the past"
+      "required": "Rhowch y dyddiad wnaethoch wneud cais am Gredyd Cynhwysol",
+      "missingOne": "Rhaid i'r dyddiad pan wnaethoch gais am Gredyd Cynhwysol gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i'r dyddiad pan wnaethoch gais am Gredyd Cynhwysol gynnwys {{first}} ac {{second}}",
+      "notRealDate": "Rhaid i’r dyddiad pan wnaethoch gais am Gredyd Cynhwysol fod yn ddyddiad go iawn",
+      "futureDate": "Rhaid i'r dyddiad pan wnaethoch gais am Gredyd Cynhwysol fod naill ai'n ddyddiad heddiw neu yn y gorffennol"
     }
   }
 }

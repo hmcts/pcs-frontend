@@ -3,7 +3,7 @@
   "caption": "cyRespond to a property possession claim",
   "notApplicable": "cyNot applicable",
   "counterClaimAmountLabel": "cyCounterclaim amount",
-  "counterClaimFeeLabel": "cyCounterclaim fee",
+  "counterClaimFeeLabel": "Ffi gwrth-hawliad",
   "counterClaimAmountDisplay": "cy{{counterClaimAmount, currency(currency: GBP)}}",
   "counterClaimFeeDisplay": "cy{{counterClaimFee, currency(currency: GBP)}}",
   "payNowButton": "cyPay your counterclaim fee ({{counterClaimFee, currency(currency: GBP)}})",

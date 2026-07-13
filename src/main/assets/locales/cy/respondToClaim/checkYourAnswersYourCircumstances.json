@@ -3,11 +3,11 @@
   "cardTitle": "Eich amgylchiadau",
   "rows": {
     "dependantChildren": {
-      "label": "cy Do you have any dependent children?",
+      "label": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
       "changeHidden": "cy dependent children"
     },
     "dependantChildrenDetails": {
-      "label": "cy Give details about your dependent children",
+      "label": "Rhowch fanylion eich plant dibynnol",
       "changeHidden": "cy dependent children details"
     },
     "otherDependants": {

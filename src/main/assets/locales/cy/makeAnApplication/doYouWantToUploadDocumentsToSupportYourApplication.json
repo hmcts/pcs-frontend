@@ -1,10 +1,10 @@
 {
   "pageTitle": "Ydych chi eisiau uwchlwytho dogfennau i gefnogi eich cais?",
   "caption": "Gwneud cais",
-  "heading": "cyDo you want to upload documents to support your application? (Optional)",
+  "heading": "Ydych chi eisiau uwchlwytho dogfennau i gefnogi eich cais? (Dewisol)",
   "question": "Ydych chi eisiau uwchlwytho dogfennau i gefnogi eich cais?",
-  "multipleApplicationsText": "cyIf you have selected multiple applications, you should upload documents that relate to all of them.",
+  "multipleApplicationsText": "Os ydych wedi dewis sawl cais, dylech uwchlwytho dogfennau sy'n ymwneud â phob un ohonynt.",
   "errors": {
-    "uploadDocuments": "cyConfirm if you want to upload documents to support your application"
+    "uploadDocuments": "Cadarnhewch os ydych chi eisiau uwchlwytho dogfennau i gefnogi eich cais"
   }
 }

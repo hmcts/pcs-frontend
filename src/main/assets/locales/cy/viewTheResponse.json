@@ -18,11 +18,11 @@
     "paymentsOrAgreements": "cyPayments or agreements since the claim was made",
     "householdAndCircumstances": "cyYour household and circumstances",
     "regularIncome": "cyRegular income",
-    "priorityDebts": "cyPriority debts",
+    "priorityDebts": "Dyledion blaenoriaeth",
     "regularExpenses": "cyRegular expenses",
     "additionalInformation": "cyAdditional information",
-    "counterclaim": "cyCounterclaim",
-    "statementOfTruth": "cyStatement of truth"
+    "counterclaim": "Gwrth-hawliad",
+    "statementOfTruth": "Datganiad gwirionedd"
   },
 
   "claimantDetails": {
@@ -69,7 +69,7 @@
     "landlordRegistered": "cyIs your landlord registered?",
     "landlordLicensed": "cyIs your landlord licensed?",
     "writtenTerms": "cyHas your landlord sent you written terms of the occupation contract?",
-    "makeCounterClaim": "cyDo you want to make a counterclaim?"
+    "makeCounterClaim": "Ydych chi eisiau gwneud gwrth-hawliad?"
   },
 
   "payments": {
@@ -83,7 +83,7 @@
   },
 
   "household": {
-    "dependantChildren": "cyDo you have any dependent children?",
+    "dependantChildren": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
     "dependantChildrenDetails": "cyDetails of dependent children",
     "otherDependants": "cyDo you have any other dependants?",
     "otherDependantDetails": "cyDetails of other dependants",
@@ -101,8 +101,8 @@
     "fromJobs": "cyIncome from all jobs you do",
     "pension": "cyPension – state and private",
     "universalCredit": "cyUniversal Credit",
-    "universalCreditApplied": "cyHave you applied for Universal Credit?",
-    "universalCreditApplicationDate": "cyWhen did you apply?",
+    "universalCreditApplied": "Ydych chi wedi gwneud cais am Gredyd Cynhwysol?",
+    "universalCreditApplicationDate": "Pryd wnaethoch chi wneud cais?",
     "otherBenefits": "cyOther benefits and credits",
     "moneyFromElsewhere": "cyMoney from somewhere else (for example, child maintenance payments or someone in your household gives you money)",
     "moneyFromElsewhereDetails": "cyGive details about the other sources of income and how much you usually receive",
@@ -111,9 +111,9 @@
   },
 
   "debts": {
-    "hasPriorityDebts": "cyDo you have any priority debts?",
-    "debtTotal": "cyWhat is the total amount you owe for all your priority debts?",
-    "debtContribution": "cyHow much do you pay towards your priority debts each week or month?",
+    "hasPriorityDebts": "A oes gennych chi unrhyw ddyledion blaenoriaeth?",
+    "debtTotal": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
+    "debtContribution": "Faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis?",
     "paidEvery": "cyPaid every"
   },
 
@@ -132,29 +132,29 @@
   },
 
   "additional": {
-    "otherConsiderations": "cyIs there anything else you want to tell the court as part of your response?",
+    "otherConsiderations": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
     "otherConsiderationsDetails": "cyDetails of what else you want to tell the court"
   },
 
   "counterclaim": {
-    "type": "cyWhat are you claiming for?",
-    "amountKnown": "cyAre you claiming for a specific sum of money?",
-    "amount": "cyHow much are you claiming?",
-    "estimatedMaxAmount": "cyWhat’s the maximum value of your claim?",
-    "against": "cyWho are you making the counterclaim against?",
+    "type": "Beth ydych chi’n ei hawlio?",
+    "amountKnown": "Ydych chi'n hawlio ar gyfer swm penodol o arian?",
+    "amount": "Faint ydych chi'n ei hawlio?",
+    "estimatedMaxAmount": "Beth yw uchafswm gwerth eich hawliad?",
+    "against": "Yn erbyn pwy ydych chi'n gwneud y gwrth-hawliad?",
     "againstName": "cyWhat is the name of the person or organisation you are making the counterclaim against?",
     "againstAddress": "cyWhat's their postal address?",
-    "for": "cyWhat is your counterclaim for?",
-    "reasons": "cyWhat are your reasons for making the counterclaim?",
-    "ordersRequested": "cyWhat orders are you asking the court to make?",
-    "factsForCourt": "cyWhat facts would you like the court to consider when deciding the claim?",
-    "needHelpWithFees": "cyDo you need help paying the counterclaim fee?",
-    "appliedForHwf": "cyHave you already applied for help with your counterclaim fee?",
+    "for": "Ar gyfer beth mae eich gwrth-hawliad?",
+    "reasons": "Beth yw eich rhesymau dros wneud y gwrth-hawliad?",
+    "ordersRequested": "Pa orchymyn ydych chi’n gofyn i’r tribiwnlys ei wneud?",
+    "factsForCourt": "Pa ffeithiau hoffech chi i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
+    "needHelpWithFees": "Ydych chi angen help i dalu'r ffi gwrth-hawliad?",
+    "appliedForHwf": "A ydych chi eisoes wedi gwneud cais am help gyda'ch ffi gwrth-hawliad?",
     "hwfReference": "cyHelp with Fees reference number",
     "claimTypeOptions": {
-      "PAYMENT_OR_COMPENSATION": "cyA sum of money or compensation",
+      "PAYMENT_OR_COMPENSATION": "Swm o arian neu iawndal",
       "SOMETHING_ELSE": "cySomething else",
-      "BOTH": "cyBoth"
+      "BOTH": "Y ddau"
     },
     "needHelpWithFeesOptions": {
       "YES": "cyI need help paying the fee",
@@ -189,7 +189,7 @@
     "linkText": "cyResponse (PDF)"
   },
 
-  "closeAndReturn": "cyClose and return to case overview",
+  "closeAndReturn": "Cau a dychwelyd i drosolwg o’r achos",
 
   "accordion": {
     "summary": "cyIf you cannot find a document that you are looking for in this section",

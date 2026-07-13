@@ -1,5 +1,5 @@
 {
-  "serviceName": "cyPossession Claims",
+  "serviceName": "Hawliadau Meddiant",
   "phase": "ALPHA",
   "feedback": "Mae hwn yn wasanaeth newydd, bydd eich <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">adborth (yn agor mewn tab newydd)</a> yn ein helpu i'w wella.",
   "opensInNewTab": "yn agor mewn tab newydd",
@@ -37,7 +37,7 @@
   },
   "change": "Newid",
   "back": "Yn ôl",
-  "noAnswerProvided": "cyNo answer provided",
+  "noAnswerProvided": "Dim ateb wedi'i nodi",
   "date": {
     "day": "Diwrnod",
     "month": "Mis",
@@ -50,7 +50,7 @@
     "defaultRequired": "Rhaid llenwi’r blwch hwn",
     "defaultInvalid": "Fformat annilys",
     "defaultMaxLength": "Rhaid iddo fod yn {max} nod neu lai",
-    "defaultSpecialCharacter": "cy{fieldName} must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
+    "defaultSpecialCharacter": "Dylai {fieldName} ond cynnwys llythrennau a i z, a nodweddion arbennig fel cysylltnod, bylchau a chollnod.",
     "chooseOption": "Dewis opsiwn",
     "email": {
       "required": "Rhowch gyfeiriad e-bost",
@@ -64,7 +64,7 @@
       "month": "Mis",
       "year": "Blwyddyn",
       "required": "Rhowch ddyddiad",
-      "notRealDate": "cyDate must be a real date",
+      "notRealDate": "Rhaid i’r dyddiad fod yn ddyddiad dilys",
       "futureDate": "Rhaid i’r dyddiad fod yn y gorffennol",
       "pastDate": "Rhaid i'r dyddiad fod yn y dyfodol",
       "invalidValue": "Rhowch werth dilys",
@@ -73,16 +73,16 @@
       "missingTwo": "Rhaid i'r dyddiad gynnwys {{first}} a {{second}}"
     },
     "documentUpload": {
-      "wrongFileTypeDocStore": "cyThe selected file must be a DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
+      "wrongFileTypeDocStore": "Rhaid i'r ffeil a ddewiswyd fod yn DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
       "fileTooLargeDocStore": "cyFile you have uploaded is too big. Document files must be less than {{maxSize}}.",
       "fileTooLargeMedia": "cyFile you have uploaded is too big. Image files must be smaller than {{maxSize}}.",
       "fileTotalTooLargeDocStore": "cyThe selected files must be smaller than {{maxSize}}. Delete one or more files or reduce the file sizes.",
       "filenameTooLong": "cyThe file name must be {{maxLength}} characters or fewer",
-      "noFileSelected": "cySelect a file to upload",
+      "noFileSelected": "Dewiswch ffeil i’w llwytho",
       "uploadFailed": "cyThe selected file could not be uploaded – try again",
-      "fileDeleteFailed": "cyThe file could not be removed – try again",
-      "documentUrlRequired": "cySelect a file to remove",
-      "uploadSuccess": "cy{{filename}} has been uploaded",
+      "fileDeleteFailed": "Ni ellid dileu’r ffeil - rhowch gynnig arall arni.",
+      "documentUrlRequired": "Dewiswch ffeil i’w dileu",
+      "uploadSuccess": "{{filename}} wedi'i uwchlwytho",
       "errorSummaryTitle": "Mae yna broblem"
     }
   },
@@ -116,33 +116,33 @@
   },
   "characterCount": {
     "charactersUnderLimitText": {
-      "one": "cyYou have %{count} character remaining",
-      "other": "cyYou have %{count} characters remaining"
+      "one": "Mae gennych %{count} nod ar ôl",
+      "other": "Mae gennych %{count} nod ar ôl"
     },
-    "charactersAtLimitText": "cyYou have 0 characters remaining",
+    "charactersAtLimitText": "Mae gennych 0 nod ar ôl",
     "charactersOverLimitText": {
-      "one": "cyYou have %{count} character too many",
-      "other": "cyYou have %{count} characters too many"
+      "one": "Mae gennych %{count} nod yn ormod",
+      "other": "Mae gennych %{count} nod yn ormod"
     },
     "wordsUnderLimitText": {
-      "one": "cyYou have %{count} word remaining",
-      "other": "cyYou have %{count} words remaining"
+      "one": "Mae gennych %{count} gair ar ôl",
+      "other": "Mae gennych %{count} gair ar ôl"
     },
-    "wordsAtLimitText": "cyYou have 0 words remaining",
+    "wordsAtLimitText": "Mae gennych 0 gair ar ôl",
     "wordsOverLimitText": {
-      "one": "cyYou have %{count} word too many",
-      "other": "cyYou have %{count} words too many"
+      "one": "Mae gennych %{count} gair yn ormod",
+      "other": "Mae gennych %{count} gair yn ormod"
     },
-    "textareaDescriptionText": "cyYou can enter up to %{count} characters"
+    "textareaDescriptionText": "Gallwch nodi hyd at %{count} o nodau."
   },
   "errorPages": {
     "pageNotFound": {
       "title": "Ni ellir dod o hyd i’r dudalen",
-      "paragraph": "cyIf you typed the web address, check it is correct.",
-      "paragraph2": "cyIf you pasted the web address, check you copied the entire address.",
-      "paragraph3": "cyIf the web address is correct or you selected a link or button, contact us by email or telephone.",
+      "paragraph": "Os bu ichi deipio cyfeiriad y wefan, gwiriwch ei fod yn gywir.",
+      "paragraph2": "Os bu ichi ludo cyfeiriad y wefan, gwiriwch eich bod wedi copïo’r cyfeiriad cyfan.",
+      "paragraph3": "Os yw cyfeiriad y wefan yn gywir, neu os gwnaethoch glicio ar ddolen neu fotwm, cysylltwch â ni drwy e-bost neu dros y ffôn.",
       "heading": "E-bost",
-      "paragraph4": "cyUse the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
+      "paragraph4": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">dod o hyd i lys neu wasanaeth tribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
       "paragraph5": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna'r categori Tai i ddod o hyd iddo.",
       "heading2": "Rhif ffôn",
       "paragraph6": "0300 303 5174",
@@ -150,13 +150,13 @@
       "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "serviceUnavailable": {
-      "title": "cySorry, the service is unavailable",
-      "paragraphMinutes": "cyYou will be able to use the service in {{minutes}} minutes.",
-      "paragraphDateAndTime": "cyYou will be able to use the service from {{time}} on {{date}}.",
-      "paragraphFallback": "cyTry again later.",
-      "paragraph2": "cyFor help with your case, contact us by email or telephone.",
+      "title": "Yn anffodus, nid yw’r gwasanaeth ar gael",
+      "paragraphMinutes": "Byddwch yn gallu defnyddio’r gwasanaeth hwn mewn {{minutes}} munud.",
+      "paragraphDateAndTime": "Byddwch yn gallu defnyddio'r gwasanaeth o {{time}} ar {{date}}.",
+      "paragraphFallback": "Rhowch gynnig arall arni hwyrach ymlaen.",
+      "paragraph2": "Am gymorth gyda'ch achos, cysylltwch â ni drwy e-bost neu dros y ffôn.",
       "heading": "E-bost",
-      "paragraph3": "cyUse the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
+      "paragraph3": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">dod o hyd i lys neu wasanaeth tribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
       "paragraph4": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna'r categori Tai i ddod o hyd iddo.",
       "heading2": "Rhif ffôn",
       "paragraph5": "0300 303 5174",
@@ -164,12 +164,12 @@
       "paragraph7": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "technicalError": {
-      "title": "cySorry, there is a problem with the service",
-      "paragraph": "cyTry again later.",
-      "paragraph2": "cyWe saved your answers. They will be available for 30 days.",
-      "paragraph3": "cyFor help with your case, contact us by email or telephone.",
+      "title": "Mae’n ddrwg gennym, mae yna broblem gyda'r gwasanaeth",
+      "paragraph": "Rhowch gynnig arall arni hwyrach ymlaen.",
+      "paragraph2": "Rydym wedi cadw eich atebion. Byddant ar gael am 30 diwrnod.",
+      "paragraph3": "Am gymorth gyda'ch achos, cysylltwch â ni drwy e-bost neu dros y ffôn.",
       "heading": "E-bost",
-      "paragraph4": "cyUse the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
+      "paragraph4": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">dod o hyd i lys neu wasanaeth tribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
       "paragraph5": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna'r categori Tai i ddod o hyd iddo.",
       "heading2": "Rhif ffôn",
       "paragraph6": "0300 303 5174",
@@ -177,10 +177,10 @@
       "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
     },
     "accessDenied": {
-      "title": "cyYou do not have access to this page",
-      "paragraph": "cyContact us if you think you should have access, or if you need help with your case.",
+      "title": "Nid oes gennych fynediad i’r dudalen hon.",
+      "paragraph": "Cysylltwch â ni os ydych yn meddwl y dylech gael mynediad, neu os ydych angen help gyda'ch achos.",
       "heading": "E-bost",
-      "paragraph2": "cyUse the <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address.",
+      "paragraph2": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">dod o hyd i lys neu wasanaeth tribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
       "paragraph3": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna'r categori Tai i ddod o hyd iddo.",
       "heading2": "Rhif ffôn",
       "paragraph4": "0300 303 5174",
@@ -190,22 +190,22 @@
   },
   "applicationErrors": {
     "noApplicationIdInSession": {
-      "title": "cyApplication not available",
-      "paragraph": "cyThis application is not available. It may have already been submitted in a different window."
+      "title": "Cais ddim ar gael",
+      "paragraph": "Nid yw'r cais hwn ar gael. Efallai ei fod wedi'i gyflwyno'n barod mewn ffenestr wahanol."
     },
     "documentNotAvailable": {
-      "title": "cyDocument not available",
-      "paragraph": "cyThe selected file could not be downloaded – try again."
+      "title": "Dogfen ddim ar gael",
+      "paragraph": "Ni ellid lawrlwytho’r ffeil a ddewiswyd - rhowch gynnig arall arni."
     }
   },
   "taskList": {
-    "startNowAndDetails": "cyRead information about responding and free legal advice",
-    "personalDetails": "cyConfirm your details and contact preferences",
-    "disputeAndTenancy": "cyRespond to specific parts of the claimant’s claim",
-    "situationAndCircumstances": "cyGive details about your household and circumstances",
-    "payments": "cyDeclare recent payments or agreements made",
-    "incomeAndExpenditure": "cyGive details about your income and expenses",
+    "startNowAndDetails": "Darllenwch y wybodaeth am ymateb a chyngor cyfreithiol am ddim",
+    "personalDetails": "Cadarnhewch eich manylion a dewisiadau cyswllt",
+    "disputeAndTenancy": "Ymateb i rannau penodol o hawliad yr hawlydd",
+    "situationAndCircumstances": "Rhowch fanylion am eich aelwyd a'ch amgylchiadau",
+    "payments": "Datganwch daliadau diweddar neu gytundebau a wnaed",
+    "incomeAndExpenditure": "Rhowch fanylion eich incwm a’ch gwariant",
     "uploadFiles": "Uwchlwytho dogfennau",
-    "checkYourAnswersAndSubmit": "cyCheck your answers and submit"
+    "checkYourAnswersAndSubmit": "Gwiriwch eich atebion cyn cyflwyno"
   }
 }

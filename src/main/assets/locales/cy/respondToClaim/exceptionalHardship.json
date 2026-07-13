@@ -1,7 +1,7 @@
 {
   "pageTitle": "Caledi eithriadol",
   "introParagraph1": "Mae caledi eithriadol yn golygu profi anawsterau difrifol sy'n mynd y tu hwnt i'r anhawster arferol o golli eich cartref.",
-  "introParagraph2": "cyAny details you provide will be considered by a judge. If  they decide that exceptional hardship applies in your case, they might consider whether you can stay in your home for longer.",
+  "introParagraph2": "Caiff unrhyw fanylion a ddarperir gennych eu hystyried gan farnwr. Os byddant yn penderfynu bod caledi eithriadol yn berthnasol yn eich achos, mae'n bosibl y byddant yn ystyried os gallwch aros yn eich cartref am gyfnod hirach.",
   "forExample": "Er enghraifft, gallwch fod wedi:",
   "bullet1": "mynd drwy ysgariad neu wahanu",
   "bullet2": "colli eich swydd neu wedi cael eich diswyddo",
@@ -16,7 +16,7 @@
   "errors": {
     "exceptionalHardship": "Dewiswch a fyddech yn profi caledi eithriadol os gofynnir i chi adael eich cartref",
     "exceptionalHardship.exceptionalHardshipDetails": "Rhowch fanylion am y caledi eithriadol y byddech yn ei brofi",
-    "exceptionalHardshipDetailsMaxLength": "cyExceptional hardship details must be 500 characters or less",
-    "exceptionalHardshipDetailsInvalidCharacters": "cyThe details of the exceptional hardship you’d experience must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "exceptionalHardshipDetailsMaxLength": "Rhaid i fanylion caledi eithriadol fod yn 500 o nodau neu lai",
+    "exceptionalHardshipDetailsInvalidCharacters": "Rhowch i fanylion y caledi eithriadol a brofir gennych ond cynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
   }
 }

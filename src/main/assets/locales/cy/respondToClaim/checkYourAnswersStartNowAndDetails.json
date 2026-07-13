@@ -12,7 +12,7 @@
       }
     },
     "hasSolicitor": {
-      "label": "cy Do you have a solicitor?",
+      "label": "A oes gennych gyfreithiwr?",
       "changeHidden": "cy do you have a solicitor",
       "options": {
         "YES": "Ydy",

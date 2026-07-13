@@ -1,12 +1,12 @@
 {
-  "pageTitle": "cyDo you have a solicitor?",
-  "heading": "cyDo you have a solicitor?",
-  "question": "cyDo you have a solicitor?",
+  "pageTitle": "A oes gennych gyfreithiwr?",
+  "heading": "A oes gennych gyfreithiwr?",
+  "question": "A oes gennych gyfreithiwr?",
   "options": {
     "yes": "Ydy",
     "no": "Nac ydy"
   },
   "errors": {
-    "hasSolicitor": "cySelect if you have a solicitor"
+    "hasSolicitor": "Dewiswch os oes gennych gyfreithiwr"
   }
 }

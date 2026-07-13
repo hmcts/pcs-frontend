@@ -8,7 +8,7 @@
   "errors": {
     "date": {
       "day": "cyDay",
-      "month": "cyMonth",
+      "month": "Mis",
       "year": "cyYear",
       "notRealDate": "cyThe date the defendant received notice must be a real date",
       "futureDate": "cyThe date the defendant received notice must either be today’s date or in the past",

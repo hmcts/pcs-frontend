@@ -19,6 +19,6 @@
     "disputeDetails": {
       "required": "cyEnter the parts of the claim the defendant disputes"
     },
-    "disputeDetailsMaxLength": "cyExplanation must be 6500 characters or less"
+    "disputeDetailsMaxLength": "Rhaid i’r disgrifiad fod yn 6500 llythyren neu lai"
   }
 }
