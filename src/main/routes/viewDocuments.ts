@@ -88,7 +88,7 @@ export default function viewDocumentsRoutes(app: Application): void {
         const allDocuments = [
           ...(ccdCase.data?.allDocuments ?? []),
           ...(ccdCase.data?.detailsTab_TenancyLicenceDetails?.tenancyLicenceDocuments ?? []),
-          ...(ccdCase.data?.detailsTab_RentArrearsDetails?.rentStatement ?? [])
+          ...(ccdCase.data?.detailsTab_RentArrearsDetails?.rentStatement ?? []),
         ] as {
           id?: string;
           value?: { document_filename?: string; document_binary_url?: string };
