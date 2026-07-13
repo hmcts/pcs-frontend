@@ -101,8 +101,9 @@ test.afterEach(async () => {
   finaliseAllValidations();
 });
 
+//Skipping these tests temporarily in @nightly as LR feature will be toggled off in all test environments until the first release HDPI-7531
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
-test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
+test.describe('Respond to a claim LR - e2e Journey', async () => {
   test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
