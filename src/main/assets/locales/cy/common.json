@@ -153,7 +153,7 @@
       "title": "Yn anffodus, nid yw’r gwasanaeth ar gael",
       "paragraphMinutes": "Byddwch yn gallu defnyddio’r gwasanaeth hwn mewn {{minutes}} munud.",
       "paragraphDateAndTime": "Byddwch yn gallu defnyddio'r gwasanaeth o {{time}} ar {{date}}.",
-      "paragraphFallback": "Rhowch gynnig arall arni hwyrach ymlaen.",
+      "paragraphFallback": "Rhowch gynnig arall arni'n hwyrach ymlaen.",
       "paragraph2": "Am gymorth gyda'ch achos, cysylltwch â ni drwy e-bost neu dros y ffôn.",
       "heading": "E-bost",
       "paragraph3": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">dod o hyd i lys neu wasanaeth tribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
