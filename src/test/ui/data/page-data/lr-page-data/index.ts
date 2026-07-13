@@ -33,3 +33,5 @@
 // export * from './repaymentsAgreedLR.page.data';
 //export * from './selectDefendantLR.page.data';
 // export * from './contactPreferencesTextMessageLR.page.data';
+// export * from './howMuchAffordToPayLR.page.data';
+// export * from './instalmentPaymentsLR.page.data';

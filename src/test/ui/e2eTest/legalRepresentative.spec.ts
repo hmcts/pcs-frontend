@@ -17,9 +17,7 @@ import {
   exceptionalHardship,
   haveYouAppliedForUniversalCredit,
   incomeAndExpenses,
-  installmentPayments,
   languageUsed,
-  nonRentArrearsDispute,
   otherConsiderations,
   previousPaymentsLR,
   priorityDebtDetails,
@@ -43,11 +41,13 @@ import { doYouHaveAnyDependantChildrenLR } from '../data/page-data/lr-page-data/
 import { doYouHaveAnyOtherDependantsLR } from '../data/page-data/lr-page-data/doYouHaveAnyOtherDependantsLR.page.data';
 import { exceptionalHardshipLR } from '../data/page-data/lr-page-data/exceptionalHardshipLR.page.data';
 import { incomeAndExpensesLR } from '../data/page-data/lr-page-data/incomeAndExpensesLR.page.data';
+import { instalmentPaymentsLR } from '../data/page-data/lr-page-data/instalmentPaymentsLR.page.data';
 import { languageUsedLR } from '../data/page-data/lr-page-data/languageUsedLR.page.data';
 import { nonRentArrearsDisputeLR } from '../data/page-data/lr-page-data/nonRentArrearsDisputeLR.page.data';
 import { otherConsiderationsLR } from '../data/page-data/lr-page-data/otherConsiderationsLR.page.data';
 import { priorityDebtsLR } from '../data/page-data/lr-page-data/priorityDebtsLR.page.data';
 import { rentArrearsLR } from '../data/page-data/lr-page-data/rentArrearsDisputeLR.page.data';
+import { repaymentsAgreedLR } from '../data/page-data/lr-page-data/repaymentsAgreedLR.page.data';
 import { selectDefendantLR } from '../data/page-data/lr-page-data/selectDefendantLR.page.data';
 import { tenancyTypeDetailsLR } from '../data/page-data/lr-page-data/tenancyTypeDetailsLR.page.data';
 import { whatOtherRegularExpensesDoYouHaveLR } from '../data/page-data/lr-page-data/whatOtherRegularExpensesDoYouHaveLR.page.data';
@@ -101,7 +101,7 @@ test.afterEach(async () => {
   finaliseAllValidations();
 });
 
-//selectNoticeDetails= defendant not sure
+//selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent', async () => {
     const pin2User = await getPinUserAt(1);
@@ -285,11 +285,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       rentArrearsTotal: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('disputingOtherPartsOfTheClaimLR', {
-      disputeOption: nonRentArrearsDispute.yesRadioOption,
-      disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
+      disputeOption: nonRentArrearsDisputeLR.yesRadioOption,
+      disputeInfo: nonRentArrearsDisputeLR.explainClaimTextInput,
     });
     await performAction('selectCounterClaim', {
-      option: counterClaim.yesRadioOption,
+      option: counterClaimLR.yesRadioOption,
     });
     // await performAction('selectWhatAreYouClaimingFor', {
     //   question: counterClaimWhatAreYouClaimingFor.mainHeader,
@@ -322,33 +322,33 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       repaymentOption: previousPaymentsLR.noRadioOption,
     });
     await performAction('repaymentAgreedLR', {
-      question: repaymentsAgreed.lrGiveDetailsHiddenTextLabel,
+      question: repaymentsAgreedLR.giveDetailsHiddenTextLabel,
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performAction('installmentPayments', {
-      question: installmentPayments.lrHiddenWouldTheDefendantLikeToOfferQuestion,
-      radioOption: installmentPayments.noRadioOption,
+      question: instalmentPaymentsLR.wouldDefendantLikeToOfferToPayQuestion,
+      radioOption: instalmentPaymentsLR.noRadioOption,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
-      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+      dependantChildrenOption: doYouHaveAnyDependantChildrenLR.noRadioOption,
     });
     await performAction('otherDependantsLR', {
-      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
-      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+      otherDependantsOption: doYouHaveAnyOtherDependantsLR.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependantsLR.detailsTextInput,
     });
     await performAction('otherAdultsLR', {
-      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+      radioOption: doAnyOtherAdultsLiveInYourHomeLR.noRadioOption,
     });
     await performAction('alternativeAccommodationLR', {
-      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.lrHiddenDefendantNotSureRadioOption,
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.defendantNotSureRadioOption,
     });
     await performAction('circumstancesLR', {
       question: circumstancesLR.lrWouldYouLikeToShareHeader,
       yourCircumstancesOption: circumstancesLR.noRadioOption,
     });
-    await performAction('exceptionalHardshipLR', {
-      question: exceptionalHardship.mainHeader,
-      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    await performAction('selectExceptionalHardshipLR', {
+      question: exceptionalHardshipLR.mainHeader,
+      exceptionalHardshipOption: exceptionalHardshipLR.noRadioOption,
     });
     await performAction('selectIncomeAndExpensesLR', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
@@ -459,7 +459,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       repaymentInfo: previousPaymentsLR.detailsTextInput,
     });
     await performAction('repaymentAgreedLR', {
-      question: repaymentsAgreed.lrGiveDetailsHiddenTextLabel,
+      question: repaymentsAgreedLR.giveDetailsHiddenTextLabel,
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });

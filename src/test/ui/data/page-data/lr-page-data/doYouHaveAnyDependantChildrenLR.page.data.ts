@@ -10,7 +10,6 @@ export const doYouHaveAnyDependantChildrenLR = {
   youHave500CharactersHiddenHintText: `You can enter up to 500 characters`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouHaveAnyDependentChildrenErrorMessage: `Select if they have any dependent children`,
-  giveDetailsAboutYourDependentChildrenErrorMessage: `Give details about your dependent children`,
   mustBeUnderCharacterLimitErrorMessage: `Dependent children details must be 500 characters or less`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
