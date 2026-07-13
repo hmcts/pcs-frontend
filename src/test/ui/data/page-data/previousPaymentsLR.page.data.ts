@@ -1,6 +1,8 @@
+import { getCurrentFormattedDate } from '../../utils/common/date.utils';
+
 export const previousPaymentsLR = {
   getMainHeader: () => {
-    return `Has the defendant paid any money to ${process.env.CLAIMANT_NAME} since 16th June 2025?`;
+    return `Has the defendant paid any money to ${process.env.CLAIMANT_NAME} since ${getCurrentFormattedDate()}?`;
   },
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

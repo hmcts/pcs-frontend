@@ -2,7 +2,6 @@ import type { Request } from 'express';
 
 import { fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { formatIsoDate } from '../../utils/dateUtils';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -84,14 +83,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
-    const validatedCase = req.res?.locals.validatedCase;
     const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
-    // TODO HDPI-5157: hardcode for now, wire claimIssueDate from START callback later
-    const claimIssueDate = validatedCase?.claimIssueDate ? formatIsoDate(validatedCase.claimIssueDate) : '20 May 2025';
+    const dateIssued = caseData?.dateIssued;
 
     return {
       claimantName,
-      claimIssueDate,
+      dateIssued,
     };
   },
   fields: [

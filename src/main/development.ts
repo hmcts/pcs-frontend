@@ -14,7 +14,7 @@ export const setupDev = (app: express.Express, developmentMode: boolean): void =
   const webpackconfig = require('../../webpack.config');
   const compiler = webpack(webpackconfig);
 
-  app.use(webpackDev(compiler, { publicPath: '/' }));
+  app.use(webpackDev(compiler, { publicPath: webpackconfig.output.publicPath }));
   const hotMiddleware = webpackHot(compiler, { path: '/__webpack_hmr' });
   app.use(hotMiddleware);
 
