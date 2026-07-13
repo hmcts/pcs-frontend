@@ -1,6 +1,6 @@
 export const doAnyOtherAdultsLiveInYourHome = {
   mainHeader: `Do any other adults live in your home?`,
-  lrMainHeader: `Other adults`,
+  lrHiddenMainHeader: `Other adults`,
   lrHiddenParagraph: `Do any other adults live in the defendant’s home?`,
   backLink: `Back`,
   giveDetailsAboutOtherAdultsHiddenTextLabel: `Give details about the other adults living in your home`,
