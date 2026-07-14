@@ -290,14 +290,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
-  pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNo(t, caseData.isExemptLandlord));
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.landlordRegistered'),
-    yesNoNotSure(t, responses?.landlordRegistered)
-  );
-  pushRow(rows, t('viewTheResponse:responseToClaim.landlordLicensed'), yesNoNotSure(t, responses?.landlordLicensed));
-  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
+  pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNoNotSure(t, responses?.exemptLandlord));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.tenancyTypeConfirmation'),
@@ -318,6 +311,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
       formatGdsDate(responses?.tenancyStartDate) ?? ''
     );
   }
+  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
