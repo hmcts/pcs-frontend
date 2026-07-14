@@ -45,7 +45,7 @@ const home_url = process.env.TEST_URL;
 let claimantName: string;
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  await performAction('getLdFlagValue', 'cui-respond-to-claim-lr-enabled');
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-lr-enabled');
   process.env.NOTICE_SERVED = 'YES';
   if (testInfo.title.includes('@nonRent')) {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadAssuredTenancy.claimantName;
