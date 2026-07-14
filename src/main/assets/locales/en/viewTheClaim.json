@@ -16,6 +16,7 @@
   "documentsHelpLinkText": "Documents page",
   "closeAndReturn": "Close and return to case overview",
   "personsUnknown": "Persons unknown",
+  "addressUnknown": "Address unknown",
   "statementOfTruthBody": "I believe the facts stated in this claim form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
   "sections": {
     "claimantDetails": "Claimant details",
