@@ -15,7 +15,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   getInitialFormData: async (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const exemptLandlord = caseData?.possessionClaimResponse?.defendantResponses?.exemptLandlord as
-      YesNoNotSureValue | undefined;
+      | YesNoNotSureValue
+      | undefined;
 
     return exemptLandlord ? { exemptLandlord } : {};
   },
