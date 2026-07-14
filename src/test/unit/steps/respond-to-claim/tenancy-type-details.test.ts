@@ -72,15 +72,6 @@ type TenancyTypeDetailsStep = {
               tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
               occupationLicenceTypeWales?: string;
               otherLicenceTypeDetails?: string;
-              allDocumentsWithType?: {
-                id: string;
-                value: {
-                  type?: string;
-                  document?: {
-                    document_filename?: string;
-                  };
-                };
-              }[];
             };
           };
         };
