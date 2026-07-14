@@ -30,6 +30,7 @@ import type {
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import { getDashboardUrl } from '@routes/dashboard';
+import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
@@ -193,9 +194,9 @@ export function createPostHandler(
           const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
             ? config.get<string>('redirects.manageCaseReturnURL')
             : null;
-          if (caseDetailsBaseUrl) {
-            const caseDetailsUrl = `${caseDetailsBaseUrl}/${caseId}`;
-            return res.redirect(caseDetailsUrl);
+          const caseDetailsUrl = buildManageCaseDetailsRedirect(caseDetailsBaseUrl, caseId);
+          if (caseDetailsUrl) {
+            return res.redirect(303, caseDetailsUrl);
           }
         }
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
