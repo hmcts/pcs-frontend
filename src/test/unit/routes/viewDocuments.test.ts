@@ -397,5 +397,53 @@ describe('viewDocuments route', () => {
       expect(pipeSpy).toHaveBeenCalledWith(res);
       expect(next).not.toHaveBeenCalled();
     });
+
+    it('streams document binary from notice_Documents when allDocuments and details tab are empty', async () => {
+      const stream = new PassThrough();
+      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
+      (getDocumentBinary as jest.Mock).mockResolvedValue({
+        stream,
+        contentType: 'application/pdf',
+      });
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [],
+          notice_Documents: [
+            {
+              id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+              value: {
+                document_filename: 'notice-served.pdf',
+                document_binary_url: 'http://dm-store/documents/notice-ccd/binary',
+              },
+            },
+          ],
+          detailsTab_NoticeDetails: {},
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
+      const res = {
+        setHeader: jest.fn(),
+      } as unknown as Response;
+      const next = jest.fn();
+
+      await handler(
+        {
+          params: {
+            caseReference: '1777570813792018',
+            documentId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+          },
+          session: { user: { accessToken: 'token' } },
+        } as unknown as Request,
+        res,
+        next
+      );
+
+      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/notice-ccd/binary', 'token');
+      expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
+      expect(pipeSpy).toHaveBeenCalledWith(res);
+      expect(next).not.toHaveBeenCalled();
+    });
   });
 });
