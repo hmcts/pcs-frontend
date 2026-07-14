@@ -16,7 +16,7 @@
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
   {% if noticeDocumentId %}
-    {% set insetHtml %}<p class="govuk-body">{{ hintText }}</p><a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ noticeDocumentId }}" target="_blank" rel="noopener noreferrer">{{ viewNoticeLinkText }}</a>{% endset %}
+    {% set insetHtml %}<p class="govuk-body">{{ hintText }}</p><p class="govuk-body"><a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ noticeDocumentId }}" target="_blank" rel="noopener noreferrer">{{ viewNoticeLinkText }}</a></p>{% endset %}
     {{ govukInsetText({ html: insetHtml }) }}
   {% else %}
     {{ govukInsetText({ text: hintText }) }}

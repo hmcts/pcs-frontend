@@ -6,11 +6,16 @@
   "viewNoticeLinkText": "cyView a copy of the notice (opens in a new tab)",
   "methodOfService": {
     "PERSONALLY_HANDED": "cythe notice was served by personally handing it to or leaving it with {{name}}",
+    "PERSONALLY_HANDED_ALT": "cythe notice was served by personally handing it to or leaving it with someone",
     "EMAIL": "cythe notice was served by email to {{emailAddress}}",
+    "EMAIL_ALT": "cythe notice was served by email",
     "DELIVERED_PERMITTED_PLACE": "cythe notice was served by delivering it to or leaving it at a permitted place on {{date}}",
+    "DELIVERED_PERMITTED_PLACE_ALT": "cythe notice was served by delivering it to or leaving it at a permitted place",
     "FIRST_CLASS_POST": "cythe notice was served by first class post or other service which provides for delivery on the next working day",
     "OTHER_ELECTRONIC": "cythe notice was served by other electronic method: {{details}}",
-    "OTHER": "cythe notice was served by other means: {{details}}"
+    "OTHER_ELECTRONIC_ALT": "cythe notice was served by other electronic method",
+    "OTHER": "cythe notice was served by other means: {{details}}",
+    "OTHER_ALT": "cythe notice was served by other means"
   },
   "question": "Pryd gawsoch yr hysbysiad gan {{claimantName}} (dewisol)?",
   "noticeDateHint": "Er enghraifft, 27 9 2022",

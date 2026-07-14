@@ -6,13 +6,20 @@ import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { getRequestLanguage } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData } from '@services/ccdCase.interface';
 import { extractCaseDocuments } from '@utils/documentUtils';
+import { formatDate, toDateLocale } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const logger = Logger.getLogger('confirmation-of-notice-date-when-provided');
+
+const textOrUndefined = (value?: string): string | undefined => {
+  const trimmed = value?.trim();
+  return trimmed || undefined;
+};
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-date-when-provided',
@@ -97,13 +104,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: req => {
     const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
+    const locale = toDateLocale(getRequestLanguage(req));
 
     const noticeDateRaw = validatedCase?.noticeDate || '';
-
-    // Format the date for display (e.g., "1 January 2024")
-    const noticeDate = noticeDateRaw
-      ? DateTime.fromISO(noticeDateRaw).setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y')
-      : '';
+    const noticeDate = formatDate(noticeDateRaw, locale) ?? '';
 
     const t = getTranslationFunction(req);
 
@@ -117,43 +121,45 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       documents.find(d => d.sourceField === 'detailsTab_NoticeDetails.noticeDocuments') ??
       documents.find(d => d.sourceField === 'notice_Documents');
     const noticeDocumentId = noticeDoc?.id;
-    const noticeDocumentFilename = noticeDoc?.filename;
-
-    const formatNoticeDate = (raw?: string): string =>
-      raw ? DateTime.fromISO(raw).setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y') : '';
 
     const serviceMethod = validatedCase?.notice_ServiceMethod;
     let noticeMethodText: string | undefined;
 
     switch (serviceMethod) {
-      case 'PERSONALLY_HANDED':
-        noticeMethodText = t('methodOfService.PERSONALLY_HANDED', {
-          name: validatedCase?.notice_PersonName ?? '',
-        });
+      case 'PERSONALLY_HANDED': {
+        const name = textOrUndefined(validatedCase?.notice_PersonName);
+        noticeMethodText = name
+          ? t('methodOfService.PERSONALLY_HANDED', { name })
+          : t('methodOfService.PERSONALLY_HANDED_ALT');
         break;
-      case 'EMAIL':
-        noticeMethodText = t('methodOfService.EMAIL', {
-          emailAddress: validatedCase?.notice_EmailAddress ?? '',
-        });
+      }
+      case 'EMAIL': {
+        const emailAddress = textOrUndefined(validatedCase?.notice_EmailAddress);
+        noticeMethodText = emailAddress ? t('methodOfService.EMAIL', { emailAddress }) : t('methodOfService.EMAIL_ALT');
         break;
-      case 'DELIVERED_PERMITTED_PLACE':
-        noticeMethodText = t('methodOfService.DELIVERED_PERMITTED_PLACE', {
-          date: formatNoticeDate(validatedCase?.notice_DeliveredDate),
-        });
+      }
+      case 'DELIVERED_PERMITTED_PLACE': {
+        const date = formatDate(validatedCase?.notice_DeliveredDate, locale);
+        noticeMethodText = date
+          ? t('methodOfService.DELIVERED_PERMITTED_PLACE', { date })
+          : t('methodOfService.DELIVERED_PERMITTED_PLACE_ALT');
         break;
+      }
       case 'FIRST_CLASS_POST':
         noticeMethodText = t('methodOfService.FIRST_CLASS_POST');
         break;
-      case 'OTHER_ELECTRONIC':
-        noticeMethodText = t('methodOfService.OTHER_ELECTRONIC', {
-          details: validatedCase?.notice_OtherElectronicExplanation ?? '',
-        });
+      case 'OTHER_ELECTRONIC': {
+        const details = textOrUndefined(validatedCase?.notice_OtherElectronicExplanation);
+        noticeMethodText = details
+          ? t('methodOfService.OTHER_ELECTRONIC', { details })
+          : t('methodOfService.OTHER_ELECTRONIC_ALT');
         break;
-      case 'OTHER':
-        noticeMethodText = t('methodOfService.OTHER', {
-          details: validatedCase?.notice_OtherExplanation ?? '',
-        });
+      }
+      case 'OTHER': {
+        const details = textOrUndefined(validatedCase?.notice_OtherExplanation);
+        noticeMethodText = details ? t('methodOfService.OTHER', { details }) : t('methodOfService.OTHER_ALT');
         break;
+      }
       default:
         noticeMethodText = undefined;
     }
@@ -165,7 +171,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       hintText,
       listItem1,
       noticeDocumentId,
-      noticeDocumentFilename,
       noticeMethodText,
     };
   },

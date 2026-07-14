@@ -3,6 +3,10 @@ jest.mock('../../../../main/modules/steps', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
+jest.mock('../../../../main/modules/i18n', () => ({
+  getRequestLanguage: jest.fn(() => 'en'),
+}));
+
 import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-provided';
 
@@ -49,7 +53,7 @@ describe('confirmation-of-notice-date-when-provided step', () => {
   });
 
   describe('extendGetContent', () => {
-    it('sets noticeDocumentId and noticeDocumentFilename when a notice document is uploaded', () => {
+    it('sets noticeDocumentId when a notice document is uploaded', () => {
       const content = testedStep.extendGetContent({
         res: {
           locals: {
@@ -71,7 +75,6 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       });
 
       expect(content.noticeDocumentId).toBe('doc-123');
-      expect(content.noticeDocumentFilename).toBe('notice.pdf');
     });
 
     it('resolves the notice document from notice_Documents when the details tab is stripped to empty', () => {
@@ -99,7 +102,6 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       });
 
       expect(content.noticeDocumentId).toBe('notice-doc-77');
-      expect(content.noticeDocumentFilename).toBe('possession-notice.pdf');
     });
 
     it('sets noticeDocumentId from detailsTab_NoticeDetails.noticeDocuments for submitted cases', () => {
@@ -127,7 +129,6 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       });
 
       expect(content.noticeDocumentId).toBe('entity-uuid-52');
-      expect(content.noticeDocumentFilename).toBe('DocUploaded - Claimant 1.rtf');
     });
 
     it('prefers detailsTab_NoticeDetails.noticeDocuments over notice_Documents when both exist', () => {
@@ -164,7 +165,6 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       });
 
       expect(content.noticeDocumentId).toBe('submitted-doc-id');
-      expect(content.noticeDocumentFilename).toBe('submitted-notice.pdf');
     });
 
     it('omits noticeDocumentId when no notice document is uploaded', () => {
@@ -180,7 +180,6 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       });
 
       expect(content.noticeDocumentId).toBeUndefined();
-      expect(content.noticeDocumentFilename).toBeUndefined();
     });
 
     it('does not expose a notice link when able to upload but no notice document exists', () => {
@@ -197,7 +196,6 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       });
 
       expect(content.noticeDocumentId).toBeUndefined();
-      expect(content.noticeDocumentFilename).toBeUndefined();
     });
 
     it.each([
@@ -208,16 +206,29 @@ describe('confirmation-of-notice-date-when-provided step', () => {
         'PERSONALLY_HANDED[name=Jane Doe]',
       ],
       [
+        'PERSONALLY_HANDED without name',
+        { notice_ServiceMethod: 'PERSONALLY_HANDED' },
+        ['methodOfService.PERSONALLY_HANDED_ALT'],
+        'PERSONALLY_HANDED_ALT',
+      ],
+      [
         'EMAIL',
         { notice_ServiceMethod: 'EMAIL', notice_EmailAddress: 'jane@example.com' },
         ['methodOfService.EMAIL', { emailAddress: 'jane@example.com' }],
         'EMAIL[emailAddress=jane@example.com]',
       ],
+      ['EMAIL without address', { notice_ServiceMethod: 'EMAIL' }, ['methodOfService.EMAIL_ALT'], 'EMAIL_ALT'],
       [
         'DELIVERED_PERMITTED_PLACE',
         { notice_ServiceMethod: 'DELIVERED_PERMITTED_PLACE', notice_DeliveredDate: '2024-01-15' },
         ['methodOfService.DELIVERED_PERMITTED_PLACE', { date: '15 January 2024' }],
         'DELIVERED_PERMITTED_PLACE[date=15 January 2024]',
+      ],
+      [
+        'DELIVERED_PERMITTED_PLACE without date',
+        { notice_ServiceMethod: 'DELIVERED_PERMITTED_PLACE' },
+        ['methodOfService.DELIVERED_PERMITTED_PLACE_ALT'],
+        'DELIVERED_PERMITTED_PLACE_ALT',
       ],
       [
         'FIRST_CLASS_POST',
@@ -235,11 +246,18 @@ describe('confirmation-of-notice-date-when-provided step', () => {
         'OTHER_ELECTRONIC[details=via secure portal]',
       ],
       [
+        'OTHER_ELECTRONIC without details',
+        { notice_ServiceMethod: 'OTHER_ELECTRONIC' },
+        ['methodOfService.OTHER_ELECTRONIC_ALT'],
+        'OTHER_ELECTRONIC_ALT',
+      ],
+      [
         'OTHER',
         { notice_ServiceMethod: 'OTHER', notice_OtherExplanation: 'handed to neighbour' },
         ['methodOfService.OTHER', { details: 'handed to neighbour' }],
         'OTHER[details=handed to neighbour]',
       ],
+      ['OTHER without details', { notice_ServiceMethod: 'OTHER' }, ['methodOfService.OTHER_ALT'], 'OTHER_ALT'],
     ] as const)('returns noticeMethodText for %s', (_label, caseData, expectedTranslationCall, expectedText) => {
       const content = testedStep.extendGetContent({
         res: {
