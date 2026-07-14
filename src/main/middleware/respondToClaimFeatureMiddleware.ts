@@ -1,18 +1,30 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
+import { isLegalRepresentativeUser } from '../steps/utils';
+
 import { handleRespondToClaimDisabled } from './handleRespondToClaimDisabled';
 
-import { isRespondToClaimEnabledForUser } from '@utils/isRespondToClaimEnabledForUser';
+import {
+  isRespondToClaimEnabledForRelease,
+  isRespondToClaimEnabledForUser,
+} from '@utils/isRespondToClaimEnabledForUser';
 
-export function respondToClaimFeatureMiddleware(): RequestHandler {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const enabled = await isRespondToClaimEnabledForUser(req);
-
-    if (!enabled) {
-      handleRespondToClaimDisabled(req, res);
-      return;
+export const respondToClaimFeatureMiddleware: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  if (isLegalRepresentativeUser(req)) {
+    const isReleaseEnabled = await isRespondToClaimEnabledForRelease(req);
+    if (!isReleaseEnabled) {
+      return handleRespondToClaimDisabled(req, res);
     }
+  }
 
-    next();
-  };
-}
+  const isUserEnabled = await isRespondToClaimEnabledForUser(req);
+  if (!isUserEnabled) {
+    return handleRespondToClaimDisabled(req, res);
+  }
+
+  next();
+};
