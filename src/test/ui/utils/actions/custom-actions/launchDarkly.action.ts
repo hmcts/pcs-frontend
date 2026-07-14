@@ -9,7 +9,7 @@ export class LaunchDarklyAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const flagKey = fieldName as string;
     const flagOn = await this.getFlagValue(flagKey);
-    test.skip(!flagOn, `Flag "${flagKey}" is OFF`);
+    test.skip(!flagOn, `Flag "${flagKey}" is OFF / returned NULL`);
   }
 
   private async getFlagValue(flagKey: string): Promise<boolean> {
@@ -17,6 +17,7 @@ export class LaunchDarklyAction implements IAction {
       if (!ldClient) {
         const sdkKey = process.env.LAUNCHDARKLY_SDK_KEY;
         if (!sdkKey) {
+          console.error(`The SDK key is not set`);
           return false;
         }
 
