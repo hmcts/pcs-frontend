@@ -1,0 +1,40 @@
+{
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "cy Payments and agreements",
+  "rows": {
+    "anyPaymentsMade": {
+      "label": "cy Has the defendant paid any money to {{claimantName}} since {{claimIssueDate}}?",
+      "changeHidden": "cy payments made"
+    },
+    "paymentDetails": {
+      "label": "cy Give details about how much the defendant paid and when",
+      "changeHidden": "cy payment details"
+    },
+    "repaymentPlanAgreed": {
+      "label": "cy Has the defendant come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+      "changeHidden": "cy repayment agreement"
+    },
+    "repaymentAgreedDetails": {
+      "label": "cy Give details about how much the defendant has agreed to pay, how often the defendant will pay and when the agreement was made",
+      "changeHidden": "cy repayment details"
+    },
+    "repayArrearsInstalments": {
+      "label": "cy Would the defendant like to offer to pay off their arrears in instalments?",
+      "changeHidden": "cy offer to pay in instalments"
+    },
+    "installmentAmount": {
+      "label": "cy How much could the defendant afford to pay in addition to the current rent?",
+      "changeHidden": "cy instalment amount"
+    },
+    "installmentFrequency": {
+      "label": "cy How frequently could the defendant afford to pay this amount?",
+      "changeHidden": "cy instalment frequency",
+      "frequencies": {
+        "weekly": "Pob wythnos",
+        "every2Weeks": "Pob 2 wythnos",
+        "every4Weeks": "Pob 4 wythnos",
+        "monthly": "Pob mis"
+      }
+    }
+  }
+}

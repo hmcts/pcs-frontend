@@ -1,0 +1,54 @@
+{
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "cy Your circumstances",
+  "rows": {
+    "dependantChildren": {
+      "label": "cy Does the defendant have any dependant children?",
+      "changeHidden": "cy dependent children"
+    },
+    "dependantChildrenDetails": {
+      "label": "cy Give details about their dependant children",
+      "changeHidden": "cy dependent children details"
+    },
+    "otherDependants": {
+      "label": "cy Does the defendant have any other dependants?",
+      "changeHidden": "cy other dependants"
+    },
+    "otherDependantsDetails": {
+      "label": "cy Give details about their other dependants",
+      "changeHidden": "cy other dependants details"
+    },
+    "otherTenants": {
+      "label": "cy Do any other adults live in the defendant’s home?",
+      "changeHidden": "cy other adults in your home"
+    },
+    "otherTenantsDetails": {
+      "label": "cy Give details about the other adults living in the defendant’s home",
+      "changeHidden": "cy other adults details"
+    },
+    "alternativeAccommodation": {
+      "label": "cy Would the defendant have somewhere else to live if they had to leave their home?",
+      "changeHidden": "cy alternative accommodation"
+    },
+    "alternativeAccommodationDate": {
+      "label": "cy When would they be able to move in?",
+      "changeHidden": "cy alternative accommodation move-in date"
+    },
+    "shareAdditionalCircumstances": {
+      "label": "cy Would you like to share anything about the defendant’s circumstances?",
+      "changeHidden": "cy additional circumstances"
+    },
+    "shareAdditionalCircumstancesDetails": {
+      "label": "cy Give details about the defendant’s circumstances",
+      "changeHidden": "cy additional circumstances details"
+    },
+    "exceptionalHardship": {
+      "label": "cy Would the defendant experience exceptional hardship if they were asked to leave their home?",
+      "changeHidden": "cy exceptional hardship"
+    },
+    "exceptionalHardshipDetails": {
+      "label": "cy Give details about the exceptional hardship the defendant would experience",
+      "changeHidden": "cy exceptional hardship details"
+    }
+  }
+}
