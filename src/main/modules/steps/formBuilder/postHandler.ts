@@ -1,3 +1,4 @@
+import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -29,7 +30,7 @@ import type {
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import { getDashboardUrl } from '@routes/dashboard';
-import { redirectToCaseManagement } from '@utils/legalRepresentativeRedirectHandler';
+import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
@@ -190,7 +191,13 @@ export function createPostHandler(
         const caseId = req.res?.locals.validatedCase?.id;
 
         if (isLegalRepresentativeUser(req)) {
-          return redirectToCaseManagement(res, caseId);
+          const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
+            ? config.get<string>('redirects.manageCaseReturnURL')
+            : null;
+          const caseDetailsUrl = buildManageCaseDetailsRedirect(caseDetailsBaseUrl, caseId);
+          if (caseDetailsUrl) {
+            return res.redirect(303, caseDetailsUrl);
+          }
         }
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
       }
