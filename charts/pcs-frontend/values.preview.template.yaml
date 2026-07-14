@@ -20,6 +20,7 @@ nodejs:
     XUI_BASE_URI: '${XUI_BASE_URI}'
     REDIRECTS_MANAGE_CASE_RETURN_URL: '${REDIRECTS_MANAGE_CASE_RETURN_URL}'
     PAYMENT_RETURN_URL: 'https://${SERVICE_FQDN}/payment/return'
+    LAUNCHDARKLY_ENV: '${SERVICE_FQDN}'
 redis:
   image:
     registry: hmctsprod.azurecr.io
