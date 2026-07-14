@@ -3,7 +3,7 @@ export const doYouHaveAnyDependantChildrenLR = {
   doesTheDefendantHaveDependantChildrenQuestion: `Does the defendant have any dependant children?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  giveDetailsHiddenTextLabel: `Give details about their dependent children`,
+  giveDetailsHiddenTextLabel: `Give details about their dependant children`,
   detailsTextInput: `1 dependant child - Name:Samuel and Age:7`,
   saveAndContinueButton: `Save and continue`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,

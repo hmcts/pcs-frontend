@@ -1,4 +1,4 @@
-export const confirmationOfNoticeDateWhenNotProvided = {
+export const confirmationOfNoticeDateWhenNotProvidedLR = {
   mainHeader: `Notice date`,
   backLink: `Back`,
   didNotProvideNoticeLabel: () =>
