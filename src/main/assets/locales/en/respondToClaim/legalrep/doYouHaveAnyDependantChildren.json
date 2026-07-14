@@ -1,7 +1,7 @@
 {
   "heading": "Dependant children",
   "dependantQuestion": "Does the defendant have any dependant children?",
-  "dependantChildrenParagraph": "",
+  "dependentChildrenParagraph": "",
   "dependentChildrenDetailsLabel": "Give details about their dependant children",
   "dependentChildrenDetailsHint": "",
   "errors": {
