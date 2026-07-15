@@ -13,7 +13,7 @@ export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
 
   res.locals.isLegalRepresentative = isLegalRepresentative;
 
-  if (isLegalRepresentative && req.body) {
+  if (isLegalRepresentative && req.method === 'POST' && req.body) {
     req.body.isLegalRepresentative = 'true';
   }
 
