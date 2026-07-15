@@ -1,3 +1,4 @@
+import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
 
 import * as flowModule from '@modules/steps/flow';
@@ -6,6 +7,7 @@ import { createPostHandler } from '@modules/steps/formBuilder/postHandler';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import * as dashboardModule from '@routes/dashboard';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
+import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 
 jest.mock('@routes/dashboard');
 jest.mock('@modules/i18n');
@@ -248,10 +250,14 @@ describe('PostHandler - Save for Later Fix', () => {
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
-      expect(mockResponse.redirect).toHaveBeenCalledWith(
-        303,
-        'https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS/1771325608502536'
+      // Base URL comes from config (REDIRECTS_MANAGE_CASE_RETURN_URL), which Jenkins overrides when
+      // the PR carries a pcs-api-pr: label — assert against the resolved config value, not a fixed host.
+      const expectedUrl = buildManageCaseDetailsRedirect(
+        config.get<string>('redirects.manageCaseReturnURL'),
+        '1771325608502536'
       );
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, expectedUrl);
     });
 
     it('does not use an invalid case ID in the legal representative Manage Case redirect', async () => {
