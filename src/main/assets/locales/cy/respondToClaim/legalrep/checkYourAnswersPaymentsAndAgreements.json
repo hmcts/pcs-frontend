@@ -1,5 +1,5 @@
 {
-  "pageTitle": "Gwirio eich atebion",
+  "pageTitle": "cy Check your answers",
   "cardTitle": "cy Payments and agreements",
   "rows": {
     "anyPaymentsMade": {
@@ -30,10 +30,10 @@
       "label": "cy How frequently could the defendant afford to pay this amount?",
       "changeHidden": "cy instalment frequency",
       "frequencies": {
-        "weekly": "Pob wythnos",
-        "every2Weeks": "Pob 2 wythnos",
-        "every4Weeks": "Pob 4 wythnos",
-        "monthly": "Pob mis"
+        "weekly": "cy Weekly",
+        "every2Weeks": "cy Every 2 weeks",
+        "every4Weeks": "cy Every 4 weeks",
+        "monthly": "cy Monthly"
       }
     }
   }

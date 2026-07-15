@@ -1,17 +1,17 @@
 {
-  "pageTitle": "Gwirio eich atebion",
+  "pageTitle": "cy Check your answers",
   "cardTitle": "cy Personal details",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "Ai enw eich cleient yw {{defendantName}}?",
+      "label": "cy Is your client’s name {{defendantName}}?",
       "changeHidden": "cy name"
     },
     "defendantName": {
-      "label": "Enw",
+      "label": "cy Name",
       "changeHidden": "cy corrected name"
     },
     "defendantNameCapture": {
-      "label": "Beth yw enw eich cleient?",
+      "label": "cy What is your client’s name?",
       "changeHidden": "cy name"
     },
     "dateOfBirth": {
@@ -24,23 +24,23 @@
       "changeHidden": "cy correspondence address"
     },
     "contactByEmailOrPost": {
-      "label": "Sut ydych chi eisiau cael diweddariadau?",
+      "label": "cy How do you want to receive updates?",
       "changeHidden": "cy how you receive updates",
       "options": {
-        "email": "Trwy e-bost",
-        "post": "Trwy’r post",
+        "email": "cy By email",
+        "post": "cy By post",
         "none": "cy None"
       }
     },
     "contactByEmailAddress": {
-      "label": "E-bost"
+      "label": "cy Email"
     },
     "contactByPhone": {
-      "label": "Ydych chi'n hapus i ni gysylltu â chi dros y ffôn?",
+      "label": "cy Are you happy to be contacted by telephone?",
       "changeHidden": "cy contact by phone"
     },
     "contactByText": {
-      "label": "Ydych chi'n hapus i ni gysylltu â chi drwy neges testun?",
+      "label": "cy Are you happy to be contacted by text message?",
       "changeHidden": "cy contact by text message"
     },
     "contactDetails": {

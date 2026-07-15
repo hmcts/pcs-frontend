@@ -1,18 +1,18 @@
 {
-  "pageTitle": "Gwirio eich atebion",
+  "pageTitle": "cy Check your answers",
   "cardTitle": "cy Response",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
-    "imNotSure": "Nid wyf yn siŵr"
+    "yes": "cy Yes",
+    "no": "cy No",
+    "imNotSure": "cy I’m not sure"
   },
   "rows": {
     "landlordRegistered": {
-      "label": "A yw eich landlord wedi'i gofrestru?",
+      "label": "cy Is the landlord registered?",
       "changeHidden": "cy landlord registered"
     },
     "landlordLicensed": {
-      "label": "A yw eich landlord wedi'i drwyddedu?",
+      "label": "cy Is the landlord licensed?",
       "changeHidden": "cy landlord licensed"
     },
     "writtenTerms": {
@@ -72,7 +72,7 @@
       "changeHidden": "cy counterclaim type",
       "options": {
         "PAYMENT_OR_COMPENSATION": "cy A sum of money or compensation",
-        "SOMETHING_ELSE": "Rhywbeth arall",
+        "SOMETHING_ELSE": "cy Something else",
         "BOTH": "cy Both"
       }
     },
@@ -92,8 +92,8 @@
       "label": "cy Do you need help paying the counterclaim fee?",
       "changeHidden": "cy help paying the counterclaim fee",
       "options": {
-        "YES": "Rwyf angen help i dalu’r ffi",
-        "NO": "Nid wyf angen help i dalu’r ffi"
+        "YES": "cy I need help paying the fee",
+        "NO": "cy I do not need help paying the fee"
       }
     },
     "counterClaimAppliedForHwf": {
@@ -101,7 +101,7 @@
       "changeHidden": "cy applied for help with fees"
     },
     "counterClaimHwfReference": {
-      "label": "Nodwch eich cyfeirnod Help i Dalu Ffioedd",
+      "label": "cy Enter your Help with Fees reference number",
       "changeHidden": "cy Help with Fees reference number"
     },
     "counterClaimFor": {
