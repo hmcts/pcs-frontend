@@ -42,6 +42,31 @@ export const accessRules: readonly AccessRule[] = [
     pathPattern: /^\/access-your-case(?:\/.*)?$/,
     allowedRoles: CITIZEN_USER_ROLES,
   },
+  {
+    name: 'view-the-claim',
+    pathPattern: /^\/case\/[^/]+\/view-the-claim(?:\/.*)?$/,
+    allowedRoles: CITIZEN_USER_ROLES,
+  },
+  {
+    name: 'view-documents',
+    pathPattern: /^\/case\/[^/]+\/view-documents(?:\/.*)?$/,
+    allowedRoles: CITIZEN_USER_ROLES,
+  },
+  {
+    name: 'view-hearing-documents',
+    pathPattern: /^\/case\/[^/]+\/view-hearing-documents(?:\/.*)?$/,
+    allowedRoles: CITIZEN_USER_ROLES,
+  },
+  {
+    name: 'view-orders-and-notices',
+    pathPattern: /^\/case\/[^/]+\/view-orders-and-notices(?:\/.*)?$/,
+    allowedRoles: CITIZEN_USER_ROLES,
+  },
+  {
+    name: 'view-all-applications',
+    pathPattern: /^\/case\/[^/]+\/view-all-applications(?:\/.*)?$/,
+    allowedRoles: CITIZEN_USER_ROLES,
+  },
 ];
 
 export function findRuleForPath(path: string): AccessRule | undefined {

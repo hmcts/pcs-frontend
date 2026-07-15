@@ -1,10 +1,10 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
-import { findRuleForPath, logAccessDenied, userMayAccessPath } from '../access-control';
-import { getUserRoles } from '../steps/utils';
+import { findRuleForPath, logAccessDenied, sendToLogin } from '../access-control';
+import { classifyAccess, getUserRoles } from '../steps/utils';
 
-export const roleAccessMiddleware: RequestHandler = (req: Request, _res: Response, next: NextFunction): void => {
+export const roleAccessMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
   const matchedRule = findRuleForPath(req.path);
   if (!matchedRule) {
     return next();
@@ -12,8 +12,10 @@ export const roleAccessMiddleware: RequestHandler = (req: Request, _res: Respons
   if (!req.session?.user) {
     return next();
   }
+
   const userRoles = getUserRoles(req);
-  if (userMayAccessPath(userRoles, req.path)) {
+  const classification = classifyAccess(userRoles, matchedRule.allowedRoles);
+  if (classification === 'allow') {
     return next();
   }
 
@@ -25,5 +27,8 @@ export const roleAccessMiddleware: RequestHandler = (req: Request, _res: Respons
     rule: matchedRule,
   });
 
-  next(new HTTPError('Access denied', 403));
+  if (classification === 'deny') {
+    return next(new HTTPError('Access denied', 403));
+  }
+  return sendToLogin(req, res);
 };

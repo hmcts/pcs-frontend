@@ -5,6 +5,7 @@ import {
   LEGAL_REPRESENTATIVE_USER_ROLES,
   ROLE_CITIZEN,
   ROLE_PCS_SOLICITOR,
+  classifyAccess,
   getUserRoles,
   getUserToken,
   getUserType,
@@ -81,6 +82,26 @@ describe('userRole', () => {
     it('returns "citizen" otherwise', () => {
       expect(getUserType(reqWith(['citizen']))).toBe('citizen');
       expect(getUserType(reqWith([]))).toBe('citizen');
+    });
+  });
+
+  describe('classifyAccess', () => {
+    it('returns "allow" when the user holds an allowed role', () => {
+      expect(classifyAccess(['citizen'], ['citizen'])).toBe('allow');
+      expect(classifyAccess(['caseworker-pcs-solicitor'], ['citizen', 'caseworker-pcs-solicitor'])).toBe('allow');
+    });
+
+    it('returns "deny" when a solicitor lacks the allowed role', () => {
+      expect(classifyAccess(['caseworker-pcs-solicitor'], ['citizen'])).toBe('deny');
+    });
+
+    it('prefers "allow" over "deny" when a solicitor is explicitly allowed', () => {
+      expect(classifyAccess(['caseworker-pcs-solicitor'], ['caseworker-pcs-solicitor'])).toBe('allow');
+    });
+
+    it('returns "login" for any other role or no roles', () => {
+      expect(classifyAccess(['some-other-role'], ['citizen'])).toBe('login');
+      expect(classifyAccess([], ['citizen'])).toBe('login');
     });
   });
 

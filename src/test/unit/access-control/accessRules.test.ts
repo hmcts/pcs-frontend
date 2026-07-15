@@ -21,6 +21,12 @@ describe('accessRules', () => {
       ['/claims/anything', 'claims'],
       ['/access-your-case', 'access-your-case'],
       ['/access-your-case/x', 'access-your-case'],
+      ['/case/1234567890123456/view-the-claim', 'view-the-claim'],
+      ['/case/1234567890123456/view-documents', 'view-documents'],
+      ['/case/1234567890123456/view-documents/doc-1', 'view-documents'],
+      ['/case/1234567890123456/view-hearing-documents', 'view-hearing-documents'],
+      ['/case/1234567890123456/view-orders-and-notices', 'view-orders-and-notices'],
+      ['/case/1234567890123456/view-all-applications', 'view-all-applications'],
     ])('matches gated path %s to rule "%s"', (path, expectedRuleName) => {
       expect(findRuleForPath(path)?.name).toBe(expectedRuleName);
     });
@@ -58,6 +64,17 @@ describe('accessRules', () => {
 
     it('allows citizens into upload-additional-documents', () => {
       expect(userMayAccessPath(['citizen'], '/case/1/upload-additional-documents')).toBe(true);
+    });
+
+    it.each([
+      '/case/1/view-the-claim',
+      '/case/1/view-documents',
+      '/case/1/view-hearing-documents',
+      '/case/1/view-orders-and-notices',
+      '/case/1/view-all-applications',
+    ])('gates the view page %s to citizens only', path => {
+      expect(userMayAccessPath(['citizen'], path)).toBe(true);
+      expect(userMayAccessPath(['caseworker-pcs-solicitor'], path)).toBe(false);
     });
 
     it('blocks users with no matching role', () => {

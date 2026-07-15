@@ -17,6 +17,7 @@ interface SessionShape {
   user?: { uid?: string; roles?: string[] };
   returnTo?: string;
   save: jest.Mock;
+  destroy: jest.Mock;
 }
 
 const buildReq = (
@@ -28,6 +29,7 @@ const buildReq = (
     user,
     returnTo,
     save: jest.fn((cb: () => void) => cb()),
+    destroy: jest.fn((cb: () => void) => cb()),
   };
   const req = { path, session } as unknown as Request;
   return { req, session };
@@ -103,10 +105,12 @@ describe('roleAccessMiddleware', () => {
     );
   });
 
-  it('denies a user with no matching role from make-an-application', () => {
-    const { req } = buildReq('/case/1/make-an-application', { uid: 'u2', roles: ['some-other-role'] });
+  it('sends a user with any other role to login (session destroyed, no 403) from make-an-application', () => {
+    const { req, session } = buildReq('/case/1/make-an-application', { uid: 'u2', roles: ['some-other-role'] });
     invoke(req);
-    expect((lastError() as HTTPError).status).toBe(403);
+    expect(session.destroy).toHaveBeenCalledTimes(1);
+    expect(res.redirect).toHaveBeenCalledWith('/login');
+    expect(next).not.toHaveBeenCalled();
   });
 
   it('denies an authenticated solicitor on /claims (citizen-only)', () => {
@@ -129,5 +133,38 @@ describe('roleAccessMiddleware', () => {
     });
     invoke(req);
     expect((lastError() as HTTPError).status).toBe(403);
+  });
+
+  describe('AC13 view pages are citizen-only', () => {
+    const viewPaths = [
+      '/case/1/view-the-claim',
+      '/case/1/view-documents',
+      '/case/1/view-documents/doc-123',
+      '/case/1/view-hearing-documents',
+      '/case/1/view-orders-and-notices',
+      '/case/1/view-all-applications',
+    ];
+
+    it.each(viewPaths)('allows a citizen into %s', path => {
+      const { req } = buildReq(path, { uid: 'c1', roles: ['citizen'] });
+      invoke(req);
+      expect(next).toHaveBeenCalledWith();
+      expect(res.redirect).not.toHaveBeenCalled();
+    });
+
+    it.each(viewPaths)('denies a solicitor on %s with HTTPError 403', path => {
+      const { req, session } = buildReq(path, { uid: 's1', roles: ['caseworker-pcs-solicitor'] });
+      invoke(req);
+      expect(session.user).toBeDefined();
+      expect((lastError() as HTTPError).status).toBe(403);
+    });
+
+    it.each(viewPaths)('sends any other role on %s to login', path => {
+      const { req, session } = buildReq(path, { uid: 'o1', roles: ['some-other-role'] });
+      invoke(req);
+      expect(session.destroy).toHaveBeenCalledTimes(1);
+      expect(res.redirect).toHaveBeenCalledWith('/login');
+      expect(next).not.toHaveBeenCalled();
+    });
   });
 });

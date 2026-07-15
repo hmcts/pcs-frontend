@@ -32,6 +32,27 @@ export function isLegalRepresentativeUser(req: Request): boolean {
   );
 }
 
+export type AccessClassification = 'allow' | 'deny' | 'login';
+
+/**
+ * - `allow` – the user holds one of the allowed roles
+ * - `deny`  – the user is a legal representative (solicitor)
+ * - `login` – any other role (or none)
+ */
+export function classifyAccess(userRoles: readonly string[], allowedRoles: readonly string[]): AccessClassification {
+  if (userRoles.some(role => allowedRoles.includes(role))) {
+    return 'allow';
+  }
+  if (
+    userRoles.some(role =>
+      LEGAL_REPRESENTATIVE_USER_ROLES.includes(role as (typeof LEGAL_REPRESENTATIVE_USER_ROLES)[number])
+    )
+  ) {
+    return 'deny';
+  }
+  return 'login';
+}
+
 export function getUserType(req: Request): UserType {
   if (isLegalRepresentativeUser(req)) {
     return 'legalrep';

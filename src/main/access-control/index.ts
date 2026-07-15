@@ -11,3 +11,4 @@ export type { AccessRule, LoginAccessDecision } from './accessRules';
 export { logAccessDenied } from './logging';
 export type { AccessDenialContext, AccessDenialStage } from './logging';
 export { requireRoles } from './requireRoles';
+export { sendToLogin } from './sendToLogin';

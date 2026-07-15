@@ -41,6 +41,7 @@ export {
   LEGAL_REPRESENTATIVE_USER_ROLES,
   ROLE_CITIZEN,
   ROLE_PCS_SOLICITOR,
+  classifyAccess,
   getUserRoles,
   getUserToken,
   getUserType,
@@ -48,6 +49,7 @@ export {
   isLegalRepresentativeUser,
   normaliseRoles,
 } from './userRole';
+export type { AccessClassification } from './userRole';
 export { getPreviousStepForCounterClaimAbout } from './getPreviousStepForCounterClaimAbout';
 export { formatDatePartsToISODate, formatIsoDate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
