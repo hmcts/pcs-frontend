@@ -5,8 +5,10 @@ import { findRuleForPath, requireRoles } from '../access-control';
 import {
   caseReferenceParamMiddleware,
   legalRepresentativeHeaderMiddleware,
+  legalRepresentativeSpecificStepsAccessMiddleware,
   oidcMiddleware,
   requireEventAccess,
+  respondToClaimFeatureMiddleware,
 } from '../middleware';
 
 import { Logger } from '@modules/logger';
@@ -50,8 +52,21 @@ function buildGetMiddleware(
   const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
 
   return stepMiddleware
-    ? [stepContext, dependencyCheck, ...stepMiddleware, legalRepresentativeHeaderMiddleware]
-    : [stepContext, dependencyCheck, legalRepresentativeHeaderMiddleware];
+    ? [
+        stepContext,
+        dependencyCheck,
+        ...stepMiddleware,
+        legalRepresentativeSpecificStepsAccessMiddleware,
+        legalRepresentativeHeaderMiddleware,
+        respondToClaimFeatureMiddleware,
+      ]
+    : [
+        stepContext,
+        dependencyCheck,
+        legalRepresentativeSpecificStepsAccessMiddleware,
+        legalRepresentativeHeaderMiddleware,
+        respondToClaimFeatureMiddleware,
+      ];
 }
 
 /**
@@ -102,10 +117,17 @@ function registerStepRoutes(
   }
 
   if (step.postController?.post) {
-    router.post(step.url, stepContext, legalRepresentativeHeaderMiddleware, (req, res, next) => {
-      const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
-      return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
-    });
+    router.post(
+      step.url,
+      stepContext,
+      legalRepresentativeSpecificStepsAccessMiddleware,
+      legalRepresentativeHeaderMiddleware,
+      respondToClaimFeatureMiddleware,
+      (req, res, next) => {
+        const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
+        return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
+      }
+    );
   }
 
   stats.totalSteps++;

@@ -25,6 +25,20 @@ jest.mock('@utils/safeRedirect', () => ({
   safeRedirect303: mockSafeRedirect303,
 }));
 
+const mockIsRespondToClaimEnabledForUser = jest.fn().mockResolvedValue(true);
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  isRespondToClaimEnabledForUser: (...args: unknown[]) => mockIsRespondToClaimEnabledForUser(...args),
+}));
+
+jest.mock('@modules/i18n', () => ({
+  getTranslationFunction: jest.fn(() => {
+    const strings: Record<string, string> = {
+      'accessCode:errors.respondToClaimUnavailable': 'The option to respond to a claim is not available at the moment.',
+    };
+    return ((key: string) => strings[key] ?? key) as import('i18next').TFunction;
+  }),
+}));
+
 import type { Application, Request, Response } from 'express';
 
 import citizenCaseLinkRoutes from '@routes/citizenCaseLink';
@@ -36,6 +50,7 @@ describe('citizenCaseLink routes', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
 
     mockGet = jest.fn();
     mockPost = jest.fn();
@@ -49,24 +64,84 @@ describe('citizenCaseLink routes', () => {
   });
 
   describe('GET /access-your-case', () => {
-    it('should render the form', () => {
-      const handler = mockGet.mock.calls[0][mockGet.mock.calls[0].length - 1] as (req: Request, res: Response) => void;
+    it('should render the form', async () => {
+      const handler = mockGet.mock.calls[0][mockGet.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
-      const req = {} as unknown as Request;
+      const req = { i18n: { loadNamespaces: jest.fn().mockResolvedValue(undefined) } } as unknown as Request;
       const res = { render: jest.fn() } as unknown as Response;
 
-      handler(req, res);
+      await handler(req, res);
 
       expect(res.render).toHaveBeenCalledWith('accessCode', {
         errors: {},
         errorList: [],
         claimNumber: '',
         accessCode: '',
+        respondToClaimBlocked: false,
+        blockedMessage: undefined,
       });
+    });
+
+    it('should render blocked message when respond-to-claim flag is off', async () => {
+      mockIsRespondToClaimEnabledForUser.mockResolvedValueOnce(false);
+
+      const handler = mockGet.mock.calls[0][mockGet.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
+
+      const req = { i18n: { loadNamespaces: jest.fn().mockResolvedValue(undefined) } } as unknown as Request;
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(res.render).toHaveBeenCalledWith(
+        'accessCode',
+        expect.objectContaining({
+          respondToClaimBlocked: true,
+          blockedMessage: 'The option to respond to a claim is not available at the moment.',
+          errorList: [
+            {
+              text: 'The option to respond to a claim is not available at the moment.',
+            },
+          ],
+        })
+      );
     });
   });
 
   describe('POST /access-your-case', () => {
+    it('should render blocked message when respond-to-claim flag is off without calling validateAccessCode', async () => {
+      mockIsRespondToClaimEnabledForUser.mockResolvedValueOnce(false);
+
+      const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
+
+      const req = {
+        body: { claimNumber: '1234567890123456', accessCode: 'ABCD12345678' },
+        session: { user: { accessToken: 'mock-token' } },
+        i18n: { loadNamespaces: jest.fn().mockResolvedValue(undefined) },
+      } as unknown as Request;
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(mockValidateAccessCode).not.toHaveBeenCalled();
+      expect(res.render).toHaveBeenCalledWith(
+        'accessCode',
+        expect.objectContaining({
+          respondToClaimBlocked: true,
+          claimNumber: '1234567890123456',
+          accessCode: 'ABCD12345678',
+        })
+      );
+    });
+
     it('should return 401 when no access token in session', async () => {
       const handler = mockPost.mock.calls[0][mockPost.mock.calls[0].length - 1] as (
         req: Request,

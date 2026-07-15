@@ -12,8 +12,13 @@ import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { DashboardTaskGroup } from '@services/dashboard.interface';
 import { sanitiseCaseReference } from '@utils/caseReference';
-import { getDashboardTaskPath } from '@utils/dashboardTaskPaths';
+import {
+  RESPOND_TO_CLAIM_DASHBOARD_TASK_TEMPLATE_ID,
+  getDashboardTaskPath,
+  isRespondToClaimDashboardNotification,
+} from '@utils/dashboardTaskPaths';
 import { getTagClasses, isLinkableStatus } from '@utils/dashboardTaskStatus';
+import { isRespondToClaimEnabledForUser } from '@utils/isRespondToClaimEnabledForUser';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -60,11 +65,17 @@ function getTaskUrl(
   templateId: string,
   taskStatus: string,
   caseReference: string,
-  taskGroupId: string
+  taskGroupId: string,
+  showRespondToClaimLinks: boolean
 ): string | undefined {
   if (taskStatus === 'NOT_AVAILABLE') {
     return undefined;
   }
+
+  if (templateId === RESPOND_TO_CLAIM_DASHBOARD_TASK_TEMPLATE_ID && !showRespondToClaimLinks) {
+    return undefined;
+  }
+
   return getDashboardTaskPath(templateId, caseReference, taskGroupId);
 }
 
@@ -84,7 +95,12 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
 export default function dashboardRoutes(app: Application): void {
   const logger = Logger.getLogger('dashboard');
 
-  function mapTaskGroup(tg: DashboardTaskGroup, t: TFunction, caseReference: string): MappedTaskGroup {
+  function mapTaskGroup(
+    tg: DashboardTaskGroup,
+    t: TFunction,
+    caseReference: string,
+    showRespondToClaimLinks: boolean
+  ): MappedTaskGroup {
     const groupIdLower = tg.groupId.toLowerCase();
     const groupTitle = lookup(t, `dashboard:taskGroups.${tg.groupId}`);
     if (!groupTitle) {
@@ -108,7 +124,9 @@ export default function dashboardRoutes(app: Application): void {
 
           return {
             title: { html: resolved.title },
-            href: linkable ? getTaskUrl(task.templateId, task.status, caseReference, groupIdLower) : undefined,
+            href: linkable
+              ? getTaskUrl(task.templateId, task.status, caseReference, groupIdLower, showRespondToClaimLinks)
+              : undefined,
             status: tagText && classes ? { tag: { text: tagText, classes } } : {},
           };
         })
@@ -154,9 +172,14 @@ export default function dashboardRoutes(app: Application): void {
       try {
         const dashboardData = await ccdCaseService.getDashboardView(accessToken, caseReference);
 
+        const showRespondToClaimLinks = await isRespondToClaimEnabledForUser(req);
+
         const t = getTranslationFunction(req, ['dashboard', 'common']);
 
         const notifications = dashboardData.notifications
+          .filter(
+            notification => showRespondToClaimLinks || !isRespondToClaimDashboardNotification(notification.templateId)
+          )
           .map(n => {
             const resolved = resolveNotification(
               t,
@@ -171,7 +194,9 @@ export default function dashboardRoutes(app: Application): void {
           })
           .filter((x): x is NonNullable<typeof x> => x !== null);
 
-        const taskGroups = dashboardData.taskGroups.map(tg => mapTaskGroup(tg, t, caseReference));
+        const taskGroups = dashboardData.taskGroups.map(tg =>
+          mapTaskGroup(tg, t, caseReference, showRespondToClaimLinks)
+        );
 
         const propertyAddress = dashboardData.propertyAddress ?? null;
 

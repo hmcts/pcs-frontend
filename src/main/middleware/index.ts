@@ -5,3 +5,6 @@ export * from './roleAccess';
 export * from './pcqRedirect';
 export * from './pageTrackingUrl';
 export * from './legalRepresentativeHeaders';
+export * from './respondToClaimFeatureMiddleware';
+export * from './handleRespondToClaimDisabled';
+export * from './legalRepresentativeSpecificStepsAccess';

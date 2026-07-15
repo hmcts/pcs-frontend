@@ -25,11 +25,17 @@ jest.mock('@modules/steps/flow', () => ({
 }));
 
 const mockLegalRepresentativeHeaderMiddleware = jest.fn((req, res, next) => next());
+const mockRespondToClaimFeatureMiddleware = jest.fn((req, res, next) => next());
+const mockLegalRepresentativeSpecificStepsAccessMiddleware = jest.fn((req, res, next) => next());
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
   legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) =>
     mockLegalRepresentativeHeaderMiddleware(req, res, next)
+  ),
+  respondToClaimFeatureMiddleware: jest.fn((req, res, next) => mockRespondToClaimFeatureMiddleware(req, res, next)),
+  legalRepresentativeSpecificStepsAccessMiddleware: jest.fn((req, res, next) =>
+    mockLegalRepresentativeSpecificStepsAccessMiddleware(req, res, next)
   ),
 }));
 
@@ -137,7 +143,11 @@ const mockStepsData = {
 
 import { Application, Request, Response } from 'express';
 
-import { legalRepresentativeHeaderMiddleware } from '../../../main/middleware';
+import {
+  legalRepresentativeHeaderMiddleware,
+  legalRepresentativeSpecificStepsAccessMiddleware,
+  respondToClaimFeatureMiddleware,
+} from '../../../main/middleware';
 import { registerSteps } from '../../../main/routes/registerSteps';
 
 describe('registerSteps', () => {
@@ -187,24 +197,28 @@ describe('registerSteps', () => {
     const protectedGetCall = mockGet.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedGetCall).toBeDefined();
 
-    // [url, stepContext, dependencyCheck, legalRepHeaders, handler]
+    // [url, stepContext, dependencyCheck, legalRepSpecificSteps, legalRepHeaders, respondToClaimFeature, handler]
     // Auth runs once at the journey basePath (see registerAllJourneys), not per step.
-    expect(protectedGetCall!).toHaveLength(5);
+    expect(protectedGetCall!).toHaveLength(7);
     expect(protectedGetCall![0]).toBe('/steps/protected');
     expect(typeof protectedGetCall![1]).toBe('function');
     expect(protectedGetCall![2]).toBe(mockStepDependencyCheck);
-    expect(protectedGetCall![3]).toBe(legalRepresentativeHeaderMiddleware);
-    expect(typeof protectedGetCall![4]).toBe('function');
+    expect(protectedGetCall![3]).toBe(legalRepresentativeSpecificStepsAccessMiddleware);
+    expect(protectedGetCall![4]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(protectedGetCall![5]).toBe(respondToClaimFeatureMiddleware);
+    expect(typeof protectedGetCall![6]).toBe('function');
 
     const protectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/protected');
     expect(protectedPostCall).toBeDefined();
-    // [url, stepContext, legalRepHeaders, handler]
+    // [url, stepContext, legalRepSpecificSteps, legalRepHeaders, respondToClaimFeature, handler]
     // Auth runs once at the journey basePath (see registerAllJourneys), not per step.
-    expect(protectedPostCall!).toHaveLength(4);
+    expect(protectedPostCall!).toHaveLength(6);
     expect(protectedPostCall![0]).toBe('/steps/protected');
     expect(typeof protectedPostCall![1]).toBe('function');
-    expect(protectedPostCall![2]).toBe(legalRepresentativeHeaderMiddleware);
-    expect(typeof protectedPostCall![3]).toBe('function');
+    expect(protectedPostCall![2]).toBe(legalRepresentativeSpecificStepsAccessMiddleware);
+    expect(protectedPostCall![3]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(protectedPostCall![4]).toBe(respondToClaimFeatureMiddleware);
+    expect(typeof protectedPostCall![5]).toBe('function');
   });
 
   it('registers GET and POST without middlewares for unprotected steps', () => {
@@ -213,21 +227,25 @@ describe('registerSteps', () => {
     const unprotectedGetCall = mockGet.mock.calls.find(call => call[0] === '/steps/unprotected');
     expect(unprotectedGetCall).toBeDefined();
     // [url, stepContext, dependencyCheck, legalRepHeaders, handler]
-    expect(unprotectedGetCall!).toHaveLength(5);
+    expect(unprotectedGetCall!).toHaveLength(7);
     expect(unprotectedGetCall![0]).toBe('/steps/unprotected');
     expect(typeof unprotectedGetCall![1]).toBe('function');
     expect(unprotectedGetCall![2]).toBe(mockStepDependencyCheck);
-    expect(unprotectedGetCall![3]).toBe(legalRepresentativeHeaderMiddleware);
-    expect(typeof unprotectedGetCall![4]).toBe('function');
+    expect(unprotectedGetCall![3]).toBe(legalRepresentativeSpecificStepsAccessMiddleware);
+    expect(unprotectedGetCall![4]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(unprotectedGetCall![5]).toBe(respondToClaimFeatureMiddleware);
+    expect(typeof unprotectedGetCall![6]).toBe('function');
 
     const unprotectedPostCall = mockPost.mock.calls.find(call => call[0] === '/steps/unprotected');
     expect(unprotectedPostCall).toBeDefined();
-    // [url, stepContext, legalRepHeaders, handler]
-    expect(unprotectedPostCall!).toHaveLength(4);
+    // [url, stepContext, legalRepHeaders, handler, respondToClaimFeatureMiddleware]
+    expect(unprotectedPostCall!).toHaveLength(6);
     expect(unprotectedPostCall![0]).toBe('/steps/unprotected');
     expect(typeof unprotectedPostCall![1]).toBe('function');
-    expect(unprotectedPostCall![2]).toBe(legalRepresentativeHeaderMiddleware);
-    expect(typeof unprotectedPostCall![3]).toBe('function');
+    expect(unprotectedPostCall![2]).toBe(legalRepresentativeSpecificStepsAccessMiddleware);
+    expect(unprotectedPostCall![3]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(unprotectedPostCall![4]).toBe(respondToClaimFeatureMiddleware);
+    expect(typeof unprotectedPostCall![5]).toBe('function');
   });
 
   it('delegates POST handlers to the resolved step definition', () => {
@@ -261,14 +279,16 @@ describe('registerSteps', () => {
     const stepWithMiddlewareCall = mockGet.mock.calls.find(call => call[0] === '/steps/with-middleware');
 
     expect(stepWithMiddlewareCall).toBeDefined();
-    // [url, stepContext, dependencyCheck, customMiddleware, legalRepHeaders, handler]
-    expect(stepWithMiddlewareCall!).toHaveLength(6);
+    // [url, stepContext, dependencyCheck, customMiddleware, legalRepSpecificSteps, legalRepHeaders, respondToClaimFeature, handler]
+    expect(stepWithMiddlewareCall!).toHaveLength(8);
     expect(stepWithMiddlewareCall![0]).toBe('/steps/with-middleware');
     expect(typeof stepWithMiddlewareCall![1]).toBe('function');
     expect(stepWithMiddlewareCall![2]).toBe(mockStepDependencyCheck);
     expect(stepWithMiddlewareCall![3]).toBe(mockStepsData.stepWithMiddleware.middleware![0]);
-    expect(stepWithMiddlewareCall![4]).toBe(legalRepresentativeHeaderMiddleware);
-    expect(typeof stepWithMiddlewareCall![5]).toBe('function');
+    expect(stepWithMiddlewareCall![4]).toBe(legalRepresentativeSpecificStepsAccessMiddleware);
+    expect(stepWithMiddlewareCall![5]).toBe(legalRepresentativeHeaderMiddleware);
+    expect(stepWithMiddlewareCall![6]).toBe(respondToClaimFeatureMiddleware);
+    expect(typeof stepWithMiddlewareCall![7]).toBe('function');
   });
 
   it('calls getValidatedLanguage for each GET route', () => {
@@ -429,7 +449,9 @@ describe('registerAllJourneys', () => {
       oidcMiddleware: jest.fn((req, res, next) => next()),
       caseReferenceParamMiddleware: mockCaseReferenceParamMiddleware,
       requireEventAccess: mockRequireEventAccess,
+      legalRepresentativeSpecificStepsAccessMiddleware: jest.fn((req, res, next) => next()),
       legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
+      respondToClaimFeatureMiddleware: jest.fn((req, res, next) => next()),
     }));
   });
 
@@ -479,7 +501,9 @@ describe('registerAllJourneys', () => {
       oidcMiddleware: jest.fn((req, res, next) => next()),
       caseReferenceParamMiddleware: caseRefMw,
       requireEventAccess: jest.fn(() => jest.fn((req, res, next) => next())),
+      legalRepresentativeSpecificStepsAccessMiddleware: jest.fn((req, res, next) => next()),
       legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
+      respondToClaimFeatureMiddleware: jest.fn((req, res, next) => next()),
     }));
 
     const testStep = {
@@ -598,6 +622,8 @@ describe('registerAllJourneys', () => {
         })
       ),
       legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
+      legalRepresentativeSpecificStepsAccessMiddleware: jest.fn((req, res, next) => next()),
+      respondToClaimFeatureMiddleware: jest.fn((req, res, next) => next()),
     }));
 
     const testStep = {

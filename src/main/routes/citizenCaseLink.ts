@@ -3,8 +3,10 @@ import type { Application, Request, Response } from 'express';
 import { requireRoles, rolesForRule } from '../access-control';
 import { oidcMiddleware } from '../middleware/oidc';
 
+import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { type AccessCodeValidationError, validateAccessCode } from '@services/pcsApi/pcsApiService';
+import { isRespondToClaimEnabledForUser } from '@utils/isRespondToClaimEnabledForUser';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const accessYourCaseGuard = requireRoles(rolesForRule('access-your-case'), 'access-your-case');
@@ -21,6 +23,19 @@ interface FieldError {
 interface FormErrors {
   claimNumber?: FieldError;
   accessCode?: FieldError;
+}
+
+interface ErrorListItem {
+  text: string;
+  href?: string;
+}
+
+interface RenderFormOptions {
+  errors?: FormErrors;
+  claimNumber?: string;
+  accessCode?: string;
+  respondToClaimBlocked?: boolean;
+  blockedMessage?: string;
 }
 
 const API_ERROR_MESSAGES: Record<AccessCodeValidationError, { field: 'claimNumber' | 'accessCode'; text: string }> = {
@@ -46,8 +61,13 @@ const API_ERROR_MESSAGES: Record<AccessCodeValidationError, { field: 'claimNumbe
   },
 };
 
-function buildErrorList(errors: FormErrors): { text: string; href: string }[] {
-  const list: { text: string; href: string }[] = [];
+function buildErrorList(errors: FormErrors, blockedMessage?: string): ErrorListItem[] {
+  const list: ErrorListItem[] = [];
+
+  if (blockedMessage) {
+    list.push({ text: blockedMessage });
+  }
+
   if (errors.claimNumber) {
     list.push({ text: errors.claimNumber.text, href: '#claimNumber' });
   }
@@ -57,23 +77,57 @@ function buildErrorList(errors: FormErrors): { text: string; href: string }[] {
   return list;
 }
 
-function renderForm(res: Response, errors: FormErrors = {}, claimNumber = '', accessCode = ''): void {
+function renderForm(res: Response, options: RenderFormOptions = {}): void {
+  const { errors = {}, claimNumber = '', accessCode = '', respondToClaimBlocked = false, blockedMessage } = options;
+
   res.render('accessCode', {
     errors,
-    errorList: buildErrorList(errors),
+    errorList: buildErrorList(errors, blockedMessage),
+    claimNumber,
+    accessCode,
+    respondToClaimBlocked,
+    blockedMessage,
+  });
+}
+
+async function getRespondToClaimBlockedMessage(req: Request): Promise<string> {
+  await req.i18n?.loadNamespaces(['accessCode']);
+  const t = getTranslationFunction(req, ['accessCode']);
+  return t('accessCode:errors.respondToClaimUnavailable');
+}
+
+async function renderRespondToClaimBlockedForm(
+  req: Request,
+  res: Response,
+  claimNumber = '',
+  accessCode = ''
+): Promise<void> {
+  const blockedMessage = await getRespondToClaimBlockedMessage(req);
+  renderForm(res, {
+    respondToClaimBlocked: true,
+    blockedMessage,
     claimNumber,
     accessCode,
   });
 }
 
 export default function citizenCaseLinkRoutes(app: Application): void {
-  app.get('/access-your-case', oidcMiddleware, accessYourCaseGuard, (_req: Request, res: Response) => {
+  app.get('/access-your-case', oidcMiddleware, accessYourCaseGuard, async (req: Request, res: Response) => {
+    if (!(await isRespondToClaimEnabledForUser(req))) {
+      return renderRespondToClaimBlockedForm(req, res);
+    }
+
     return renderForm(res);
   });
 
   app.post('/access-your-case', oidcMiddleware, accessYourCaseGuard, async (req: Request, res: Response) => {
     const claimNumber = typeof req.body.claimNumber === 'string' ? req.body.claimNumber.trim() : '';
     const accessCode = typeof req.body.accessCode === 'string' ? req.body.accessCode.trim() : '';
+
+    if (!(await isRespondToClaimEnabledForUser(req))) {
+      return renderRespondToClaimBlockedForm(req, res, claimNumber, accessCode);
+    }
+
     const userAccessToken = req.session.user?.accessToken;
 
     if (!userAccessToken) {
@@ -104,7 +158,7 @@ export default function citizenCaseLinkRoutes(app: Application): void {
     }
 
     if (errors.claimNumber || errors.accessCode) {
-      return renderForm(res, errors, claimNumber, accessCode);
+      return renderForm(res, { errors, claimNumber, accessCode });
     }
 
     // Strip hyphens to get the internal 16-digit case ID
@@ -121,13 +175,13 @@ export default function citizenCaseLinkRoutes(app: Application): void {
       const { field, text } = API_ERROR_MESSAGES[result.error];
       errors[field] = { text };
       logger.warn(`Access code validation failed for case ${caseId}: ${result.error}`);
-      return renderForm(res, errors, claimNumber, accessCode);
+      return renderForm(res, { errors, claimNumber, accessCode });
     } catch (err) {
       logger.error(`Failed to validate access code for case ${caseId}:`, err);
       errors.claimNumber = {
         text: 'We cannot find that claim number. Enter the claim number that you received from the court',
       };
-      return renderForm(res, errors, claimNumber, accessCode);
+      return renderForm(res, { errors, claimNumber, accessCode });
     }
   });
 }

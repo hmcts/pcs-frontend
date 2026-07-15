@@ -89,5 +89,8 @@
   },
   "payment": {
     "returnUrl": "PAYMENT_RETURN_URL"
+  },
+  "launchdarkly": {
+    "env": "LAUNCHDARKLY_ENV"
   }
 }
