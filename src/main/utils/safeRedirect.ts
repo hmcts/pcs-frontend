@@ -6,15 +6,15 @@ const logger = Logger.getLogger('safeRedirect');
 
 const INTERNAL_BASE = 'http://localhost'; // parsing anchor only
 
-function getSafeRedirectPath(
+export function safeRedirect303(
+  res: Response,
   target: unknown,
-  fallback: string,
-  allowedPrefixes: string[],
-  contextName: string
-): string {
+  fallback = '/',
+  allowedPrefixes: string[] = ['/']
+): void {
   if (typeof target !== 'string') {
-    logger.warn(`${contextName}: Non-string target`);
-    return fallback;
+    logger.warn('safeRedirect303: Non-string target');
+    return res.redirect(303, fallback);
   }
 
   let decoded: string;
@@ -22,26 +22,26 @@ function getSafeRedirectPath(
   try {
     decoded = decodeURIComponent(target.trim());
   } catch {
-    logger.warn(`${contextName}: Malformed encoding`, { target });
-    return fallback;
+    logger.warn('safeRedirect303: Malformed encoding', { target });
+    return res.redirect(303, fallback);
   }
 
   if (/[\r\n]/.test(decoded)) {
-    logger.warn(`${contextName}: CRLF detected`, { target });
-    return fallback;
+    logger.warn('safeRedirect303: CRLF detected', { target });
+    return res.redirect(303, fallback);
   }
 
   if (!decoded.startsWith('/') || decoded.startsWith('//')) {
-    logger.warn(`${contextName}: Non-relative path blocked`, { target });
-    return fallback;
+    logger.warn('safeRedirect303: Non-relative path blocked', { target });
+    return res.redirect(303, fallback);
   }
 
   try {
     const parsed = new URL(decoded, INTERNAL_BASE);
 
     if (parsed.origin !== INTERNAL_BASE) {
-      logger.warn(`${contextName}: External origin blocked`, { target });
-      return fallback;
+      logger.warn('safeRedirect303: External origin blocked', { target });
+      return res.redirect(303, fallback);
     }
 
     const normalizedPath = parsed.pathname + parsed.search;
@@ -49,26 +49,16 @@ function getSafeRedirectPath(
     const isAllowed = allowedPrefixes.some(prefix => normalizedPath.startsWith(prefix));
 
     if (!isAllowed) {
-      logger.warn(`${contextName}: Prefix not allowed`, {
+      logger.warn('safeRedirect303: Prefix not allowed', {
         target,
         allowedPrefixes,
       });
-      return fallback;
+      return res.redirect(303, fallback);
     }
 
-    return normalizedPath;
+    return res.redirect(303, normalizedPath);
   } catch {
-    logger.warn(`${contextName}: URL parsing failed`, { target });
-    return fallback;
+    logger.warn('safeRedirect303: URL parsing failed', { target });
+    return res.redirect(303, fallback);
   }
-}
-
-export function safeRedirect303(
-  res: Response,
-  target: unknown,
-  fallback = '/',
-  allowedPrefixes: string[] = ['/']
-): void {
-  const path = getSafeRedirectPath(target, fallback, allowedPrefixes, 'safeRedirect303');
-  return res.redirect(303, path);
 }
