@@ -4,6 +4,7 @@ import type { TFunction } from 'i18next';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import {
   RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY,
+  buildStatementOfTruthPayload,
   getEndOfJourneyCyaSubmitErrorPath,
   submitRespondToClaimResponse,
 } from '../../utils/respondToClaimFinalSubmit';
@@ -153,28 +154,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   beforeRedirect: async (req: Request) => {
     const draft = buildDraftDefendantResponse(req);
-
-    const contempt = req.body?.statementOfTruthContempt as string[] | undefined;
-    const belief = req.body?.statementOfTruthBelief as string[] | undefined;
     const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
 
-    // Fix: Condition bothAccepted based on whether they are a Legal Rep
-    const bothAccepted = isLegalRepresentative
-      ? belief?.includes('yes')
-      : contempt?.includes('yes') && belief?.includes('yes');
-
-    // For legal reps, also persist nameOfFirm and positionHeld
-    draft.defendantResponses.statementOfTruth = {
-      accepted: bothAccepted ? 'YES' : 'NO',
-      fullName: (req.body?.fullName as string | undefined)?.trim(),
-      ...(isLegalRepresentative
-        ? {
-            nameOfFirm: (req.body?.nameOfFirm as string | undefined)?.trim(),
-            positionHeld: (req.body?.positionHeld as string | undefined)?.trim(),
-            hasLegalRepresentation: 'YES',
-          }
-        : {}),
-    };
+    draft.defendantResponses.statementOfTruth = buildStatementOfTruthPayload(req.body, isLegalRepresentative);
 
     const enumValue = sectionIdToBackendEnum('checkYourAnswersAndSubmit');
     const current = draft.defendantResponses.completedSections ?? [];

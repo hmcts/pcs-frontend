@@ -60,13 +60,17 @@ jest.mock('../../../../main/steps/respond-to-claim/end-of-journey-cya/buildEndOf
 }));
 
 const mockSubmitRespondToClaimResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/respondToClaimFinalSubmit', () => ({
-  RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY: 'respondToClaimPostSubmitRedirect',
-  getEndOfJourneyCyaSubmitErrorPath: jest.fn(
-    (caseId: string) => `/case/${caseId}/respond-to-claim/end-of-journey-cya?submitError=failed`
-  ),
-  submitRespondToClaimResponse: (...args: unknown[]) => mockSubmitRespondToClaimResponse(...args),
-}));
+jest.mock('../../../../main/steps/utils/respondToClaimFinalSubmit', () => {
+  const actual = jest.requireActual('../../../../main/steps/utils/respondToClaimFinalSubmit');
+  return {
+    ...actual,
+    RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY: 'respondToClaimPostSubmitRedirect',
+    getEndOfJourneyCyaSubmitErrorPath: jest.fn(
+      (caseId: string) => `/case/${caseId}/respond-to-claim/end-of-journey-cya?submitError=failed`
+    ),
+    submitRespondToClaimResponse: (...args: unknown[]) => mockSubmitRespondToClaimResponse(...args),
+  };
+});
 
 const mockSaveDraftDefendantResponse = jest.fn().mockResolvedValue(undefined);
 jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({

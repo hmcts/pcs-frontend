@@ -26,7 +26,6 @@
 
   <form method="post" action="{{ url }}" novalidate>
     {{ csrfProtection(csrfToken) }}
-    <input type="hidden" name="isLegalRepresentative" value="{{ 'true' if isLegalRepresentative else 'false' }}">
 
     <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>
     <p class="govuk-body">{{ statementOfTruthHint }}</p>

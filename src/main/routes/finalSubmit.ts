@@ -12,6 +12,7 @@ import { requireEventAccess } from '../middleware/requireEventAccess';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../steps/utils/buildDraftDefendantResponse';
 import {
   RespondToClaimFinalSubmitError,
+  buildStatementOfTruthPayload,
   getEndOfJourneyCyaSubmitErrorPath,
   submitRespondToClaimResponse,
 } from '../steps/utils/respondToClaimFinalSubmit';
@@ -48,24 +49,8 @@ export default function finalSubmitRoutes(app: Application): void {
     try {
       const draft = buildDraftDefendantResponse(req);
       const isLegalRepresentative = res.locals.isLegalRepresentative === true;
-      const contempt = req.body?.statementOfTruthContempt as string[] | undefined;
-      const belief = req.body?.statementOfTruthBelief as string[] | undefined;
 
-      const bothAccepted = isLegalRepresentative
-        ? belief?.includes('yes')
-        : contempt?.includes('yes') && belief?.includes('yes');
-
-      draft.defendantResponses.statementOfTruth = {
-        accepted: bothAccepted ? 'YES' : 'NO',
-        fullName: (req.body?.fullName as string | undefined)?.trim(),
-        ...(isLegalRepresentative
-          ? {
-              nameOfFirm: (req.body?.nameOfFirm as string | undefined)?.trim(),
-              positionHeld: (req.body?.positionHeld as string | undefined)?.trim(),
-              hasLegalRepresentation: 'YES',
-            }
-          : {}),
-      };
+      draft.defendantResponses.statementOfTruth = buildStatementOfTruthPayload(req.body, isLegalRepresentative);
       await saveDraftDefendantResponse(req, draft);
 
       req.res = res;
