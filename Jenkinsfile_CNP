@@ -26,12 +26,16 @@ def secrets = [
     secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
     secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID'),
     secret('pcs-api-idam-secret', 'PCS_API_IDAM_SECRET'),
+    secret('launchdarkly-sdk-key', 'LAUNCHDARKLY_SDK_KEY'),
   ]
 ]
 
 withPipeline(type, product, component) {
   def githubApi = new GithubAPI(this)
   loadVaultSecrets(secrets)
+
+  syncBranchesWithMaster(['ithc', 'perftest'])
+
   env.NODE_CONFIG_ENV = 'test'
   env.PCS_API_URL = "http://pcs-api-aat.service.core-compute-aat.internal"
   env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
