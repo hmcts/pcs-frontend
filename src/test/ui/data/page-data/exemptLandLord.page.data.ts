@@ -11,7 +11,7 @@ export const exemptLandLord = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  selectIfYouAgreeWithExemptLandLordErrorMessage: `Select if you agree the landlord is exempt`,
+  selectIfYouAgreeWithExemptLandLordErrorMessage: `Select whether your landlord is an exempt landlord under Part 1 of the Housing (Wales) Act 2014`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `exempt-landlord`,
 };

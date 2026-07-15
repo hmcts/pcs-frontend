@@ -1,4 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
+import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
   checkYourAnswersRTC,
   confirmationOfNoticeGiven,
@@ -224,7 +226,16 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.TENANCY_START_DATE_KNOWN = 'YES';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
-  } else {
+  }
+  else if (testInfo.title.includes('Wales-specific')) {
+    process.env.WALES_POSTCODE = 'YES';
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
+    submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
+    await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
+  }
+  else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
@@ -754,12 +765,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await performAction('taskList', { subSection: taskList.confirmDetailsLink });
 
-    await softErrorMessageValidation('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmation.mainHeader,
-      option: defendantNameConfirmation.noRadioOption,
-      fName: defendantNameConfirmation.firstNameInputText,
-      lName: defendantNameConfirmation.lastNameInputText,
+    await softErrorMessageValidation('defendantNameCapture', defendantNameCaptureErrorValidation);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
     });
 
     await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
