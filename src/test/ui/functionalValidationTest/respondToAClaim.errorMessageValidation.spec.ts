@@ -226,16 +226,14 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.TENANCY_START_DATE_KNOWN = 'YES';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
-  }
-  else if (testInfo.title.includes('Wales-specific')) {
+  } else if (testInfo.title.includes('Wales-specific')) {
     process.env.WALES_POSTCODE = 'YES';
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
     submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
     await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
-  }
-  else {
+  } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
