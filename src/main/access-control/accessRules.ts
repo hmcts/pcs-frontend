@@ -82,14 +82,6 @@ export function rolesForRule(name: string): readonly string[] {
   return rule.allowedRoles;
 }
 
-export function userMayAccessPath(userRoles: readonly string[], path: string): boolean {
-  const rule = findRuleForPath(path);
-  if (!rule) {
-    return true;
-  }
-  return userRoles.some(role => rule.allowedRoles.includes(role));
-}
-
 export type LoginAccessDecision = { allowed: true } | { allowed: false; rule: AccessRule };
 
 export function evaluateLoginAccess(returnTo: string | undefined, userRoles: readonly string[]): LoginAccessDecision {

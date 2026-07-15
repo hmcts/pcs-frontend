@@ -3,7 +3,6 @@ import {
   evaluateLoginAccess,
   findRuleForPath,
   rolesForRule,
-  userMayAccessPath,
 } from '../../../main/access-control/accessRules';
 
 describe('accessRules', () => {
@@ -39,47 +38,21 @@ describe('accessRules', () => {
     );
   });
 
-  describe('userMayAccessPath', () => {
-    it('allows access to ungated paths regardless of roles', () => {
-      expect(userMayAccessPath([], '/login')).toBe(true);
-      expect(userMayAccessPath(['unknown-role'], '/login')).toBe(true);
-    });
-
-    it('allows citizens into respond-to-claim, dashboard, make-an-application, /claims and /access-your-case', () => {
-      expect(userMayAccessPath(['citizen'], '/case/1/respond-to-claim')).toBe(true);
-      expect(userMayAccessPath(['citizen'], '/case/1/dashboard')).toBe(true);
-      expect(userMayAccessPath(['citizen'], '/case/1/make-an-application')).toBe(true);
-      expect(userMayAccessPath(['citizen'], '/claims')).toBe(true);
-      expect(userMayAccessPath(['citizen'], '/access-your-case')).toBe(true);
-    });
-
-    it('allows pcs solicitors into respond-to-claim only', () => {
-      expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/case/1/respond-to-claim')).toBe(true);
-      expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/case/1/dashboard')).toBe(false);
-      expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/case/1/make-an-application')).toBe(false);
-      expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/case/1/upload-additional-documents')).toBe(false);
-      expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/claims')).toBe(false);
-      expect(userMayAccessPath(['caseworker-pcs-solicitor'], '/access-your-case')).toBe(false);
-    });
-
-    it('allows citizens into upload-additional-documents', () => {
-      expect(userMayAccessPath(['citizen'], '/case/1/upload-additional-documents')).toBe(true);
-    });
-
-    it.each([
-      '/case/1/view-the-claim',
-      '/case/1/view-documents',
-      '/case/1/view-hearing-documents',
-      '/case/1/view-orders-and-notices',
-      '/case/1/view-all-applications',
-    ])('gates the view page %s to citizens only', path => {
-      expect(userMayAccessPath(['citizen'], path)).toBe(true);
-      expect(userMayAccessPath(['caseworker-pcs-solicitor'], path)).toBe(false);
-    });
-
-    it('blocks users with no matching role', () => {
-      expect(userMayAccessPath([], '/case/1/respond-to-claim')).toBe(false);
-      expect(userMayAccessPath(['unknown-role'], '/case/1/dashboard')).toBe(false);
+  describe('allowed roles per gated path', () => {
+    it.each<[string, string[]]>([
+      ['/case/1/respond-to-claim', ['citizen', 'caseworker-pcs-solicitor']],
+      ['/case/1/dashboard', ['citizen']],
+      ['/case/1/make-an-application', ['citizen']],
+      ['/case/1/upload-additional-documents', ['citizen']],
+      ['/claims', ['citizen']],
+      ['/access-your-case', ['citizen']],
+      ['/case/1/view-the-claim', ['citizen']],
+      ['/case/1/view-documents', ['citizen']],
+      ['/case/1/view-hearing-documents', ['citizen']],
+      ['/case/1/view-orders-and-notices', ['citizen']],
+      ['/case/1/view-all-applications', ['citizen']],
+    ])('gates %s to roles %s', (path, expectedRoles) => {
+      expect(findRuleForPath(path)?.allowedRoles).toEqual(expectedRoles);
     });
   });
 

@@ -2,13 +2,9 @@ import type { NextFunction, Request, Response } from 'express';
 
 const mockLogAccessDenied = jest.fn();
 
-jest.mock('../../../main/access-control', () => {
-  const actual = jest.requireActual('../../../main/access-control');
-  return {
-    ...actual,
-    logAccessDenied: (...args: unknown[]) => mockLogAccessDenied(...args),
-  };
-});
+jest.mock('../../../main/access-control/logging', () => ({
+  logAccessDenied: (...args: unknown[]) => mockLogAccessDenied(...args),
+}));
 
 import { HTTPError } from '../../../main/HttpError';
 import { roleAccessMiddleware } from '../../../main/middleware/roleAccess';
