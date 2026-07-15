@@ -746,7 +746,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     assertAllErrorMessageValidations();
   });
 
-  test('Wales-specific page error validation for exempt landlord and written terms', async () => {
+  test('Wales-specific page error validation for exempt landlord and written terms @PR', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
