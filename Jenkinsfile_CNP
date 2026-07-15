@@ -104,7 +104,7 @@ withPipeline(type, product, component) {
       archiveFunctionalTestReports()
     }
     afterAlways('securitychecks') {
-      archiveArtifacts artifacts: 'yarn-audit*', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'yarn-audit*issues', allowEmptyArchive: true
     }
   }
 
