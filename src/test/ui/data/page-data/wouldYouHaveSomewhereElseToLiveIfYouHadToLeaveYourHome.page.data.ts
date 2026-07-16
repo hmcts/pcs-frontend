@@ -1,6 +1,6 @@
 export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome = {
   mainHeader: `Would you have somewhere else to live if you had to leave your home?`,
-  lrMainHeader: `Alternative accommodation`,
+  lrHiddenMainHeader: `Alternative accommodation`,
   lrHiddenParagraph: `Would the defendant have somewhere else to live if they had to leave their home?`,
   backLink: `Back`,
   whenWouldYouBeableToMoveHiddenTextLabel: `When would you be able to move in (optional)?`,

@@ -4,6 +4,7 @@ import {
   DocumentsAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
+  LaunchDarklyAction,
   LoginAction,
   NavigateToUrlAction,
   RecordAnswers,
@@ -52,6 +53,7 @@ export class ActionRegistry {
     ['updatePaymentAPI', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['skipTestIfLdFlagDisabled', new LaunchDarklyAction()],
 
     //Citizen Dashboard
     ['citizenDashboard', new CitizenDashboardAction()],
