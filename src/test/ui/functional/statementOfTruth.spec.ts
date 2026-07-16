@@ -56,8 +56,8 @@ test.describe('Statement of Truth - Citizen - functional test @nightly', async (
     await page.fill('#fullName', 'John Citizen');
     await page.click('button[type="submit"]');
 
-    // Verify redirection to final-submit page
-    await expect(page).toHaveURL(new RegExp(`/case/${process.env.CASE_NUMBER}/final-submit`));
+    // Verify redirection to response-submitted confirmation page
+    await expect(page).toHaveURL(new RegExp(`/case/${process.env.CASE_NUMBER}/respond-to-claim/response-submitted`));
   });
 });
 
@@ -110,7 +110,7 @@ test.describe('Statement of Truth - Legal Representative - functional test @nigh
     await page.fill('#positionHeld', 'Partner');
     await page.click('button[type="submit"]');
 
-    // Verify redirection to final-submit page
-    await expect(page).toHaveURL(new RegExp(`/case/${process.env.CASE_NUMBER}/final-submit`));
+    // Verify redirection to response-submitted confirmation page
+    await expect(page).toHaveURL(new RegExp(`/case/${process.env.CASE_NUMBER}/respond-to-claim/response-submitted`));
   });
 });

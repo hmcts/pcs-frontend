@@ -1,0 +1,13 @@
+{
+  "statementOfTruth": {
+    "beliefOption": "cy The defendant believes that the facts stated in this defence form are true. I am authorised by the defendant to submit this statement.",
+    "fullNameLabel": "cy Full name",
+    "nameOfFirmLabel": "cy Name of firm",
+    "positionHeldLabel": "cy Position or office held"
+  },
+  "errors": {
+    "statementOfTruthBelief": "cy Select if the defendant believes that the facts stated in this defence form are true and that you are authorised by the defendant to submit this statement",
+    "nameOfFirm": "cy Enter the name of firm",
+    "positionHeld": "cy Enter your position or office held"
+  }
+}

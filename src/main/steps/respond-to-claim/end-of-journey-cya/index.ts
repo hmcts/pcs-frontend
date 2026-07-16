@@ -90,7 +90,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ...(positionHeld ? { positionHeld } : {}),
     };
   },
-  extendGetContent: async (req: Request, formContent) => {
+  extendGetContent: async (req: Request, _formContent) => {
     await loadStepNamespaces(
       req,
       [
@@ -110,32 +110,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
     const submitDisabled = status === 'SUBMITTED';
     const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
-
-    // For legal reps: mutate the pre-built field components to use legal-rep specific text
-    if (isLegalRepresentative && formContent?.fields?.length) {
-      const tSot = getTranslationFunction(req);
-      const beliefField = formContent.fields.find(f => f.name === 'statementOfTruthBelief');
-      if (beliefField?.component) {
-        const component = beliefField.component as Record<string, unknown>;
-        const items = component.items as Record<string, unknown>[] | undefined;
-        if (items?.[0]) {
-          items[0].text = tSot('statementOfTruth.legalRepBeliefOption');
-        }
-        // Override the error message for belief field
-        if (component.errorMessage) {
-          (component.errorMessage as Record<string, unknown>).text = tSot('errors.legalRepStatementOfTruthBelief');
-        }
-      }
-
-      const fullNameField = formContent.fields.find(f => f.name === 'fullName');
-      if (fullNameField?.component) {
-        const component = fullNameField.component as Record<string, unknown>;
-        const label = component.label as Record<string, unknown> | undefined;
-        if (label) {
-          label.text = tSot('statementOfTruth.legalRepFullNameLabel');
-        }
-      }
-    }
 
     if (req.query.submitError !== 'failed') {
       return { sections, submitDisabled, isLegalRepresentative };

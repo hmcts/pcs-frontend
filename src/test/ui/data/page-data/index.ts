@@ -75,3 +75,4 @@ export * from './responseSubmitted.page.data';
 export * from './responseSubmittedCounterclaimFeePaymentNeeded.page.data';
 export * from './viewTheResponse.page.data';
 export * from './paymentDetails.page.data';
+export * from './statementOfTruth.page.data';
