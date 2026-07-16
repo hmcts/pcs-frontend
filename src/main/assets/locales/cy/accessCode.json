@@ -9,5 +9,8 @@
     "label": "Nodwch eich cod mynediad",
     "hint": "Mae hwn yn cynnwys 12 nod"
   },
-  "errorPrefix": "Gwall:"
+  "errorPrefix": "Gwall:",
+  "errors": {
+    "respondToClaimUnavailable": "cyThe option to respond to a claim is not available at the moment."
+  }
 }
