@@ -402,6 +402,8 @@ describe('respond-to-claim tenancy-type-details step', () => {
     });
 
     it('returns the first occupation contract licence document from detailsTab_OccupationContractLicenceDetails.documents', async () => {
+      (isWalesProperty as jest.Mock).mockReturnValue(true);
+
       const occupationContractDocument = {
         id: '77777777-7777-4777-8777-777777777777',
         value: {

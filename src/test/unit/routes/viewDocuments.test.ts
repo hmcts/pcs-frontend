@@ -403,7 +403,7 @@ describe('viewDocuments route', () => {
               {
                 id: '44444444-4444-4444-8444-444444444444',
                 value: {
-                  filename: 'occupation-contract.pdf',
+                  document_filename: 'occupation-contract.pdf',
                   document_binary_url: 'http://dm-store/documents/occupation-contract-123/binary',
                 },
               },
