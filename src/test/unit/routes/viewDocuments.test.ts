@@ -388,6 +388,58 @@ describe('viewDocuments route', () => {
       expect(pipeSpy).toHaveBeenCalledWith(res);
     });
 
+    it('streams a document loaded from detailsTab_OccupationContractLicenceDetails', async () => {
+      const stream = new PassThrough();
+      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
+      (getDocumentBinary as jest.Mock).mockResolvedValue({
+        stream,
+        contentType: 'application/pdf',
+      });
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          detailsTab_OccupationContractLicenceDetails: {
+            documents: [
+              {
+                id: '44444444-4444-4444-8444-444444444444',
+                value: {
+                  filename: 'occupation-contract.pdf',
+                  document_binary_url: 'http://dm-store/documents/occupation-contract-123/binary',
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
+      const res = {
+        setHeader: jest.fn(),
+      } as unknown as Response;
+
+      await handler(
+        {
+          params: {
+            caseReference: '1777570813792018',
+            documentId: '44444444-4444-4444-8444-444444444444',
+          },
+          session: { user: { accessToken: 'token' } },
+        } as unknown as Request,
+        res,
+        jest.fn()
+      );
+
+      expect(getDocumentBinary).toHaveBeenCalledWith(
+        'http://dm-store/documents/occupation-contract-123/binary',
+        'token'
+      );
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'Content-Disposition',
+        'inline; filename="occupation-contract.pdf"; filename*=UTF-8\'\'occupation-contract.pdf'
+      );
+      expect(pipeSpy).toHaveBeenCalledWith(res);
+    });
+
     it('returns 401 when access token is missing', async () => {
       const handler = getHandler('/case/:caseReference/view-documents/:documentId');
       const next = jest.fn();

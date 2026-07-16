@@ -249,6 +249,90 @@ describe('documentUtils', () => {
     ]);
   });
 
+  it('extracts tenancy licence documents from detailsTab_TenancyLicenceDetails.tenancyLicenceDocuments for submitted cases', () => {
+    const documents = extractCaseDocuments({
+      detailsTab_TenancyLicenceDetails: {
+        tenancyLicenceDocuments: [
+          {
+            id: '44444444-4444-4444-4444-444444444444',
+            value: {
+              document_binary_url: 'http://doc-store/submitted-tenancy/binary',
+              document_filename: 'tenancy-agreement.pdf',
+              document_type: 'TENANCY_LICENCE_DOCUMENT',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      {
+        id: '44444444-4444-4444-4444-444444444444',
+        filename: 'tenancy-agreement.pdf',
+        binaryUrl: 'http://doc-store/submitted-tenancy/binary',
+        categoryId: undefined,
+        documentType: 'TENANCY_LICENCE_DOCUMENT',
+        sourceField: 'detailsTab_TenancyLicenceDetails.tenancyLicenceDocuments',
+      },
+    ]);
+  });
+
+  it('extracts rent statement documents from detailsTab_RentArrearsDetails.rentStatement for submitted cases', () => {
+    const documents = extractCaseDocuments({
+      detailsTab_RentArrearsDetails: {
+        rentStatement: [
+          {
+            id: '55555555-5555-5555-5555-555555555555',
+            value: {
+              document_binary_url: 'http://doc-store/submitted-rent-statement/binary',
+              document_filename: 'rent-statement.pdf',
+              document_type: 'RENT_STATEMENT',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      {
+        id: '55555555-5555-5555-5555-555555555555',
+        filename: 'rent-statement.pdf',
+        binaryUrl: 'http://doc-store/submitted-rent-statement/binary',
+        categoryId: undefined,
+        documentType: 'RENT_STATEMENT',
+        sourceField: 'detailsTab_RentArrearsDetails.rentStatement',
+      },
+    ]);
+  });
+
+  it('extracts occupation contract licence documents from detailsTab_OccupationContractLicenceDetails.documents for submitted cases', () => {
+    const documents = extractCaseDocuments({
+      detailsTab_OccupationContractLicenceDetails: {
+        documents: [
+          {
+            id: '66666666-6666-6666-6666-666666666666',
+            value: {
+              document_binary_url: 'http://doc-store/submitted-occupation-contract/binary',
+              document_filename: 'occupation-contract.pdf',
+              document_type: 'OCCUPATION_CONTRACT_LICENCE_DOCUMENT',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      {
+        id: '66666666-6666-6666-6666-666666666666',
+        filename: 'occupation-contract.pdf',
+        binaryUrl: 'http://doc-store/submitted-occupation-contract/binary',
+        categoryId: undefined,
+        documentType: 'OCCUPATION_CONTRACT_LICENCE_DOCUMENT',
+        sourceField: 'detailsTab_OccupationContractLicenceDetails.documents',
+      },
+    ]);
+  });
+
   it('finds documents from allDocuments by id', () => {
     const document = findCaseDocumentById(
       {

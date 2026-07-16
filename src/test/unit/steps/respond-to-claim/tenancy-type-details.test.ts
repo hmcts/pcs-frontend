@@ -76,6 +76,9 @@ type TenancyTypeDetailsStep = {
               detailsTab_TenancyLicenceDetails?: {
                 tenancyLicenceDocuments?: CcdCollectionItem<CcdCaseDocument>[];
               };
+              detailsTab_OccupationContractLicenceDetails?: {
+                documents?: CcdCollectionItem<CcdCaseDocument>[];
+              };
             };
           };
         };
@@ -396,6 +399,41 @@ describe('respond-to-claim tenancy-type-details step', () => {
       );
 
       expect(content.tenancyDocument).toEqual(tenancyLicenceDocument);
+    });
+
+    it('returns the first occupation contract licence document from detailsTab_OccupationContractLicenceDetails.documents', async () => {
+      const occupationContractDocument = {
+        id: '77777777-7777-4777-8777-777777777777',
+        value: {
+          document_filename: 'occupation-contract.pdf',
+          document_binary_url: 'http://dm-store/documents/occupation-123/binary',
+          category_id: 'propertyDocuments',
+        },
+      };
+
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          res: {
+            locals: {
+              validatedCase: {
+                id: '12345',
+                data: {
+                  possessionClaimResponse: {
+                    claimantOrganisations: [{ value: 'Acme Housing' }],
+                  },
+                  detailsTab_OccupationContractLicenceDetails: {
+                    documents: [occupationContractDocument],
+                  },
+                },
+              },
+            },
+          },
+        },
+        formContent
+      );
+
+      expect(content.tenancyDocument).toEqual(occupationContractDocument);
     });
 
     it('returns an empty string when detailsTab_TenancyLicenceDetails exists but tenancyLicenceDocuments is empty', async () => {
