@@ -313,8 +313,9 @@ export interface CcdCaseData {
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
-  detailsTab_TenancyLicenceDetails?: detailsTab_TenancyLicenceDetails;
-  detailsTab_RentArrearsDetails?: detailsTab_RentArrearsDetails;
+  detailsTab_TenancyLicenceDetails?: DetailsTab_TenancyLicenceDetails;
+  detailsTab_RentArrearsDetails?: DetailsTab_RentArrearsDetails;
+  detailsTab_OccupationContractLicenceDetails?: DetailsTab_OccupationContractLicenceDetails;
 }
 
 export interface CcdCaseDocument {
@@ -458,14 +459,14 @@ export interface MakeAnApplicationResponse {
   feeAmount?: number;
 }
 
-export interface detailsTab_TenancyLicenceDetails {
+export interface DetailsTab_TenancyLicenceDetails {
   typeOfTenancyLicence: string;
   tenancyLicenceDate: string;
   hasCopyOfTenancyLicence: string;
   tenancyLicenceDocuments: CcdCollectionItem<CcdCaseDocument>[];
 }
 
-export interface detailsTab_RentArrearsDetails {
+export interface DetailsTab_RentArrearsDetails {
   rentAmount: string;
   calculationFrequency: string;
   dailyRate: string;
@@ -473,4 +474,11 @@ export interface detailsTab_RentArrearsDetails {
   rentStatement: CcdCollectionItem<CcdCaseDocument>[];
   arrearsTotal: string;
   judgmentRequested: string;
+}
+
+export interface DetailsTab_OccupationContractLicenceDetails {
+  agreementType: string;
+  agreementTypeDescription: string;
+  agreementStartDate: string;
+  documents: CcdCollectionItem<CcdCaseDocument>[];
 }

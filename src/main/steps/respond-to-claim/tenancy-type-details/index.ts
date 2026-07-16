@@ -167,7 +167,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
-    const tenancyDocument = caseData?.detailsTab_TenancyLicenceDetails?.tenancyLicenceDocuments?.[0] ?? '';
+    const tenancyDocument = walesProperty
+      ? (caseData?.detailsTab_OccupationContractLicenceDetails?.documents?.[0] ?? '')
+      : (caseData?.detailsTab_TenancyLicenceDetails?.tenancyLicenceDocuments?.[0] ?? '');
 
     return {
       ...formContent,
