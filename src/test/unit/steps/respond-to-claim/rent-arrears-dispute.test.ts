@@ -61,9 +61,9 @@ const t = ((key: string, options?: Record<string, string>) => {
   return translations[key] || key;
 }) as unknown as (key: string, options?: Record<string, string>) => string;
 
-import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import type { SupportedLang } from '../../../../main/modules/steps';
 import { GetController } from '../../../../main/modules/steps';
+import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../main/steps/respond-to-claim/rent-arrears-dispute';
 import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
@@ -258,8 +258,7 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
     req.res = res;
 
     const gc = step.getController;
-    const controller: GetController =
-      typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
+    const controller: GetController = typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1] as Record<string, unknown>;
@@ -294,8 +293,7 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
     req.res = res;
 
     const gc = step.getController;
-    const controller: GetController =
-      typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
+    const controller: GetController = typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1] as Record<string, unknown>;
