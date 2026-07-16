@@ -10,5 +10,5 @@ export const linkSolicitorTokenApiData = {
     },
   }),
   linkSolicitorApiEndPoint: (): string =>
-    `${process.env.CASE_API_URL}/testing-support/link-defendant-solicitor-to-party/${process.env.CASE_NUMBER}/${process.env.Defendant_ID}`,
+    `/testing-support/link-defendant-solicitor-to-party/${process.env.CASE_NUMBER}/${process.env.Defendant_ID}`,
 };
