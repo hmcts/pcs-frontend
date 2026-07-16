@@ -37,7 +37,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     {
       name: 'statementOfTruthContempt',
       type: 'checkbox',
-      required: formData => formData?.isLegalRepresentative !== 'true',
+      required: (_formData, _allData, req) => req?.res?.locals.isLegalRepresentative !== true,
       errorMessage: 'errors.statementOfTruthContempt',
       translationKey: { label: 'statementOfTruth.contemptFieldLabel' },
       legendClasses: 'govuk-visually-hidden',
@@ -63,7 +63,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     {
       name: 'nameOfFirm',
       type: 'text',
-      required: formData => formData?.isLegalRepresentative === 'true',
+      required: (_formData, _allData, req) => req?.res?.locals.isLegalRepresentative === true,
       maxLength: 100,
       errorMessage: 'errors.nameOfFirm',
       translationKey: { label: 'statementOfTruth.nameOfFirmLabel' },
@@ -71,7 +71,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     {
       name: 'positionHeld',
       type: 'text',
-      required: formData => formData?.isLegalRepresentative === 'true',
+      required: (_formData, _allData, req) => req?.res?.locals.isLegalRepresentative === true,
       maxLength: 100,
       errorMessage: 'errors.positionHeld',
       translationKey: { label: 'statementOfTruth.positionHeldLabel' },
