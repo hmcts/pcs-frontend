@@ -1,6 +1,6 @@
 export const linkSolicitorTokenApiData = {
   linkSolicitorTokenApiInstance: () => ({
-    baseURL: process.env.CASE_API_URL,
+    baseURL: process.env.PCS_API_URL,
     headers: {
       Authorization: `Bearer ${process.env.SOLICITOR_ACCESS_TOKEN}`,
       ServiceAuthorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}`,
