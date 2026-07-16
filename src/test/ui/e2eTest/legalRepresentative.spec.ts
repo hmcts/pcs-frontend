@@ -7,7 +7,6 @@ import {
   previousPaymentsLR,
   rentArrears,
   repaymentsAgreed,
-  startNow,
 } from '../data/page-data';
 import { confirmationOfNoticeGivenLR } from '../data/page-data/lr-page-data/confirmationOfNoticeGivenLR.page.data';
 import { contactPreferenceEmailOrPostLR } from '../data/page-data/lr-page-data/contactPreferenceEmailOrPostLR.page.data';
@@ -34,6 +33,7 @@ import { priorityDebtsLR } from '../data/page-data/lr-page-data/priorityDebtsLR.
 import { rentArrearsLR } from '../data/page-data/lr-page-data/rentArrearsDisputeLR.page.data';
 import { repaymentsAgreedLR } from '../data/page-data/lr-page-data/repaymentsAgreedLR.page.data';
 import { selectDefendantLR } from '../data/page-data/lr-page-data/selectDefendantLR.page.data';
+import { startNowLR } from '../data/page-data/lr-page-data/startNowLR.page.data';
 import { tenancyTypeDetailsLR } from '../data/page-data/lr-page-data/tenancyTypeDetailsLR.page.data';
 import { whatOtherRegularExpensesDoYouHaveLR } from '../data/page-data/lr-page-data/whatOtherRegularExpensesDoYouHaveLR.page.data';
 import { whatRegularIncomeDoYouReceiveLR } from '../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
@@ -80,7 +80,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
   //await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('clickButton', startNow.startNowButton);
+  await performAction('clickButton', startNowLR.startNowButton);
 });
 
 test.afterEach(async () => {
@@ -89,7 +89,7 @@ test.afterEach(async () => {
 
 //Skipping these tests temporarily in @nightly as LR feature will be toggled off in all test environments until the first release HDPI-7531
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
-test.describe('Respond to a claim LR - e2e Journey @sanity', async () => {
+test.describe('Respond to a claim LR - e2e Journey', async () => {
   test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
