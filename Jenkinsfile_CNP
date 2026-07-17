@@ -103,6 +103,9 @@ withPipeline(type, product, component) {
     afterAlways('fullFunctionalTest:preview') {
       archiveFunctionalTestReports()
     }
+    afterAlways('securitychecks') {
+      archiveArtifacts artifacts: 'yarn-audit*issues*', allowEmptyArchive: true
+    }
   }
 
   onMaster() {
@@ -127,6 +130,9 @@ withPipeline(type, product, component) {
       if (currentBuild.currentResult in ['FAILURE', 'UNSTABLE']) {
           sendAllureReportToSlack('master', 'Frontend_20Functional_20Test_20Report/')
       }
+    }
+    afterAlways('securitychecks') {
+      archiveArtifacts artifacts: 'yarn-audit*issues*', allowEmptyArchive: true
     }
   }
 }
