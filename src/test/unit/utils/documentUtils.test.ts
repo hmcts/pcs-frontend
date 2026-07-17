@@ -273,4 +273,72 @@ describe('documentUtils', () => {
       })
     );
   });
+
+  it('indexes claim-journey documents from the Case Details tab collections', () => {
+    const documents = extractCaseDocuments({
+      detailsTab_TenancyLicenceDetails: {
+        tenancyLicenceDocuments: [
+          {
+            id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            value: {
+              document_filename: 'tenancy-agreement.pdf',
+              document_binary_url: 'http://doc-store/tenancy/binary',
+            },
+          },
+        ],
+      },
+      detailsTab_RequiredDocumentsDetails: {
+        gasSafetyReports: [
+          {
+            id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            value: {
+              document_filename: 'gas-safety.pdf',
+              document_binary_url: 'http://doc-store/gas/binary',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      expect.objectContaining({
+        id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        filename: 'tenancy-agreement.pdf',
+        binaryUrl: 'http://doc-store/tenancy/binary',
+        sourceField: 'detailsTab_TenancyLicenceDetails.tenancyLicenceDocuments',
+      }),
+      expect.objectContaining({
+        id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        filename: 'gas-safety.pdf',
+        binaryUrl: 'http://doc-store/gas/binary',
+        sourceField: 'detailsTab_RequiredDocumentsDetails.gasSafetyReports',
+      }),
+    ]);
+  });
+
+  it('finds a Case Details tab document by its collection id (View Claim download)', () => {
+    const document = findCaseDocumentById(
+      {
+        detailsTab_NoticeDetails: {
+          noticeDocuments: [
+            {
+              id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+              value: {
+                document_filename: 'notice-of-seeking-possession.pdf',
+                document_binary_url: 'http://doc-store/notice-doc/binary',
+              },
+            },
+          ],
+        },
+      },
+      'cccccccc-cccc-cccc-cccc-cccccccccccc'
+    );
+
+    expect(document).toEqual(
+      expect.objectContaining({
+        filename: 'notice-of-seeking-possession.pdf',
+        binaryUrl: 'http://doc-store/notice-doc/binary',
+      })
+    );
+  });
 });
