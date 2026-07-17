@@ -84,10 +84,14 @@ function mapSupportingDocuments(genApp: GenApp) {
     return [];
   }
 
-  return genApp.supportingDocuments.map(listValue => ({
-    filename: listValue.value.document_filename,
-    documentId: listValue.id,
-  }));
+  const submissionDocumentId = genApp.submissionDocument?.id;
+
+  return genApp.supportingDocuments
+    .filter(listValue => listValue.id !== submissionDocumentId)
+    .map(listValue => ({
+      filename: listValue.value.document_filename,
+      documentId: listValue.id,
+    }));
 }
 
 function isForApplicant(genApp: GenApp, currentUserIdamId: string) {
