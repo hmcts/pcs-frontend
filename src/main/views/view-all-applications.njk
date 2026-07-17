@@ -17,7 +17,7 @@
               <p class="govuk-body govuk-!-margin-bottom-1">
                 {% set submissionDocument = genApp.submissionDocument %}
                 {% if submissionDocument.documentId %}
-                  <a href="/case/{{ caseReference }}/view-documents/{{ submissionDocument.documentId }}" rel="noreferrer noopener" target="_blank">
+                  <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ submissionDocument.documentId }}" rel="noreferrer noopener" target="_blank">
                     {{ submissionDocument.filename }} ({{ t('opensInNewTab') }})
                   </a>
                 {% else %}
@@ -32,7 +32,7 @@
                   <ul class="govuk-list govuk-!-padding-bottom-1">
                   {% for supportingDocument in supportingDocuments %}
                   <li class="govuk-body-s">
-                    <a href="/case/{{ caseReference }}/view-documents/{{ supportingDocument.documentId }}" rel="noreferrer noopener" target="_blank">
+                    <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ supportingDocument.documentId }}" rel="noreferrer noopener" target="_blank">
                       {{ supportingDocument.filename }} ({{ t('opensInNewTab') }})
                     </a>
                   </li>
