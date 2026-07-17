@@ -6,6 +6,12 @@ import { confirmationOfNoticeDateWhenNotProvidedLR } from '../../../data/page-da
 import { noticeDateWhenProvidedLR } from '../../../data/page-data/lr-page-data/confirmationOfNoticeDateWhenProvidedLR.page.data';
 import { confirmationOfNoticeGivenLR } from '../../../data/page-data/lr-page-data/confirmationOfNoticeGivenLR.page.data';
 import { correspondenceAddressLR } from '../../../data/page-data/lr-page-data/correspondenceAddressLR.page.data';
+import { counterClaimAboutLR } from '../../../data/page-data/lr-page-data/counterClaimAboutLR.page.data';
+import { counterClaimAgainstWhomLR } from '../../../data/page-data/lr-page-data/counterClaimAgainstWhomLR.page.data';
+import { counterClaimFeeLR } from '../../../data/page-data/lr-page-data/counterClaimFeeLR.page.data';
+import { counterClaimLR } from '../../../data/page-data/lr-page-data/counterClaimLR.page.data';
+import { counterClaimSpecificSumOfMoneyLR } from '../../../data/page-data/lr-page-data/counterClaimSpecificSumOfMoneyLR.page.data';
+import { counterClaimWhatAreYouClaimingForLR } from '../../../data/page-data/lr-page-data/counterClaimWhatAreYouClaimingForLR.page.data';
 import { doAnyOtherAdultsLiveInYourHomeLR } from '../../../data/page-data/lr-page-data/doAnyOtherAdultsLiveInYourHomeLR.page.data';
 import { doYouHaveAnyDependantChildrenLR } from '../../../data/page-data/lr-page-data/doYouHaveAnyDependantChildrenLR.page.data';
 import { doYouHaveAnyOtherDependantsLR } from '../../../data/page-data/lr-page-data/doYouHaveAnyOtherDependantsLR.page.data';
@@ -51,6 +57,12 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['selectPriorityDebtsLR', () => this.selectPriorityDebtsLR(fieldName as actionRecord)],
       ['enterPriorityDebtDetailsLR', () => this.enterPriorityDebtDetailsLR(fieldName as actionRecord)],
       ['selectExpensesLR', () => this.selectExpensesLR(fieldName as actionRecord)],
+      ['selectCounterClaimLR', () => this.selectCounterClaimLR(fieldName as actionRecord)],
+      ['counterClaimSpecificSumOfMoneyLR', () => this.counterClaimSpecificSumOfMoneyLR(fieldName as actionRecord)],
+      ['selectWhatAreYouClaimingForLR', () => this.selectWhatAreYouClaimingForLR(fieldName as actionRecord)],
+      ['selectCounterClaimFeeLR', () => this.selectCounterClaimFeeLR(fieldName as actionRecord)],
+      ['selectClaimAgainstWhomLR', () => this.selectClaimAgainstWhomLR(fieldName as actionRecord)],
+      ['counterClaimAboutLR', () => this.counterClaimAboutLR(fieldName as actionRecord)],
       ['otherConsiderationsLR', () => this.otherConsiderationsLR(fieldName as actionRecord)],
       ['rentArrearsLR', () => this.rentArrearsLR(fieldName as actionRecord)],
       ['previousPaymentsLR', () => this.previousPaymentsLR(fieldName as actionRecord)],
@@ -432,6 +444,110 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       );
     }
     await performAction('clickButton', repaymentsAgreedLR.saveAndContinueButton);
+  }
+
+  private async selectCounterClaimLR(counterClaimOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
+      option: counterClaimOption.option,
+    });
+
+    await performAction('clickButton', counterClaimLR.saveAndContinueButton);
+  }
+
+  private async selectWhatAreYouClaimingForLR(counterClaimingOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterClaimWhatAreYouClaimingForLR.mainHeader,
+      option: counterClaimingOption.option,
+    });
+    await performAction('clickButton', counterClaimWhatAreYouClaimingForLR.saveAndContinueButton);
+  }
+
+  private async counterClaimSpecificSumOfMoneyLR(sumOfMoney: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: sumOfMoney.question,
+      option: sumOfMoney.option,
+    });
+
+    if (sumOfMoney.option === counterClaimSpecificSumOfMoneyLR.yesRadioOption) {
+      await performAction(
+        'inputText',
+        counterClaimSpecificSumOfMoneyLR.howMuchIsTheDefendantHiddenQuestion,
+        sumOfMoney.amount
+      );
+    } else {
+      await performAction(
+        'inputText',
+        counterClaimSpecificSumOfMoneyLR.maximumValueOfYourClaimHiddenQuestion,
+        sumOfMoney.amount
+      );
+    }
+
+    await performAction('clickButton', counterClaimSpecificSumOfMoneyLR.saveAndContinueButton);
+  }
+
+  private async selectCounterClaimFeeLR(counterClaimFeeOption: actionRecord) {
+    let counterClaimFeeValue: number | string = 0;
+    if (counterClaimFeeOption.typeOfClaim === 'Something else') {
+      counterClaimFeeValue = 387;
+    } else if (
+      counterClaimFeeOption.typeOfClaim === 'A sum of money or compensation' ||
+      counterClaimFeeOption.typeOfClaim === 'Both'
+    ) {
+      if (counterClaimFeeOption.amount === null) {
+        throw new Error('Amount is required for this type of claim');
+      }
+      const amount = Number(counterClaimFeeOption.amount);
+      if (amount <= 300) {
+        counterClaimFeeValue = 35; // FEE0514
+      } else if (amount <= 500) {
+        counterClaimFeeValue = 50; // FEE0513
+      } else if (amount <= 1000) {
+        counterClaimFeeValue = 70; // FEE0512
+      } else if (amount <= 1500) {
+        counterClaimFeeValue = 80; // FEE0511
+      } else if (amount <= 3000) {
+        counterClaimFeeValue = 115; // FEE0510
+      } else if (amount <= 5000) {
+        counterClaimFeeValue = 205; // FEE0509
+      } else if (amount <= 10000) {
+        counterClaimFeeValue = 455; // FEE0508
+      } else if (amount <= 200000) {
+        counterClaimFeeValue = Number((amount * 0.05).toFixed(2)); // FEE0507
+      } else {
+        counterClaimFeeValue = 10000; // FEE0506
+      }
+    }
+    const basedOnInformationParagraph = `Based on the information provided, it will cost the defendant £${counterClaimFeeValue} to make their counterclaim.`;
+    await performValidation('text', { elementType: 'paragraph', text: basedOnInformationParagraph });
+    await performAction('clickRadioButton', {
+      question: counterClaimFeeLR.doesTheDefendantNeedHelpQuestion,
+      option: counterClaimFeeOption.radioOption,
+    });
+    await performAction('clickButton', counterClaimFeeLR.saveAndContinueButton);
+  }
+
+  private async selectClaimAgainstWhomLR(claimAgainstWhom: actionRecord): Promise<void> {
+    if (Array.isArray(claimAgainstWhom.options)) {
+      for (const option of claimAgainstWhom.options) {
+        await performAction('check', {
+          question: claimAgainstWhom.question,
+          option,
+        });
+      }
+    } else if (claimAgainstWhom.radioOption) {
+      await performAction('check', {
+        question: claimAgainstWhom.question,
+        option: claimAgainstWhom.radioOption,
+      });
+    }
+    await performAction('clickButton', counterClaimAgainstWhomLR.saveAndContinueButton);
+  }
+
+  private async counterClaimAboutLR(claimAbout: actionRecord): Promise<void> {
+    await performAction('inputText', counterClaimAboutLR.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
+    await performAction('inputText', counterClaimAboutLR.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
+    await performAction('clickButton', counterClaimAboutLR.saveAndContinueButton);
   }
 
   private async selectUniversalCreditLR(universalCreditDateData: actionRecord): Promise<void> {

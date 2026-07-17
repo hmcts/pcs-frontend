@@ -192,6 +192,12 @@ export class ActionRegistry {
     ['selectUniversalCreditLR', new RespondToClaimLRAction()],
     ['selectCorrespondenceAddressUnknownLR', new RespondToClaimLRAction()],
     ['enterNoticeDateKnownLR', new RespondToClaimLRAction()],
+    ['selectCounterClaimLR', new RespondToClaimLRAction()],
+    ['selectWhatAreYouClaimingForLR', new RespondToClaimLRAction()],
+    ['counterClaimSpecificSumOfMoneyLR', new RespondToClaimLRAction()],
+    ['selectCounterClaimFeeLR', new RespondToClaimLRAction()],
+    ['selectClaimAgainstWhomLR', new RespondToClaimLRAction()],
+    ['counterClaimAboutLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

@@ -12,7 +12,12 @@ import { contactPreferenceEmailOrPostLR } from '../data/page-data/lr-page-data/c
 import { contactPreferencesTelephoneLR } from '../data/page-data/lr-page-data/contactPreferencesTelephoneLR.page.data';
 import { contactPreferencesTextMessageLR } from '../data/page-data/lr-page-data/contactPreferencesTextMessageLR.page.data';
 import { correspondenceAddressLR } from '../data/page-data/lr-page-data/correspondenceAddressLR.page.data';
-import { counterClaimLR } from '../data/page-data/lr-page-data/counterclaimLR.page.data';
+import { counterClaimAboutLR } from '../data/page-data/lr-page-data/counterClaimAboutLR.page.data';
+import { counterClaimAgainstWhomLR } from '../data/page-data/lr-page-data/counterClaimAgainstWhomLR.page.data';
+import { counterClaimFeeLR } from '../data/page-data/lr-page-data/counterClaimFeeLR.page.data';
+import { counterClaimLR } from '../data/page-data/lr-page-data/counterClaimLR.page.data';
+import { counterClaimSpecificSumOfMoneyLR } from '../data/page-data/lr-page-data/counterClaimSpecificSumOfMoneyLR.page.data';
+import { counterClaimWhatAreYouClaimingForLR } from '../data/page-data/lr-page-data/counterClaimWhatAreYouClaimingForLR.page.data';
 import { defendantDateOfBirthLR } from '../data/page-data/lr-page-data/defendantDateOfBirthLR.page.data';
 import { defendantNameConfirmationLR } from '../data/page-data/lr-page-data/defendantNameConfirmationLR.page.data';
 import { doAnyOtherAdultsLiveInYourHomeLR } from '../data/page-data/lr-page-data/doAnyOtherAdultsLiveInYourHomeLR.page.data';
@@ -134,27 +139,33 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('disputingOtherPartsOfTheClaimLR', {
       disputeOption: nonRentArrearsDisputeLR.noRadioOption,
     });
-    await performAction('selectCounterClaim', {
+    await performAction('selectCounterClaimLR', {
+      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
       option: counterClaimLR.yesRadioOption,
     });
-    // await performAction('selectWhatAreYouClaimingFor', {
-    //   question: counterClaimWhatAreYouClaimingFor.mainHeader,
-    //   option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
-    // });
-    // await performAction('counterClaimSpecificSumOfMoney', {
-    //   question: counterClaimSpecificSumOfMoney.mainHeader,
-    //   option: counterClaimSpecificSumOfMoney.yesRadioOption,
-    //   amount: counterClaimSpecificSumOfMoney.claimInput,
-    // });
-    // await performAction('selectCounterClaimFee', {
-    //   radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
-    //   typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
-    //   amount: counterClaimSpecificSumOfMoney.claimInput,
-    // });
-    // await performAction('counterClaimAbout', {
-    //   counterClaimFor: counterClaimAbout.counterClaimForInput,
-    //   reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
-    // });
+    await performAction('selectWhatAreYouClaimingForLR', {
+      option: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoneyLR', {
+      question: counterClaimSpecificSumOfMoneyLR.mainHeader,
+      option: counterClaimSpecificSumOfMoneyLR.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+    });
+    await performAction('selectCounterClaimFeeLR', {
+      radioOption: counterClaimFeeLR.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+    });
+    const firstName = pin2User.firstName ?? submitCaseApiData.submitCasePayloadDefault.defendant1.firstName;
+    const lastName = pin2User.lastName ?? submitCaseApiData.submitCasePayloadDefault.defendant1.lastName;
+    await performAction('selectClaimAgainstWhomLR', {
+      question: counterClaimAgainstWhomLR.mainHeader,
+      options: [claimantName, `${firstName} ${lastName}`],
+    });
+    await performAction('counterClaimAboutLR', {
+      counterClaimFor: counterClaimAboutLR.counterClaimForInput,
+      reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
+    });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
@@ -275,28 +286,23 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       disputeOption: nonRentArrearsDisputeLR.yesRadioOption,
       disputeInfo: nonRentArrearsDisputeLR.explainClaimTextInput,
     });
-    await performAction('selectCounterClaim', {
+    await performAction('selectCounterClaimLR', {
       option: counterClaimLR.yesRadioOption,
     });
-    // await performAction('selectWhatAreYouClaimingFor', {
-    //   question: counterClaimWhatAreYouClaimingFor.mainHeader,
-    //   option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
-    // });
-    // await performAction('counterClaimSpecificSumOfMoney', {
-    //   question: counterClaimSpecificSumOfMoney.mainHeader,
-    //   option: counterClaimSpecificSumOfMoney.yesRadioOption,
-    //   amount: counterClaimSpecificSumOfMoney.claimInput,
-    // });
-    // await performAction('selectCounterClaimFee', {
-    //   radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
-    //   typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
-    //   amount: counterClaimSpecificSumOfMoney.claimInput,
-    // });
-    // const pin2User = await getPinUserAt(1);
-    // await performAction('selectClaimAgainstWhom', {
-    //   question: counterClaimAgainstWhom.mainHeader,
-    //   options: [claimantName, `${pin2User.firstName} ${pin2User.lastName}`],
-    // });
+    await performAction('selectWhatAreYouClaimingForLR', {
+      option: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoneyLR', {
+      question: counterClaimSpecificSumOfMoneyLR.mainHeader,
+      option: counterClaimSpecificSumOfMoneyLR.noRadioOption,
+      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+    });
+    await performAction('selectCounterClaimFeeLR', {
+      radioOption: counterClaimFeeLR.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+    });
+
     // await performAction('counterClaimAbout', {
     //   counterClaimFor: counterClaimAbout.counterClaimForInput,
     //   reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
@@ -411,8 +417,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: rentArrears.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
-    await performAction('selectCounterClaim', {
-      option: counterClaim.yesRadioOption,
+    await performAction('selectCounterClaimLR', {
+      option: counterClaim.noRadioOption,
     });
     // await performAction('selectWhatAreYouClaimingFor', {
     //   question: counterClaimWhatAreYouClaimingFor.mainHeader,
