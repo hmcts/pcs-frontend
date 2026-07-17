@@ -1,6 +1,6 @@
 import { generateRandomString } from '../../../utils/common/string.utils';
 
-export const whatRegularIncomeDoYouReceive = {
+export const whatRegularIncomeDoYouReceiveLR = {
   mainHeader: `Income`,
   whatRegularIncomeDoesDefendantReceiveQuestion: `What regular income does the defendant receive? (Optional)`,
   selectAllThatApplyHintText: `Select all that apply. The information the defendant provides must be truthful and accurate.`,
