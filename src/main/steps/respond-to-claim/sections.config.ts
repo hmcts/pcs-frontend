@@ -20,7 +20,13 @@ const sectionDefs = [
     id: 'startNowAndDetails',
     groupId: 'checkBeforeYouStart',
     titleKey: 'taskList.startNowAndDetails',
-    steps: ['start-now', 'free-legal-advice', 'check-your-answers-start-now-and-details'],
+    steps: [
+      'start-now',
+      'free-legal-advice',
+      'solicitor',
+      'ask-your-solicitor-to-respond-to-the-claim',
+      'check-your-answers-start-now-and-details',
+    ],
   },
   {
     id: 'personalDetails',
@@ -63,7 +69,8 @@ const sectionDefs = [
       'counter-claim-against-whom',
       'counter-claim-about',
       'counter-claim-order-other-than-sum',
-      'counter-claim-upload-documents',
+      'counter-claim-do-you-want-to-upload-files',
+      'counter-claim-upload-files',
       'check-your-answers-your-response',
     ],
   },
@@ -130,12 +137,21 @@ const sectionDefs = [
       'incomeAndExpenditure',
       'uploadFiles',
     ],
+    // 'reasonable-adjustments-triage', 'equality-and-diversity-start' and
+    // 'equality-and-diversity-end' are intentionally parked out of the live citizen
+    // journey while RA / Your Support and PCQ integrations are still in progress.
+    // Their step folders, registry entries and locale files are retained so re-
+    // enablement is a one-line restore here. See HDPI-3793 (RA triage), HDPI-6649
+    // (RA confirmation, parked on a custom branch) and the PCQ tie-in tracked in
+    // config/default.json (`pcq.enabled`).
     steps: [
-      'reasonable-adjustments-triage',
-      'equality-and-diversity-start',
-      'equality-and-diversity-end',
       'language-used',
-      'check-your-answers',
+      'end-of-journey-cya',
+      'response-submitted',
+      'response-submitted-counter-claim-fee-payment-needed',
+      'counter-claim-application-fee-amount',
+      'counter-claim-payment-successful',
+      'response-and-counter-claim-submitted',
     ],
   },
 ] as const satisfies readonly {
@@ -173,7 +189,7 @@ export function sectionIdToBackendEnum(id: RespondToClaimSectionId): RespondToCl
 }
 
 export function sectionHasCya(section: SectionConfig): boolean {
-  return section.steps.some(stepName => stepName.startsWith(CYA_STEP_PREFIX));
+  return section.steps.some(stepName => stepName === 'end-of-journey-cya' || stepName.startsWith(CYA_STEP_PREFIX));
 }
 
 const stepToSectionId = buildStepToSectionIdMap();

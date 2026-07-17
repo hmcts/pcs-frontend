@@ -1,34 +1,15 @@
 import type { Express, NextFunction, Request, Response } from 'express';
-import type { TFunction } from 'i18next';
 
 import { ApplicationError } from '../../ApplicationError';
 import { HTTPError } from '../../HttpError';
 import { getTranslationFunction, populateCommonTranslations } from '../i18n';
 
 import { authFailure } from './authFailure';
+import { getErrorPageKey } from './errorPageKeys';
 
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('error-handler');
-
-function getErrorMessages(status: number, t: TFunction): { title: string; paragraph: string } {
-  if (status === 400 || status === 403) {
-    return {
-      title: t('errorPages.403.title'),
-      paragraph: t('errorPages.403.paragraph'),
-    };
-  }
-  if (status === 404) {
-    return {
-      title: t('errorPages.404.title'),
-      paragraph: t('errorPages.404.paragraph'),
-    };
-  }
-  return {
-    title: t('errorPages.500.title'),
-    paragraph: t('errorPages.500.paragraph'),
-  };
-}
 
 export function createNotFoundHandler(): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -83,9 +64,36 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
       res.locals.errorTitle = t(`applicationErrors.${err.errorCode}.title`);
       res.locals.errorParagraph = t(`applicationErrors.${err.errorCode}.paragraph`);
     } else {
-      const { title: errorTitle, paragraph: errorParagraph } = getErrorMessages(status, t);
-      res.locals.errorTitle = errorTitle;
-      res.locals.errorParagraph = errorParagraph;
+      const errorPageKey = getErrorPageKey(status);
+      res.locals.errorPageKey = errorPageKey;
+
+      if (errorPageKey === 'serviceUnavailable' && httpError.retryAfter) {
+        // Retry-After can be seconds or an HTTP date string.
+        const retryAfter = httpError.retryAfter;
+        const seconds = Number(retryAfter);
+
+        if (!Number.isNaN(seconds)) {
+          res.locals.serviceUnavailableParagraph = t('errorPages.serviceUnavailable.paragraphMinutes', {
+            minutes: Math.ceil(seconds / 60),
+          });
+        } else {
+          const retryAfterDate = new Date(retryAfter);
+          const time = retryAfterDate.toLocaleTimeString('en-GB', {
+            hour12: true,
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          const date = retryAfterDate.toLocaleDateString('en-GB', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          });
+          res.locals.serviceUnavailableParagraph = t('errorPages.serviceUnavailable.paragraphDateAndTime', {
+            date,
+            time,
+          });
+        }
+      }
     }
 
     populateCommonTranslations(req, res, t);

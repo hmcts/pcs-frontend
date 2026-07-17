@@ -14,8 +14,15 @@
   transition:
     outline-offset 0.1s ease-in-out,
     background-color 0.1s linear;
-  outline: 3px dashed govuk-colour('black');
+  outline: none;
+  border: 3px dashed govuk-colour('black');
   text-align: center;
+}
+
+.moj-multi-file-upload__dropzone:focus-within,
+.moj-multi-file-upload__dropzone.moj-multi-file-upload__dropzone--error-summary-target {
+  outline: 3px solid $govuk-focus-colour;
+  outline-offset: 0;
 }
 
 .moj-multi-file-upload__dropzone label {
@@ -36,7 +43,7 @@
 }
 
 .moj-multi-file-upload--dragover {
-  outline-color: #6f777b;
+  border-color: #6f777b;
   background: #b1b4b6;
 }
 

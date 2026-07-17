@@ -2,6 +2,8 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 import _ from 'lodash';
 
+import { stripHtmlTags } from '../../../steps/utils/fieldValidators';
+
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
 import type { FormError } from './errorUtils';
@@ -18,7 +20,7 @@ export function getTranslation(
   fallback?: string,
   interpolation?: Record<string, unknown>
 ): string | undefined {
-  const options = { returnObjects: true, ...interpolation };
+  const options = { returnObjects: true, returnEmptyString: true, ...interpolation };
   const result = t(key, options) as unknown;
   if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
     return result;
@@ -390,6 +392,20 @@ export function validateForm(
         }
       }
     } else {
+      // Sanitise text fields before required/validator checks so that input that
+      // reduces to empty after stripping (e.g. '<script>...</script>') is correctly
+      // treated as missing rather than silently accepted.
+      if (
+        typeof value === 'string' &&
+        (field.type === 'character-count' || field.type === 'text' || field.type === 'textarea')
+      ) {
+        const sanitizedText = stripHtmlTags(value.trim());
+        if (sanitizedText !== value.trim()) {
+          value = sanitizedText;
+          req.body[fieldName] = sanitizedText;
+        }
+      }
+
       const isMissing =
         field.type === 'checkbox'
           ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())
@@ -479,11 +495,8 @@ export function validateForm(
             if (!errors[fieldName]) {
               const translationLabelKey =
                 typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
-
               const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
-
               const displayName = resolvedLabel ?? toSentenceCase(fieldName);
-
               const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
                 '{fieldName}',
                 displayName
@@ -501,7 +514,9 @@ export function validateForm(
             const customError = field.validate(value, formData, validationAllData);
             if (customError) {
               if (!errors[fieldName]) {
-                errors[fieldName] = customError;
+                errors[fieldName] = customError.startsWith('errors.')
+                  ? translations?.[customError.replace('errors.', '')] || customError
+                  : customError;
               }
             }
           } catch (err) {
@@ -514,7 +529,9 @@ export function validateForm(
           const customError = field.validate(value, formData, validationAllData);
           if (customError) {
             if (!errors[fieldName]) {
-              errors[fieldName] = customError;
+              errors[fieldName] = customError.startsWith('errors.')
+                ? translations?.[customError.replace('errors.', '')] || customError
+                : customError;
             }
           }
         } catch (err) {

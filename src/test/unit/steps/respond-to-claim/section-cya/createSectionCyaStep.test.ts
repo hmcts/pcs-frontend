@@ -17,6 +17,7 @@ import { createSectionCyaStep } from '../../../../../main/steps/respond-to-claim
 const makeReq = (action: string | undefined): Request =>
   ({
     body: action === undefined ? {} : { action },
+    session: {},
     res: { locals: { validatedCase: { id: '1777294706554860' } } },
   }) as unknown as Request;
 

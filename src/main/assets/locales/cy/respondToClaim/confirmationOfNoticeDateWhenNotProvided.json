@@ -1,18 +1,18 @@
 {
-  "pageTitle": "cyNotice date",
-  "question": "cyWhen did you receive notice from {{claimantName}} (optional)?",
-  "noticeDateHint": "cyFor example, 27 9 2022. If you’re not sure of the exact date, you can find it on the notice",
-  "paragraph": "cy{{claimantName}} did not provide the date they served you notice.",
+  "pageTitle": "Dyddiad yr hysbysiad",
+  "question": "Pryd gawsoch yr hysbysiad gan {{claimantName}} (dewisol)?",
+  "noticeDateHint": "Er enghraifft, 27 9 2022. Os nad ydych yn siŵr o'r union ddyddiad, gallwch ddod o hyd iddo ar yr hysbysiad",
+  "paragraph": "Ni wnaeth {{claimantName}} roi'r dyddiad y gwnaethant gyflwyno'r hysbysiad i chi.",
   "errors": {
     "date": {
-      "day": "cyDay",
-      "month": "cyMonth",
-      "year": "cyYear",
-      "notRealDate": "cyThe date you received notice must be a real date",
-      "futureDate": "cyThe date you received notice must either be today’s date or in the past",
-      "invalidValue": "cyThe date you received notice must be a real date",
-      "missingOne": "cyThe date you received notice must include a {{missingField}}",
-      "missingTwo": "cyThe date you received notice must include a {{first}} and {{second}}"
+      "day": "Diwrnod",
+      "month": "Mis",
+      "year": "Blwyddyn",
+      "notRealDate": "Rhaid i’r dyddiad pan gawsoch yr hysbysiad fod yn ddyddiad go iawn",
+      "futureDate": "Rhaid i'r dyddiad pan gawsoch yr hysbysiad fod naill ai'n ddyddiad heddiw neu yn y gorffennol",
+      "invalidValue": "Rhaid i’r dyddiad pan gawsoch yr hysbysiad fod yn ddyddiad go iawn",
+      "missingOne": "Mae'n rhaid i'r dyddiad pan gawsoch yr hysbysiad gynnwys {{missingField}}",
+      "missingTwo": "Mae'n rhaid i'r dyddiad pan gawsoch yr hysbysiad gynnwys {{first}} ac {{second}}"
     }
   }
 }

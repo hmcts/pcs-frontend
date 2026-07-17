@@ -11,7 +11,8 @@ import { buildSummaryListRows } from './summaryListRowFactory';
 import VisibleFormDataView from './visibleFormDataView';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
+import { CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
+import { PaymentSessionState, clearPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
 import { toCaseReference16 } from '@utils/caseReference';
 
 const STEP_NAME = 'check-your-answers';
@@ -67,11 +68,14 @@ export const step: StepDefinition = createFormStep({
       visibleFormData.getApplicationTypeField()?.fieldValue !== GenAppType.ADJOURN ||
       visibleFormData.getHearingInNext14DaysField()?.fieldValue === 'yes';
 
+    const hwfApplies = visibleFormData.getHwfReferenceField()?.fieldValue;
+    const paymentNeeded = feeApplies && !hwfApplies;
+
     return {
       summaryData: {
         rows: buildSummaryListRows(req, t),
       },
-      buttonLabel: feeApplies ? t('buttons.continueToPayment') : t('buttons.submit'),
+      buttonLabel: paymentNeeded ? t('buttons.continueToPayment') : t('buttons.submit'),
     };
   },
   beforeRedirect: async (req: Request) => {
@@ -113,7 +117,7 @@ export const step: StepDefinition = createFormStep({
       clientReference: req.session.genApp.applicationId,
     };
 
-    await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
+    const makeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
       id: ccdCase.id,
       data: {
         citizenGenAppRequest,
@@ -126,5 +130,16 @@ export const step: StepDefinition = createFormStep({
       delete req.session.uploadedDocs[caseRef];
     }
     delete req.session.genApp;
+
+    if (makeAnApplicationResponse?.state === GenAppState.PENDING_GEN_APP_ISSUED) {
+      const paymentSessionState: PaymentSessionState = {
+        serviceRequestReference: makeAnApplicationResponse.serviceRequestReference,
+        feeAmount: makeAnApplicationResponse.feeAmount,
+      };
+
+      setPaymentSessionState(req, paymentSessionState);
+    } else {
+      clearPaymentSessionState(req);
+    }
   },
 });

@@ -16,6 +16,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -31,7 +32,7 @@ test.describe('Respond to a claim - smoke test @health', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
   });
 
-  test('Respond to a claim E2E Journey @regression @crossbrowser @sanity', async () => {
+  test('Respond to a claim E2E Journey @crossbrowser @sanity', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     // Below steps will be unskipped once HDPI-5407 and HDPI-5350 are done
     /*await performAction('confirmDefendantDetails', {

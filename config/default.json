@@ -33,6 +33,7 @@
   },
   "ccd": {
     "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
+
     "caseTypeId": "PCS"
   },
   "osPostcodeLookup": {
@@ -125,19 +126,19 @@
     "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
   },
   "documentUpload": {
-    "maxFileSizeMB": 1024,
-    "maxFileSizePerFileMB": 100,
-    "maxTotalFileSizeMB": 1024
+    "maxFileSizePerFileMB": 1024,
+    "maxMediaFileSizeMB": 500,
+    "maxTotalFileSizeMB": 4096,
+    "maxDocumentFileSizeMB": 1024,
+    "maxFilenameLength": 255
   },
-  "dashboard": {
-    "taskRoutes": {
-      "ViewClaim": "/case/:caseReference/view-the-claim",
-      "RespondToClaim": "/case/:caseReference/respond-to-claim/task-list",
-      "MakeGeneralApplication": "/case/:caseReference/make-an-application/choose-an-application",
-      "ViewAllApplications": "/case/:caseReference/view-all-applications",
-      "ViewHearingDocuments": "/case/:caseReference/view-hearing-documents",
-      "ViewOrdersAndNotices": "/case/:caseReference/view-orders-and-notices",
-      "ViewDocuments": "/case/:caseReference/view-documents"
-    }
+  "redirects": {
+    "manageCaseReturnURL": "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
+  },
+  "payment": {
+    "returnUrl": "https://pcs.aat.platform.hmcts.net/payment/return"
+  },
+  "launchdarkly": {
+    "env": "AAAAAAAA"
   }
 }

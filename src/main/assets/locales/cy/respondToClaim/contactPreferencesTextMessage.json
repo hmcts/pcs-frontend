@@ -1,19 +1,18 @@
 {
-  "pageTitle": "cyContact by text message",
-  "heading": "cyContact by text message",
-  "subtitle": "cyWe might also send updates about your case by text message.",
-  "question": "cyAre you happy to be contacted by text message?",
-
+  "pageTitle": "Cysylltu drwy neges testun",
+  "heading": "Cysylltu drwy neges testun",
+  "subtitle": "Mae'n bosib y byddwn hefyd yn anfon diweddariadau am eich achos atoch drwy negeseuon testun",
+  "question": "Ydych chi'n hapus i ni gysylltu â chi drwy neges testun?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
-  "phoneNumberLabel": "cyUK telephone number",
+  "phoneNumberLabel": "Rhif ffôn yn y DU",
   "buttons": {
-    "saveAndContinue": "cySave and continue",
-    "saveForLater": "cySave for later"
+    "saveAndContinue": "Cadw a pharhau",
+    "saveForLater": "Cadw at hwyrach ymlaen"
   },
   "errors": {
-    "contactByTextMessage": "cySelect if you want to be contacted by text message."
+    "contactByTextMessage": "Dewiswch a ydych chi eisiau i ni gysylltu â chi drwy neges testun."
   }
 }

@@ -42,7 +42,7 @@
       {% block serviceNavigation %}
         {{ govukServiceNavigation({
           serviceName: t('serviceName', 'Respond to a property possession claim'),
-          serviceUrl: dashboardUrl if dashboardUrl else "/dashboard",
+          serviceUrl: "/claims",
           navigation: [
             {
               text: t('logout', 'Sign out'),
@@ -90,7 +90,7 @@
       {% endblock %}
     </div>
 
-    {% if contactUsForHelp %}
+    {% if contactUsForHelp and not isLegalRepresentative %}
       <div class="govuk-grid-column-one-third">
         <aside class="app-related-items" aria-label="{{ t('supportAndContactInformation', 'Support and contact information') }}">
           {% include "components/contact-us-details.njk" %}

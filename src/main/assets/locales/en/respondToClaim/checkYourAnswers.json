@@ -1,0 +1,6 @@
+{
+  "pageTitle": "Check your answers",
+  "errors": {
+    "submitResponseFailed": "Failed to submit response. Please try again."
+  }
+}

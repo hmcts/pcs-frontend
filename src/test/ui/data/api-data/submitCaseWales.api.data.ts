@@ -3,7 +3,8 @@ export const submitCaseApiDataWales = {
 
   submitCasePayload: {
     legislativeCountry: 'Wales',
-
+    regionId: 7,
+    caseManagementLocationNumber: 366572,
     claimantType: {
       value: {
         code: 'COMMUNITY_LANDLORD',
@@ -104,10 +105,11 @@ export const submitCaseApiDataWales = {
     prohibitedConductWalesClaim: 'NO',
 
     walesNoticeServed: 'YES',
+    notice_ServiceMethod: 'FIRST_CLASS_POST',
+    notice_PostedDate: '2025-11-10',
+    notice_AbleToUploadDocument: 'No',
+    notice_UnableToUploadReason: 'no documents to upload',
     walesTypeOfNoticeServed: 'terts',
-    notice_NoticeServiceMethod: 'FIRST_CLASS_POST',
-    notice_NoticePostedDate: '1995-11-10',
-    notice_NoticeDocuments: [],
 
     preActionProtocolCompleted: 'YES',
     mediationAttempted: 'NO',
@@ -148,6 +150,8 @@ export const submitCaseApiDataWales = {
 
   submitCaseRentNonRentStandard: {
     legislativeCountry: 'Wales',
+    regionId: 7,
+    caseManagementLocationNumber: 366572,
     claimantType: {
       value: {
         code: 'COMMUNITY_LANDLORD',
@@ -209,11 +213,11 @@ export const submitCaseApiDataWales = {
     preActionProtocolCompleted: 'NO',
     mediationAttempted: 'NO',
     settlementAttempted: 'NO',
-    walesNoticeServed: 'No',
+    walesNoticeServed: 'NO',
     rentDetails_CurrentRent: '100000',
     rentDetails_Frequency: 'MONTHLY',
     rentDetails_CalculatedDailyCharge: '3285',
-    rentArrears_Total: '150000',
+    rentArrears_Total: '8000',
     rentArrears_RecoveryAttempted: 'NO',
     arrearsJudgmentWanted: 'NO',
     claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
@@ -239,6 +243,8 @@ export const submitCaseApiDataWales = {
 
   submitCaseRentOtherTenancy: {
     legislativeCountry: 'Wales',
+    regionId: 7,
+    caseManagementLocationNumber: 366572,
     claimantType: {
       value: {
         code: 'COMMUNITY_LANDLORD',
@@ -301,13 +307,14 @@ export const submitCaseApiDataWales = {
     settlementAttempted: 'NO',
     walesNoticeServed: 'YES',
     walesTypeOfNoticeServed: null,
-    notice_NoticeServiceMethod: 'FIRST_CLASS_POST',
-    notice_NoticePostedDate: '2022-02-02',
-    notice_NoticeDocuments: [],
+    notice_ServiceMethod: 'FIRST_CLASS_POST',
+    notice_PostedDate: '2022-02-02',
+    notice_AbleToUploadDocument: 'No',
+    notice_UnableToUploadReason: 'no documents to upload',
     rentDetails_CurrentRent: '50000',
     rentDetails_Frequency: 'MONTHLY',
     rentDetails_CalculatedDailyCharge: '1643',
-    rentArrears_Total: '40000',
+    rentArrears_Total: '8000',
     rentArrears_RecoveryAttempted: 'NO',
     arrearsJudgmentWanted: 'NO',
     claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
@@ -326,6 +333,8 @@ export const submitCaseApiDataWales = {
 
   submitCaseNonRentStandard: {
     legislativeCountry: 'Wales',
+    regionId: 7,
+    caseManagementLocationNumber: 366572,
     claimantType: {
       value: {
         code: 'COMMUNITY_LANDLORD',
@@ -393,7 +402,11 @@ export const submitCaseApiDataWales = {
     preActionProtocolCompleted: 'NO',
     mediationAttempted: 'NO',
     settlementAttempted: 'NO',
-    walesNoticeServed: 'No',
+    walesNoticeServed: 'YES',
+    notice_ServiceMethod: 'FIRST_CLASS_POST',
+    notice_PostedDate: '2025-11-10',
+    notice_AbleToUploadDocument: 'No',
+    notice_UnableToUploadReason: 'no documents to upload',
     claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',

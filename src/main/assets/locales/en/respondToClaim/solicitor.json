@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Do you have a solicitor?",
+  "heading": "Do you have a solicitor?",
+  "question": "Do you have a solicitor?",
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "hasSolicitor": "Select if you have a solicitor"
+  }
+}

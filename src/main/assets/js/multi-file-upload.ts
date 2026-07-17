@@ -1,6 +1,6 @@
 import { MultiFileUpload } from '@ministryofjustice/frontend';
 
-import { isAllowedExtension, isBlockedExtension } from '@utils/fileExtensionValidation';
+import { isAllowedExtension, isBlockedExtension, isMediaExtension } from '@utils/fileExtensionValidation';
 
 const uploadInstances = new WeakMap<HTMLElement, MultiFileUpload>();
 
@@ -14,6 +14,14 @@ interface DisplayDocument {
 
 function getCsrfToken(): string {
   return document.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value || '';
+}
+
+// base64url so the WAF doesn't read the JSON as SQLi; the server decodes it (HDPI-5770).
+export function encodeUploadedDocument(doc: unknown): string {
+  const bytes = new TextEncoder().encode(JSON.stringify(doc));
+  let binary = '';
+  bytes.forEach(b => (binary += String.fromCharCode(b)));
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 // MOJ multi-file-upload error pattern (https://design-patterns.service.justice.gov.uk/components/multi-file-upload/):
@@ -30,6 +38,20 @@ function getPageAnchor(): HTMLElement {
 
 function getFileInput(container: HTMLElement): HTMLInputElement | null {
   return container.querySelector<HTMLInputElement>('.moj-multi-file-upload__input');
+}
+
+const DROPZONE_ERROR_HIGHLIGHT_CLASS = 'moj-multi-file-upload__dropzone--error-summary-target';
+
+function getDropzone(container: HTMLElement): HTMLElement | null {
+  return container.querySelector<HTMLElement>('.moj-multi-file-upload__dropzone');
+}
+
+function highlightDropzone(container: HTMLElement): void {
+  getDropzone(container)?.classList.add(DROPZONE_ERROR_HIGHLIGHT_CLASS);
+}
+
+function clearDropzoneHighlight(container: HTMLElement): void {
+  getDropzone(container)?.classList.remove(DROPZONE_ERROR_HIGHLIGHT_CLASS);
 }
 
 function getOrCreateErrorSummary(title: string): HTMLDivElement {
@@ -91,6 +113,7 @@ function setInlineFieldError(container: HTMLElement, message: string): void {
 }
 
 function clearInlineFieldError(container: HTMLElement): void {
+  clearDropzoneHighlight(container);
   const fileInput = getFileInput(container);
   if (!fileInput) {
     return;
@@ -205,8 +228,13 @@ function initContainer(container: HTMLElement): void {
 
   const maxFileSizeMb = Number.parseInt(container.dataset.maxFileSizeMb || '1024', 10);
   const maxBytes = maxFileSizeMb * 1024 * 1024;
+  const maxMediaMb = Number.parseInt(container.dataset.maxMediaMb || '0', 10);
+  const maxMediaBytes = maxMediaMb > 0 ? maxMediaMb * 1024 * 1024 : 0;
+  const maxFilenameLength = Number.parseInt(container.dataset.maxFilenameLength || '0', 10);
   const wrongTypeMessage = container.dataset.errorWrongType || '';
   const tooLargeMessage = container.dataset.errorFileTooLarge || '';
+  const tooLargeMediaMessage = container.dataset.errorFileTooLargeMedia || tooLargeMessage;
+  const filenameTooLongMessage = container.dataset.errorFilenameTooLong || '';
   const deleteFailedMessage = container.dataset.errorDelete || '';
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
@@ -219,16 +247,26 @@ function initContainer(container: HTMLElement): void {
         clearErrorSummary(container);
         // Mirror server's validateFileType precedence:
         //   1. blocked media (AC04)         → wrong-type message
-        //   2. extension not in allowlist   → wrong-type message
-        //   3. file too large               → too-large message
+        //   2. filename too long            → filename-too-long message
+        //   3. extension not in allowlist   → wrong-type message
+        //   4. image file too large         → media-too-large message
+        //   5. file too large               → too-large message
         // Pre-flight here saves the round-trip; server still validates as defence in depth.
         if (isBlockedExtension(file.name)) {
           showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
           throw new Error('blocked');
         }
+        if (maxFilenameLength > 0 && file.name.length > maxFilenameLength) {
+          showErrorSummary(container, filenameTooLongMessage, errorSummaryTitle);
+          throw new Error('filename_too_long');
+        }
         if (!isAllowedExtension(file.name)) {
           showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
           throw new Error('invalid_type');
+        }
+        if (maxMediaBytes > 0 && isMediaExtension(file.name) && file.size > maxMediaBytes) {
+          showErrorSummary(container, tooLargeMediaMessage, errorSummaryTitle);
+          throw new Error('media_too_large');
         }
         if (file.size > maxBytes) {
           showErrorSummary(container, tooLargeMessage, errorSummaryTitle);
@@ -245,7 +283,7 @@ function initContainer(container: HTMLElement): void {
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'uploadedDocuments[]';
-            input.value = JSON.stringify(doc);
+            input.value = encodeUploadedDocument(doc);
             input.dataset.documentIndex = String(doc.index);
             hiddenContainer.appendChild(input);
           }
@@ -331,6 +369,32 @@ function initContainer(container: HTMLElement): void {
     duplicateLabel.replaceWith(chooseFilesButton);
   }
 
+  const wireDropzoneErrorHighlight = (): void => {
+    const fileInput = getFileInput(container);
+    if (!fileInput) {
+      return;
+    }
+
+    const onFileInputFocus = (): void => {
+      highlightDropzone(container);
+    };
+    const onFileInputBlur = (): void => {
+      clearDropzoneHighlight(container);
+    };
+
+    fileInput.addEventListener('focus', onFileInputFocus);
+    fileInput.addEventListener('blur', onFileInputBlur);
+
+    const summaryLinkSelector = `.govuk-error-summary a[href="#${fileInput.id}"]`;
+    document.querySelectorAll<HTMLAnchorElement>(summaryLinkSelector).forEach(link => {
+      link.addEventListener('click', () => {
+        highlightDropzone(container);
+      });
+    });
+  };
+
+  wireDropzoneErrorHighlight();
+
   form.addEventListener('submit', event => {
     if (!hasVisibleError(container)) {
       return;
@@ -339,6 +403,20 @@ function initContainer(container: HTMLElement): void {
     const summary = form.querySelector<HTMLDivElement>('.govuk-error-summary');
     summary?.focus();
   });
+}
+
+function getRowDocumentFilename(row: Element, deleteButton: HTMLButtonElement | null): string {
+  const fromFilenameEl = row.querySelector('.moj-multi-file-upload__filename')?.textContent?.trim();
+  if (fromFilenameEl) {
+    return fromFilenameEl;
+  }
+
+  const fromVisuallyHidden = deleteButton?.querySelector('.govuk-visually-hidden')?.textContent?.trim();
+  if (fromVisuallyHidden) {
+    return fromVisuallyHidden;
+  }
+
+  return row.querySelector('.moj-multi-file-upload__message')?.textContent?.trim() || '';
 }
 
 function rebuildHiddenInputs(hiddenContainer: HTMLElement, uploadContainer: HTMLElement): void {
@@ -350,20 +428,23 @@ function rebuildHiddenInputs(hiddenContainer: HTMLElement, uploadContainer: HTML
   // Rebuild from remaining file rows in the MOJ component
   const rows = uploadContainer.querySelectorAll('.moj-multi-file-upload__row:not(.moj-multi-file-upload__row--error)');
   rows.forEach((row, index) => {
-    const filenameEl = row.querySelector('.moj-multi-file-upload__filename');
     const deleteButton = row.querySelector<HTMLButtonElement>('.moj-multi-file-upload__delete');
     const documentId = deleteButton?.value?.trim();
-    if (filenameEl) {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'uploadedDocuments[]';
-      input.value = JSON.stringify({
-        ...(documentId ? { id: documentId } : { index }),
-        document_filename: filenameEl.textContent?.trim() || '',
-      });
-      input.dataset.documentIndex = String(index);
-      hiddenContainer.appendChild(input);
+    const document_filename = getRowDocumentFilename(row, deleteButton);
+
+    if (!document_filename && !documentId) {
+      return;
     }
+
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'uploadedDocuments[]';
+    input.value = encodeUploadedDocument({
+      ...(documentId ? { id: documentId } : { index }),
+      document_filename,
+    });
+    input.dataset.documentIndex = String(index);
+    hiddenContainer.appendChild(input);
   });
 }
 

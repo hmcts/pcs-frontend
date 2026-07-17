@@ -1,6 +1,10 @@
 import { Page } from '@playwright/test';
 
-import { confirmIfTheseDocumentsRelateToAnApplication } from '../../../data/page-data/documents-page-data';
+import {
+  checkYourAnswers,
+  confirmIfTheseDocumentsRelateToAnApplication,
+  uploadYourDocuments,
+} from '../../../data/page-data/documents-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -8,6 +12,8 @@ export class DocumentsAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['startEvidenceUpload', () => this.startEvidenceUpload(fieldName)],
+      ['uploadDocuments', () => this.uploadDocuments(fieldName)],
+      ['verifyCheckYourAnswers', () => this.verifyCheckYourAnswers(fieldName)],
       ['validateViewDocuments', () => this.validateViewDocuments(fieldName)],
       [
         'verifyDocumentRelatesToApplication',
@@ -24,6 +30,32 @@ export class DocumentsAction implements IAction {
 
   private async startEvidenceUpload(data: actionData): Promise<void> {
     await performAction('clickButton', data);
+  }
+
+  private async uploadDocuments(data: actionRecord): Promise<void> {
+    if (data?.files) {
+      await performAction('uploadFile', data.files);
+    }
+    await performAction('clickButton', uploadYourDocuments.continueButton);
+  }
+
+  private async verifyCheckYourAnswers(data: actionRecord): Promise<void> {
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+
+    if (data.relatedApplication) {
+      await performValidation('summaryRow', checkYourAnswers.relatedApplicationKey, {
+        value: data.relatedApplication,
+        linkText: 'Change',
+      });
+    }
+    await performValidation('summaryRow', checkYourAnswers.uploadedDocumentsKey, {
+      value: data.fileName,
+      linkText: 'Change',
+    });
+    await performValidation('text', {
+      elementType: 'link',
+      text: 'Cancel',
+    });
   }
 
   private async validateViewDocuments(data: actionRecord): Promise<void> {

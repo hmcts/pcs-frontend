@@ -104,5 +104,14 @@ describe('validateForm', () => {
       expect(errors.textareaField).toContain('must only include letters a to z');
       expect(errors.charCountField).toContain('must only include letters a to z');
     });
+
+    it('should strip HTML tags silently and write back to req.body without validation error', () => {
+      const req = { body: { testField: '<script>alert(1)</script>hello' }, session: {} } as Partial<Request>;
+
+      const errors = validateForm(req as Request, emojiFields, {});
+
+      expect(errors.testField).toBeUndefined();
+      expect(req.body.testField).toBe('hello');
+    });
   });
 });

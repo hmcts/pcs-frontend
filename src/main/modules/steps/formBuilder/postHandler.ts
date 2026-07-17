@@ -1,11 +1,14 @@
+import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
+import { isLegalRepresentativeUser } from '../../../steps/utils/userRole';
 import { createStepNavigation, getStepUrl } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { renderWithErrors } from './errorUtils';
 import { translateFields } from './fieldTranslation';
+import { hydrateUploadedDocumentsFromBody, wireFileUploadOnPostError } from './fileUploadUtils';
 import { type FormBuilderFlowConfig, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import {
@@ -18,6 +21,7 @@ import {
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
 
+import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/storage';
 import type {
   BuiltFormContent,
   ExtendGetContent,
@@ -26,6 +30,7 @@ import type {
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import { getDashboardUrl } from '@routes/dashboard';
+import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
@@ -49,7 +54,9 @@ export function createPostHandler(
   beforeRedirect?: (req: Request) => Promise<void> | void,
   translationKeys?: TranslationKeys,
   showCancelButton?: boolean,
-  extendGetContent?: ExtendGetContent
+  extendGetContent?: ExtendGetContent,
+  documentStorage?: DocumentStorage,
+  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -89,6 +96,21 @@ export function createPostHandler(
       // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
       normalizeCheckboxFields(req, fields);
 
+      // For file fields backed by documentStorage, the form body's `uploadedDocuments[]`
+      // hidden inputs are a UI mirror only — session is the source of truth. Hydrate
+      // req.body[field.name] from storage so required-validation and the error re-render
+      // both see actual upload state. Empty -> undefined so the standard isMissing check
+      // fires; non-empty -> display documents so the macro repopulates the file list.
+      if (documentStorage) {
+        for (const field of fields) {
+          if (field.type === 'file') {
+            const docs = await documentStorage.read(req);
+            req.body[field.name] = docs.length > 0 ? toDisplayDocuments(docs) : undefined;
+          }
+        }
+      }
+      await hydrateUploadedDocumentsFromBody(req, documentStorage);
+
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
       const emptyFormContent = { fields: [] } as BuiltFormContent;
       const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
@@ -126,6 +148,7 @@ export function createPostHandler(
           interpolationValues,
           showCancelButton
         );
+        await wireFileUploadOnPostError(formContent, req, documentStorage);
         // Call extendGetContent to get additional translated content (buttons, labels, etc.)
         const extendedContent = extendGetContent ? await extendGetContent(req, formContent) : {};
         const fullContent = { ...formContent, ...extendedContent };
@@ -164,7 +187,26 @@ export function createPostHandler(
       }
 
       if (isSaveForLater) {
+        delete req.session.returnToCya;
+        const caseId = req.res?.locals.validatedCase?.id;
+
+        if (isLegalRepresentativeUser(req)) {
+          const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
+            ? config.get<string>('redirects.manageCaseReturnURL')
+            : null;
+          const caseDetailsUrl = buildManageCaseDetailsRedirect(caseDetailsBaseUrl, caseId);
+          if (caseDetailsUrl) {
+            return res.redirect(303, caseDetailsUrl);
+          }
+        }
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
+      }
+
+      if (resolveRedirectAfterPost) {
+        const customRedirectPath = await resolveRedirectAfterPost(req);
+        if (customRedirectPath) {
+          return safeRedirect303(res, customRedirectPath, '/', ['/case']);
+        }
       }
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);

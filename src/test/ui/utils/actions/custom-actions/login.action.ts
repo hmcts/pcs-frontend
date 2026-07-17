@@ -8,7 +8,7 @@ export class LoginAction implements IAction {
   async execute(page: Page, action: string, userType?: actionData, roles?: actionData): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['createUser', () => this.createUser(userType as string, roles as string[])],
-      ['login', () => this.login()],
+      ['login', () => this.login(userType as string)],
       ['generateCitizenAccessToken', () => this.generateCitizenAccessToken()],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -18,8 +18,14 @@ export class LoginAction implements IAction {
     await actionToPerform();
   }
 
-  private async login() {
-    await performAction('inputText', 'Email address', process.env.IDAM_PCS_USER_EMAIL);
+  private async login(email?: string): Promise<void> {
+    const emailToUse = email && email.trim() !== '' ? email : process.env.IDAM_PCS_USER_EMAIL;
+
+    if (!emailToUse) {
+      throw new Error('Email is required for login but not provided');
+    }
+
+    await performAction('inputText', 'Email address', emailToUse);
     await performAction('inputText', 'Password', resolveIdamPassword());
     await performAction('clickButton', 'Sign in');
   }

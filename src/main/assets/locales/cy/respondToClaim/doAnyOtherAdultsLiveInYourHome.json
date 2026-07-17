@@ -1,15 +1,15 @@
 {
-  "pageTitle": "cyOther adults",
-  "question": "cyDo any other adults live in your home?",
+  "pageTitle": "Oedolion eraill",
+  "question": "A oes yna unrhyw oedolion eraill yn byw yn eich cartref?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
-  "textAreaLabel": "cyGive details about the other adults living in your home",
-  "textAreaHintText": "cyYou should include details about how many adults live in your home, their relationship to you, as well as anything else you think the court should know about them",
+  "textAreaLabel": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",
+  "textAreaHintText": "Dylech gynnwys manylion faint o oedolion sy'n byw yn eich cartref, eu perthynas â chi, yn ogystal ag unrhyw beth arall yr ydych yn meddwl y dylai'r llys wybod amdano",
   "errors": {
-    "confirmOtherAdults": "cySelect if any other adults live in your home",
-    "confirmOtherAdults.otherAdultsDetails": "cyGive details about the other adults living in your home",
+    "confirmOtherAdults": "Dewiswch a oes yna unrhyw oedolion eraill yn byw yn eich cartref",
+    "confirmOtherAdults.otherAdultsDetails": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",
     "otherAdultsDetailsMaxLength": "cyDetails about other adults must be 500 characters or less",
     "otherAdultsDetailsInvalidCharacters": "cyGive details about the other adults living in your home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }

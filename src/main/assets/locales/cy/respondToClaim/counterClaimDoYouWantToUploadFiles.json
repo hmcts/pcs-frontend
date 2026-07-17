@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyDo you want to upload files?",
+  "heading": "cyDo you want to upload files to support your counterclaim?",
+  "paragraph1": "cyWitness statements do not need to be uploaded at this stage, directions for the exchange of witness statements will be given later.",
+  "paragraph2": "cyThe claimant will be able to see these files.",
+  "errors": {
+    "counterClaimWantToUploadFiles": "cySelect if you want to upload files to support your counterclaim"
+  }
+}

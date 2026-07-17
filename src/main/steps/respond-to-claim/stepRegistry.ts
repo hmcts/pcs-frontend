@@ -1,6 +1,6 @@
 import { step as wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome } from './alternative-accommodation';
 import { step as doYouHaveAnyOtherDependants } from './any-other-dependants';
-import { step as checkYourAnswers } from './check-your-answers';
+import { step as askYourSolicitorToRespondToTheClaim } from './ask-your-solicitor-to-respond-to-the-claim';
 import { step as checkYourAnswersDocuments } from './check-your-answers-documents';
 import { step as checkYourAnswersIncomeAndExpenses } from './check-your-answers-income-and-expenses';
 import { step as checkYourAnswersPaymentsAndAgreements } from './check-your-answers-payments-and-agreements';
@@ -18,11 +18,14 @@ import { step as correspondenceAddress } from './correspondence-address';
 import { step as counterClaim } from './counter-claim';
 import { step as counterClaimAbout } from './counter-claim-about';
 import { step as counterClaimAgainstWhom } from './counter-claim-against-whom';
+import { step as counterClaimApplicationFeeAmount } from './counter-claim-application-fee-amount';
+import { step as counterClaimDoYouWantToUploadFiles } from './counter-claim-do-you-want-to-upload-files';
 import { step as counterClaimFee } from './counter-claim-fee';
 import { step as counterClaimHaveYouAppliedForHelp } from './counter-claim-have-you-applied-for-help';
 import { step as counterClaimOrderOtherThanSum } from './counter-claim-order-other-than-sum';
+import { step as counterClaimPaymentSuccessful } from './counter-claim-payment-successful';
 import { step as counterClaimSpecificSum } from './counter-claim-specific-sum';
-import { step as counterClaimUploadDocuments } from './counter-claim-upload-documents';
+import { step as counterClaimUploadFiles } from './counter-claim-upload-files';
 import { step as counterClaimWhatAreYouClaimingFor } from './counter-claim-what-are-you-claiming-for';
 import { step as counterClaimYouNeedToApplyForHelpWithYourFees } from './counter-claim-you-need-to-apply-for-help-with-your-fees';
 import { step as yourCircumstances } from './current-circumstances';
@@ -32,6 +35,7 @@ import { step as defendantNameConfirmation } from './defendant-name-confirmation
 import { step as doYouHaveAnyDependantChildren } from './dependant-children';
 import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
 import { step as endNow } from './end-now';
+import { step as endOfJourneyCya } from './end-of-journey-cya';
 import { step as equalityAndDiversityEnd } from './equality-and-diversity-end';
 import { step as equalityAndDiversityStart } from './equality-and-diversity-start';
 import { step as exceptionalHardship } from './exceptional-hardship';
@@ -54,7 +58,11 @@ import { step as whatRegularIncomeDoYouReceive } from './regular-income';
 import { step as rentArrearsDispute } from './rent-arrears-dispute';
 import { step as repaymentsAgreed } from './repayments-agreed';
 import { step as repaymentsMade } from './repayments-made';
+import { step as responseAndCounterClaimSubmitted } from './response-and-counter-claim-submitted';
+import { step as responseSubmitted } from './response-submitted';
+import { step as responseSubmittedCounterClaimFeePaymentNeeded } from './response-submitted-counter-claim-fee-payment-needed';
 import { step as yourHouseholdAndCircumstances } from './situation-interstitial';
+import { step as solicitor } from './solicitor';
 import { step as startNow } from './start-now';
 import { step as taskList } from './task-list';
 import { step as tenancyDateDetails } from './tenancy-date-details';
@@ -70,6 +78,8 @@ export const stepRegistry = {
   'start-now': startNow,
   'correspondence-address': correspondenceAddress,
   'free-legal-advice': freeLegalAdvice,
+  solicitor,
+  'ask-your-solicitor-to-respond-to-the-claim': askYourSolicitorToRespondToTheClaim,
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
@@ -99,15 +109,18 @@ export const stepRegistry = {
   'non-rent-arrears-dispute': nonRentArrearsDispute,
   'upload-document': uploadDocument,
   'counter-claim': counterClaim,
+  'counter-claim-application-fee-amount': counterClaimApplicationFeeAmount,
   'counter-claim-what-are-you-claiming-for': counterClaimWhatAreYouClaimingFor,
   'counter-claim-specific-sum': counterClaimSpecificSum,
   'counter-claim-fee': counterClaimFee,
+  'counter-claim-payment-successful': counterClaimPaymentSuccessful,
   'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
   'counter-claim-you-need-to-apply-for-help-with-your-fees': counterClaimYouNeedToApplyForHelpWithYourFees,
   'counter-claim-against-whom': counterClaimAgainstWhom,
   'counter-claim-about': counterClaimAbout,
   'counter-claim-order-other-than-sum': counterClaimOrderOtherThanSum,
-  'counter-claim-upload-documents': counterClaimUploadDocuments,
+  'counter-claim-do-you-want-to-upload-files': counterClaimDoYouWantToUploadFiles,
+  'counter-claim-upload-files': counterClaimUploadFiles,
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
@@ -132,7 +145,10 @@ export const stepRegistry = {
   'equality-and-diversity-start': equalityAndDiversityStart,
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,
-  'check-your-answers': checkYourAnswers,
+  'end-of-journey-cya': endOfJourneyCya,
+  'response-submitted': responseSubmitted,
+  'response-submitted-counter-claim-fee-payment-needed': responseSubmittedCounterClaimFeePaymentNeeded,
+  'response-and-counter-claim-submitted': responseAndCounterClaimSubmitted,
 } satisfies Record<string, StepDefinition>;
 
 export type RespondToClaimStepName = keyof typeof stepRegistry;

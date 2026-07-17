@@ -24,6 +24,15 @@ export class TextValidation implements IValidation {
       case 'paragraph':
         data.elementType = 'p';
         break;
+      case 'paragraphWithLink': {
+        const locator = page.locator(`p:text("${data.text}")`).filter({ visible: true }).first();
+        if (validation === 'textNotVisible') {
+          await expect(locator).toHaveCount(0);
+          return;
+        }
+        await expect(locator).toContainText(data.text as string);
+        return;
+      }
       case 'inlineText':
         data.elementType = 'span';
         break;
@@ -39,8 +48,14 @@ export class TextValidation implements IValidation {
       case 'taskListStatus':
         data.elementType = `li:has(a:has-text("${fieldName}")) .govuk-tag`;
         break;
+      case 'legend':
+        data.elementType = 'legend';
     }
     const locator = page.locator(`${data.elementType}:text-is("${data.text}")`).filter({ visible: true }).first();
+    if (validation === 'textNotVisible') {
+      await expect(locator).toHaveCount(0);
+      return;
+    }
     await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(String(data.text))}\\s*$`));
   }
 }
