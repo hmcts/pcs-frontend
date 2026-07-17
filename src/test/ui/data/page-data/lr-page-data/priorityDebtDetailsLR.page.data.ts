@@ -1,4 +1,4 @@
-export const priorityDebtDetails = {
+export const priorityDebtDetailsLR = {
   mainHeader: `Priority debt details`,
   whatIsTheTotalAmountQuestion: `What is the total amount the defendant owes for all their priority debts?`,
   howMuchDoesDefendantPayQuestion: `How much does the defendant pay towards their priority debts each week or month?`,
