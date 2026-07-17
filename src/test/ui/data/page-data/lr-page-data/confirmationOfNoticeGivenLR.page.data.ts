@@ -1,4 +1,4 @@
-export const confirmationOfNoticeGiven = {
+export const confirmationOfNoticeGivenLR = {
   mainHeader: `Notice details`,
   backLink: `Back`,
   getDidClaimantGiveYouQuestion(claimantName: string): string {
