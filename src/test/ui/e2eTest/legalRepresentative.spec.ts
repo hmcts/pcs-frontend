@@ -1,6 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
-  circumstancesLR,
   confirmationOfNoticeGiven,
   counterClaim,
   otherConsiderations,
@@ -38,6 +37,7 @@ import { tenancyTypeDetailsLR } from '../data/page-data/lr-page-data/tenancyType
 import { whatOtherRegularExpensesDoYouHaveLR } from '../data/page-data/lr-page-data/whatOtherRegularExpensesDoYouHaveLR.page.data';
 import { whatRegularIncomeDoYouReceiveLR } from '../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR } from '../data/page-data/lr-page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
+import { yourCircumstancesLR } from '../data/page-data/lr-page-data/yourCircumstancesLR.page.data';
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
@@ -171,8 +171,8 @@ test.describe('Respond to a claim LR - e2e Journey', async () => {
       ...getRelativeDate(5),
     });
     await performAction('circumstancesLR', {
-      question: circumstancesLR.wouldYouLikeToShareHeader,
-      yourCircumstancesOption: circumstancesLR.yesRadioOption,
+      question: yourCircumstancesLR.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstancesLR.yesRadioOption,
     });
     await performAction('selectExceptionalHardshipLR', {
       question: exceptionalHardshipLR.mainHeader,
@@ -330,8 +330,8 @@ test.describe('Respond to a claim LR - e2e Journey', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.defendantNotSureRadioOption,
     });
     await performAction('circumstancesLR', {
-      question: circumstancesLR.wouldYouLikeToShareHeader,
-      yourCircumstancesOption: circumstancesLR.noRadioOption,
+      question: yourCircumstancesLR.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstancesLR.noRadioOption,
     });
     await performAction('selectExceptionalHardshipLR', {
       question: exceptionalHardshipLR.mainHeader,
@@ -464,8 +464,8 @@ test.describe('Respond to a claim LR - e2e Journey', async () => {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.noRadioOption,
     });
     await performAction('circumstancesLR', {
-      question: circumstancesLR.wouldYouLikeToShareHeader,
-      yourCircumstancesOption: circumstancesLR.noRadioOption,
+      question: yourCircumstancesLR.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstancesLR.noRadioOption,
     });
     await performAction('selectExceptionalHardshipLR', {
       question: exceptionalHardshipLR.mainHeader,

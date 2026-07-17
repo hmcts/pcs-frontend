@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { circumstancesLR, previousPaymentsLR, whatRegularIncomeDoYouReceive } from '../../../data/page-data';
+import { previousPaymentsLR, whatRegularIncomeDoYouReceive } from '../../../data/page-data';
 import { exceptionalHardshipLR } from '../../../data/page-data/exceptionalHardshipLR.page.data';
 import { confirmationOfNoticeDateWhenNotProvidedLR } from '../../../data/page-data/lr-page-data/confirmationOfNoticeDateWhenNotProvidedLR.page.data';
 import { noticeDateWhenProvidedLR } from '../../../data/page-data/lr-page-data/confirmationOfNoticeDateWhenProvidedLR.page.data';
@@ -22,6 +22,7 @@ import { tenancyDateUnknownLR } from '../../../data/page-data/lr-page-data/tenan
 import { whatOtherRegularExpensesDoYouHaveLR } from '../../../data/page-data/lr-page-data/whatOtherRegularExpensesDoYouHaveLR.page.data';
 import { whatRegularIncomeDoYouReceiveLR } from '../../../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR } from '../../../data/page-data/lr-page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
+import { yourCircumstancesLR } from '../../../data/page-data/lr-page-data/yourCircumstancesLR.page.data';
 import { formatCurrency } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -244,9 +245,13 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       option: yourCircumstancesData.yourCircumstancesOption,
     });
     if (yourCircumstancesData.yourCircumstancesOption === 'Yes') {
-      await performAction('inputText', circumstancesLR.giveDetailsHiddenTextLabel, circumstancesLR.detailsTextInput);
+      await performAction(
+        'inputText',
+        yourCircumstancesLR.giveDetailsHiddenTextLabel,
+        yourCircumstancesLR.detailsTextInput
+      );
     }
-    await performAction('clickButton', circumstancesLR.saveAndContinueButton);
+    await performAction('clickButton', yourCircumstancesLR.saveAndContinueButton);
   }
 
   private async selectExceptionalHardshipLR(exceptionalHardshipData: actionRecord): Promise<void> {
