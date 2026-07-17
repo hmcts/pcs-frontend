@@ -73,9 +73,9 @@
   },
 
   "payments": {
-    "anyPaymentsMade": "cyHave you paid any money to {{claimantName}} since {{claimIssueDate}}?",
+    "anyPaymentsMade": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}?",
     "paymentDetails": "cyDetails of payments made",
-    "repaymentPlanAgreed": "cyHave you come to any agreement with {{claimantName}} to repay the arrears since {{claimIssueDate}}?",
+    "repaymentPlanAgreed": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}?",
     "repaymentAgreedDetails": "cyDetails of repayment agreement",
     "repayArrearsInstalments": "cyWould you like to offer to pay your arrears in instalments?",
     "additionalContribution": "cyHow much could you afford to pay in addition to the current rent?",
@@ -181,7 +181,7 @@
 
   "statementOfTruth": {
     "body": "cyI believe the facts stated in this defence form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in the truth.",
-    "completedBy": "cyCompleted by"
+    "completedBy": "Cwblhawyd gan"
   },
 
   "pdf": {
