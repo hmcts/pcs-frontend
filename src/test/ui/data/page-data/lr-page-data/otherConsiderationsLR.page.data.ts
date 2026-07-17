@@ -1,4 +1,4 @@
-export const otherConsiderations = {
+export const otherConsiderationsLR = {
   mainHeader: `Other considerations`,
   isThereAnythingElseParagraph: `Is there anything else the defendant wants to tell the court as part of their response?`,
   yesRadioOption: `Yes`,

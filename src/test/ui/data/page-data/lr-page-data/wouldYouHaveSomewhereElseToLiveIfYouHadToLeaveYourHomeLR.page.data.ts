@@ -1,4 +1,4 @@
-export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome = {
+export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR = {
   mainHeader: `Alternative accommodation`,
   wouldTheDefendantHaveParagraph: `Would the defendant have somewhere else to live if they had to leave their home?`,
   backLink: `Back`,
