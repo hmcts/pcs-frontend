@@ -1,23 +1,23 @@
 {
-  "pageTitle": "Priority debt details",
-  "totalQuestion": "What is the total amount you owe for all your priority debts?",
-  "contributionQuestion": "How much do you pay towards your priority debts each week or month?",
-  "frequencyQuestion": "Paid every:",
-  "amountHint": "Enter total amount in pounds and pence, for example £148.00 or £148.50",
+  "pageTitle": "Manylion dyledion blaenoriaeth",
+  "totalQuestion": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
+  "contributionQuestion": "Faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis?",
+  "frequencyQuestion": "Talu pob:",
+  "amountHint": "Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148.00 neu £148.50",
   "frequency": {
-    "week": "Week",
-    "month": "Month"
+    "week": "Wythnos",
+    "month": "Mis"
   },
   "errors": {
-    "priorityDebtTotal": "Enter the total amount you owe for all your priority debts",
-    "priorityDebtTotalMin": "The total amount you owe for all your priority debts must be £0.00 or above",
-    "priorityDebtTotalMax": "The total amount you owe for all your priority debts must be less than £1 billion",
-    "priorityDebtContribution": "Enter the amount you pay towards your priority debts each week or month",
-    "priorityDebtContributionMin": "The amount you pay towards your priority debts each week or month must be £0.00 or above",
-    "priorityDebtContributionMax": "The amount you pay towards your priority debts each week or month must be less than £1 billion",
-    "priorityDebtContributionFrequency": "Select how frequently you pay the amount you entered above",
+    "priorityDebtTotal": "Rhowch y cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth",
+    "priorityDebtTotalMin": "Rhaid i'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth fod yn £0.00 neu fwy",
+    "priorityDebtTotalMax": "Rhaid i'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth fod yn llai nag £1 biliwn",
+    "priorityDebtContribution": "Rhowch faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis",
+    "priorityDebtContributionMin": "Rhaid i'r swm a delir gennych tuag at eich dyledion blaenoriaeth bob wythnos neu bob mis fod yn £0.00 neu fwy",
+    "priorityDebtContributionMax": "Rhaid i'r swm a delir gennych tuag at eich dyledion blaenoriaeth bob wythnos neu bob mis fod yn llai nag £1 biliwn",
+    "priorityDebtContributionFrequency": "Dewiswch pa mor aml rydych yn talu'r swm a nodwyd gennych uchod",
     "amount": {
-      "invalidFormat": "Enter an amount in the correct format, for example 148.00 or 148.50"
+      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
     }
   }
 }
