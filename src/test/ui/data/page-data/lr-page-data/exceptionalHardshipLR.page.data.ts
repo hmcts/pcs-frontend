@@ -1,4 +1,4 @@
-export const exceptionalHardship = {
+export const exceptionalHardshipLR = {
   mainHeader: `Exceptional hardship`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
