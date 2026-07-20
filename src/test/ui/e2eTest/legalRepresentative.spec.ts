@@ -1,45 +1,41 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { repaymentsAgreed } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
-  counterClaim,
-  otherConsiderations,
+  contactPreferenceEmailOrPostLR,
+  contactPreferencesTelephoneLR,
+  contactPreferencesTextMessageLR,
+  correspondenceAddressLR,
+  counterClaimLR,
+  defendantDateOfBirthLR,
+  defendantNameConfirmationLR,
+  doAnyOtherAdultsLiveInYourHomeLR,
+  doYouHaveAnyDependantChildrenLR,
+  doYouHaveAnyOtherDependantsLR,
+  equalityAndDiversityEndLR,
+  equalityAndDiversityStartLR,
+  exceptionalHardshipLR,
+  haveYouAppliedForUniversalCreditLR,
+  incomeAndExpensesLR,
+  instalmentPaymentsLR,
+  languageUsedLR,
+  nonRentArrearsDisputeLR,
+  otherConsiderationsLR,
   previousPaymentsLR,
-  rentArrears,
-  repaymentsAgreed,
-} from '../data/page-data';
-import { confirmationOfNoticeGivenLR } from '../data/page-data/lr-page-data/confirmationOfNoticeGivenLR.page.data';
-import { contactPreferenceEmailOrPostLR } from '../data/page-data/lr-page-data/contactPreferenceEmailOrPostLR.page.data';
-import { contactPreferencesTelephoneLR } from '../data/page-data/lr-page-data/contactPreferencesTelephoneLR.page.data';
-import { contactPreferencesTextMessageLR } from '../data/page-data/lr-page-data/contactPreferencesTextMessageLR.page.data';
-import { correspondenceAddressLR } from '../data/page-data/lr-page-data/correspondenceAddressLR.page.data';
-import { counterClaimLR } from '../data/page-data/lr-page-data/counterclaimLR.page.data';
-import { defendantDateOfBirthLR } from '../data/page-data/lr-page-data/defendantDateOfBirthLR.page.data';
-import { defendantNameConfirmationLR } from '../data/page-data/lr-page-data/defendantNameConfirmationLR.page.data';
-import { doAnyOtherAdultsLiveInYourHomeLR } from '../data/page-data/lr-page-data/doAnyOtherAdultsLiveInYourHomeLR.page.data';
-import { doYouHaveAnyDependantChildrenLR } from '../data/page-data/lr-page-data/doYouHaveAnyDependantChildrenLR.page.data';
-import { doYouHaveAnyOtherDependantsLR } from '../data/page-data/lr-page-data/doYouHaveAnyOtherDependantsLR.page.data';
-import { equalityAndDiversityEndLR } from '../data/page-data/lr-page-data/equalityAndDiversityEndLR.page.data';
-import { equalityAndDiversityStartLR } from '../data/page-data/lr-page-data/equalityAndDiversityStartLR.page.data';
-import { exceptionalHardshipLR } from '../data/page-data/lr-page-data/exceptionalHardshipLR.page.data';
-import { haveYouAppliedForUniversalCreditLR } from '../data/page-data/lr-page-data/haveYouAppliedForUniversalCreditLR.page.data';
-import { incomeAndExpensesLR } from '../data/page-data/lr-page-data/incomeAndExpensesLR.page.data';
-import { instalmentPaymentsLR } from '../data/page-data/lr-page-data/instalmentPaymentsLR.page.data';
-import { languageUsedLR } from '../data/page-data/lr-page-data/languageUsedLR.page.data';
-import { nonRentArrearsDisputeLR } from '../data/page-data/lr-page-data/nonRentArrearsDisputeLR.page.data';
-import { otherConsiderationsLR } from '../data/page-data/lr-page-data/otherConsiderationsLR.page.data';
-import { priorityDebtDetailsLR } from '../data/page-data/lr-page-data/priorityDebtDetailsLR.page.data';
-import { priorityDebtsLR } from '../data/page-data/lr-page-data/priorityDebtsLR.page.data';
-import { rentArrearsLR } from '../data/page-data/lr-page-data/rentArrearsDisputeLR.page.data';
-import { repaymentsAgreedLR } from '../data/page-data/lr-page-data/repaymentsAgreedLR.page.data';
-import { selectDefendantLR } from '../data/page-data/lr-page-data/selectDefendantLR.page.data';
-import { startNowLR } from '../data/page-data/lr-page-data/startNowLR.page.data';
-import { tenancyTypeDetailsLR } from '../data/page-data/lr-page-data/tenancyTypeDetailsLR.page.data';
-import { whatOtherRegularExpensesDoYouHaveLR } from '../data/page-data/lr-page-data/whatOtherRegularExpensesDoYouHaveLR.page.data';
-import { whatRegularIncomeDoYouReceiveLR } from '../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
-import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR } from '../data/page-data/lr-page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
-import { yourCircumstancesLR } from '../data/page-data/lr-page-data/yourCircumstancesLR.page.data';
+  priorityDebtDetailsLR,
+  priorityDebtsLR,
+  rentArrearsLR,
+  repaymentsAgreedLR,
+  selectDefendantLR,
+  startNowLR,
+  tenancyTypeDetailsLR,
+  whatOtherRegularExpensesDoYouHaveLR,
+  whatRegularIncomeDoYouReceiveLR,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
+  yourCircumstancesLR,
+} from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
-import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { getPinUserAt } from '../utils/actions/custom-actions';
 import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -128,7 +124,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       tsYear: '2024',
     });
     await performAction('selectNoticeDetailsLR', {
-      option: confirmationOfNoticeGivenLR.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknownLR');
     await performAction('disputingOtherPartsOfTheClaimLR', {
@@ -259,7 +255,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: tenancyTypeDetailsLR.yesRadioOption,
     });
     await performAction('selectNoticeDetailsLR', {
-      option: confirmationOfNoticeGivenLR.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnownLR', {
       day: '25',
@@ -359,7 +355,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectExpensesLR');
     await performAction('otherConsiderationsLR', {
       question: otherConsiderationsLR.isThereAnythingElseParagraph,
-      option: otherConsiderations.noRadioOption,
+      option: otherConsiderationsLR.noRadioOption,
     });
     await performAction('uploadFiles');
     await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
@@ -408,11 +404,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performAction('rentArrearsLR', {
-      option: rentArrears.yesRadioOption,
+      option: rentArrearsLR.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaim', {
-      option: counterClaim.yesRadioOption,
+      option: counterClaimLR.yesRadioOption,
     });
     // await performAction('selectWhatAreYouClaimingFor', {
     //   question: counterClaimWhatAreYouClaimingFor.mainHeader,

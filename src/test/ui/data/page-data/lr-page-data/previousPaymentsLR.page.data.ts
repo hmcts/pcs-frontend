@@ -1,4 +1,4 @@
-import { getCurrentFormattedDate } from '../../utils/common/date.utils';
+import { getCurrentFormattedDate } from '../../../utils/common/date.utils';
 
 export const previousPaymentsLR = {
   getMainHeader: () => {
