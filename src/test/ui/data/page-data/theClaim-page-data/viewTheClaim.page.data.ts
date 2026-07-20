@@ -1,6 +1,19 @@
+const formatDate = (): string =>
+  new Date().toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
 export const viewTheClaim = {
   mainHeader: `View the claim`,
   theClaimCaption: 'The claim',
+
+  dateAndCaseDetails: {
+    'Date issued': formatDate(),
+    'Date submitted': formatDate(),
+    'Property address': '2 Second Avenue, London, W3 7RX',
+  },
 
   possessionClaimParagraph: `Possession Claims Solicitor Org has made a property possession claim against you. These are their answers to the questions they were asked when making their claim.`,
 
@@ -20,18 +33,22 @@ export const viewTheClaim = {
 
   claimantDetails: {
     Name: 'Possession Claims Solicitor Org',
+    'Address for service': 'Ministry Of JusticeSeventh Floor 102 Petty FranceLondonSW1H 9AJUnited Kingdom',
   },
 
   defendant1Details: {
     Name: 'Test John',
+    'Address for service': '10 Second AvenueLondonW3 7RX',
   },
 
   additionalDefendant1Details: {
     Name: 'Peter Parker',
+    'Address for service': '2 Second AvenueLondonW3 7RX',
   },
 
   additionalDefendant2Details: {
     Name: 'Jen Parker',
+    'Address for service': '2 Second AvenueLondonW3 7RX',
   },
 
   claimDetails: {
@@ -87,8 +104,10 @@ export const viewTheClaim = {
   statementOfTruthParagraph:
     'I believe the facts stated in this claim form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.',
 
-  downloadPDFLink: 'Download a PDF copy of the claim',
+  downloadPDFSubHeader: 'Download a PDF copy of the claim',
   claimPDFLink: 'Claim (PDF)',
   closeAndReturnButton: 'Close and return to case overview',
   ifYouCannotFindLink: 'If you cannot find a document that you are looking for in this section',
+  allDocumentsUploadedParagraph: 'All documents uploaded by you or the claimant are on the Documents page',
+  documentsPageLink: 'Documents page',
 };

@@ -4,6 +4,7 @@ import {
   DocumentsAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
+  LaunchDarklyAction,
   LoginAction,
   NavigateToUrlAction,
   RecordAnswers,
@@ -52,6 +53,7 @@ export class ActionRegistry {
     ['updatePaymentAPI', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['skipTestIfLdFlagDisabled', new LaunchDarklyAction()],
 
     //Citizen Dashboard
     ['citizenDashboard', new CitizenDashboardAction()],
@@ -133,6 +135,7 @@ export class ActionRegistry {
     //Documents
     ['startEvidenceUpload', new DocumentsAction()],
     ['uploadDocuments', new DocumentsAction()],
+    ['verifyCheckYourAnswers', new DocumentsAction()],
     ['validateViewDocuments', new DocumentsAction()],
     ['verifyDocumentRelatesToApplication', new DocumentsAction()],
 
@@ -175,7 +178,7 @@ export class ActionRegistry {
     ['otherAdultsLR', new RespondToClaimLRAction()],
     ['alternativeAccommodationLR', new RespondToClaimLRAction()],
     ['circumstancesLR', new RespondToClaimLRAction()],
-    ['exceptionalHardshipLR', new RespondToClaimLRAction()],
+    ['selectExceptionalHardshipLR', new RespondToClaimLRAction()],
     ['selectIncomeAndExpensesLR', new RespondToClaimLRAction()],
     ['representationLR', new RespondToClaimLRAction()],
     ['selectWhatRegularIncomeDoTheyReceiveLR', new RespondToClaimLRAction()],
