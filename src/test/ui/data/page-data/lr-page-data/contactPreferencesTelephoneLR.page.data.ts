@@ -1,4 +1,4 @@
-export const contactPreferencesTelephone = {
+export const contactPreferencesTelephoneLR = {
   mainHeader: `Contact by telephone`,
   backLink: `Back`,
   weMightNeedToContactParagraph: `We might need to contact you by telephone with urgent updates about your case.`,
