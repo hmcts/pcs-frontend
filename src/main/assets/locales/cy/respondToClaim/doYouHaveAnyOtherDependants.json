@@ -1,12 +1,12 @@
 {
-  "pageTitle": "cyOther dependants",
-  "heading": "cyDo you have any other dependants?",
-  "otherDependantsParagraph": "cyDependants are people you look after financially, like elderly relatives.",
-  "otherDependantDetailsLabel": "cyGive details about your other dependants",
-  "otherDependantDetailsHint": "cyYou should include details about how many other dependants you have, how old they are and anything else you think the court should know about them",
+  "pageTitle": "Dibynyddion eraill",
+  "heading": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
+  "otherDependantsParagraph": "Pobl rydych yn gofalu amdanynt yn ariannol, fel perthnasau hŷn yw pobl sy'n ddibynnol.",
+  "otherDependantDetailsLabel": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnoch",
+  "otherDependantDetailsHint": "Dylech gynnwys manylion am faint o bobl eraill sy'n ddibynnol arnoch, eu hoedran ac unrhyw beth arall rydych yn meddwl y dylai'r llys wybod amdano",
   "errors": {
-    "otherDependants": "cySelect if you have any other dependants",
-    "otherDependantDetails": "cyGive details about your other dependants",
+    "otherDependants": "Nodwch a oes gennych chi unrhyw un arall yn ddibynnol arnoch",
+    "otherDependantDetails": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnoch",
     "otherDependantDetailsMaxLength": "cyOther dependants details must be 500 characters or less"
   }
 }

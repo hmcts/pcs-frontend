@@ -6,6 +6,7 @@ export const otherConsiderations = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   giveDetailsHiddenTextLabel: `Give details about what else you want to tell the court`,
+  lrHiddenGiveDetailsTextLabel: `Give details about what else the defendant wants to tell the court`,
   youCanEnterUpToHiddenHintText: `You can enter up to 500 characters`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   backLink: `Back`,

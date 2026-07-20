@@ -42,6 +42,7 @@ import {
   yourCircumstances,
 } from '../data/page-data';
 import { accessYourCaseErrorValidation } from '../functional/accessYourCase.pft';
+import { checkYourAnswersRTCErrorValidation } from '../functional/checkYourAnswersRTC.pft';
 import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
 import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
 import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
@@ -82,13 +83,13 @@ import { whatOtherRegularExpensesDoYouHaveErrorValidation } from '../functional/
 import { whatRegularIncomeDoYouReceiveErrorValidation } from '../functional/whatRegularIncomeDoYouReceive.pft';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation } from '../functional/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.pft';
 import { yourCircumstancesErrorValidation } from '../functional/yourCircumstances.pft';
+import { getRelativeDate } from '../utils/common/date.utils';
 import {
   assertAllErrorMessageValidations,
   clearErrorMessageValidationFailures,
   softErrorMessageValidation,
 } from '../utils/common/error-message-validation-helper';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { getRelativeDate } from '../utils/common/string.utils';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
@@ -108,7 +109,9 @@ const NO_EMV_MISSING_DESIGN = 'ErrorMessageValidation(EMV) is missing for this p
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
+  process.env.WALES_POSTCODE = 'NO';
   process.env.CLAIMANT_NAME = claimantName;
+  process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
   if (testInfo.title.includes('NoticeServed - No')) {
     process.env.NOTICE_SERVED = 'NO';
   } else {
@@ -200,12 +203,16 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else if (testInfo.title.includes('@assured')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   } else if (testInfo.title.includes('@secureFlexible')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
   } else if (testInfo.title.includes('@other')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
   } else if (testInfo.title.includes('@rentNonRent')) {
@@ -215,11 +222,13 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -488,7 +497,13 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: languageUsed.englishRadioOption,
     });
 
-    await performAction('clickButton', 'Submit');
+    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
+
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+
     assertAllErrorMessageValidations();
   });
 
@@ -511,7 +526,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('enterDateOfBirthDetails');
 
     await softErrorMessageValidation('correspondenceAddress', NO_EMV_MISSING_DESIGN);
-    await performAction('selectCorrespondenceAddressUnKnown', {
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
@@ -717,7 +733,12 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: languageUsed.englishRadioOption,
     });
 
-    await performAction('clickButton', 'Submit');
+    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
+
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
     assertAllErrorMessageValidations();
   });
 });

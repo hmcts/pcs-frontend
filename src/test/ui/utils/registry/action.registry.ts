@@ -4,6 +4,7 @@ import {
   DocumentsAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
+  LaunchDarklyAction,
   LoginAction,
   NavigateToUrlAction,
   RecordAnswers,
@@ -13,6 +14,7 @@ import {
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
 import { LinkSolicitorAPIAction } from '../actions/custom-actions/linkSolicitorAPI.action';
+import { RespondToClaimLRAction } from '../actions/custom-actions/respondToClaimLR.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -47,16 +49,21 @@ export class ActionRegistry {
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
     ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
+    ['deleteCaseRole', new CreateCaseAPIAction()],
+    ['updatePaymentAPI', new CreateCaseAPIAction()],
+    ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['skipTestIfLdFlagDisabled', new LaunchDarklyAction()],
+
+    //Citizen Dashboard
     ['citizenDashboard', new CitizenDashboardAction()],
     ['validateViewAllApplications', new CitizenDashboardAction()],
     ['verifyRespondToClaimNotificationAndTag', new CitizenDashboardAction()],
     ['verifyNavigationFromNotificationLink', new CitizenDashboardAction()],
-    ['deleteCaseRole', new CreateCaseAPIAction()],
-    ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
-    ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
-    ['startEvidenceUpload', new DocumentsAction()],
-    ['validateViewDocuments', new DocumentsAction()],
-    ['verifyDocumentRelatesToApplication', new DocumentsAction()],
+    ['verifyResponseDetailsOnViewTheResponsePage', new CitizenDashboardAction()],
+    ['verifyClaimDetailsOnViewTheClaimPage', new CitizenDashboardAction()],
+
+    //Respond to claim
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
@@ -85,6 +92,7 @@ export class ActionRegistry {
     ['selectLandlordLicensed', new RespondToClaimAction()],
     ['selectContactPreferenceEmailOrPost', new RespondToClaimAction()],
     ['selectIfAnyOtherAdultsLiveInYourHouse', new RespondToClaimAction()],
+    ['taskList', new RespondToClaimAction()],
     ['selectAlternativeAccommodation', new RespondToClaimAction()],
     ['readYourHouseholdAndCircumstances', new RespondToClaimAction()],
     ['doYouHaveAnyDependantChildren', new RespondToClaimAction()],
@@ -107,6 +115,8 @@ export class ActionRegistry {
     ['otherConsiderations', new RespondToClaimAction()],
     ['uploadFiles', new RespondToClaimAction()],
     ['languageUsed', new RespondToClaimAction()],
+    ['inputCounterClaimPaymentDetails', new RespondToClaimAction()],
+    ['validateCounterClaimApplicationFee', new RespondToClaimAction()],
     ['selectWhatAreYouClaimingFor', new RespondToClaimAction()],
     ['counterClaimSpecificSumOfMoney', new RespondToClaimAction()],
     ['taskList', new RespondToClaimAction()],
@@ -114,11 +124,20 @@ export class ActionRegistry {
     ['resetRTCAnswerStore', new RespondToClaimAction()],
     ['retrieveCYATableDataRTC', new RespondToClaimAction()],
     ['validateCYARTC', new RespondToClaimAction()],
+    ['changeAnswerOnFinalCYA', new RespondToClaimAction()],
+    ['selectStatementOfTruthRTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
     ['getCaseAPI', new CreateCaseAPIAction()],
     ['linkSolicitorAPI', new LinkSolicitorAPIAction()],
     ['doYouWantToUploadFiles', new RespondToClaimAction()],
     ['uploadFilesToSupportCounterclaim', new RespondToClaimAction()],
+
+    //Documents
+    ['startEvidenceUpload', new DocumentsAction()],
+    ['uploadDocuments', new DocumentsAction()],
+    ['verifyCheckYourAnswers', new DocumentsAction()],
+    ['validateViewDocuments', new DocumentsAction()],
+    ['verifyDocumentRelatesToApplication', new DocumentsAction()],
 
     //ADD GEN APPS details below this line
     ['chooseAnApplication', new GenAppsAction()],
@@ -144,6 +163,35 @@ export class ActionRegistry {
     ['counterClaimAbout', new RespondToClaimAction()],
     ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
+    ['payForApplication', new GenAppsAction()],
+    ['inputPaymentDetails', new GenAppsAction()],
+    ['confirmPayment', new GenAppsAction()],
+    ['verifyApplicationSubmitted', new GenAppsAction()],
+
+    //LR details below
+    ['selectNoticeDetailsLR', new RespondToClaimLRAction()],
+    ['enterTenancyStartDetailsUnKnownLR', new RespondToClaimLRAction()],
+    ['disputingOtherPartsOfTheClaimLR', new RespondToClaimLRAction()],
+    ['enterNoticeDateUnknownLR', new RespondToClaimLRAction()],
+    ['doesTheDependantHaveChildrenLR', new RespondToClaimLRAction()],
+    ['otherDependantsLR', new RespondToClaimLRAction()],
+    ['otherAdultsLR', new RespondToClaimLRAction()],
+    ['alternativeAccommodationLR', new RespondToClaimLRAction()],
+    ['circumstancesLR', new RespondToClaimLRAction()],
+    ['selectExceptionalHardshipLR', new RespondToClaimLRAction()],
+    ['selectIncomeAndExpensesLR', new RespondToClaimLRAction()],
+    ['representationLR', new RespondToClaimLRAction()],
+    ['selectWhatRegularIncomeDoTheyReceiveLR', new RespondToClaimLRAction()],
+    ['selectPriorityDebtsLR', new RespondToClaimLRAction()],
+    ['enterPriorityDebtDetailsLR', new RespondToClaimLRAction()],
+    ['selectExpensesLR', new RespondToClaimLRAction()],
+    ['otherConsiderationsLR', new RespondToClaimLRAction()],
+    ['rentArrearsLR', new RespondToClaimLRAction()],
+    ['previousPaymentsLR', new RespondToClaimLRAction()],
+    ['repaymentAgreedLR', new RespondToClaimLRAction()],
+    ['selectUniversalCreditLR', new RespondToClaimLRAction()],
+    ['selectCorrespondenceAddressUnknownLR', new RespondToClaimLRAction()],
+    ['enterNoticeDateKnownLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

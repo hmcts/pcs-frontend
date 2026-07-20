@@ -7,6 +7,7 @@ const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
   process.env.NOTICE_SERVED = 'YES';
   process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
   process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
@@ -26,6 +27,7 @@ test.describe('Claims list - e2e Journey @nightly', async () => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
     console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
+    await performAction('updatePaymentAPI');
     await performAction('fetchPINsAPI');
     await performAction('validateAccessCodeAPI');
     await performAction('reloadPage');

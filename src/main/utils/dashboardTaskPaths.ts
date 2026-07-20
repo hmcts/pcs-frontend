@@ -1,7 +1,7 @@
 /** Maps CCD dashboard task `templateId` values to case path patterns in `caseRoutes`. */
 import {
   MAKE_GENERAL_APPLICATION_ROUTE,
-  RESPOND_TO_CLAIM_START_ROUTE,
+  RESPOND_TO_CLAIM_ROUTE,
   UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE,
   VIEW_ALL_APPLICATIONS_ROUTE,
   VIEW_DOCUMENTS_ROUTE,
@@ -15,13 +15,25 @@ export const DASHBOARD_TASK_PATH_PATTERNS: Readonly<Record<string, string>> = {
   UploadDocuments: UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE,
   ViewDocuments: VIEW_DOCUMENTS_ROUTE,
   ViewClaim: VIEW_THE_CLAIM_ROUTE,
-  RespondToClaim: RESPOND_TO_CLAIM_START_ROUTE,
+  RespondToClaim: `${RESPOND_TO_CLAIM_ROUTE}/task-list`,
   ViewResponse: VIEW_RESPONSE_ROUTE,
   ViewHearingDocuments: VIEW_HEARING_DOCUMENTS_ROUTE,
   ViewOrdersAndNotices: VIEW_ORDERS_AND_NOTICES_ROUTE,
   ViewAllApplications: VIEW_ALL_APPLICATIONS_ROUTE,
   MakeGeneralApplication: MAKE_GENERAL_APPLICATION_ROUTE,
 };
+
+export const RESPOND_TO_CLAIM_DASHBOARD_TASK_TEMPLATE_ID = 'RespondToClaim';
+
+export const RESPOND_TO_CLAIM_DASHBOARD_NOTIFICATION_TEMPLATE_IDS = [
+  'Defendant.ResponseToClaim',
+  'Defendant.ResponseNotStarted',
+  'Defendant.ResponseInProgress',
+] as const;
+
+export function isRespondToClaimDashboardNotification(templateId: string): boolean {
+  return (RESPOND_TO_CLAIM_DASHBOARD_NOTIFICATION_TEMPLATE_IDS as readonly string[]).includes(templateId);
+}
 
 /**
  * Resolves the same href the dashboard task list uses for a linkable task (canonical `/case/...`

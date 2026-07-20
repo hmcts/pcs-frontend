@@ -21,7 +21,7 @@ import {
 } from './helpers';
 import { validateConfigInDevelopment } from './schema';
 
-import type { DocumentStorage } from '@modules/documents/storage';
+import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/storage';
 import type {
   BuiltFormContent,
   ExtendGetContent,
@@ -30,6 +30,7 @@ import type {
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import { getDashboardUrl } from '@routes/dashboard';
+import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
@@ -54,7 +55,8 @@ export function createPostHandler(
   translationKeys?: TranslationKeys,
   showCancelButton?: boolean,
   extendGetContent?: ExtendGetContent,
-  documentStorage?: DocumentStorage
+  documentStorage?: DocumentStorage,
+  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -94,6 +96,19 @@ export function createPostHandler(
       // Note: We only normalize checkboxes here, NOT date fields, because date validation expects individual day/month/year keys
       normalizeCheckboxFields(req, fields);
 
+      // For file fields backed by documentStorage, the form body's `uploadedDocuments[]`
+      // hidden inputs are a UI mirror only — session is the source of truth. Hydrate
+      // req.body[field.name] from storage so required-validation and the error re-render
+      // both see actual upload state. Empty -> undefined so the standard isMissing check
+      // fires; non-empty -> display documents so the macro repopulates the file list.
+      if (documentStorage) {
+        for (const field of fields) {
+          if (field.type === 'file') {
+            const docs = await documentStorage.read(req);
+            req.body[field.name] = docs.length > 0 ? toDisplayDocuments(docs) : undefined;
+          }
+        }
+      }
       await hydrateUploadedDocumentsFromBody(req, documentStorage);
 
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
@@ -172,18 +187,26 @@ export function createPostHandler(
       }
 
       if (isSaveForLater) {
+        delete req.session.returnToCya;
         const caseId = req.res?.locals.validatedCase?.id;
 
         if (isLegalRepresentativeUser(req)) {
           const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
             ? config.get<string>('redirects.manageCaseReturnURL')
             : null;
-          if (caseDetailsBaseUrl) {
-            const caseDetailsUrl = `${caseDetailsBaseUrl}/${caseId}`;
-            return res.redirect(caseDetailsUrl);
+          const caseDetailsUrl = buildManageCaseDetailsRedirect(caseDetailsBaseUrl, caseId);
+          if (caseDetailsUrl) {
+            return res.redirect(303, caseDetailsUrl);
           }
         }
         return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
+      }
+
+      if (resolveRedirectAfterPost) {
+        const customRedirectPath = await resolveRedirectAfterPost(req);
+        if (customRedirectPath) {
+          return safeRedirect303(res, customRedirectPath, '/', ['/case']);
+        }
       }
 
       const redirectPath = await stepNavigation.getNextStepUrl(req, stepName, bodyWithoutAction);

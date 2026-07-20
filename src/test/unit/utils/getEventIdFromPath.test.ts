@@ -19,6 +19,11 @@ describe('getEventIdFromPath', () => {
       expect(getEventIdFromPath(req)).toBe('respondPossessionClaim');
     });
 
+    it('should return uploadDocuments for upload-additional-documents journey', () => {
+      const req = createMockRequest(`/case/${CASE_REF}/upload-additional-documents`);
+      expect(getEventIdFromPath(req)).toBe('uploadDocuments');
+    });
+
     it('should match the journey segment with deeper path segments', () => {
       const req = createMockRequest(`/case/${CASE_REF}/make-an-application/check-your-answers`);
       expect(getEventIdFromPath(req)).toBe('makeAnApplication');

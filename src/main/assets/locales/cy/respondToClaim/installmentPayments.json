@@ -1,16 +1,16 @@
 {
-  "pageTitle": "cyMaking an offer to pay your arrears",
-  "heading": "cyMaking an offer to pay your arrears",
-  "paragraph1": "cyFrom your previous answers, you have not come to any arrangement with {{claimantName}} to pay off your rent arrears.",
-  "paragraph2": "cyYou can offer to pay off your arrears in instalments and say how much you’d be able to afford to pay and how frequently.",
-  "paragraph3": "cyAt the hearing, the judge will look at your offer and the details of your income and expenses you choose to share. They will decide if your offer is affordable.",
-  "paragraph4": "cyYou’ll be able to tell the judge if the amount you can afford to pay has changed.",
-  "question": "cyWould you like to offer to pay your arrears in instalments?",
+  "pageTitle": "Gwneud cynnig i dalu eich ôl-ddyledion",
+  "heading": "Gwneud cynnig i dalu eich ôl-ddyledion",
+  "paragraph1": "O edrych ar eich atebion blaenorol, nid ydych wedi dod i unrhyw gytundeb gyda {{claimantName}} i dalu eich ôl-ddyledion rhent.",
+  "paragraph2": "Gallwch gynnig talu eich ôl-ddyledion mewn rhandaliadau a dweud faint y gallech fforddio ei dalu a pha mor aml.",
+  "paragraph3": "Yn y gwrandawiad, bydd y barnwr yn edrych ar eich cynnig a manylion eich incwm a chostau yr ydych yn dewis eu rhannu. Byddant yn penderfynu a yw eich cynnig yn fforddiadwy.",
+  "paragraph4": "Byddwch yn gallu dweud wrth y barnwr os yw'r swm y gallwch fforddio ei dalu wedi newid.",
+  "question": "A hoffech chi gynnig talu eich ôl-ddyledion mewn rhandaliadau?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
   "errors": {
-    "confirmInstallmentOffer": "cySelect whether you would like to offer to pay your arrears in instalments"
+    "confirmInstallmentOffer": "Dewiswch a hoffech chi gynnig talu eich ôl-ddyledion mewn rhandaliadau"
   }
 }

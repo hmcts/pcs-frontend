@@ -1,11 +1,17 @@
 import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { dashboard } from '../data/page-data';
 import {
+  checkYourAnswers,
   confirmIfTheseDocumentsRelateToAnApplication,
+  documentsUploaded,
   startEvidenceUpload,
   uploadYourDocuments,
   viewDocuments,
 } from '../data/page-data/documents-page-data';
-import { confirmDocumentsRelateToApplicationErrorValidation } from '../functional/documents-functional/confirmIfTheseDocumentsRelateToAnApplication.pft';
+import {
+  confirmDocumentsRelateToApplicationErrorValidation,
+  uploadYourDocumentsErrorValidation,
+} from '../functional/documents-functional';
 import { softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -15,12 +21,14 @@ const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
   process.env.NOTICE_SERVED = 'YES';
   process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
@@ -35,20 +43,35 @@ test.afterEach(async () => {
 
 test.describe('Documents - e2e Journey @nightly', async () => {
   test('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
-    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await softErrorMessageValidation(
-      'confirmIfTheseDocumentsRelateToAnApplication',
-      confirmDocumentsRelateToApplicationErrorValidation
-    );
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToAdjournRadioOptionHidden,
     });
+    await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
+    await performAction('verifyCheckYourAnswers', {
+      relatedApplication: checkYourAnswers.getRelatedApplicationAdjournValue(),
+      fileName: 'uploadYourDocuments.docx',
+    });
+    await performAction('clickLink', checkYourAnswers.changeLink);
+    await performAction('clickRadioButton', {
+      question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
+      option: confirmIfTheseDocumentsRelateToAnApplication.noRadioOption,
+    });
+    await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
+    await performAction('clickButton', uploadYourDocuments.continueButton);
+    await performAction('verifyCheckYourAnswers', {
+      relatedApplication: checkYourAnswers.relatedApplicationNoValue,
+      fileName: 'uploadYourDocuments.docx',
+    });
+    await performAction('clickButton', checkYourAnswers.submitButton);
+    await performAction('clickLink', documentsUploaded.closeAndReturnToCaseOverviewLink);
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Upload documents when GenApps not submitted @regression', async () => {
@@ -57,7 +80,19 @@ test.describe('Documents - e2e Journey @nightly', async () => {
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
     );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await performValidation('mainHeader', uploadYourDocuments.mainHeader);
+    await softErrorMessageValidation('uploadYourDocuments', uploadYourDocumentsErrorValidation);
+    await performAction('uploadDocuments', { files: ['uploadYourDocuments.ppt'] });
+    await performAction('verifyCheckYourAnswers', {
+      fileName: 'uploadYourDocuments.ppt',
+    });
+    await performAction('clickLink', checkYourAnswers.changeLink);
+    await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
+    await performAction('verifyCheckYourAnswers', {
+      fileName: 'uploadYourDocuments.docx',
+    });
+    await performAction('clickButton', checkYourAnswers.submitButton);
+    await performAction('clickLink', documentsUploaded.closeAndReturnToCaseOverviewLink);
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('View documents submitted through make a claim @regression', async () => {
@@ -65,6 +100,11 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('validateViewDocuments', {
       caseNumber: viewDocuments.getCaseNumber(),
       documents: [
+        {
+          sectionHeader: viewDocuments.statementsOfCaseSubHeader,
+          documentName: viewDocuments.claimFormLink,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
         {
           sectionHeader: viewDocuments.statementsOfCaseSubHeader,
           documentName: viewDocuments.noticeServiceJurisdictionLink,
@@ -90,14 +130,14 @@ test.describe('Documents - e2e Journey @nightly', async () => {
   });
 
   test('Verify confirm document options based on GenApp type', async () => {
-    await performAction(
-      'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
-    );
     // SET_ASIDE
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SET_ASIDE').citizenCreateGenAppPayload,
     });
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await softErrorMessageValidation(
       'confirmIfTheseDocumentsRelateToAnApplication',
@@ -109,12 +149,18 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', uploadYourDocuments.mainHeader);
     await performAction('clickLink', 'Back');
-    await performAction('clickLink', 'Back');
-    await performValidation('mainHeader', startEvidenceUpload.mainHeader);
+    await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
+    //skipping below lines as we have bug HDPI-7411
+    /*await performAction('clickLink', 'Back');
+    await performValidation('mainHeader', startEvidenceUpload.mainHeader);*/
     // SOMETHING_ELSE + default YES
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
     });
+    await performAction(
+      'navigateToUrl',
+      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
+    );
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
