@@ -1,6 +1,8 @@
+import { ServerResponse } from 'http';
 import * as path from 'path';
 
 import * as bodyParser from 'body-parser';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import { glob } from 'glob';
@@ -25,10 +27,26 @@ app.locals.ENV = env;
 
 setupDev(app, developmentMode);
 
+app.use(compression());
+
 app.use(cookieParser());
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+const oneYearSeconds = 31536000;
+const fingerprintedAsset = /\.[0-9a-f]{8,}\.(?:js|css)$|-[0-9a-f]{6,}(?:-v\d+)?\.(?:woff2?|ttf|eot)$/;
+const setImmutableCacheHeaders = (res: ServerResponse, filePath: string): void => {
+  if (fingerprintedAsset.test(filePath)) {
+    res.setHeader('Cache-Control', `public, max-age=${oneYearSeconds}, immutable`);
+  }
+};
+
+app.use(express.static(path.join(__dirname, 'public'), { setHeaders: setImmutableCacheHeaders }));
+
+// Serve CFT UI component lib assets directly from node_modules
+const cftStylesPath = path.dirname(require.resolve('@hmcts-cft/cft-ui-component-lib/styles/ui-component-lib.css'));
+app.use('/assets/ui-component-lib', express.static(cftStylesPath, { setHeaders: setImmutableCacheHeaders }));
 
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,11 +54,6 @@ modules.modules.forEach(async moduleName => {
   await moduleInstance.enableFor(app);
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Serve CFT UI component lib assets directly from node_modules
-const cftStylesPath = path.dirname(require.resolve('@hmcts-cft/cft-ui-component-lib/styles/ui-component-lib.css'));
-app.use('/assets/ui-component-lib', express.static(cftStylesPath));
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
   next();
