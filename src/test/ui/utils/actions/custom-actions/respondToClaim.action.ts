@@ -784,6 +784,16 @@ export class RespondToClaimAction implements IAction {
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
     await performValidation('text', { elementType: 'listItem', text: noticeDateWhenProvided.noticeGivenDateLabel });
+    if (noticeData?.showNoticeDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: noticeDateWhenProvided.noticeDocumentLink,
+      });
+      await performAction('clickLinkAndVerifyNewTabUrl', {
+        fieldName: noticeDateWhenProvided.noticeDocumentLink,
+        urlContains: noticeDateWhenProvided.noticeDocumentUrlPath,
+      });
+    }
     this.recordRtcCyaDateFromParts(
       `When did you receive notice from ${claimantsName}?`,
       noticeData?.day,
