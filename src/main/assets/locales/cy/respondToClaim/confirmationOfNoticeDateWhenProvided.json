@@ -1,8 +1,8 @@
 {
   "pageTitle": "Dyddiad yr hysbysiad",
   "bulletPointLabel": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:",
-  "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}}roi'r dyddiad pan wnaethant roi'r hysbysiad i chi (y dyddiad cyflwyno). Os nad ydych yn siŵr o'r union ddyddiad, gallwch ddod o hyd iddo ar yr hysbysiad.",
-  "listItem1": "gwnaethant gyflwyno hysbysiad i chi yn ceisio meddiant ar {{noticeDate}}",
+  "hintText": "Pan wnaethant wneud eu hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i chi (y dyddiad cyflwyno). Os nad ydych yn siŵr o'r union ddyddiad, gallwch ddod o hyd iddo ar yr hysbysiad.",
+  "listItem1": "gwnaethant gyflwyno hysbysiad ar {{noticeDate}}",
   "viewNoticeLinkText": "cyView a copy of the notice (opens in a new tab)",
   "methodOfService": {
     "PERSONALLY_HANDED": "cythe notice was served by personally handing it to or leaving it with {{name}}",
