@@ -17,7 +17,7 @@
     },
     "writtenTerms": {
       "label": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth?",
-      "changeHidden": "cy written terms"
+      "changeHidden": "telerau ysgrifenedig"
     },
     "tenancyTypeCorrect": {
       "label": "A yw'r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",

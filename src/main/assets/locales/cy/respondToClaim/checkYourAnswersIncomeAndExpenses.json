@@ -20,7 +20,7 @@
     },
     "regularIncome": {
       "label": "cy What regular income do you receive?",
-      "changeHidden": "cy regular income",
+      "changeHidden": "incwm rheolaidd",
       "options": {
         "incomeFromJobs": "Incwm o bob swydd a wneir gennych",
         "pension": "Pensiwn, y wladwriaeth a phreifat",
@@ -39,7 +39,7 @@
     },
     "priorityDebts": {
       "label": "A oes gennych chi unrhyw ddyledion blaenoriaeth?",
-      "changeHidden": "cy priority debts"
+      "changeHidden": "dyledion blaenoriaeth"
     },
     "priorityDebtTotal": {
       "label": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
@@ -51,7 +51,7 @@
     },
     "regularExpenses": {
       "label": "cy What other regular expenses do you have?",
-      "changeHidden": "cy regular expenses",
+      "changeHidden": "costau rheolaidd",
       "options": {
         "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
         "loanPayments": "Taliadau benthyciadau",

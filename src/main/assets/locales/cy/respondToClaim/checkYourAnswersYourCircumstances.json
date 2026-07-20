@@ -4,7 +4,7 @@
   "rows": {
     "dependantChildren": {
       "label": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
-      "changeHidden": "cy dependent children"
+      "changeHidden": "plant dibynnol"
     },
     "dependantChildrenDetails": {
       "label": "Rhowch fanylion eich plant dibynnol",
@@ -12,7 +12,7 @@
     },
     "otherDependants": {
       "label": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
-      "changeHidden": "cy other dependants"
+      "changeHidden": "dibynyddion eraill"
     },
     "otherDependantsDetails": {
       "label": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnoch",
@@ -44,7 +44,7 @@
     },
     "exceptionalHardship": {
       "label": "A fyddech yn profi caledi eithriadol os gofynnir i chi adael eich cartref?",
-      "changeHidden": "cy exceptional hardship"
+      "changeHidden": "caledi eithriadol"
     },
     "exceptionalHardshipDetails": {
       "label": "Rhowch fanylion am y caledi eithriadol y byddech yn ei brofi",
