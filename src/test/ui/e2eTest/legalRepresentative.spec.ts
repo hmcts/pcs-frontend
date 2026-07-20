@@ -90,7 +90,7 @@ test.afterEach(async () => {
 //Skipping these tests temporarily in @nightly as LR feature will be toggled off in all test environments until the first release HDPI-7531
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent', async () => {
+  test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendantLR.whichDefendantQuestion,
@@ -225,7 +225,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent', async () => {
+  test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -373,7 +373,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('RentArrears - DemotedTenancy - LR @smoke @regression @rent', async () => {
+  test('RentArrears - DemotedTenancy - LR @smoke @regression @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
