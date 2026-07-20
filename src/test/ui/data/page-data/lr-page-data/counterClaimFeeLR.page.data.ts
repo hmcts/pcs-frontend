@@ -9,10 +9,12 @@ export const counterClaimFeeLR = {
   backLink: `Back`,
   defendantNeedHelpRadioOption: `The defendant needs help paying the fee`,
   defendantDoNotNeedHelpRadioOption: `The defendant does not need help paying the fee`,
-  thereIsAProblemErrorMessageHeader: `There is a problem`,
-  selectIfYouNeedHelpErrorMessage: `Select if you need help paying the counterclaim fee`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `counter-claim-fee`,
+  /*
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfYouNeedHelpErrorMessage: `Select if you need help paying the counterclaim fee`,
+   */
 };

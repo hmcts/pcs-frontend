@@ -9,14 +9,18 @@ import { correspondenceAddressLR } from '../../../data/page-data/lr-page-data/co
 import { counterClaimAboutLR } from '../../../data/page-data/lr-page-data/counterClaimAboutLR.page.data';
 import { counterClaimAgainstWhomLR } from '../../../data/page-data/lr-page-data/counterClaimAgainstWhomLR.page.data';
 import { counterClaimFeeLR } from '../../../data/page-data/lr-page-data/counterClaimFeeLR.page.data';
+import { counterClaimHaveYouAppliedForHelpLR } from '../../../data/page-data/lr-page-data/counterClaimHaveYouAppliedForHelpLR.page.data';
 import { counterClaimLR } from '../../../data/page-data/lr-page-data/counterClaimLR.page.data';
+import { counterClaimOrderOtherThanSumLR } from '../../../data/page-data/lr-page-data/counterClaimOrderOtherThanSumLR.page.data';
 import { counterClaimSpecificSumOfMoneyLR } from '../../../data/page-data/lr-page-data/counterClaimSpecificSumOfMoneyLR.page.data';
 import { counterClaimWhatAreYouClaimingForLR } from '../../../data/page-data/lr-page-data/counterClaimWhatAreYouClaimingForLR.page.data';
 import { doAnyOtherAdultsLiveInYourHomeLR } from '../../../data/page-data/lr-page-data/doAnyOtherAdultsLiveInYourHomeLR.page.data';
 import { doYouHaveAnyDependantChildrenLR } from '../../../data/page-data/lr-page-data/doYouHaveAnyDependantChildrenLR.page.data';
 import { doYouHaveAnyOtherDependantsLR } from '../../../data/page-data/lr-page-data/doYouHaveAnyOtherDependantsLR.page.data';
 import { haveYouAppliedForUniversalCreditLR } from '../../../data/page-data/lr-page-data/haveYouAppliedForUniversalCreditLR.page.data';
+import { howMuchAffordToPayLR } from '../../../data/page-data/lr-page-data/howMuchAffordToPayLR.page.data';
 import { incomeAndExpensesLR } from '../../../data/page-data/lr-page-data/incomeAndExpensesLR.page.data';
+import { instalmentPaymentsLR } from '../../../data/page-data/lr-page-data/instalmentPaymentsLR.page.data';
 import { nonRentArrearsDisputeLR } from '../../../data/page-data/lr-page-data/nonRentArrearsDisputeLR.page.data';
 import { otherConsiderationsLR } from '../../../data/page-data/lr-page-data/otherConsiderationsLR.page.data';
 import { priorityDebtDetailsLR } from '../../../data/page-data/lr-page-data/priorityDebtDetailsLR.page.data';
@@ -67,6 +71,13 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['rentArrearsLR', () => this.rentArrearsLR(fieldName as actionRecord)],
       ['previousPaymentsLR', () => this.previousPaymentsLR(fieldName as actionRecord)],
       ['repaymentAgreedLR', () => this.repaymentAgreedLR(fieldName as actionRecord)],
+      ['installmentPaymentsLR', () => this.installmentPaymentsLR(fieldName as actionRecord)],
+      ['counterClaimOrderOtherThanSumLR', () => this.counterClaimOrderOtherThanSumLR(fieldName as actionRecord)],
+      ['selectHowMuchAffordToPayLR', () => this.selectHowMuchAffordToPayLR(fieldName as actionRecord)],
+      [
+        'counterClaimHaveYouAppliedForHelpWithFeeLR',
+        () => this.counterClaimHaveYouAppliedForHelpWithFeeLR(fieldName as actionRecord),
+      ],
       ['selectUniversalCreditLR', () => this.selectUniversalCreditLR(fieldName as actionRecord)],
       [
         'selectCorrespondenceAddressUnknownLR',
@@ -548,6 +559,57 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('inputText', counterClaimAboutLR.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
     await performAction('inputText', counterClaimAboutLR.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('clickButton', counterClaimAboutLR.saveAndContinueButton);
+  }
+
+  private async installmentPaymentsLR(installmentData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: installmentData.question,
+      option: installmentData.radioOption,
+    });
+    await performAction('clickButton', instalmentPaymentsLR.saveAndContinueButton);
+  }
+
+  private async selectHowMuchAffordToPayLR(howMuchToPayData: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      howMuchAffordToPayLR.howMuchCouldDefendantAffordToPayTextLabel,
+      howMuchToPayData.affordToPay
+    );
+    await performAction('clickRadioButton', {
+      question: howMuchToPayData.question,
+      option: howMuchToPayData.radioOption,
+    });
+    await performAction('clickButton', howMuchAffordToPayLR.saveAndContinueButton);
+  }
+
+  private async counterClaimOrderOtherThanSumLR(cliamOtherThanSum: actionRecord): Promise<void> {
+    await performAction(
+      'inputText',
+      counterClaimOrderOtherThanSumLR.whatOrdersAreTheyAskingLabelText,
+      cliamOtherThanSum.ordersInput
+    );
+    await performAction(
+      'inputText',
+      counterClaimOrderOtherThanSumLR.whatFactsWouldTheyLikeLabelText,
+      cliamOtherThanSum.factsInput
+    );
+    await performAction('clickButton', counterClaimOrderOtherThanSumLR.saveAndContinueButton);
+  }
+
+  private async counterClaimHaveYouAppliedForHelpWithFeeLR(helpWithFee: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterClaimHaveYouAppliedForHelpLR.mainHeader,
+      option: helpWithFee.helpWithFeeOption,
+    });
+
+    if (helpWithFee.helpWithFeeOption === 'Yes') {
+      await performAction(
+        'inputText',
+        counterClaimHaveYouAppliedForHelpLR.enterHelpWithFeeReferenceHiddenTextLabel,
+        helpWithFee.feeReference
+      );
+    }
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelpLR.saveAndContinueButton);
   }
 
   private async selectUniversalCreditLR(universalCreditDateData: actionRecord): Promise<void> {

@@ -8,11 +8,13 @@ export const counterClaimAboutLR = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
-  enterWhatYourCounterClaimErrorMessage: `Enter what your counterclaim is for`,
-  enterWhatYourReasonsAreForErrorMessage: `Enter what your reasons are for making the counterclaim`,
-  thereIsAProblemErrorMessageHeader: `There is a problem`,
   counterClaimForInput: `services not provided`,
   reasonsForCounterClaimInput: `electricity and windows not repaired`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `counter-claim-against-whom`,
+  /*
+  enterWhatYourCounterClaimErrorMessage: `Enter what your counterclaim is for`,
+  enterWhatYourReasonsAreForErrorMessage: `Enter what your reasons are for making the counterclaim`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+   */
 };

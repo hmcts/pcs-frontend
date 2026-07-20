@@ -6,7 +6,7 @@ export const counterClaimSpecificSumOfMoneyLR = {
   saveForLaterButton: `Save for later`,
   theDefendantsCounterClaimFeeHiddenParagraph: `The defendant’s counterclaim fee (the fee they will pay to make the counterclaim)  depends on the amount they’re claiming for.`,
   ifYouWantToCheckHiddenParagraph: `If you want to check how much their fee will be, you can estimate how much it will cost you to make your counterclaim (opens in new tab) `,
-  howMuchIsTheDefendantHiddenQuestion: `How much is the defendant claiming for?`,
+  howMuchIsTheDefendantHiddenQuestion: `How much is the defendant claiming?`,
   claimInput: `80.00`,
   ifYouDontKnowHiddenParagraph: `If you do not know the specific sum you’re claiming for, the court needs to know what you believe the maximum value of your claim will be.`,
   ifYouDontKnowExactAmountHiddenParagraph: ` If they do not know the exact amount, they can give an estimate.`,
@@ -15,18 +15,18 @@ export const counterClaimSpecificSumOfMoneyLR = {
   enterMaximumValueFEE0508Input: `10000.00`,
   billionTextInput: `1000000000.00`,
   negativeInput: `-1000`,
-  /*
-  enterHowMuchYouAreClaimingErrorMessage: `Enter how much you are claiming for`,
-  thereIsAProblemErrorMessageHeader: `There is a problem`,
-  specificSumRequiredErrorMessage: `Select if you are claiming for a specific sum of money`,
-  enterMaxValueErrorMessage: `Enter the maximum value of your claim`,
-  billionClaimErrorMessage: `The amount you are claiming for must be less than £1 billion`,
-  negativeClaimInputErrorMessage: `The amount you are claiming for must be £0.00 or above`,
-  maximumValueBillionErrorMessage: `The maximum value you are claiming for must be less than £1 billion`,
-  negativeMaxValueErrorMessage: `The maximum value you are claiming for must be £0.00 or above`,
-   */
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `counter-claim-specific-sum`,
   backLink: `Back`,
   feeHiddenAmount: `35.00`,
+  /*
+enterHowMuchYouAreClaimingErrorMessage: `Enter how much you are claiming for`,
+thereIsAProblemErrorMessageHeader: `There is a problem`,
+specificSumRequiredErrorMessage: `Select if you are claiming for a specific sum of money`,
+enterMaxValueErrorMessage: `Enter the maximum value of your claim`,
+billionClaimErrorMessage: `The amount you are claiming for must be less than £1 billion`,
+negativeClaimInputErrorMessage: `The amount you are claiming for must be £0.00 or above`,
+maximumValueBillionErrorMessage: `The maximum value you are claiming for must be less than £1 billion`,
+negativeMaxValueErrorMessage: `The maximum value you are claiming for must be £0.00 or above`,
+ */
 };

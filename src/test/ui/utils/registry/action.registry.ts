@@ -198,6 +198,10 @@ export class ActionRegistry {
     ['selectCounterClaimFeeLR', new RespondToClaimLRAction()],
     ['selectClaimAgainstWhomLR', new RespondToClaimLRAction()],
     ['counterClaimAboutLR', new RespondToClaimLRAction()],
+    ['installmentPaymentsLR', new RespondToClaimLRAction()],
+    ['selectHowMuchAffordToPayLR', new RespondToClaimLRAction()],
+    ['counterClaimOrderOtherThanSumLR', new RespondToClaimLRAction()],
+    ['counterClaimHaveYouAppliedForHelpWithFeeLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {
