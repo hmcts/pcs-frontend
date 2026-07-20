@@ -38,7 +38,7 @@ export class PageContentValidation implements IValidation {
   private static pageToHeaderTextMap = new Map<string, string>();
 
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
-  private static readonly PAGE_DATA_LR_DIR = path.join(__dirname, '../../../data/lr-page-data');
+  private static readonly PAGE_DATA_LR_DIR = path.join(__dirname, '../../../data/page-data/lr-page-data');
 
   private readonly locatorPatterns = {
     Button: (page: Page, value: string) =>
