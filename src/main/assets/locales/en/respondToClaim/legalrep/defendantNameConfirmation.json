@@ -1,9 +1,10 @@
 {
-  "pageTitle": "Your client’s name",
-  "nameConfirmationLabel": "Is your client’s name {{defendantName}}?",
+  "nameConfirmationLabel": "Is the defendant's name {{defendantName}}?",
+  "firstNameLabel": "Defendant's first name",
+  "lastNameLabel": "Defendant's last name",
   "errors": {
-    "nameConfirmation": "You must say if your client’s name is {{defendantName}}",
-    "firstName": "Enter your client’s first name",
-    "lastName": "Enter your client’s last name"
+    "nameConfirmation": "You must say if the defendant's name is {{defendantName}}",
+    "firstName": "Enter the defendant's first name",
+    "lastName": "Enter the defendant's last name"
   }
 }

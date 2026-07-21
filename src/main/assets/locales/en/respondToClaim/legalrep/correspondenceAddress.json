@@ -1,0 +1,35 @@
+{
+  "pageTitle": "Your postal address",
+  "legend": "Is the defendant's postal address {{ formattedAddressStr }}",
+  "legend.hint": "This is the address provided by {{claimantName}}",
+  "labels": {
+    "yes": "Yes",
+    "no": "No",
+    "enterAddress": "Enter postal address",
+    "enterPostcode": "Enter a UK postcode",
+    "enterManually": "Enter an address manually",
+    "enterManuallySubText": "You can enter the defendant's address details in the fields below.",
+    "selectAddress": "Select an address",
+    "selectAddressLabel": "Select an address",
+    "addressHeading": "What’s the defendant's postal address?",
+    "addressLine1": "Address line 1",
+    "addressLine2": "Address line 2 (optional)",
+    "townOrCity": "Town or city",
+    "county": "County (optional)",
+    "postcode": "Postcode"
+  },
+  "buttons": {
+    "findAddress": "Find address",
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
+  },
+  "errors": {
+    "lookupPostcode": "Enter a valid UK postcode",
+    "postcodeNotFound": "Postcode not found. Please check and try again.",
+    "selectAddress": "Please select an address",
+    "correspondenceAddressConfirm": "Please confirm the defendant's address by selecting the options below",
+    "correspondenceAddressConfirm.addressLine1": "Enter address line 1, typically the building and street",
+    "correspondenceAddressConfirm.townOrCity": "Enter town or city",
+    "correspondenceAddressConfirm.postcode": "Enter a valid UK postcode"
+  }
+}
