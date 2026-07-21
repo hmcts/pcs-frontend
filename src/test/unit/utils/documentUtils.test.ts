@@ -59,6 +59,74 @@ describe('documentUtils', () => {
     ]);
   });
 
+  it('groups uncategorised documents into the Uncategorised folder, ordered last', () => {
+    const folders = extractViewDocumentFolders({
+      allDocuments: [
+        {
+          id: '1',
+          value: {
+            document_filename: 'loose-doc-a.pdf',
+            document_binary_url: 'http://doc-store/loose-doc-a/binary',
+            category_id: 'uncategorisedDocuments',
+            upload_timestamp: '2026-06-24T10:00:00.000Z',
+          },
+        },
+        {
+          id: '2',
+          value: {
+            document_filename: 'claim-form.pdf',
+            document_binary_url: 'http://doc-store/claim-form/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+        {
+          id: '3',
+          value: {
+            document_filename: 'loose-doc-b.pdf',
+            document_binary_url: 'http://doc-store/loose-doc-b/binary',
+            category_id: 'uncategorisedDocuments',
+          },
+        },
+      ],
+    });
+
+    expect(folders).toEqual([
+      {
+        title: 'Statements of case',
+        documents: [{ id: '2', filename: 'claim-form.pdf', submittedOn: null }],
+      },
+      {
+        title: 'Uncategorised',
+        documents: [
+          { id: '1', filename: 'loose-doc-a.pdf', submittedOn: '2026-06-24T10:00:00.000Z' },
+          { id: '3', filename: 'loose-doc-b.pdf', submittedOn: null },
+        ],
+      },
+    ]);
+  });
+
+  it('hides the Uncategorised folder when it has no documents', () => {
+    const folders = extractViewDocumentFolders({
+      allDocuments: [
+        {
+          id: '1',
+          value: {
+            document_filename: 'certificate.pdf',
+            document_binary_url: 'http://doc-store/certificate/binary',
+            category_id: 'correspondence',
+          },
+        },
+      ],
+    });
+
+    expect(folders).toEqual([
+      {
+        title: 'Correspondence',
+        documents: [{ id: '1', filename: 'certificate.pdf', submittedOn: null }],
+      },
+    ]);
+  });
+
   it('hides folders with no documents', () => {
     const folders = extractViewDocumentFolders({
       allDocuments: [
