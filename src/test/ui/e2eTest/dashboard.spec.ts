@@ -5,7 +5,8 @@ import {
   submitCaseApiData,
 } from '../data/api-data';
 import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
-import { dashboard, taskList } from '../data/page-data';
+import { dashboard } from '../data/index.selector';
+import { taskList } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
@@ -226,7 +227,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
   });
 
   // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
-  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
+  test('Validate View the response page data @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performAction('reloadPage');
     await performAction('respondPossessionClaimAPI', {
