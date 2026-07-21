@@ -11,3 +11,4 @@ export * from '../../../utils/validations/element-validations/validateDocumentSe
 export * from '../../../utils/validations/element-validations/viewClaimOrResponseTable.validation';
 export * from '../../../utils/validations/element-validations/checkYourAnswersSummaryRow.validation';
 export * from '../../../utils/validations/element-validations/viewClaimHeaderDetails.validation';
+export * from '../../../utils/validations/element-validations/pdfDocument.validation';
