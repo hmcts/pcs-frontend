@@ -37,25 +37,15 @@ export function noticeServiceMethodText(payload: NoticeMethodPayload): string {
     case 'FIRST_CLASS_POST':
       return 'the notice was served by first class post or other service which provides for delivery on the next working day';
     case 'DELIVERED_PERMITTED_PLACE':
-      return payload.notice_DeliveredDate
-        ? `the notice was served by delivering it to or leaving it at a permitted place on ${convertDateFormat(payload.notice_DeliveredDate)}`
-        : 'the notice was served by delivering it to or leaving it at a permitted place';
+      return `the notice was served by delivering it to or leaving it at a permitted place on ${convertDateFormat(payload.notice_DeliveredDate as string)}`;
     case 'PERSONALLY_HANDED':
-      return payload.notice_PersonName
-        ? `the notice was served by personally handing it to or leaving it with ${payload.notice_PersonName}`
-        : 'the notice was served by personally handing it to or leaving it with someone';
+      return `the notice was served by personally handing it to or leaving it with ${payload.notice_PersonName}`;
     case 'EMAIL':
-      return payload.notice_EmailAddress
-        ? `the notice was served by email to ${payload.notice_EmailAddress}`
-        : 'the notice was served by email';
+      return `the notice was served by email to ${payload.notice_EmailAddress}`;
     case 'OTHER_ELECTRONIC':
-      return payload.notice_OtherElectronicDetails
-        ? `the notice was served by other electronic method: ${payload.notice_OtherElectronicDetails}`
-        : 'the notice was served by other electronic method';
+      return `the notice was served by other electronic method: ${payload.notice_OtherElectronicDetails}`;
     case 'OTHER':
-      return payload.notice_OtherExplanation
-        ? `the notice was served by other means: ${payload.notice_OtherExplanation}`
-        : 'the notice was served by other means';
+      return `the notice was served by other means: ${payload.notice_OtherExplanation}`;
     default:
       throw new Error(`Unsupported notice service method: ${payload.notice_ServiceMethod}`);
   }
