@@ -3,7 +3,7 @@
   "bulletPointLabel": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:",
   "hintText": "Pan wnaethant wneud eu hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i chi (y dyddiad cyflwyno). Os nad ydych yn siŵr o'r union ddyddiad, gallwch ddod o hyd iddo ar yr hysbysiad.",
   "listItem1": "gwnaethant gyflwyno hysbysiad ar {{noticeDate}}",
-  "viewNoticeLinkText": "cyView a copy of the notice (opens in a new tab)",
+  "viewNoticeLinkText": "cyView a copy of the notice (opens in new tab)",
   "methodOfService": {
     "PERSONALLY_HANDED": "cythe notice was served by personally handing it to or leaving it with {{name}}",
     "PERSONALLY_HANDED_ALT": "cythe notice was served by personally handing it to or leaving it with someone",
