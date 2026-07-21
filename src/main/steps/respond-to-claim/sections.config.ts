@@ -152,6 +152,7 @@ const sectionDefs = [
       'counter-claim-application-fee-amount',
       'counter-claim-payment-successful',
       'response-and-counter-claim-submitted',
+      'reasonable-adjustments-triage',
     ],
   },
 ] as const satisfies readonly {
