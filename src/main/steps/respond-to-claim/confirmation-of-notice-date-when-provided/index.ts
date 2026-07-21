@@ -6,13 +6,12 @@ import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getRequestLanguage } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData } from '@services/ccdCase.interface';
 import { extractCaseDocuments } from '@utils/documentUtils';
-import { formatDate, toDateLocale } from '@utils/viewTheClaim/viewTheClaimUtils';
+import { formatDateOrdinal } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const logger = Logger.getLogger('confirmation-of-notice-date-when-provided');
 
@@ -104,10 +103,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: req => {
     const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
-    const locale = toDateLocale(getRequestLanguage(req));
 
     const noticeDateRaw = validatedCase?.noticeDate || '';
-    const noticeDate = formatDate(noticeDateRaw, locale) ?? '';
+    const noticeDate = formatDateOrdinal(noticeDateRaw) ?? '';
 
     const t = getTranslationFunction(req);
 
@@ -139,7 +137,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         break;
       }
       case 'DELIVERED_PERMITTED_PLACE': {
-        const date = formatDate(validatedCase?.notice_DeliveredDate, locale);
+        const date = formatDateOrdinal(validatedCase?.notice_DeliveredDate);
         noticeMethodText = date
           ? t('methodOfService.DELIVERED_PERMITTED_PLACE', { date })
           : t('methodOfService.DELIVERED_PERMITTED_PLACE_ALT');
