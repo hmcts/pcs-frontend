@@ -1,5 +1,14 @@
 import { submitCaseApiData } from '../api-data';
 
+export type NoticeMethodPayload = {
+  notice_ServiceMethod?: string;
+  notice_DeliveredDate?: string;
+  notice_PersonName?: string;
+  notice_EmailAddress?: string | null;
+  notice_OtherElectronicDetails?: string;
+  notice_OtherExplanation?: string;
+};
+
 export const noticeDateWhenProvided = {
   mainHeader: `Notice date`,
   backLink: `Back`,
@@ -8,7 +17,6 @@ export const noticeDateWhenProvided = {
   noticeDetailsGivenLabel: () => `Notice details given by ${process.env.CLAIMANT_NAME}:`,
   noticeGivenDateLabel: `They served you with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCasePayload.notice_PostedDate)}`,
   noticeDocumentLink: `View a copy of the notice (opens in new tab)`,
-  noticeDocumentUrlPath: `/view-documents/`,
   noticeGivenDateHiddenLabelLR: `They served the defendant with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.notice_PostedDate)}`,
   getWhenDidYouReceiveNoticeQuestion: `When did you receive notice from ${process.env.CLAIMANT_NAME} (optional)?`,
   exampleHintText: `For example, 27 9 2022`,
@@ -23,6 +31,35 @@ export const noticeDateWhenProvided = {
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `confirmation-of-notice-date-when-provided`,
 };
+
+export function noticeServiceMethodText(payload: NoticeMethodPayload): string {
+  switch (payload.notice_ServiceMethod) {
+    case 'FIRST_CLASS_POST':
+      return 'the notice was served by first class post or other service which provides for delivery on the next working day';
+    case 'DELIVERED_PERMITTED_PLACE':
+      return payload.notice_DeliveredDate
+        ? `the notice was served by delivering it to or leaving it at a permitted place on ${convertDateFormat(payload.notice_DeliveredDate)}`
+        : 'the notice was served by delivering it to or leaving it at a permitted place';
+    case 'PERSONALLY_HANDED':
+      return payload.notice_PersonName
+        ? `the notice was served by personally handing it to or leaving it with ${payload.notice_PersonName}`
+        : 'the notice was served by personally handing it to or leaving it with someone';
+    case 'EMAIL':
+      return payload.notice_EmailAddress
+        ? `the notice was served by email to ${payload.notice_EmailAddress}`
+        : 'the notice was served by email';
+    case 'OTHER_ELECTRONIC':
+      return payload.notice_OtherElectronicDetails
+        ? `the notice was served by other electronic method: ${payload.notice_OtherElectronicDetails}`
+        : 'the notice was served by other electronic method';
+    case 'OTHER':
+      return payload.notice_OtherExplanation
+        ? `the notice was served by other means: ${payload.notice_OtherExplanation}`
+        : 'the notice was served by other means';
+    default:
+      throw new Error(`Unsupported notice service method: ${payload.notice_ServiceMethod}`);
+  }
+}
 
 export function convertDateFormat(dateString: string): string {
   const date = new Date(dateString);

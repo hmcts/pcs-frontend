@@ -36,7 +36,6 @@ export class ActionRegistry {
     ['clickSummary', new ClickSummaryAction()],
     ['clickLink', new ClickLinkAction()],
     ['clickLinkAndVerifyNewTabTitle', new ClickLinkAction()],
-    ['clickLinkAndVerifyNewTabUrl', new ClickLinkAction()],
     ['clickLinkAndVerifySameTabTitle', new ClickLinkAction()],
     ['clickRadioButton', new ClickRadioButtonAction()],
     ['clickTab', new ClickTabAction()],

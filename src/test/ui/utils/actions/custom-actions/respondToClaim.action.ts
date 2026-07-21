@@ -3,6 +3,7 @@ import { Locator, Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
+  NoticeMethodPayload,
   accessYourCase,
   askYourSolicitorToRespond,
   checkYourAnswersRTC,
@@ -42,6 +43,7 @@ import {
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
+  noticeServiceMethodText,
   otherConsiderations,
   paymentDetails,
   paymentInterstitial,
@@ -95,6 +97,9 @@ const rtcCyaLabels = {
   counterClaimHelpWithFeesReference: 'Enter your Help with Fees reference number',
   universalCreditApplicationDate: 'When did you apply for Universal Credit?',
 } as const;
+
+const isNoticeMethodPayload = (value: actionData | undefined): value is NoticeMethodPayload =>
+  typeof value === 'object' && !Array.isArray(value) && value !== null && 'notice_ServiceMethod' in value;
 
 const rtcSectionByAction = new Map<string, string>([
   ['selectLegalAdvice', 'startNowAndDetails'],
@@ -789,9 +794,14 @@ export class RespondToClaimAction implements IAction {
         elementType: 'link',
         text: noticeDateWhenProvided.noticeDocumentLink,
       });
-      await performAction('clickLinkAndVerifyNewTabUrl', {
-        fieldName: noticeDateWhenProvided.noticeDocumentLink,
-        urlContains: noticeDateWhenProvided.noticeDocumentUrlPath,
+      await performValidation('validatePdfDocument', {
+        linkText: noticeDateWhenProvided.noticeDocumentLink,
+      });
+    }
+    if (isNoticeMethodPayload(noticeData?.noticeMethodPayload)) {
+      await performValidation('text', {
+        elementType: 'listItem',
+        text: noticeServiceMethodText(noticeData.noticeMethodPayload),
       });
     }
     this.recordRtcCyaDateFromParts(

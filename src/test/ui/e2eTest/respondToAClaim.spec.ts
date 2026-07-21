@@ -745,6 +745,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateKnown', {
       showNoticeDocumentLink: true,
+      noticeMethodPayload: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy,
     });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,

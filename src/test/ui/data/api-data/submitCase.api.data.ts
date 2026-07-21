@@ -107,8 +107,8 @@ export const submitCaseApiData = {
       notice_Documents: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78/binary`,
+            document_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503/binary`,
             document_filename: 'rentArrears.pdf',
           },
         },
@@ -269,9 +269,7 @@ export const submitCaseApiData = {
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
       noticeServed: process.env.NOTICE_SERVED,
-      notice_ServiceMethod: 'OTHER',
-      notice_OtherDateTime: '2025-11-10T10:11:20',
-      notice_OtherExplanation: 'served by courier',
+      notice_ServiceMethod: 'EMAIL',
       claimantNamePossessiveForm: 'John Doe',
       claimantCircumstancesSelect: 'NO',
       hasDefendantCircumstancesInfo: 'NO',
@@ -508,9 +506,7 @@ export const submitCaseApiData = {
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
       noticeServed: process.env.NOTICE_SERVED,
-      notice_ServiceMethod: 'PERSONALLY_HANDED',
-      notice_HandedOverDateTime: '2025-11-10T10:11:20',
-      notice_PersonName: 'Alex Tenant',
+      notice_ServiceMethod: 'EMAIL',
       claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
       claimantCircumstancesSelect: 'NO',
       hasDefendantCircumstancesInfo: 'NO',
@@ -601,8 +597,8 @@ export const submitCaseApiData = {
       notice_Documents: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78/binary`,
+            document_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503/binary`,
             document_filename: 'rentArrears.pdf',
           },
         },
@@ -903,9 +899,7 @@ export const submitCaseApiData = {
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
       noticeServed: 'YES',
-      notice_ServiceMethod: 'OTHER_ELECTRONIC',
-      notice_OtherElectronicDateTime: '2025-11-10T10:11:20',
-      notice_OtherElectronicDetails: 'sent by secure portal',
+      notice_ServiceMethod: 'EMAIL',
       claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
       claimantCircumstancesSelect: 'NO',
       hasDefendantCircumstancesInfo: 'NO',

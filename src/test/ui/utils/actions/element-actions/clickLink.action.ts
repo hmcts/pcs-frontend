@@ -9,7 +9,6 @@ type ClickLinkParams =
       fieldName: string;
       header?: string;
       sectionHeader?: string;
-      urlContains?: string;
     };
 
 export class ClickLinkAction implements IAction {
@@ -26,7 +25,6 @@ export class ClickLinkAction implements IAction {
         () => this.clickLinkAndVerifySameTabTitle(page, fieldName as string | ClickLinkParams, header!),
       ],
       ['clickLinkAndVerifyNewTabTitle', () => this.clickLinkAndVerifyNewTabTitle(page, fieldName as string, header!)],
-      ['clickLinkAndVerifyNewTabUrl', () => this.clickLinkAndVerifyNewTabUrl(page, fieldName as ClickLinkParams)],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -107,27 +105,6 @@ export class ClickLinkAction implements IAction {
     if (!newPageTitle.includes(header)) {
       throw new Error(`Title validation failed. Expected to contain: "${header}", Actual title: "${newPageTitle}"`);
     }
-    await newPage.close();
-    await originalPage.bringToFront();
-  }
-
-  private async clickLinkAndVerifyNewTabUrl(page: Page, fieldName: ClickLinkParams): Promise<void> {
-    if (typeof fieldName === 'string') {
-      throw new Error('clickLinkAndVerifyNewTabUrl requires fieldName and urlContains');
-    }
-
-    const link = page.locator(`a:text-is("${fieldName.fieldName}")`);
-    await link.waitFor({ state: 'visible' });
-    const originalPage = page;
-    const [newPage] = await Promise.all([page.waitForEvent('popup'), link.click()]);
-    await newPage.waitForLoadState('domcontentloaded');
-
-    if (!newPage.url().includes(fieldName.urlContains ?? '')) {
-      throw new Error(
-        `URL validation failed. Expected to contain: "${fieldName.urlContains}", Actual URL: "${newPage.url()}"`
-      );
-    }
-
     await newPage.close();
     await originalPage.bringToFront();
   }
