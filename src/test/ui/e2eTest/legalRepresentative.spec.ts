@@ -408,6 +408,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     //await performAction('clickButton', 'Submit');
   });
+
   test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @regression @nonRent', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
@@ -746,7 +747,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaimLR.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
-      option: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
+      option: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
       question: counterClaimSpecificSumOfMoneyLR.mainHeader,
@@ -929,6 +930,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     //await performAction('clickButton', 'Submit');
   });
+
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @regression @rent', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
@@ -975,13 +977,13 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
       question: counterClaimSpecificSumOfMoneyLR.mainHeader,
-      option: counterClaimSpecificSumOfMoneyLR.noRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+      option: counterClaimSpecificSumOfMoneyLR.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
     });
     await performAction('selectCounterClaimFeeLR', {
       radioOption: counterClaimFeeLR.defendantNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelpLR.yesRadioOption,
@@ -1040,6 +1042,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     //await performAction('clickButton', 'Submit');
   });
+
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @regression @rent', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
