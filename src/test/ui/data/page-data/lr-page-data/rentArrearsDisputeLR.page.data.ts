@@ -1,4 +1,4 @@
-export const rentArrears = {
+export const rentArrearsLR = {
   mainHeader: `Rent arrears`,
   amountDefendantOwesHeader: `Amount the defendant owes in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
   saveAndContinueButton: `Save and continue`,

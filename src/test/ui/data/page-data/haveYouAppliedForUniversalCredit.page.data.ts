@@ -1,6 +1,5 @@
 export const haveYouAppliedForUniversalCredit = {
   mainHeader: `Have you applied for Universal Credit?`,
-  lrHiddenmainHeader: `Has the defendant applied for Universal Credit?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   whenDidYouApplyHiddenQuestion: `When did you apply?`,
