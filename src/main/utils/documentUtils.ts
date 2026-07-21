@@ -82,6 +82,8 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   const seen = new Set<string>();
 
   addFlatDocuments(documents, seen, caseData, 'allDocuments');
+  addFlatDocuments(documents, seen, caseData, 'notice_Documents');
+  addNestedFlatDocuments(documents, seen, caseData, 'detailsTab_NoticeDetails', 'noticeDocuments');
 
   return documents;
 }
@@ -112,7 +114,29 @@ function addFlatDocuments(
   caseData: CaseDataRecord,
   sourceField: string
 ): void {
-  for (const item of asCollection(caseData[sourceField])) {
+  indexCollectionDocuments(documents, seen, caseData[sourceField], sourceField);
+}
+
+function addNestedFlatDocuments(
+  documents: CaseDocumentLookupItem[],
+  seen: Set<string>,
+  caseData: CaseDataRecord,
+  parentField: string,
+  childField: string
+): void {
+  const parent = asRecord(caseData[parentField]);
+  const sourceField = `${parentField}.${childField}`;
+
+  indexCollectionDocuments(documents, seen, parent?.[childField], sourceField);
+}
+
+function indexCollectionDocuments(
+  documents: CaseDocumentLookupItem[],
+  seen: Set<string>,
+  collection: unknown,
+  sourceField: string
+): void {
+  for (const item of asCollection(collection)) {
     const id = stringValue(item.id);
     const value = asRecord(item.value);
     const filename = stringValue(value?.document_filename);

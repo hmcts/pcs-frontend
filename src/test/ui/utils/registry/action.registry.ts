@@ -179,7 +179,7 @@ export class ActionRegistry {
     ['otherAdultsLR', new RespondToClaimLRAction()],
     ['alternativeAccommodationLR', new RespondToClaimLRAction()],
     ['circumstancesLR', new RespondToClaimLRAction()],
-    ['exceptionalHardshipLR', new RespondToClaimLRAction()],
+    ['selectExceptionalHardshipLR', new RespondToClaimLRAction()],
     ['selectIncomeAndExpensesLR', new RespondToClaimLRAction()],
     ['representationLR', new RespondToClaimLRAction()],
     ['selectWhatRegularIncomeDoTheyReceiveLR', new RespondToClaimLRAction()],

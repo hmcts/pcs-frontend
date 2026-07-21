@@ -296,6 +296,12 @@ export interface CcdCaseData {
   notice_EmailSentDateTime?: string;
   notice_OtherElectronicDateTime?: string;
   notice_OtherDateTime?: string;
+  notice_ServiceMethod?: string;
+  notice_PersonName?: string;
+  notice_EmailAddress?: string;
+  notice_OtherExplanation?: string;
+  notice_OtherElectronicExplanation?: string;
+  notice_Documents?: CcdCollectionItem<Document>[];
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
@@ -318,6 +324,9 @@ export interface CcdCaseData {
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+  detailsTab_NoticeDetails?: {
+    noticeDocuments?: CcdCollectionItem<Document>[];
+  };
 }
 
 export interface CcdCaseDocument {
