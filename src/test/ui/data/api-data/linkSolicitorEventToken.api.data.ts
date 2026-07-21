@@ -1,6 +1,6 @@
 export const linkSolicitorTokenApiData = {
   linkSolicitorTokenApiInstance: () => ({
-    baseURL: process.env.CASE_API_URL,
+    baseURL: process.env.PCS_API_URL,
     headers: {
       Authorization: `Bearer ${process.env.SOLICITOR_ACCESS_TOKEN}`,
       ServiceAuthorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}`,
@@ -10,5 +10,5 @@ export const linkSolicitorTokenApiData = {
     },
   }),
   linkSolicitorApiEndPoint: (): string =>
-    `${process.env.CASE_API_URL}/testing-support/link-defendant-solicitor-to-party/${process.env.CASE_NUMBER}/${process.env.Defendant_ID}`,
+    `/testing-support/link-defendant-solicitor-to-party/${process.env.CASE_NUMBER}/${process.env.Defendant_ID}`,
 };
