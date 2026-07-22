@@ -24,7 +24,7 @@
         {{ govukRadios(field.component) }}
       {% endif %}
     {% endfor %}
-    {{ stepButtons(saveAndContinue, saveForLater) }}
+    {{ stepButtons(saveAndContinue) }}
     {{ csrfProtection(csrfToken) }}
   </form>
 {% endblock %}
