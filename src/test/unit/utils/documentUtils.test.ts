@@ -273,4 +273,89 @@ describe('documentUtils', () => {
       })
     );
   });
+
+  it('extracts notice documents from notice_Documents for draft cases', () => {
+    const documents = extractCaseDocuments({
+      notice_Documents: [
+        {
+          id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+          value: {
+            document_binary_url: 'http://doc-store/draft-notice/binary',
+            document_filename: 'draft-notice.pdf',
+            document_type: 'POSSESSION_NOTICE',
+          },
+        },
+      ],
+    });
+
+    expect(documents).toEqual([
+      {
+        id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        filename: 'draft-notice.pdf',
+        binaryUrl: 'http://doc-store/draft-notice/binary',
+        categoryId: undefined,
+        documentType: 'POSSESSION_NOTICE',
+        sourceField: 'notice_Documents',
+      },
+    ]);
+  });
+
+  it('extracts notice documents from detailsTab_NoticeDetails.noticeDocuments for submitted cases', () => {
+    const documents = extractCaseDocuments({
+      notice_Documents: [],
+      detailsTab_NoticeDetails: {
+        noticeDocuments: [
+          {
+            id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            value: {
+              document_binary_url: 'http://doc-store/submitted-notice/binary',
+              document_filename: 'DocUploaded - Claimant 1.rtf',
+              document_type: 'POSSESSION_NOTICE',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      {
+        id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        filename: 'DocUploaded - Claimant 1.rtf',
+        binaryUrl: 'http://doc-store/submitted-notice/binary',
+        categoryId: undefined,
+        documentType: 'POSSESSION_NOTICE',
+        sourceField: 'detailsTab_NoticeDetails.noticeDocuments',
+      },
+    ]);
+  });
+
+  it('prefers detailsTab notice documents over notice_Documents when both are present', () => {
+    const documents = extractCaseDocuments({
+      notice_Documents: [
+        {
+          id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+          value: {
+            document_binary_url: 'http://doc-store/draft/binary',
+            document_filename: 'draft.pdf',
+          },
+        },
+      ],
+      detailsTab_NoticeDetails: {
+        noticeDocuments: [
+          {
+            id: 'dddddddd-dddd-dddd-dddd-dddddddddddd',
+            value: {
+              document_binary_url: 'http://doc-store/submitted/binary',
+              document_filename: 'submitted.pdf',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents.map(document => document.sourceField)).toEqual([
+      'notice_Documents',
+      'detailsTab_NoticeDetails.noticeDocuments',
+    ]);
+  });
 });
