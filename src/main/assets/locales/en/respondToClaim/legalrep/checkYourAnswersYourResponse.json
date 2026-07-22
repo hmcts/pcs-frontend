@@ -37,10 +37,10 @@
         "label": "What is the correct start date?",
         "changeHidden": "corrected tenancy start date"
       },
-      "labelEntered": "When did your tenancy, occupation contract or licence start?"
+      "labelEntered": "What is the tenancy, occupation contract or licence start date?"
     },
     "possessionNoticeReceived": {
-      "label": "Did {{claimantName}} give you notice of their intention to begin possession proceedings?",
+      "label": "Did {{claimantName}} give the defendant notice of their intention to begin possession proceedings?",
       "changeHidden": "notice received"
     },
     "noticeReceivedDate": {
@@ -60,7 +60,7 @@
       "changeHidden": "dispute other parts of the claim"
     },
     "disputeClaimDetails": {
-      "label": "Explain which parts of the claim you do not agree with",
+      "label": "Explain which parts of the claim the defendant disputes",
       "changeHidden": "dispute details"
     },
     "makeCounterClaim": {

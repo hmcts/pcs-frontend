@@ -1,12 +1,43 @@
 {
+  "pageTitle": "cy Check your answers",
+  "heading": "cy Check your answers",
+  "sections": {
+    "legalAdvice": "cy Legal advice",
+    "personalDetails": "cy Personal details",
+    "claimantsClaim": "cy {{claimantName, pluralPossessive}} claim",
+    "dependantsAndOtherResidents": "cy Dependants and other residents",
+    "yourCircumstances": "cy Circumstances",
+    "incomeAndExpenses": "cy Income and expenses",
+    "regularIncome": "cy Regular income",
+    "universalCredit": "cy Universal credit",
+    "priorityDebts": "cy Priority debts",
+    "regularExpenses": "cy Regular expenses",
+    "uploadFiles": "cy Upload files",
+    "otherConsiderations": "cy Other considerations",
+    "languageUsed": "cy Language used"
+  },
+  "rows": {
+    "otherConsiderations": {
+      "label": "cy Is there anything else the defendant wants to tell the court as part of their response?"
+    },
+    "otherConsiderationsDetails": {
+      "label": "cy Give details about what else the defendant wants to tell the court"
+    },
+    "languageUsed": {
+      "label": "cy Which language did you use to complete this service?"
+    }
+  },
   "statementOfTruth": {
+    "heading": "cy Statement of truth",
+    "hint": "",
+    "contemptOption": "cy I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
     "beliefOption": "cy The defendant believes that the facts stated in this defence form are true. I am authorised by the defendant to submit this statement.",
     "fullNameLabel": "cy Full name",
     "nameOfFirmLabel": "cy Name of firm",
     "positionHeldLabel": "cy Position or office held"
   },
   "errors": {
-    "statementOfTruthBelief": "cy Select if the defendant believes that the facts stated in this defence form are true and that you are authorised by the defendant to submit this statement",
+    "statementOfTruthBelief": "cy Select if the defendant believes that the facts stated in this defence form are true",
     "nameOfFirm": "cy Enter the name of firm",
     "positionHeld": "cy Enter your position or office held"
   }

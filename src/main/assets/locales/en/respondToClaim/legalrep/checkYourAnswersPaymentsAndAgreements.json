@@ -15,7 +15,7 @@
       "changeHidden": "repayment agreement"
     },
     "repaymentAgreedDetails": {
-      "label": "Give details about how much the defendant has agreed to pay, how often the defendant will pay and when the agreement was made",
+      "label": "Give details about how much they’ve agreed to pay and when",
       "changeHidden": "repayment details"
     },
     "repayArrearsInstalments": {

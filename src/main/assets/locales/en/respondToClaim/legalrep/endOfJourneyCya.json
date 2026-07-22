@@ -1,12 +1,27 @@
 {
+  "sections": {
+    "yourCircumstances": "Circumstances"
+  },
+  "rows": {
+    "otherConsiderations": {
+      "label": "Is there anything else the defendant wants to tell the court as part of their response?"
+    },
+    "otherConsiderationsDetails": {
+      "label": "Give details about what else the defendant wants to tell the court"
+    },
+    "languageUsed": {
+      "label": "Which language did you use to complete this service?"
+    }
+  },
   "statementOfTruth": {
+    "hint": "",
     "beliefOption": "The defendant believes that the facts stated in this defence form are true. I am authorised by the defendant to submit this statement.",
     "fullNameLabel": "Full name",
     "nameOfFirmLabel": "Name of firm",
     "positionHeldLabel": "Position or office held"
   },
   "errors": {
-    "statementOfTruthBelief": "Select if the defendant believes that the facts stated in this defence form are true and that you are authorised by the defendant to submit this statement",
+    "statementOfTruthBelief": "Select if the defendant believes that the facts stated in this defence form are true",
     "nameOfFirm": "Enter firm name",
     "positionHeld": "Enter position held name"
   }

@@ -1,3 +1,4 @@
+import config from 'config';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -17,6 +18,7 @@ import { getTranslationFunction, loadStepNamespaces } from '@modules/steps';
 import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { getDashboardUrl } from '@routes/dashboard';
 
 const STEP_NAME = 'end-of-journey-cya';
 
@@ -111,8 +113,20 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const submitDisabled = status === 'SUBMITTED';
     const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
 
+    const caseId = req.res?.locals.validatedCase?.id;
+    let dashboardUrl = getDashboardUrl(caseId);
+
+    if (isLegalRepresentative && caseId) {
+      const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
+        ? config.get<string>('redirects.manageCaseReturnURL')
+        : null;
+      if (caseDetailsBaseUrl) {
+        dashboardUrl = `${caseDetailsBaseUrl}/${caseId}`;
+      }
+    }
+
     if (req.query.submitError !== 'failed') {
-      return { sections, submitDisabled, isLegalRepresentative };
+      return { sections, submitDisabled, isLegalRepresentative, dashboardUrl };
     }
 
     const tError = getTranslationFunction(req, ['respondToClaim/checkYourAnswers', 'common']);
@@ -124,7 +138,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const errorSummary = buildErrorSummary({ submitResponse: message }, submitResponseErrorFields, tError);
 
-    return { sections, submitDisabled, isLegalRepresentative, ...(errorSummary ? { errorSummary } : {}) };
+    return { sections, submitDisabled, isLegalRepresentative, dashboardUrl, ...(errorSummary ? { errorSummary } : {}) };
   },
   beforeRedirect: async (req: Request) => {
     const draft = buildDraftDefendantResponse(req);

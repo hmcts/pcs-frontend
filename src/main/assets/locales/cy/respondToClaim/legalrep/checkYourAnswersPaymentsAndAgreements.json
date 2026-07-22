@@ -15,7 +15,7 @@
       "changeHidden": "cy repayment agreement"
     },
     "repaymentAgreedDetails": {
-      "label": "cy Give details about how much the defendant has agreed to pay, how often the defendant will pay and when the agreement was made",
+      "label": "cy Give details about how much they’ve agreed to pay and when",
       "changeHidden": "cy repayment details"
     },
     "repayArrearsInstalments": {

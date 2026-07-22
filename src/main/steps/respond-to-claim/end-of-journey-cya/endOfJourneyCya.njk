@@ -28,7 +28,9 @@
     {{ csrfProtection(csrfToken) }}
 
     <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>
-    <p class="govuk-body">{{ statementOfTruthHint }}</p>
+    {% if statementOfTruthHint %}
+      <p class="govuk-body">{{ statementOfTruthHint }}</p>
+    {% endif %}
 
     {% if isLegalRepresentative %}
       {# Legal rep: first field (contemptOfCourt) is rendered as plain text, not a checkbox #}
