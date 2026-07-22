@@ -13,34 +13,40 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  <h2 class="govuk-heading-s">{{ whatCounterClaimIsHeading }}</h2>
-  <p class="govuk-body">{{ whatCounterClaimIsParagraph1 }}</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>{{ whatCounterClaimIsBullet1 }}</li>
-    <li>{{ whatCounterClaimIsBullet2 }}</li>
-  </ul>
-  <p class="govuk-body">{{ whatCounterClaimIsParagraph2 }}</p>
-  <p class="govuk-body">{{ whatCounterClaimIsParagraph3 }}</p>
-  <p class="govuk-body">
-      {{ whatCounterClaimIsLinkText | safe }}
-  </p>
+  {% if whatCounterClaimIsHeading %}
+    <h2 class="govuk-heading-s">{{ whatCounterClaimIsHeading }}</h2>
 
-  <h2 class="govuk-heading-s">{{ whenMakeCounterClaimHeading }}</h2>
-  <p class="govuk-body">{{ whenMakeCounterClaimParagraph1 }}</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>{{ whenMakeCounterClaimBullet1 }}</li>
-    <li>{{ whenMakeCounterClaimBullet2 }}</li>
-  </ul>
-  <p class="govuk-body">{{ whenMakeCounterClaimParagraph2 }}</p>
-  <p class="govuk-body">{{ whenMakeCounterClaimParagraph3 | safe  }}</p>
-  <h2 class="govuk-heading-s">{{ counterClaimFeesHeading }}</h2>
-  <p class="govuk-body">
-    {{ counterClaimFeesParagraph1 | safe }}
-  </p>
+    <p class="govuk-body">{{ whatCounterClaimIsParagraph1 }}</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ whatCounterClaimIsBullet1 }}</li>
+      <li>{{ whatCounterClaimIsBullet2 }}</li>
+    </ul>
+    <p class="govuk-body">{{ whatCounterClaimIsParagraph2 }}</p>
+    <p class="govuk-body">{{ whatCounterClaimIsParagraph3 }}</p>
+    <p class="govuk-body">
+        {{ whatCounterClaimIsLinkText | safe }}
+    </p>
+
+    <h2 class="govuk-heading-s">{{ whenMakeCounterClaimHeading }}</h2>
+    <p class="govuk-body">{{ whenMakeCounterClaimParagraph1 }}</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ whenMakeCounterClaimBullet1 }}</li>
+      <li>{{ whenMakeCounterClaimBullet2 }}</li>
+    </ul>
+    <p class="govuk-body">{{ whenMakeCounterClaimParagraph2 }}</p>
+    <p class="govuk-body">{{ whenMakeCounterClaimParagraph3 | safe  }}</p>
+    <h2 class="govuk-heading-s">{{ counterClaimFeesHeading }}</h2>
+    <p class="govuk-body">
+      {{ counterClaimFeesParagraph1 | safe }}
+    </p>
+   {% endif %}
   <p class="govuk-body">{{ counterClaimFeesParagraph2 }}</p>
-  <p class="govuk-body">
-      {{ counterClaimFeesCourtFeesLinkText | safe  }}
-  </p>
+
+  {% if counterClaimFeesCourtFeesLinkText %}
+    <p class="govuk-body">
+        {{ counterClaimFeesCourtFeesLinkText | safe  }}
+    </p>
+  {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
