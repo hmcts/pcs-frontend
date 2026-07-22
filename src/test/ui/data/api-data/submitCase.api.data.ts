@@ -113,9 +113,9 @@ export const submitCaseApiData = {
         {
           value: {
             document_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f',
+              `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f`,
             document_binary_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f/binary',
+              `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f/binary`,
             document_filename: 'RentArrearsStatement.pdf',
           },
         },
