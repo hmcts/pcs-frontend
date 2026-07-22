@@ -1,4 +1,4 @@
-export const tenancyDateUnknown = {
+export const tenancyDateUnknownLR = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   whenDidYourTenancyQuestion: 'What is the tenancy, occupation contract or licence start date? (Optional)',
   getDidNotProvideParagraph: (claimantName: string): string => {
