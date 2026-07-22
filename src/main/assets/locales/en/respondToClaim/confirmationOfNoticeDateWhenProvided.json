@@ -3,7 +3,7 @@
   "bulletPointLabel": "Notice details given by {{claimantName}}:",
   "hintText": "When they made their claim, {{claimantName}} had to say the date they gave you notice (the date of service). If you’re not sure of the exact date, you can find it on the notice.",
   "listItem1": "they served notice on {{noticeDate}}",
-  "viewNoticeLinkText": "View a copy of the notice (opens in a new tab)",
+  "viewNoticeLinkText": "View a copy of the notice (opens in new tab)",
   "methodOfService": {
     "PERSONALLY_HANDED": "the notice was served by personally handing it to or leaving it with {{name}}",
     "PERSONALLY_HANDED_ALT": "the notice was served by personally handing it to or leaving it with someone",
