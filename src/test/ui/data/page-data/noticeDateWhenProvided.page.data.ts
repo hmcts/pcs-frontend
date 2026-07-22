@@ -17,7 +17,6 @@ export const noticeDateWhenProvided = {
   noticeDetailsGivenLabel: () => `Notice details given by ${process.env.CLAIMANT_NAME}:`,
   noticeGivenDateLabel: `they served notice on ${convertDateFormat(submitCaseApiData.submitCasePayload.notice_PostedDate)}`,
   noticeDocumentLink: `View a copy of the notice (opens in new tab)`,
-  noticeGivenDateHiddenLabelLR: `They served the defendant with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.notice_PostedDate)}`,
   getWhenDidYouReceiveNoticeQuestion: `When did you receive notice from ${process.env.CLAIMANT_NAME} (optional)?`,
   exampleHintText: `For example, 27 9 2022`,
   dayTextLabel: `Day`,
@@ -56,5 +55,24 @@ export function convertDateFormat(dateString: string): string {
   const day = date.getDate();
   const month = date.toLocaleString(`en-US`, { month: `long` });
 
-  return `${day} ${month} ${date.getFullYear()}`;
+  return `${formatOrdinalDay(day)} ${month} ${date.getFullYear()}`;
+}
+
+function formatOrdinalDay(day: number): string {
+  const lastTwoDigits = day % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+    return `${day}th`;
+  }
+
+  switch (day % 10) {
+    case 1:
+      return `${day}st`;
+    case 2:
+      return `${day}nd`;
+    case 3:
+      return `${day}rd`;
+    default:
+      return `${day}th`;
+  }
 }

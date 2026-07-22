@@ -1491,6 +1491,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       day: '25',
       month: '2',
       year: '2020',
+      showNoticeDocumentLink: true,
+      noticeMethodPayload: submitCaseApiData.submitCasePayload,
     });
     await performAction('rentArrears', {
       option: rentArrears.noRadioOption,
