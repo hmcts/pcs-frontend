@@ -7,6 +7,7 @@ import {
 } from '../validations/custom-validations';
 import {
   BannerAlertValidation,
+  CheckYourAnswersSummaryRowValidation,
   FormLabelValueValidation,
   InputErrorValidation,
   InputTextValueValidation,
@@ -16,7 +17,8 @@ import {
   SummaryListValueValidation,
   TextValidation,
   ValidateDocumentUnderSectionValidation,
-  viewClaimOrResponseTableValidation,
+  ViewClaimHeaderDetailsValidation,
+  ViewClaimOrResponseTableValidation,
 } from '../validations/element-validations';
 
 export class ValidationRegistry {
@@ -38,7 +40,9 @@ export class ValidationRegistry {
     ['pageNavigation', new PageNavigationValidation()],
     ['inputTextValue', new InputTextValueValidation()],
     ['validateDocumentUnderSection', new ValidateDocumentUnderSectionValidation()],
-    ['viewClaimOrResponseTable', new viewClaimOrResponseTableValidation()],
+    ['viewClaimOrResponseTable', new ViewClaimOrResponseTableValidation()],
+    ['viewClaimHeaderDetails', new ViewClaimHeaderDetailsValidation()],
+    ['summaryRow', new CheckYourAnswersSummaryRowValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {

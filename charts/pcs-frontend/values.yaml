@@ -23,6 +23,7 @@ nodejs:
         - pcs-frontend-idam-secret
         - pcs-os-client-lookup-key
         - pcs-pcq-token-key
+        - launchdarkly-sdk-key
   environment:
     REDIS_TTL: 6000
     REDIS_SESSION_PREFIX: 'pcs'
@@ -39,3 +40,4 @@ nodejs:
     FEE_SERVICE_URL: 'http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     REDIRECTS_MANAGE_CASE_RETURN_URL: 'https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net/cases/case-details/PCS/PCS'
     PAYMENT_RETURN_URL: 'https://pcs.{{ .Values.global.environment }}.platform.hmcts.net/payment/return'
+    LAUNCHDARKLY_ENV: '{{ .Values.global.environment }}'
