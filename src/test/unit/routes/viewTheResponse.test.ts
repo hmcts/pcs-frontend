@@ -119,7 +119,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         noticeReceivedDate: '2025-12-01',
         rentArrearsAmountConfirmation: 'YES',
         rentArrearsAmount: '125000',
-        landlordRegistered: 'YES',
+        exemptLandlord: 'YES',
         landlordLicensed: 'NO',
         writtenTerms: 'NOT_SURE',
         paymentAgreement: {
@@ -208,7 +208,7 @@ function buildAlternateBranchesCaseData(): CcdCaseData {
         disputeClaim: 'NO',
         tenancyTypeConfirmation: 'NO',
         possessionNoticeReceived: 'NOT_SURE',
-        landlordRegistered: undefined,
+        exemptLandlord: undefined,
         householdCircumstances: {
           incomeFromJobs: 'NO',
           universalCredit: 'NO',
@@ -390,19 +390,11 @@ describe('viewTheResponse route', () => {
     expect(renderArgs.responseToClaim.rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.landlordRegistered' },
+          key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
           value: { text: 'Yes' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.landlordLicensed' },
-          value: { text: 'No' },
         }),
         expect.objectContaining({
           key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmountConfirmation' },
-          value: { text: 'Yes' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
           value: { text: 'Yes' },
         }),
         expect.objectContaining({

@@ -23,12 +23,11 @@ import {
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
+  exemptLandLord,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
   incomeAndExpenses,
   installmentPayments,
-  landlordLicensed,
-  landlordRegistered,
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
@@ -148,11 +147,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
-    await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
-    await performAction('selectLandlordLicensed', {
-      question: landlordLicensed.isYourLandlordLicensedQuestion,
-      radioOption: landlordLicensed.iamNotSureRadioOption,
-    });
+    await performAction('exemptLandLord', exemptLandLord.yesRadioOption);
     await performValidation('mainHeader', writtenTerms.mainHeader);
     await performAction('selectWrittenTerms', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
@@ -361,11 +356,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiDataWales.submitCaseRentNonRentStandard.isClaimantNameCorrect
     );
-    await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
-    await performAction('selectLandlordLicensed', {
-      question: landlordLicensed.isYourLandlordLicensedQuestion,
-      radioOption: landlordLicensed.iamNotSureRadioOption,
-    });
+    await performAction('exemptLandLord', exemptLandLord.noRadioOption);
     await performValidation('mainHeader', writtenTerms.mainHeader);
     await performAction('selectWrittenTerms', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
@@ -490,11 +481,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiDataWales.submitCaseRentOtherTenancy.isClaimantNameCorrect
     );
-    await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
-    await performAction('selectLandlordLicensed', {
-      question: landlordLicensed.isYourLandlordLicensedQuestion,
-      radioOption: landlordLicensed.iamNotSureRadioOption,
-    });
+    await performAction('exemptLandLord', exemptLandLord.imNotSureRadioOption);
     await performValidation('mainHeader', writtenTerms.mainHeader);
     await performAction('selectWrittenTerms', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
@@ -634,11 +621,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiDataWales.submitCaseNonRentStandard.isClaimantNameCorrect
     );
-    await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
-    await performAction('selectLandlordLicensed', {
-      question: landlordLicensed.isYourLandlordLicensedQuestion,
-      radioOption: landlordLicensed.iamNotSureRadioOption,
-    });
+    await performAction('exemptLandLord', exemptLandLord.yesRadioOption);
     await performValidation('mainHeader', writtenTerms.mainHeader);
     await performAction('selectWrittenTerms', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
@@ -727,11 +710,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       'disputeClaimInterstitial',
       submitCaseApiDataWales.submitCaseNonRentStandard.isClaimantNameCorrect
     );
-    await performAction('selectLandlordRegistered', landlordRegistered.noRadioOption);
-    await performAction('selectLandlordLicensed', {
-      question: landlordLicensed.isYourLandlordLicensedQuestion,
-      radioOption: landlordLicensed.iamNotSureRadioOption,
-    });
+    await performAction('exemptLandLord', exemptLandLord.noRadioOption);
     await performValidation('mainHeader', writtenTerms.mainHeader);
     await performAction('selectWrittenTerms', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,

@@ -16,8 +16,7 @@ const legalRepStepOrder = [
   'contact-preferences-email-or-post',
   'contact-preferences-telephone',
   'contact-preferences-text-message',
-  'landlord-registered',
-  'landlord-licensed',
+  'exempt-landlord',
   'written-terms',
   'tenancy-type-details',
   'tenancy-date-details',
@@ -69,7 +68,6 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'select-defendant': {
       showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
     },
-
     'defendant-name-confirmation': {
       showCondition: () => true,
     },
