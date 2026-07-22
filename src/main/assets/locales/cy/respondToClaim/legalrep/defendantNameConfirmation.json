@@ -2,6 +2,9 @@
   "nameConfirmationLabel": "cyIs the defendant's name {{defendantName}}?",
   "firstNameLabel": "cyDefendant's first name",
   "lastNameLabel": "cyDefendant's last name",
+  "nameConfirmationHint": "cyThis is the name provided by {{organisationName}}",
+  "yesOption": "cyYes",
+  "noOption": "cyNo",
   "errors": {
     "nameConfirmation": "cyYou must say if the defendant's name is {{defendantName}}",
     "firstName": "cyEnter the defendant's first name",

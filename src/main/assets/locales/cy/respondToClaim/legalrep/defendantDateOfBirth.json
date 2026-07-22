@@ -4,7 +4,13 @@
   "dateOfBirthLabel": "cyDefendant date of birth",
   "errors": {
     "date": {
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
       "required": "cyEnter the defendant's date of birth",
+      "notRealDate": "cyDate of birth must be a real date",
+      "futureDate": "cyDate of birth must be in the past",
+      "invalidValue": "Date of birth must be a real date",
       "missingOne": "cyThe defendant's date of birth must include a {{missingField}}",
       "missingTwo": "cyThe defendant's date of birth must include a {{first}} and {{second}}"
     }
