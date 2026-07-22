@@ -58,25 +58,23 @@ describe('legalRepresentativeAccessMiddleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it('blocks legalrep users from non-allowed paths', () => {
+  it('blocks legalrep users from non-allowed paths with a 403', () => {
     mockIsLegalRepresentativeUser.mockReturnValue(true);
     const req = { path: '/dashboard' } as unknown as Request;
 
     invokeMiddleware(req);
 
-    expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.send).toHaveBeenCalledWith('Not Found');
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 403 }));
   });
 
-  it('blocks legalrep users from access-code paths', () => {
+  it('blocks legalrep users from access-code paths with a 403', () => {
     mockIsLegalRepresentativeUser.mockReturnValue(true);
     const req = { path: '/case/1234567890123456/access-code' } as unknown as Request;
 
     invokeMiddleware(req);
 
-    expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.send).toHaveBeenCalledWith('Not Found');
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 403 }));
   });
 });

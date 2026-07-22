@@ -326,7 +326,7 @@ describe('OIDCModule', () => {
           email: 'test@example.com',
           given_name: 'Test',
           family_name: 'User',
-          roles: ['test-role'],
+          roles: ['citizen'],
         };
 
         (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
@@ -355,6 +355,39 @@ describe('OIDCModule', () => {
         expect(mockResponse.redirect).toHaveBeenCalledWith('/claims');
       });
 
+      it('denies access and logs out a user without a permitted role', async () => {
+        const mockTokens = {
+          access_token: 'test-token',
+          id_token: 'test-id-token',
+          refresh_token: 'test-refresh-token',
+          claims: jest.fn().mockReturnValue({ sub: 'test-sub' }),
+        };
+        const mockUserInfo = {
+          email: 'test@example.com',
+          roles: ['judge'],
+        };
+        const mockLogoutUrl = 'https://idam.example.com/logout';
+
+        (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
+        (fetchUserInfo as jest.Mock).mockResolvedValue(mockUserInfo);
+        (buildEndSessionUrl as jest.Mock).mockReturnValue({ href: mockLogoutUrl });
+
+        const destroy = jest.fn().mockImplementation(callback => callback(null));
+        mockRequest.session = createMockSession({
+          codeVerifier: 'test-verifier',
+          nonce: 'test-nonce',
+          destroy,
+        });
+
+        oidcModule.enableFor(mockApp);
+        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
+        await callbackHandler(mockRequest, mockResponse, mockNext);
+
+        expect(mockRequest.session.user).toBeUndefined();
+        expect(destroy).toHaveBeenCalled();
+        expect(mockResponse.redirect).toHaveBeenCalledWith(mockLogoutUrl);
+      });
+
       it('should redirect to returnTo URL when present', async () => {
         const mockTokens = {
           access_token: 'test-token',
@@ -364,6 +397,7 @@ describe('OIDCModule', () => {
         };
         const mockUserInfo = {
           email: 'test@example.com',
+          roles: ['citizen'],
         };
 
         (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
@@ -433,6 +467,7 @@ describe('OIDCModule', () => {
         };
         const mockUserInfo = {
           email: 'test@example.com',
+          roles: ['citizen'],
         };
 
         (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);

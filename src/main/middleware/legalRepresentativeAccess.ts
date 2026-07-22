@@ -1,5 +1,6 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
+import { HTTPError } from '../HttpError';
 import { isLegalRepresentativeUser } from '../steps/utils';
 
 const LEGAL_REPRESENTATIVE_ALLOWED_PATHS = [
@@ -22,5 +23,5 @@ export const legalRepresentativeAccessMiddleware: RequestHandler = (
     return next();
   }
 
-  res.status(404).send('Not Found');
+  next(new HTTPError('Access denied', 403));
 };
