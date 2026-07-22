@@ -137,7 +137,6 @@ export const step: StepDefinition = {
       ];
 
       return {
-        backUrl: getDashboardUrl(caseId) ?? '/dashboard',
         dashboardUrl: getDashboardUrl(caseId),
         cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
         url: req.originalUrl || '',
