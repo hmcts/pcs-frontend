@@ -1,0 +1,40 @@
+{
+  "pageTitle": "cy Check your answers",
+  "cardTitle": "cy Payments and agreements",
+  "rows": {
+    "anyPaymentsMade": {
+      "label": "cy Has the defendant paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}?",
+      "changeHidden": "cy payments made"
+    },
+    "paymentDetails": {
+      "label": "cy Give details about how much the defendant paid and when",
+      "changeHidden": "cy payment details"
+    },
+    "repaymentPlanAgreed": {
+      "label": "cy Has the defendant come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}?",
+      "changeHidden": "cy repayment agreement"
+    },
+    "repaymentAgreedDetails": {
+      "label": "cy Give details about how much they’ve agreed to pay and when",
+      "changeHidden": "cy repayment details"
+    },
+    "repayArrearsInstalments": {
+      "label": "cy Would the defendant like to offer to pay off their arrears in instalments?",
+      "changeHidden": "cy offer to pay in instalments"
+    },
+    "installmentAmount": {
+      "label": "cy How much could the defendant afford to pay in addition to the current rent?",
+      "changeHidden": "cy instalment amount"
+    },
+    "installmentFrequency": {
+      "label": "cy How frequently could the defendant afford to pay this amount?",
+      "changeHidden": "cy instalment frequency",
+      "frequencies": {
+        "weekly": "cy Weekly",
+        "every2Weeks": "cy Every 2 weeks",
+        "every4Weeks": "cy Every 4 weeks",
+        "monthly": "cy Monthly"
+      }
+    }
+  }
+}

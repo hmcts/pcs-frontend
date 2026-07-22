@@ -1,0 +1,54 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Your circumstances",
+  "rows": {
+    "dependantChildren": {
+      "label": "Does the defendant have any dependant children?",
+      "changeHidden": "dependent children"
+    },
+    "dependantChildrenDetails": {
+      "label": "Give details about their dependant children",
+      "changeHidden": "dependent children details"
+    },
+    "otherDependants": {
+      "label": "Does the defendant have any other dependants?",
+      "changeHidden": "other dependants"
+    },
+    "otherDependantsDetails": {
+      "label": "Give details about their other dependants",
+      "changeHidden": "other dependants details"
+    },
+    "otherTenants": {
+      "label": "Do any other adults live in the defendant’s home?",
+      "changeHidden": "other adults in your home"
+    },
+    "otherTenantsDetails": {
+      "label": "Give details about the other adults living in the defendant’s home",
+      "changeHidden": "other adults details"
+    },
+    "alternativeAccommodation": {
+      "label": "Would the defendant have somewhere else to live if they had to leave their home?",
+      "changeHidden": "alternative accommodation"
+    },
+    "alternativeAccommodationDate": {
+      "label": "When would they be able to move in?",
+      "changeHidden": "alternative accommodation move-in date"
+    },
+    "shareAdditionalCircumstances": {
+      "label": "Would you like to share anything about the defendant’s circumstances?",
+      "changeHidden": "additional circumstances"
+    },
+    "shareAdditionalCircumstancesDetails": {
+      "label": "Give details about the defendant’s circumstances",
+      "changeHidden": "additional circumstances details"
+    },
+    "exceptionalHardship": {
+      "label": "Would the defendant experience exceptional hardship if they were asked to leave their home?",
+      "changeHidden": "exceptional hardship"
+    },
+    "exceptionalHardshipDetails": {
+      "label": "Give details about the exceptional hardship the defendant would experience",
+      "changeHidden": "exceptional hardship details"
+    }
+  }
+}

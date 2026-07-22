@@ -1,6 +1,6 @@
 {% extends "stepsTemplate.njk" %}
-{% from "govuk/components/error-summary/macro.njk"  import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk"   import govukSummaryList %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
@@ -28,17 +28,39 @@
     {{ csrfProtection(csrfToken) }}
 
     <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>
-    <p class="govuk-body">{{ statementOfTruthHint }}</p>
+    {% if statementOfTruthHint %}
+      <p class="govuk-body">{{ statementOfTruthHint }}</p>
+    {% endif %}
 
-    {% for field in fields %}
-      {% if field.componentType == 'checkboxes' %}
-        {{ govukCheckboxes(field.component) }}
-      {% endif %}
-    {% endfor %}
+    {% if isLegalRepresentative %}
+      {# Legal rep: first field (contemptOfCourt) is rendered as plain text, not a checkbox #}
+      {% for field in fields %}
+        {% if field.name == 'statementOfTruthContempt' %}
+          <p class="govuk-body">{{ field.component.items[0].text }}</p>
+        {% endif %}
+      {% endfor %}
 
+      {# Legal rep: belief checkbox with legal-rep specific wording #}
+      {% for field in fields %}
+        {% if field.componentType == 'checkboxes' and field.name != 'statementOfTruthContempt' %}
+          {{ govukCheckboxes(field.component) }}
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      {# Citizen: both checkboxes rendered normally #}
+      {% for field in fields %}
+        {% if field.componentType == 'checkboxes' %}
+          {{ govukCheckboxes(field.component) }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {# fullName is always shown; nameOfFirm and positionHeld only shown for legal reps #}
     {% for field in fields %}
       {% if field.componentType == 'input' %}
-        {{ govukInput(field.component) }}
+        {% if field.name == 'fullName' or isLegalRepresentative %}
+          {{ govukInput(field.component) }}
+        {% endif %}
       {% endif %}
     {% endfor %}
 
