@@ -221,8 +221,8 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       [
         'DELIVERED_PERMITTED_PLACE',
         { notice_ServiceMethod: 'DELIVERED_PERMITTED_PLACE', notice_DeliveredDate: '2024-01-15' },
-        ['methodOfService.DELIVERED_PERMITTED_PLACE', { date: '15 January 2024' }],
-        'DELIVERED_PERMITTED_PLACE[date=15 January 2024]',
+        ['methodOfService.DELIVERED_PERMITTED_PLACE', { date: '15th January 2024' }],
+        'DELIVERED_PERMITTED_PLACE[date=15th January 2024]',
       ],
       [
         'DELIVERED_PERMITTED_PLACE without date',
