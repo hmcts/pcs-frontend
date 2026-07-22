@@ -112,10 +112,8 @@ export const submitCaseApiData = {
       rentArrears_StatementDocuments: [
         {
           value: {
-            document_url:
-              `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f`,
-            document_binary_url:
-              `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f/binary`,
+            document_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f/binary`,
             document_filename: 'RentArrearsStatement.pdf',
           },
         },
