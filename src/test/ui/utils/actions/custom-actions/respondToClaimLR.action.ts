@@ -18,7 +18,7 @@ import {
   priorityDebtsLR,
   rentArrearsLR,
   repaymentsAgreedLR,
-  selectDefendantLR,
+  selectDefendant,
   tenancyDateUnknownLR,
   whatOtherRegularExpensesDoYouHaveLR,
   whatRegularIncomeDoYouReceiveLR,
@@ -284,7 +284,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       question: representationOption.question,
       option: representationOption.radioOption,
     });
-    await performAction('clickButton', selectDefendantLR.saveAndContinueButton);
+    await performAction('clickButton', selectDefendant.saveAndContinueButton);
   }
 
   private async selectWhatRegularIncomeDoTheyReceiveLR(regularIncome?: actionRecord): Promise<void> {

@@ -1,4 +1,4 @@
-export const startNowLR = {
+export const startNow = {
   mainHeader: `Respond to a property possession claim online`,
   thisServiceIsAlsoAvailableParagraph: `This service is also available `,
   inWelshLink: `in Welsh (Cymraeg)`,

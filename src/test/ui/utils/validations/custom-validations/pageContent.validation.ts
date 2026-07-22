@@ -204,10 +204,11 @@ export class PageContentValidation implements IValidation {
   private loadPageDataFile(fileName: string): object | null {
     const isLR = test.info().title.includes('@LR') || false;
     const baseDir = isLR ? PageContentValidation.PAGE_DATA_LR_DIR : PageContentValidation.PAGE_DATA_DIR;
-    const filePath = this.resolveDataFilePath(baseDir, `${fileName}.page.data.ts`);
+    const filePath = this.resolveDataFilePath(baseDir, `${fileName}${isLR ? '.page.data.lr.ts' : '.page.data.ts'}`);
 
     if (!filePath || !fs.existsSync(filePath)) {
       console.warn(`Path not found for the file ${fileName}`);
+      PageContentValidation.missingDataFiles.add(fileName);
       return null;
     }
     try {
@@ -215,6 +216,7 @@ export class PageContentValidation implements IValidation {
       const module = require(filePath);
       return module.default || module[fileName] || module[Object.keys(module)[0]];
     } catch {
+      PageContentValidation.missingDataFiles.add(fileName);
       return null;
     }
   }

@@ -1,4 +1,4 @@
-export * from './startNowLR.page.data';
+export * from './startNow.page.data.lr';
 export * from './defendantNameConfirmationLR.page.data';
 export * from './defendantDateOfBirthLR.page.data';
 export * from './correspondenceAddressLR.page.data';
@@ -31,7 +31,7 @@ export * from './rentArrearsDisputeLR.page.data';
 export * from './confirmationOfNoticeDateWhenProvidedLR.page.data';
 export * from './repaymentsMadeLR.page.data';
 export * from './repaymentsAgreedLR.page.data';
-export * from './selectDefendantLR.page.data';
+export * from './selectDefendant.page.data.lr';
 export * from './contactPreferencesTextMessageLR.page.data';
 export * from './howMuchAffordToPayLR.page.data';
 export * from './instalmentPaymentsLR.page.data';

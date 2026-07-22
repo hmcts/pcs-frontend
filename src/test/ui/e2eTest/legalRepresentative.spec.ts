@@ -26,8 +26,8 @@ import {
   priorityDebtsLR,
   rentArrearsLR,
   repaymentsAgreedLR,
-  selectDefendantLR,
-  startNowLR,
+  selectDefendant,
+  startNow,
   tenancyTypeDetailsLR,
   whatOtherRegularExpensesDoYouHaveLR,
   whatRegularIncomeDoYouReceiveLR,
@@ -35,7 +35,7 @@ import {
   yourCircumstancesLR,
 } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
-import { getPinUserAt } from '../utils/actions/custom-actions';
+import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -76,7 +76,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
   //await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('clickButton', startNowLR.startNowButton);
+  await performAction('clickButton', startNow.startNowButton);
 });
 
 test.afterEach(async () => {
@@ -89,7 +89,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
-      question: selectDefendantLR.whichDefendantQuestion,
+      question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
     await performAction('confirmDefendantDetails', {
