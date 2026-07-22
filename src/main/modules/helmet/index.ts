@@ -46,6 +46,13 @@ export class Helmet {
       formAction.push(manageCaseReturnURL);
     }
 
+    // Required so the browser allows the post-submit 303 redirect out to the CUI Your
+    // Support (cui-ra) microsite. form-action is enforced against redirect targets too.
+    const cuiRaDomain: string = new URL(config.get<string>('cuiRa.url')).origin;
+    if (cuiRaDomain) {
+      formAction.push(cuiRaDomain);
+    }
+
     app.use(
       helmet({
         contentSecurityPolicy: {

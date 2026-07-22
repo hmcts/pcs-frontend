@@ -138,6 +138,13 @@
   "payment": {
     "returnUrl": "https://pcs.aat.platform.hmcts.net/payment/return"
   },
+  "cuiRa": {
+    "url": "https://cui-ra.aat.platform.hmcts.net",
+    "hmctsServiceId": "AAA3",
+    "masterFlagCode": "RA0001",
+    "callbackUrl": "https://pcs.aat.platform.hmcts.net/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id",
+    "logoutUrl": "https://pcs.aat.platform.hmcts.net/logout"
+  },
   "launchdarkly": {
     "env": "AAAAAAAA"
   }

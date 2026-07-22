@@ -40,4 +40,7 @@ nodejs:
     FEE_SERVICE_URL: 'http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     REDIRECTS_MANAGE_CASE_RETURN_URL: 'https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net/cases/case-details/PCS/PCS'
     PAYMENT_RETURN_URL: 'https://pcs.{{ .Values.global.environment }}.platform.hmcts.net/payment/return'
+    CUI_RA_URL: 'https://cui-ra.{{ .Values.global.environment }}.platform.hmcts.net'
+    CUI_RA_CALLBACK_URL: 'https://pcs.{{ .Values.global.environment }}.platform.hmcts.net/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id'
+    CUI_RA_LOGOUT_URL: 'https://pcs.{{ .Values.global.environment }}.platform.hmcts.net/logout'
     LAUNCHDARKLY_ENV: '{{ .Values.global.environment }}'
