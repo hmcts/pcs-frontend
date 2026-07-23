@@ -1,4 +1,5 @@
 export * from './oidc';
+export * from './accessControl';
 export * from './caseReference';
 export * from './requireEventAccess';
 export * from './legalRepresentativeAccess';
