@@ -792,10 +792,10 @@ export class RespondToClaimAction implements IAction {
     if (noticeData?.showNoticeDocumentLink) {
       await performValidation('text', {
         elementType: 'link',
-        text: noticeDateWhenProvided.noticeDocumentLink,
+        text: noticeDateWhenProvided.noticeDocumentDynamicLink,
       });
       await performValidation('validatePdfDocument', {
-        linkText: noticeDateWhenProvided.noticeDocumentLink,
+        linkText: noticeDateWhenProvided.noticeDocumentDynamicLink,
       });
     }
     if (isNoticeMethodPayload(noticeData?.noticeMethodPayload)) {
