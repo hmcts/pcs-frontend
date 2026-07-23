@@ -1,3 +1,4 @@
+import { convertDateFormat } from '../../../utils/common/date.utils';
 import { submitCaseApiData } from '../../api-data';
 
 export const noticeDateWhenProvidedLR = {
@@ -20,11 +21,3 @@ export const noticeDateWhenProvidedLR = {
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `confirmation-of-notice-date-when-provided`,
 };
-
-export function convertDateFormat(dateString: string): string {
-  const date = new Date(dateString);
-  const day = date.getDate();
-  const month = date.toLocaleString(`en-US`, { month: `long` });
-
-  return `${day} ${month} ${date.getFullYear()}`;
-}
