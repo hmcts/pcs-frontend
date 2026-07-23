@@ -80,6 +80,8 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
   //await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+  await performAction('midEventRespondPossessionClaimLRAPI');
+  await performAction('submitPossessionClaimResponseLRAPI');
   await performAction('clickButton', startNowLR.startNowButton);
 });
 
