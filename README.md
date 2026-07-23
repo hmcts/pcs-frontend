@@ -27,7 +27,7 @@ You can take this a step further and integrate auto-detection directly into your
 
 Runtime secrets are pulled live from the AAT key vault (`pcs-aat`) at startup
 via [@hmcts/properties-volume](https://github.com/hmcts/properties-volume-nodejs),
-so you no longer need to copy secret values into `.env` by hand. Authenticate
+so you no longer need to copy secret values into `.env` by hand. Authenticate.
 once with the Azure CLI:
 
 ```bash
