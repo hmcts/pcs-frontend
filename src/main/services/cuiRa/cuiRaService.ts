@@ -3,7 +3,7 @@ import config from 'config';
 
 import { HTTPError } from '../../HttpError';
 
-import type { CuiRaInvocationRequest, CuiRaInvocationResponse } from './cuiRa.interface';
+import type { CuiRaGetPayloadResponse, CuiRaInvocationRequest, CuiRaInvocationResponse } from './cuiRa.interface';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
@@ -33,7 +33,7 @@ function toHttpError(error: unknown): HTTPError {
   }
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
-  logger.error(`cui-ra payload invocation failed: ${axiosError.message}`);
+  logger.error(`cui-ra request failed: ${axiosError.message}`);
   return new HTTPError(`cui-ra service error: ${axiosError.message || 'Unknown error'}`, status || 500);
 }
 
@@ -54,6 +54,20 @@ export const cuiRaService = {
         buildHeaders(accessToken, serviceToken)
       );
       return response.data.url;
+    } catch (error) {
+      throw toHttpError(error);
+    }
+  },
+
+  // Retrieves the result of a completed microsite session (Step 4: GET /api/payload/:id).
+  // This endpoint is S2S-only — it takes the `service-token` header, not the citizen idam-token.
+  async getPayload(id: string, serviceToken: string): Promise<CuiRaGetPayloadResponse> {
+    try {
+      const response = await http.get<CuiRaGetPayloadResponse>(
+        `${getBaseUrl()}/api/payload/${encodeURIComponent(id)}`,
+        { headers: { 'service-token': serviceToken, accept: 'application/json' } }
+      );
+      return response.data;
     } catch (error) {
       throw toHttpError(error);
     }

@@ -12,6 +12,7 @@ jest.mock('config', () => ({
 jest.mock('@modules/http', () => ({
   http: {
     post: jest.fn(),
+    get: jest.fn(),
   },
 }));
 
@@ -68,5 +69,42 @@ describe('cuiRaService.invokePayload', () => {
 
     await expect(promise).rejects.toBeInstanceOf(HTTPError);
     await expect(promise).rejects.toMatchObject({ status: 500 });
+  });
+});
+
+describe('cuiRaService.getPayload', () => {
+  beforeEach(() => {
+    (config.get as jest.Mock).mockReturnValue(cuiRaBase);
+    jest.clearAllMocks();
+  });
+
+  it('gets /api/payload/:id with only the service-token header and returns the payload', async () => {
+    const responsePayload = {
+      action: 'submit',
+      correlationId: '123',
+      replacementFlags: { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] },
+    };
+    mockHttp.get.mockResolvedValue({ data: responsePayload });
+
+    const payload = await cuiRaService.getPayload('abc-123', 's2s-tok');
+
+    expect(payload).toEqual(responsePayload);
+    expect(mockHttp.get).toHaveBeenCalledWith(`${cuiRaBase}/api/payload/abc-123`, {
+      headers: { 'service-token': 's2s-tok', accept: 'application/json' },
+    });
+  });
+
+  it('url-encodes the id', async () => {
+    mockHttp.get.mockResolvedValue({ data: { action: 'cancel', correlationId: '1' } });
+
+    await cuiRaService.getPayload('a/b c', 's2s-tok');
+
+    expect(mockHttp.get).toHaveBeenCalledWith(`${cuiRaBase}/api/payload/a%2Fb%20c`, expect.anything());
+  });
+
+  it('wraps a failure as an HTTPError', async () => {
+    mockHttp.get.mockRejectedValue({ message: 'boom', response: { status: 404 } });
+
+    await expect(cuiRaService.getPayload('missing', 's2s-tok')).rejects.toMatchObject({ status: 404 });
   });
 });

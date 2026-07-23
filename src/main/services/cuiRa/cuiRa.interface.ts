@@ -65,3 +65,17 @@ export interface CuiRaInvocationRequest {
 export interface CuiRaInvocationResponse {
   url: string;
 }
+
+// The action the citizen completed in the microsite (returned by GET /api/payload/:id).
+// 'submit' = save the data; 'cancel' = ignore, make no changes.
+export type CuiRaAction = 'submit' | 'cancel';
+
+// Response of GET /api/payload/:id — the result of the citizen's microsite session.
+// `flagsAsSupplied` / `replacementFlags` are only present depending on what changed in the
+// microsite (see the cui-ra contract); `action` and `correlationId` are always present.
+export interface CuiRaGetPayloadResponse {
+  flagsAsSupplied?: CuiRaFlags;
+  replacementFlags?: CuiRaFlags;
+  action: CuiRaAction;
+  correlationId: string;
+}
