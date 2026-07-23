@@ -4,18 +4,18 @@
   "expenseQuestion": "cyWhat regular monthly expenses does the defendant have? (Optional)",
   "hintText": "cySelect all that apply. The information the defendant provides must be truthful and accurate.",
   "options": {
-    "householdBills": "cyHousehold bills (for example, council tax, gas, electricity, water, internet)",
-    "loanPayments": "cyLoan payments",
-    "childSpousalMaintenance": "cyChild or spousal maintenance",
-    "mobilePhone": "cyMobile phone",
-    "groceryShopping": "cyGrocery shopping",
-    "fuelParkingTransport": "cyFuel, parking and transport",
-    "schoolCosts": "cySchool costs (for example, uniform and school dinners)",
-    "clothing": "cyClothing",
-    "otherExpenses": "cyOther"
+    "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+    "loanPayments": "Taliadau benthyciadau",
+    "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/gwraig",
+    "mobilePhone": "Ffôn symudol",
+    "groceryShopping": "Siopa bwyd",
+    "fuelParkingTransport": "Tanwydd, parcio a chludiant",
+    "schoolCosts": "Costau ysgol (er enghraifft, gwisg a chinio ysgol)",
+    "clothing": "Dillad",
+    "otherExpenses": "Arall"
   },
   "subFields": {
-    "amount": "cyAmount paid",
+    "amount": "Swm a dalwyd",
     "frequency": "Talu pob:"
   },
   "frequency": {

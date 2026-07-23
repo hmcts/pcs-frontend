@@ -1,13 +1,13 @@
 {
-  "pageTitle": "cyInstalments",
-  "heading": "cyInstalments",
+  "pageTitle": "Rhandaliadau",
+  "heading": "Rhandaliadau",
   "amountQuestion": "cyHow much could the defendant afford to pay in addition to the current rent?",
   "frequencyQuestion": "cyHow frequently could the defendant afford to pay this amount?",
   "frequencyOptions": {
-    "weekly": "cyWeekly",
-    "every2Weeks": "cyEvery 2 weeks",
-    "every4Weeks": "cyEvery 4 weeks",
-    "monthly": "cyMonthly"
+    "weekly": "Pob wythnos",
+    "every2Weeks": "Pob 2 wythnos",
+    "every4Weeks": "Pob 4 wythnos",
+    "monthly": "Pob mis"
   },
   "amountHint": "",
   "errors": {

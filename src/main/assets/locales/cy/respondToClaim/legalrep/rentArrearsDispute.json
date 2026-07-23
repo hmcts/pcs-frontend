@@ -1,10 +1,10 @@
 {
-  "pageTitle": "cyRent arrears",
+  "pageTitle": "Ôl-ddyledion rhent",
   "amountOwedHeading": "cyAmount the defendant owes in rent arrears given by {{claimantName}}:",
   "rentArrearsQuestion": "cyDoes the defendant owe this amount in rent arrears?",
   "rentArrearsOptions": {
-    "yes": "cyYes",
-    "no": "cyNo",
+    "yes": "Ydy",
+    "no": "Nac ydy",
     "notSure": "cyDefendant is not sure"
   },
   "insetIntroText": "",

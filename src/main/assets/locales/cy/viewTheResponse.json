@@ -1,58 +1,52 @@
 {
-  "pageTitle": "cyView the response",
-  "heading": "cyView the response",
+  "pageTitle": "Gweld yr ymateb",
+  "heading": "Gweld yr ymateb",
   "caption": "cyThe response",
   "propertyAddressLabel": "cyProperty address:",
-  "caseReferenceLabel": "cyCase number:",
-
+  "caseReferenceLabel": "Rhif yr achos:",
   "summary": {
     "dateIssued": "cyDate issued",
     "dateSubmitted": "cyDate submitted"
   },
-
   "sections": {
     "claimantDetails": "cyClaimant details",
     "defendant1Details": "cyDefendant 1 details",
     "additionalDefendantDetails": "cyAdditional defendant {{number}} details",
     "responseToClaim": "cyResponse to the claimant’s claim",
-    "paymentsOrAgreements": "cyPayments or agreements since the claim was made",
-    "householdAndCircumstances": "cyYour household and circumstances",
-    "regularIncome": "cyRegular income",
+    "paymentsOrAgreements": "Taliadau neu gytundebau ers gwneud yr hawliad",
+    "householdAndCircumstances": "Eich cartref a'ch amgylchiadau",
+    "regularIncome": "Incwm rheolaidd",
     "priorityDebts": "Dyledion blaenoriaeth",
-    "regularExpenses": "cyRegular expenses",
+    "regularExpenses": "Costau rheolaidd",
     "additionalInformation": "cyAdditional information",
     "counterclaim": "Gwrth-hawliad",
     "statementOfTruth": "Datganiad gwirionedd"
   },
-
   "claimantDetails": {
     "organisation": "cyClaimant organisation",
     "name": "cyName",
     "address": "cyAddress for service"
   },
-
   "defendant": {
     "name": "cyName",
-    "dateOfBirth": "cyDate of birth",
-    "email": "cyEmail address",
+    "dateOfBirth": "Dyddiad geni",
+    "email": "Cyfeiriad e-bost",
     "phone": "cyPhone number",
     "address": "cyPostal address",
     "contactPreferences": "cyContact preferences",
-    "freeLegalAdvice": "cyHave you had any free legal advice?",
+    "freeLegalAdvice": "A ydych wedi cael unrhyw gyngor cyfreithiol am ddim?",
     "freeLegalAdviceOptions": {
-      "YES": "cyYes",
-      "NO": "cyNo",
-      "PREFER_NOT_TO_SAY": "cyPrefer not to say"
+      "YES": "Ydy",
+      "NO": "Nac ydy",
+      "PREFER_NOT_TO_SAY": "Mae'n well gen i beidio dweud"
     }
   },
-
   "contactPreference": {
     "text": "cyText message",
     "phone": "cyPhone",
-    "email": "cyEmail",
+    "email": "E-bost",
     "post": "cyPost"
   },
-
   "responseToClaim": {
     "disputeClaim": "cyDo you dispute any other parts of the claim?",
     "disputeDetails": "cyExplain which parts of the claim you dispute",
@@ -66,76 +60,69 @@
     "noticeReceivedDate": "cyWhen did you receive notice from the claimant?",
     "rentArrearsAmountConfirmation": "cyIs the amount of rent arrears given by the claimant correct?",
     "rentArrearsAmount": "cyAdmitted amount owed in rent arrears",
-    "landlordRegistered": "cyIs your landlord registered?",
-    "landlordLicensed": "cyIs your landlord licensed?",
-    "writtenTerms": "cyHas your landlord sent you written terms of the occupation contract?",
+    "landlordRegistered": "A yw eich landlord wedi'i gofrestru?",
+    "landlordLicensed": "A yw eich landlord wedi'i drwyddedu?",
+    "writtenTerms": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth?",
     "makeCounterClaim": "Ydych chi eisiau gwneud gwrth-hawliad?"
   },
-
   "payments": {
     "anyPaymentsMade": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}?",
     "paymentDetails": "cyDetails of payments made",
     "repaymentPlanAgreed": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}?",
     "repaymentAgreedDetails": "cyDetails of repayment agreement",
-    "repayArrearsInstalments": "cyWould you like to offer to pay your arrears in instalments?",
-    "additionalContribution": "cyHow much could you afford to pay in addition to the current rent?",
-    "additionalContributionFrequency": "cyHow frequently could you afford to pay this amount?"
+    "repayArrearsInstalments": "A hoffech chi gynnig talu eich ôl-ddyledion mewn rhandaliadau?",
+    "additionalContribution": "Faint allwch chi fforddio’i dalu ar ben eich rhent cyfredol?",
+    "additionalContributionFrequency": "Pa mor aml allech chi fforddio talu'r swm hwn?"
   },
-
   "household": {
     "dependantChildren": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
     "dependantChildrenDetails": "cyDetails of dependent children",
-    "otherDependants": "cyDo you have any other dependants?",
+    "otherDependants": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
     "otherDependantDetails": "cyDetails of other dependants",
-    "otherTenants": "cyDo any other adults live in your home?",
+    "otherTenants": "A oes yna unrhyw oedolion eraill yn byw yn eich cartref?",
     "otherTenantsDetails": "cyDetails of other adults living in your home?",
-    "alternativeAccommodation": "cyWould you have somewhere else to live if you had to leave your home?",
+    "alternativeAccommodation": "A fyddai gennych rywle arall i fyw os byddai'n rhaid i chi adael eich cartref?",
     "alternativeAccommodationDate": "cyWhen would you be able to move in?",
-    "shareAdditional": "cyWould you like to share anything about your circumstances?",
+    "shareAdditional": "Hoffech chi rannu unrhyw beth am eich amgylchiadau?",
     "additionalDetails": "cyDetails about your circumstances",
-    "exceptionalHardship": "cyWould you experience exceptional hardship if you were asked to leave your home?",
+    "exceptionalHardship": "A fyddech yn profi caledi eithriadol os gofynnir i chi adael eich cartref?",
     "exceptionalHardshipDetails": "cyDetails about the exceptional hardship you’d experience"
   },
-
   "income": {
-    "fromJobs": "cyIncome from all jobs you do",
-    "pension": "cyPension – state and private",
-    "universalCredit": "cyUniversal Credit",
+    "fromJobs": "Incwm o bob swydd a wneir gennych",
+    "pension": "Pensiwn, y wladwriaeth a phreifat",
+    "universalCredit": "Credyd Cynhwysol",
     "universalCreditApplied": "Ydych chi wedi gwneud cais am Gredyd Cynhwysol?",
     "universalCreditApplicationDate": "Pryd wnaethoch chi wneud cais?",
-    "otherBenefits": "cyOther benefits and credits",
-    "moneyFromElsewhere": "cyMoney from somewhere else (for example, child maintenance payments or someone in your household gives you money)",
-    "moneyFromElsewhereDetails": "cyGive details about the other sources of income and how much you usually receive",
-    "totalAmountReceived": "cyTotal amount received",
+    "otherBenefits": "Budd-daliadau a chredydau eraill",
+    "moneyFromElsewhere": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yn eich cartref yn rhoi arian i chi)",
+    "moneyFromElsewhereDetails": "Rhowch fanylion y ffynonellau eraill o incwm a faint rydych fel arfer yn ei gael",
+    "totalAmountReceived": "Cyfanswm a dderbynnir",
     "receivedEvery": "cyReceived every"
   },
-
   "debts": {
     "hasPriorityDebts": "A oes gennych chi unrhyw ddyledion blaenoriaeth?",
     "debtTotal": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
     "debtContribution": "Faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis?",
     "paidEvery": "cyPaid every"
   },
-
   "expenses": {
-    "householdBills": "cyHousehold bills (for example, council tax, gas, electricity, water, internet)",
-    "loanPayments": "cyLoan payments",
-    "childSpousalMaintenance": "cyChild or spousal maintenance",
-    "mobilePhone": "cyMobile phone",
-    "groceryShopping": "cyGrocery shopping",
-    "fuelParkingTransport": "cyFuel, parking and transport",
-    "schoolCosts": "cySchool costs (for example, uniform and school dinners)",
-    "clothing": "cyClothing",
-    "other": "cyOther",
-    "amountPaid": "cyAmount paid",
+    "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+    "loanPayments": "Taliadau benthyciadau",
+    "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/gwraig",
+    "mobilePhone": "Ffôn symudol",
+    "groceryShopping": "Siopa bwyd",
+    "fuelParkingTransport": "Tanwydd, parcio a chludiant",
+    "schoolCosts": "Costau ysgol (er enghraifft, gwisg a chinio ysgol)",
+    "clothing": "Dillad",
+    "other": "Arall",
+    "amountPaid": "Swm a dalwyd",
     "paidEvery": "cyPaid every"
   },
-
   "additional": {
     "otherConsiderations": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
     "otherConsiderationsDetails": "cyDetails of what else you want to tell the court"
   },
-
   "counterclaim": {
     "type": "Beth ydych chi’n ei hawlio?",
     "amountKnown": "Ydych chi'n hawlio ar gyfer swm penodol o arian?",
@@ -153,50 +140,42 @@
     "hwfReference": "cyHelp with Fees reference number",
     "claimTypeOptions": {
       "PAYMENT_OR_COMPENSATION": "Swm o arian neu iawndal",
-      "SOMETHING_ELSE": "cySomething else",
+      "SOMETHING_ELSE": "Rhywbeth arall",
       "BOTH": "Y ddau"
     },
     "needHelpWithFeesOptions": {
-      "YES": "cyI need help paying the fee",
-      "NO": "cyI do not need help paying the fee"
+      "YES": "Rwyf angen help i dalu’r ffi",
+      "NO": "Nid wyf angen help i dalu’r ffi"
     }
   },
-
   "incomeFrequencies": {
     "WEEKLY": "cyreceived every week",
     "MONTHLY": "cyreceived every month"
   },
-
   "paymentFrequencies": {
     "WEEKLY": "cypaid every week",
     "MONTHLY": "cypaid every month"
   },
-
   "frequency": {
-    "weekly": "cyWeekly",
-    "every2Weeks": "cyEvery 2 weeks",
-    "every4Weeks": "cyEvery 4 weeks",
-    "monthly": "cyMonthly"
+    "weekly": "Pob wythnos",
+    "every2Weeks": "Pob 2 wythnos",
+    "every4Weeks": "Pob 4 wythnos",
+    "monthly": "Pob mis"
   },
-
   "statementOfTruth": {
     "body": "cyI believe the facts stated in this defence form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in the truth.",
     "completedBy": "Cwblhawyd gan"
   },
-
   "pdf": {
     "heading": "cyDownload a PDF copy of the response",
     "linkText": "cyResponse (PDF)"
   },
-
   "closeAndReturn": "Cau a dychwelyd i drosolwg o’r achos",
-
   "accordion": {
     "summary": "cyIf you cannot find a document that you are looking for in this section",
     "body": "cyAll documents uploaded by you or the claimant are on the",
     "linkText": "cyDocuments page"
   },
-
   "personsUnknown": "cyPersons unknown",
   "addressUnknown": "cyAddress unknown"
 }

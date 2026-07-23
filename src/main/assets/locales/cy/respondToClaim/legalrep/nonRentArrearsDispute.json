@@ -1,13 +1,13 @@
 {
-  "pageTitle": "cyDisputing the claim",
-  "heading": "cy{{claimantName}}\u2019s claim",
+  "pageTitle": "Gwrthwynebu’r hawliad",
+  "heading": "cy{{claimantName}}’s claim",
   "disputeOtherPartsQuestion": "cyDoes the defendant dispute any other parts of the claim?",
   "disputeDetails": {
     "label": "cyExplain which parts of the claim the defendant does not agree with"
   },
   "disputeOtherPartsOptions": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
   "introParagraph": "",
   "includesHeading": "",

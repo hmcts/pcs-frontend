@@ -1,11 +1,11 @@
 {
   "pageTitle": "Cais wedi'i gyflwyno",
-  "applicationSubmitted": "cyApplication submitted",
+  "applicationSubmitted": "Cais wedi'i gyflwyno",
   "paymentBeingProcessed": "cyPayment being processed",
   "adjournRequestReceived": "cyWe have received your request to adjourn (delay) the court hearing.",
   "setAsideRequestReceived": "cyWe have received your request to set aside (cancel) the order.",
   "somethingElseRequestReceived": "cyWe have received your request to ask the court to make an order.",
-  "whatHappensNext": "cyWhat happens next",
+  "whatHappensNext": "Beth fydd yn digwydd nesaf",
   "youDoNotNeedToDoAnythingElse": "cyYou do not need to do anything else. We will send your application to the judge and we will contact you again when they have made a decision.",
   "giveFeedbackAboutThisService": "cyGive feedback about this service",
   "completeThisShortSurvey": "<a href=\"https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Llenwch yr arolwg byr hwn i'n helpu i wella'r gwasanaeth hwn</a> (fel arfer yn cymryd 5 munud).",

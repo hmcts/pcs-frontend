@@ -1,13 +1,13 @@
 {
-  "pageTitle": "cyNotice date",
+  "pageTitle": "Dyddiad yr hysbysiad",
   "question": "cyWhen did the defendant receive notice from {{claimantName}} (optional)?",
-  "noticeDateHint": "cyFor example, 27 9 2022",
+  "noticeDateHint": "Er enghraifft, 27 9 2022",
   "paragraph": "cy{{claimantName}} did not provide the date they served the defendant notice.",
   "errors": {
     "date": {
-      "day": "cyDay",
+      "day": "Diwrnod",
       "month": "Mis",
-      "year": "cyYear",
+      "year": "Blwyddyn",
       "notRealDate": "cyThe date the defendant received notice must be a real date",
       "futureDate": "cyThe date the defendant received notice must either be today’s date or in the past",
       "invalidValue": "cyThe date the defendant received notice must be a real date",
