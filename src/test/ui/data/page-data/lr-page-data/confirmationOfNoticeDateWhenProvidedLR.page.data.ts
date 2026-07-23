@@ -26,24 +26,5 @@ export function convertDateFormat(dateString: string): string {
   const day = date.getDate();
   const month = date.toLocaleString(`en-US`, { month: `long` });
 
-  return `${formatOrdinalDay(day)} ${month} ${date.getFullYear()}`;
-}
-
-function formatOrdinalDay(day: number): string {
-  const lastTwoDigits = day % 100;
-
-  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
-    return `${day}th`;
-  }
-
-  switch (day % 10) {
-    case 1:
-      return `${day}st`;
-    case 2:
-      return `${day}nd`;
-    case 3:
-      return `${day}rd`;
-    default:
-      return `${day}th`;
-  }
+  return `${day} ${month} ${date.getFullYear()}`;
 }
