@@ -20,8 +20,7 @@
   "statementOfTruthBody": "cyI believe the facts stated in this claim form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
   "sections": {
     "claimantDetails": "cyClaimant details",
-    "defendantDetails": "cyDefendant 1 details",
-    "additionalDefendantDetails": "cyAdditional defendant {{number}} details",
+    "defendantDetails": "cyDefendant {{number}} details",
     "claimDetails": "cyClaim details",
     "asb": "cyAlleged antisocial behaviour and illegal or prohibited conduct",
     "rentArrears": "cyDetails of rent arrears",

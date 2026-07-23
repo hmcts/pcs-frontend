@@ -144,16 +144,10 @@ function joinName(firstName?: string, lastName?: string): string {
   return [firstName, lastName].filter(Boolean).join(' ').trim();
 }
 
-function resolveAdditionalDefendantName(t: TFunction, party: CcdParty | undefined): string {
-  if (!party || Object.keys(party).length === 0 || isNo(party.nameKnown)) {
-    return t('viewTheResponse:personsUnknown');
-  }
-
-  if (party.firstName === 'Person unknown' && party.lastName === 'Person unknown') {
-    return t('viewTheResponse:personsUnknown');
-  }
-
-  return joinName(party.firstName, party.lastName) || t('viewTheResponse:personsUnknown');
+function resolveCurrentDefendantRank(caseData: CcdCaseData): number {
+  const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
+  const currentDefendant = (caseData.allDefendants ?? []).find(defendant => defendant.id === currentDefendantPartyId);
+  return typeof currentDefendant?.value.rank === 'number' ? currentDefendant.value.rank : 1;
 }
 
 function resolveDefendantPostalAddress(
@@ -233,7 +227,7 @@ function resolveClaimantName(caseData: CcdCaseData): string {
   return new CcdCaseModel({ id: '', data: caseData }).claimantName;
 }
 
-function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildDefendantDetails(t: TFunction, caseData: CcdCaseData): TitledSummarySection {
   const rows: SummaryRow[] = [];
   const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
   const responses = caseData.possessionClaimResponse?.defendantResponses;
@@ -251,39 +245,11 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
   if (!addressUnknown) {
     pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
   }
-  return { rows };
-}
 
-function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): TitledSummarySection[] {
-  const defendants = caseData.allDefendants ?? [];
-  if (defendants.length < 2) {
-    return [];
-  }
-
-  const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
-
-  return defendants
-    .filter(defendant => !currentDefendantPartyId || defendant.id !== currentDefendantPartyId)
-    .map((defendant, index) => {
-      const party = defendant.value;
-      const rows: SummaryRow[] = [];
-      const addressUnknown = isNo(party.addressKnown);
-
-      pushRow(rows, t('viewTheResponse:defendant.name'), resolveAdditionalDefendantName(t, party));
-      pushRow(
-        rows,
-        t('viewTheResponse:defendant.address'),
-        resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
-      );
-      if (!addressUnknown) {
-        pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(party.dateOfBirth) ?? '');
-      }
-
-      return {
-        sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
-        rows,
-      };
-    });
+  return {
+    sectionTitle: t('viewTheResponse:sections.defendantDetails', { number: resolveCurrentDefendantRank(caseData) }),
+    rows,
+  };
 }
 
 function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySection {
@@ -621,8 +587,7 @@ export default function viewTheResponseRoutes(app: Application): void {
 
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
-        defendant1Details: buildDefendant1Details(t, caseData),
-        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
+        defendantDetails: buildDefendantDetails(t, caseData),
         responseToClaim: buildResponseToClaim(t, caseData),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
