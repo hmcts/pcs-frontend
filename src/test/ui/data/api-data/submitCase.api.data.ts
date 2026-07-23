@@ -103,8 +103,16 @@ export const submitCaseApiData = {
       rentArrears_Total: '200000',
       rentArrears_RecoveryAttempted: 'NO',
       arrearsJudgmentWanted: 'NO',
-      notice_AbleToUploadDocument: 'No',
-      notice_UnableToUploadReason: 'no documents to upload',
+      notice_AbleToUploadDocument: 'Yes',
+      notice_Documents: [
+        {
+          value: {
+            document_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503/binary`,
+            document_filename: 'rentArrears.pdf',
+          },
+        },
+      ],
       notice_ServiceMethod: 'FIRST_CLASS_POST',
       claimantNamePossessiveForm: null,
       claimantCircumstancesSelect: 'NO',
@@ -585,8 +593,16 @@ export const submitCaseApiData = {
       settlementAttempted: 'NO',
       noticeServed: process.env.NOTICE_SERVED,
       notice_PostedDate: '2025-11-10',
-      notice_AbleToUploadDocument: 'No',
-      notice_UnableToUploadReason: 'no documents to upload',
+      notice_AbleToUploadDocument: 'Yes',
+      notice_Documents: [
+        {
+          value: {
+            document_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503/binary`,
+            document_filename: 'rentArrears.pdf',
+          },
+        },
+      ],
       notice_ServiceMethod: 'EMAIL',
       notice_EmailSentDateTime: '2025-11-10T10:11:20',
       notice_EmailAddress: 'test@gmail.com',

@@ -79,3 +79,12 @@ export function getCurrentFormattedDate(): string {
     month: 'long',
   })} ${date.getFullYear()}`;
 }
+
+export function convertDateFormat(dateString: string): string {
+  const date = new Date(dateString);
+  const day = date.getDate();
+
+  return `${day}${getOrdinal(day)} ${date.toLocaleString('en-GB', {
+    month: 'long',
+  })} ${date.getFullYear()}`;
+}
