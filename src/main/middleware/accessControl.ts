@@ -2,9 +2,13 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
 import { legalrepFlowConfig } from '../steps/respond-to-claim/legalrep.flow.config';
-import { getUserType } from '../steps/utils';
+import { getUserRoles, getUserType } from '../steps/utils';
 
 import { oidcMiddleware } from './oidc';
+
+import { Logger } from '@modules/logger';
+
+const logger = Logger.getLogger('accessControl');
 
 export const PUBLIC_PATHS: RegExp[] = [
   /^\/$/,
@@ -65,8 +69,21 @@ export const authorisationGate: RequestHandler = (req: Request, res: Response, n
     if (isSolicitorAllowedPath(req.path)) {
       return next();
     }
+    logger.warn('Authorisation denied', {
+      event: 'access_denied',
+      userType,
+      userId: req.session?.user?.uid,
+      roles: getUserRoles(req),
+      path: req.path,
+    });
     return next(new HTTPError('Access denied', 403));
   }
 
+  logger.warn('Authorisation denied - session has no permitted role, logging out', {
+    event: 'access_denied_logout',
+    userId: req.session?.user?.uid,
+    roles: getUserRoles(req),
+    path: req.path,
+  });
   res.redirect('/logout');
 };

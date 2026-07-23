@@ -9,6 +9,7 @@ jest.mock('../../../main/middleware/oidc', () => ({
 
 jest.mock('../../../main/steps/utils', () => ({
   getUserType: (...args: unknown[]) => mockGetUserType(...args),
+  getUserRoles: () => [],
 }));
 
 jest.mock('../../../main/steps/respond-to-claim/legalrep.flow.config', () => ({
