@@ -144,10 +144,10 @@ function joinName(firstName?: string, lastName?: string): string {
   return [firstName, lastName].filter(Boolean).join(' ').trim();
 }
 
-function resolveCurrentDefendantRank(caseData: CcdCaseData): number {
+function resolveCurrentDefendantRank(caseData: CcdCaseData): number | undefined {
   const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
   const currentDefendant = (caseData.allDefendants ?? []).find(defendant => defendant.id === currentDefendantPartyId);
-  return typeof currentDefendant?.value.rank === 'number' ? currentDefendant.value.rank : 1;
+  return typeof currentDefendant?.value.rank === 'number' ? currentDefendant.value.rank : undefined;
 }
 
 function resolveDefendantPostalAddress(
