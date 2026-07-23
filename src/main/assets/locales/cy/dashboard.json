@@ -1,10 +1,11 @@
 {
-  "serviceName": "cyPossession Claims",
+  "serviceName": "Hawliadau Meddiant",
   "caseReferenceLabel": "Rhif yr achos:",
   "iWantToHeading": "Rwyf eisiau ...",
   "askCourtToMakeOrder": "Gofyn i'r llys wneud gorchymyn (gwneud cais cyffredinol)",
   "uploadAdditionalDocuments": "Uwchlwytho dogfennau ychwanegol",
   "helpAndSupportHeading": "Cymorth a chefnogaeth",
+  "helpAndSupportAriaLabel": "Cymorth a chefnogaeth",
   "contactInformationAriaLabel": "Cymorth a gwybodaeth gyswllt",
   "helpWithFees": "Help i dalu ffioedd",
   "whatToExpectAtTheHearing": "Beth i’w ddisgwyl mewn gwrandawiad",
@@ -13,54 +14,54 @@
   "getDebtRespite": "Cael seibiant o ddyled (Lle i Anadlu)",
   "findInformation": "Dod o hyd i wybodaeth am fy llys",
   "taskGroups": {
-    "CLAIM": "cyThe claim against you",
-    "HEARING": "cyCourt hearings",
-    "JUDGEMENT": "cyJudgement from the court",
-    "NOTICE": "cyOrders and notices from the court",
-    "DOCUMENTS": "cyDocuments",
-    "RESPONSE": "cyYour response",
-    "APPLICATIONS": "cyApplications"
+    "CLAIM": "Yr hawliad yn eich erbyn",
+    "HEARING": "Gwrandawiadau llys",
+    "JUDGEMENT": "Dyfarniad gan y llys",
+    "NOTICE": "Gorchmynion a hysbysiadau gan y llys",
+    "DOCUMENTS": "Dogfennau",
+    "RESPONSE": "Eich ymateb",
+    "APPLICATIONS": "Ceisiadau"
   },
   "notifications": {
     "Defendant": {
       "CaseIssued": {
-        "title": "cyCase issued",
-        "body": "cyYour case has been issued. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">View the claim</a>. Respond by {{responseEndDate}}."
+        "title": "Achos wedi'i gyflwyno",
+        "body": "Mae eich achos wedi'i gyflwyno <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">Gweld yr hawliad</a>. Ymateb erbyn {{responseEndDate}}."
       },
       "ResponseToClaim": {
-        "title": "cyResponse to claim",
+        "title": "Ymateb i’r hawliad",
         "body": "<a class=\"govuk-link\" href=\"{{respondToClaimUrl}}\">{{ctaLabel}}</a>"
       },
       "ResponseNotStarted": {
-        "title": "cyYour response",
-        "body": "cyYou should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Start your response</a>"
+        "title": "Eich ymateb",
+        "body": "Dylech ymateb i'r hawliad cyn y gwrandawiad.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Dechrau eich ymateb </a>"
       },
       "ResponseInProgress": {
-        "title": "cyYour response",
-        "body": "cyYou should complete your response before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Continue with your response</a>"
+        "title": "Eich ymateb",
+        "body": "Dylech gwblhau eich ymateb cyn y gwrandawiad.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Parhau gyda'ch ymateb </a>"
       },
       "ResponseSubmitted": {
-        "title": "cyYour response",
-        "body": "cyYou have responded to the claim."
+        "title": "Eich ymateb",
+        "body": "Rydych wedi ymateb i’r hawliad."
       },
       "NoHearingArranged": {
-        "title": "cyA property possession claim has been made against you",
-        "body": "cyThe court will arrange the hearing and contact you with details."
+        "title": "Mae hawliad meddiannu eiddo wedi’i wneud yn eich erbyn",
+        "body": "Bydd y llys yn trefnu'r gwrandawiad ac yn cysylltu gyda chi gyda manylion."
       }
     }
   },
   "tasks": {
     "statuses": {
-      "AVAILABLE": "cyAvailable",
-      "IN_PROGRESS": "cyIn progress",
-      "COMPLETED": "cyCompleted",
-      "NOT_STARTED": "cyNot started"
+      "AVAILABLE": "Ar gael",
+      "IN_PROGRESS": "Yn mynd rhagddo",
+      "COMPLETED": "Wedi’i gwblhau",
+      "NOT_STARTED": "Heb ddechrau"
     },
     "ViewClaim": {
       "title": "Gweld yr hawliad"
     },
     "RespondToClaim": {
-      "title": "cyRespond to the claim"
+      "title": "Ymateb i’r hawliad"
     },
     "ViewResponse": {
       "title": "Gweld yr ymateb"
@@ -69,37 +70,37 @@
       "title": "Gweld y dogfennau"
     },
     "ViewHearingDocuments": {
-      "title": "cyView hearing documents"
+      "title": "Gweld dogfennau gwrandawiad"
     },
     "ViewOrdersAndNotices": {
-      "title": "cyView orders and notices"
+      "title": "Gweld gorchmynion a rhybuddion"
     },
     "UploadDocuments": {
       "title": "Uwchlwytho dogfennau ychwanegol"
     },
     "ReviewResponse": {
-      "title": "cyReview the response"
+      "title": "Adolygu'r ymateb"
     },
     "SubmitResponse": {
-      "title": "cySubmit the response"
+      "title": "Cyflwyno'r ymateb"
     },
     "MakeGeneralApplication": {
       "title": "Gofyn i'r llys wneud gorchymyn (gwneud cais cyffredinol)"
     },
     "ViewAllApplications": {
-      "title": "cyView all applications"
+      "title": "Gweld yr holl geisiadau"
     }
   },
 
   "viewDocuments": {
     "pageTitle": "Gweld y dogfennau",
-    "noDocuments": "cyThere are no documents to display.",
-    "submittedOn": "cySubmitted on",
+    "noDocuments": "Nid oes unrhyw ddogfennau i'w harddangos.",
+    "submittedOn": "Cyflwynwyd ar",
     "folders": {
-      "statementsOfCase": "cyStatements of case",
-      "propertyDocuments": "cyProperty documents",
-      "evidence": "cyEvidence",
-      "correspondence": "cyCorrespondence"
+      "statementsOfCase": "Datganiadau am yr achos",
+      "propertyDocuments": "Dogfennau eiddo",
+      "evidence": "Tystiolaeth",
+      "correspondence": "Gohebiaeth"
     }
   }
 }

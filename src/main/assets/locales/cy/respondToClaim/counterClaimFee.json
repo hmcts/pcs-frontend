@@ -1,19 +1,19 @@
 {
-  "pageTitle": "cyCounterclaim fee",
-  "counterClaimFeeCostParagraph": "cyBased on the information provided, it will cost {{counterClaimFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to make your counterclaim.",
-  "counterClaimFeeHeading": "cyHelp with court fees",
+  "pageTitle": "Ffi gwrth-hawliad",
+  "counterClaimFeeCostParagraph": "Yn seiliedig ar yr wybodaeth a ddarparwyd, bydd yn costio {{counterClaimFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} i wneud eich gwrth-hawliad.",
+  "counterClaimFeeHeading": "Help gyda ffioedd llys",
   "counterClaimFeeHelpParagraph": "Efallai y gallwch gael help i dalu'r ffi os ydych chi (os yw un neu fwy o’r canlynol yn berthnasol):",
   "counterClaimFeeBulletBenefits": "yn cael budd-daliadau penodol",
   "counterClaimFeeBulletLowSavings": "gyda dim ond ychydig neu dim cynilion",
   "counterClaimFeeBulletLowIncome": "ar incwm isel",
-  "counterClaimFeeHeading2": "cyDo you need help paying the counterclaim fee?",
+  "counterClaimFeeHeading2": "Ydych chi angen help i dalu'r ffi gwrth-hawliad?",
   "counterClaimFeeOptions": {
     "iNeedHelpWithPayingFee": "Rwyf angen help i dalu’r ffi",
     "iDoNotNeedHelpWithPayingFee": "Nid wyf angen help i dalu’r ffi"
   },
   "errors": {
     "counterClaimFee": {
-      "required": "cySelect if you need help paying the counterclaim fee"
+      "required": "Dewiswch os oes arnoch angen help i dalu’r ffi gwrth-hawliad"
     }
   }
 }

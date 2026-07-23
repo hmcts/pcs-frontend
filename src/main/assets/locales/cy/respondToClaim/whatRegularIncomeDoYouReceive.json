@@ -54,7 +54,7 @@
     "otherBenefitsFrequency": {
       "required": "Dewiswch pa mor aml rydych yn cael incwm o fudd-daliadau a chredydau eraill"
     },
-    "moneyFromElsewhereDetailsMaxLength": "cyDetails of money from somewhere else must be 500 characters or less",
+    "moneyFromElsewhereDetailsMaxLength": "Rhaid i fanylion arian o rhywle arall fod yn 500 o nodau neu lai",
     "moneyFromElsewhereDetails": {
       "required": "Rhowch fanylion yr arian rydych yn ei gael o rywle arall a faint rydych fel arfer yn ei gael",
       "invalidCharacters": "Rhowch fanylion am y ffynonellau eraill o incwm a faint rydych fel arfer yn ei gael - dylai gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"

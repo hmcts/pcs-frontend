@@ -9,7 +9,7 @@
   "textAreaHint": "Gallwch nodi hyd at 500 o nodau.",
   "errors": {
     "repaymentsInfo": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
-    "repaymentsInfoMaxLength": "cyPayment details must be 500 characters or less",
+    "repaymentsInfoMaxLength": "Rhaid i’r manylion talu fod yn 500 nod neu lai",
     "confirmRepaymentsMade": "Dewiswch a ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}"
   }
 }

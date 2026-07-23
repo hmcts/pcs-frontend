@@ -13,7 +13,7 @@
   "errors": {
     "repaymentsAgreed": "Dewiswch a ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}",
     "repaymentsAgreed.repaymentsAgreedDetails": "Rhowch fanylion faint rydych wedi cytuno i'w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
-    "repaymentsAgreedDetailsMaxLength": "cyRepayment agreement details must be 500 characters or less",
-    "repaymentsAgreed.repaymentsAgreedDetails.invalid": "cyRepayments agreed details must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "repaymentsAgreedDetailsMaxLength": "Rhaid i fanylion y cytundeb ad-dalu fod yn 500 o nodau neu lai",
+    "repaymentsAgreed.repaymentsAgreedDetails.invalid": "Dylai manylion y cytunwyd arnynt ar gyfer ad-dalu gynnwys llythrennau a i z yn unig, a nodweddion arbennig fel cysylltnod, bylchau a chollnod."
   }
 }
