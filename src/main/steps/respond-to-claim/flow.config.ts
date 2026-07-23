@@ -44,7 +44,7 @@ export const flowConfig: JourneyFlowConfig = {
   useSessionFormData: false,
   eventId: 'respondPossessionClaim',
   sections: respondToClaimSections,
-  nonSectionStepOrder: ['end-now', 'task-list', 'reasonable-adjustments-confirmation'],
+  nonSectionStepOrder: ['end-now', 'task-list', 'reasonable-adjustments-triage', 'reasonable-adjustments-confirmation'],
   // First visible step of any section back-links to this hub step.
   hubStepName: 'task-list',
   steps: {

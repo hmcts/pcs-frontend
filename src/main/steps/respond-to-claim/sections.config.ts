@@ -137,14 +137,14 @@ const sectionDefs = [
       'incomeAndExpenditure',
       'uploadFiles',
     ],
-    // 'reasonable-adjustments-triage', 'equality-and-diversity-start' and
-    // 'equality-and-diversity-end' are intentionally parked out of the live citizen
-    // journey while RA / Your Support and PCQ integrations are still in progress.
-    // Their step folders, registry entries and locale files are retained so re-
-    // enablement is a one-line restore here. See HDPI-3793 (RA triage) and the PCQ
-    // tie-in tracked in config/default.json (`pcq.enabled`). The RA confirmation
-    // screen is registered as a non-section step reachable by direct
-    // navigation; wiring into the live journey is owned by the PCQ integration.
+    // 'equality-and-diversity-start' and 'equality-and-diversity-end' are intentionally
+    // parked out of the live citizen journey while the PCQ integration is still in
+    // progress. Their step folders, registry entries and locale files are retained so
+    // re-enablement is a one-line restore here (see the PCQ tie-in tracked in
+    // config/default.json `pcq.enabled`). The RA triage (HDPI-3793) and RA confirmation
+    // screens are registered as non-section steps (flow.config `nonSectionStepOrder`),
+    // reachable by direct navigation; wiring them into the live journey is owned by the
+    // PCQ integration.
     steps: [
       'language-used',
       'end-of-journey-cya',
@@ -153,7 +153,6 @@ const sectionDefs = [
       'counter-claim-application-fee-amount',
       'counter-claim-payment-successful',
       'response-and-counter-claim-submitted',
-      'reasonable-adjustments-triage',
     ],
   },
 ] as const satisfies readonly {

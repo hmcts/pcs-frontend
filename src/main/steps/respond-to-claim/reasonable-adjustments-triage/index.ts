@@ -16,11 +16,23 @@ export const step: StepDefinition = createFormStep({
   // Your Support microsite and redirects the browser out to it. The "skip" button
   // (reasonableAdjustmentsChoice=skip) falls through to the normal next step.
   beforeRedirect: async (req: Request) => {
-    if (req.body.reasonableAdjustmentsChoice !== 'questions') {
+    if (req.body.reasonableAdjustmentsChoice === 'questions') {
+      const redirectUrl = await startYourSupport(req);
+      req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
       return;
     }
-    const redirectUrl = await startYourSupport(req);
-    req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
+    // TODO (HDPI-7379, INTERIM until the PCQ integration wires the RA journey): the "I do not
+    // need any support at this time" (skip) button returns the citizen to their response journey
+    // at the language-used page. We redirect EXPLICITLY only because reasonable-adjustments-triage
+    // is currently a NON-section step (flow.config `nonSectionStepOrder`): getNextStep from a
+    // non-section step never traverses into the checkYourAnswersAndSubmit section, where
+    // language-used lives. If triage is later moved back into that section (immediately before
+    // language-used), delete this redirect — the normal next-step flow will route there
+    // automatically. Track in Jira.
+    const caseReference = req.res?.locals.validatedCase?.id;
+    if (caseReference) {
+      req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/language-used`);
+    }
   },
   translationKeys: {
     pageTitle: 'pageTitle',
