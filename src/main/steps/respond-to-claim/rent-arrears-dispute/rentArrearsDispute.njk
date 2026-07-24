@@ -17,12 +17,15 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
-  {% if insetIntroText %}
-    <div class="govuk-inset-text">
-      <p class="govuk-body">{{ insetIntroText }}</p>
-      <p class="govuk-body">{{ insetDetailsText }}</p>
-    </div>
-  {% endif %}
+  <div class="govuk-inset-text">
+    <p class="govuk-body">{{ insetIntroText }}</p>
+    <p class="govuk-body">{{ insetDetailsText }}</p>
+    {% if rentStatementDocument %}
+    <p class="govuk-body">
+      <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ rentStatementDocument.id }}" target="_blank" rel="noopener noreferrer">{{ rentStatementDocumentLinkText }}</a>
+    </p>
+    {% endif %}
+  </div>
 
   <h2 class="govuk-heading-s">{{ amountOwedHeading }}</h2>
 

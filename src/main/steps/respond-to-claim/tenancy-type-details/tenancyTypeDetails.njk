@@ -17,9 +17,14 @@
   {% endif %}
   
   <form method="post" action="{{ url }}" novalidate>
-    {% if insetText %}
-      {{ govukInsetText({ text: insetText }) }}
-    {% endif %}
+      <div class="govuk-inset-text">
+        <p class="govuk-body">{{ insetText }}</p>
+        {% if tenancyDocument %}
+        <p class="govuk-body">
+          <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ tenancyDocument.id }}" target="_blank" rel="noopener noreferrer">{{ tenancyAgreementDocumentLinkText }}</a>
+        </p>
+        {% endif %}
+      </div>
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-2">{{ detailsHeading }}</p>
       <ul class="govuk-list govuk-list--bullet">
           <li>{{ tenancyType }}</li>

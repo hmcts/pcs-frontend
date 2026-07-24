@@ -76,6 +76,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     detailsHeading: 'detailsHeading',
     tenancyType: 'tenancyType',
     tenancyTypeOther: 'tenancyTypeOther',
+    tenancyAgreementDocumentLinkText: 'tenancyAgreementDocumentLinkText',
   },
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
@@ -166,6 +167,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
+    const tenancyDocument = walesProperty
+      ? (caseData?.detailsTab_OccupationContractLicenceDetails?.documents?.[0] ?? '')
+      : (caseData?.detailsTab_TenancyLicenceDetails?.tenancyLicenceDocuments?.[0] ?? '');
+
     return {
       ...formContent,
       senderName,
@@ -176,6 +181,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyTypeAgreementType,
       tenancyTypeConfirm,
       correctType,
+      tenancyDocument,
     };
   },
 });
