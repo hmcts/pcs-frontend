@@ -175,6 +175,7 @@
     "webpack-hot-middleware": "2.26.1"
   },
   "resolutions": {
+    "body-parser": "^2.3.0",
     "@grpc/grpc-js": "1.14.4",
     "@eslint/plugin-kit": "0.7.2",
     "@opentelemetry/core": "2.9.0",

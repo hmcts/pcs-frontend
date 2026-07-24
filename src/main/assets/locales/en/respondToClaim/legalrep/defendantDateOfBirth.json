@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyDefendant\u2019s date of birth",
+  "dateOfBirthHint": "For example, 31 3 1980",
+  "dateOfBirthLabel": "Defendant\u2019s date of birth (Optional)",
+  "errors": {
+    "date": {
+      "required": "Enter the defendant\u2019s date of birth",
+      "missingOne": "The defendant\u2019s date of birth must include a {{missingField}}",
+      "missingTwo": "The defendant\u2019s date of birth must include a {{first}} and {{second}}"
+    }
+  }
+}
