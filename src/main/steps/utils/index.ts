@@ -37,11 +37,16 @@ export {
 } from './moneyAmountTransforms';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export {
+  ALLOWED_USER_ROLES,
+  CITIZEN_USER_ROLES,
   LEGAL_REPRESENTATIVE_USER_ROLES,
   getUserRoles,
   getUserToken,
   getUserType,
+  hasAllowedUserRole,
+  isCitizenUser,
   isLegalRepresentativeUser,
+  normaliseRoles,
 } from './userRole';
 export { getPreviousStepForCounterClaimAbout } from './getPreviousStepForCounterClaimAbout';
 export { formatDatePartsToISODate, formatIsoDate, parseISOToDateParts } from './dateUtils';
