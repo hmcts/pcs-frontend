@@ -30,12 +30,18 @@ export default function decentralisedEventRoutes(app: Application): void {
       return res.status(404).send('Not Found');
     }
 
-    const currentSub = req.session?.user?.sub;
-    const isDevelopment = config.get('node-env') === 'development';
-    if (expectedSub && currentSub && expectedSub !== currentSub && !isDevelopment) {
+    const user = req.session?.user;
+    const isUserMatch =
+      !expectedSub ||
+      user?.sub === expectedSub ||
+      user?.uid === expectedSub ||
+      user?.id === expectedSub ||
+      user?.email === expectedSub;
+
+    if (!isUserMatch) {
       logger.warn('User IDAM subject mismatch (expected_sub), forcing re-authentication', {
         expectedSub,
-        currentSub,
+        currentSub: user?.sub || user?.uid || user?.id || user?.email,
         caseReference,
       });
       req.session.returnTo = req.originalUrl;
