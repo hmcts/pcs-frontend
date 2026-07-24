@@ -1,6 +1,10 @@
 import { Page } from '@playwright/test';
 
-import { previousPaymentsLR, whatRegularIncomeDoYouReceive } from '../../../data/page-data';
+import {
+  previousPaymentsLR,
+  uploadFilesToSupportYourCounterclaim,
+  whatRegularIncomeDoYouReceive,
+} from '../../../data/page-data';
 import { exceptionalHardshipLR } from '../../../data/page-data/exceptionalHardshipLR.page.data';
 import { confirmationOfNoticeDateWhenNotProvidedLR } from '../../../data/page-data/lr-page-data/confirmationOfNoticeDateWhenNotProvidedLR.page.data';
 import { noticeDateWhenProvidedLR } from '../../../data/page-data/lr-page-data/confirmationOfNoticeDateWhenProvidedLR.page.data';
@@ -14,6 +18,7 @@ import { counterClaimLR } from '../../../data/page-data/lr-page-data/counterClai
 import { counterClaimOrderOtherThanSumLR } from '../../../data/page-data/lr-page-data/counterClaimOrderOtherThanSumLR.page.data';
 import { counterClaimSpecificSumOfMoneyLR } from '../../../data/page-data/lr-page-data/counterClaimSpecificSumOfMoneyLR.page.data';
 import { counterClaimWhatAreYouClaimingForLR } from '../../../data/page-data/lr-page-data/counterClaimWhatAreYouClaimingForLR.page.data';
+import { counterclaimDoYouWantToUploadFilesLR } from '../../../data/page-data/lr-page-data/counterclaimDoYouWantToUploadFilesLR.page.data';
 import { doAnyOtherAdultsLiveInYourHomeLR } from '../../../data/page-data/lr-page-data/doAnyOtherAdultsLiveInYourHomeLR.page.data';
 import { doYouHaveAnyDependantChildrenLR } from '../../../data/page-data/lr-page-data/doYouHaveAnyDependantChildrenLR.page.data';
 import { doYouHaveAnyOtherDependantsLR } from '../../../data/page-data/lr-page-data/doYouHaveAnyOtherDependantsLR.page.data';
@@ -84,6 +89,8 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         () => this.selectCorrespondenceAddressUnknownLR(fieldName as actionRecord),
       ],
       ['enterNoticeDateKnownLR', () => this.enterNoticeDateKnownLR(fieldName as actionRecord)],
+      ['doYouWantToUploadFilesLR', () => this.doYouWantToUploadFilesLR(fieldName as actionRecord)],
+      ['uploadFilesToSupportCounterclaimLR', () => this.uploadFilesToSupportCounterclaimLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -559,6 +566,19 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('inputText', counterClaimAboutLR.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
     await performAction('inputText', counterClaimAboutLR.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('clickButton', counterClaimAboutLR.saveAndContinueButton);
+  }
+
+  private async doYouWantToUploadFilesLR(uploadOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterclaimDoYouWantToUploadFilesLR.mainHeader,
+      option: uploadOption.option,
+    });
+    await performAction('clickButton', counterclaimDoYouWantToUploadFilesLR.saveAndContinueButton);
+  }
+
+  private async uploadFilesToSupportCounterclaimLR(uploadCounterClaimFiles: actionRecord): Promise<void> {
+    await performAction('uploadFile', uploadCounterClaimFiles.files);
+    await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   }
 
   private async installmentPaymentsLR(installmentData: actionRecord): Promise<void> {

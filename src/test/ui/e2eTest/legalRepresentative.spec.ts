@@ -19,6 +19,7 @@ import { counterClaimLR } from '../data/page-data/lr-page-data/counterClaimLR.pa
 import { counterClaimOrderOtherThanSumLR } from '../data/page-data/lr-page-data/counterClaimOrderOtherThanSumLR.page.data';
 import { counterClaimSpecificSumOfMoneyLR } from '../data/page-data/lr-page-data/counterClaimSpecificSumOfMoneyLR.page.data';
 import { counterClaimWhatAreYouClaimingForLR } from '../data/page-data/lr-page-data/counterClaimWhatAreYouClaimingForLR.page.data';
+import { counterclaimDoYouWantToUploadFilesLR } from '../data/page-data/lr-page-data/counterclaimDoYouWantToUploadFilesLR.page.data';
 import { counterclaimYouNeedToApplyForHelpWithYourFeesLR } from '../data/page-data/lr-page-data/counterclaimYouNeedToApplyForHelpWithYourFeesLR.page.data';
 import { defendantDateOfBirthLR } from '../data/page-data/lr-page-data/defendantDateOfBirthLR.page.data';
 import { defendantNameConfirmationLR } from '../data/page-data/lr-page-data/defendantNameConfirmationLR.page.data';
@@ -201,6 +202,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
       reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
     });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.yesRadioOption,
+    });
+    await performAction('uploadFilesToSupportCounterclaimLR', { files: ['rentArrears.pdf'] });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
@@ -338,6 +343,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('counterClaimOrderOtherThanSumLR', {
       ordersInput: counterClaimOrderOtherThanSumLR.whatOrdersInput,
       factsInput: counterClaimOrderOtherThanSumLR.whatFactsInput,
+    });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
@@ -481,6 +489,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       ordersInput: counterClaimOrderOtherThanSumLR.whatOrdersInput,
       factsInput: counterClaimOrderOtherThanSumLR.whatFactsInput,
     });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
+    });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
@@ -621,9 +632,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
       reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
     });
-    // await performAction('doYouWantToUploadFiles', {
-    //   option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
-    // });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
+    });
     await performAction('previousPaymentsLR', {
       question: previousPaymentsLR.getMainHeader(),
       repaymentOption: previousPaymentsLR.noRadioOption,
@@ -763,9 +774,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
       reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
     });
-    // await performAction('doYouWantToUploadFiles', {
-    //   option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
-    // });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
+    });
     await performAction('previousPaymentsLR', {
       question: previousPaymentsLR.getMainHeader(),
       repaymentOption: previousPaymentsLR.noRadioOption,
@@ -992,6 +1003,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('counterClaimAboutLR', {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
       reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
+    });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
     });
     await performAction('previousPaymentsLR', {
       question: previousPaymentsLR.getMainHeader(),
