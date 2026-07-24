@@ -8,6 +8,7 @@
   "tenancyTypeWalesSecure": "Caiff yr eiddo ei osod o dan gontract meddiannaeth diogel",
   "tenancyTypeWales": "Caiff yr eiddo ei osod o dan gontract meddiannaeth {{welshTenancyTypeAgreementType}}",
   "tenancyTypeOther": "Darparodd yr hawlydd yr wybodaeth ganlynol am eich tenantiaeth, contract meddiannaeth neu fath o gytundeb trwydded: {{otherTenancyTypeDetails}}",
+  "tenancyAgreementDocumentLinkText": "cyView a copy of the tenancy, occupation contract or licence agreement (opens in new tab)",
   "legend": "A yw'r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
   "yes": "Ydy",
   "no": "Nac ydy",

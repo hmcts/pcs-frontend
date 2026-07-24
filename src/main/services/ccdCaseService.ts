@@ -251,7 +251,6 @@ export const ccdCaseService = {
     clientContextHeaders?: ClientContextHeaders
   ): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
-
     try {
       logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
       const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
