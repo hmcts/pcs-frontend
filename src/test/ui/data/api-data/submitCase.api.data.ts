@@ -92,6 +92,18 @@ export const submitCaseApiData = {
       showIntroductoryDemotedOtherGroundReasonPage: 'YES',
       introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
       introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS'],
+      rentArrears_StatementDocuments: [
+        {
+          id: '0b5e2d4c-9f1f-46de-8033-f9757164b5ef',
+          value: {
+            document_filename: 'rentArrears.pdf',
+            document_url:
+              'http://dm-store-aat.service.core-compute-aat.internal/documents/d4f12029-9c20-4b2a-a5a6-90b72114194e',
+            document_binary_url:
+              'http://dm-store-aat.service.core-compute-aat.internal/documents/d4f12029-9c20-4b2a-a5a6-90b72114194e/binary',
+          },
+        },
+      ],
       preActionProtocolCompleted: 'NO',
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
@@ -572,7 +584,16 @@ export const submitCaseApiData = {
       addAnotherDefendant: 'NO',
       tenancy_TypeOfTenancyLicence: process.env.TENANCY_TYPE,
       tenancy_TenancyLicenceDate: null,
-      tenancy_TenancyLicenceDocuments: [],
+      tenancy_TenancyLicenceDocuments: [
+        {
+          id: 'ecabebc6-2fc0-46a6-9bf0-f2e7aa17b0e4',
+          value: {
+            document_filename: 'tenancyAgreement.pdf',
+            document_url: `${process.env.DM_STORE_URL}/documents/3a5f6cba-2ecd-4960-8859-22f2118da0bf`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/3a5f6cba-2ecd-4960-8859-22f2118da0bf/binary`,
+          },
+        },
+      ],
       secureOrFlexibleDiscretionaryGrounds: ['DOMESTIC_VIOLENCE'],
       secureAntisocialAdditionalGrounds: [],
       secureOrFlexibleMandatoryGroundsAlt: [],

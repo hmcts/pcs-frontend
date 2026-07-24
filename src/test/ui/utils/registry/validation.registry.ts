@@ -17,6 +17,7 @@ import {
   SummaryListValueValidation,
   TextValidation,
   ValidateDocumentUnderSectionValidation,
+  ValidatePdfDocumentValidation,
   ViewClaimHeaderDetailsValidation,
   ViewClaimOrResponseTableValidation,
 } from '../validations/element-validations';
@@ -40,6 +41,7 @@ export class ValidationRegistry {
     ['pageNavigation', new PageNavigationValidation()],
     ['inputTextValue', new InputTextValueValidation()],
     ['validateDocumentUnderSection', new ValidateDocumentUnderSectionValidation()],
+    ['validatePdfDocument', new ValidatePdfDocumentValidation()],
     ['viewClaimOrResponseTable', new ViewClaimOrResponseTableValidation()],
     ['viewClaimHeaderDetails', new ViewClaimHeaderDetailsValidation()],
     ['summaryRow', new CheckYourAnswersSummaryRowValidation()],

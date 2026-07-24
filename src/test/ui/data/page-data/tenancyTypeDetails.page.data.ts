@@ -1,6 +1,6 @@
 export const tenancyTypeDetails = {
   mainHeader: `Tenancy, occupation contract or licence agreement`,
-  whenTheyMadeClaimHintText: `When they made their claim, ${process.env.CLAIMANT_NAME} had to give details about the type of tenancy, occupation contract or licence agreement you signed to rent your property, and the date it began, if known.`,
+  whenTheyMadeTheirClaimParagraph: `When they made their claim, ${process.env.CLAIMANT_NAME} had to give details about the type of tenancy, occupation contract or licence agreement you signed to rent your property, and the date it began, if known.`,
   //Add the missing colon at the end of line 5 when HDPI-7696 BUG is fixed
   detailsGivenByClaimantParagraph: `Details given by ${process.env.CLAIMANT_NAME}`,
   isTenancyTypeCorrectQuestion: `Is the tenancy, occupation contract or licence agreement type correct?`,
@@ -19,4 +19,5 @@ export const tenancyTypeDetails = {
   selectIfTenancyDetailsErrorMessage: `Select if these tenancy, licence or occupation contract details are correct`,
   enterCorrectTenancyDetailsErrorMessage: `Enter the correct tenancy, licence or occupation contract details`,
   characterLimitErrorMessage: `Tenancy, occupation contract or licence type must be 60 characters or less`,
+  tenancyDocumentDynamicLink: 'View a copy of the tenancy, occupation contract or licence agreement (opens in new tab)',
 };
