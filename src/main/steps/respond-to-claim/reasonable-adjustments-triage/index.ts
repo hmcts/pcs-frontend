@@ -12,23 +12,26 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/reasonableAdjustmentsTriage.njk`,
-  // "Continue to the questions" (reasonableAdjustmentsChoice=questions) invokes the
-  // Your Support microsite and redirects the browser out to it. The "skip" button
-  // (reasonableAdjustmentsChoice=skip) falls through to the normal next step.
+  // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
+  // microsite when cui-ra is healthy. If cui-ra is unavailable, or the citizen chose "I do not
+  // need any support" (reasonableAdjustmentsChoice=skip), we instead continue the response journey
+  // at the language-used page.
   beforeRedirect: async (req: Request) => {
     if (req.body.reasonableAdjustmentsChoice === 'questions') {
-      const redirectUrl = await startYourSupport(req);
-      req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
-      return;
+      const micrositeUrl = await startYourSupport(req); // null when cui-ra is unhealthy → skip YS
+      if (micrositeUrl) {
+        req.res?.redirect(303, micrositeUrl); // postHandler short-circuits on res.headersSent
+        return;
+      }
     }
-    // TODO (HDPI-7379, INTERIM until the PCQ integration wires the RA journey): the "I do not
-    // need any support at this time" (skip) button returns the citizen to their response journey
-    // at the language-used page. We redirect EXPLICITLY only because reasonable-adjustments-triage
-    // is currently a NON-section step (flow.config `nonSectionStepOrder`): getNextStep from a
-    // non-section step never traverses into the checkYourAnswersAndSubmit section, where
-    // language-used lives. If triage is later moved back into that section (immediately before
-    // language-used), delete this redirect — the normal next-step flow will route there
-    // automatically. Track in Jira.
+    // Reached by the "I do not need any support at this time" (skip) button, and also when Your
+    // Support is skipped because cui-ra is unavailable: continue the response journey.
+    // TODO (HDPI-7379, INTERIM until the PCQ integration wires the RA journey): we redirect
+    // EXPLICITLY only because reasonable-adjustments-triage is a NON-section step (flow.config
+    // `nonSectionStepOrder`): getNextStep from a non-section step never traverses into the
+    // checkYourAnswersAndSubmit section, where language-used lives. If triage is later moved back
+    // into that section (immediately before language-used), delete this redirect — the normal
+    // next-step flow will route there automatically. Track in Jira.
     const caseReference = req.res?.locals.validatedCase?.id;
     if (caseReference) {
       req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/language-used`);

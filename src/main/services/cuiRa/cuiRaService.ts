@@ -1,4 +1,4 @@
-import type { AxiosError } from 'axios';
+import axios, { type AxiosError } from 'axios';
 import config from 'config';
 
 import { HTTPError } from '../../HttpError';
@@ -13,6 +13,11 @@ const logger = Logger.getLogger('cuiRaService');
 function getBaseUrl(): string {
   return config.get<string>('cuiRa.url');
 }
+
+// Health-probe timeout. A slow/hanging /health must fail fast so we skip Your Support quickly.
+// Kept as a constant (not config) to avoid touching config/default.json; move to config if
+// per-environment tuning is ever needed.
+const HEALTH_TIMEOUT_MS = 3000;
 
 // cui-ra authenticates the citizen via `idam-token` (Bearer) and the service via
 // `service-token` (the raw S2S token, no "Bearer" prefix). The shared http client
@@ -70,6 +75,26 @@ export const cuiRaService = {
       return response.data;
     } catch (error) {
       throw toHttpError(error);
+    }
+  },
+
+  // Checks cui-ra /health before launching the microsite. /health is public (no S2S/idam), so we
+  // probe it with a plain axios call — independent of our shared http client and S2S token — and a
+  // short timeout. Healthy ONLY when we get a response whose root `status` is 'UP' (nested
+  // frontend/backend component checks are intentionally ignored). Every other condition — non-2xx,
+  // status !== 'UP', unreachable, timeout, malformed body — returns false so the caller skips YS.
+  async isHealthy(): Promise<boolean> {
+    const url = `${getBaseUrl()}/healthbbbb`;
+    try {
+      const response = await axios.get(url, { timeout: HEALTH_TIMEOUT_MS, headers: { accept: 'application/json' } });
+      const healthy = response.data?.status === 'UP';
+      if (!healthy) {
+        logger.warn(`cui-ra health status is '${response.data?.status}' (not UP) — skipping Your Support`);
+      }
+      return healthy;
+    } catch (error) {
+      logger.warn(`cui-ra health check failed — skipping Your Support: ${(error as Error).message}`);
+      return false;
     }
   },
 };

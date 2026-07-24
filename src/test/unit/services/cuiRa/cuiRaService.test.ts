@@ -1,3 +1,4 @@
+import axios from 'axios';
 import config from 'config';
 
 import { HTTPError } from '../../../../main/HttpError';
@@ -7,6 +8,11 @@ import { cuiRaService } from '@services/cuiRa/cuiRaService';
 
 jest.mock('config', () => ({
   get: jest.fn(),
+}));
+
+jest.mock('axios', () => ({
+  __esModule: true,
+  default: { get: jest.fn() },
 }));
 
 jest.mock('@modules/http', () => ({
@@ -106,5 +112,40 @@ describe('cuiRaService.getPayload', () => {
     mockHttp.get.mockRejectedValue({ message: 'boom', response: { status: 404 } });
 
     await expect(cuiRaService.getPayload('missing', 's2s-tok')).rejects.toMatchObject({ status: 404 });
+  });
+});
+
+describe('cuiRaService.isHealthy', () => {
+  beforeEach(() => {
+    (config.get as jest.Mock).mockReturnValue(cuiRaBase);
+    jest.clearAllMocks();
+  });
+
+  it('returns true when /health responds with root status UP, probed with a timeout', async () => {
+    (axios.get as jest.Mock).mockResolvedValue({ status: 200, data: { status: 'UP', checks: {} } });
+
+    await expect(cuiRaService.isHealthy()).resolves.toBe(true);
+    expect(axios.get).toHaveBeenCalledWith(
+      `${cuiRaBase}/health`,
+      expect.objectContaining({ timeout: expect.any(Number) })
+    );
+  });
+
+  it('returns false when the root status is not UP', async () => {
+    (axios.get as jest.Mock).mockResolvedValue({ status: 200, data: { status: 'DOWN' } });
+
+    await expect(cuiRaService.isHealthy()).resolves.toBe(false);
+  });
+
+  it('returns false when the body has no status', async () => {
+    (axios.get as jest.Mock).mockResolvedValue({ status: 200, data: {} });
+
+    await expect(cuiRaService.isHealthy()).resolves.toBe(false);
+  });
+
+  it('returns false when the health endpoint is unavailable / errors / times out', async () => {
+    (axios.get as jest.Mock).mockRejectedValue(new Error('ECONNREFUSED'));
+
+    await expect(cuiRaService.isHealthy()).resolves.toBe(false);
   });
 });
