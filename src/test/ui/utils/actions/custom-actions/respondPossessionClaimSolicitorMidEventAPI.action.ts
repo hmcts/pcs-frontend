@@ -34,13 +34,14 @@ export class RespondPossessionClaimLRMidEventAPIAction implements IAction {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       const midEventPayload = midEventLRRespondPossessionClaimApiData.midEventLRRespondPossessionClaimPayload();
       try {
-        await validateApi.post(
+        const response = await validateApi.post(
           midEventLRRespondPossessionClaimApiData.midEventLRRespondPossessionClaimApiEndPoint(),
           midEventPayload
         );
 
-        console.log("'\n✅ VALIDATE RESPOND POSSESSION CLAIM");
-        console.log(`Mid event Successful for Case ${process.env.CASE_NUMBER}`);
+        console.log(`\n✅ MID EVENT LEGAL REPRESENTATIVE RESPONSE SUCCESSFUL:`);
+        console.log(`Status Code: ${response.status}`);
+        console.log(`Mid event Successful for legal representative response to Case ${process.env.CASE_NUMBER}`);
 
         break;
       } catch (error: unknown) {

@@ -37,13 +37,14 @@ export class SubmitPossessionClaimResponseAPIAction implements IAction {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        await submitPossessionClaimResponseApi.post(
+        const submitResponseLR = await submitPossessionClaimResponseApi.post(
           submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponseApiEndPoint(),
           submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponsePayload(RESPONDCLAIM_EVENT_TOKEN)
         );
 
-        console.log('\n✅ SUBMIT POSSESSION CLAIM RESPONSE:');
-        console.log(`Successfully submitted possession claim response for Case number ${process.env.CASE_NUMBER}`);
+        console.log('\n✅ SUBMIT LEGAL REPRESENTATIVE RESPONSE SUCCESSFUL:');
+        console.log(`Status Code: ${submitResponseLR.status}`);
+        console.log(`Successfully submitted legal representative response for Case number ${process.env.CASE_NUMBER}`);
 
         break;
       } catch (error: unknown) {
