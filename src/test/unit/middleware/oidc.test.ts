@@ -4,7 +4,7 @@ import { Session } from 'express-session';
 import * as jose from 'jose';
 import { UserInfoResponse } from 'openid-client';
 
-import { clearRefreshInProgressForTesting, oidcMiddleware } from '../../../main/middleware/oidc';
+import { oidcMiddleware } from '../../../main/middleware/oidc';
 import type { OIDCModule } from '../../../main/modules/oidc';
 
 interface CustomSession extends Session {
@@ -28,6 +28,10 @@ jest.mock('@modules/logger', () => ({
       error: jest.fn(),
     }),
   },
+}));
+jest.mock('@modules/redisLock', () => ({
+  withRedisLock: jest.fn(async (_redis: unknown, _key: string, _options: unknown, fn: () => Promise<unknown>) => fn()),
+  RedisLockTimeoutError: class extends Error {},
 }));
 
 // Create a minimal mock i18n object to satisfy type requirements
@@ -55,7 +59,6 @@ describe('oidcMiddleware', () => {
   };
 
   beforeEach(() => {
-    clearRefreshInProgressForTesting();
     jest.clearAllMocks();
 
     (config.get as jest.Mock).mockImplementation((key: string, defaultValue?: unknown) => {
@@ -100,6 +103,7 @@ describe('oidcMiddleware', () => {
             addGlobal: jest.fn(),
           },
           oidc: mockOidcModule as OIDCModule,
+          redisClient: {} as never,
         },
       } as unknown as Application,
       i18n: createMockI18n(),
@@ -323,7 +327,8 @@ describe('oidcMiddleware', () => {
     expect(nextFunction).toHaveBeenCalled();
   });
 
-  it('should prevent parallel refresh attempts for same session', async () => {
+  it('coordinates refresh via the Redis lock keyed by session id', async () => {
+    const { withRedisLock } = jest.requireMock('@modules/redisLock');
     const expiredToken = createValidToken(-60);
     (mockRequest.session as CustomSession).user = {
       sub: '123',
@@ -338,38 +343,63 @@ describe('oidcMiddleware', () => {
       sub: 'test-user',
     });
 
-    // Create a promise that resolves after a delay
-    let resolveRefresh: (value: unknown) => void;
-    const delayedRefresh = new Promise(resolve => {
-      resolveRefresh = resolve;
-    });
-
-    (mockOidcModule.refreshUserTokens as jest.Mock).mockReturnValue(delayedRefresh);
-
-    // Start first middleware call
-    const promise1 = oidcMiddleware(
-      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
-      mockResponse as Response,
-      nextFunction
-    );
-
-    // Start second middleware call (should wait for first)
-    const promise2 = oidcMiddleware(
-      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
-      mockResponse as Response,
-      nextFunction
-    );
-
-    // Resolve the refresh
-    resolveRefresh!({
+    (mockOidcModule.refreshUserTokens as jest.Mock).mockResolvedValue({
       accessToken: createValidToken(3600),
       refreshToken: 'new-refresh-token',
       accessTokenExp: Math.floor(Date.now() / 1000) + 3600,
     });
 
-    await Promise.all([promise1, promise2]);
+    await oidcMiddleware(
+      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+      mockResponse as Response,
+      nextFunction
+    );
 
-    // Should only call refresh once
-    expect(mockOidcModule.refreshUserTokens).toHaveBeenCalledTimes(1);
+    expect(withRedisLock).toHaveBeenCalledWith(
+      expect.anything(),
+      'pcs:oidc-refresh:test-session-id',
+      expect.objectContaining({ ttlMs: expect.any(Number), waitTimeoutMs: expect.any(Number) }),
+      expect.any(Function)
+    );
+  });
+
+  it('adopts the freshly-refreshed session from the store and skips its own refresh', async () => {
+    const expiredToken = createValidToken(-60);
+    const freshToken = createValidToken(3600);
+    (mockRequest.session as CustomSession).user = {
+      sub: '123',
+      uid: 'test-uid',
+      accessToken: expiredToken,
+      idToken: 'id-token',
+      refreshToken: 'refresh-token',
+    };
+
+    // jose.decodeJwt: the expired token decodes to past-exp; the fresh token decodes to future-exp.
+    (jose.decodeJwt as jest.Mock).mockImplementation((token: string) =>
+      token === freshToken
+        ? { exp: Math.floor(Date.now() / 1000) + 3600, sub: 'test-user' }
+        : { exp: Math.floor(Date.now() / 1000) - 60, sub: 'test-user' }
+    );
+
+    // sessionStore.get returns a session that already holds the fresh token —
+    // simulating another pod (or earlier waiter) having just refreshed.
+    (mockRequest as Partial<Request>).sessionStore = {
+      get: jest.fn((_sid: string, cb: (err: unknown, sess: unknown) => void) =>
+        cb(null, {
+          cookie: {},
+          user: { sub: '123', uid: 'test-uid', accessToken: freshToken, idToken: 'id', refreshToken: 'r' },
+        })
+      ),
+    } as unknown as Request['sessionStore'];
+
+    await oidcMiddleware(
+      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+      mockResponse as Response,
+      nextFunction
+    );
+
+    expect(mockOidcModule.refreshUserTokens).not.toHaveBeenCalled();
+    expect((mockRequest.session as CustomSession).user?.accessToken).toBe(freshToken);
+    expect(nextFunction).toHaveBeenCalled();
   });
 });
