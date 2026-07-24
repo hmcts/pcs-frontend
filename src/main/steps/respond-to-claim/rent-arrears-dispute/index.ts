@@ -19,6 +19,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    rentStatementDocumentLinkText: 'rentStatementDocumentLinkText',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -76,12 +77,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const insetDetailsText = getTranslation(t, 'insetDetailsText', '', { claimantName }) ?? '';
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
+
+    const rentStatementDocument = caseData?.detailsTab_RentArrearsDetails?.rentStatement?.[0] ?? '';
+
     return {
       insetIntroText,
       insetDetailsText,
       amountOwedHeading,
       rentArrearsAmount,
       rentArrearsAmountCorrection,
+      rentStatementDocument,
     };
   },
   fields: [
