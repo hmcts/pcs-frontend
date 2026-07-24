@@ -2,7 +2,7 @@
   "pageTitle": "Cytundeb rhentu",
   "heading": "Tenantiaeth, contract meddiannaeth neu gytundeb trwydded",
   "insetText": "Pan wnaethant wneud eu hawliad, roedd yn rhaid i {{orgname}} roi manylion am y math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a lofnodwyd gennych i rentu eich eiddo, a'r dyddiad dechrau, os yn hysbys.",
-  "detailsHeading": "Manylion a roddwyd gan",
+  "detailsHeading": "Manylion a roddwyd gan:",
   "tenancyType": "Caiff yr eiddo ei osod o dan gytundeb tenantiaeth {{tenancyTypeAgreementType}}",
   "tenancyTypeWalesStandard": "Caiff yr eiddo ei osod o dan gontract meddiannaeth safonol",
   "tenancyTypeWalesSecure": "Caiff yr eiddo ei osod o dan gontract meddiannaeth diogel",
