@@ -195,6 +195,15 @@ export class CitizenDashboardAction implements IAction {
       ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails],
       ['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
     );
+    await performValidation('validatePdfDocument', '', {
+      linkText: 'RentArrearsStatement - Claimant 1.pdf',
+    });
+    await performValidation('validatePdfDocument', '', {
+      linkText: 'rentArrears - Claimant 1.pdf',
+    });
+    await performValidation('validatePdfDocument', '', {
+      linkText: 'tenancyLicenceDocuments - Claimant 1.pdf',
+    });
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
     await performValidation('text', { elementType: 'subHeader', text: viewTheClaim.downloadPDFSubHeader });
