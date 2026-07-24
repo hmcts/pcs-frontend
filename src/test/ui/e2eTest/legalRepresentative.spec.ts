@@ -80,8 +80,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
   //await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('midEventRespondPossessionClaimLRAPI');
-  await performAction('submitPossessionClaimResponseLRAPI');
   await performAction('clickButton', startNowLR.startNowButton);
 });
 
@@ -490,5 +488,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: languageUsedLR.englishRadioOption,
     });
     //await performAction('clickButton', 'Submit');
+  });
+
+  test('Submitted defendant should not be visible on the representation screen  @nonRent', async () => {
+    const pin2User = await getPinUserAt(1);
+    await performAction('representationLR', {
+      question: selectDefendantLR.whichDefendantQuestion,
+      radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
+    });
+    await performAction('midEventRespondPossessionClaimLRAPI');
+    await performAction('submitPossessionClaimResponseLRAPI');
+    const submittedUser = await getPinUserAt(2);
+    await performAction('clickLink', defendantNameConfirmationLR.backLink);
+    await performValidation('textNotVisible', {
+      elementType: 'text',
+      text: `${submittedUser.firstName} ${submittedUser.lastName}`,
+    });
   });
 });

@@ -8,11 +8,10 @@ export const midEventLRRespondPossessionClaimApiData = {
       experimental: 'experimental',
       Accept: '*/*',
       'Client-context': JSON.stringify({
-        selectedPartyId: `${process.env.Defendant_ID}`,
+        selectedPartyId: process.env.Defendant_ID,
       }),
     },
   }),
-
   midEventLRRespondPossessionClaimPayload: () => ({
     event: {
       id: 'respondPossessionClaim',
@@ -26,17 +25,14 @@ export const midEventLRRespondPossessionClaimApiData = {
       // selectedRespondingPartyId: process.env.DEFENDANT_ID,
 
       possessionClaimResponse: {
-        defendantResponses: [
-          {
-            defendantNameConfirmation: 'YES',
-            tenancyType: 'danTest',
-          },
-        ],
-
+        defendantResponses: {
+          defendantNameConfirmation: 'YES',
+          tenancyType: 'YES',
+        },
         defendantContactDetails: {
           party: {
-            firstName: 'John',
-            lastName: 'Doe',
+            firstName: 'Conrad',
+            lastName: 'Fisher',
           },
         },
       },

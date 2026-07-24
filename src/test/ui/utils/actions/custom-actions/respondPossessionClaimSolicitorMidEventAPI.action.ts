@@ -25,6 +25,10 @@ export class RespondPossessionClaimLRMidEventAPIAction implements IAction {
     const midEventHeader = midEventLRRespondPossessionClaimApiData.midEventLRRespondPossessionClaimApiInstance();
     const validateApi = Axios.create(midEventHeader);
 
+    // Prime the draft: the START event creates the party-keyed draft row that the
+    // mid-event save requires. Without it the callback throws UnsubmittedDataException.
+    await validateApi.get(`/cases/${process.env.CASE_NUMBER}/event-triggers/respondPossessionClaim`);
+
     const maxRetries = actionRetries;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -35,8 +39,8 @@ export class RespondPossessionClaimLRMidEventAPIAction implements IAction {
           midEventPayload
         );
 
-        console.log('\n✅ VALIDATE RESPOND POSSESSION CLAIM');
-        console.log(`Successfully validated possession claim response for Case ${process.env.CASE_NUMBER}`);
+        console.log("'\n✅ VALIDATE RESPOND POSSESSION CLAIM");
+        console.log(`Mid event Successful for Case ${process.env.CASE_NUMBER}`);
 
         break;
       } catch (error: unknown) {
@@ -51,6 +55,7 @@ export class RespondPossessionClaimLRMidEventAPIAction implements IAction {
           console.error('Message:', responseBody?.message);
           console.error('Path:', responseBody?.path);
           console.error('Timestamp:', responseBody?.timestamp);
+          console.error('Callback errors:', responseBody?.callbackErrors);
 
           if (status === 404) {
             throw error;
