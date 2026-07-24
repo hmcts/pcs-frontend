@@ -79,7 +79,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: req => {
-    const caseData = req.res?.locals.validatedCase?.possessionClaimResponse;
+    const caseData = req.res?.locals.validatedCase?.data?.possessionClaimResponse;
     const defendantResponses = caseData?.defendantResponses;
     const party = caseData?.defendantContactDetails?.party;
 
@@ -96,7 +96,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const initial: Record<string, unknown> = { emailConfirmation: 'yes' };
     if (party?.emailAddress) {
-      initial['emailonfirmation.emailAddress'] = party.emailAddress;
+      initial['emailConfirmation.emailAddress'] = party.emailAddress;
     }
     return initial;
   },
