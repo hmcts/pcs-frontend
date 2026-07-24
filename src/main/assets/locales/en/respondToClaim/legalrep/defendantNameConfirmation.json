@@ -1,10 +1,10 @@
 {
-  "nameConfirmationLabel": "Is the defendant's name {{defendantName}}?",
-  "firstNameLabel": "Defendant's first name",
-  "lastNameLabel": "Defendant's last name",
+  "nameConfirmationLabel": "Is the defendant\u2019s name {{defendantName}}?",
+  "firstNameLabel": "Defendant\u2019s first name",
+  "lastNameLabel": "Defendant\u2019s last name",
   "errors": {
-    "nameConfirmation": "You must say if the defendant's name is {{defendantName}}",
-    "firstName": "Enter the defendant's first name",
-    "lastName": "Enter the defendant's last name"
+    "nameConfirmation": "You must say if the defendant\u2019s name is {{defendantName}}",
+    "firstName": "Enter the defendant\u2019s first name",
+    "lastName": "Enter the defendant\u2019s last name"
   }
 }

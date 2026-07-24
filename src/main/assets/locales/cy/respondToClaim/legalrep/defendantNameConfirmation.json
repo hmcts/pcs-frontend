@@ -1,13 +1,13 @@
 {
-  "nameConfirmationLabel": "cyIs the defendant's name {{defendantName}}?",
-  "firstNameLabel": "cyDefendant's first name",
-  "lastNameLabel": "cyDefendant's last name",
+  "nameConfirmationLabel": "cyIs the defendant\u2019s name {{defendantName}}?",
+  "firstNameLabel": "cyDefendant\u2019s first name",
+  "lastNameLabel": "cyDefendant\u2019s last name",
   "nameConfirmationHint": "cyThis is the name provided by {{organisationName}}",
   "yesOption": "cyYes",
   "noOption": "cyNo",
   "errors": {
-    "nameConfirmation": "cyYou must say if the defendant's name is {{defendantName}}",
-    "firstName": "cyEnter the defendant's first name",
-    "lastName": "cyEnter the defendant's last name"
+    "nameConfirmation": "cyYou must say if the defendant\u2019s name is {{defendantName}}",
+    "firstName": "cyEnter the defendant\u2019s first name",
+    "lastName": "cyEnter the defendant\u2019s last name"
   }
 }

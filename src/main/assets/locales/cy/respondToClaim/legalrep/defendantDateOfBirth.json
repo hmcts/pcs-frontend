@@ -1,18 +1,18 @@
 {
-  "pageTitle": "cyDefendant's date of birth",
+  "pageTitle": "cyDefendant\u2019s date of birth",
   "dateOfBirthHint": "cyFor example, 31 3 1980",
-  "dateOfBirthLabel": "cyDefendant date of birth",
+  "dateOfBirthLabel": "cyDefendant\u2019s date of birth (Optional)",
   "errors": {
     "date": {
       "day": "cyDay",
       "month": "cyMonth",
       "year": "cyYear",
-      "required": "cyEnter the defendant's date of birth",
+      "required": "cyEnter the defendant\u2019s date of birth",
       "notRealDate": "cyDate of birth must be a real date",
       "futureDate": "cyDate of birth must be in the past",
-      "invalidValue": "Date of birth must be a real date",
-      "missingOne": "cyThe defendant's date of birth must include a {{missingField}}",
-      "missingTwo": "cyThe defendant's date of birth must include a {{first}} and {{second}}"
+      "invalidValue": "cyDate of birth must be a real date",
+      "missingOne": "cyThe defendant\u2019s date of birth must include a {{missingField}}",
+      "missingTwo": "cyThe defendant\u2019s date of birth must include a {{first}} and {{second}}"
     }
   }
 }
