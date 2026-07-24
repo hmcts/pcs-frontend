@@ -8,6 +8,7 @@ export * from '../../../utils/validations/element-validations/radioButton.valida
 export * from '../../../utils/validations/element-validations/text.validation';
 export * from '../../../utils/validations/element-validations/inputTextValue.validation';
 export * from '../../../utils/validations/element-validations/validateDocumentSection.validation';
+export * from '../../../utils/validations/element-validations/validatePdfDocument.validation';
 export * from '../../../utils/validations/element-validations/viewClaimOrResponseTable.validation';
 export * from '../../../utils/validations/element-validations/checkYourAnswersSummaryRow.validation';
 export * from '../../../utils/validations/element-validations/viewClaimHeaderDetails.validation';
