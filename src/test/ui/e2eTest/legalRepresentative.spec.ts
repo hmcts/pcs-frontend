@@ -489,4 +489,20 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     //await performAction('clickButton', 'Submit');
   });
+
+  test('Submitted defendant should not be visible on the representation screen  @nonRent', async () => {
+    const pin2User = await getPinUserAt(1);
+    await performAction('representationLR', {
+      question: selectDefendantLR.whichDefendantQuestion,
+      radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
+    });
+    await performAction('midEventRespondPossessionClaimLRAPI');
+    await performAction('submitPossessionClaimResponseLRAPI');
+    const submittedUser = await getPinUserAt(2);
+    await performAction('clickLink', defendantNameConfirmationLR.backLink);
+    await performValidation('textNotVisible', {
+      elementType: 'text',
+      text: `${submittedUser.firstName} ${submittedUser.lastName}`,
+    });
+  });
 });
