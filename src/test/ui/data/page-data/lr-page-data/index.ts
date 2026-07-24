@@ -35,3 +35,4 @@
 // export * from './contactPreferencesTextMessageLR.page.data';
 // export * from './howMuchAffordToPayLR.page.data';
 // export * from './instalmentPaymentsLR.page.data';
+// export * from './counterclaimDoYouWantToUploadFilesLR.page.data';
