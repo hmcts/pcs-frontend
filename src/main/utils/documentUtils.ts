@@ -1,3 +1,5 @@
+import { get } from 'lodash';
+
 import type { CcdCaseDocument } from '@services/ccdCase.interface';
 
 const DOCUMENT_FOLDER_TITLES = {
@@ -94,7 +96,7 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   addDocumentsFromCollection(documents, seen, caseData.allDocuments, 'allDocuments');
 
   for (const path of CASE_DETAILS_DOCUMENT_PATHS) {
-    addDocumentsFromCollection(documents, seen, getByPath(caseData, path), path);
+    addDocumentsFromCollection(documents, seen, get(caseData, path), path);
   }
 
   return documents;
@@ -146,14 +148,6 @@ function addDocumentsFromCollection(
       sourceField,
     });
   }
-}
-
-function getByPath(caseData: CaseDataRecord, path: string): unknown {
-  return path.split('.').reduce<unknown>((value, key) => {
-    return value && typeof value === 'object' && !Array.isArray(value)
-      ? (value as Record<string, unknown>)[key]
-      : undefined;
-  }, caseData);
 }
 
 function asCollection(value: unknown): { id?: unknown; value?: unknown }[] {
