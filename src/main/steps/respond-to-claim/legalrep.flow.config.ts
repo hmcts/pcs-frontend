@@ -13,6 +13,7 @@ const legalRepStepOrder = [
   'defendant-name-confirmation',
   'defendant-date-of-birth',
   'correspondence-address',
+  'email-confirmation',
   'landlord-registered',
   'landlord-licensed',
   'written-terms',
