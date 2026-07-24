@@ -1,7 +1,7 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 import { purgeCounterClaimDocumentsFromCdam } from '../utils';
 
-import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { YesNoEnum } from '@services/ccdCase.interface';
 import type { CaseData, YesNoValue } from '@services/ccdCase.interface';
