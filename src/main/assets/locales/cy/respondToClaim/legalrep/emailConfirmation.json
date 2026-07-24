@@ -1,0 +1,20 @@
+{
+  "pageTitle": "cyDefendent\u2019s Email Address",
+  "heading": "cyDefendent\u2019s Email Address",
+
+  "emailConfirmationLabel": "cyDo you know the defendent\u2019s email address?",
+
+  "options": {
+    "yes": "cyYes",
+    "noOption": "cyNo"
+  },
+
+  "emailLabel": "cyEnter the defendent\u2019s email address",
+  "errors": {
+    "emailConfirmation": "cySelect if you know the defendant\u2019s email address",
+    "emailAddress": {
+      "required": "cyEnter the defendent\u2019s email address",
+      "invalid": "cyEnter an email address in the correct format, like name@example.com"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "pageTitle": "Defendent\u2019s Email Address",
+  "heading": "Defendent\u2019s Email Address",
+
+  "emailConfirmationLabel": "Do you know the defendent\u2019s email address?",
+
+  "options": {
+    "yes": "Yes",
+    "noOption": "No"
+  },
+
+  "emailLabel": "Enter the defendent\u2019s email address",
+  "errors": {
+    "emailConfirmation": "Select if you know the defendant\u2019s email address",
+    "emailAddress": {
+      "required": "Enter the defendent\u2019s email address",
+      "invalid": "Enter an email address in the correct format, like name@example.com"
+    }
+  }
+}

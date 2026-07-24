@@ -1,9 +1,13 @@
 {
-  "pageTitle": "Enw eich cleient",
-  "nameConfirmationLabel": "Ai enw eich cleient yw {{defendantName}}?",
+  "nameConfirmationLabel": "cyIs the defendant's name {{defendantName}}?",
+  "firstNameLabel": "cyDefendant's first name",
+  "lastNameLabel": "cyDefendant's last name",
+  "nameConfirmationHint": "cyThis is the name provided by {{organisationName}}",
+  "yesOption": "cyYes",
+  "noOption": "cyNo",
   "errors": {
-    "nameConfirmation": "Mae'n rhaid i chi ddweud os mai enw eich cleient yw {{defendantName}}",
-    "firstName": "Nodwch enw cyntaf eich cleient",
-    "lastName": "Nodwch cyfenw eich cleient"
+    "nameConfirmation": "cyYou must say if the defendant's name is {{defendantName}}",
+    "firstName": "cyEnter the defendant's first name",
+    "lastName": "cyEnter the defendant's last name"
   }
 }

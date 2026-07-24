@@ -1,0 +1,34 @@
+{
+  "legend": "cyIs the defendant's postal address {{ formattedAddressStr }}",
+  "legend.hint": "cyThis is the address provided by {{claimantName}}",
+  "labels": {
+    "yes": "cyYes",
+    "no": "cyNo",
+    "enterAddress": "cyEnter postal address",
+    "enterPostcode": "cyEnter a UK postcode",
+    "enterManually": "cyEnter an address manually",
+    "enterManuallySubText": "cyYou can enter the defendant's address details in the fields below.",
+    "selectAddress": "cySelect an address",
+    "selectAddressLabel": "cySelect an address",
+    "addressHeading": "cyWhat’s the defendant's postal address?",
+    "addressLine1": "cyAddress line 1",
+    "addressLine2": "cyAddress line 2 (optional)",
+    "townOrCity": "cyTown or city",
+    "county": "cyCounty (optional)",
+    "postcode": "cyPostcode"
+  },
+  "buttons": {
+    "findAddress": "cyFind address",
+    "saveAndContinue": "cySave and continue",
+    "saveForLater": "cySave for later"
+  },
+  "errors": {
+    "lookupPostcode": "cyEnter a valid UK postcode",
+    "postcodeNotFound": "cyPostcode not found. Please check and try again.",
+    "selectAddress": "cyPlease select an address",
+    "correspondenceAddressConfirm": "cyPlease confirm the defendant's address by selecting the options below",
+    "correspondenceAddressConfirm.addressLine1": "cyEnter address line 1, typically the building and street",
+    "correspondenceAddressConfirm.townOrCity": "cyEnter town or city",
+    "correspondenceAddressConfirm.postcode": "cyEnter a valid UK postcode"
+  }
+}
