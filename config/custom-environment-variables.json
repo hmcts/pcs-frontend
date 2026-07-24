@@ -90,6 +90,13 @@
   "payment": {
     "returnUrl": "PAYMENT_RETURN_URL"
   },
+  "cuiRa": {
+    "url": "CUI_RA_URL",
+    "hmctsServiceId": "CUI_RA_HMCTS_SERVICE_ID",
+    "masterFlagCode": "CUI_RA_MASTER_FLAG_CODE",
+    "callbackUrl": "CUI_RA_CALLBACK_URL",
+    "logoutUrl": "CUI_RA_LOGOUT_URL"
+  },
   "launchdarkly": {
     "env": "LAUNCHDARKLY_ENV"
   }

@@ -26,6 +26,7 @@ describe('respond-to-claim sections config', () => {
     const nonSectionStepSlugs = new Set([
       ...(flowConfig.nonSectionStepOrder ?? []),
       'reasonable-adjustments-triage',
+      'reasonable-adjustments-error',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
     ]);
@@ -78,11 +79,7 @@ describe('respond-to-claim sections config', () => {
 
   // HDPI-6929 — focused navigation test
   describe('HDPI-6929 — navigation contract from upload-document', () => {
-    const PARKED_STEPS = [
-      'reasonable-adjustments-triage',
-      'equality-and-diversity-start',
-      'equality-and-diversity-end',
-    ];
+    const PARKED_STEPS = ['equality-and-diversity-start', 'equality-and-diversity-end'];
 
     const makeReq = (): Request =>
       ({
