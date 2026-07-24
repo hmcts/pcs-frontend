@@ -85,6 +85,7 @@ export function buildDefendantSection(
   copy: ViewTheClaimCopy
 ): ViewTheClaimSection | undefined {
   const defendant = firstDefendantParty(data);
+  const rank = typeof defendant?.rank === 'number' ? defendant.rank : 1;
 
   const rows = [
     textRow(
@@ -103,7 +104,7 @@ export function buildDefendantSection(
     partyAddressRow(defendant, propertyAddress, copy.label('addressForService'), copy),
   ];
 
-  return section(copy.section('defendantDetails'), rows);
+  return section(copy.section('defendantDetails', { number: rank }), rows);
 }
 
 export function buildAdditionalDefendantSections(
@@ -114,12 +115,14 @@ export function buildAdditionalDefendantSections(
   const defendants = additionalDefendantParties(data);
 
   return defendants
-    .map((defendant, index) =>
-      section(copy.section('additionalDefendantDetails', { number: index + 1 }), [
+    .map((defendant, index) => {
+      const rank = typeof defendant.rank === 'number' ? defendant.rank : index + 2;
+
+      return section(copy.section('defendantDetails', { number: rank }), [
         textRow(copy.label('defendantName'), additionalDefendantName(defendant, data, index, copy)),
         partyAddressRow(defendant, propertyAddress, copy.label('addressForService'), copy),
-      ])
-    )
+      ]);
+    })
     .filter((sectionItem): sectionItem is ViewTheClaimSection => !!sectionItem);
 }
 
