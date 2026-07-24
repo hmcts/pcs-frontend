@@ -48,6 +48,12 @@ export const flowConfig: JourneyFlowConfig = {
   // First visible step of any section back-links to this hub step.
   hubStepName: 'task-list',
   steps: {
+    // Context-aware error page for a failed Your Support launch. Reached only by an explicit
+    // redirect from the triage step (not linear navigation); preventBack keeps it renderable
+    // without a back link even though it's outside any section / nonSectionStepOrder.
+    'reasonable-adjustments-error': {
+      preventBack: true,
+    },
     'ask-your-solicitor-to-respond-to-the-claim': {
       showCondition: (req: Request) =>
         req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',
