@@ -1,4 +1,3 @@
-import config from 'config';
 import { Application, Request, Response, Router } from 'express';
 
 import { oidcMiddleware } from '../middleware';
