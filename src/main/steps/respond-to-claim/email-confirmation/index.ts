@@ -1,9 +1,9 @@
 import { isEmail } from 'validator';
 
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'email-confirmation',
@@ -33,7 +33,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
-    heading: 'heading'
+    heading: 'heading',
   },
   fields: [
     {
