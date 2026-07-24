@@ -36,6 +36,8 @@ const legalRepStepOrder = [
   'counter-claim-against-whom',
   'counter-claim-about',
   'counter-claim-order-other-than-sum',
+  'counter-claim-do-you-want-to-upload-files',
+  'counter-claim-upload-files',
   'repayments-made',
   'repayments-agreed',
   'installment-payments',
