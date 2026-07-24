@@ -33,13 +33,7 @@ function applyCaseReference(template: string, caseReference: string): string {
 
 // Builds the cui-ra invocation payload from the current request/case and invokes the
 // microsite, returning the URL the browser should be redirected to (the YS questions).
-export async function startYourSupport(req: Request): Promise<string | null> {
-  // Gate: skip Your Support if cui-ra isn't healthy (return null → the caller continues the
-  // response journey). Checked first so we don't touch tokens/case when we're going to skip.
-  if (!(await cuiRaService.isHealthy())) {
-    return null;
-  }
-
+export async function startYourSupport(req: Request): Promise<string> {
   const accessToken = req.session.user?.accessToken;
   if (!accessToken) {
     throw new HTTPError('Authentication required to start Your Support', 401);

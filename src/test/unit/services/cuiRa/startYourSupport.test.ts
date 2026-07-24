@@ -9,7 +9,7 @@ jest.mock('config', () => ({
 }));
 
 jest.mock('@services/cuiRa/cuiRaService', () => ({
-  cuiRaService: { invokePayload: jest.fn(), isHealthy: jest.fn() },
+  cuiRaService: { invokePayload: jest.fn() },
 }));
 
 jest.mock('@modules/steps', () => ({
@@ -53,16 +53,7 @@ describe('startYourSupport', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (config.get as jest.Mock).mockImplementation((key: string) => configValues[key]);
-    (cuiRaService.isHealthy as jest.Mock).mockResolvedValue(true);
     (cuiRaService.invokePayload as jest.Mock).mockResolvedValue('https://cui-ra/microsite/xyz');
-  });
-
-  it('returns null and does not invoke the microsite when cui-ra is unhealthy', async () => {
-    (cuiRaService.isHealthy as jest.Mock).mockResolvedValue(false);
-    const { req } = buildReq();
-
-    await expect(startYourSupport(req)).resolves.toBeNull();
-    expect(cuiRaService.invokePayload).not.toHaveBeenCalled();
   });
 
   it('builds the invocation payload from the case and returns the microsite url', async () => {

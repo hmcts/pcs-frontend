@@ -13,19 +13,14 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/reasonableAdjustmentsTriage.njk`,
   // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
-  // microsite when cui-ra is healthy. If cui-ra is unavailable, or the citizen chose "I do not
-  // need any support" (reasonableAdjustmentsChoice=skip), we instead continue the response journey
-  // at the language-used page.
+  // microsite. The "I do not need any support at this time" (reasonableAdjustmentsChoice=skip)
+  // button instead continues the response journey at the language-used page.
   beforeRedirect: async (req: Request) => {
     if (req.body.reasonableAdjustmentsChoice === 'questions') {
-      const micrositeUrl = await startYourSupport(req); // null when cui-ra is unhealthy → skip YS
-      if (micrositeUrl) {
-        req.res?.redirect(303, micrositeUrl); // postHandler short-circuits on res.headersSent
-        return;
-      }
+      const redirectUrl = await startYourSupport(req);
+      req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
+      return;
     }
-    // Reached by the "I do not need any support at this time" (skip) button, and also when Your
-    // Support is skipped because cui-ra is unavailable: continue the response journey.
     // TODO (HDPI-7379, INTERIM until the PCQ integration wires the RA journey): we redirect
     // EXPLICITLY only because reasonable-adjustments-triage is a NON-section step (flow.config
     // `nonSectionStepOrder`): getNextStep from a non-section step never traverses into the
