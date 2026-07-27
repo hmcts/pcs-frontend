@@ -1,48 +1,25 @@
 import { Page } from '@playwright/test';
 
-import { previousPaymentsLR, whatRegularIncomeDoYouReceive } from '../../../data/page-data';
-import { exceptionalHardshipLR } from '../../../data/page-data/exceptionalHardshipLR.page.data';
-import { confirmationOfNoticeDateWhenNotProvidedLR } from '../../../data/page-data/lr-page-data/confirmationOfNoticeDateWhenNotProvidedLR.page.data';
-import { noticeDateWhenProvidedLR } from '../../../data/page-data/lr-page-data/confirmationOfNoticeDateWhenProvidedLR.page.data';
-import { confirmationOfNoticeGivenLR } from '../../../data/page-data/lr-page-data/confirmationOfNoticeGivenLR.page.data';
-import { correspondenceAddressLR } from '../../../data/page-data/lr-page-data/correspondenceAddressLR.page.data';
-import { counterClaimAboutLR } from '../../../data/page-data/lr-page-data/counterClaimAboutLR.page.data';
-import { counterClaimAgainstWhomLR } from '../../../data/page-data/lr-page-data/counterClaimAgainstWhomLR.page.data';
-import { counterClaimFeeLR } from '../../../data/page-data/lr-page-data/counterClaimFeeLR.page.data';
-import { counterClaimHaveYouAppliedForHelpLR } from '../../../data/page-data/lr-page-data/counterClaimHaveYouAppliedForHelpLR.page.data';
-import { counterClaimLR } from '../../../data/page-data/lr-page-data/counterClaimLR.page.data';
-import { counterClaimOrderOtherThanSumLR } from '../../../data/page-data/lr-page-data/counterClaimOrderOtherThanSumLR.page.data';
-import { counterClaimSpecificSumOfMoneyLR } from '../../../data/page-data/lr-page-data/counterClaimSpecificSumOfMoneyLR.page.data';
-import { counterClaimWhatAreYouClaimingForLR } from '../../../data/page-data/lr-page-data/counterClaimWhatAreYouClaimingForLR.page.data';
-import { doAnyOtherAdultsLiveInYourHomeLR } from '../../../data/page-data/lr-page-data/doAnyOtherAdultsLiveInYourHomeLR.page.data';
-import { doYouHaveAnyDependantChildrenLR } from '../../../data/page-data/lr-page-data/doYouHaveAnyDependantChildrenLR.page.data';
-import { doYouHaveAnyOtherDependantsLR } from '../../../data/page-data/lr-page-data/doYouHaveAnyOtherDependantsLR.page.data';
-import { haveYouAppliedForUniversalCreditLR } from '../../../data/page-data/lr-page-data/haveYouAppliedForUniversalCreditLR.page.data';
-import { howMuchAffordToPayLR } from '../../../data/page-data/lr-page-data/howMuchAffordToPayLR.page.data';
-import { incomeAndExpensesLR } from '../../../data/page-data/lr-page-data/incomeAndExpensesLR.page.data';
-import { instalmentPaymentsLR } from '../../../data/page-data/lr-page-data/instalmentPaymentsLR.page.data';
-import { nonRentArrearsDisputeLR } from '../../../data/page-data/lr-page-data/nonRentArrearsDisputeLR.page.data';
-import { otherConsiderationsLR } from '../../../data/page-data/lr-page-data/otherConsiderationsLR.page.data';
-import { priorityDebtDetailsLR } from '../../../data/page-data/lr-page-data/priorityDebtDetailsLR.page.data';
-import { priorityDebtsLR } from '../../../data/page-data/lr-page-data/priorityDebtsLR.page.data';
-import { rentArrearsLR } from '../../../data/page-data/lr-page-data/rentArrearsDisputeLR.page.data';
-import { repaymentsAgreedLR } from '../../../data/page-data/lr-page-data/repaymentsAgreedLR.page.data';
-import { selectDefendantLR } from '../../../data/page-data/lr-page-data/selectDefendantLR.page.data';
-import { tenancyDateUnknownLR } from '../../../data/page-data/lr-page-data/tenancyDateUnknownLR.page.data';
-import { whatOtherRegularExpensesDoYouHaveLR } from '../../../data/page-data/lr-page-data/whatOtherRegularExpensesDoYouHaveLR.page.data';
-import { whatRegularIncomeDoYouReceiveLR } from '../../../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
-import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR } from '../../../data/page-data/lr-page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
-import { yourCircumstancesLR } from '../../../data/page-data/lr-page-data/yourCircumstancesLR.page.data';
 import {
   confirmationOfNoticeDateWhenNotProvidedLR,
   confirmationOfNoticeGiven,
   correspondenceAddressLR,
+  counterClaimAboutLR,
+  counterClaimAgainstWhomLR,
+  counterClaimFeeLR,
+  counterClaimHaveYouAppliedForHelpLR,
+  counterClaimLR,
+  counterClaimOrderOtherThanSumLR,
+  counterClaimSpecificSumOfMoneyLR,
+  counterClaimWhatAreYouClaimingForLR,
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
   exceptionalHardshipLR,
   haveYouAppliedForUniversalCreditLR,
+  howMuchAffordToPayLR,
   incomeAndExpensesLR,
+  instalmentPaymentsLR,
   nonRentArrearsDisputeLR,
   noticeDateWhenProvidedLR,
   otherConsiderationsLR,

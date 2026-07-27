@@ -1,57 +1,19 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { repaymentsAgreed } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
-  otherConsiderations,
-  previousPaymentsLR,
-  rentArrears,
-  repaymentsAgreed,
-} from '../data/page-data';
-import { confirmationOfNoticeGivenLR } from '../data/page-data/lr-page-data/confirmationOfNoticeGivenLR.page.data';
-import { contactPreferenceEmailOrPostLR } from '../data/page-data/lr-page-data/contactPreferenceEmailOrPostLR.page.data';
-import { contactPreferencesTelephoneLR } from '../data/page-data/lr-page-data/contactPreferencesTelephoneLR.page.data';
-import { contactPreferencesTextMessageLR } from '../data/page-data/lr-page-data/contactPreferencesTextMessageLR.page.data';
-import { correspondenceAddressLR } from '../data/page-data/lr-page-data/correspondenceAddressLR.page.data';
-import { counterClaimAboutLR } from '../data/page-data/lr-page-data/counterClaimAboutLR.page.data';
-import { counterClaimAgainstWhomLR } from '../data/page-data/lr-page-data/counterClaimAgainstWhomLR.page.data';
-import { counterClaimFeeLR } from '../data/page-data/lr-page-data/counterClaimFeeLR.page.data';
-import { counterClaimHaveYouAppliedForHelpLR } from '../data/page-data/lr-page-data/counterClaimHaveYouAppliedForHelpLR.page.data';
-import { counterClaimLR } from '../data/page-data/lr-page-data/counterClaimLR.page.data';
-import { counterClaimOrderOtherThanSumLR } from '../data/page-data/lr-page-data/counterClaimOrderOtherThanSumLR.page.data';
-import { counterClaimSpecificSumOfMoneyLR } from '../data/page-data/lr-page-data/counterClaimSpecificSumOfMoneyLR.page.data';
-import { counterClaimWhatAreYouClaimingForLR } from '../data/page-data/lr-page-data/counterClaimWhatAreYouClaimingForLR.page.data';
-import { counterclaimYouNeedToApplyForHelpWithYourFeesLR } from '../data/page-data/lr-page-data/counterclaimYouNeedToApplyForHelpWithYourFeesLR.page.data';
-import { defendantDateOfBirthLR } from '../data/page-data/lr-page-data/defendantDateOfBirthLR.page.data';
-import { defendantNameConfirmationLR } from '../data/page-data/lr-page-data/defendantNameConfirmationLR.page.data';
-import { doAnyOtherAdultsLiveInYourHomeLR } from '../data/page-data/lr-page-data/doAnyOtherAdultsLiveInYourHomeLR.page.data';
-import { doYouHaveAnyDependantChildrenLR } from '../data/page-data/lr-page-data/doYouHaveAnyDependantChildrenLR.page.data';
-import { doYouHaveAnyOtherDependantsLR } from '../data/page-data/lr-page-data/doYouHaveAnyOtherDependantsLR.page.data';
-import { equalityAndDiversityEndLR } from '../data/page-data/lr-page-data/equalityAndDiversityEndLR.page.data';
-import { equalityAndDiversityStartLR } from '../data/page-data/lr-page-data/equalityAndDiversityStartLR.page.data';
-import { exceptionalHardshipLR } from '../data/page-data/lr-page-data/exceptionalHardshipLR.page.data';
-import { haveYouAppliedForUniversalCreditLR } from '../data/page-data/lr-page-data/haveYouAppliedForUniversalCreditLR.page.data';
-import { howMuchAffordToPayLR } from '../data/page-data/lr-page-data/howMuchAffordToPayLR.page.data';
-import { incomeAndExpensesLR } from '../data/page-data/lr-page-data/incomeAndExpensesLR.page.data';
-import { instalmentPaymentsLR } from '../data/page-data/lr-page-data/instalmentPaymentsLR.page.data';
-import { languageUsedLR } from '../data/page-data/lr-page-data/languageUsedLR.page.data';
-import { nonRentArrearsDisputeLR } from '../data/page-data/lr-page-data/nonRentArrearsDisputeLR.page.data';
-import { otherConsiderationsLR } from '../data/page-data/lr-page-data/otherConsiderationsLR.page.data';
-import { priorityDebtDetailsLR } from '../data/page-data/lr-page-data/priorityDebtDetailsLR.page.data';
-import { priorityDebtsLR } from '../data/page-data/lr-page-data/priorityDebtsLR.page.data';
-import { rentArrearsLR } from '../data/page-data/lr-page-data/rentArrearsDisputeLR.page.data';
-import { repaymentsAgreedLR } from '../data/page-data/lr-page-data/repaymentsAgreedLR.page.data';
-import { selectDefendantLR } from '../data/page-data/lr-page-data/selectDefendantLR.page.data';
-import { startNowLR } from '../data/page-data/lr-page-data/startNowLR.page.data';
-import { tenancyTypeDetailsLR } from '../data/page-data/lr-page-data/tenancyTypeDetailsLR.page.data';
-import { whatOtherRegularExpensesDoYouHaveLR } from '../data/page-data/lr-page-data/whatOtherRegularExpensesDoYouHaveLR.page.data';
-import { whatRegularIncomeDoYouReceiveLR } from '../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
-import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR } from '../data/page-data/lr-page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
-import { yourCircumstancesLR } from '../data/page-data/lr-page-data/yourCircumstancesLR.page.data';
   contactPreferenceEmailOrPostLR,
   contactPreferencesTelephoneLR,
   contactPreferencesTextMessageLR,
   correspondenceAddressLR,
+  counterClaimAboutLR,
+  counterClaimAgainstWhomLR,
+  counterClaimFeeLR,
+  counterClaimHaveYouAppliedForHelpLR,
   counterClaimLR,
+  counterClaimOrderOtherThanSumLR,
+  counterClaimSpecificSumOfMoneyLR,
+  counterClaimWhatAreYouClaimingForLR,
+  counterclaimYouNeedToApplyForHelpWithYourFeesLR,
   defendantDateOfBirthLR,
   defendantNameConfirmationLR,
   doAnyOtherAdultsLiveInYourHomeLR,
@@ -61,6 +23,7 @@ import { yourCircumstancesLR } from '../data/page-data/lr-page-data/yourCircumst
   equalityAndDiversityStartLR,
   exceptionalHardshipLR,
   haveYouAppliedForUniversalCreditLR,
+  howMuchAffordToPayLR,
   incomeAndExpensesLR,
   instalmentPaymentsLR,
   languageUsedLR,
@@ -202,7 +165,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       tsYear: '2024',
     });
     await performAction('selectNoticeDetailsLR', {
-      option: confirmationOfNoticeGivenLR.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknownLR');
     await performAction('disputingOtherPartsOfTheClaimLR', {
@@ -307,7 +270,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('NonRentArrears - AssuredTenancy - Something else - LR @smoke @regression @nonRent', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
-      question: selectDefendantLR.whichDefendantQuestion,
+      question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
     await performAction('confirmDefendantDetails', {
@@ -342,7 +305,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       tsYear: '2024',
     });
     await performAction('selectNoticeDetailsLR', {
-      option: confirmationOfNoticeGivenLR.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknownLR');
     await performAction('disputingOtherPartsOfTheClaimLR', {
@@ -445,7 +408,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @regression @nonRent', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
-      question: selectDefendantLR.whichDefendantQuestion,
+      question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
     await performAction('confirmDefendantDetails', {
@@ -480,7 +443,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       tsYear: '2024',
     });
     await performAction('selectNoticeDetailsLR', {
-      option: confirmationOfNoticeGivenLR.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateUnknownLR');
     await performAction('disputingOtherPartsOfTheClaimLR', {
@@ -663,7 +626,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('repaymentAgreedLR', {
       question: repaymentsAgreedLR.giveDetailsHiddenTextLabel,
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+      repaymentAgreedOption: repaymentsAgreedLR.noRadioOption,
     });
     await performAction('installmentPayments', {
       question: instalmentPaymentsLR.wouldDefendantLikeToOfferToPayQuestion,
@@ -712,7 +675,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectExpensesLR');
     await performAction('otherConsiderationsLR', {
       question: otherConsiderationsLR.isThereAnythingElseParagraph,
-      option: otherConsiderations.noRadioOption,
+      option: otherConsiderationsLR.noRadioOption,
     });
     await performAction('uploadFiles');
     await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
@@ -805,7 +768,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('repaymentAgreedLR', {
       question: repaymentsAgreedLR.giveDetailsHiddenTextLabel,
-      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+      repaymentAgreedOption: repaymentsAgreedLR.noRadioOption,
     });
     await performAction('installmentPaymentsLR', {
       question: instalmentPaymentsLR.wouldDefendantLikeToOfferToPayQuestion,
@@ -999,7 +962,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performAction('rentArrearsLR', {
-      option: rentArrears.yesRadioOption,
+      option: rentArrearsLR.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {
@@ -1111,7 +1074,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performAction('rentArrearsLR', {
-      option: rentArrears.yesRadioOption,
+      option: rentArrearsLR.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {
