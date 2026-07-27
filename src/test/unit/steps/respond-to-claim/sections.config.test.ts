@@ -25,7 +25,6 @@ describe('respond-to-claim sections config', () => {
     // unmapped here in addition to flowConfig.nonSectionStepOrder.
     const nonSectionStepSlugs = new Set([
       ...(flowConfig.nonSectionStepOrder ?? []),
-      'reasonable-adjustments-triage',
       'reasonable-adjustments-error',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
@@ -67,6 +66,7 @@ describe('respond-to-claim sections config', () => {
 
   it('maps end-of-journey steps into final section', () => {
     expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
+      'reasonable-adjustments-triage',
       'language-used',
       'end-of-journey-cya',
       'response-submitted',

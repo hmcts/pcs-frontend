@@ -137,15 +137,16 @@ const sectionDefs = [
       'incomeAndExpenditure',
       'uploadFiles',
     ],
-    // 'equality-and-diversity-start' and 'equality-and-diversity-end' are intentionally
-    // parked out of the live citizen journey while the PCQ integration is still in
-    // progress. Their step folders, registry entries and locale files are retained so
-    // re-enablement is a one-line restore here (see the PCQ tie-in tracked in
-    // config/default.json `pcq.enabled`). The RA triage (HDPI-3793) and RA confirmation
-    // screens are registered as non-section steps (flow.config `nonSectionStepOrder`),
-    // reachable by direct navigation; wiring them into the live journey is owned by the
-    // PCQ integration.
+    // 'reasonable-adjustments-triage' (HDPI-3793) is the first step of this section, reached from
+    // the task-list when the citizen opens "Check your answers and submit". "Continue to the
+    // questions" launches Your Support; an un-invoked / declined YS falls through to language-used
+    // (the next step) via the normal next-step flow. The RA confirmation and RA error screens are
+    // registered non-section steps reached only by redirect. By contrast,
+    // 'equality-and-diversity-start'/'-end' remain parked out of the live journey pending the PCQ
+    // integration (their folders/registry/locales are retained; see config/default.json
+    // `pcq.enabled`).
     steps: [
+      'reasonable-adjustments-triage',
       'language-used',
       'end-of-journey-cya',
       'response-submitted',

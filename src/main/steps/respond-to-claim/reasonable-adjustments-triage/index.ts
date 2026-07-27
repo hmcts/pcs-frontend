@@ -16,34 +16,26 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/reasonableAdjustmentsTriage.njk`,
   // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
-  // microsite. The "I do not need any support at this time" (reasonableAdjustmentsChoice=skip)
-  // button instead continues the response journey at the language-used page.
+  // microsite; any failure lands the citizen on the RA error page. The "I do not need any support"
+  // (skip) button falls through to the normal next-step flow — because this step sits immediately
+  // before language-used in the checkYourAnswersAndSubmit section, that continues to language-used.
   beforeRedirect: async (req: Request) => {
-    const caseReference = req.res?.locals.validatedCase?.id;
-    if (req.body.reasonableAdjustmentsChoice === 'questions') {
-      try {
-        const redirectUrl = await startYourSupport(req);
-        req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
-      } catch (error) {
-        // Any failure launching Your Support (cui-ra down, POST error, missing token) lands the
-        // citizen on the context-aware RA error page, which offers a route back to triage. We
-        // deliberately do NOT rethrow, so we avoid the shared error page (no way back into this
-        // journey) and the authFailure login-redirect that a cui-ra 401 would otherwise trigger.
-        logger.error(`Failed to launch Your Support for case ${caseReference}`, error);
-        if (caseReference) {
-          req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`);
-        }
-      }
-      return;
+    if (req.body.reasonableAdjustmentsChoice !== 'questions') {
+      return; // "skip": let the normal next-step flow continue to language-used
     }
-    // TODO (HDPI-7379, INTERIM until the PCQ integration wires the RA journey): we redirect
-    // EXPLICITLY only because reasonable-adjustments-triage is a NON-section step (flow.config
-    // `nonSectionStepOrder`): getNextStep from a non-section step never traverses into the
-    // checkYourAnswersAndSubmit section, where language-used lives. If triage is later moved back
-    // into that section (immediately before language-used), delete this redirect — the normal
-    // next-step flow will route there automatically. Track in Jira.
-    if (caseReference) {
-      req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/language-used`);
+    const caseReference = req.res?.locals.validatedCase?.id;
+    try {
+      const redirectUrl = await startYourSupport(req);
+      req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
+    } catch (error) {
+      // Any failure launching Your Support (cui-ra down, POST error, missing token) lands the
+      // citizen on the context-aware RA error page, which offers a route back to triage. We
+      // deliberately do NOT rethrow, so we avoid the shared error page (no way back into this
+      // journey) and the authFailure login-redirect that a cui-ra 401 would otherwise trigger.
+      logger.error(`Failed to launch Your Support for case ${caseReference}`, error);
+      if (caseReference) {
+        req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`);
+      }
     }
   },
   translationKeys: {
