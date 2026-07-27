@@ -54,6 +54,11 @@ export const flowConfig: JourneyFlowConfig = {
     'reasonable-adjustments-error': {
       preventBack: true,
     },
+    // Cancelled-YS page (payload action = 'cancel'). Reached only by redirect from the callback;
+    // preventBack keeps it renderable without a back link (outside any section / nonSectionStepOrder).
+    'reasonable-adjustments-cancelled': {
+      preventBack: true,
+    },
     'ask-your-solicitor-to-respond-to-the-claim': {
       showCondition: (req: Request) =>
         req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',

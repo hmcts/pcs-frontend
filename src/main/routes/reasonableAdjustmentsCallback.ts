@@ -24,6 +24,7 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
       const payloadId = String(req.params.id || '');
       const fallback = `/case/${caseReference}`;
       const confirmationUrl = `/case/${caseReference}/respond-to-claim/reasonable-adjustments-confirmation`;
+      const cancelledUrl = `/case/${caseReference}/respond-to-claim/reasonable-adjustments-cancelled`;
       const errorUrl = `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`;
 
       // GET /api/payload/:id authenticates with the S2S service token only (no idam-token).
@@ -35,10 +36,12 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
 
       try {
         const payload = await cuiRaService.getPayload(payloadId, serviceToken);
-        // TODO(later AC): persist these answers onto the case, and use payload.action to pick the
-        // next step — e.g. a 'cancel' should not land on the "request sent" confirmation.
+        // TODO(later AC): persist these answers onto the case.
         logger.info(`Your Support payload for case ${caseReference}, id ${payloadId}: ${JSON.stringify(payload)}`);
-        return safeRedirect303(res, confirmationUrl, fallback, ['/case']);
+        // Only an explicit 'submit' shows the "request sent" confirmation; 'cancel' (or any other
+        // value) means nothing was sent → the "No request was sent" page.
+        const nextUrl = payload.action === 'submit' ? confirmationUrl : cancelledUrl;
+        return safeRedirect303(res, nextUrl, fallback, ['/case']);
       } catch (error) {
         logger.error(`Failed to fetch Your Support payload for id ${payloadId}`, error);
         return safeRedirect303(res, errorUrl, fallback, ['/case']);

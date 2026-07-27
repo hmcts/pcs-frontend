@@ -52,6 +52,7 @@ import { step as otherConsiderations } from './other-considerations';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
+import { step as reasonableAdjustmentsCancelled } from './reasonable-adjustments-cancelled';
 import { step as reasonableAdjustmentsConfirmation } from './reasonable-adjustments-confirmation';
 import { step as reasonableAdjustmentsError } from './reasonable-adjustments-error';
 import { step as reasonableAdjustmentsTriage } from './reasonable-adjustments-triage';
@@ -146,6 +147,7 @@ export const stepRegistry = {
   'reasonable-adjustments-triage': reasonableAdjustmentsTriage,
   'reasonable-adjustments-confirmation': reasonableAdjustmentsConfirmation,
   'reasonable-adjustments-error': reasonableAdjustmentsError,
+  'reasonable-adjustments-cancelled': reasonableAdjustmentsCancelled,
   'equality-and-diversity-start': equalityAndDiversityStart,
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,

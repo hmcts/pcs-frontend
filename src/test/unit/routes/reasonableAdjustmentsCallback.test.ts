@@ -40,6 +40,7 @@ import reasonableAdjustmentsCallbackRoutes from '../../../main/routes/reasonable
 
 const ROUTE = '/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id';
 const confirmationUrl = '/case/123/respond-to-claim/reasonable-adjustments-confirmation';
+const cancelledUrl = '/case/123/respond-to-claim/reasonable-adjustments-cancelled';
 const errorUrl = '/case/123/respond-to-claim/reasonable-adjustments-error';
 
 describe('reasonableAdjustmentsCallback routes', () => {
@@ -72,7 +73,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
   });
 
-  it('retrieves the payload and redirects to the confirmation page on success', async () => {
+  it('redirects to the confirmation page when the payload action is submit', async () => {
     mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
     const res = {} as unknown as Response;
 
@@ -80,6 +81,15 @@ describe('reasonableAdjustmentsCallback routes', () => {
 
     expect(mockGetPayload).toHaveBeenCalledWith('abc-1', 's2s-tok');
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
+  });
+
+  it('redirects to the "no request sent" page when the payload action is cancel', async () => {
+    mockGetPayload.mockResolvedValue({ action: 'cancel', correlationId: '123' });
+    const res = {} as unknown as Response;
+
+    await getHandler()(buildReq('s2s-tok'), res);
+
+    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
   });
 
   it('redirects to the error page when payload retrieval fails', async () => {
