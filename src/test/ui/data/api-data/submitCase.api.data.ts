@@ -98,9 +98,9 @@ export const submitCaseApiData = {
           value: {
             document_filename: 'rentArrears.pdf',
             document_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/d4f12029-9c20-4b2a-a5a6-90b72114194e',
+              '${process.env.DM_STORE_URL}/documents/d4f12029-9c20-4b2a-a5a6-90b72114194e',
             document_binary_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/d4f12029-9c20-4b2a-a5a6-90b72114194e/binary',
+              '${process.env.DM_STORE_URL}/documents/d4f12029-9c20-4b2a-a5a6-90b72114194e/binary',
           },
         },
       ],
