@@ -19,6 +19,7 @@ const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
   process.env.NOTICE_SERVED = 'YES';
   process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';

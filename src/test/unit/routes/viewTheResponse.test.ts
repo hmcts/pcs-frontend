@@ -21,13 +21,15 @@ const translationStrings: Record<string, string> = {
   'viewTheResponse:incomeFrequencies.MONTHLY': 'received every month',
   'viewTheResponse:paymentFrequencies.WEEKLY': 'paid every week',
   'viewTheResponse:paymentFrequencies.MONTHLY': 'paid every month',
-  'viewTheResponse:defendant1.freeLegalAdviceOptions.YES': 'Yes',
-  'viewTheResponse:defendant1.freeLegalAdviceOptions.NO': 'No',
-  'viewTheResponse:defendant1.freeLegalAdviceOptions.PREFER_NOT_TO_SAY': 'Prefer not to say',
+  'viewTheResponse:defendant.freeLegalAdviceOptions.YES': 'Yes',
+  'viewTheResponse:defendant.freeLegalAdviceOptions.NO': 'No',
+  'viewTheResponse:defendant.freeLegalAdviceOptions.PREFER_NOT_TO_SAY': 'Prefer not to say',
   'viewTheResponse:counterclaim.claimTypeOptions.PAYMENT_OR_COMPENSATION': 'A sum of money or compensation',
   'viewTheResponse:counterclaim.claimTypeOptions.SOMETHING_ELSE': 'Something else',
   'viewTheResponse:counterclaim.claimTypeOptions.BOTH': 'Both',
   'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
+  'viewTheResponse:personsUnknown': 'Persons unknown',
+  'viewTheResponse:addressUnknown': 'Address unknown',
 };
 
 jest.mock('@modules/i18n', () => ({
@@ -355,17 +357,25 @@ describe('viewTheResponse route', () => {
     );
     expect(renderArgs.defendant1Details.rows.length).toBeGreaterThan(0);
     expect(renderArgs.defendant1Details.rows.map((row: { key: { text: string } }) => row.key.text)).toEqual([
-      'viewTheResponse:defendant1.name',
-      'viewTheResponse:defendant1.phone',
-      'viewTheResponse:defendant1.address',
-      'viewTheResponse:defendant1.dateOfBirth',
+      'viewTheResponse:defendant.name',
+      'viewTheResponse:defendant.phone',
+      'viewTheResponse:defendant.address',
+      'viewTheResponse:defendant.dateOfBirth',
     ]);
     expect(renderArgs.additionalDefendantDetails).toHaveLength(1);
     expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant1.name' },
+          key: { text: 'viewTheResponse:defendant.name' },
           value: { text: 'Peter Parker' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.address' },
+          value: { text: '10 Second Avenue, London, W3 7RX' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.dateOfBirth' },
+          value: { text: '20 July 1985' },
         }),
       ])
     );
@@ -534,8 +544,12 @@ describe('viewTheResponse route', () => {
     const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
     expect(renderArgs.additionalDefendantDetails[0].rows).toEqual([
       expect.objectContaining({
-        key: { text: 'viewTheResponse:defendant1.name' },
-        value: { text: 'viewTheResponse:personsUnknown' },
+        key: { text: 'viewTheResponse:defendant.name' },
+        value: { text: 'Persons unknown' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
       }),
     ]);
   });
@@ -569,8 +583,12 @@ describe('viewTheResponse route', () => {
     const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
     expect(renderArgs.additionalDefendantDetails[0].rows).toEqual([
       expect.objectContaining({
-        key: { text: 'viewTheResponse:defendant1.name' },
-        value: { text: 'viewTheResponse:personsUnknown' },
+        key: { text: 'viewTheResponse:defendant.name' },
+        value: { text: 'Persons unknown' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
       }),
     ]);
   });
@@ -604,8 +622,12 @@ describe('viewTheResponse route', () => {
     expect(additionalDefendantDetails).toHaveLength(1);
     expect(additionalDefendantDetails[0].rows).toEqual([
       expect.objectContaining({
-        key: { text: 'viewTheResponse:defendant1.name' },
+        key: { text: 'viewTheResponse:defendant.name' },
         value: { text: 'Jane Defendant' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
       }),
     ]);
   });
@@ -639,8 +661,12 @@ describe('viewTheResponse route', () => {
     expect(additionalDefendantDetails).toHaveLength(1);
     expect(additionalDefendantDetails[0].rows).toEqual([
       expect.objectContaining({
-        key: { text: 'viewTheResponse:defendant1.name' },
+        key: { text: 'viewTheResponse:defendant.name' },
         value: { text: 'Peter Parker' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
       }),
     ]);
   });

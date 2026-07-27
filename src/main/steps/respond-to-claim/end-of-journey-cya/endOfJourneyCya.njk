@@ -24,7 +24,7 @@
     {% endif %}
   {% endfor %}
 
-  <form method="post" action="/case/{{ ccdId }}/final-submit" novalidate>
+  <form method="post" action="{{ url }}" novalidate>
     {{ csrfProtection(csrfToken) }}
 
     <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>

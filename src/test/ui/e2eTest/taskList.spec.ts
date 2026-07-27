@@ -44,6 +44,7 @@ let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
   process.env.WALES_POSTCODE = 'NO';
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
   process.env.CLAIMANT_NAME = claimantName;

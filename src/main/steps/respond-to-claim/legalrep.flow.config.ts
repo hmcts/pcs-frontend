@@ -46,6 +46,8 @@ const legalRepStepOrder = [
   'what-other-regular-expenses-do-you-have',
   'other-considerations',
   'upload-document',
+  'equality-and-diversity-start',
+  'equality-and-diversity-end',
   'language-used',
   'end-of-journey-cya',
   'end-now',

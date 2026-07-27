@@ -172,6 +172,7 @@ export const step: StepDefinition = {
         });
       }
 
+      await loadStepNamespace(req);
       const t = getTranslationFunction(req);
       let relatedApplicationCategory: string | undefined;
       let relatedApplicationText = '';
