@@ -1,4 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { repaymentsAgreed } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
   otherConsiderations,
@@ -46,6 +47,38 @@ import { whatOtherRegularExpensesDoYouHaveLR } from '../data/page-data/lr-page-d
 import { whatRegularIncomeDoYouReceiveLR } from '../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR } from '../data/page-data/lr-page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
 import { yourCircumstancesLR } from '../data/page-data/lr-page-data/yourCircumstancesLR.page.data';
+  contactPreferenceEmailOrPostLR,
+  contactPreferencesTelephoneLR,
+  contactPreferencesTextMessageLR,
+  correspondenceAddressLR,
+  counterClaimLR,
+  defendantDateOfBirthLR,
+  defendantNameConfirmationLR,
+  doAnyOtherAdultsLiveInYourHomeLR,
+  doYouHaveAnyDependantChildrenLR,
+  doYouHaveAnyOtherDependantsLR,
+  equalityAndDiversityEndLR,
+  equalityAndDiversityStartLR,
+  exceptionalHardshipLR,
+  haveYouAppliedForUniversalCreditLR,
+  incomeAndExpensesLR,
+  instalmentPaymentsLR,
+  languageUsedLR,
+  nonRentArrearsDisputeLR,
+  otherConsiderationsLR,
+  previousPaymentsLR,
+  priorityDebtDetailsLR,
+  priorityDebtsLR,
+  rentArrearsLR,
+  repaymentsAgreedLR,
+  selectDefendant,
+  startNow,
+  tenancyTypeDetailsLR,
+  whatOtherRegularExpensesDoYouHaveLR,
+  whatRegularIncomeDoYouReceiveLR,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
+  yourCircumstancesLR,
+} from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
@@ -121,7 +154,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
   //await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('clickButton', startNowLR.startNowButton);
+  await performAction('clickButton', startNow.startNowButton);
 });
 
 test.afterEach(async () => {
@@ -131,10 +164,10 @@ test.afterEach(async () => {
 //Skipping these tests temporarily in @nightly as LR feature will be toggled off in all test environments until the first release HDPI-7531
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent', async () => {
+  test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
-      question: selectDefendantLR.whichDefendantQuestion,
+      question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
     await performAction('confirmDefendantDetails', {
@@ -585,7 +618,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: tenancyTypeDetailsLR.yesRadioOption,
     });
     await performAction('selectNoticeDetailsLR', {
-      option: confirmationOfNoticeGivenLR.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnownLR', {
       day: '25',
@@ -727,7 +760,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: tenancyTypeDetailsLR.yesRadioOption,
     });
     await performAction('selectNoticeDetailsLR', {
-      option: confirmationOfNoticeGivenLR.yesRadioOption,
+      option: confirmationOfNoticeGiven.yesRadioOption,
     });
     await performAction('enterNoticeDateKnownLR', {
       day: '25',
@@ -826,7 +859,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectExpensesLR');
     await performAction('otherConsiderationsLR', {
       question: otherConsiderationsLR.isThereAnythingElseParagraph,
-      option: otherConsiderations.noRadioOption,
+      option: otherConsiderationsLR.noRadioOption,
     });
     await performAction('uploadFiles');
     await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
@@ -840,7 +873,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('RentArrears - DemotedTenancy - LR @smoke @regression @rent', async () => {
+  test('RentArrears - DemotedTenancy - LR @smoke @regression @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -875,7 +908,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performAction('rentArrearsLR', {
-      option: rentArrears.yesRadioOption,
+      option: rentArrearsLR.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {

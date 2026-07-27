@@ -33,6 +33,31 @@ import { whatOtherRegularExpensesDoYouHaveLR } from '../../../data/page-data/lr-
 import { whatRegularIncomeDoYouReceiveLR } from '../../../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR } from '../../../data/page-data/lr-page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
 import { yourCircumstancesLR } from '../../../data/page-data/lr-page-data/yourCircumstancesLR.page.data';
+import {
+  confirmationOfNoticeDateWhenNotProvidedLR,
+  confirmationOfNoticeGiven,
+  correspondenceAddressLR,
+  doAnyOtherAdultsLiveInYourHomeLR,
+  doYouHaveAnyDependantChildrenLR,
+  doYouHaveAnyOtherDependantsLR,
+  exceptionalHardshipLR,
+  haveYouAppliedForUniversalCreditLR,
+  incomeAndExpensesLR,
+  nonRentArrearsDisputeLR,
+  noticeDateWhenProvidedLR,
+  otherConsiderationsLR,
+  previousPaymentsLR,
+  priorityDebtDetailsLR,
+  priorityDebtsLR,
+  rentArrearsLR,
+  repaymentsAgreedLR,
+  selectDefendant,
+  tenancyDateUnknownLR,
+  whatOtherRegularExpensesDoYouHaveLR,
+  whatRegularIncomeDoYouReceiveLR,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
+  yourCircumstancesLR,
+} from '../../../data/page-data/lr-page-data';
 import { formatCurrency } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -94,10 +119,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async selectNoticeDetailsLR(noticeGivenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: confirmationOfNoticeGivenLR.getDidClaimantGiveYouQuestion(`${process.env.CLAIMANT_NAME}`),
+      question: confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(`${process.env.CLAIMANT_NAME}`),
       option: noticeGivenData.option,
     });
-    await performAction('clickButton', confirmationOfNoticeGivenLR.saveAndContinueButton);
+    await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressUnknownLR(addressData: actionRecord) {
@@ -305,7 +330,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       question: representationOption.question,
       option: representationOption.radioOption,
     });
-    await performAction('clickButton', selectDefendantLR.saveAndContinueButton);
+    await performAction('clickButton', selectDefendant.saveAndContinueButton);
   }
 
   private async selectWhatRegularIncomeDoTheyReceiveLR(regularIncome?: actionRecord): Promise<void> {
@@ -334,11 +359,11 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
 
-      await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
+      await performAction('inputText', whatRegularIncomeDoYouReceiveLR.totalAmountReceivedHiddenTextLabel, value);
       await performAction('clickRadioButton', frequency);
     }
 
-    await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+    await performAction('clickButton', whatRegularIncomeDoYouReceiveLR.saveAndContinueButton);
   }
 
   private async selectPriorityDebtsLR(priorityDebtsData: actionRecord): Promise<void> {
