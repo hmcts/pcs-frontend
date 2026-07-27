@@ -124,8 +124,8 @@ describe('start-evidence-upload step', () => {
       step.view,
       expect.objectContaining({
         pageUrl: '/case/1234567890123456/upload-additional-documents/start-evidence-upload',
-        backUrl: '/dashboard/1234567890123456',
-        dashboardUrl: '/dashboard/1234567890123456',
+        backUrl: '/case/1234567890123456/dashboard',
+        dashboardUrl: '/case/1234567890123456/dashboard',
         url: '/case/1234567890123456/upload-additional-documents/start-evidence-upload',
       })
     );

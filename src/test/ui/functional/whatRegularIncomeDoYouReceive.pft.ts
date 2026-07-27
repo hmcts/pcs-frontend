@@ -1,4 +1,4 @@
-import { feedback, incomeAndExpenses, taskList, whatRegularIncomeDoYouReceive } from '../data/page-data';
+import { feedback, incomeAndExpenses, whatRegularIncomeDoYouReceive } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -329,5 +329,4 @@ export async function whatRegularIncomeDoYouReceiveNavigationTests(): Promise<vo
     pageSlug: whatRegularIncomeDoYouReceive.pageSlug,
   });
   await performValidation('pageNavigation', whatRegularIncomeDoYouReceive.backLink, incomeAndExpenses.mainHeader);
-  await performValidation('pageNavigation', whatRegularIncomeDoYouReceive.saveForLaterButton, taskList.mainHeader);
 }

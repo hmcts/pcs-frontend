@@ -5,7 +5,7 @@ import {
   submitCaseApiData,
 } from '../data/api-data';
 import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
-import { dashboard } from '../data/page-data';
+import { dashboard, taskList } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
@@ -19,19 +19,21 @@ const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  process.env.NOTICE_SERVED = 'NO';
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
+  process.env.NOTICE_SERVED = 'YES';
   process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/access-your-case`);
   await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
-  await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
+  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
@@ -143,7 +145,40 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('validateViewAllApplications');
   });
 
-  test('Validate notification and response status @regression @crossbrowser', async () => {
+  test('View all applications should be disabled when another defendant has withoutNotice = YES', async () => {
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
+    await performAction('reloadPage');
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+    await performAction('clickLink', 'Sign out');
+    await performAction('createUser', 'citizen', ['citizen']);
+    await performAction('navigateToUrl', home_url);
+    await performAction('login');
+    await performAction('navigateToUrl', home_url + `/access-your-case`);
+    await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 1 });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+    await performValidation('textNotVisible', {
+      elementType: 'link',
+      text: dashboard.viewAllApplicationsLink,
+    });
+  });
+
+  test('View all applications should be enabled when another defendant has withoutNotice = NO', async () => {
+    await performAction('citizenCreateGenAppAPI', {
+      data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
+    });
+    await performAction('reloadPage');
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+    await performAction('clickLink', 'Sign out');
+    await performAction('createUser', 'citizen', ['citizen']);
+    await performAction('navigateToUrl', home_url);
+    await performAction('login');
+    await performAction('navigateToUrl', home_url + `/access-your-case`);
+    await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 1 });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+  });
+
+  test('Validate notification and response status @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
     await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
@@ -154,11 +189,11 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
       viewResponseHeader: dashboard.viewTheResponseSubHeader,
       tag: dashboard.notStartedTag,
-      nextPageHeader: dashboard.respondToAPropertyHeader,
+      nextPageHeader: taskList.mainHeader,
     });
     await performAction('verifyNavigationFromNotificationLink', {
       responseLink: dashboard.startYourResponseLink,
-      nextPageHeader: dashboard.respondToAPropertyHeader,
+      nextPageHeader: taskList.mainHeader,
     });
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimMidEventApiData.respondPossessionClaimPayload,
@@ -174,7 +209,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
     await performAction('verifyNavigationFromNotificationLink', {
       responseLink: dashboard.continueYourResponseLink,
-      nextPageHeader: dashboard.respondToAPropertyHeader,
+      nextPageHeader: taskList.mainHeader,
     });
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimApiData.respondPossessionClaimPayload,
@@ -188,5 +223,26 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       tag: dashboard.completedTag,
       viewResponseTag: dashboard.availableTag,
     });
+  });
+
+  // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
+  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
+    await performValidation('mainHeader', dashboard.mainHeader);
+    await performAction('reloadPage');
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      type: 'both',
+    });
+    await performAction('reloadPage');
+    await performAction('clickButton', dashboard.viewTheResponseSubHeader);
+    await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+    await performAction('verifyResponseDetailsOnViewTheResponsePage');
+  });
+
+  test('Validate View the claim page data @regression @crossbrowser', async () => {
+    await performAction('clickLink', dashboard.viewTheClaimLink);
+    await performValidation('mainHeader', viewTheClaim.mainHeader);
+    await performAction('verifyClaimDetailsOnViewTheClaimPage');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });

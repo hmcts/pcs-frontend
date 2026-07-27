@@ -128,8 +128,7 @@ describe('respond-to-claim installments step', () => {
 
     const viewModel = res.render.mock.calls[0][1] as { fields: Record<string, unknown>[] };
     const amountField = viewModel.fields.find(f => f.name === 'installmentAmount') as
-      | { component?: { prefix?: { text?: string } } }
-      | undefined;
+      { component?: { prefix?: { text?: string } } } | undefined;
     expect(amountField?.component?.prefix?.text).toBe('£');
   });
 

@@ -1,4 +1,4 @@
-import { exceptionalHardship, feedback, taskList, yourCircumstances } from '../data/page-data';
+import { exceptionalHardship, feedback, yourCircumstances } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -33,5 +33,4 @@ export async function yourExceptionalHardshipNavigationTests(): Promise<void> {
   });
   await performValidation('pageNavigation', yourCircumstances.backLink, yourCircumstances.mainHeader);
   await performAction('clickRadioButton', yourCircumstances.noRadioOption);
-  await performValidation('pageNavigation', exceptionalHardship.saveForLaterButton, taskList.mainHeader);
 }

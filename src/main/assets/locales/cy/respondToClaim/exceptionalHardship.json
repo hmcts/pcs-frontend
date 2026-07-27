@@ -1,21 +1,21 @@
 {
-  "pageTitle": "cyExceptional hardship",
-  "introParagraph1": "cyExceptional hardship means experiencing serious difficulties that go beyond the normal difficulty of losing your home.",
+  "pageTitle": "Caledi eithriadol",
+  "introParagraph1": "Mae caledi eithriadol yn golygu profi anawsterau difrifol sy'n mynd y tu hwnt i'r anhawster arferol o golli eich cartref.",
   "introParagraph2": "cyAny details you provide will be considered by a judge. If  they decide that exceptional hardship applies in your case, they might consider whether you can stay in your home for longer.",
-  "forExample": "cyFor example, you might have:",
-  "bullet1": "cygone through a divorce or separation",
-  "bullet2": "cylost your job or been made redundant",
-  "bullet3": "cyexperienced a bereavement or long-term illness",
-  "bullet4": "cybeen declared bankrupt",
-  "question": "cyWould you experience exceptional hardship if you were asked to leave your home?",
+  "forExample": "Er enghraifft, gallwch fod wedi:",
+  "bullet1": "mynd drwy ysgariad neu wahanu",
+  "bullet2": "colli eich swydd neu wedi cael eich diswyddo",
+  "bullet3": "profi galar neu salwch hirdymor",
+  "bullet4": "eich datgan yn fethdalwr",
+  "question": "A fyddech yn profi caledi eithriadol os gofynnir i chi adael eich cartref?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
-  "textAreaLabel": "cyGive details about the exceptional hardship you’d experience",
+  "textAreaLabel": "Rhowch fanylion am y caledi eithriadol y byddech yn ei brofi",
   "errors": {
-    "exceptionalHardship": "cySelect if you’d experience exceptional hardship if you were asked to leave your home",
-    "exceptionalHardship.exceptionalHardshipDetails": "cyGive details about the exceptional hardship you’d experience",
+    "exceptionalHardship": "Dewiswch a fyddech yn profi caledi eithriadol os gofynnir i chi adael eich cartref",
+    "exceptionalHardship.exceptionalHardshipDetails": "Rhowch fanylion am y caledi eithriadol y byddech yn ei brofi",
     "exceptionalHardshipDetailsMaxLength": "cyExceptional hardship details must be 500 characters or less",
     "exceptionalHardshipDetailsInvalidCharacters": "cyThe details of the exceptional hardship you’d experience must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }

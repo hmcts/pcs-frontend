@@ -19,9 +19,9 @@
       "changeHidden": "date of birth"
     },
     "correspondenceAddressConfirmation": {
-      "label": "Is your correspondence address {{address}}?",
-      "fallbackLabel": "What’s your correspondence address?",
-      "changeHidden": "correspondence address"
+      "label": "Is your postal address {{address}}?",
+      "fallbackLabel": "What’s your postal address?",
+      "changeHidden": "postal address"
     },
     "contactByEmailOrPost": {
       "label": "How do you want to receive updates?",

@@ -94,26 +94,40 @@ function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void
 function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   // On a confirmed "Yes" the step clears party.address, so show the claimant-recorded
   // address; on "No" or a typed-in one, show the defendant party's.
-  const confirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
-  const addressConfirmed = !!confirmation && normalizeYesNoValue(confirmation) === 'YES';
+  const claimantProvidedConfirmation = validatedCase.defendantResponses?.correspondenceAddressConfirmation;
+  const propertyAddressConfirmation = validatedCase.defendantResponses?.propertyAddressConfirmation;
 
-  const sourceAddress = addressConfirmed
-    ? validatedCase.claimantEnteredDefendantDetails?.address
-    : validatedCase.defendantContactDetailsPartyAddress;
+  const activeConfirmation = claimantProvidedConfirmation ?? propertyAddressConfirmation;
+  if (!activeConfirmation) {
+    return;
+  }
+
+  const addressConfirmed = normalizeYesNoValue(activeConfirmation) === 'YES';
+
+  let sourceAddress;
+  if (addressConfirmed) {
+    // YES on standard scenario: use claimant-recorded address
+    // YES on property fallback scenario: use property address
+    sourceAddress = claimantProvidedConfirmation
+      ? validatedCase.claimantEnteredDefendantDetails?.address
+      : validatedCase.propertyAddress;
+  } else {
+    // NO in both scenarios: user entered their own address
+    sourceAddress = validatedCase.defendantContactDetailsPartyAddress;
+  }
 
   // Drop Country for the CYA row (UK address; matches the step legend and the task-list heading).
   const address = sourceAddress ? { ...sourceAddress, Country: undefined } : undefined;
-
   const lines = formatCcdAddressLines(address);
   if (lines.length === 0) {
     return;
   }
 
-  if (addressConfirmed && confirmation) {
+  if (addressConfirmed) {
     // YES: question carries the address, value is just "Yes" (same shape as the name row).
     rows.push({
       key: { text: t('rows.correspondenceAddressConfirmation.label', { address: lines.join(', ') }) },
-      value: { text: yesNoNotSure(confirmation) },
+      value: { text: yesNoNotSure(activeConfirmation) },
       actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
     });
     return;

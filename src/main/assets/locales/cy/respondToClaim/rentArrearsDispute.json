@@ -1,30 +1,30 @@
 {
-  "title": "cyRent arrears",
-  "pageTitle": "cyRent arrears",
-  "insetIntroText": "cyRent arrears are money you owe in rent payments.",
+  "title": "Ôl-ddyledion rhent",
+  "pageTitle": "Ôl-ddyledion rhent",
+  "insetIntroText": "Ôl-ddyledion rhent yw'r arian sy'n ddyledus gennych mewn taliadau rhent.",
   "insetDetailsText": "cyWhen they made their claim, {{claimantName}} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.",
-  "amountOwedHeading": "cyAmount you owe in rent arrears given by {{claimantName}}:",
-  "rentArrearsQuestion": "cyDo you owe this amount in rent arrears?",
+  "amountOwedHeading": "Swm sy'n ddyledus gennych mewn ôl-ddyledion rhent a roddwyd gan{{claimantName}}:",
+  "rentArrearsQuestion": "A yw'r swm hwn yn ddyledus gennych mewn ôl-ddyledion rhent?",
   "rentArrearsOptions": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "or": "cyor",
-    "notSure": "cyI’m not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "notSure": "Nid wyf yn siŵr"
   },
   "rentArrearsAmountCorrection": {
-    "label": "cyHow much do you believe you owe in rent arrears?",
-    "hint": "cyFor example, £148.00 or £148.50"
+    "label": "Faint ydych chi'n credu sy'n ddyledus gennych mewn ôl-ddyledion rhent?",
+    "hint": "Er enghraifft, £148.00 neu £148.50"
   },
   "errors": {
     "rentArrears": {
-      "required": "cySelect if you owe this amount in rent arrears"
+      "required": "Dewiswch a yw'r swm hwn yn ddyledus gennych mewn ôl-ddyledion rhent"
     },
     "rentArrearsAmountCorrection": {
-      "required": "cyEnter the amount you believe you owe in rent arrears",
-      "negativeAmount": "cyThe amount you believe you owe in rent arrears must be £0.00 or above",
-      "largeAmount": "cyThe amount you believe you owe in rent arrears must be less than £1 billion",
-      "invalidFormat": "cyEnter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write £148.00)"
+      "required": "Nodwch y swm rydych chi'n credu sy'n ddyledus gennych mewn ôl-ddyledion rhent",
+      "negativeAmount": "Rhaid i'r swm y credwch sy'n ddyledus gennych mewn ôl-ddyledion rhent fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm y credwch sy'n ddyledus gennych mewn ôl-ddyledion rhent fod yn llai nag £1 biliwn",
+      "invalidFormat": "Nodwch faint y credwch sy'n ddyledus gennych mewn ôl-ddyledion rhent, yn y fformat cywir (e.e. os yw £148 yn ddyledus gennych, ysgrifennwch - £148.00)"
     },
-    "rentArrears.rentArrearsAmountCorrection": "cyEnter the amount you believe you owe in rent arrears"
+    "rentArrears.rentArrearsAmountCorrection": "Nodwch y swm rydych chi'n credu sy'n ddyledus gennych mewn ôl-ddyledion rhent"
   }
 }

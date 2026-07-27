@@ -1,6 +1,7 @@
 {
+  "pageTitle": "cyExpenses",
   "heading": "cyExpenses",
-  "subheading": "cyWhat regular monthly expenses does the defendant have? (Optional)",
+  "expenseQuestion": "cyWhat regular monthly expenses does the defendant have? (Optional)",
   "hintText": "cySelect all that apply. The information the defendant provides must be truthful and accurate.",
   "options": {
     "householdBills": "cyHousehold bills (for example, council tax, gas, electricity, water, internet)",

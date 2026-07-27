@@ -19,7 +19,7 @@
   {% block serviceNavigation %}
     {{ govukServiceNavigation({
       serviceName: t('serviceName', 'Respond to a property possession claim'),
-      serviceUrl: "/dashboard?lang=" ~ lang,
+      serviceUrl: "/claims?lang=" ~ lang,
       navigation: [
         {
           text: t('logout', 'Log out'),

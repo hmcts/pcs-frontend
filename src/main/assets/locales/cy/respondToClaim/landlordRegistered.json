@@ -1,15 +1,15 @@
 {
-  "pageTitle": "cyRegistered landlord",
-  "introText": "cyYou can check if your landlord is registered by searching the",
-  "publicRegisterLinkText": "cyPublic Register (opens in new tab)",
-  "question": "cyIs your landlord registered?",
+  "pageTitle": "Landlord cofrestredig",
+  "introText": "Gallwch wirio a yw eich landlord yn gofrestredig drwy chwilio'r",
+  "publicRegisterLinkText": "Gofrestr Gyhoeddus (yn agor mewn tab newydd)",
+  "question": "A yw eich landlord wedi'i gofrestru?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "or": "cyor",
-    "imNotSure": "cyI’m not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "imNotSure": "Nid wyf yn siŵr"
   },
   "errors": {
-    "landlordRegistered": "cySelect if you agree with the landlord’s claim to be registered"
+    "landlordRegistered": "Dewiswch a ydych yn cytuno â hawliad y landlord iddo gael ei gofrestru"
   }
 }

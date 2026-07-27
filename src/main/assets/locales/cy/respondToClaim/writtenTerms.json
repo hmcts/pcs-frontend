@@ -1,14 +1,14 @@
 {
-  "pageTitle": "cyWritten terms",
-  "introText": "cyIt is required under the Renting Homes Wales Act 2016 for a landlord to send you written terms of the occupation contract.",
-  "question": "cyHas your landlord sent you written terms of the occupation contract?",
+  "pageTitle": "Telerau ysgrifenedig",
+  "introText": "Mae'n ofynnol o dan y Ddeddf Rhentu Cartrefi (Cymru) 2016 i landlord anfon telerau ysgrifenedig atoch o'r contract meddiannaeth.",
+  "question": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "or": "cyor",
-    "imNotSure": "cyI’m not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "imNotSure": "Nid wyf yn siŵr"
   },
   "errors": {
-    "writtenTerms": "cySelect if the landlord has sent you written terms of the occupation contract"
+    "writtenTerms": "Dewiswch a yw'r landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth"
   }
 }

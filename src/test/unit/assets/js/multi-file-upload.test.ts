@@ -2,6 +2,16 @@
  * @jest-environment jsdom
  */
 
+import { TextDecoder, TextEncoder } from 'util';
+
+// jsdom strips TextEncoder/TextDecoder from the global scope; real browsers expose them.
+if (typeof globalThis.TextEncoder === 'undefined') {
+  (globalThis as unknown as { TextEncoder: unknown }).TextEncoder = TextEncoder;
+}
+if (typeof globalThis.TextDecoder === 'undefined') {
+  (globalThis as unknown as { TextDecoder: unknown }).TextDecoder = TextDecoder;
+}
+
 let capturedHooks: Record<string, (...args: unknown[]) => void> = {};
 
 jest.mock('@ministryofjustice/frontend', () => ({
@@ -24,9 +34,27 @@ jest.mock('@utils/fileExtensionValidation', () => ({
       filename.endsWith('.txt') ||
       filename.endsWith('.csv')
   ),
+  isMediaExtension: jest.fn(
+    (filename: string) =>
+      filename.endsWith('.jpg') ||
+      filename.endsWith('.jpeg') ||
+      filename.endsWith('.png') ||
+      filename.endsWith('.bmp') ||
+      filename.endsWith('.tif') ||
+      filename.endsWith('.tiff')
+  ),
 }));
 
-import { initMultiFileUpload } from '../../../../main/assets/js/multi-file-upload';
+import { encodeUploadedDocument, initMultiFileUpload } from '../../../../main/assets/js/multi-file-upload';
+
+import { decodeBase64UrlJson } from '@utils/base64Json';
+
+// Hidden uploadedDocuments[] inputs carry base64url-encoded JSON (WAF-safe).
+function decodeHiddenValue(value: string): Record<string, unknown> {
+  const b64 = value.replace(/-/g, '+').replace(/_/g, '/');
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
 
 function setupDOM() {
   document.body.innerHTML = `
@@ -40,6 +68,30 @@ function setupDOM() {
            data-max-file-size-mb="1024"
            data-error-wrong-type="Wrong file type"
            data-error-file-too-large="File too large"
+           data-error-delete="Delete failed"
+           data-error-summary-title="There is a problem"
+           data-delete-button-text="Remove">
+      </div>
+    </form>
+  `;
+}
+
+function setupDOMWithMediaAndFilenameCaps() {
+  document.body.innerHTML = `
+    <input name="_csrf" value="test-csrf-token" />
+    <form>
+      <div id="uploaded-documents-container"></div>
+      <div id="upload-container"
+           data-module="moj-multi-file-upload"
+           data-upload-url="/case/123/respond-to-claim/upload-document/upload"
+           data-delete-url="/case/123/respond-to-claim/upload-document/delete"
+           data-max-file-size-mb="1024"
+           data-max-media-mb="500"
+           data-max-filename-length="255"
+           data-error-wrong-type="Wrong file type"
+           data-error-file-too-large="File too large"
+           data-error-file-too-large-media="Image too large"
+           data-error-filename-too-long="Filename too long"
            data-error-delete="Delete failed"
            data-error-summary-title="There is a problem"
            data-delete-button-text="Remove">
@@ -155,6 +207,44 @@ describe('multi-file-upload', () => {
     });
   });
 
+  describe('entryHook with media + filename caps', () => {
+    beforeEach(() => {
+      setupDOMWithMediaAndFilenameCaps();
+      initMultiFileUpload();
+    });
+
+    it('throws filename_too_long for an over-length name', () => {
+      const longName = 'a'.repeat(256) + '.pdf';
+      expect(() => capturedHooks.entryHook(null, { name: longName, size: 100 })).toThrow('filename_too_long');
+      expect(document.querySelector('.govuk-error-summary')!.textContent).toContain('Filename too long');
+    });
+
+    it('throws media_too_large for an oversize image', () => {
+      const fiveHundredMbPlusOneByte = 500 * 1024 * 1024 + 1;
+      expect(() => capturedHooks.entryHook(null, { name: 'big-photo.jpg', size: fiveHundredMbPlusOneByte })).toThrow(
+        'media_too_large'
+      );
+      expect(document.querySelector('.govuk-error-summary')!.textContent).toContain('Image too large');
+    });
+
+    it('allows an image just under the media cap', () => {
+      const justUnder = 500 * 1024 * 1024 - 1;
+      expect(() => capturedHooks.entryHook(null, { name: 'photo.jpg', size: justUnder })).not.toThrow();
+    });
+
+    it('uses the document cap for non-image files even when the media cap is configured', () => {
+      // 600MB pdf — over the 500MB media cap, under the 1024MB document cap. Should pass.
+      const sixHundredMb = 600 * 1024 * 1024;
+      expect(() => capturedHooks.entryHook(null, { name: 'big.pdf', size: sixHundredMb })).not.toThrow();
+    });
+
+    it('checks filename length before extension allowlist', () => {
+      // Overlong .xyz name: precedence puts filename_too_long before invalid_type.
+      const longName = 'a'.repeat(256) + '.xyz';
+      expect(() => capturedHooks.entryHook(null, { name: longName, size: 100 })).toThrow('filename_too_long');
+    });
+  });
+
   describe('exitHook', () => {
     beforeEach(() => {
       setupDOM();
@@ -168,7 +258,7 @@ describe('multi-file-upload', () => {
       const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
       expect(inputs).toHaveLength(1);
       expect((inputs[0] as HTMLInputElement).dataset.documentIndex).toBe('0');
-      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      const value = decodeHiddenValue((inputs[0] as HTMLInputElement).value);
       expect(value.index).toBe(0);
       expect(value.document_filename).toBe('test.pdf');
     });
@@ -266,7 +356,7 @@ describe('multi-file-upload', () => {
 
       const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
       expect(inputs).toHaveLength(1);
-      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      const value = decodeHiddenValue((inputs[0] as HTMLInputElement).value);
       expect(value.document_filename).toBe('remaining.pdf');
       expect(value.index).toBe(0);
     });
@@ -295,7 +385,7 @@ describe('multi-file-upload', () => {
 
       const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
       expect(inputs).toHaveLength(1);
-      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      const value = decodeHiddenValue((inputs[0] as HTMLInputElement).value);
       expect(value.document_filename).toBe('remaining.pdf');
       expect(value.id).toBe('ccd-doc-id');
       expect(value.index).toBeUndefined();
@@ -325,7 +415,7 @@ describe('multi-file-upload', () => {
 
       const inputs = getHiddenContainer().querySelectorAll('input[name="uploadedDocuments[]"]');
       expect(inputs).toHaveLength(1);
-      const value = JSON.parse((inputs[0] as HTMLInputElement).value);
+      const value = decodeHiddenValue((inputs[0] as HTMLInputElement).value);
       expect(value.document_filename).toBe('uploaded.pdf');
       expect(value.id).toBe('ccd-doc-id-2');
     });
@@ -532,5 +622,23 @@ describe('multi-file-upload', () => {
 
       expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
     });
+  });
+});
+
+// The client encoder and the server decoder are separate implementations; this guards
+// against the two base64url paths drifting apart (HDPI-5770).
+describe('encodeUploadedDocument round-trips through the server decoder', () => {
+  it('decodes back to the original document', () => {
+    const doc = { index: 0, id: 'abc', document_filename: 'rentArrears.pdf' };
+    expect(decodeBase64UrlJson(encodeUploadedDocument(doc))).toEqual(doc);
+  });
+
+  it('survives non-ASCII filenames', () => {
+    const doc = { index: 1, document_filename: 'café-déjà-vu.pdf' };
+    expect(decodeBase64UrlJson(encodeUploadedDocument(doc))).toEqual(doc);
+  });
+
+  it('produces only base64url characters', () => {
+    expect(encodeUploadedDocument({ document_filename: 'x.pdf' })).toMatch(/^[A-Za-z0-9_-]+$/);
   });
 });

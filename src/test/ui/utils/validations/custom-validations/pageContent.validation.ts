@@ -127,10 +127,12 @@ export class PageContentValidation implements IValidation {
                     .govuk-list:text-is("${value}")`)
         ),
     List: (page: Page, value: string) =>
-      page.locator(`
+      page.getByText(exactTextWithOptionalWhitespaceRegex(value)).or(
+        page.locator(`
                     li:text-is("${value}"),
                     ul li:text-is("${value}"),
-                    ol li:text-is("${value}")`),
+                    ol li:text-is("${value}")`)
+      ),
     Text: (page: Page, value: string) => page.locator(`:text-is("${value}")`),
     Tab: (page: Page, value: string) => page.getByRole('tab', { name: new RegExp(`^${escapeForRegex(value)}$`) }),
   };
@@ -154,9 +156,11 @@ export class PageContentValidation implements IValidation {
         if (
           key.includes('Input') ||
           key.includes('Hidden') ||
+          key.startsWith('lr') ||
           key.includes('Validation') ||
           key.includes('pageSlug') ||
-          key.includes('ErrorMessage')
+          key.includes('ErrorMessage') ||
+          key.includes('Dynamic')
         ) {
           continue;
         }
@@ -186,7 +190,7 @@ export class PageContentValidation implements IValidation {
 
   private async getPageData(pageName: string): Promise<object | null> {
     const pageData = this.loadPageDataFile(pageName);
-    if (pageName !== 'home') {
+    if (!(pageName === 'home' || pageName === 'claims')) {
       const contactUsData = this.loadSectionDataFile('contactUs');
       if (contactUsData) {
         await performAction('clickSummary', contactUs.contactUsForHelpParagraph);

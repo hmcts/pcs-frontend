@@ -1,0 +1,26 @@
+{% extends "template.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block pageTitle %}{{ t('claimList:pageTitle') }} - GOV.UK{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">{{ t('claimList:heading') }}</h1>
+
+  <p class="govuk-body">{{ t('claimList:accessYourCase') | safe }}</p>
+
+  <h2 class="govuk-heading-m">{{ t('claimList:claimsMadeAgainstYou') }}</h2>
+
+  {% if tableRows.length %}
+    {{ govukTable({
+      head: [
+        { text: t('claimList:table.claimNumber') },
+        { text: t('claimList:table.claimantsName') },
+        { text: t('claimList:table.propertyPostcode') },
+        { text: t('claimList:table.actions') }
+      ],
+      rows: tableRows
+    }) }}
+  {% else %}
+    <p class="govuk-body">{{ t('claimList:noClaimsFound') }}</p>
+  {% endif %}
+{% endblock %}

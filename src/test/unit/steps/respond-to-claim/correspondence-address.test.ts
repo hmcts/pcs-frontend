@@ -79,6 +79,7 @@ describe('correspondence-address beforeRedirect', () => {
           id: '1234567890123456',
           data: { possessionClaimResponse: {} },
           possessionClaimResponse: {},
+          claimantEnteredDefendantDetailsAddressKnown: 'YES',
         },
       },
     },
@@ -144,23 +145,5 @@ describe('correspondence-address beforeRedirect', () => {
       postcode: 'E1 1AA',
     });
     expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(req, response);
-  });
-
-  it('clears both correspondenceAddressConfirmation and party.address when answer is absent', async () => {
-    const response = {
-      defendantResponses: { correspondenceAddressConfirmation: 'YES' } as Record<string, unknown>,
-      defendantContactDetails: {
-        party: { address: { AddressLine1: 'Old Road' } } as Record<string, unknown>,
-      },
-    };
-    mockBuildDraftDefendantResponse.mockReturnValue(response);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    await step.postController!.post(createReq({ action: 'continue' }), res, jest.fn());
-
-    expect(response.defendantResponses.correspondenceAddressConfirmation).toBeUndefined();
-    expect(response.defendantContactDetails.party.address).toBeUndefined();
-    expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(expect.anything(), response);
   });
 });

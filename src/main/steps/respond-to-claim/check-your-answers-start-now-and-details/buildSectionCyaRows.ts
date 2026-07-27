@@ -24,5 +24,17 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     });
   }
 
+  const hasSolicitor = validatedCase.defendantResponses?.hasSolicitor;
+
+  if (hasSolicitor) {
+    rows.push({
+      key: { text: t('rows.hasSolicitor.label') },
+      value: { text: t(`rows.hasSolicitor.options.${hasSolicitor}`) },
+      actions: {
+        items: [change('solicitor', 'rows.hasSolicitor.changeHidden')],
+      },
+    });
+  }
+
   return rows;
 }

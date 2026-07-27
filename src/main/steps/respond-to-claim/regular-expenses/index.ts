@@ -99,7 +99,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     pageTitle: 'pageTitle',
     hintText: 'hintText',
     caseNumber: 'caseNumber',
-    subheading: 'subheading',
+    expenseQuestion: 'expenseQuestion',
   },
 
   fields: [
@@ -107,9 +107,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'regularExpenses',
       type: 'checkbox',
       required: false,
-      legendClasses: 'govuk-visually-hidden',
+      legendClasses: 'govuk-fieldset__legend--m',
       translationKey: {
-        label: 'pageTitle',
+        label: 'expenseQuestion',
         hint: 'hintText',
       },
       options: [
@@ -452,8 +452,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const draftHc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances as
-      | HouseholdCircumstances
-      | undefined;
+      HouseholdCircumstances | undefined;
 
     if (!draftHc) {
       return {};
