@@ -13,11 +13,11 @@ import {
   InputTextValueValidation,
   MainHeaderValidation,
   OptionListValidation,
+  PdfDocumentValidation,
   RadioButtonValidation,
   SummaryListValueValidation,
   TextValidation,
   ValidateDocumentUnderSectionValidation,
-  PdfDocumentValidation,
   ViewClaimHeaderDetailsValidation,
   ViewClaimOrResponseTableValidation,
 } from '../validations/element-validations';
