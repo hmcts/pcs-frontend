@@ -192,6 +192,7 @@ export class ActionRegistry {
     ['selectUniversalCreditLR', new RespondToClaimLRAction()],
     ['selectCorrespondenceAddressUnknownLR', new RespondToClaimLRAction()],
     ['enterNoticeDateKnownLR', new RespondToClaimLRAction()],
+    ['uploadAdditionalDocumentsLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

@@ -19,6 +19,7 @@ import { rentArrearsLR } from '../../../data/page-data/lr-page-data/rentArrearsD
 import { repaymentsAgreedLR } from '../../../data/page-data/lr-page-data/repaymentsAgreedLR.page.data';
 import { selectDefendantLR } from '../../../data/page-data/lr-page-data/selectDefendantLR.page.data';
 import { tenancyDateUnknownLR } from '../../../data/page-data/lr-page-data/tenancyDateUnknownLR.page.data';
+import { uploadAdditionalDocumentsLR } from '../../../data/page-data/lr-page-data/uploadAdditionalDocumentsLR.page.data';
 import { whatOtherRegularExpensesDoYouHaveLR } from '../../../data/page-data/lr-page-data/whatOtherRegularExpensesDoYouHaveLR.page.data';
 import { whatRegularIncomeDoYouReceiveLR } from '../../../data/page-data/lr-page-data/whatRegularIncomeDoYouReceiveLR.page.data';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR } from '../../../data/page-data/lr-page-data/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.page.data';
@@ -61,6 +62,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         () => this.selectCorrespondenceAddressUnknownLR(fieldName as actionRecord),
       ],
       ['enterNoticeDateKnownLR', () => this.enterNoticeDateKnownLR(fieldName as actionRecord)],
+      ['uploadAdditionalDocumentsLR', () => this.uploadAdditionalDocumentsLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -432,6 +434,13 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       );
     }
     await performAction('clickButton', repaymentsAgreedLR.saveAndContinueButton);
+  }
+
+  private async uploadAdditionalDocumentsLR(data: actionRecord): Promise<void> {
+    if (data?.files) {
+      await performAction('uploadFile', data.files);
+    }
+    await performAction('clickButton', uploadAdditionalDocumentsLR.saveAndContinueButton);
   }
 
   private async selectUniversalCreditLR(universalCreditDateData: actionRecord): Promise<void> {
