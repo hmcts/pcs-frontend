@@ -12,6 +12,7 @@ import {
   counterClaimOrderOtherThanSumLR,
   counterClaimSpecificSumOfMoneyLR,
   counterClaimWhatAreYouClaimingForLR,
+  counterclaimDoYouWantToUploadFilesLR,
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
@@ -30,6 +31,7 @@ import {
   repaymentsAgreedLR,
   selectDefendant,
   tenancyDateUnknownLR,
+  uploadFilesToSupportYourCounterclaimLR,
   whatOtherRegularExpensesDoYouHaveLR,
   whatRegularIncomeDoYouReceiveLR,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
@@ -40,7 +42,6 @@ import { performAction, performActions, performValidation } from '../../controll
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { RespondToClaimAction } from './respondToClaim.action';
-
 export class RespondToClaimLRAction extends RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -575,7 +576,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async uploadFilesToSupportCounterclaimLR(uploadCounterClaimFiles: actionRecord): Promise<void> {
     await performAction('uploadFile', uploadCounterClaimFiles.files);
-    await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
+    await performAction('clickButton', uploadFilesToSupportYourCounterclaimLR.saveAndContinueButton);
   }
 
   private async installmentPaymentsLR(installmentData: actionRecord): Promise<void> {

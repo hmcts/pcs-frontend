@@ -13,6 +13,7 @@ import {
   counterClaimOrderOtherThanSumLR,
   counterClaimSpecificSumOfMoneyLR,
   counterClaimWhatAreYouClaimingForLR,
+  counterclaimDoYouWantToUploadFilesLR,
   counterclaimYouNeedToApplyForHelpWithYourFeesLR,
   defendantDateOfBirthLR,
   defendantNameConfirmationLR,
