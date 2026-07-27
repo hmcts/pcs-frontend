@@ -1,0 +1,15 @@
+export const contactPreferencesTextMessageLR = {
+  mainHeader: `Contact by text message`,
+  contactByTextMessageParagraph: `We might also send updates about your case by text message.`,
+  contactByTextMessageQuestion: `Are you happy to be contacted by text message?`,
+  yesRadioOption: `Yes`,
+  noRadioOption: `No`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  cymraegLink: `Cymraeg`,
+  backLink: `Back`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfYouWantErrorMessage: `Select if you want to be contacted by text message.`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `contact-preferences-text-message`,
+};

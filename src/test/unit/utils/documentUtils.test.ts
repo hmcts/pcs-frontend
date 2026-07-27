@@ -1,5 +1,5 @@
 import { formatCaseReferenceForDisplay } from '@utils/caseReference';
-import { extractViewDocumentFolders } from '@utils/documentUtils';
+import { extractCaseDocuments, extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
 
 describe('documentUtils', () => {
   it('extracts documents only from supported categories', () => {
@@ -205,5 +205,72 @@ describe('documentUtils', () => {
 
   it('formats case references with spaces', () => {
     expect(formatCaseReferenceForDisplay('1777570813792018')).toBe('1777 5708 1379 2018');
+  });
+
+  it('extracts direct links from allDocuments only', () => {
+    const documents = extractCaseDocuments({
+      allDocuments: [
+        {
+          id: '11111111-1111-1111-1111-111111111111',
+          value: {
+            document_binary_url: 'http://doc-store/rent-statement/binary',
+            document_filename: 'rent-statement.pdf',
+            document_type: 'RENT_STATEMENT',
+          },
+        },
+        {
+          id: '22222222-2222-2222-2222-222222222222',
+          value: {
+            document_binary_url: 'http://doc-store/notice/binary',
+            document_filename: 'notice.pdf',
+            document_type: 'NOTICE',
+          },
+        },
+      ],
+    });
+
+    expect(documents).toEqual([
+      {
+        id: '11111111-1111-1111-1111-111111111111',
+        filename: 'rent-statement.pdf',
+        binaryUrl: 'http://doc-store/rent-statement/binary',
+        categoryId: undefined,
+        documentType: 'RENT_STATEMENT',
+        sourceField: 'allDocuments',
+      },
+      {
+        id: '22222222-2222-2222-2222-222222222222',
+        filename: 'notice.pdf',
+        binaryUrl: 'http://doc-store/notice/binary',
+        categoryId: undefined,
+        documentType: 'NOTICE',
+        sourceField: 'allDocuments',
+      },
+    ]);
+  });
+
+  it('finds documents from allDocuments by id', () => {
+    const document = findCaseDocumentById(
+      {
+        allDocuments: [
+          {
+            id: '33333333-3333-3333-3333-333333333333',
+            value: {
+              document_binary_url: 'http://doc-store/notice/binary',
+              document_filename: 'notice.pdf',
+              document_type: 'NOTICE',
+            },
+          },
+        ],
+      },
+      '33333333-3333-3333-3333-333333333333'
+    );
+
+    expect(document).toEqual(
+      expect.objectContaining({
+        filename: 'notice.pdf',
+        binaryUrl: 'http://doc-store/notice/binary',
+      })
+    );
   });
 });

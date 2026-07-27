@@ -181,48 +181,34 @@
     </div>
     {% endset %}
 
-    {% if isAddressKnown %}
-      {% if subtitle %}
-        <p class="govuk-body">{{ subtitle }}</p>
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {% set updatedItems = [] %}
+
+        {% for item in field.component.items %}
+          {% if item.value == 'no' %}
+            {% set updatedItems = (updatedItems.push({
+              value: item.value,
+              text: item.text,
+              checked: item.checked,
+              conditional: {
+                html: postcodeFinderHtml
+              }
+            }), updatedItems) %}
+          {% else %}
+            {% set updatedItems = (updatedItems.push(item), updatedItems) %}
+          {% endif %}
+        {% endfor %}
+
+        {{ govukRadios({
+          name: field.component.name,
+          fieldset: field.component.fieldset,
+          hint: field.component.hint,
+          errorMessage: field.component.errorMessage,
+          items: updatedItems
+        }) }}
       {% endif %}
-
-      {% for field in fields %}
-        {% if field.componentType == 'radios' %}
-          {% set updatedItems = [] %}
-
-          {% for item in field.component.items %}
-            {% if item.value == 'no' %}
-              {% set updatedItems = (updatedItems.push({
-                value: item.value,
-                text: item.text,
-                checked: item.checked,
-                conditional: {
-                  html: postcodeFinderHtml
-                }
-              }), updatedItems) %}
-            {% else %}
-              {% set updatedItems = (updatedItems.push(item), updatedItems) %}
-            {% endif %}
-          {% endfor %}
-
-          {{ govukRadios({
-            name: field.component.name,
-            fieldset: field.component.fieldset,
-            hint: field.component.hint,
-            errorMessage: field.component.errorMessage,
-            items: updatedItems
-          }) }}
-        {% endif %}
-      {% endfor %}
-    {% else %}
-      <h1 class="govuk-heading-l">{{ legendNa }}</h1>
-      <p class="govuk-body">{{ legendhintNa }}</p>
-      {# When address is not shown we don't render the radio; send "no" so subField validation (e.g. postcode) still runs #}
-      <input type="hidden" name="correspondenceAddressConfirm" value="no"/>
-      <div>
-        {{ postcodeFinderHtml | safe }}
-      </div>
-    {% endif %}
+    {% endfor %}
 
     {{ stepButtons(saveAndContinue, saveForLater) }}
     {{ csrfProtection(csrfToken) }}

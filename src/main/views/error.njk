@@ -1,5 +1,19 @@
 {% extends "stepsTemplate.njk" %}
 
+{% block pageTitle %}
+  {% if errorPageKey == 'pageNotFound' %}
+    {{ t('errorPages.pageNotFound.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% elif errorPageKey == 'serviceUnavailable' %}
+    {{ t('errorPages.serviceUnavailable.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% elif errorPageKey == 'technicalError' %}
+    {{ t('errorPages.technicalError.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% elif errorPageKey == 'accessDenied' %}
+    {{ t('errorPages.accessDenied.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% else %}
+    {{ errorTitle or t('errorPages.technicalError.title') or "Something went wrong" }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% endif %}
+{% endblock %}
+
 {% block mainContent %}
   {% if errorPageKey == 'pageNotFound' %}
 
@@ -8,11 +22,11 @@
     <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph2') }}</p>
     <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph3') }}</p>
 
-    <h2 class="govuk-heading-m">{{ t('errorPages.pageNotFound.heading') }}</h2>
+    <h2 class="govuk-heading-s">{{ t('errorPages.pageNotFound.heading') }}</h2>
     <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph4') | safe }}</p>
     <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph5') }}</p>
 
-    <h2 class="govuk-heading-m">{{ t('errorPages.pageNotFound.heading2') }}</h2>
+    <h2 class="govuk-heading-s">{{ t('errorPages.pageNotFound.heading2') }}</h2>
     <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph6') }}</p>
     <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph7') }}</p>
     <p class="govuk-body">{{ t('errorPages.pageNotFound.paragraph8') | safe }}</p>
@@ -23,11 +37,11 @@
     <p class="govuk-body">{{ serviceUnavailableParagraph or t('errorPages.serviceUnavailable.paragraphFallback') }}</p>
     <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph2') }}</p>
 
-    <h2 class="govuk-heading-m">{{ t('errorPages.serviceUnavailable.heading') }}</h2>
+    <h2 class="govuk-heading-s">{{ t('errorPages.serviceUnavailable.heading') }}</h2>
     <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph3') | safe }}</p>
     <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph4') }}</p>
 
-    <h2 class="govuk-heading-m">{{ t('errorPages.serviceUnavailable.heading2') }}</h2>
+    <h2 class="govuk-heading-s">{{ t('errorPages.serviceUnavailable.heading2') }}</h2>
     <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph5') }}</p>
     <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph6') }}</p>
     <p class="govuk-body">{{ t('errorPages.serviceUnavailable.paragraph7') | safe }}</p>
@@ -39,11 +53,11 @@
     <p class="govuk-body">{{ t('errorPages.technicalError.paragraph2') }}</p>
     <p class="govuk-body">{{ t('errorPages.technicalError.paragraph3') }}</p>
 
-    <h2 class="govuk-heading-m">{{ t('errorPages.technicalError.heading') }}</h2>
+    <h2 class="govuk-heading-s">{{ t('errorPages.technicalError.heading') }}</h2>
     <p class="govuk-body">{{ t('errorPages.technicalError.paragraph4') | safe }}</p>
     <p class="govuk-body">{{ t('errorPages.technicalError.paragraph5') }}</p>
 
-    <h2 class="govuk-heading-m">{{ t('errorPages.technicalError.heading2') }}</h2>
+    <h2 class="govuk-heading-s">{{ t('errorPages.technicalError.heading2') }}</h2>
     <p class="govuk-body">{{ t('errorPages.technicalError.paragraph6') }}</p>
     <p class="govuk-body">{{ t('errorPages.technicalError.paragraph7') }}</p>
     <p class="govuk-body">{{ t('errorPages.technicalError.paragraph8') | safe }}</p>
@@ -53,11 +67,11 @@
     <h1 class="govuk-heading-l">{{ t('errorPages.accessDenied.title') }}</h1>
     <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph') }}</p>
 
-    <h2 class="govuk-heading-m">{{ t('errorPages.accessDenied.heading') }}</h2>
+    <h2 class="govuk-heading-s">{{ t('errorPages.accessDenied.heading') }}</h2>
     <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph2') | safe }}</p>
     <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph3') }}</p>
 
-    <h2 class="govuk-heading-m">{{ t('errorPages.accessDenied.heading2') }}</h2>
+    <h2 class="govuk-heading-s">{{ t('errorPages.accessDenied.heading2') }}</h2>
     <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph4') }}</p>
     <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph5') }}</p>
     <p class="govuk-body">{{ t('errorPages.accessDenied.paragraph6') | safe }}</p>

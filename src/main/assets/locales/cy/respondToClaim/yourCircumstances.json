@@ -1,19 +1,19 @@
 {
-  "pageTitle": "cyYour circumstances",
-  "introParagraph": "cyYou can use this section to give details about any events or circumstances that have impacted your case that you think a judge should know about.",
-  "forExample": "cyFor example:",
-  "bullet1": "cysomeone in your household has an illness or disability",
-  "bullet2": "cychildren in your household attend a local school",
-  "bullet3": "cyyou work irregular hours, making it hard to find a new place to live",
-  "question": "cyWould you like to share anything about your circumstances?",
+  "pageTitle": "Eich amgylchiadau",
+  "introParagraph": "Gallwch ddefnyddio'r adran hon i roi manylion unrhyw ddigwyddiadau neu amgylchiadau sydd wedi effeithio ar eich achos rydych yn meddwl y dylai barnwr wybod amdanynt.",
+  "forExample": "Er enghraifft:",
+  "bullet1": "mae gan rywun yn eich cartref salwch neu anabledd",
+  "bullet2": "mae plant yn eich cartref yn mynychu ysgol leol",
+  "bullet3": "rydych yn gweithio oriau afreolaidd, sy'n ei gwneud yn anodd dod o hyd i le newydd i fyw",
+  "question": "Hoffech chi rannu unrhyw beth am eich amgylchiadau?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
-  "textAreaLabel": "cyGive details about your circumstances",
+  "textAreaLabel": "Rhowch fanylion am eich amgylchiadau",
   "errors": {
-    "shareCircumstances": "cySelect if you’d like to share anything about your circumstances",
-    "shareCircumstances.circumstancesDetails": "cyGive details about your circumstances",
+    "shareCircumstances": "Dewiswch a hoffech chi rannu unrhyw beth am eich amgylchiadau",
+    "shareCircumstances.circumstancesDetails": "Rhowch fanylion am eich amgylchiadau",
     "circumstancesDetailsMaxLength": "cyCircumstances details must be 500 characters or less",
     "circumstancesDetailsInvalidCharacters": "cyThe details of your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }

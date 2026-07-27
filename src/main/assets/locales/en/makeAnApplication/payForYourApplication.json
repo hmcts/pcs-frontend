@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Pay for your application",
+  "heading": "Pay for your application",
+  "applicationFee": "Application fee:",
+  "formattedFeeAmount": "{{feeAmount, currency(currency: GBP)}}",
+  "youWillBeRedirected": "You will be redirected to GOV.UK Pay to complete your payment securely.",
+  "govPayIsASecureService": "GOV.UK Pay is a secure payment service used by government services.",
+  "buttons": {
+    "continueToPayment": "Continue to payment"
+  }
+}

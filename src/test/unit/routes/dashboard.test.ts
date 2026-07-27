@@ -95,6 +95,8 @@ jest.mock('@modules/i18n', () => ({
       'dashboard:tasks.statuses.NOT_STARTED': 'Not started',
       'dashboard:notifications.Defendant.CaseIssued.title': 'Case issued title',
       'dashboard:notifications.Defendant.CaseIssued.body': 'The claim has been issued to you.',
+      'dashboard:notifications.Defendant.ResponseNotStarted.title': 'Your response',
+      'dashboard:notifications.Defendant.ResponseNotStarted.body': 'Start your response',
     };
     return ((key: string, opts?: { defaultValue?: string }) =>
       strings[key] ?? opts?.defaultValue ?? MISSING) as import('i18next').TFunction;
@@ -107,6 +109,12 @@ jest.mock('@services/ccdCaseService', () => ({
   },
 }));
 
+const mockIsRespondToClaimEnabledForUser = jest.fn().mockResolvedValue(true);
+
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  isRespondToClaimEnabledForUser: (...args: unknown[]) => mockIsRespondToClaimEnabledForUser(...args),
+}));
+
 describe('Dashboard Routes', () => {
   let app: Application;
   let logger: { error: jest.Mock; warn: jest.Mock };
@@ -115,6 +123,7 @@ describe('Dashboard Routes', () => {
     mockRouterGet.mockClear();
     mockRouterParam.mockClear();
     mockRouterUse.mockClear();
+    mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
     (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValue({
       notifications: [
         {
@@ -448,6 +457,52 @@ describe('Dashboard Routes', () => {
 
       expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Authentication required' }));
       expect(ccdCaseService.getDashboardView).not.toHaveBeenCalled();
+    });
+
+    it('should hide respond-to-claim task links and notifications when the feature flag is off', async () => {
+      mockIsRespondToClaimEnabledForUser.mockResolvedValueOnce(false);
+
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [
+          { templateId: 'Defendant.CaseIssued', templateValues: {} },
+          { templateId: 'Defendant.ResponseNotStarted', templateValues: {} },
+        ],
+        taskGroups: [
+          {
+            groupId: 'RESPONSE',
+            tasks: [{ templateId: 'RespondToClaim', status: 'AVAILABLE' }],
+          },
+        ],
+        propertyAddress: null,
+      });
+
+      dashboardRoutes(app);
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        notifications: unknown[];
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+
+      expect(renderArgs.notifications).toEqual([
+        {
+          title: 'Case issued title',
+          body: 'The claim has been issued to you.',
+        },
+      ]);
+      expect(renderArgs.taskGroups[0].tasks[0].href).toBeUndefined();
     });
   });
 

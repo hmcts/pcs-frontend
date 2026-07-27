@@ -7,14 +7,18 @@ import {
 } from '../validations/custom-validations';
 import {
   BannerAlertValidation,
+  CheckYourAnswersSummaryRowValidation,
   FormLabelValueValidation,
   InputErrorValidation,
   InputTextValueValidation,
   MainHeaderValidation,
   OptionListValidation,
   RadioButtonValidation,
+  SummaryListValueValidation,
   TextValidation,
   ValidateDocumentUnderSectionValidation,
+  ViewClaimHeaderDetailsValidation,
+  ViewClaimOrResponseTableValidation,
 } from '../validations/element-validations';
 
 export class ValidationRegistry {
@@ -23,6 +27,7 @@ export class ValidationRegistry {
     ['textNotVisible', new TextValidation()],
     ['bannerAlert', new BannerAlertValidation()],
     ['formLabelValue', new FormLabelValueValidation()],
+    ['summaryListValue', new SummaryListValueValidation()],
     ['optionList', new OptionListValidation()],
     ['mainHeader', new MainHeaderValidation()],
     ['errorMessage', new ErrorMessageValidation()],
@@ -35,6 +40,9 @@ export class ValidationRegistry {
     ['pageNavigation', new PageNavigationValidation()],
     ['inputTextValue', new InputTextValueValidation()],
     ['validateDocumentUnderSection', new ValidateDocumentUnderSectionValidation()],
+    ['viewClaimOrResponseTable', new ViewClaimOrResponseTableValidation()],
+    ['viewClaimHeaderDetails', new ViewClaimHeaderDetailsValidation()],
+    ['summaryRow', new CheckYourAnswersSummaryRowValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {

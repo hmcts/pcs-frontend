@@ -2,6 +2,13 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../u
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CcdCounterClaim } from '@services/ccdCase.interface';
+
+function clearCounterClaimMoneyFields(counterClaim: CcdCounterClaim): void {
+  delete counterClaim.isClaimAmountKnown;
+  delete counterClaim.claimAmount;
+  delete counterClaim.estimatedMaxClaimAmount;
+}
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-what-are-you-claiming-for',
@@ -41,21 +48,19 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   beforeRedirect: async req => {
     const claimType = req.body?.claimType as string | undefined;
+    const previousClaimType =
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim?.claimType;
     const response = buildDraftDefendantResponse(req);
     response.defendantResponses.counterClaim = response.defendantResponses.counterClaim ?? {};
 
     if (claimType) {
       response.defendantResponses.counterClaim.claimType = claimType;
-      if (claimType === 'SOMETHING_ELSE') {
-        delete response.defendantResponses.counterClaim.isClaimAmountKnown;
-        delete response.defendantResponses.counterClaim.claimAmount;
-        delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
+      if (claimType !== previousClaimType) {
+        clearCounterClaimMoneyFields(response.defendantResponses.counterClaim);
       }
     } else {
       delete response.defendantResponses.counterClaim.claimType;
-      delete response.defendantResponses.counterClaim.isClaimAmountKnown;
-      delete response.defendantResponses.counterClaim.claimAmount;
-      delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
+      clearCounterClaimMoneyFields(response.defendantResponses.counterClaim);
     }
 
     await saveDraftDefendantResponse(req, response);

@@ -40,9 +40,14 @@ jest.mock('../../../main/modules/http', () => ({
   },
 }));
 
-const mockClientContextClearer = jest.fn(req => req);
-jest.mock('@utils/clientContextSessionClearer', () => ({
-  clientContextSessionClearer: mockClientContextClearer,
+const mockSaveDraftDefendantResponse = jest.fn().mockResolvedValue(undefined);
+const mockBuildDraftDefendantResponse = jest.fn(() => ({
+  defendantResponses: {},
+  defendantContactDetails: { party: {} },
+}));
+jest.mock('../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
 import type { Application, Request, Response } from 'express';
@@ -55,6 +60,25 @@ describe('finalSubmit routes', () => {
   let mockRouterPost: jest.Mock;
   let mockRouterParam: jest.Mock;
   let mockRouterUse: jest.Mock;
+
+  const createSession = (overrides: Record<string, unknown> = {}) => {
+    const session = {
+      user: { accessToken: 'mock-token' },
+      ...overrides,
+    } as Record<string, unknown>;
+
+    session.save = jest.fn(callback => {
+      callback?.(undefined);
+      return session;
+    });
+
+    return session;
+  };
+
+  const bindReqRes = (req: Request, res: Response): Request => {
+    req.res = res;
+    return req;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -152,7 +176,7 @@ describe('finalSubmit routes', () => {
         data: { token: 'mock-event-token' },
       });
 
-      mockHttpPost.mockResolvedValue({});
+      mockHttpPost.mockResolvedValue({ data: {} });
 
       const validatedCase = {
         id: '1234567890123456',
@@ -165,6 +189,11 @@ describe('finalSubmit routes', () => {
 
       const req = {
         params: { caseReference: '1234567890123456' },
+        body: {
+          statementOfTruthContempt: ['yes'],
+          statementOfTruthBelief: ['yes'],
+          fullName: 'Jane Defendant',
+        },
         session: {
           user: { accessToken: 'mock-token' },
         },
@@ -175,76 +204,211 @@ describe('finalSubmit routes', () => {
         redirect: jest.fn(),
       } as unknown as Response;
 
+      req.res = res;
+
       await handler(req, res);
 
+      expect(mockBuildDraftDefendantResponse).toHaveBeenCalledWith(req);
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
+        expect.objectContaining({
+          defendantResponses: expect.objectContaining({
+            statementOfTruth: {
+              accepted: 'YES',
+              fullName: 'Jane Defendant',
+            },
+          }),
+        })
+      );
       expect(mockHttpGet).toHaveBeenCalled();
       expect(mockHttpPost).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
-      expect(mockClientContextClearer).not.toHaveBeenCalled();
     });
 
-    it('should successfully submit to CCD with currentRepresentedPartyId', async () => {
+    it('stores submit-time payment data in session for counterclaim payment-needed path', async () => {
       const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       mockHttpGet.mockResolvedValue({
         data: { token: 'mock-event-token' },
       });
 
-      mockHttpPost.mockResolvedValue({});
+      mockHttpPost.mockResolvedValue({
+        data: {
+          after_submit_callback_response: {
+            confirmation_body: JSON.stringify({
+              state: 'PENDING_COUNTER_CLAIM_ISSUED',
+              serviceRequestReference: 'SR-123',
+              feeAmount: 404,
+            }),
+          },
+        },
+      });
+
+      const validatedCase = {
+        id: '1234567890123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: {
+              makeCounterClaim: 'YES',
+              counterClaim: {
+                hwfReferenceNumber: '',
+                isClaimAmountKnown: 'YES',
+                claimAmount: '250000',
+                claimType: 'PAYMENT_OR_COMPENSATION',
+              },
+            },
+          },
+        },
+      };
 
       const req = {
         params: { caseReference: '1234567890123456' },
-        session: {
-          user: { accessToken: 'mock-token' },
-          clientContext: { selectedPartyId: 'partyId' },
-        },
+        session: createSession(),
       } as unknown as Request;
 
       const res = {
-        locals: { validatedCase: { id: '1234567890123456' } },
+        locals: { validatedCase },
         redirect: jest.fn(),
       } as unknown as Response;
 
+      bindReqRes(req, res);
+
       await handler(req, res);
 
-      expect(mockHttpGet).toHaveBeenCalledWith(
-        expect.stringContaining('/cases/1234567890123456/event-triggers/respondPossessionClaim'),
+      expect(req.session.payment).toEqual(
         expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: 'Bearer mock-token',
-          }),
+          caseReference: '1234567890123456',
+          serviceRequestReference: 'SR-123',
+          feeAmount: 404,
+          counterClaimAmountInPence: '250000',
+          counterClaimType: 'PAYMENT_OR_COMPENSATION',
         })
       );
-
-      expect(mockHttpPost).toHaveBeenCalledWith(
-        expect.stringContaining('/cases/1234567890123456/events'),
-        expect.objectContaining({
-          data: {
-            currentRepresentedPartyId: 'partyId',
-            possessionClaimResponse: {},
-          },
-          event: {
-            id: 'respondPossessionClaim',
-            summary: 'Citizen respondPossessionClaim summary',
-            description: 'Citizen respondPossessionClaim description',
-          },
-          event_token: 'mock-event-token',
-          ignore_warning: false,
-        }),
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: 'Bearer mock-token',
-          }),
-        })
+      expect(req.session.save).toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1234567890123456/respond-to-claim/response-submitted-counter-claim-fee-payment-needed'
       );
-
-      expect(mockClientContextClearer).toHaveBeenCalledWith(req);
-      expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/response-submitted');
-      expect(mockLogger.info).toHaveBeenCalledWith('Submitting response to claim for case 1234567890123456');
-      expect(mockLogger.info).toHaveBeenCalledWith('Response submitted successfully for case 1234567890123456');
     });
 
-    it('should redirect to check-your-answers with error when submission fails', async () => {
+    it('stores submit-time payment data when confirmation body nests counterClaim payload', async () => {
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      mockHttpGet.mockResolvedValue({
+        data: { token: 'mock-event-token' },
+      });
+
+      mockHttpPost.mockResolvedValue({
+        data: {
+          after_submit_callback_response: {
+            confirmation_body: JSON.stringify({
+              counterClaim: {
+                status: 'PENDING_COUNTER_CLAIM_ISSUED',
+                serviceRequestReference: 'SR-456',
+                feeAmount: 303,
+                claimType: 'PAYMENT_OR_COMPENSATION',
+              },
+            }),
+          },
+        },
+      });
+
+      const validatedCase = {
+        id: '1234567890123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { makeCounterClaim: 'NO' },
+          },
+        },
+      };
+
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        session: createSession(),
+      } as unknown as Request;
+
+      const res = {
+        locals: { validatedCase },
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      bindReqRes(req, res);
+
+      await handler(req, res);
+
+      expect(req.session.payment).toEqual(
+        expect.objectContaining({
+          caseReference: '1234567890123456',
+          serviceRequestReference: 'SR-456',
+          feeAmount: 303,
+          counterClaimType: 'PAYMENT_OR_COMPENSATION',
+        })
+      );
+      expect(req.session.save).toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1234567890123456/respond-to-claim/response-submitted-counter-claim-fee-payment-needed'
+      );
+    });
+
+    it('uses claimType from confirmation body when CCD counterclaim draft is cleared before submit', async () => {
+      const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+
+      mockHttpGet.mockResolvedValue({
+        data: { token: 'mock-event-token' },
+      });
+
+      mockHttpPost.mockResolvedValue({
+        data: {
+          after_submit_callback_response: {
+            confirmation_body: JSON.stringify({
+              counterClaim: {
+                status: 'PENDING_COUNTER_CLAIM_ISSUED',
+                serviceRequestReference: 'SR-789',
+                feeAmount: 115,
+                claimType: 'PAYMENT_OR_COMPENSATION',
+              },
+            }),
+          },
+        },
+      });
+
+      const validatedCase = {
+        id: '1234567890123456',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: {
+              status: 'SUBMITTED',
+            },
+          },
+        },
+      };
+
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        session: createSession(),
+      } as unknown as Request;
+
+      const res = {
+        locals: { validatedCase },
+        redirect: jest.fn(),
+      } as unknown as Response;
+
+      bindReqRes(req, res);
+
+      await handler(req, res);
+
+      expect(req.session.payment).toEqual(
+        expect.objectContaining({
+          caseReference: '1234567890123456',
+          serviceRequestReference: 'SR-789',
+          feeAmount: 115,
+          counterClaimType: 'PAYMENT_OR_COMPENSATION',
+        })
+      );
+    });
+
+    it('should redirect to end-of-journey-cya with error when submission fails', async () => {
       const handler = mockRouterPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
       mockHttpGet.mockResolvedValue({ data: { token: 'mock-event-token' } });
@@ -262,11 +426,13 @@ describe('finalSubmit routes', () => {
         redirect: jest.fn(),
       } as unknown as Response;
 
+      bindReqRes(req, res);
+
       await handler(req, res);
 
       expect(res.redirect).toHaveBeenCalledWith(
         303,
-        '/case/1234567890123456/respond-to-claim/check-your-answers?submitError=failed'
+        '/case/1234567890123456/respond-to-claim/end-of-journey-cya?submitError=failed'
       );
     });
   });

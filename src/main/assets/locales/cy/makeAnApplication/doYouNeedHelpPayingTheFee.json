@@ -1,21 +1,21 @@
 {
-  "pageTitle": "cyDo you need help paying the fee for this application?",
-  "caption": "cyMake an application",
-  "heading": "cyDo you need help paying the fee for this application?",
-  "question": "cyDo you need help paying the fee for this application?",
+  "pageTitle": "A ydych angen help i dalu’r ffi am wneud y cais hwn?",
+  "caption": "Gwneud cais",
+  "heading": "A ydych angen help i dalu’r ffi am wneud y cais hwn?",
+  "question": "A ydych angen help i dalu’r ffi am wneud y cais hwn?",
   "errors": {
-    "needHelpPayingFee": "cyConfirm whether you need help paying the fee"
+    "needHelpPayingFee": "Cadarnhewch p'un os oes arnoch angen help i dalu’r ffi"
   },
   "options": {
-    "yes": "cyI need help paying the fee",
-    "no": "cyI do not need help paying the fee"
+    "yes": "Rwyf angen help i dalu’r ffi",
+    "no": "Nid wyf angen help i dalu’r ffi"
   },
-  "itUsuallyCostsToApply": "cyIt usually costs {{standardFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to apply. The fee will increase to {{maxFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} if:",
-  "youHaveAlreadyToldTheOtherParty": "cyyou have already told the other party that you are making this application, and",
-  "theyDidNotAgreeToIt": "cythey did not agree to it (this means that they have objected to it)",
-  "youWillSeeTheFinalApplicationFee": "cyYou’ll see the final application fee before you pay.",
-  "youMayBeAbleToGetHelp": "cyYou may be able to get help paying the fee if you (one or more of the following):",
-  "areOnCertainBenefits": "cyare on certain benefits",
-  "haveLittleOrNoSavings": "cyhave little or no savings",
-  "haveLowIncome": "cyhave low income"
+  "itUsuallyCostsToApply": "Fel arfer, mae'n costio {{standardFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} i wneud cais. Bydd y ffi yn cynyddu i {{maxFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} os:",
+  "youHaveAlreadyToldTheOtherParty": "ydych eisoes wedi dweud wrth y parti arall eich bod yn gwneud y cais hwn, ac",
+  "theyDidNotAgreeToIt": "ni wnaethant gytuno iddo (mae hyn yn golygu eu bod wedi ei wrthwynebu)",
+  "youWillSeeTheFinalApplicationFee": "Byddwch yn gweld y ffi gwneud cais terfynol cyn i chi dalu.",
+  "youMayBeAbleToGetHelp": "Efallai y gallwch gael help i dalu'r ffi os ydych chi (os yw un neu fwy o’r canlynol yn berthnasol):",
+  "areOnCertainBenefits": "yn cael budd-daliadau penodol",
+  "haveLittleOrNoSavings": "gyda dim ond ychydig neu dim cynilion",
+  "haveLowIncome": "ar incwm isel"
 }

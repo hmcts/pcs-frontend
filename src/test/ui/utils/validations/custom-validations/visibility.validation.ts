@@ -66,7 +66,7 @@ export class VisibilityValidation implements IValidation {
     elementKey: string,
     validationType: string
   ): Promise<void> {
-    let visibilityIsPassed = false;
+    let visibilityIsPassed: boolean;
     let errorMsg = '';
 
     try {
@@ -127,7 +127,7 @@ export class VisibilityValidation implements IValidation {
     elementKey: string,
     validationType: string
   ): Promise<void> {
-    let isPassed = false;
+    let isPassed: boolean;
     let errorMsg = '';
 
     try {

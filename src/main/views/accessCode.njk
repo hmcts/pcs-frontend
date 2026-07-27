@@ -17,7 +17,11 @@
               <ul class="govuk-list govuk-error-summary__list">
                 {% for item in errorList %}
                   <li>
-                    <a href="{{ item.href }}">{{ item.text }}</a>
+                    {% if item.href %}
+                      <a href="{{ item.href }}">{{ item.text }}</a>
+                    {% else %}
+                      {{ item.text }}
+                    {% endif %}
                   </li>
                 {% endfor %}
               </ul>
@@ -30,6 +34,7 @@
 
       <p class="govuk-body">{{ t('accessCode:description') }}</p>
 
+      {% if not respondToClaimBlocked %}
       <form method="POST" action="/access-your-case" novalidate>
         {{ csrfProtection(csrfToken) }}
 
@@ -83,6 +88,7 @@
           {{ t('common:buttons.continue') }}
         </button>
       </form>
+      {% endif %}
 
     </div>
   </div>

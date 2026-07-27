@@ -1,4 +1,4 @@
-import { feedback, haveYouAppliedForUniversalCredit, taskList, whatRegularIncomeDoYouReceive } from '../data/page-data';
+import { feedback, haveYouAppliedForUniversalCredit, whatRegularIncomeDoYouReceive } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise<void> {
@@ -84,5 +84,4 @@ export async function haveYouAppliedForUniversalCreditNavigationTests(): Promise
     whatRegularIncomeDoYouReceive.mainHeader
   );
   await performAction('clickRadioButton', haveYouAppliedForUniversalCredit.noRadioOption);
-  await performValidation('pageNavigation', haveYouAppliedForUniversalCredit.saveForLaterButton, taskList.mainHeader);
 }

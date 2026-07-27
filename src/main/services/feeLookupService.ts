@@ -79,6 +79,8 @@ export const getFee = async (feeType: FeeType, claimAmountInPence?: string): Pro
     return response.data.fee_amount;
   } catch (e) {
     logger.error('Fee lookup request failed', { err: e, url, params });
-    throw new Error('Error fetching fee');
+    const error = new Error('Error fetching fee');
+    (error as Error & { cause?: unknown }).cause = e;
+    throw error;
   }
 };

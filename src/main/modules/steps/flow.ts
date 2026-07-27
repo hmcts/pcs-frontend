@@ -419,8 +419,7 @@ export function getStepOrder(flowConfig: JourneyFlowConfig): readonly string[] {
 }
 
 type StepLocation =
-  | { kind: 'section'; sectionIndex: number; stepIndex: number }
-  | { kind: 'nonSection'; stepIndex: number };
+  { kind: 'section'; sectionIndex: number; stepIndex: number } | { kind: 'nonSection'; stepIndex: number };
 
 function locateStep(
   stepName: string,

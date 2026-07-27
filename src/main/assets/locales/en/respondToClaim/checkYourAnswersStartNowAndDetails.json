@@ -10,6 +10,14 @@
         "NO": "No",
         "PREFER_NOT_TO_SAY": "Prefer not to say"
       }
+    },
+    "hasSolicitor": {
+      "label": "Do you have a solicitor?",
+      "changeHidden": "do you have a solicitor",
+      "options": {
+        "YES": "Yes",
+        "NO": "No"
+      }
     }
   }
 }

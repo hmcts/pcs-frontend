@@ -48,6 +48,10 @@ export const flowConfig: JourneyFlowConfig = {
   // First visible step of any section back-links to this hub step.
   hubStepName: 'task-list',
   steps: {
+    'ask-your-solicitor-to-respond-to-the-claim': {
+      showCondition: (req: Request) =>
+        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',
+    },
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
     },
@@ -155,6 +159,14 @@ export const flowConfig: JourneyFlowConfig = {
         shouldShowResponseSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
     },
     'response-submitted-counter-claim-fee-payment-needed': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'counter-claim-application-fee-amount': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'counter-claim-payment-successful': {
       showCondition: (req: Request) =>
         shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
     },

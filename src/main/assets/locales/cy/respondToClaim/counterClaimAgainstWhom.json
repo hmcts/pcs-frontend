@@ -1,7 +1,7 @@
 {
   "pageTitle": "cyWho the counterclaim is against",
   "heading": "cyWho are you making the counterclaim against?",
-  "checkboxHint": "cySelect all that apply",
+  "checkboxHint": "Dewiswch bob un sy'n berthnasol",
   "errors": {
     "counterClaimAgainst": {
       "required": "cySelect who you are making the counterclaim against"

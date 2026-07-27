@@ -1,10 +1,10 @@
 {
-  "pageTitle": "cyPayments or agreements",
-  "heading": "cyPayments or agreements since the claim was made",
-  "paragraph1": "cyYou will now be asked questions about any payments or agreements you’ve made since {{claimantName}} made their claim.",
-  "paragraph2": "cyThis will help a judge understand:",
-  "paragraph3": "cyThe claimant will be able to see your answers.",
-  "paragraph4": "cyIf you’ve paid some or all of the money you owe, you should bring proof of this to the hearing.",
-  "bullet1": "cyIf any arrangements have already been made to pay off the money you owe in rent payments (rent arrears)",
-  "bullet2": "cyIf you’ve paid some or all of the money you owe"
+  "pageTitle": "Taliadau neu gytundebau",
+  "heading": "Taliadau neu gytundebau ers gwneud yr hawliad",
+  "paragraph1": "Gofynnir cwestiynau i chi nawr am unrhyw daliadau neu gytundebau a wnaed gennych ers i {{claimantName}} wneud eu hawliad.",
+  "paragraph2": "Bydd hyn yn helpu barnwr i ddeall:",
+  "paragraph3": "Bydd yr hawlydd yn gallu gweld eich atebion.",
+  "paragraph4": "Os ydych wedi talu rhywfaint neu'r cyfan o'r arian sy'n ddyledus gennych, dylech ddod â thystiolaeth o hyn i'r gwrandawiad.",
+  "bullet1": "Os gwnaed unrhyw drefniadau'n barod i dalu'r arian sy'n ddyledus gennych mewn taliadau rhent (ôl-ddyledion rhent)",
+  "bullet2": "Os ydych wedi talu rhywfaint neu'r cyfan o'r arian sy'n ddyledus gennych"
 }

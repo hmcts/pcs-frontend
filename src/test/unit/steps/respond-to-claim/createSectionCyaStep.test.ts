@@ -24,6 +24,7 @@ const mkRes = (): Response => {
 const reqWith = (body: Record<string, unknown>, caseId = '1234123412341234'): Request =>
   ({
     body,
+    session: {},
     res: { locals: { validatedCase: { id: caseId } } },
   }) as unknown as Request;
 
