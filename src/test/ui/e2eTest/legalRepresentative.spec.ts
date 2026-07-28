@@ -13,6 +13,7 @@ import {
   counterClaimOrderOtherThanSumLR,
   counterClaimSpecificSumOfMoneyLR,
   counterClaimWhatAreYouClaimingForLR,
+  counterclaimDoYouWantToUploadFilesLR,
   counterclaimYouNeedToApplyForHelpWithYourFeesLR,
   defendantDateOfBirthLR,
   defendantNameConfirmationLR,
@@ -197,6 +198,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
       reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
     });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.yesRadioOption,
+    });
+    await performAction('uploadFilesToSupportCounterclaimLR', { files: ['rentArrears.pdf'] });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
@@ -334,6 +339,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('counterClaimOrderOtherThanSumLR', {
       ordersInput: counterClaimOrderOtherThanSumLR.whatOrdersInput,
       factsInput: counterClaimOrderOtherThanSumLR.whatFactsInput,
+    });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
@@ -477,6 +485,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       ordersInput: counterClaimOrderOtherThanSumLR.whatOrdersInput,
       factsInput: counterClaimOrderOtherThanSumLR.whatFactsInput,
     });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
+    });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
@@ -617,9 +628,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
       reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
     });
-    // await performAction('doYouWantToUploadFiles', {
-    //   option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
-    // });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
+    });
     await performAction('previousPaymentsLR', {
       question: previousPaymentsLR.getMainHeader(),
       repaymentOption: previousPaymentsLR.noRadioOption,
@@ -759,9 +770,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
       reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
     });
-    // await performAction('doYouWantToUploadFiles', {
-    //   option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
-    // });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
+    });
     await performAction('previousPaymentsLR', {
       question: previousPaymentsLR.getMainHeader(),
       repaymentOption: previousPaymentsLR.noRadioOption,
@@ -988,6 +999,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('counterClaimAboutLR', {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
       reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
+    });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFilesLR.noRadioOption,
     });
     await performAction('previousPaymentsLR', {
       question: previousPaymentsLR.getMainHeader(),
