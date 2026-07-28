@@ -1,0 +1,11 @@
+{#
+  Marker consumed by assets/js/redirect-on-back.ts.
+
+  Rendered only on journey confirmation pages, which set `redirectOnBack: true`
+  in their step content. When present, the client-side script traps the browser
+  Back button and sends the user to `dashboardUrl` instead of the previous
+  (already-submitted) form page.
+#}
+{% if redirectOnBack and dashboardUrl %}
+  <span id="redirect-on-back" data-dashboard-url="{{ dashboardUrl }}" hidden></span>
+{% endif %}
