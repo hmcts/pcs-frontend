@@ -1,3 +1,5 @@
+import { redirectTo } from './navigate';
+
 /**
  * When the page renders the `#redirect-on-back` marker (set via the
  * `redirectOnBack` step flag), we push a duplicate history entry and listen for
@@ -24,7 +26,7 @@ export function initRedirectOnBack(): void {
     history.pushState(null, document.title, location.href);
 
     window.addEventListener('popstate', () => {
-      window.location.replace(dashboardUrl);
+      redirectTo(dashboardUrl);
     });
   };
 
