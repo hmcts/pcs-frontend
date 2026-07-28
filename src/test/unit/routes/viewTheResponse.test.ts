@@ -10,9 +10,14 @@ import { oidcMiddleware } from '../../../main/middleware';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
+}));
+
+jest.mock('@utils/getLaunchDarklyFlag', () => ({
+  getLaunchDarklyFlag: jest.fn(),
 }));
 
 const translationStrings: Record<string, string> = {
@@ -261,6 +266,7 @@ describe('viewTheResponse route', () => {
     app = {
       get: jest.fn(),
     } as unknown as Application;
+    (getLaunchDarklyFlag as jest.Mock).mockResolvedValue(true);
   });
 
   afterEach(() => {
