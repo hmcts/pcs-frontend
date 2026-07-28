@@ -22,5 +22,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/responseAndCounterClaimSubmitted.njk`,
   extendGetContent: () => ({
     backUrl: '',
+    redirectOnBack: true,
   }),
 });

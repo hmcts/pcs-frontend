@@ -26,6 +26,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       paymentReferenceLine: paymentReference ? t('paymentReference', { paymentReference }) : undefined,
+      redirectOnBack: true,
     };
   },
 });
