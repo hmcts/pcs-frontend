@@ -30,11 +30,16 @@ const translationStrings: Record<string, string> = {
   'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
   'viewTheResponse:personsUnknown': 'Persons unknown',
   'viewTheResponse:addressUnknown': 'Address unknown',
+  'viewTheResponse:sections.defendantDetails': 'Defendant {{number}} details',
 };
 
 jest.mock('@modules/i18n', () => ({
   getTranslationFunction: jest.fn(
-    () => ((key: string) => translationStrings[key] ?? key) as import('i18next').TFunction
+    () =>
+      ((key: string, options?: Record<string, unknown>) =>
+        (translationStrings[key] ?? key).replace(/{{(\w+)}}/g, (_match, name) =>
+          String(options?.[name] ?? '')
+        )) as import('i18next').TFunction
   ),
 }));
 
@@ -66,7 +71,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
     isExemptLandlord: 'YES',
     dateSubmitted: '2026-02-01',
     allDefendants: [
-      { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
+      { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant', rank: 2 } },
       {
         id: 'def-2',
         value: {
@@ -76,6 +81,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
           addressKnown: 'YES',
           addressSameAsProperty: 'YES',
           dateOfBirth: '1985-07-20',
+          rank: 1,
         },
       },
     ] as CcdCaseData['allDefendants'],
@@ -355,6 +361,7 @@ describe('viewTheResponse route', () => {
         }),
       ])
     );
+    expect(renderArgs.defendantDetails.sectionTitle).toBe('Defendant 2 details');
     expect(renderArgs.defendantDetails.rows.length).toBeGreaterThan(0);
     expect(renderArgs.defendantDetails.rows.map((row: { key: { text: string } }) => row.key.text)).toEqual([
       'viewTheResponse:defendant.name',

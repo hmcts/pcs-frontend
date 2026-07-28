@@ -387,7 +387,7 @@ export function additionalDefendantName(
   index: number,
   copy: ViewTheClaimCopy
 ): string {
-  if (!defendant || Object.keys(defendant).length === 0) {
+  if (!defendant || Object.keys(defendant).every(key => key === 'rank')) {
     return copy.personsUnknown;
   }
 
