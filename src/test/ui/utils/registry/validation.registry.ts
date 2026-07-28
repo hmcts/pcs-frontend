@@ -13,6 +13,7 @@ import {
   InputTextValueValidation,
   MainHeaderValidation,
   OptionListValidation,
+  PdfDocumentValidation,
   RadioButtonValidation,
   SummaryListValueValidation,
   TextValidation,
@@ -43,6 +44,7 @@ export class ValidationRegistry {
     ['viewClaimOrResponseTable', new ViewClaimOrResponseTableValidation()],
     ['viewClaimHeaderDetails', new ViewClaimHeaderDetailsValidation()],
     ['summaryRow', new CheckYourAnswersSummaryRowValidation()],
+    ['validatePdfDocument', new PdfDocumentValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {
