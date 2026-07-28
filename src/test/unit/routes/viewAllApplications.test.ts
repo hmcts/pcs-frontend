@@ -58,13 +58,6 @@ describe('View All Application Route', () => {
       session: {
         user: { uid: currentUserId, accessToken: 'access-token-1' },
       },
-      res: {
-        locals: {
-          validatedCase: {
-            id: caseReference,
-          },
-        },
-      },
     } as unknown as Request;
 
     const res = {
