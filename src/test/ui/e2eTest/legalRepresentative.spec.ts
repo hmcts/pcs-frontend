@@ -584,6 +584,423 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetailsLR.yesRadioOption,
+    });
+    await performAction('enterTenancyStartDetailsUnKnownLR', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
+    await performAction('selectNoticeDetailsLR', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknownLR');
+    await performAction('disputingOtherPartsOfTheClaimLR', {
+      disputeOption: nonRentArrearsDisputeLR.noRadioOption,
+    });
+    await performAction('selectCounterClaimLR', {
+      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
+      option: counterClaimLR.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingForLR', {
+      option: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoneyLR', {
+      question: counterClaimSpecificSumOfMoneyLR.mainHeader,
+      option: counterClaimSpecificSumOfMoneyLR.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+    });
+    await performAction('selectCounterClaimFeeLR', {
+      radioOption: counterClaimFeeLR.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+    });
+    const pinUser = await getPinUserAt(2);
+    await performAction('selectClaimAgainstWhomLR', {
+      question: counterClaimAgainstWhomLR.mainHeader,
+      options: [claimantName, `${pinUser.firstName} ${pinUser.lastName}`],
+    });
+    await performAction('counterClaimAboutLR', {
+      counterClaimFor: counterClaimAboutLR.counterClaimForInput,
+      reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
+    });
+    await performAction('doesTheDependantHaveChildrenLR', {
+      dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
+    });
+    await performAction('otherDependantsLR', {
+      otherDependantsOption: doYouHaveAnyOtherDependantsLR.noRadioOption,
+    });
+    await performAction('otherAdultsLR', {
+      radioOption: doAnyOtherAdultsLiveInYourHomeLR.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHomeLR.detailsAboutAdultsTextInput,
+    });
+    await performAction('alternativeAccommodationLR', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('circumstancesLR', {
+      question: yourCircumstancesLR.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstancesLR.yesRadioOption,
+    });
+    await performAction('selectExceptionalHardshipLR', {
+      question: exceptionalHardshipLR.mainHeader,
+      exceptionalHardshipOption: exceptionalHardshipLR.yesRadioOption,
+    });
+    await performAction('selectIncomeAndExpensesLR', {
+      incomeAndExpensesOption: incomeAndExpensesLR.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceiveLR.universalCreditParagraph,
+          whatRegularIncomeDoYouReceiveLR.universalCreditTextInput,
+          whatRegularIncomeDoYouReceiveLR.monthHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('selectPriorityDebtsLR', {
+      question: priorityDebtsLR.doesDefendantHaveAnyPriorityDebtsQuestion,
+      option: priorityDebtsLR.noRadioOption,
+    });
+    await performAction('selectExpensesLR', {
+      regularExpensesOptions: [
+        [
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingWeekHiddenRadioOption,
+        ],
+        [
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsParagraph,
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsTotalAmountInput,
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsMonthHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('otherConsiderationsLR', {
+      question: otherConsiderationsLR.isThereAnythingElseParagraph,
+      option: otherConsiderationsLR.yesRadioOption,
+      courtInfo: otherConsiderationsLR.detailsTextInput,
+    });
+    await performAction('uploadFiles');
+    await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStartLR.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsedLR.mainHeader,
+      radioOption: languageUsedLR.englishRadioOption,
+    });
+    //await performAction('clickButton', 'Submit');
+  });
+
+  test('NonRentArrears - AssuredTenancy - Something else - LR @smoke @regression @nonRent', async () => {
+    const pin2User = await getPinUserAt(1);
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
+    });
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmationLR.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmationLR.yesRadioOption,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirthLR.dayInputText,
+      dobMonth: defendantDateOfBirthLR.monthInputText,
+      dobYear: defendantDateOfBirthLR.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddressLR.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddressLR.walesTownOrCityTextInput,
+      postcode: correspondenceAddressLR.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPostLR.byEmailCheckbox,
+      emailAddress: contactPreferenceEmailOrPostLR.emailAddressTextInput,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephoneLR.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetailsLR.yesRadioOption,
+    });
+    await performAction('enterTenancyStartDetailsUnKnownLR', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
+    await performAction('selectNoticeDetailsLR', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknownLR');
+    await performAction('disputingOtherPartsOfTheClaimLR', {
+      disputeOption: nonRentArrearsDisputeLR.noRadioOption,
+    });
+    await performAction('selectCounterClaimLR', {
+      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
+      option: counterClaimLR.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingForLR', {
+      option: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
+    });
+    await performAction('selectCounterClaimFeeLR', {
+      radioOption: counterClaimFeeLR.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
+    });
+    const pinUser = await getPinUserAt(2);
+    await performAction('selectClaimAgainstWhomLR', {
+      question: counterClaimAgainstWhomLR.mainHeader,
+      options: [claimantName, `${pinUser.firstName} ${pinUser.lastName}`],
+    });
+    await performAction('counterClaimAboutLR', {
+      counterClaimFor: counterClaimAboutLR.counterClaimForInput,
+      reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
+    });
+    await performAction('counterClaimOrderOtherThanSumLR', {
+      ordersInput: counterClaimOrderOtherThanSumLR.whatOrdersInput,
+      factsInput: counterClaimOrderOtherThanSumLR.whatFactsInput,
+    });
+    await performAction('doesTheDependantHaveChildrenLR', {
+      dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
+    });
+    await performAction('otherDependantsLR', {
+      otherDependantsOption: doYouHaveAnyOtherDependantsLR.noRadioOption,
+    });
+    await performAction('otherAdultsLR', {
+      radioOption: doAnyOtherAdultsLiveInYourHomeLR.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHomeLR.detailsAboutAdultsTextInput,
+    });
+    await performAction('alternativeAccommodationLR', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('circumstancesLR', {
+      question: yourCircumstancesLR.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstancesLR.yesRadioOption,
+    });
+    await performAction('selectExceptionalHardshipLR', {
+      question: exceptionalHardshipLR.mainHeader,
+      exceptionalHardshipOption: exceptionalHardshipLR.yesRadioOption,
+    });
+    await performAction('selectIncomeAndExpensesLR', {
+      incomeAndExpensesOption: incomeAndExpensesLR.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceiveLR.universalCreditParagraph,
+          whatRegularIncomeDoYouReceiveLR.universalCreditTextInput,
+          whatRegularIncomeDoYouReceiveLR.monthHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('selectPriorityDebtsLR', {
+      question: priorityDebtsLR.doesDefendantHaveAnyPriorityDebtsQuestion,
+      option: priorityDebtsLR.noRadioOption,
+    });
+    await performAction('selectExpensesLR', {
+      regularExpensesOptions: [
+        [
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingWeekHiddenRadioOption,
+        ],
+        [
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsParagraph,
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsTotalAmountInput,
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsMonthHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('otherConsiderationsLR', {
+      question: otherConsiderationsLR.isThereAnythingElseParagraph,
+      option: otherConsiderationsLR.yesRadioOption,
+      courtInfo: otherConsiderationsLR.detailsTextInput,
+    });
+    await performAction('uploadFiles');
+    await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStartLR.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsedLR.mainHeader,
+      radioOption: languageUsedLR.englishRadioOption,
+    });
+    //await performAction('clickButton', 'Submit');
+  });
+
+  test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @regression @nonRent', async () => {
+    const pin2User = await getPinUserAt(1);
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
+    });
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmationLR.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmationLR.yesRadioOption,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirthLR.dayInputText,
+      dobMonth: defendantDateOfBirthLR.monthInputText,
+      dobYear: defendantDateOfBirthLR.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnKnown', {
+      addressLine1: correspondenceAddressLR.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddressLR.walesTownOrCityTextInput,
+      postcode: correspondenceAddressLR.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPostLR.byEmailCheckbox,
+      emailAddress: contactPreferenceEmailOrPostLR.emailAddressTextInput,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephoneLR.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetailsLR.yesRadioOption,
+    });
+    await performAction('enterTenancyStartDetailsUnKnownLR', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
+    await performAction('selectNoticeDetailsLR', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknownLR');
+    await performAction('disputingOtherPartsOfTheClaimLR', {
+      disputeOption: nonRentArrearsDisputeLR.noRadioOption,
+    });
+    await performAction('selectCounterClaimLR', {
+      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
+      option: counterClaimLR.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingForLR', {
+      option: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
+    });
+    await performAction('selectCounterClaimFeeLR', {
+      radioOption: counterClaimFeeLR.defendantNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
+    });
+    await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelpLR.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelpLR.helpWithFeeReferenceTextInput,
+    });
+    const pinUser = await getPinUserAt(2);
+    await performAction('selectClaimAgainstWhomLR', {
+      question: counterClaimAgainstWhomLR.mainHeader,
+      options: [claimantName, `${pinUser.firstName} ${pinUser.lastName}`],
+    });
+    await performAction('counterClaimAboutLR', {
+      counterClaimFor: counterClaimAboutLR.counterClaimForInput,
+      reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
+    });
+    await performAction('counterClaimOrderOtherThanSumLR', {
+      ordersInput: counterClaimOrderOtherThanSumLR.whatOrdersInput,
+      factsInput: counterClaimOrderOtherThanSumLR.whatFactsInput,
+    });
+    await performAction('doesTheDependantHaveChildrenLR', {
+      dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
+    });
+    await performAction('otherDependantsLR', {
+      otherDependantsOption: doYouHaveAnyOtherDependantsLR.noRadioOption,
+    });
+    await performAction('otherAdultsLR', {
+      radioOption: doAnyOtherAdultsLiveInYourHomeLR.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHomeLR.detailsAboutAdultsTextInput,
+    });
+    await performAction('alternativeAccommodationLR', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('circumstancesLR', {
+      question: yourCircumstancesLR.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstancesLR.yesRadioOption,
+    });
+    await performAction('selectExceptionalHardshipLR', {
+      question: exceptionalHardshipLR.mainHeader,
+      exceptionalHardshipOption: exceptionalHardshipLR.yesRadioOption,
+    });
+    await performAction('selectIncomeAndExpensesLR', {
+      incomeAndExpensesOption: incomeAndExpensesLR.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceiveLR.universalCreditParagraph,
+          whatRegularIncomeDoYouReceiveLR.universalCreditTextInput,
+          whatRegularIncomeDoYouReceiveLR.monthHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('selectPriorityDebtsLR', {
+      question: priorityDebtsLR.doesDefendantHaveAnyPriorityDebtsQuestion,
+      option: priorityDebtsLR.noRadioOption,
+    });
+    await performAction('selectExpensesLR', {
+      regularExpensesOptions: [
+        [
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingWeekHiddenRadioOption,
+        ],
+        [
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsParagraph,
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsTotalAmountInput,
+          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsMonthHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('otherConsiderationsLR', {
+      question: otherConsiderationsLR.isThereAnythingElseParagraph,
+      option: otherConsiderationsLR.yesRadioOption,
+      courtInfo: otherConsiderationsLR.detailsTextInput,
+    });
+    await performAction('uploadFiles');
+    await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStartLR.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsedLR.mainHeader,
+      radioOption: languageUsedLR.englishRadioOption,
+    });
+    //await performAction('clickButton', 'Submit');
+  });
+
+  test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent', async () => {
+    const pinUser = await getPinUserAt(0);
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmationLR.noRadioOption,
+      fName: defendantNameConfirmationLR.firstNameInputText,
+      lName: defendantNameConfirmationLR.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirthLR.dayInputText,
+      dobMonth: defendantDateOfBirthLR.monthInputText,
+      dobYear: defendantDateOfBirthLR.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressUnknownLR', {
+      radioOption: correspondenceAddressLR.yesRadioOption,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPostLR.byPostCheckbox,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephoneLR.yesRadioOption,
+      phoneNumber: contactPreferencesTelephoneLR.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
+    await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetailsLR.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetailsLR.giveCorrectTenancyTypeTextInput,
