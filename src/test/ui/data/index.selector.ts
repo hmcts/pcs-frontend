@@ -1,10 +1,7 @@
 import * as englishData from './page-data';
 import * as welshData from './page-data-cy';
 
-const language = process.env.LANGUAGE || 'English';
-const isWelsh = language === 'Welsh';
-
-const selectedData = isWelsh ? welshData : englishData;
+const selectedData = process.env.RUN_E2E_IN_WELSH?.toLowerCase() === 'true' ? welshData : englishData;
 
 const data = selectedData as typeof englishData;
 

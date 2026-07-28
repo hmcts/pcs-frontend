@@ -7,5 +7,5 @@ export const dashboard = {
       ? `${createCaseApiWalesData.createCasePayload.propertyAddress.AddressLine1}, ${createCaseApiWalesData.createCasePayload.propertyAddress.PostTown}, ${createCaseApiWalesData.createCasePayload.propertyAddress.PostCode}`
       : `${createCaseApiData.createCasePayload.propertyAddress.AddressLine1}, ${createCaseApiData.createCasePayload.propertyAddress.PostTown}, ${createCaseApiData.createCasePayload.propertyAddress.PostCode}`;
   },
-  viewTheResponseSubHeader: `My Welsh word`,
+  viewTheResponseSubHeader: `Gweld yr ymateb`,
 };
