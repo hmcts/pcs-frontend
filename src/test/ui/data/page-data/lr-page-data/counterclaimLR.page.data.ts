@@ -1,4 +1,4 @@
-export const counterClaim = {
+export const counterClaimLR = {
   mainHeader: `Counterclaim`,
   doYouWantToMakeACounterclaim: `Does the defendant want to make a counterclaim?`,
   selectIfYouArePlanningToMakeClaimErrorMessage: `Select if you’re planning to make a counterclaim`,

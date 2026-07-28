@@ -10,7 +10,6 @@ export const repaymentsAgreed = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   giveDetailsHiddenTextLabel: `Give details about how much you’ve agreed to pay, how often you’ll pay and when the agreement was made`,
-  lrGiveDetailsHiddenTextLabel: `Give details about how much they’ve agreed to pay and when`,
   youCanEnterUpToHiddenHintText: `You can enter up to 500 characters`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   backLink: `Back`,

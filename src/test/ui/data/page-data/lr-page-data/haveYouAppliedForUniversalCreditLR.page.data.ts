@@ -1,4 +1,4 @@
-export const haveYouAppliedForUniversalCredit = {
+export const haveYouAppliedForUniversalCreditLR = {
   mainHeader: `Universal Credit`,
   hasDefendantAppliedParagraph: `Has the defendant applied for Universal Credit?`,
   yesRadioOption: `Yes`,

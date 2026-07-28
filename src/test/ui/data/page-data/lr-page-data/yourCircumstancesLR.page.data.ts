@@ -1,4 +1,4 @@
-export const yourCircumstances = {
+export const yourCircumstancesLR = {
   mainHeader: `Circumstances`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

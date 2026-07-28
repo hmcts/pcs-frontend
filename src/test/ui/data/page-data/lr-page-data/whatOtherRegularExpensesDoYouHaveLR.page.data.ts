@@ -1,5 +1,6 @@
-export const whatOtherRegularExpensesDoYouHave = {
-  mainHeader: `What other regular expenses does the defendant have? (Optional)`,
+export const whatOtherRegularExpensesDoYouHaveLR = {
+  mainHeader: `Expenses`,
+  whatOtherRegularExpensesQuestion: `What other regular expenses does the defendant have? (Optional)`,
   selectAllThatApplyHintText: `Select all that apply. The information the defendant provides must be truthful and accurate.`,
 
   // Household Bills

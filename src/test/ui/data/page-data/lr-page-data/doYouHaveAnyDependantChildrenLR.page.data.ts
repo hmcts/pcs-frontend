@@ -1,16 +1,15 @@
-export const doYouHaveAnyDependantChildren = {
+export const doYouHaveAnyDependantChildrenLR = {
   mainHeader: `Dependent children`,
   doesTheDefendantHaveDependantChildrenQuestion: `Does the defendant have any dependant children?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  giveDetailsHiddenTextLabel: `Give details about their dependent children`,
+  giveDetailsHiddenTextLabel: `Give details about their dependant children`,
   detailsTextInput: `1 dependant child - Name:Samuel and Age:7`,
   saveAndContinueButton: `Save and continue`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   youHave500CharactersHiddenHintText: `You can enter up to 500 characters`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouHaveAnyDependentChildrenErrorMessage: `Select if they have any dependent children`,
-  giveDetailsAboutYourDependentChildrenErrorMessage: `Give details about your dependent children`,
   mustBeUnderCharacterLimitErrorMessage: `Dependent children details must be 500 characters or less`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,

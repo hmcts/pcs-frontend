@@ -5,7 +5,7 @@ const claimIssueDate = (): string => {
   return formatDateFromParts(today.day, today.month, today.year) ?? '20 May 2025';
 };
 
-export const repaymentsAgreed = {
+export const repaymentsAgreedLR = {
   mainHeader: 'Repayment agreement',
   hasDefendantComeToAgreementQuestion: (claimantsName: string) =>
     `Have you come to any agreement with ${claimantsName} to repay the arrears since ${claimIssueDate()}?`,
@@ -15,10 +15,10 @@ export const repaymentsAgreed = {
   defendantNotSureRadioOption: `Defendant is not sure`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  giveDetailsHiddenTextLabel: `Give details about how much the defendant agreed to pay, how often they will pay and when the agreement was made`,
   youCanEnterUpToHiddenHintText: `You can enter up to 500 characters`,
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   backLink: `Back`,
+  giveDetailsHiddenTextLabel: `Give details about how much they’ve agreed to pay and when`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   getSelectAgreementErrorMessage: (claimantsName: string) =>
     `Select if the defendant has come to any agreement with ${claimantsName} to repay the arrears since ${claimIssueDate()}`,

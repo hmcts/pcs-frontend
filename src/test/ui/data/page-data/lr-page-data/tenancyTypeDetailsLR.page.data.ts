@@ -1,4 +1,4 @@
-export const tenancyTypeDetails = {
+export const tenancyTypeDetailsLR = {
   mainHeader: `Tenancy, occupation contract or licence agreement`,
   whenTheyMadeClaimHintText: `When they made their claim, ${process.env.CLAIMANT_NAME} had to give details about the type of tenancy, occupation contract or licence agreement the defendant signed to rent their property, and the date it began, if known.`,
   detailsGivenByClaimantParagraph: `Details given by ${process.env.CLAIMANT_NAME}`,

@@ -1,4 +1,4 @@
-export const contactPreferenceEmailOrPost = {
+export const contactPreferenceEmailOrPostLR = {
   mainHeader: `Contact preference`,
   backLink: `Back`,
   importantDocumentSentByPostParagraph: `Important documents like orders will always be sent by post.`,

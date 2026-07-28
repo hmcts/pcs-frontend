@@ -1,6 +1,6 @@
 import { generateRandomString } from '../../../utils/common/string.utils';
 
-export const nonRentArrearsDispute = {
+export const nonRentArrearsDisputeLR = {
   mainHeader: `${process.env.CLAIMANT_NAME}’s claim`,
   groundsForPossessionList: `${process.env.CLAIMANT_NAME}’s grounds for possession (their reasons for making the claim)`,
   doYouWantToDisputeQuestion: `Does the defendant dispute any other parts of the claim?`,

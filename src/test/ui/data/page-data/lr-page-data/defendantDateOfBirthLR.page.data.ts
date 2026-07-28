@@ -12,7 +12,7 @@ function getRandomDateOfBirth() {
 
 const randomDOB = getRandomDateOfBirth();
 
-export const defendantDateOfBirth = {
+export const defendantDateOfBirthLR = {
   mainHeader: `What’s your date of birth? (Optional)`,
   forExampleParagraph: `For example, 31 3 1980`,
   dayTextLabel: `Day`,
