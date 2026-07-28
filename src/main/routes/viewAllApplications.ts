@@ -57,7 +57,7 @@ export default function viewAllApplicationsRoutes(app: Application): void {
     res.render('view-all-applications', {
       caseReference,
       formattedCaseReference,
-      dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+      dashboardUrl: getDashboardUrl(caseReference),
       userGenApps,
       otherPartyGenAppsMap,
     });
