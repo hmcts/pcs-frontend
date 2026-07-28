@@ -2,7 +2,13 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { formatIsoDate, isTenancyStartDateKnown, normalizeYesNoValue, penceToPounds } from '../../utils';
+import {
+  formatIsoDate,
+  isTenancyStartDateKnown,
+  normalizeYesNoValue,
+  penceToPounds,
+  shouldShowExemptLandlordStep,
+} from '../../utils';
 import { isNoticeDateConfirmedAndNotProvided, isNoticeDateConfirmedAndProvided } from '../flowConditions';
 import {
   type BaseRowContext,
@@ -53,8 +59,8 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
-function addExemptLandlordRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
-  if (!responses.exemptLandlord) {
+function addExemptLandlordRow({ rows, responses, t, change, yesNoNotSure, req }: RowContext): void {
+  if (!shouldShowExemptLandlordStep(req) || !responses.exemptLandlord) {
     return;
   }
   pushYesNoRow(rows, 'rows.exemptLandlord', responses.exemptLandlord, 'exempt-landlord', t, yesNoNotSure, change);

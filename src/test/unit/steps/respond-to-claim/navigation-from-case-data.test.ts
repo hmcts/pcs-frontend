@@ -13,7 +13,7 @@ import {
 import { getNextStep, getPreviousStep } from '@modules/steps/flow';
 
 describe('respond-to-claim navigation from CCD case data', () => {
-  const createReq = (validatedCase: Record<string, unknown>): Request => {
+  const createReq = (validatedCase: Record<string, unknown>, options: { release12Enabled?: boolean } = {}): Request => {
     const includesNestedData =
       'data' in validatedCase &&
       typeof validatedCase['data'] === 'object' &&
@@ -26,6 +26,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       res: {
         locals: {
           validatedCase: normalizedValidatedCase,
+          release12Enabled: options.release12Enabled ?? false,
         },
       },
     } as unknown as Request;
@@ -81,7 +82,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
   });
 
   it('derives tenancy type back navigation from validated case data only', async () => {
-    const welshReq = createReq({ legislativeCountry: 'Wales' });
+    const welshReq = createReq({ legislativeCountry: 'Wales' }, { release12Enabled: true });
     const englishReq = createReq({ legislativeCountry: 'England' });
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
@@ -92,12 +93,21 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes Wales dispute interstitial forward to exempt landlord and then written terms', async () => {
-    const welshReq = createReq({ legislativeCountry: 'Wales' });
+  it('routes Wales dispute interstitial forward to exempt landlord and then written terms when release 1.2 is enabled', async () => {
+    const welshReq = createReq({ legislativeCountry: 'Wales' }, { release12Enabled: true });
 
     await expect(getNextStep(welshReq, 'dispute-claim-interstitial', flowConfig, {})).resolves.toBe('exempt-landlord');
     await expect(getNextStep(welshReq, 'exempt-landlord', flowConfig, {})).resolves.toBe('written-terms');
     await expect(getPreviousStep(welshReq, 'written-terms', flowConfig, {})).resolves.toBe('exempt-landlord');
+  });
+
+  it('skips exempt landlord for Wales when release 1.2 is disabled', async () => {
+    const welshReq = createReq({ legislativeCountry: 'Wales' }, { release12Enabled: false });
+
+    await expect(getNextStep(welshReq, 'dispute-claim-interstitial', flowConfig, {})).resolves.toBe('written-terms');
+    await expect(getPreviousStep(welshReq, 'written-terms', flowConfig, {})).resolves.toBe(
+      'dispute-claim-interstitial'
+    );
   });
 
   it('derives date-of-birth back navigation from CCD defendant name-known state', async () => {

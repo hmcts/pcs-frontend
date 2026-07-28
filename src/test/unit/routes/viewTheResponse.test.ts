@@ -6,6 +6,11 @@ import { oidcMiddleware } from '../../../main/middleware';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
+
+const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
+  typeof isRespondToClaimEnabledForRelease
+>;
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
@@ -44,8 +49,13 @@ jest.mock('@services/ccdCaseService', () => ({
   },
 }));
 
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  isRespondToClaimEnabledForRelease: jest.fn(),
+}));
+
 function buildComprehensiveCaseData(): CcdCaseData {
   return {
+    legislativeCountry: 'Wales',
     claimantName: 'Example Claimant Ltd',
     propertyAddress: {
       AddressLine1: '10 Second Avenue',
@@ -257,6 +267,7 @@ describe('viewTheResponse route', () => {
     app = {
       get: jest.fn(),
     } as unknown as Application;
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
   });
 
   afterEach(() => {

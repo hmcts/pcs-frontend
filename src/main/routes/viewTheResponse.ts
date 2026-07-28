@@ -5,7 +5,7 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../HttpError';
 import { VIEW_DOCUMENTS_ROUTE, VIEW_RESPONSE_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
-import { normalizeYesNoValue, penceToPounds } from '../steps/utils';
+import { isWalesProperty, normalizeYesNoValue, penceToPounds } from '../steps/utils';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -27,6 +27,7 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
 const logger = Logger.getLogger('viewTheResponse');
 
@@ -286,11 +287,13 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
     });
 }
 
-function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLandlord: boolean): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
-  pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNoNotSure(t, responses?.exemptLandlord));
+  if (showExemptLandlord) {
+    pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNoNotSure(t, responses?.exemptLandlord));
+  }
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.tenancyTypeConfirmation'),
@@ -608,6 +611,8 @@ export default function viewTheResponseRoutes(app: Application): void {
       }
 
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
+      const release12Enabled = await isRespondToClaimEnabledForRelease(req);
+      const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
 
       const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
@@ -617,7 +622,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         claimantDetails: buildClaimantDetails(t, caseData),
         defendant1Details: buildDefendant1Details(t, caseData),
         additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
-        responseToClaim: buildResponseToClaim(t, caseData),
+        responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
         regularIncome: buildRegularIncome(t, caseData),
