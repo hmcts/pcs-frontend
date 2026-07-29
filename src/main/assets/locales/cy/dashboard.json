@@ -99,7 +99,8 @@
       "statementsOfCase": "cyStatements of case",
       "propertyDocuments": "cyProperty documents",
       "evidence": "cyEvidence",
-      "correspondence": "cyCorrespondence"
+      "correspondence": "cyCorrespondence",
+      "uncategorisedDocuments": "cyUncategorised"
     }
   }
 }

@@ -99,6 +99,7 @@ describe('viewDocuments route', () => {
                 'dashboard:viewDocuments.folders.propertyDocuments': 'Property documents',
                 'dashboard:viewDocuments.folders.evidence': 'Evidence',
                 'dashboard:viewDocuments.folders.correspondence': 'Correspondence',
+                'dashboard:viewDocuments.folders.uncategorisedDocuments': 'Uncategorised',
               }) as Record<string, string>
             )[key],
         } as unknown as Request,
@@ -118,6 +119,62 @@ describe('viewDocuments route', () => {
                 expect.objectContaining({
                   id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
                   filename: 'claim-form.pdf',
+                  submittedOn: '2026-06-24',
+                }),
+              ],
+            }),
+          ],
+        })
+      );
+    });
+
+    it('renders an Uncategorised folder for uncategorised documents', async () => {
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [
+            {
+              id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+              value: {
+                document_filename: 'loose-doc.pdf',
+                document_binary_url: 'http://doc-store/loose-doc/binary',
+                upload_timestamp: '2026-06-24',
+                category_id: 'uncategorisedDocuments',
+              },
+            },
+          ],
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents');
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        {
+          params: { caseReference: '1777570813792018' },
+          language: 'en',
+          session: { user: { accessToken: 'token' } },
+          t: (key: string) =>
+            (
+              ({
+                'dashboard:viewDocuments.folders.uncategorisedDocuments': 'Uncategorised',
+              }) as Record<string, string>
+            )[key] ?? key,
+        } as unknown as Request,
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-documents',
+        expect.objectContaining({
+          documentFolders: [
+            expect.objectContaining({
+              title: 'Uncategorised',
+              documents: [
+                expect.objectContaining({
+                  id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+                  filename: 'loose-doc.pdf',
                   submittedOn: '2026-06-24',
                 }),
               ],
@@ -217,6 +274,53 @@ describe('viewDocuments route', () => {
         'Content-Disposition',
         'inline; filename="claim-form.pdf"; filename*=UTF-8\'\'claim-form.pdf'
       );
+      expect(pipeSpy).toHaveBeenCalledWith(res);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('streams a Case Details tab document by its collection id', async () => {
+      const stream = new PassThrough();
+      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
+      (getDocumentBinary as jest.Mock).mockResolvedValue({
+        stream,
+        contentType: 'application/pdf',
+        contentLength: '2048',
+      });
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [],
+          detailsTab_TenancyLicenceDetails: {
+            tenancyLicenceDocuments: [
+              {
+                id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+                value: {
+                  document_filename: 'tenancy-agreement.pdf',
+                  document_binary_url: 'http://dm-store/documents/tenancy-1/binary',
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
+      const res = { setHeader: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      await handler(
+        {
+          params: {
+            caseReference: '1777570813792018',
+            documentId: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+          },
+          session: { user: { accessToken: 'token' } },
+        } as unknown as Request,
+        res,
+        next
+      );
+
+      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/tenancy-1/binary', 'token');
       expect(pipeSpy).toHaveBeenCalledWith(res);
       expect(next).not.toHaveBeenCalled();
     });

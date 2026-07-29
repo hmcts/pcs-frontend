@@ -63,6 +63,7 @@ export const viewTheClaim = {
     'Total rent arrears at time of issue': '£2000',
     'Have there been previous steps taken to recover rent arrears?': 'No',
     'Judgment requested for the outstanding arrears?': 'No',
+    'Rent statement': 'RentArrearsStatement - Claimant 1.pdf',
   },
 
   actionTakenDetails: {
@@ -82,6 +83,8 @@ export const viewTheClaim = {
   tenancyDetails: {
     'What type of tenancy, occupation contract or licence is in place, or was in place?': 'Introductory tenancy',
     'Tenancy, occupation contract or licence start date': '10 February 2026',
+    'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?': 'Yes',
+    'Tenancy, occupation contract or licence agreement': 'tenancyLicenceDocuments - Claimant 1.pdf',
   },
 
   claimantCircumstancesDetails: {

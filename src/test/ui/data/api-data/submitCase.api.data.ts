@@ -88,7 +88,16 @@ export const submitCaseApiData = {
       ],
       tenancy_TypeOfTenancyLicence: process.env.TENANCY_TYPE,
       tenancy_TenancyLicenceDate: '2026-02-10',
-      tenancy_TenancyLicenceDocuments: [],
+      tenancy_HasCopyOfTenancyLicence: 'YES',
+      tenancy_TenancyLicenceDocuments: [
+        {
+          value: {
+            document_url: `${process.env.DM_STORE_URL}/documents/113a0ffe-456d-4960-8c3d-a4f8366c91ca`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/113a0ffe-456d-4960-8c3d-a4f8366c91ca/binary`,
+            document_filename: 'tenancyLicenceDocuments.pdf',
+          },
+        },
+      ],
       showIntroductoryDemotedOtherGroundReasonPage: 'YES',
       introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
       introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS'],
@@ -100,6 +109,15 @@ export const submitCaseApiData = {
       rentDetails_CurrentRent: '100000',
       rentDetails_Frequency: 'MONTHLY',
       rentDetails_CalculatedDailyCharge: '3285',
+      rentArrears_StatementDocuments: [
+        {
+          value: {
+            document_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f/binary`,
+            document_filename: 'RentArrearsStatement.pdf',
+          },
+        },
+      ],
       rentArrears_Total: '200000',
       rentArrears_RecoveryAttempted: 'NO',
       arrearsJudgmentWanted: 'NO',
@@ -1002,10 +1020,8 @@ export const submitCaseApiData = {
       rentArrears_StatementDocuments: [
         {
           value: {
-            document_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/60de46a0-7e5c-4e87-8b74-dc7b498e9a07',
-            document_binary_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/60de46a0-7e5c-4e87-8b74-dc7b498e9a07/binary',
+            document_url: `${process.env.DM_STORE_URL}/documents/60de46a0-7e5c-4e87-8b74-dc7b498e9a07`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/60de46a0-7e5c-4e87-8b74-dc7b498e9a07/binary`,
             document_filename: 'Screenshot 2026-06-24 at 13.54.56.png',
           },
         },
@@ -1118,10 +1134,8 @@ export const submitCaseApiData = {
       rentArrears_StatementDocuments: [
         {
           value: {
-            document_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f',
-            document_binary_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f/binary',
+            document_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f/binary`,
             document_filename: 'Screenshot 2026-06-23 at 10.40.44.png',
           },
         },
