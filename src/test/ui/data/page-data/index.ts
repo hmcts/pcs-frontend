@@ -68,7 +68,6 @@ export * from './checkYourAnswersRTC.page.data';
 export * from './counterClaimOrderOtherThanSum.page.data';
 export * from './endNow.page.data';
 export * from './uploadFilesToSupportYourCounterclaim.page.data';
-export * from './previousPaymentsLR.page.data';
 export * from './responseAndCounterClaimSubmitted.page.data';
 export * from './responseSubmitted.page.data';
 export * from './responseSubmittedCounterclaimFeePaymentNeeded.page.data';
