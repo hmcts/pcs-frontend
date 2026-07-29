@@ -1,3 +1,5 @@
+import { get } from 'lodash';
+
 import type { CcdCaseDocument } from '@services/ccdCase.interface';
 
 const DOCUMENT_FOLDER_TITLES = {
@@ -5,6 +7,7 @@ const DOCUMENT_FOLDER_TITLES = {
   propertyDocuments: 'Property documents',
   evidence: 'Evidence',
   correspondence: 'Correspondence',
+  uncategorisedDocuments: 'Uncategorised',
 } as const;
 
 type DocumentFolderKey = keyof typeof DOCUMENT_FOLDER_TITLES;
@@ -73,6 +76,16 @@ export function extractViewDocumentFolders(
   return Object.values(folders).filter(folder => folder.documents.length > 0);
 }
 
+const CASE_DETAILS_DOCUMENT_PATHS = [
+  'detailsTab_RentArrearsDetails.rentStatement',
+  'detailsTab_TenancyLicenceDetails.tenancyLicenceDocuments',
+  'detailsTab_OccupationContractLicenceDetails.documents',
+  'detailsTab_NoticeDetails.noticeDocuments',
+  'detailsTab_RequiredDocumentsDetails.energyPerformanceCertificates',
+  'detailsTab_RequiredDocumentsDetails.gasSafetyReports',
+  'detailsTab_RequiredDocumentsDetails.electricalInstallationReports',
+] as const;
+
 export function findCaseDocumentById(caseData: CaseDataRecord, documentId: string): CaseDocumentLookupItem | undefined {
   return extractCaseDocuments(caseData).find(document => document.id === documentId);
 }
@@ -81,7 +94,11 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   const documents: CaseDocumentLookupItem[] = [];
   const seen = new Set<string>();
 
-  addFlatDocuments(documents, seen, caseData, 'allDocuments');
+  addDocumentsFromCollection(documents, seen, caseData.allDocuments, 'allDocuments');
+
+  for (const path of CASE_DETAILS_DOCUMENT_PATHS) {
+    addDocumentsFromCollection(documents, seen, get(caseData, path), path);
+  }
 
   return documents;
 }
@@ -99,6 +116,7 @@ function createFolders(
     propertyDocuments: { title: titles.propertyDocuments, documents: [] },
     evidence: { title: titles.evidence, documents: [] },
     correspondence: { title: titles.correspondence, documents: [] },
+    uncategorisedDocuments: { title: titles.uncategorisedDocuments, documents: [] },
   };
 }
 
@@ -106,13 +124,13 @@ function isDocumentFolderKey(value: unknown): value is DocumentFolderKey {
   return typeof value === 'string' && value in DOCUMENT_FOLDER_TITLES;
 }
 
-function addFlatDocuments(
+function addDocumentsFromCollection(
   documents: CaseDocumentLookupItem[],
   seen: Set<string>,
-  caseData: CaseDataRecord,
+  collection: unknown,
   sourceField: string
 ): void {
-  for (const item of asCollection(caseData[sourceField])) {
+  for (const item of asCollection(collection)) {
     const id = stringValue(item.id);
     const value = asRecord(item.value);
     const filename = stringValue(value?.document_filename);
