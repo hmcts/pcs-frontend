@@ -7,8 +7,13 @@ jest.mock('../../../../main/modules/i18n', () => ({
   getRequestLanguage: jest.fn(() => 'en'),
 }));
 
+jest.mock('../../../../main/steps/utils/isRelease12Enabled', () => ({
+  isRelease12Enabled: jest.fn(() => true),
+}));
+
 import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-provided';
+import { isRelease12Enabled } from '../../../../main/steps/utils/isRelease12Enabled';
 
 import type { CcdCaseData } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -53,6 +58,44 @@ describe('confirmation-of-notice-date-when-provided step', () => {
   });
 
   describe('extendGetContent', () => {
+    // Flag cleanup (`release-1.2-enabled`): delete this case and the isRelease12Enabled mock once the flag is on.
+    it('keeps the existing content and hides release 1.2 additions when the flag is disabled', () => {
+      (isRelease12Enabled as jest.Mock).mockReturnValueOnce(false);
+
+      const content = testedStep.extendGetContent({
+        res: {
+          locals: {
+            validatedCase: makeValidatedCase({
+              claimantName: 'Test Claimant',
+              notice_PostedDate: '2024-01-15',
+              notice_ServiceMethod: 'FIRST_CLASS_POST',
+              notice_Documents: [
+                {
+                  id: 'doc-123',
+                  value: {
+                    document_filename: 'notice.pdf',
+                    document_url: 'http://doc-store/notice',
+                    document_binary_url: 'http://doc-store/notice/binary',
+                  },
+                },
+              ],
+            }),
+          },
+        },
+      });
+
+      expect(tMock).toHaveBeenCalledWith('hintText', {
+        returnObjects: true,
+        claimantName: 'Test Claimant',
+      });
+      expect(tMock).toHaveBeenCalledWith('listItem1', {
+        returnObjects: true,
+        noticeDate: '15 January 2024',
+      });
+      expect(content.noticeDocumentId).toBeUndefined();
+      expect(content.noticeMethodText).toBeUndefined();
+    });
+
     it('sets noticeDocumentId when a notice document is uploaded', () => {
       const content = testedStep.extendGetContent({
         res: {
