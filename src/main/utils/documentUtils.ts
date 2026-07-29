@@ -7,6 +7,7 @@ const DOCUMENT_FOLDER_TITLES = {
   propertyDocuments: 'Property documents',
   evidence: 'Evidence',
   correspondence: 'Correspondence',
+  uncategorisedDocuments: 'Uncategorised',
 } as const;
 
 type DocumentFolderKey = keyof typeof DOCUMENT_FOLDER_TITLES;
@@ -115,6 +116,7 @@ function createFolders(
     propertyDocuments: { title: titles.propertyDocuments, documents: [] },
     evidence: { title: titles.evidence, documents: [] },
     correspondence: { title: titles.correspondence, documents: [] },
+    uncategorisedDocuments: { title: titles.uncategorisedDocuments, documents: [] },
   };
 }
 
