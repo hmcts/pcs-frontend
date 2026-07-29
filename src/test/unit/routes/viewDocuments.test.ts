@@ -99,6 +99,7 @@ describe('viewDocuments route', () => {
                 'dashboard:viewDocuments.folders.propertyDocuments': 'Property documents',
                 'dashboard:viewDocuments.folders.evidence': 'Evidence',
                 'dashboard:viewDocuments.folders.correspondence': 'Correspondence',
+                'dashboard:viewDocuments.folders.uncategorisedDocuments': 'Uncategorised',
               }) as Record<string, string>
             )[key],
         } as unknown as Request,
@@ -118,6 +119,62 @@ describe('viewDocuments route', () => {
                 expect.objectContaining({
                   id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
                   filename: 'claim-form.pdf',
+                  submittedOn: '2026-06-24',
+                }),
+              ],
+            }),
+          ],
+        })
+      );
+    });
+
+    it('renders an Uncategorised folder for uncategorised documents', async () => {
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [
+            {
+              id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+              value: {
+                document_filename: 'loose-doc.pdf',
+                document_binary_url: 'http://doc-store/loose-doc/binary',
+                upload_timestamp: '2026-06-24',
+                category_id: 'uncategorisedDocuments',
+              },
+            },
+          ],
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents');
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        {
+          params: { caseReference: '1777570813792018' },
+          language: 'en',
+          session: { user: { accessToken: 'token' } },
+          t: (key: string) =>
+            (
+              ({
+                'dashboard:viewDocuments.folders.uncategorisedDocuments': 'Uncategorised',
+              }) as Record<string, string>
+            )[key] ?? key,
+        } as unknown as Request,
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-documents',
+        expect.objectContaining({
+          documentFolders: [
+            expect.objectContaining({
+              title: 'Uncategorised',
+              documents: [
+                expect.objectContaining({
+                  id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+                  filename: 'loose-doc.pdf',
                   submittedOn: '2026-06-24',
                 }),
               ],
