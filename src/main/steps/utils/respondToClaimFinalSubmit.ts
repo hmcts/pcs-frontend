@@ -152,7 +152,7 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
     });
   }
 
-  if (selectedPartyId) {
+  if (selectedPartyId && !counterClaimFeePaymentRequired) {
     clientContextSessionClearer(req);
   }
 
