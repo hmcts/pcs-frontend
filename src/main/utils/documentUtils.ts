@@ -1,3 +1,5 @@
+import { get } from 'lodash';
+
 import type { CcdCaseDocument } from '@services/ccdCase.interface';
 
 const DOCUMENT_FOLDER_TITLES = {
@@ -73,6 +75,16 @@ export function extractViewDocumentFolders(
   return Object.values(folders).filter(folder => folder.documents.length > 0);
 }
 
+const CASE_DETAILS_DOCUMENT_PATHS = [
+  'detailsTab_RentArrearsDetails.rentStatement',
+  'detailsTab_TenancyLicenceDetails.tenancyLicenceDocuments',
+  'detailsTab_OccupationContractLicenceDetails.documents',
+  'detailsTab_NoticeDetails.noticeDocuments',
+  'detailsTab_RequiredDocumentsDetails.energyPerformanceCertificates',
+  'detailsTab_RequiredDocumentsDetails.gasSafetyReports',
+  'detailsTab_RequiredDocumentsDetails.electricalInstallationReports',
+] as const;
+
 export function findCaseDocumentById(caseData: CaseDataRecord, documentId: string): CaseDocumentLookupItem | undefined {
   return extractCaseDocuments(caseData).find(document => document.id === documentId);
 }
@@ -81,10 +93,11 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   const documents: CaseDocumentLookupItem[] = [];
   const seen = new Set<string>();
 
-  addFlatDocuments(documents, seen, caseData, 'allDocuments');
-  addNestedFlatDocuments(documents, seen, caseData, 'detailsTab_TenancyLicenceDetails', 'tenancyLicenceDocuments');
-  addNestedFlatDocuments(documents, seen, caseData, 'detailsTab_RentArrearsDetails', 'rentStatement');
-  addNestedFlatDocuments(documents, seen, caseData, 'detailsTab_OccupationContractLicenceDetails', 'documents');
+  addDocumentsFromCollection(documents, seen, caseData.allDocuments, 'allDocuments');
+
+  for (const path of CASE_DETAILS_DOCUMENT_PATHS) {
+    addDocumentsFromCollection(documents, seen, get(caseData, path), path);
+  }
 
   return documents;
 }
@@ -109,29 +122,7 @@ function isDocumentFolderKey(value: unknown): value is DocumentFolderKey {
   return typeof value === 'string' && value in DOCUMENT_FOLDER_TITLES;
 }
 
-function addFlatDocuments(
-  documents: CaseDocumentLookupItem[],
-  seen: Set<string>,
-  caseData: CaseDataRecord,
-  sourceField: string
-): void {
-  indexCollectionDocuments(documents, seen, caseData[sourceField], sourceField);
-}
-
-function addNestedFlatDocuments(
-  documents: CaseDocumentLookupItem[],
-  seen: Set<string>,
-  caseData: CaseDataRecord,
-  parentField: string,
-  childField: string
-): void {
-  const parent = asRecord(caseData[parentField]);
-  const sourceField = `${parentField}.${childField}`;
-
-  indexCollectionDocuments(documents, seen, parent?.[childField], sourceField);
-}
-
-function indexCollectionDocuments(
+function addDocumentsFromCollection(
   documents: CaseDocumentLookupItem[],
   seen: Set<string>,
   collection: unknown,

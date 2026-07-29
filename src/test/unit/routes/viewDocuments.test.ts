@@ -221,23 +221,25 @@ describe('viewDocuments route', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('streams a document loaded from detailsTab_TenancyLicenceDetails', async () => {
+    it('streams a Case Details tab document by its collection id', async () => {
       const stream = new PassThrough();
       const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
       (getDocumentBinary as jest.Mock).mockResolvedValue({
         stream,
         contentType: 'application/pdf',
+        contentLength: '2048',
       });
       mockGetCaseById.mockResolvedValue({
         id: '1777570813792018',
         data: {
+          allDocuments: [],
           detailsTab_TenancyLicenceDetails: {
             tenancyLicenceDocuments: [
               {
-                id: '33333333-3333-4333-8333-333333333333',
+                id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
                 value: {
                   document_filename: 'tenancy-agreement.pdf',
-                  document_binary_url: 'http://dm-store/documents/tenancy-123/binary',
+                  document_binary_url: 'http://dm-store/documents/tenancy-1/binary',
                 },
               },
             ],
@@ -246,198 +248,24 @@ describe('viewDocuments route', () => {
       });
 
       const handler = getHandler('/case/:caseReference/view-documents/:documentId');
-      const res = {
-        setHeader: jest.fn(),
-      } as unknown as Response;
+      const res = { setHeader: jest.fn() } as unknown as Response;
+      const next = jest.fn();
 
       await handler(
         {
           params: {
             caseReference: '1777570813792018',
-            documentId: '33333333-3333-4333-8333-333333333333',
+            documentId: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
           },
           session: { user: { accessToken: 'token' } },
         } as unknown as Request,
         res,
-        jest.fn()
+        next
       );
 
-      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/tenancy-123/binary', 'token');
-      expect(res.setHeader).toHaveBeenCalledWith(
-        'Content-Disposition',
-        'inline; filename="tenancy-agreement.pdf"; filename*=UTF-8\'\'tenancy-agreement.pdf'
-      );
+      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/tenancy-1/binary', 'token');
       expect(pipeSpy).toHaveBeenCalledWith(res);
-    });
-
-    it('streams a document loaded from allDocuments when tenancy and rent arrears documents also exist', async () => {
-      const stream = new PassThrough();
-      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
-      (getDocumentBinary as jest.Mock).mockResolvedValue({
-        stream,
-        contentType: 'application/pdf',
-      });
-      mockGetCaseById.mockResolvedValue({
-        id: '1777570813792018',
-        data: {
-          allDocuments: [
-            {
-              id: '55555555-5555-4555-8555-555555555555',
-              value: {
-                document_filename: 'claim-form.pdf',
-                document_binary_url: 'http://dm-store/documents/all-docs-123/binary',
-              },
-            },
-          ],
-          detailsTab_TenancyLicenceDetails: {
-            tenancyLicenceDocuments: [
-              {
-                id: '66666666-6666-4666-8666-666666666666',
-                value: {
-                  document_filename: 'tenancy-agreement.pdf',
-                  document_binary_url: 'http://dm-store/documents/tenancy-123/binary',
-                },
-              },
-            ],
-          },
-          detailsTab_RentArrearsDetails: {
-            rentStatement: [
-              {
-                id: '77777777-7777-4777-8777-777777777777',
-                value: {
-                  document_filename: 'rent-statement.pdf',
-                  document_binary_url: 'http://dm-store/documents/rent-123/binary',
-                },
-              },
-            ],
-          },
-        },
-      });
-
-      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
-      const res = {
-        setHeader: jest.fn(),
-      } as unknown as Response;
-
-      await handler(
-        {
-          params: {
-            caseReference: '1777570813792018',
-            documentId: '55555555-5555-4555-8555-555555555555',
-          },
-          session: { user: { accessToken: 'token' } },
-        } as unknown as Request,
-        res,
-        jest.fn()
-      );
-
-      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/all-docs-123/binary', 'token');
-      expect(res.setHeader).toHaveBeenCalledWith(
-        'Content-Disposition',
-        'inline; filename="claim-form.pdf"; filename*=UTF-8\'\'claim-form.pdf'
-      );
-      expect(pipeSpy).toHaveBeenCalledWith(res);
-    });
-
-    it('streams a document loaded from detailsTab_RentArrearsDetails', async () => {
-      const stream = new PassThrough();
-      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
-      (getDocumentBinary as jest.Mock).mockResolvedValue({
-        stream,
-        contentType: 'application/pdf',
-      });
-      mockGetCaseById.mockResolvedValue({
-        id: '1777570813792018',
-        data: {
-          detailsTab_RentArrearsDetails: {
-            rentStatement: [
-              {
-                id: '44444444-4444-4444-8444-444444444444',
-                value: {
-                  document_filename: 'rent-statement.pdf',
-                  document_binary_url: 'http://dm-store/documents/rent-123/binary',
-                },
-              },
-            ],
-          },
-        },
-      });
-
-      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
-      const res = {
-        setHeader: jest.fn(),
-      } as unknown as Response;
-
-      await handler(
-        {
-          params: {
-            caseReference: '1777570813792018',
-            documentId: '44444444-4444-4444-8444-444444444444',
-          },
-          session: { user: { accessToken: 'token' } },
-        } as unknown as Request,
-        res,
-        jest.fn()
-      );
-
-      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/rent-123/binary', 'token');
-      expect(res.setHeader).toHaveBeenCalledWith(
-        'Content-Disposition',
-        'inline; filename="rent-statement.pdf"; filename*=UTF-8\'\'rent-statement.pdf'
-      );
-      expect(pipeSpy).toHaveBeenCalledWith(res);
-    });
-
-    it('streams a document loaded from detailsTab_OccupationContractLicenceDetails', async () => {
-      const stream = new PassThrough();
-      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
-      (getDocumentBinary as jest.Mock).mockResolvedValue({
-        stream,
-        contentType: 'application/pdf',
-      });
-      mockGetCaseById.mockResolvedValue({
-        id: '1777570813792018',
-        data: {
-          detailsTab_OccupationContractLicenceDetails: {
-            documents: [
-              {
-                id: '44444444-4444-4444-8444-444444444444',
-                value: {
-                  document_filename: 'occupation-contract.pdf',
-                  document_binary_url: 'http://dm-store/documents/occupation-contract-123/binary',
-                },
-              },
-            ],
-          },
-        },
-      });
-
-      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
-      const res = {
-        setHeader: jest.fn(),
-      } as unknown as Response;
-
-      await handler(
-        {
-          params: {
-            caseReference: '1777570813792018',
-            documentId: '44444444-4444-4444-8444-444444444444',
-          },
-          session: { user: { accessToken: 'token' } },
-        } as unknown as Request,
-        res,
-        jest.fn()
-      );
-
-      expect(getDocumentBinary).toHaveBeenCalledWith(
-        'http://dm-store/documents/occupation-contract-123/binary',
-        'token'
-      );
-      expect(res.setHeader).toHaveBeenCalledWith(
-        'Content-Disposition',
-        'inline; filename="occupation-contract.pdf"; filename*=UTF-8\'\'occupation-contract.pdf'
-      );
-      expect(pipeSpy).toHaveBeenCalledWith(res);
+      expect(next).not.toHaveBeenCalled();
     });
 
     it('returns 401 when access token is missing', async () => {

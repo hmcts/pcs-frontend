@@ -14,11 +14,11 @@ export const respondToClaimFeatureMiddleware: RequestHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  if (isLegalRepresentativeUser(req)) {
-    const isReleaseEnabled = await isRespondToClaimEnabledForRelease(req);
-    if (!isReleaseEnabled) {
-      return handleRespondToClaimDisabled(req, res);
-    }
+  const isReleaseEnabled = await isRespondToClaimEnabledForRelease(req);
+  res.locals.release12Enabled = isReleaseEnabled;
+
+  if (isLegalRepresentativeUser(req) && !isReleaseEnabled) {
+    return handleRespondToClaimDisabled(req, res);
   }
 
   const isUserEnabled = await isRespondToClaimEnabledForUser(req);
