@@ -44,7 +44,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       translationKey: {
         label: 'emailConfirmationLabel',
       },
-      isPageHeading: true,
       options: [
         {
           value: 'yes',
