@@ -58,7 +58,6 @@ export default function viewDocumentsRoutes(app: Application): void {
               propertyDocuments: req.t('dashboard:viewDocuments.folders.propertyDocuments'),
               evidence: req.t('dashboard:viewDocuments.folders.evidence'),
               correspondence: req.t('dashboard:viewDocuments.folders.correspondence'),
-              uncategorisedDocuments: req.t('dashboard:viewDocuments.folders.uncategorisedDocuments'),
             },
           }),
         });
