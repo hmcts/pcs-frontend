@@ -660,7 +660,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
         responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
-        });
+      });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);
       return next(e);
