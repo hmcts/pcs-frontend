@@ -1,17 +1,52 @@
-import { penceToPounds } from '../../utils';
+import { isLegalRepresentativeUser, penceToPounds } from '../../utils';
 import { getCounterClaimAmountInPence } from '../../utils/counterClaimAmount';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
+import { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 import { getPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
+import { SelectItems } from '@utils/fieldComponentTypes.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-application-fee-amount',
   stepDir: __dirname,
-  fields: [],
+  fields: [
+    {
+      name: 'paymentOptions',
+      type: 'radio',
+      required: true,
+      legendClasses: 'govuk-fieldset__legend--m',
+      translationKey: {
+        label: 'paymentOptions',
+      },
+      options: [
+        {
+          value: 'pba',
+          translationKey: 'options.pba',
+          subFields: {
+            pbaAccount: {
+              name: 'pbaAccount',
+              type: 'select',
+              required: true,
+              translationKey: { label: 'pbaAccount' },
+            },
+            customerReference: {
+              name: 'customerReference',
+              type: 'text',
+              translationKey: { label: 'customerReferenceLabel' },
+            },
+          },
+        },
+        {
+          value: 'card',
+          translationKey: 'options.card',
+        },
+      ],
+    },
+  ],
   customTemplate: `${__dirname}/counterClaimApplicationFeeAmount.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -21,8 +56,22 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     counterClaimFeeLabel: 'counterClaimFeeLabel',
     payNowButton: 'payNowButton',
     paymentError: 'paymentError',
+    pbaNumberLabel: 'pbaNumberLabel',
+    customerReferenceLabel: 'customerReferenceLabel',
   },
-  extendGetContent: async req => {
+  resolveRedirectAfterPost: async req => {
+    const caseReference = req.params.caseReference;
+    if (isLegalRepresentativeUser(req)) {
+      const paymentOption = req.body?.paymentOptions as string | undefined;
+
+      if (paymentOption === 'pba') {
+        return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start` : '#';
+      } else {
+        return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
+      }
+    }
+  },
+  extendGetContent: async (req, formContent) => {
     const paymentSession = getPaymentSessionState(req);
     const caseModel = req.res?.locals?.validatedCase;
     const counterClaim = caseModel instanceof CcdCaseModel ? caseModel.defendantResponsesCounterClaim : undefined;
@@ -63,6 +112,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ? `/case/${caseReference}/respond-to-claim/response-submitted-counter-claim-fee-payment-needed`
       : '';
 
+
+    if (isLegalRepresentativeUser(req)) {
+      buildPbaAccountsSelections(formContent);
+    }
+
     return {
       formattedCounterClaimAmount:
         counterClaimAmount === undefined ? undefined : t('counterClaimAmountDisplay', { counterClaimAmount }),
@@ -75,3 +129,29 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     };
   },
 });
+
+function buildPbaAccountsSelections(formContent: BuiltFormContent) {
+  const select = formContent.fields.find(f => f.name === 'selectDefendant') as SelectItems | undefined;
+  const pbaAccounts = getPbaAccounts();
+
+  addSelectOptionsForPbaAccounts(pbaAccounts, select);
+}
+
+function getPbaAccounts(): string[] {
+  // invoke api
+  return ['pba123', 'pba321'];
+}
+
+function addSelectOptionsForPbaAccounts(
+  pbaAccounts: string[] | undefined,
+  radio: SelectItems | undefined
+) {
+  if (radio?.component) {
+    pbaAccounts?.forEach(pbaAccount => {
+      radio.component.items.push({
+        value: pbaAccount,
+        text: pbaAccount
+      });
+    });
+  }
+}

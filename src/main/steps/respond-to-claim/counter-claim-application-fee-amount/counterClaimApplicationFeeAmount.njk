@@ -2,6 +2,9 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
@@ -32,9 +35,26 @@
     <p class="govuk-error-message">{{ paymentError }}</p>
   {% endif %}
 
-  {{ govukButton({
-    text: payNowButton,
-    href: payNowUrl,
-    disabled: payNowDisabled
-  }) }}
+  {% if isLegalRepresentative %}
+    <form method="post" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+    {% for field in fields %}
+      {% if field.componentType == 'radios' %}
+        {{ govukRadios(field.component) }}
+      {% endif %}
+    {% endfor %}
+
+      {{ govukButton({
+        text: payNowButton,
+        disabled: payNowDisabled
+      }) }}
+    </form>
+  {% else %}
+    {{ govukButton({
+      text: payNowButton,
+      href: payNowUrl,
+      disabled: payNowDisabled
+    }) }}
+  {% endif %}
 {% endblock %}

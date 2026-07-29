@@ -7,3 +7,12 @@ export type RadioItems = {
     }[];
   };
 };
+
+export type SelectItems = {
+  component: {
+    items: {
+      text: string;
+      value?: string;
+    }[];
+  };
+};

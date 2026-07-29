@@ -6,7 +6,7 @@ import type { DocumentStorage } from '@modules/documents/storage';
 import type { UploadValidationOptions } from '@utils/documentUploadValidation';
 
 export type FormFieldType =
-  'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup' | 'file';
+  'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup' | 'file' | 'select';
 export type ComponentType =
   'input' | 'textarea' | 'characterCount' | 'radios' | 'checkboxes' | 'dateInput' | 'postcodeLookup' | 'fileUpload';
 

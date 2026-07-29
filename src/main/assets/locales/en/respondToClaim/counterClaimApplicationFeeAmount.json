@@ -7,5 +7,12 @@
   "counterClaimAmountDisplay": "{{counterClaimAmount, currency(currency: GBP)}}",
   "counterClaimFeeDisplay": "{{counterClaimFee, currency(currency: GBP)}}",
   "payNowButton": "Pay your counterclaim fee ({{counterClaimFee, currency(currency: GBP)}})",
-  "paymentError": "We could not start your payment. Try again."
+  "paymentError": "We could not start your payment. Try again.",
+  "options": {
+    "pba": "Pay fee using Payment by Account (PBA)",
+    "card": "Pay by credit or debit card"
+  },
+  "errors": {
+    "paymentOptions": "You must select a payment option"
+  }
 }
