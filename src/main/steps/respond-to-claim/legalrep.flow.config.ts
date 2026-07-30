@@ -10,6 +10,7 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 const legalRepStepOrder = [
   'start-now',
   'select-defendant',
+  'counter-claim-application-fee-amount',
   'defendant-name-confirmation',
   'defendant-date-of-birth',
   'correspondence-address',
@@ -60,7 +61,6 @@ const legalRepStepOrder = [
   'end-of-journey-cya',
   'response-submitted',
   'response-submitted-counter-claim-fee-payment-needed',
-  'counter-claim-application-fee-amount',
   'counter-claim-payment-successful',
   'response-and-counter-claim-submitted',
 ] as const satisfies readonly LegalRepRespondToClaimStepName[];
@@ -80,6 +80,10 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     ...citizenFlowConfig.steps,
     'select-defendant': {
       showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
+    },
+
+    'counter-claim-application-fee-amount': {
+      showCondition: () => true,
     },
 
     'defendant-name-confirmation': {

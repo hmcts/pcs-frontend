@@ -6,7 +6,7 @@ import { getTranslationFunction } from '@modules/steps';
 import { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
-import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+// import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 import { getPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
 import { SelectItems } from '@utils/fieldComponentTypes.interface';
 
@@ -28,10 +28,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
           translationKey: 'options.pba',
           subFields: {
             pbaAccount: {
-              name: 'pbaAccount',
+              name: 'pbaAccounts',
               type: 'select',
-              required: true,
-              translationKey: { label: 'pbaAccount' },
+              translationKey: {
+                label: 'pbaAccountsLabel',
+              },
+              
             },
             customerReference: {
               name: 'customerReference',
@@ -75,7 +77,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const paymentSession = getPaymentSessionState(req);
     const caseModel = req.res?.locals?.validatedCase;
     const counterClaim = caseModel instanceof CcdCaseModel ? caseModel.defendantResponsesCounterClaim : undefined;
-    const claimType = paymentSession?.counterClaimType ?? counterClaim?.claimType;
+    const claimType = 'SOMETHING_ELSE';
 
     if (!claimType) {
       throw new Error('Counterclaim fee unavailable: missing claimType');
@@ -85,8 +87,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     let feeAmount = paymentSession?.feeAmount;
     if (feeAmount === undefined) {
-      const feeType = getCounterClaimFeeType(claimType, claimAmountInPence);
-      feeAmount = await getFee(feeType, claimAmountInPence);
+      // const feeType = getCounterClaimFeeType(claimType, claimAmountInPence);
+      // feeAmount = await getFee(feeType, claimAmountInPence);
+      feeAmount = 123;
     }
 
     if (paymentSession) {
@@ -112,12 +115,26 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ? `/case/${caseReference}/respond-to-claim/response-submitted-counter-claim-fee-payment-needed`
       : '';
 
+    const isLegalRepresentative = isLegalRepresentativeUser(req);
+    let pbaAccountItems: Array<{ value: string; text: string }> = [];
 
-    if (isLegalRepresentativeUser(req)) {
+    if (isLegalRepresentative) {
       buildPbaAccountsSelections(formContent);
+      
+      // direct rendering 
+      const pbaAccounts = getPbaAccounts();
+      pbaAccountItems = [
+        { value: '', text: 'Select a PBA account' },
+        ...pbaAccounts.map(account => ({
+          value: account,
+          text: account,
+        })),
+      ];
     }
 
     return {
+      isLegalRepresentative,
+      pbaAccountItems,
       formattedCounterClaimAmount:
         counterClaimAmount === undefined ? undefined : t('counterClaimAmountDisplay', { counterClaimAmount }),
       formattedCounterClaimFee: t('counterClaimFeeDisplay', { counterClaimFee: feeAmount }),
@@ -125,33 +142,46 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       payNowUrl,
       payNowDisabled,
       showPaymentError,
-      backUrl,
+      backUrl
     };
   },
 });
 
 function buildPbaAccountsSelections(formContent: BuiltFormContent) {
-  const select = formContent.fields.find(f => f.name === 'selectDefendant') as SelectItems | undefined;
-  const pbaAccounts = getPbaAccounts();
+const radios = formContent.fields.find(f => f.name === 'paymentOptions') as any;
+const pbaAccounts = getPbaAccounts();
 
+const pbaOption = radios?.options?.find((o: any) => o.value === 'pbaAccount' || o.value === 'pba');
+const select = pbaOption?.subFields?.pbaAccount;
+
+if (select) {
   addSelectOptionsForPbaAccounts(pbaAccounts, select);
 }
+}
+
 
 function getPbaAccounts(): string[] {
   // invoke api
   return ['pba123', 'pba321'];
 }
 
-function addSelectOptionsForPbaAccounts(
-  pbaAccounts: string[] | undefined,
-  radio: SelectItems | undefined
-) {
-  if (radio?.component) {
-    pbaAccounts?.forEach(pbaAccount => {
-      radio.component.items.push({
-        value: pbaAccount,
-        text: pbaAccount
-      });
-    });
+function addSelectOptionsForPbaAccounts(pbaAccounts: string[] | undefined,select: SelectItems | any) {
+  if (!select) return;
+
+  if (!select.component) {
+    select.component = { items: [] };
   }
+  if (!select.component.items) {
+    select.component.items = [];
+  }
+
+  pbaAccounts?.forEach(pbaAccount => {
+    const exists = select.component.items.some((item: any) => item.value === pbaAccount);
+    if (!exists) {
+      select.component.items.push({
+        value: pbaAccount,
+        text: pbaAccount,
+      });
+    }
+  });
 }

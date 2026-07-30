@@ -39,9 +39,53 @@
     <form method="post" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
+      {% set pbaAccountlHtml %}
+        {{ govukSelect({
+          id: "pbaAccounts",
+          name: "paymentOptions.pbaAccounts",
+          label: {
+            text: pbaNumberLabel
+          },
+          items: pbaAccountItems,
+          value: form.pbaAccounts,
+          errorMessage: errors.pbaAccounts
+        }) }}
+
+        {{ govukInput({
+              id: 'customerReference',
+              name: 'paymentOptions.customerReference',
+              label: {
+                text: labels.customerReference
+              },
+        }) }}
+      {% endset -%}
+
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
-        {{ govukRadios(field.component) }}
+        {% set updatedItems = [] %}
+
+        {% for item in field.component.items %}
+          {% if item.value == 'pba' %}
+            {% set updatedItems = (updatedItems.push({
+              value: item.value,
+              text: item.text,
+              checked: item.checked,
+              conditional: {
+                html: pbaAccountlHtml
+              }
+            }), updatedItems) %}
+          {% else %}
+            {% set updatedItems = (updatedItems.push(item), updatedItems) %}
+          {% endif %}
+        {% endfor %}
+
+        {{ govukRadios({
+          name: field.component.name,
+          fieldset: field.component.fieldset,
+          hint: field.component.hint,
+          errorMessage: field.component.errorMessage,
+          items: updatedItems
+        }) }}
       {% endif %}
     {% endfor %}
 
