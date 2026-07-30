@@ -5,6 +5,7 @@ import { HTTPError } from '../../HttpError';
 
 import type { CuiRaFlags, CuiRaInvocationRequest } from './cuiRa.interface';
 import { cuiRaService } from './cuiRaService';
+import { toCuiRaFlags } from './flagMapping';
 
 import { Logger } from '@modules/logger';
 import { getValidatedLanguage } from '@modules/steps';
@@ -56,10 +57,15 @@ export async function startYourSupport(req: Request): Promise<string> {
     logger.warn(`Starting Your Support for case ${caseReference} with an empty defendant party name`);
   }
 
+  // Pre-populate the microsite with any adjustments already captured for this defendant so a
+  // returning user can amend them. They are persisted in the draft (possessionClaimResponse
+  // .defendantFlags, pulled into validatedCase) in the CCD `Flags` shape, so map back to cui-ra's
+  // shape. Empty details on a first-time capture.
+  const storedFlags = validatedCase.data?.possessionClaimResponse?.defendantFlags;
   const existingFlags: CuiRaFlags = {
     partyName,
     roleOnCase: DEFENDANT_ROLE_ON_CASE,
-    details: [], // first-time capture: no existing adjustments to carry in
+    details: storedFlags ? toCuiRaFlags(storedFlags).details : [],
   };
 
   const body: CuiRaInvocationRequest = {

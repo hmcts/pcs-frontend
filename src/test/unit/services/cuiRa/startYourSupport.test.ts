@@ -78,6 +78,60 @@ describe('startYourSupport', () => {
     });
   });
 
+  it('pre-populates existingFlags from stored defendantFlags (CCD path { value } -> cui-ra { name })', async () => {
+    const { req } = buildReq({
+      res: {
+        locals: {
+          validatedCase: {
+            id: '1234123412341234',
+            defendantContactDetailsPartyName: 'John Doe',
+            data: {
+              possessionClaimResponse: {
+                defendantFlags: {
+                  partyName: 'John Doe',
+                  roleOnCase: 'Defendant',
+                  details: [
+                    {
+                      id: 'd1',
+                      value: {
+                        name: 'Language interpreter',
+                        flagCode: 'RA0042',
+                        path: [{ id: 'p1', value: 'Reasonable adjustment' }],
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    await startYourSupport(req);
+
+    expect(cuiRaService.invokePayload).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          existingFlags: {
+            partyName: 'John Doe',
+            roleOnCase: 'Defendant',
+            details: [
+              {
+                id: 'd1',
+                value: {
+                  name: 'Language interpreter',
+                  flagCode: 'RA0042',
+                  path: [{ id: 'p1', name: 'Reasonable adjustment' }],
+                },
+              },
+            ],
+          },
+        }),
+      })
+    );
+  });
+
   it('falls back through the defendant name getters for partyName', async () => {
     const { req } = buildReq({
       res: {
