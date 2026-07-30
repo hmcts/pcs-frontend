@@ -20,6 +20,12 @@ jest.mock('@services/cuiRa/cuiRaService', () => ({
   cuiRaService: { getPayload: mockGetPayload },
 }));
 
+const mockUpdateDraft = jest.fn();
+const mockGetCaseByIdForEvent = jest.fn();
+jest.mock('@services/ccdCaseService', () => ({
+  ccdCaseService: { updateDraft: mockUpdateDraft, getCaseByIdForEvent: mockGetCaseByIdForEvent },
+}));
+
 jest.mock('config', () => ({
   get: jest.fn((key: string) => {
     if (key === 's2s.key') {
@@ -37,6 +43,7 @@ jest.mock('@utils/safeRedirect', () => ({
 import type { Application, Request, Response } from 'express';
 
 import reasonableAdjustmentsCallbackRoutes from '../../../main/routes/reasonableAdjustmentsCallback';
+import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../../../main/steps/respond-to-claim/draftEvent';
 
 const ROUTE = '/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id';
 const confirmationUrl = '/case/123/respond-to-claim/reasonable-adjustments-confirmation';
@@ -49,13 +56,18 @@ describe('reasonableAdjustmentsCallback routes', () => {
   const buildReq = (serviceToken: string | null): Request =>
     ({
       params: { caseReference: '123', id: 'abc-1' },
+      session: { user: { accessToken: 'user-tok' }, clientContext: { context: 'x' } },
       app: { locals: { redisClient: { get: jest.fn().mockResolvedValue(serviceToken) } } },
     }) as unknown as Request;
 
   const getHandler = () => mockAppGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
+  // The existing in-progress defendant response the callback loads before writing flags.
+  const existingResponse = { defendantResponses: { situation_HasMoved: 'NO' } };
+
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetCaseByIdForEvent.mockResolvedValue({ id: '123', data: { possessionClaimResponse: existingResponse } });
     mockAppGet = jest.fn();
     reasonableAdjustmentsCallbackRoutes({ get: mockAppGet } as unknown as Application);
   });
@@ -73,27 +85,121 @@ describe('reasonableAdjustmentsCallback routes', () => {
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
   });
 
-  it('redirects to the confirmation page when the payload action is submit', async () => {
-    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
+  it('loads the current response and persists the flags (path remapped to CCD ListValue) on submit', async () => {
+    // cui-ra emits path items as { name }; pcs-api wants { value } (ListValue<String>).
+    const flags = {
+      partyName: 'John Doe',
+      roleOnCase: 'Defendant',
+      details: [
+        {
+          id: 'd1',
+          value: { name: 'Language interpreter', flagCode: 'RA0042', path: [{ id: 'p1', name: 'Reasonable adjustment' }, { name: 'Support' }] },
+        },
+      ],
+    };
+    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq('s2s-tok'), res);
 
     expect(mockGetPayload).toHaveBeenCalledWith('abc-1', 's2s-tok');
+    // Loads the in-progress defendant response so the REPLACE-style draft-save doesn't wipe answers.
+    expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith('user-tok', '123', 'respondPossessionClaim', {
+      context: 'x',
+    });
+    expect(mockUpdateDraft).toHaveBeenCalledWith(
+      RESPOND_TO_CLAIM_DRAFT_EVENT,
+      'user-tok',
+      '123',
+      {
+        possessionClaimResponse: {
+          ...existingResponse,
+          defendantFlags: {
+            partyName: 'John Doe',
+            roleOnCase: 'Defendant',
+            details: [
+              {
+                id: 'd1',
+                value: {
+                  name: 'Language interpreter',
+                  flagCode: 'RA0042',
+                  path: [
+                    { id: 'p1', value: 'Reasonable adjustment' },
+                    { value: 'Support' },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      { context: 'x' }
+    );
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
   });
 
-  it('redirects to the "no request sent" page when the payload action is cancel', async () => {
+  it('falls back to flagsAsSupplied when replacementFlags is absent', async () => {
+    const flags = { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] };
+    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', flagsAsSupplied: flags });
+    const res = {} as unknown as Response;
+
+    await getHandler()(buildReq('s2s-tok'), res);
+
+    expect(mockUpdateDraft).toHaveBeenCalledWith(
+      RESPOND_TO_CLAIM_DRAFT_EVENT,
+      'user-tok',
+      '123',
+      { possessionClaimResponse: { ...existingResponse, defendantFlags: flags } },
+      { context: 'x' }
+    );
+  });
+
+  it('does not persist when a submit carries no flags, but still confirms', async () => {
+    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
+    const res = {} as unknown as Response;
+
+    await getHandler()(buildReq('s2s-tok'), res);
+
+    expect(mockGetCaseByIdForEvent).not.toHaveBeenCalled();
+    expect(mockUpdateDraft).not.toHaveBeenCalled();
+    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
+  });
+
+  it('redirects to the "no request sent" page (and does not persist) when the action is cancel', async () => {
     mockGetPayload.mockResolvedValue({ action: 'cancel', correlationId: '123' });
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq('s2s-tok'), res);
 
+    expect(mockUpdateDraft).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
   });
 
   it('redirects to the error page when payload retrieval fails', async () => {
     mockGetPayload.mockRejectedValue(new Error('boom'));
+    const res = {} as unknown as Response;
+
+    await getHandler()(buildReq('s2s-tok'), res);
+
+    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
+  });
+
+  it('redirects to the error page when loading the current response fails', async () => {
+    const flags = { partyName: 'x', roleOnCase: 'y', details: [] };
+    mockGetPayload.mockResolvedValue({ action: 'submit', replacementFlags: flags });
+    mockGetCaseByIdForEvent.mockRejectedValue(new Error('case load down'));
+    const res = {} as unknown as Response;
+
+    await getHandler()(buildReq('s2s-tok'), res);
+
+    expect(mockUpdateDraft).not.toHaveBeenCalled();
+    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
+  });
+
+  it('redirects to the error page when persisting the flags fails', async () => {
+    const flags = { partyName: 'x', roleOnCase: 'y', details: [] };
+    mockGetPayload.mockResolvedValue({ action: 'submit', replacementFlags: flags });
+    mockUpdateDraft.mockRejectedValue(new Error('ccd down'));
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq('s2s-tok'), res);
