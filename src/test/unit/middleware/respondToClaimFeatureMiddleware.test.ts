@@ -54,6 +54,7 @@ describe('respondToClaimFeatureMiddleware', () => {
 
   // Changed to an async function that awaits the middleware execution
   const invokeMiddleware = async (req: Request): Promise<void> => {
+    req.res = res as Response;
     await respondToClaimFeatureMiddleware(req, res as Response, next);
   };
 
@@ -63,23 +64,27 @@ describe('respondToClaimFeatureMiddleware', () => {
     res = {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
+      locals: {},
     };
   });
 
   it('calls next when citizen respond-to-claim is enabled for the user', async () => {
     mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
     mockIsLegalRepresentativeUser.mockReturnValue(false);
     const req = makeReq();
 
     await invokeMiddleware(req);
 
+    expect(req.res?.locals.release12Enabled).toBe(true);
     expect(next).toHaveBeenCalledTimes(1);
     expect(mockHandleRespondToClaimDisabled).not.toHaveBeenCalled();
-    expect(mockIsRespondToClaimEnabledForRelease).not.toHaveBeenCalled();
+    expect(mockIsRespondToClaimEnabledForRelease).toHaveBeenCalled();
   });
 
   it('redirects when citizen respond-to-claim is disabled for the user', async () => {
     mockIsRespondToClaimEnabledForUser.mockResolvedValue(false);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
     mockIsLegalRepresentativeUser.mockReturnValue(false);
     const req = makeReq();
 
@@ -87,7 +92,20 @@ describe('respondToClaimFeatureMiddleware', () => {
 
     expect(next).not.toHaveBeenCalled();
     expect(mockHandleRespondToClaimDisabled).toHaveBeenCalled();
-    expect(mockIsRespondToClaimEnabledForRelease).not.toHaveBeenCalled();
+    expect(mockIsRespondToClaimEnabledForRelease).toHaveBeenCalled();
+  });
+
+  it('calls next for citizens when release 1.2 is disabled but respond-to-claim is enabled', async () => {
+    mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
+    mockIsLegalRepresentativeUser.mockReturnValue(false);
+    const req = makeReq();
+
+    await invokeMiddleware(req);
+
+    expect(req.res?.locals.release12Enabled).toBe(false);
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(mockHandleRespondToClaimDisabled).not.toHaveBeenCalled();
   });
 
   it('redirects when legal rep and disabled for user and enabled for release', async () => {
