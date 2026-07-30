@@ -8796,10 +8796,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-fs-backend@npm:2.6.6":
-  version: 2.6.6
-  resolution: "i18next-fs-backend@npm:2.6.6"
-  checksum: 10/1be64a7fb945692c2d6700c2739f92ecc2fe2d32e3047e98bb21a6b2531ed162e0cc0b13ad996b64e0db50d9e828f3de8b2684e730b212ba04d85a00f19c10c5
+"i18next-fs-backend@npm:2.6.7":
+  version: 2.6.7
+  resolution: "i18next-fs-backend@npm:2.6.7"
+  checksum: 10/9d449c880f2e617cbb1534b2478210ded4e501557c9cee81d44c150bfc0a41470e68fd7539c82f71cd313dd17071bdd34165f14853bcce0b643d0d233bc4a509
   languageName: node
   linkType: hard
 
@@ -11738,7 +11738,7 @@ __metadata:
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
     i18next: "npm:26.3.6"
-    i18next-fs-backend: "npm:2.6.6"
+    i18next-fs-backend: "npm:2.6.7"
     i18next-http-middleware: "npm:3.9.7"
     ioredis: "npm:5.11.1"
     jest: "npm:30.4.2"
@@ -11757,7 +11757,7 @@ __metadata:
     openid-client: "npm:6.8.4"
     playwright: "npm:1.61.1"
     playwright-core: "npm:1.61.1"
-    postcss: "npm:8.5.23"
+    postcss: "npm:8.5.24"
     prettier: "npm:3.9.6"
     sass: "npm:1.101.0"
     sass-loader: "npm:17.0.0"
@@ -12074,14 +12074,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.5.23":
-  version: 8.5.23
-  resolution: "postcss@npm:8.5.23"
+"postcss@npm:8.5.24":
+  version: 8.5.24
+  resolution: "postcss@npm:8.5.24"
   dependencies:
     nanoid: "npm:^3.3.16"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10/8387f421216696bf62a13e5a270e9fefdafc81e196903c0f8d7653f8bab315367cc2261b3c22cf197e492cb075f31bdfc07fd9c3be1cb165ff3cabe14c5a039a
+  checksum: 10/4e26169ed6fe8c2a32702d233b16368124d162a9399606381ed7a2f99ba6237360717aab339a0bd0f072280663413ff5115189b282085d1be74ffb2d25bdb562
   languageName: node
   linkType: hard
 

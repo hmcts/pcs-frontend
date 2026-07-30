@@ -13,7 +13,6 @@ const CITIZEN_ONLY_STEPS = [
   'task-list',
   'check-your-answers-start-now-and-details',
   'check-your-answers-personal-details',
-  'check-your-answers-your-response',
   'check-your-answers-payments-and-agreements',
   'check-your-answers-your-circumstances',
   'check-your-answers-income-and-expenses',
