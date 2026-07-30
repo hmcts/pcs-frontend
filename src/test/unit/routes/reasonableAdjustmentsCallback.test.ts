@@ -93,7 +93,11 @@ describe('reasonableAdjustmentsCallback routes', () => {
       details: [
         {
           id: 'd1',
-          value: { name: 'Language interpreter', flagCode: 'RA0042', path: [{ id: 'p1', name: 'Reasonable adjustment' }, { name: 'Support' }] },
+          value: {
+            name: 'Language interpreter',
+            flagCode: 'RA0042',
+            path: [{ id: 'p1', name: 'Reasonable adjustment' }, { name: 'Support' }],
+          },
         },
       ],
     };
@@ -123,10 +127,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
                 value: {
                   name: 'Language interpreter',
                   flagCode: 'RA0042',
-                  path: [
-                    { id: 'p1', value: 'Reasonable adjustment' },
-                    { value: 'Support' },
-                  ],
+                  path: [{ id: 'p1', value: 'Reasonable adjustment' }, { value: 'Support' }],
                 },
               },
             ],

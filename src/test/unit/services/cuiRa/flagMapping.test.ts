@@ -13,10 +13,7 @@ describe('toCcdFlags', () => {
             name: 'Language interpreter',
             flagCode: 'RA0042',
             status: 'Active',
-            path: [
-              { id: 'p1', name: 'Reasonable adjustment' },
-              { name: 'Support with the case' },
-            ],
+            path: [{ id: 'p1', name: 'Reasonable adjustment' }, { name: 'Support with the case' }],
           },
         },
       ],

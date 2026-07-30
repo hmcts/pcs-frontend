@@ -27,7 +27,7 @@ export const buildDraftDefendantResponse = (req: Request): DraftDefendantRespons
     defendantContactDetails: existing?.defendantContactDetails
       ? cloneDeep(existing.defendantContactDetails)
       : { party: {} },
-    // Carry forward any reasonable-adjustment flags written by the cui-ra callback. 
+    // Carry forward any reasonable-adjustment flags written by the cui-ra callback.
     ...(existing?.defendantFlags ? { defendantFlags: cloneDeep(existing.defendantFlags) } : {}),
   };
 
