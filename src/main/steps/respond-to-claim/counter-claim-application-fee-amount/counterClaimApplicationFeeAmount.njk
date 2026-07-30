@@ -44,7 +44,7 @@
           id: "pbaAccounts",
           name: "paymentOptions.pbaAccounts",
           label: {
-            text: pbaNumberLabel
+            text: "Select PBA account"
           },
           items: pbaAccountItems,
           value: form.pbaAccounts,
@@ -55,8 +55,8 @@
               id: 'customerReference',
               name: 'paymentOptions.customerReference',
               label: {
-                text: labels.customerReference
-              },
+                text: "Enter a reference for your PBA account statements"
+              }
         }) }}
       {% endset -%}
 

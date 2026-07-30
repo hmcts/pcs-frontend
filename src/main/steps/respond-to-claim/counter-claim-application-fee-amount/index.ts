@@ -3,18 +3,17 @@ import { getCounterClaimAmountInPence } from '../../utils/counterClaimAmount';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
-import { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import { BuiltFormContent, FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 // import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 import { getPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
 import { SelectItems } from '@utils/fieldComponentTypes.interface';
 
-export const step: StepDefinition = createRespondToClaimFormStep({
-  stepName: 'counter-claim-application-fee-amount',
-  stepDir: __dirname,
-  fields: [
-    {
+// const citizenFormConfig: FormFieldConfig[] = [];
+// let fieldsConfig = citizenFormConfig;
+const legalRepFormFieldConfig: FormFieldConfig[] = [
+  {
       name: 'paymentOptions',
       type: 'radio',
       required: true,
@@ -48,19 +47,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         },
       ],
     },
-  ],
+]
+
+export const step: StepDefinition = createRespondToClaimFormStep({
+  stepName: 'counter-claim-application-fee-amount',
+  stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimApplicationFeeAmount.njk`,
-  translationKeys: {
-    pageTitle: 'pageTitle',
-    caption: 'caption',
-    notApplicable: 'notApplicable',
-    counterClaimAmountLabel: 'counterClaimAmountLabel',
-    counterClaimFeeLabel: 'counterClaimFeeLabel',
-    payNowButton: 'payNowButton',
-    paymentError: 'paymentError',
-    pbaNumberLabel: 'pbaNumberLabel',
-    customerReferenceLabel: 'customerReferenceLabel',
-  },
   resolveRedirectAfterPost: async req => {
     const caseReference = req.params.caseReference;
     if (isLegalRepresentativeUser(req)) {
@@ -130,6 +122,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
           text: account,
         })),
       ];
+      // fieldsConfig = legalRepFormFieldConfig;
     }
 
     return {
@@ -142,9 +135,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       payNowUrl,
       payNowDisabled,
       showPaymentError,
-      backUrl
+      backUrl,      
     };
   },
+    translationKeys: { pageTitle: 'pageTitle' },
+    fields: [],
 });
 
 function buildPbaAccountsSelections(formContent: BuiltFormContent) {
