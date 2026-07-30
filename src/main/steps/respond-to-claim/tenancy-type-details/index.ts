@@ -3,8 +3,8 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
-import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
