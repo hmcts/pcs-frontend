@@ -36,7 +36,7 @@ export * from './howMuchAffordToPayLR.page.data';
 export * from './instalmentPaymentsLR.page.data';
 export * from './previousPaymentsLR.page.data';
 export * from './counterClaimWhatAreYouClaimingForLR.page.data';
-export * from './counterClaimLR.page.data';
+export * from './counterclaimLR.page.data';
 export * from './counterClaimSpecificSumOfMoneyLR.page.data';
 export * from './counterClaimFeeLR.page.data';
 export * from './counterClaimAgainstWhomLR.page.data';

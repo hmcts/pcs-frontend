@@ -8,4 +8,5 @@ export const uploadAdditionalDocumentsLR = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
+  pageSlug: `upload-document`,
 };
