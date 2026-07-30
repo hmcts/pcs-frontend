@@ -14,7 +14,9 @@ import {
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
 import { LinkSolicitorAPIAction } from '../actions/custom-actions/linkSolicitorAPI.action';
+import { RespondPossessionClaimLRMidEventAPIAction } from '../actions/custom-actions/respondPossessionClaimSolicitorMidEventAPI.action';
 import { RespondToClaimLRAction } from '../actions/custom-actions/respondToClaimLR.action';
+import { SubmitPossessionClaimResponseAPIAction } from '../actions/custom-actions/respondToClaimSubmitAPIForLR.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -204,6 +206,8 @@ export class ActionRegistry {
     ['counterClaimHaveYouAppliedForHelpWithFeeLR', new RespondToClaimLRAction()],
     ['doYouWantToUploadFilesLR', new RespondToClaimLRAction()],
     ['uploadFilesToSupportCounterclaimLR', new RespondToClaimLRAction()],
+    ['submitPossessionClaimResponseLRAPI', new SubmitPossessionClaimResponseAPIAction()],
+    ['midEventRespondPossessionClaimLRAPI', new RespondPossessionClaimLRMidEventAPIAction()],
   ]);
 
   static getAction(actionName: string): IAction {
