@@ -19,7 +19,7 @@
   <form method="post" action="{{ url }}" novalidate>
       <div class="govuk-inset-text">
         <p class="govuk-body">{{ insetText }}</p>
-        {% if (tenancyDocument and release12Enabled) %}
+        {% if (tenancyDocument and isRelease12Enabled) %}
         <p class="govuk-body">
           <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ tenancyDocument.id }}" target="_blank" rel="noopener noreferrer">{{ tenancyAgreementDocumentLinkText }}</a>
         </p>

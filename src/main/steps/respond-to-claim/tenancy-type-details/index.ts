@@ -4,6 +4,7 @@ import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
@@ -150,6 +151,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
     const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
+    const release12Enabled = isRelease12Enabled(req);
 
     const t = getTranslationFunction(req);
     let tenancyType: unknown;
@@ -182,6 +184,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyTypeConfirm,
       correctType,
       tenancyDocument,
+      isRelease12Enabled: release12Enabled,
     };
   },
 });

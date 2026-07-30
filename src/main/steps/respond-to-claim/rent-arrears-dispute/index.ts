@@ -4,6 +4,7 @@ import { currency } from '../../../modules/nunjucks/filters/currency';
 import { getTranslation, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -79,6 +80,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
 
     const rentStatementDocument = caseData?.detailsTab_RentArrearsDetails?.rentStatement?.[0] ?? '';
+    const release12Enabled = isRelease12Enabled(req);
 
     return {
       insetIntroText,
@@ -87,6 +89,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       rentArrearsAmount,
       rentArrearsAmountCorrection,
       rentStatementDocument,
+      isRelease12Enabled: release12Enabled,
     };
   },
   fields: [
