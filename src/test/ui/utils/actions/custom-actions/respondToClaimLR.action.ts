@@ -12,6 +12,7 @@ import {
   counterClaimOrderOtherThanSumLR,
   counterClaimSpecificSumOfMoneyLR,
   counterClaimWhatAreYouClaimingForLR,
+  counterclaimDoYouWantToUploadFilesLR,
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
@@ -31,6 +32,7 @@ import {
   selectDefendant,
   tenancyDateUnknownLR,
   uploadAdditionalDocumentsLR,
+  uploadFilesToSupportYourCounterclaimLR,
   whatOtherRegularExpensesDoYouHaveLR,
   whatRegularIncomeDoYouReceiveLR,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
@@ -41,7 +43,6 @@ import { performAction, performActions, performValidation } from '../../controll
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { RespondToClaimAction } from './respondToClaim.action';
-
 export class RespondToClaimLRAction extends RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -88,6 +89,8 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ],
       ['enterNoticeDateKnownLR', () => this.enterNoticeDateKnownLR(fieldName as actionRecord)],
       ['uploadAdditionalDocumentsLR', () => this.uploadAdditionalDocumentsLR(fieldName as actionRecord)],
+      ['doYouWantToUploadFilesLR', () => this.doYouWantToUploadFilesLR(fieldName as actionRecord)],
+      ['uploadFilesToSupportCounterclaimLR', () => this.uploadFilesToSupportCounterclaimLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -563,6 +566,19 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('inputText', counterClaimAboutLR.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
     await performAction('inputText', counterClaimAboutLR.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('clickButton', counterClaimAboutLR.saveAndContinueButton);
+  }
+
+  private async doYouWantToUploadFilesLR(uploadOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: counterclaimDoYouWantToUploadFilesLR.mainHeader,
+      option: uploadOption.option,
+    });
+    await performAction('clickButton', counterclaimDoYouWantToUploadFilesLR.saveAndContinueButton);
+  }
+
+  private async uploadFilesToSupportCounterclaimLR(uploadCounterClaimFiles: actionRecord): Promise<void> {
+    await performAction('uploadFile', uploadCounterClaimFiles.files);
+    await performAction('clickButton', uploadFilesToSupportYourCounterclaimLR.saveAndContinueButton);
   }
 
   private async installmentPaymentsLR(installmentData: actionRecord): Promise<void> {
