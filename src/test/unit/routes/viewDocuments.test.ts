@@ -5,12 +5,21 @@ import type { Application, Request, Response } from 'express';
 import viewDocumentsRoute from '@routes/viewDocuments';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
+import { isUncategorisedDocumentsEnabled } from '@utils/isUncategorisedDocumentsEnabled';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void>;
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
 }));
+
+jest.mock('@utils/isUncategorisedDocumentsEnabled', () => ({
+  isUncategorisedDocumentsEnabled: jest.fn(),
+}));
+
+const mockIsUncategorisedDocumentsEnabled = isUncategorisedDocumentsEnabled as jest.MockedFunction<
+  typeof isUncategorisedDocumentsEnabled
+>;
 
 jest.mock('@services/cdamService', () => ({
   getDocumentBinary: jest.fn(),
@@ -39,6 +48,7 @@ describe('viewDocuments route', () => {
     app = {
       get: jest.fn(),
     } as unknown as Application;
+    mockIsUncategorisedDocumentsEnabled.mockResolvedValue(false);
     viewDocumentsRoute(app);
   });
 
@@ -128,7 +138,8 @@ describe('viewDocuments route', () => {
       );
     });
 
-    it('renders an Uncategorised folder for uncategorised documents', async () => {
+    it('renders an Uncategorised folder for uncategorised documents when the feature flag is on', async () => {
+      mockIsUncategorisedDocumentsEnabled.mockResolvedValue(true);
       mockGetCaseById.mockResolvedValue({
         id: '1777570813792018',
         data: {
@@ -182,6 +193,42 @@ describe('viewDocuments route', () => {
           ],
         })
       );
+    });
+
+    it('omits the Uncategorised folder when the feature flag is off', async () => {
+      mockIsUncategorisedDocumentsEnabled.mockResolvedValue(false);
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [
+            {
+              id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+              value: {
+                document_filename: 'loose-doc.pdf',
+                document_binary_url: 'http://doc-store/loose-doc/binary',
+                upload_timestamp: '2026-06-24',
+                category_id: 'uncategorisedDocuments',
+              },
+            },
+          ],
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents');
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        {
+          params: { caseReference: '1777570813792018' },
+          language: 'en',
+          session: { user: { accessToken: 'token' } },
+          t: (key: string) => key,
+        } as unknown as Request,
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith('view-documents', expect.objectContaining({ documentFolders: [] }));
     });
 
     it('returns 401 when access token is missing', async () => {

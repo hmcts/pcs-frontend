@@ -8,6 +8,7 @@ import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
 import { extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
 import { asHeaderString } from '@utils/httpHeaders';
+import { isUncategorisedDocumentsEnabled } from '@utils/isUncategorisedDocumentsEnabled';
 import { sanitiseUUID } from '@utils/uuid';
 
 // view-documents is a read-only display, so we fetch the case directly via
@@ -47,18 +48,22 @@ export default function viewDocumentsRoutes(app: Application): void {
 
       try {
         const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
+        const uncategorisedEnabled = await isUncategorisedDocumentsEnabled(req);
 
         res.render('view-documents', {
           dashboardUrl: getDashboardUrl(caseReference),
           backUrl: getDashboardUrl(caseReference),
           caseReference,
           documentFolders: extractViewDocumentFolders((ccdCase.data ?? {}) as Record<string, unknown>, {
+            includeUncategorised: uncategorisedEnabled,
             folderTitles: {
               statementsOfCase: req.t('dashboard:viewDocuments.folders.statementsOfCase'),
               propertyDocuments: req.t('dashboard:viewDocuments.folders.propertyDocuments'),
               evidence: req.t('dashboard:viewDocuments.folders.evidence'),
               correspondence: req.t('dashboard:viewDocuments.folders.correspondence'),
-              uncategorisedDocuments: req.t('dashboard:viewDocuments.folders.uncategorisedDocuments'),
+              ...(uncategorisedEnabled && {
+                uncategorisedDocuments: req.t('dashboard:viewDocuments.folders.uncategorisedDocuments'),
+              }),
             },
           }),
         });
