@@ -255,7 +255,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderationsLR.yesRadioOption,
       courtInfo: otherConsiderationsLR.detailsTextInput,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR');
     await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityStartLR.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
@@ -393,7 +393,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderationsLR.yesRadioOption,
       courtInfo: otherConsiderationsLR.detailsTextInput,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
     await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityStartLR.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
@@ -824,7 +824,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: otherConsiderationsLR.isThereAnythingElseParagraph,
       option: otherConsiderationsLR.noRadioOption,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
     await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityStartLR.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
@@ -1027,7 +1027,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: otherConsiderationsLR.isThereAnythingElseParagraph,
       option: otherConsiderationsLR.noRadioOption,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR');
     await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityStartLR.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);

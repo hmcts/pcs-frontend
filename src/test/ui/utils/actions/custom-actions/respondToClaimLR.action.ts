@@ -30,6 +30,7 @@ import {
   repaymentsAgreedLR,
   selectDefendant,
   tenancyDateUnknownLR,
+  uploadAdditionalDocumentsLR,
   whatOtherRegularExpensesDoYouHaveLR,
   whatRegularIncomeDoYouReceiveLR,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
