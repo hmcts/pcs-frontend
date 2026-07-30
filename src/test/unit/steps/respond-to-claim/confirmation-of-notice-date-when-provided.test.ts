@@ -11,6 +11,9 @@ jest.mock('../../../../main/steps/utils/isRelease12Enabled', () => ({
   isRelease12Enabled: jest.fn(() => true),
 }));
 
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-provided';
 import { isRelease12Enabled } from '../../../../main/steps/utils/isRelease12Enabled';
@@ -333,6 +336,35 @@ describe('confirmation-of-notice-date-when-provided step', () => {
 
       expect(missingMethodContent.noticeMethodText).toBeUndefined();
       expect(unknownMethodContent.noticeMethodText).toBeUndefined();
+    });
+  });
+
+  describe('legal representative copy', () => {
+    type NoticeDateLocale = { release12: Record<string, string> };
+
+    const readLocale = (lang: string, folder: string): NoticeDateLocale =>
+      JSON.parse(
+        fs.readFileSync(
+          path.join(
+            __dirname,
+            '../../../../main/assets/locales',
+            lang,
+            folder,
+            'confirmationOfNoticeDateWhenProvided.json'
+          ),
+          'utf8'
+        )
+      );
+
+    it.each(['en', 'cy'])('overrides every release 1.2 key in %s so citizen wording cannot leak through', lang => {
+      const citizen = readLocale(lang, 'respondToClaim');
+      const legalRep = readLocale(lang, 'respondToClaim/legalrep');
+
+      for (const key of Object.keys(citizen.release12)) {
+        expect(legalRep.release12[key]).toBeDefined();
+        expect(legalRep.release12[key]).not.toBe(citizen.release12[key]);
+        expect(legalRep.release12[key]).toContain('the defendant');
+      }
     });
   });
 });
