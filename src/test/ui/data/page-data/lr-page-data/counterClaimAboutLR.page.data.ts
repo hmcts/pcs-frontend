@@ -1,0 +1,20 @@
+export const counterClaimAboutLR = {
+  mainHeader: `About the defendant’s counterclaim`,
+  youWillBeParagraph: `You will be able to upload any evidence the defendant has on the next page.`,
+  theClaimantWillBeParagraph: `The claimant will be able to see your answers.`,
+  whatIsYourCounterClaimLabelText: `What is the defendant’s counterclaim for?`,
+  youCanEnterUpToHintText: `You have 6,800 characters remaining`,
+  whatAreYourReasonsLabelText: `What are their reasons for making the counterclaim?`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  backLink: `Back`,
+  counterClaimForInput: `services not provided`,
+  reasonsForCounterClaimInput: `electricity and windows not repaired`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `counter-claim-against-whom`,
+  /*
+  enterWhatYourCounterClaimErrorMessage: `Enter what your counterclaim is for`,
+  enterWhatYourReasonsAreForErrorMessage: `Enter what your reasons are for making the counterclaim`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+   */
+};
