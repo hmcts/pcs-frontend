@@ -57,7 +57,7 @@ export default function viewAllApplicationsRoutes(app: Application): void {
     res.render('view-all-applications', {
       caseReference,
       formattedCaseReference,
-      dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+      dashboardUrl: getDashboardUrl(caseReference),
       userGenApps,
       otherPartyGenAppsMap,
     });
@@ -84,10 +84,14 @@ function mapSupportingDocuments(genApp: GenApp) {
     return [];
   }
 
-  return genApp.supportingDocuments.map(listValue => ({
-    filename: listValue.value.document_filename,
-    documentId: listValue.id,
-  }));
+  const submissionDocumentId = genApp.submissionDocument?.id;
+
+  return genApp.supportingDocuments
+    .filter(listValue => listValue.id !== submissionDocumentId)
+    .map(listValue => ({
+      filename: listValue.value.document_filename,
+      documentId: listValue.id,
+    }));
 }
 
 function isForApplicant(genApp: GenApp, currentUserIdamId: string) {
