@@ -8803,10 +8803,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-http-middleware@npm:3.9.7":
-  version: 3.9.7
-  resolution: "i18next-http-middleware@npm:3.9.7"
-  checksum: 10/b698193d196a136d75565d5fef4842b532fdfafd13d42733674604c7ebf89fae31309196654456aa369c5d00708c00229c41c0ae82ccb1be7a52cabfd5ef2d1d
+"i18next-http-middleware@npm:3.9.8":
+  version: 3.9.8
+  resolution: "i18next-http-middleware@npm:3.9.8"
+  checksum: 10/0d7d1cac9e5dcbc04ee5b2b1927acb83096f2082d0cb1cf8926df8f9164f20f90213fdb745b3fbf0ce496892ef97cc776cf660849eaecae0ddffb17eb27abf86
   languageName: node
   linkType: hard
 
@@ -11739,7 +11739,7 @@ __metadata:
     husky: "npm:9.1.7"
     i18next: "npm:26.3.6"
     i18next-fs-backend: "npm:2.6.7"
-    i18next-http-middleware: "npm:3.9.7"
+    i18next-http-middleware: "npm:3.9.8"
     ioredis: "npm:5.11.1"
     jest: "npm:30.4.2"
     jest-environment-jsdom: "npm:30.4.1"
