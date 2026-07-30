@@ -168,7 +168,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const bulletPointLabel = t('bulletPointLabel', { returnObjects: true, claimantName });
     // Flag cleanup (`release-1.2-enabled`): once the flag is permanently on, move the `release12.*` copy up to
-    // the top-level `hintText` / `listItem1` keys in the en and cy locale files and read them unconditionally.
+    // the top-level `hintText` / `listItem1` keys in both citizen and legal-rep en/cy locale files, delete all
+    // four `release12` blocks, and read the top-level keys unconditionally.
     const hintText = t(release12Enabled ? 'release12.hintText' : 'hintText', {
       returnObjects: true,
       claimantName,
