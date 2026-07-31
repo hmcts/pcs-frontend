@@ -11786,7 +11786,7 @@ __metadata:
     prettier: "npm:3.9.6"
     sass: "npm:1.102.0"
     sass-loader: "npm:17.0.0"
-    saucectl: "npm:^0.211.0"
+    saucectl: "npm:^0.213.0"
     serve-favicon: "npm:2.5.1"
     style-loader: "npm:4.0.0"
     stylelint: "npm:17.14.1"
@@ -12806,14 +12806,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"saucectl@npm:^0.211.0":
-  version: 0.211.0
-  resolution: "saucectl@npm:0.211.0"
+"saucectl@npm:^0.213.0":
+  version: 0.213.0
+  resolution: "saucectl@npm:0.213.0"
   dependencies:
     "@saucelabs/bin-wrapper": "npm:^2.1.0"
   bin:
     saucectl: index.js
-  checksum: 10/c07bc61cb241bf87b9e344b997676448ced19775014d9d2ef2790e550b492a489491a78f6a1d8e955cf79d6277eefc972757d415ca5549dd8d059313de6b3da1
+  checksum: 10/0994a37bafd5581ed4f081ead6590586491372a04c8506030f1a4ef7e0008fab452db8f27cb64663af7b16b16fa39153f94f42a9299c161472c9d45efa04f165
   languageName: node
   linkType: hard
 
