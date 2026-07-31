@@ -16,7 +16,8 @@ export default function decentralisedEventRoutes(app: Application): void {
   router.get('/:caseReference/event/:eventId', (req: Request, res: Response) => {
     const rawCaseReference = req.params.caseReference;
     const eventId = req.params.eventId;
-    const expectedSub = req.query.expected_sub;
+    const rawExpectedSub = req.query.expected_sub;
+    const expectedSub = typeof rawExpectedSub === 'string' ? rawExpectedSub : undefined;
 
     const caseReference = typeof rawCaseReference === 'string' ? sanitiseCaseReference(rawCaseReference) : null;
     if (!caseReference) {
@@ -29,22 +30,27 @@ export default function decentralisedEventRoutes(app: Application): void {
       return res.status(404).send('Not Found');
     }
 
+    if (!expectedSub) {
+      logger.warn('Missing expected_sub in decentralised event request', { caseReference, eventId });
+      return res.status(404).send('Not found');
+    }
+
     const user = req.session?.user;
-    const isUserMatch =
-      !expectedSub ||
-      user?.sub === expectedSub ||
-      user?.uid === expectedSub ||
-      user?.id === expectedSub ||
-      user?.email === expectedSub;
+    const isUserMatch = [user?.sub, user?.uid, user?.id, user?.email].includes(expectedSub);
 
     if (!isUserMatch) {
       logger.warn('User IDAM subject mismatch (expected_sub), forcing re-authentication', {
-        expectedSub,
-        currentSub: user?.sub || user?.uid || user?.id || user?.email,
         caseReference,
       });
-      req.session.returnTo = req.originalUrl;
-      return req.session.save(() => res.redirect('/login'));
+      if (!req.session.returnTo) {
+        req.session.returnTo = req.originalUrl;
+      }
+      const authSessionKeys = ['user', 'ccdCase', 'codeVerifier', 'nonce'] as const;
+      for (const key of authSessionKeys) {
+        delete req.session[key];
+      }
+
+      return res.redirect('/login');
     }
 
     logger.info('Decentralised event validation successful, redirecting to CUI respond to claim start page', {
