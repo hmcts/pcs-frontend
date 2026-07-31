@@ -1,17 +1,15 @@
 {
-  "pageTitle": "cyCircumstances",
-  "introParagraph": "cyUse this section to give details about any events or circumstances that have impacted the defendant’s case that a judge should know about.",
-
-  "bullet1": "cysomeone in the defendant’s household has an illness or disability",
-  "bullet2": "cychildren in the defendant’s household attend a local school",
-  "bullet3": "cythe defendant works irregular hours, making it hard to find a new place to live",
+  "pageTitle": "Amgylchiadau",
+  "introParagraph": "Defnyddiwch yr adran hon i roi manylion unrhyw ddigwyddiadau neu amgylchiadau sydd wedi effeithio ar achos y diffynnydd y dylai barnwr wybod amdanynt.",
+  "bullet1": "mae gan rywun yng nghartref y diffynnydd salwch neu anabledd",
+  "bullet2": "mae plant yng nghartref y diffynnydd yn mynychu ysgol leol",
+  "bullet3": "mae'r diffynnydd yn gweithio oriau afreolaidd, sy'n ei gwneud yn anodd dod o hyd i le newydd i fyw",
   "question": "",
-  "circumstanceQuestion": "cyWould you like to share anything about the defendant’s circumstances?",
-
-  "textAreaLabel": "cyGive details about the defendant’s circumstances",
+  "circumstanceQuestion": "Hoffech chi rannu unrhyw beth am amgylchiadau'r diffynnydd?",
+  "textAreaLabel": "Rhowch fanylion am amgylchiadau'r diffynnydd",
   "errors": {
-    "shareCircumstances": "cySelect if the defendant would like to share anything about their circumstances",
-    "circumstancesDetails": "cyGive details about the defendant’s circumstances",
-    "circumstancesDetailsInvalidCharacters": "cyThe details of their circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "shareCircumstances": "Rhannwch os hoffai'r diffynnydd rannu unrhyw beth am eu hamgylchiadau",
+    "circumstancesDetails": "Rhowch fanylion am amgylchiadau'r diffynnydd",
+    "circumstancesDetailsInvalidCharacters": "Dylai manylion eu hamgylchiadau ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnod, bylchau a chollnod."
   }
 }

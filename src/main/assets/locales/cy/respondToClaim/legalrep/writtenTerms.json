@@ -1,16 +1,16 @@
 {
-  "pageTitle": "cyWritten terms",
-  "introText": "cyIt is required under the Renting Homes Wales Act 2016 for a landlord to send the defendant written terms of the occupation contract.",
-  "question": "cyHas the landlord sent the defendant written terms of the occupation contract?",
-  "heading": "cyWritten terms",
-  "termsQuestion": "cyHas the landlord sent the defendant written terms of the occupation contract?",
+  "pageTitle": "Telerau ysgrifenedig",
+  "introText": "Mae'n ofynnol o dan y Ddeddf Rhentu Cartrefi (Cymru) 2016 i landlord anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth.",
+  "question": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?",
+  "heading": "Telerau ysgrifenedig",
+  "termsQuestion": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo",
-    "or": "cyor",
-    "imNotSure": "cyDefendant is not sure"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "imNotSure": "Diffynnydd ddim yn siŵr"
   },
   "errors": {
-    "writtenTerms": "cySelect if the landlord has sent the defendant written terms of the occupation contract"
+    "writtenTerms": "Dewiswch a yw'r landlord wedi anfon telerau ysgrifenedig y contract meddiannaeth at y diffynnydd"
   }
 }

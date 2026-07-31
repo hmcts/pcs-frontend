@@ -1,18 +1,18 @@
 {
-  "pageTitle": "cyNotice date",
-  "question": "cyWhen did the defendant receive notice from {{claimantName}} (optional)?",
-  "noticeDateHint": "cyFor example, 27 9 2022",
-  "paragraph": "cy{{claimantName}} did not provide the date they served the defendant notice.",
+  "pageTitle": "Dyddiad yr hysbysiad",
+  "question": "Pryd wnaeth y diffynnydd gael yr hysbysiad gan {{claimantName}} (dewisol)?",
+  "noticeDateHint": "Er enghraifft, 27 9 2022",
+  "paragraph": "Ni wnaeth {{claimantName}} roi'r dyddiad y gwnaethant gyflwyno'r hysbysiad i'r diffynnydd.",
   "errors": {
     "date": {
-      "day": "cyDay",
-      "month": "cyMonth",
-      "year": "cyYear",
-      "notRealDate": "cyThe date the defendant received notice must be a real date",
-      "futureDate": "cyThe date the defendant received notice must either be today’s date or in the past",
-      "invalidValue": "cyThe date the defendant received notice must be a real date",
-      "missingOne": "cyThe date the defendant received notice must include a {{missingField}}",
-      "missingTwo": "cyThe date the defendant received notice must include a {{first}} and {{second}}"
+      "day": "Diwrnod",
+      "month": "Mis",
+      "year": "Blwyddyn",
+      "notRealDate": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn",
+      "futureDate": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad fod naill ai'n ddyddiad heddiw neu yn y gorffennol",
+      "invalidValue": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn",
+      "missingOne": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{first}} a {{second}}"
     }
   }
 }

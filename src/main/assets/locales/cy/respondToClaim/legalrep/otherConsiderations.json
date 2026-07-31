@@ -1,12 +1,12 @@
 {
-  "pageTitle": "cyAnything else to tell",
-  "heading": "cyOther considerations",
-  "question": "cyIs there anything else the defendant wants to tell the court as part of their response?",
-  "otherConsiderationsDetailsLabel": "cyGive details about what else the defendant wants to tell the court",
+  "pageTitle": "Unrhyw beth arall i'w ddweud",
+  "heading": "Ystyriaethau eraill",
+  "question": "Oes yna unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fel rhan o'u hymateb?",
+  "otherConsiderationsDetailsLabel": "Rhowch fanylion beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys",
   "errors": {
-    "otherConsiderations": "cySelect if there is anything else the defendant wants to tell the court",
-    "otherConsiderationsDetails": "cyEnter details about what the defendant wants to tell the court",
-    "otherConsiderationsInvalid": "cyGive details about what else the defendant wants to tell the court must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
-    "otherConsiderationsDetailsMaxLength": "cyDetails about what else the defendant wants to tell the court must be 6400 characters or less"
+    "otherConsiderations": "Dewiswch os oes unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys",
+    "otherConsiderationsDetails": "Rhowch fanylion yr hyn mae'r diffynnydd am ei ddweud wrth y llys",
+    "otherConsiderationsInvalid": "Rhowch fanylion beth arall mae'r diffynnydd am ei ddweud wrth y llys, ac rhaid iddo gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod",
+    "otherConsiderationsDetailsMaxLength": "Rhaid i fanylion am beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fod yn 6400 o nodau neu lai"
   }
 }
