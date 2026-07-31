@@ -49,19 +49,12 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
         }
 
         // Persist the returned flags to the case DRAFT via the same citizen respondPossessionClaim
-        // draft-save our journey pages use. pcs-api stores them at
-        // `possessionClaimResponse.defendantFlags` (party-level, defendant slice). `replacementFlags`
-        // is the full updated collection (flags added); `flagsAsSupplied` is the collection when
-        // only cancellations happened. Map cui-ra's shape to CCD `Flags` (`path` item `{ name }` →
-        // `{ value }`) or pcs-api silently drops `path`.
+        // draft-save our journey pages use.
         const rawFlags = payload.replacementFlags ?? payload.flagsAsSupplied;
         if (rawFlags) {
           const defendantFlags = toCcdFlags(rawFlags);
-          // The draft-save FULLY REPLACES the stored defendant response (pcs-api's midEvent does
-          // not merge), and the final submit reads this same draft — so a flags-only post would
-          // wipe the defendant's answers. Load the current response first and post it back
-          // alongside the flags. `getCaseByIdForEvent` is the same call the journey uses to resume,
-          // so it reflects the in-progress draft.
+          // flags-only post would wipe the defendant's answers. Load the current response first and post it back
+          // alongside the flags. `
           const accessToken = req.session.user?.accessToken;
           const existing = await ccdCaseService.getCaseByIdForEvent(
             accessToken ?? '',
@@ -69,9 +62,7 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
             'respondPossessionClaim',
             req.session?.clientContext
           );
-          // Narrow to the defendant slice only (mirroring buildDraftDefendantResponse) — the citizen
-          // draft-save is for the defendant's answers, so we don't round-trip claimant-side fields
-          // (claimantOrganisations, claimantEnteredDefendantDetails, ...) back through it.
+          // Narrow to the defendant slice only
           const existingResponse = existing.data?.possessionClaimResponse ?? {};
           const possessionClaimResponse: PossessionClaimResponse = {
             defendantContactDetails: existingResponse.defendantContactDetails,
