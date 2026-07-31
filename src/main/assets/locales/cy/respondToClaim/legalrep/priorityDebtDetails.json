@@ -1,15 +1,15 @@
 {
   "pageTitle": "Manylion dyledion blaenoriaeth",
   "caption": "Ymateb i hawliad i feddiannu eiddo",
-  "totalQuestion": "cyWhat is the total amount the defendant owes for all their priority debts?",
-  "contributionQuestion": "cyHow much does the defendant pay towards their priority debts each week or month?",
+  "totalQuestion": "Beth yw'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth?",
+  "contributionQuestion": "Faint mae'r diffynnydd yn ei dalu tuag at eu dyledion blaenoriaeth bob wythnos neu fis?",
   "errors": {
-    "priorityDebtTotal": "cyEnter the total amount the defendant owes for all their priority debts",
-    "priorityDebtTotalMin": "cyThe total amount the defendant owes for all their priority debts must be £0.00 or above",
-    "priorityDebtTotalMax": "cyThe total amount the defendant owes for all their priority debts must be less than £1 billion",
-    "priorityDebtContribution": "cyEnter the amount the defendant pays towards their priority debts each week or month",
-    "priorityDebtContributionMin": "cyThe amount the defendant pays towards their priority debts each week or month must be £0.00 or above",
-    "priorityDebtContributionMax": "cyThe amount the defendant pays towards their priority debts each week or month must be less than £1 billion",
-    "priorityDebtContributionFrequency": "cySelect how frequently the defendant pays the amount they entered above"
+    "priorityDebtTotal": "Rhowch y cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth",
+    "priorityDebtTotalMin": "Rhaid i'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth fod yn £0.00 neu fwy",
+    "priorityDebtTotalMax": "Rhaid i'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth fod yn llai nag £1 biliwn",
+    "priorityDebtContribution": "Rhowch faint mae'r diffynnydd yn ei dalu tuag at eu dyledion blaenoriaeth bob wythnos neu fis",
+    "priorityDebtContributionMin": "Rhaid i'r swm a delir gan y diffynnydd tuag at eu dyledion blaenoriaeth bob wythnos neu bob mis fod yn £0.00 neu fwy",
+    "priorityDebtContributionMax": "Rhaid i'r swm a delir gan y diffynnydd tuag at eu dyledion blaenoriaeth bob wythnos neu bob mis fod yn llai nag £1 biliwn",
+    "priorityDebtContributionFrequency": "Dewiswch pa mor aml mae'r diffynnydd yn talu'r swm a nodwyd ganddynt uchod"
   }
 }

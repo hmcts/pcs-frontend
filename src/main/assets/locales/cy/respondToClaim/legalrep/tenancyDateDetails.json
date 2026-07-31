@@ -1,8 +1,8 @@
 {
-  "bulletPoint": "cyThe tenancy, occupation contract or licence began on {{tenancyStartDate}}",
+  "bulletPoint": "Dechreuodd y denantiaeth, contract meddiannaeth neu drwydded ar {{tenancyStartDate}}",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
-    "notSure": "cyDefendant is not sure"
+    "yes": "Do",
+    "no": "Naddo",
+    "notSure": "Diffynnydd ddim yn siŵr"
   }
 }

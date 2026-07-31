@@ -1,20 +1,20 @@
 {
   "pageTitle": "Dyddiad yr hysbysiad",
   "bulletPointLabel": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:",
-  "hintText": "cyWhen making the claim, {{claimantName}} had to say the date they gave the defendant notice (the date of service).",
-  "listItem1": "cyThey served the defendant with a notice seeking possession on {{noticeDate}}",
-  "question": "cyWhen did the defendant receive notice from {{claimantName}} (optional)?",
+  "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i'r diffynnydd (y dyddiad cyflwyno).",
+  "listItem1": "Gwnaethant gyflwyno hysbysiad i'r diffynnydd yn ceisio meddiant ar {{noticeDate}}",
+  "question": "Pryd wnaeth y diffynnydd gael yr hysbysiad gan {{claimantName}} (dewisol)?",
   "noticeDateHint": "Er enghraifft, 27 9 2022",
   "errors": {
     "date": {
       "day": "Diwrnod",
       "month": "Mis",
       "year": "Blwyddyn",
-      "notRealDate": "cyThe date the defendant received notice must be a real date",
-      "futureDate": "cyThe date the defendant received notice must either be today’s date or in the past",
-      "invalidValue": "cyThe date the defendant received notice must be a real date",
-      "missingOne": "cyThe date the defendant received notice must include a {{missingField}}",
-      "missingTwo": "cyThe date defendant received notice must include a {{first}} and {{second}}"
+      "notRealDate": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn",
+      "futureDate": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad fod naill ai'n ddyddiad heddiw neu yn y gorffennol",
+      "invalidValue": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn",
+      "missingOne": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{first}} a {{second}}"
     }
   }
 }
