@@ -266,10 +266,7 @@ export interface PossessionClaimResponse {
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
   claimIssuedDate?: string;
-  // Reasonable-adjustment (CUI Your Support) flags for the responding defendant. Written by the
-  // cui-ra return/callback leg; the pcs-api respondPossessionClaim draft-save persists it as part
-  // of the defendant slice (alongside defendantContactDetails/defendantResponses). CCD `Flags`
-  // shape — cui-ra's flags are mapped to this via `toCcdFlags` before persisting.
+
   defendantFlags?: CcdFlags;
 }
 
