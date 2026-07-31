@@ -44,7 +44,7 @@
           id: "pbaAccounts",
           name: "paymentOptions.pbaAccounts",
           label: {
-            text: "Select PBA account"
+            text: labels.pba
           },
           items: pbaAccountItems,
           value: form.pbaAccounts,
@@ -55,7 +55,12 @@
               id: 'customerReference',
               name: 'paymentOptions.customerReference',
               label: {
-                text: "Enter a reference for your PBA account statements"
+                text: labels.customerReferenceHeading,
+                classes: "govuk-label--m",
+                isPageHeading: true
+              },
+              hint: {
+                text: labels.customerReferenceHint
               }
         }) }}
       {% endset -%}
@@ -81,7 +86,6 @@
 
         {{ govukRadios({
           name: field.component.name,
-          fieldset: field.component.fieldset,
           hint: field.component.hint,
           errorMessage: field.component.errorMessage,
           items: updatedItems

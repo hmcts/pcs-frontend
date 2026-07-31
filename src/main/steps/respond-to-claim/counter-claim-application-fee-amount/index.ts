@@ -3,51 +3,43 @@ import { getCounterClaimAmountInPence } from '../../utils/counterClaimAmount';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
-import { BuiltFormContent, FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 // import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 import { getPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
-import { SelectItems } from '@utils/fieldComponentTypes.interface';
 
-// const citizenFormConfig: FormFieldConfig[] = [];
-// let fieldsConfig = citizenFormConfig;
 const legalRepFormFieldConfig: FormFieldConfig[] = [
   {
-      name: 'paymentOptions',
-      type: 'radio',
-      required: true,
-      legendClasses: 'govuk-fieldset__legend--m',
-      translationKey: {
-        label: 'paymentOptions',
-      },
-      options: [
-        {
-          value: 'pba',
-          translationKey: 'options.pba',
-          subFields: {
-            pbaAccount: {
-              name: 'pbaAccounts',
-              type: 'select',
-              translationKey: {
-                label: 'pbaAccountsLabel',
-              },
-              
-            },
-            customerReference: {
-              name: 'customerReference',
-              type: 'text',
-              translationKey: { label: 'customerReferenceLabel' },
+    name: 'paymentOptions',
+    type: 'radio',
+    required: true,
+    options: [
+      {
+        value: 'pba',
+        translationKey: 'options.pba',
+        subFields: {
+          pbaAccount: {
+            name: 'pbaAccounts',
+            type: 'select',
+            translationKey: {
+              label: 'labels.pba',
             },
           },
+          customerReference: {
+            name: 'customerReference',
+            type: 'text',
+            translationKey: { label: 'labels.customerReference' },
+          },
         },
-        {
-          value: 'card',
-          translationKey: 'options.card',
-        },
-      ],
-    },
-]
+      },
+      {
+        value: 'card',
+        translationKey: 'options.card',
+      },
+    ],
+  },
+];
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-application-fee-amount',
@@ -108,24 +100,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       : '';
 
     const isLegalRepresentative = isLegalRepresentativeUser(req);
-    let pbaAccountItems: Array<{ value: string; text: string }> = [];
+    let pbaAccountItems: { value: string; text: string }[] = [];
 
     if (isLegalRepresentative) {
-      buildPbaAccountsSelections(formContent);
-      
-      // direct rendering 
-      const pbaAccounts = getPbaAccounts();
-      pbaAccountItems = [
-        { value: '', text: 'Select a PBA account' },
-        ...pbaAccounts.map(account => ({
-          value: account,
-          text: account,
-        })),
-      ];
-      // fieldsConfig = legalRepFormFieldConfig;
+      pbaAccountItems = buildPbaAccountsSelections();
     }
 
     return {
+      ...formContent,
       isLegalRepresentative,
       pbaAccountItems,
       formattedCounterClaimAmount:
@@ -135,48 +117,33 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       payNowUrl,
       payNowDisabled,
       showPaymentError,
-      backUrl,      
+      backUrl,
+      labels: {
+        pba: t('labels.pba'),
+        customerReferenceHeading: t('labels.customerReferenceHeading'),
+        customerReferenceHint: t('labels.customerReferenceHint'),
+        selectPba: t('labels.selectPba')
+      },
     };
   },
-    translationKeys: { pageTitle: 'pageTitle' },
-    fields: [],
+  translationKeys: { pageTitle: 'pageTitle' },
+  fields: legalRepFormFieldConfig,
 });
 
-function buildPbaAccountsSelections(formContent: BuiltFormContent) {
-const radios = formContent.fields.find(f => f.name === 'paymentOptions') as any;
-const pbaAccounts = getPbaAccounts();
-
-const pbaOption = radios?.options?.find((o: any) => o.value === 'pbaAccount' || o.value === 'pba');
-const select = pbaOption?.subFields?.pbaAccount;
-
-if (select) {
-  addSelectOptionsForPbaAccounts(pbaAccounts, select);
-}
+function buildPbaAccountsSelections(): { value: string; text: string }[] {
+  // direct rendering
+  const pbaAccounts = getPbaAccounts();
+  return [
+    { value: '', text: 'labels.selectPba' },
+    ...pbaAccounts.map(account => ({
+      value: account,
+      text: account,
+    })),
+  ];
 }
 
 
 function getPbaAccounts(): string[] {
   // invoke api
   return ['pba123', 'pba321'];
-}
-
-function addSelectOptionsForPbaAccounts(pbaAccounts: string[] | undefined,select: SelectItems | any) {
-  if (!select) return;
-
-  if (!select.component) {
-    select.component = { items: [] };
-  }
-  if (!select.component.items) {
-    select.component.items = [];
-  }
-
-  pbaAccounts?.forEach(pbaAccount => {
-    const exists = select.component.items.some((item: any) => item.value === pbaAccount);
-    if (!exists) {
-      select.component.items.push({
-        value: pbaAccount,
-        text: pbaAccount,
-      });
-    }
-  });
 }

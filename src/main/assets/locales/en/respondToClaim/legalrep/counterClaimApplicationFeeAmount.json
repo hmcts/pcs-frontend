@@ -1,0 +1,16 @@
+{
+  "paymentError": "We could not start your payment. Try again.",
+  "options": {
+    "pba": "Pay fee using Payment by Account (PBA)",
+    "card": "Pay by credit or debit card"
+  },
+  "labels": {
+    "pba": "Select a PBA",
+    "selectPba": "Select option",
+    "customerReferenceHeading": "Enter a reference for your PBA account statements",
+    "customerReferenceHint": "This should be your own unique reference to identify the case. It will appear on your statements."
+  },
+  "errors": {
+    "paymentOptions": "You must select a payment option"
+  }
+}

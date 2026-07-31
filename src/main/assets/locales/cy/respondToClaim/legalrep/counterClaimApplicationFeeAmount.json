@@ -1,0 +1,15 @@
+{
+  "paymentError": "cyWe could not start your payment. Try again.",
+  "options": {
+    "pba": "cyPay fee using Payment by Account (PBA)",
+    "card": "cyPay by credit or debit card"
+  },
+  "labels": {
+    "pba": "cySelect PBA account",
+    "customerReferenceHeading": "cyEnter a reference for your PBA account statements",
+    "customerReferenceHint": "cyThis should be your own unique reference to identify the case. It will appear on your statements."
+  },
+  "errors": {
+    "paymentOptions": "cyYou must select a payment option"
+  }
+}
