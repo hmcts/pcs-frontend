@@ -48,14 +48,9 @@ export const flowConfig: JourneyFlowConfig = {
   // First visible step of any section back-links to this hub step.
   hubStepName: 'task-list',
   steps: {
-    // Context-aware error page for a failed Your Support launch. Reached only by an explicit
-    // redirect from the triage step (not linear navigation); preventBack keeps it renderable
-    // without a back link even though it's outside any section / nonSectionStepOrder.
     'reasonable-adjustments-error': {
       preventBack: true,
     },
-    // Cancelled-YS page (payload action = 'cancel'). Reached only by redirect from the callback;
-    // preventBack keeps it renderable without a back link (outside any section / nonSectionStepOrder).
     'reasonable-adjustments-cancelled': {
       preventBack: true,
     },
