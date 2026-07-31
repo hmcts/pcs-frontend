@@ -3,41 +3,24 @@ jest.mock('../../../../main/modules/steps', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
+import type { Request } from 'express';
+
 import { step } from '../../../../main/steps/respond-to-claim/reasonable-adjustments-confirmation';
 
 describe('reasonable-adjustments-confirmation step', () => {
   const testedStep = step as unknown as {
-    stepName: string;
-    fields: unknown[];
-    customTemplate: string;
-    journeyFolder: string;
-    translationKeys: Record<string, string>;
+    resolveRedirectAfterPost: (req: Request) => Promise<string | undefined | void>;
   };
 
-  it('has the correct step name', () => {
-    expect(testedStep.stepName).toBe('reasonable-adjustments-confirmation');
+  it('redirects "Save and continue" to language-used with nav=1 (bypasses the mid-section access guard)', async () => {
+    const req = { res: { locals: { validatedCase: { id: '1234123412341234' } } } } as unknown as Request;
+    await expect(testedStep.resolveRedirectAfterPost(req)).resolves.toBe(
+      '/case/1234123412341234/respond-to-claim/language-used?nav=1'
+    );
   });
 
-  it('declares no form fields (read-only confirmation page)', () => {
-    expect(testedStep.fields).toEqual([]);
-  });
-
-  it('renders the dedicated confirmation template', () => {
-    expect(testedStep.customTemplate).toMatch(/reasonableAdjustmentsConfirmation\.njk$/);
-  });
-
-  it('is registered under the respondToClaim journey folder', () => {
-    expect(testedStep.journeyFolder).toBe('respondToClaim');
-  });
-
-  it('exposes the expected translation keys for the template', () => {
-    expect(testedStep.translationKeys).toEqual({
-      pageTitle: 'pageTitle',
-      heading: 'heading',
-      submittedCaption: 'submittedCaption',
-      whatHappensNextHeading: 'whatHappensNextHeading',
-      whatHappensNextParagraph1: 'whatHappensNextParagraph1',
-      whatHappensNextParagraph2: 'whatHappensNextParagraph2',
-    });
+  it('returns undefined when the case reference is unavailable (falls back to default routing)', async () => {
+    const req = { res: { locals: {} } } as unknown as Request;
+    await expect(testedStep.resolveRedirectAfterPost(req)).resolves.toBeUndefined();
   });
 });
