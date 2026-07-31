@@ -16,9 +16,7 @@ export const step: StepDefinition = createFormStep({
   flowConfig,
   customTemplate: `${__dirname}/reasonableAdjustmentsTriage.njk`,
   // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
-  // microsite; any failure lands the citizen on the RA error page. The "I do not need any support"
-  // (skip) button falls through to the normal next-step flow — because this step sits immediately
-  // before language-used in the checkYourAnswersAndSubmit section, that continues to language-used.
+  // microsite;
   beforeRedirect: async (req: Request) => {
     if (req.body.reasonableAdjustmentsChoice !== 'questions') {
       return; // "skip": let the normal next-step flow continue to language-used
@@ -29,9 +27,7 @@ export const step: StepDefinition = createFormStep({
       req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
     } catch (error) {
       // Any failure launching Your Support (cui-ra down, POST error, missing token) lands the
-      // citizen on the context-aware RA error page, which offers a route back to triage. We
-      // deliberately do NOT rethrow, so we avoid the shared error page (no way back into this
-      // journey) and the authFailure login-redirect that a cui-ra 401 would otherwise trigger.
+      // citizen on the context-aware RA error page
       logger.error(`Failed to launch Your Support for case ${caseReference}`, error);
       if (caseReference) {
         req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`);
