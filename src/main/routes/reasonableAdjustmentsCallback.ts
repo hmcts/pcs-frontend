@@ -13,12 +13,10 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('reasonableAdjustmentsCallback');
 
-// Return leg from the CUI Your Support (cui-ra) microsite. On completion cui-ra redirects the
-// browser to /case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id. Per the
-// cui-ra docs this URL presents NO UI: we retrieve the payload (Step 4: GET /api/payload/:id,
-// S2S-only), then — on a 'submit' — persist the returned flags to the case DRAFT via the normal
-// citizen respondPossessionClaim draft-save (ccdCaseService.updateDraft), and redirect to the
-// confirmation page. 'cancel' → the "no request sent" page; a retrieval failure → the RA error page.
+// Return leg from the CUI Your Support (cui-ra) microsite. 
+// On a 'submit' — persist the returned flags to the case DRAFT
+// On a 'cancel' → the "no request sent" page; 
+// a retrieval failure → the RA error page.
 export default function reasonableAdjustmentsCallbackRoutes(app: Application): void {
   app.get(
     '/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id',
