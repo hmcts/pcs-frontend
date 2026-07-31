@@ -14,9 +14,6 @@ function getBaseUrl(): string {
   return config.get<string>('cuiRa.url');
 }
 
-// cui-ra authenticates the citizen via `idam-token` (Bearer) and the service via
-// `service-token` (the raw S2S token, no "Bearer" prefix). The shared http client
-// also attaches its own `ServiceAuthorization` header, which cui-ra ignores.
 function buildHeaders(accessToken: string, serviceToken: string) {
   return {
     headers: {
@@ -44,8 +41,7 @@ export interface InvokePayloadInput {
 }
 
 export const cuiRaService = {
-  // Invokes the Your Support microsite for a party. Returns the microsite URL the
-  // browser should be redirected to so the citizen can answer the YS questions.
+  // Invokes the Your Support microsite. Returns the microsite URL to redirect
   async invokePayload({ accessToken, serviceToken, body }: InvokePayloadInput): Promise<string> {
     try {
       const response = await http.post<CuiRaInvocationResponse>(
@@ -59,8 +55,7 @@ export const cuiRaService = {
     }
   },
 
-  // Retrieves the result of a completed microsite session (Step 4: GET /api/payload/:id).
-  // This endpoint is S2S-only — it takes the `service-token` header, not the citizen idam-token.
+  // Retrieves the result of a completed microsite session 
   async getPayload(id: string, serviceToken: string): Promise<CuiRaGetPayloadResponse> {
     try {
       const response = await http.get<CuiRaGetPayloadResponse>(
