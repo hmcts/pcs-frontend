@@ -13,8 +13,7 @@ import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
 const logger = Logger.getLogger('startYourSupport');
 
-// A responding defendant's role on the case. cui-ra requires a non-empty roleOnCase.
-// TODO(confirm): exact string cui-ra expects for a responding defendant.
+// cui-ra requires a non-empty roleOnCase.
 const DEFENDANT_ROLE_ON_CASE = 'Defendant';
 
 function resolveDefendantPartyName(validatedCase: CcdCaseModel): string {
@@ -27,7 +26,7 @@ function resolveDefendantPartyName(validatedCase: CcdCaseModel): string {
 }
 
 // `:caseReference` is substituted here; `:id` is left as a literal for the microsite
-// to replace when it redirects back on the return leg (a later AC).
+// to replace when it redirects back on the return leg
 function applyCaseReference(template: string, caseReference: string): string {
   return template.replace(':caseReference', caseReference);
 }
@@ -57,10 +56,7 @@ export async function startYourSupport(req: Request): Promise<string> {
     logger.warn(`Starting Your Support for case ${caseReference} with an empty defendant party name`);
   }
 
-  // Pre-populate the microsite with any adjustments already captured for this defendant so a
-  // returning user can amend them. They are persisted in the draft (possessionClaimResponse
-  // .defendantFlags, pulled into validatedCase) in the CCD `Flags` shape, so map back to cui-ra's
-  // shape. Empty details on a first-time capture.
+  // Pre-populate the microsite with any adjustments already captured for this defendant 
   const storedFlags = validatedCase.data?.possessionClaimResponse?.defendantFlags;
   const existingFlags: CuiRaFlags = {
     partyName,
