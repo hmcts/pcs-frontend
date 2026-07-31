@@ -1,6 +1,5 @@
 import { Page, expect } from '@playwright/test';
 
-import { RELEASE_1_2_ENABLED } from '../../../../../main/utils/respondToClaimFlags';
 import { submitCaseApiData } from '../../../data/api-data';
 import { dashboard, viewTheResponse } from '../../../data/page-data';
 import { viewAllApplications } from '../../../data/page-data/genApps-page-data';
@@ -9,7 +8,6 @@ import { performAction, performValidation, performValidations } from '../../cont
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
-import { LaunchDarklyAction } from './launchDarkly.action';
 
 export class CitizenDashboardAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -156,10 +154,7 @@ export class CitizenDashboardAction implements IAction {
       ],
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
     );
-
-    if (await new LaunchDarklyAction().getFlagValue(RELEASE_1_2_ENABLED)) {
-      await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
-    }
+    await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
@@ -213,11 +208,7 @@ export class CitizenDashboardAction implements IAction {
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
     await performValidation('text', { elementType: 'subHeader', text: viewTheClaim.downloadPDFSubHeader });
-
-    if (await new LaunchDarklyAction().getFlagValue(RELEASE_1_2_ENABLED)) {
-      await performValidation('validatePdfDocument', '', { linkText: viewTheClaim.claimPDFLink });
-    }
-
+    await performValidation('validatePdfDocument', '', { linkText: viewTheClaim.claimPDFLink });
     await performValidation('text', { elementType: 'inlineText', text: viewTheClaim.ifYouCannotFindLink });
     await performValidation('text', {
       elementType: 'paragraphWithLink',
