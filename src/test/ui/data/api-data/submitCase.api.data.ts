@@ -101,16 +101,6 @@ export const submitCaseApiData = {
       showIntroductoryDemotedOtherGroundReasonPage: 'YES',
       introGrounds_HasIntroductoryDemotedOtherGroundsForPossession: 'YES',
       introGrounds_IntroductoryDemotedOrOtherGrounds: ['RENT_ARREARS'],
-      rentArrears_StatementDocuments: [
-        {
-          id: '0b5e2d4c-9f1f-46de-8033-f9757164b5ef',
-          value: {
-            document_filename: 'rentArrears.pdf',
-            document_url: `${process.env.DM_STORE_URL}/documents/d4f12029-9c20-4b2a-a5a6-90b72114194e`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/d4f12029-9c20-4b2a-a5a6-90b72114194e/binary`,
-          },
-        },
-      ],
       preActionProtocolCompleted: 'NO',
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
