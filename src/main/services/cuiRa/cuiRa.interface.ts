@@ -1,7 +1,4 @@
 // Types for the CUI Reasonable Adjustments / Your Support micro-frontend (cui-ra).
-// Shapes follow the service's published contract (Confluence). Only the invocation
-// (POST /api/payload) request/response are exercised by this first slice; the flag
-// types are the shared structure reused by the later return/callback leg.
 
 export type CuiRaLanguage = 'en' | 'cy';
 
@@ -49,9 +46,7 @@ export interface CuiRaFlags {
 
 // --- Persisted (CCD) flag shape ---------------------------------------------------------------
 // pcs-api stores flags as a CCD SDK `Flags` object. It is identical to the cui-ra shape above
-// EXCEPT for `path`: cui-ra emits `{ name }` items, whereas CCD expects `List<ListValue<String>>`
-// i.e. `{ id?, value }` with the string under `value`. If we forward cui-ra's `{ name }` items
-// verbatim, Jackson can't map them and the `path` data is silently dropped. `toCcdFlags`
+// EXCEPT for `path`: cui-ra emits `{ name }` items, `toCcdFlags`
 // (flagMapping.ts) converts a `CuiRaFlags` into this shape at the callback boundary.
 export interface CcdListValueString {
   id?: string;
@@ -74,9 +69,6 @@ export interface CcdFlags {
 }
 
 // Body of POST /api/payload — invokes the microsite for a party.
-// Field names follow cui-ra's InboundPayloadSchema exactly (callbackUrl/logoutUrl are
-// camelCase, NOT the all-caps callbackURL/logoutURL shown in the Postman collection),
-// and the schema is additionalProperties:false so no extra keys may be sent.
 export interface CuiRaInvocationRequest {
   callbackUrl: string;
   logoutUrl: string;
