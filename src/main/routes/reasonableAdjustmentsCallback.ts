@@ -40,7 +40,9 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
 
       try {
         const payload = await cuiRaService.getPayload(payloadId, serviceToken);
-        logger.info(`Your Support payload for case ${caseReference}, id ${payloadId}: ${JSON.stringify(payload)}`);
+        logger.info(
+          `Your Support payload received for case ${caseReference}, id ${payloadId}, action ${payload.action}`
+        );
 
         // Only an explicit 'submit' persists flags + shows the "request sent" confirmation; 'cancel'
         // (or any other value) means nothing was sent → the "No request was sent" page.
@@ -69,8 +71,13 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
             'respondPossessionClaim',
             req.session?.clientContext
           );
+          // Narrow to the defendant slice only (mirroring buildDraftDefendantResponse) — the citizen
+          // draft-save is for the defendant's answers, so we don't round-trip claimant-side fields
+          // (claimantOrganisations, claimantEnteredDefendantDetails, ...) back through it.
+          const existingResponse = existing.data?.possessionClaimResponse ?? {};
           const possessionClaimResponse: PossessionClaimResponse = {
-            ...(existing.data?.possessionClaimResponse ?? {}),
+            defendantContactDetails: existingResponse.defendantContactDetails,
+            defendantResponses: existingResponse.defendantResponses,
             defendantFlags,
           };
           await ccdCaseService.updateDraft(

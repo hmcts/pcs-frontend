@@ -62,8 +62,20 @@ describe('reasonableAdjustmentsCallback routes', () => {
 
   const getHandler = () => mockAppGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
-  // The existing in-progress defendant response the callback loads before writing flags.
-  const existingResponse = { defendantResponses: { situation_HasMoved: 'NO' } };
+  // The existing in-progress response the callback loads before writing flags. Includes
+  // claimant-side fields to prove the callback narrows to the defendant slice and does not
+  // round-trip them back through the citizen draft-save.
+  const existingResponse = {
+    defendantResponses: { situation_HasMoved: 'NO' },
+    defendantContactDetails: { party: { emailAddress: 'defendant@example.com' } },
+    claimantName: 'Acme Landlord',
+    claimantEnteredDefendantDetails: { firstName: 'Jo' },
+  };
+  // Only the defendant slice should be re-sent (defendantContactDetails + defendantResponses).
+  const expectedDefendantSlice = {
+    defendantContactDetails: { party: { emailAddress: 'defendant@example.com' } },
+    defendantResponses: { situation_HasMoved: 'NO' },
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -117,7 +129,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
       '123',
       {
         possessionClaimResponse: {
-          ...existingResponse,
+          ...expectedDefendantSlice,
           defendantFlags: {
             partyName: 'John Doe',
             roleOnCase: 'Defendant',
@@ -150,7 +162,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
       RESPOND_TO_CLAIM_DRAFT_EVENT,
       'user-tok',
       '123',
-      { possessionClaimResponse: { ...existingResponse, defendantFlags: flags } },
+      { possessionClaimResponse: { ...expectedDefendantSlice, defendantFlags: flags } },
       { context: 'x' }
     );
   });
