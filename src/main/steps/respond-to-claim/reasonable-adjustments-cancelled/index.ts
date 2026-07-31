@@ -14,11 +14,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     continueButton: 'continueButton',
   },
-  // Shown when the citizen cancelled in the microsite (payload action = 'cancel') — nothing was
-  // sent to the court, so this is deliberately barer than the confirmation page (heading + a
-  // "Continue" button, no "what happens next"). The button continues the response journey at
-  // language-used; nav=1 marks it as internal navigation so the access guard allows direct entry to
-  // that mid-section step (RA triage is the first visible step of checkYourAnswersAndSubmit).
+  // Shown when the citizen cancelled in the microsite (payload action = 'cancel') 
   extendGetContent: (req: Request) => {
     const caseReference = req.res?.locals.validatedCase?.id;
     return { languageUsedUrl: `/case/${caseReference}/respond-to-claim/language-used?nav=1` };
