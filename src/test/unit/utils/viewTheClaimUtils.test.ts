@@ -5,6 +5,8 @@ import { ViewTheClaimSection, buildViewTheClaimPageData } from '@utils/viewTheCl
 const translations: Record<string, string> = {
   'viewTheClaim:claimPdfLabel': 'Claim (PDF)',
   'viewTheClaim:sections.claimantDetails': 'Claimant details',
+  'viewTheClaim:sections.defendantDetails': 'Defendant 1 details',
+  'viewTheClaim:sections.additionalDefendantDetails': 'Additional defendant 1 details',
   'viewTheClaim:sections.claimDetails': 'Claim details',
   'viewTheClaim:sections.rentArrears': 'Details of rent arrears - RENT ARREARS CLAIMS ONLY',
   'viewTheClaim:sections.underlesseeTriage': 'Underlessees or mortgagees entitled to claim relief against forfeiture',
@@ -52,7 +54,11 @@ const translations: Record<string, string> = {
 };
 
 const t = ((key: string, options?: Record<string, unknown>) => {
-  if (key === 'viewTheClaim:sections.defendantDetails') {
+  if (key === 'viewTheClaim:sections.additionalDefendantDetails') {
+    return `Additional defendant ${options?.number} details`;
+  }
+
+  if (key === 'viewTheClaim:sections.rankedDefendantDetails') {
     return `Defendant ${options?.number ?? ''} details`;
   }
 
@@ -184,12 +190,19 @@ describe('viewTheClaimUtils', () => {
 
     expect(page.sections.map(section => section.title).slice(0, 4)).toEqual([
       'Claimant details',
-      'Defendant  details',
-      'Defendant  details',
+      'Defendant 1 details',
+      'Additional defendant 1 details',
       'Claim details',
     ]);
 
     expect(rowText(sectionByTitle(page, 'Claimant details'), 'Name')).toBe('Treetops Housing');
+    expect(rowHtml(sectionByTitle(page, 'Defendant 1 details'), 'Address for service')).toBe(
+      '10 Second Avenue<br>London<br>W3 7RX'
+    );
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
+      'Address unknown'
+    );
     expect(rowText(sectionByTitle(page, 'Claim details'), 'Does the claimant have grounds for possession?')).toBe(
       'Yes'
     );
@@ -254,7 +267,6 @@ describe('viewTheClaimUtils', () => {
               lastName: 'Tenant',
               addressKnown: 'YES',
               addressSameAsProperty: 'YES',
-              rank: 1,
             },
           },
           {
@@ -262,7 +274,6 @@ describe('viewTheClaimUtils', () => {
             value: {
               nameKnown: 'NO',
               addressKnown: 'NO',
-              rank: 2,
             },
           },
         ],
@@ -278,51 +289,10 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Defendant 1 details'), 'Address for service')).toBe(
       '2 Second Avenue<br>London<br>W3 7RX'
     );
-    expect(rowText(sectionByTitle(page, 'Defendant 2 details'), 'Name')).toBe('Persons unknown');
-    expect(rowText(sectionByTitle(page, 'Defendant 2 details'), 'Address for service')).toBe('Address unknown');
-  });
-
-  it('numbers defendant sections by rank rather than list position', () => {
-    const page = buildViewTheClaimPageData(
-      '1234567890123456',
-      {
-        propertyAddress: {
-          AddressLine1: '2 Second Avenue',
-          PostTown: 'London',
-          PostCode: 'W3 7RX',
-        },
-        allDefendants: [
-          {
-            id: 'defendant-ranked-2',
-            value: {
-              nameKnown: 'YES',
-              firstName: 'Blake',
-              lastName: 'Second',
-              addressKnown: 'NO',
-              rank: 2,
-            },
-          },
-          {
-            id: 'defendant-ranked-1',
-            value: {
-              nameKnown: 'YES',
-              firstName: 'Alex',
-              lastName: 'First',
-              addressKnown: 'NO',
-              rank: 1,
-            },
-          },
-        ],
-      } as never,
-      t
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
+      'Address unknown'
     );
-
-    expect(page.sections.map(section => section.title).filter(title => title.startsWith('Defendant'))).toEqual([
-      'Defendant 2 details',
-      'Defendant 1 details',
-    ]);
-    expect(rowText(sectionByTitle(page, 'Defendant 2 details'), 'Name')).toBe('Blake Second');
-    expect(rowText(sectionByTitle(page, 'Defendant 1 details'), 'Name')).toBe('Alex First');
   });
 
   it('uses casePartiesTab_ClaimantDetails.serviceAddress when detailsTab_ClaimantAddress is empty', () => {
@@ -502,10 +472,9 @@ describe('viewTheClaimUtils', () => {
               nameKnown: 'YES',
               addressKnown: 'YES',
               addressSameAsProperty: 'YES',
-              rank: 1,
             },
           },
-          { id: '129fbbfc-3677-46a5-bd88-eb286e3f8792', value: { rank: 2 } },
+          { id: '129fbbfc-3677-46a5-bd88-eb286e3f8792', value: {} },
           {
             id: 'b4b7e79c-8ef8-4a3b-a330-2d4597bf8525',
             value: {
@@ -514,7 +483,6 @@ describe('viewTheClaimUtils', () => {
               nameKnown: 'YES',
               addressKnown: 'YES',
               addressSameAsProperty: 'YES',
-              rank: 3,
             },
           },
         ],
@@ -550,10 +518,10 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Defendant 1 details'), 'Address for service')).toBe(
       '2 Pentre Street<br>Caerdydd<br>CF11 6QX'
     );
-    expect(rowText(sectionByTitle(page, 'Defendant 2 details'), 'Name')).toBe('Persons unknown');
-    expect(rowHtml(sectionByTitle(page, 'Defendant 2 details'), 'Address for service')).toBeUndefined();
-    expect(rowText(sectionByTitle(page, 'Defendant 3 details'), 'Name')).toBe('y test');
-    expect(rowHtml(sectionByTitle(page, 'Defendant 3 details'), 'Address for service')).toBe(
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
+    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBeUndefined();
+    expect(rowText(sectionByTitle(page, 'Additional defendant 2 details'), 'Name')).toBe('y test');
+    expect(rowHtml(sectionByTitle(page, 'Additional defendant 2 details'), 'Address for service')).toBe(
       '2 Pentre Street<br>Caerdydd<br>CF11 6QX'
     );
   });

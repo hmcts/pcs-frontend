@@ -6,9 +6,14 @@ import { oidcMiddleware } from '../../../main/middleware';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
+}));
+
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  isRespondToClaimEnabledForRelease: jest.fn(),
 }));
 
 const translationStrings: Record<string, string> = {
@@ -30,7 +35,9 @@ const translationStrings: Record<string, string> = {
   'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
   'viewTheResponse:personsUnknown': 'Persons unknown',
   'viewTheResponse:addressUnknown': 'Address unknown',
-  'viewTheResponse:sections.defendantDetails': 'Defendant {{number}} details',
+  'viewTheResponse:sections.defendant1Details': 'Defendant 1 details',
+  'viewTheResponse:sections.additionalDefendantDetails': 'Additional defendant {{number}} details',
+  'viewTheResponse:sections.rankedDefendantDetails': 'Defendant {{number}} details',
 };
 
 jest.mock('@modules/i18n', () => ({
@@ -71,7 +78,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
     isExemptLandlord: 'YES',
     dateSubmitted: '2026-02-01',
     allDefendants: [
-      { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant', rank: 2 } },
+      { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
       {
         id: 'def-2',
         value: {
@@ -81,7 +88,6 @@ function buildComprehensiveCaseData(): CcdCaseData {
           addressKnown: 'YES',
           addressSameAsProperty: 'YES',
           dateOfBirth: '1985-07-20',
-          rank: 1,
         },
       },
     ] as CcdCaseData['allDefendants'],
@@ -263,6 +269,7 @@ describe('viewTheResponse route', () => {
     app = {
       get: jest.fn(),
     } as unknown as Application;
+    (isRespondToClaimEnabledForRelease as jest.Mock).mockResolvedValue(false);
   });
 
   afterEach(() => {
@@ -361,15 +368,30 @@ describe('viewTheResponse route', () => {
         }),
       ])
     );
-    expect(renderArgs.defendantDetails.sectionTitle).toBe('Defendant 2 details');
-    expect(renderArgs.defendantDetails.rows.length).toBeGreaterThan(0);
-    expect(renderArgs.defendantDetails.rows.map((row: { key: { text: string } }) => row.key.text)).toEqual([
+    expect(renderArgs.defendant1Details.rows.length).toBeGreaterThan(0);
+    expect(renderArgs.defendant1Details.rows.map((row: { key: { text: string } }) => row.key.text)).toEqual([
       'viewTheResponse:defendant.name',
       'viewTheResponse:defendant.phone',
       'viewTheResponse:defendant.address',
       'viewTheResponse:defendant.dateOfBirth',
     ]);
-    expect(renderArgs.additionalDefendantDetails).toBeUndefined();
+    expect(renderArgs.additionalDefendantDetails).toHaveLength(1);
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.name' },
+          value: { text: 'Peter Parker' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.address' },
+          value: { text: '10 Second Avenue, London, W3 7RX' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.dateOfBirth' },
+          value: { text: '20 July 1985' },
+        }),
+      ])
+    );
     expect(renderArgs.responseToClaim.rows.length).toBeGreaterThan(0);
     expect(renderArgs.paymentsOrAgreements.rows.length).toBeGreaterThan(0);
     expect(renderArgs.householdAndCircumstances.rows.length).toBeGreaterThan(0);
@@ -498,6 +520,168 @@ describe('viewTheResponse route', () => {
         }),
       ])
     );
+  });
+
+  it('should show persons unknown when additional defendant name is redacted with no name fields', async () => {
+    mockCaseById({
+      propertyAddress: {
+        AddressLine1: 'Clapping Gate',
+        AddressLine2: 'Knowles Lane',
+        PostTown: 'Whitchurch',
+        PostCode: 'SY13 2LH',
+      },
+      possessionClaimResponse: {
+        currentDefendantPartyId: 'def-1',
+        defendantResponses: { disputeClaim: 'NO' },
+      },
+      allDefendants: [
+        { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
+        { id: 'def-2', value: {} },
+      ],
+    } as CcdCaseData);
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    const next: NextFunction = jest.fn();
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      next
+    );
+
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual([
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.name' },
+        value: { text: 'Persons unknown' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
+      }),
+    ]);
+  });
+
+  it('should show persons unknown for additional defendants when name is not known', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        currentDefendantPartyId: 'def-1',
+        defendantResponses: { disputeClaim: 'NO' },
+      },
+      allDefendants: [
+        { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
+        { id: 'def-2', value: { nameKnown: 'NO', addressKnown: 'NO' } },
+      ],
+    } as CcdCaseData);
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    const next: NextFunction = jest.fn();
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      next
+    );
+
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual([
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.name' },
+        value: { text: 'Persons unknown' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
+      }),
+    ]);
+  });
+
+  it('should show other co-defendants as additional defendant sections when viewer is not defendant 1 on the claim', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        currentDefendantPartyId: 'def-2',
+        defendantResponses: { disputeClaim: 'NO' },
+      },
+      allDefendants: [
+        { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
+        { id: 'def-2', value: { firstName: 'Peter', lastName: 'Parker' } },
+      ],
+    } as CcdCaseData);
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
+    );
+
+    const { additionalDefendantDetails } = (res.render as jest.Mock).mock.calls[0][1];
+    expect(additionalDefendantDetails).toHaveLength(1);
+    expect(additionalDefendantDetails[0].rows).toEqual([
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.name' },
+        value: { text: 'Jane Defendant' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
+      }),
+    ]);
+  });
+
+  it('should omit the viewing defendant from additional defendant sections', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        currentDefendantPartyId: 'def-1',
+        defendantResponses: { disputeClaim: 'NO' },
+      },
+      allDefendants: [
+        { id: 'def-1', value: { firstName: 'Jane', lastName: 'Defendant' } },
+        { id: 'def-2', value: { firstName: 'Peter', lastName: 'Parker' } },
+      ],
+    } as CcdCaseData);
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
+    );
+
+    const { additionalDefendantDetails } = (res.render as jest.Mock).mock.calls[0][1];
+    expect(additionalDefendantDetails).toHaveLength(1);
+    expect(additionalDefendantDetails[0].rows).toEqual([
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.name' },
+        value: { text: 'Peter Parker' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
+      }),
+    ]);
   });
 
   it('should map counterclaim rows 3 and 4 exclusively by whether the amount is known', async () => {
