@@ -140,5 +140,9 @@
   },
   "launchdarkly": {
     "env": "AAAAAAAA"
+  },
+  "decentralisedEventRoutes" : {
+    "ext:respondPossessionClaim" : "/case/:caseReference/respond-to-claim/start-now",
+    "ext:resumeResponse" : "/case/:caseReference/respond-to-claim/start-now"
   }
 }

@@ -1,5 +1,6 @@
 export { isSomethingElseCounterClaim } from './isSomethingElseCounterClaim';
 export { isDefendantNameKnown } from './isDefendantNameKnown';
+export { doesDefendantHaveDraftResponse } from './doesDefendantHaveDraftResponse';
 export { isWalesProperty } from './isWalesProperty';
 export { isNoticeDateProvided } from './isNoticeDateProvided';
 export { isRentArrearsClaim } from './isRentArrearsClaim';

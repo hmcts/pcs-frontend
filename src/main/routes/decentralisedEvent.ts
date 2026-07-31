@@ -1,3 +1,4 @@
+import config from 'config';
 import { Application, Request, Response, Router } from 'express';
 
 import { oidcMiddleware } from '../middleware';
@@ -25,7 +26,7 @@ export default function decentralisedEventRoutes(app: Application): void {
       return res.status(404).send('Not Found');
     }
 
-    if (eventId !== 'ext:respondPossessionClaim') {
+    if(!config.has('decentralisedEventRoutes.' + eventId)) {
       logger.error('Unsupported event ID redirect attempted', { eventId, caseReference });
       return res.status(404).send('Not Found');
     }
@@ -53,12 +54,13 @@ export default function decentralisedEventRoutes(app: Application): void {
       return res.redirect('/login');
     }
 
-    logger.info('Decentralised event validation successful, redirecting to CUI respond to claim start page', {
+    logger.info('Decentralised event validation successful, redirecting to CUI', {
       caseReference,
       eventId,
     });
 
-    return safeRedirect303(res, `/case/${caseReference}/respond-to-claim/start-now`);
+    const redirectRoute = config.get<string>('decentralisedEventRoutes.' + eventId).replace(':caseReference', caseReference);
+    return safeRedirect303(res, redirectRoute);
   });
 
   // Mount at /cases

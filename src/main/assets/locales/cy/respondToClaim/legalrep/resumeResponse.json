@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyResume your response",
+  "title": "cycyRespond to a property possession claim",
+  "resumeResponseParagraph1" : "cyYour previous answers have been saved.  You can either",
+  "resumeResponseListItem1" : "cyresume your response using your saved answers",
+  "resumeResponseListItem2" : "cystart your response again from the beginning",
+  "resumeResponseParagraph2" : "cyIf you resume your response using your saved answers, you must select 'Continue' a the bottom of each page until you reach the question you'd like to continue your response from",
+  "question": "cyDo you want to resume the response using your saved answers?",
+  "errors": {
+    "resumeResponse": "cyPlease select an option"
+  }
+}

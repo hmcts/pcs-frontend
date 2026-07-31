@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import { doesDefendantHaveDraftResponse } from '../utils';
+
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig as citizenFlowConfig } from './flow.config';
 import { hasSingleLinkedDefendant } from './flowConditions';
 import { legalRepRespondToClaimSections } from './legalrep.sections.config';
@@ -10,6 +12,7 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 const legalRepStepOrder = [
   'start-now',
   'select-defendant',
+  'resume-response',
   'defendant-name-confirmation',
   'defendant-date-of-birth',
   'correspondence-address',
@@ -70,8 +73,13 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
     },
 
+    'resume-response': {
+      showCondition: (req: Request) => doesDefendantHaveDraftResponse(req),
+    },
+
     'defendant-name-confirmation': {
       showCondition: () => true,
     },
+
   },
 };

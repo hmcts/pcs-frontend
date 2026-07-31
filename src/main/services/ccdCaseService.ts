@@ -382,11 +382,17 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
   },
 
-  async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {
+  async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string, clientContextHeaders?: ClientContextHeaders): Promise<StartCallbackData> {
     const eventUrl = `${getBaseUrl()}/cases/${ccdCaseId}/event-triggers/respondPossessionClaim?ignore-warning=false`;
     logger.info('getExistingCaseData event URL', { eventUrl });
+
+    const caseHeaders: CaseHeaders = getCaseHeaders(accessToken || '');
+    if (clientContextHeaders) {
+      caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+    }
+
     try {
-      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
+      const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
       return response.data;
     } catch (error) {
       throw convertReadErrorToHttpError(error, 'getExistingCaseDataError');
