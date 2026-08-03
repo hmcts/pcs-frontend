@@ -27,7 +27,7 @@ export const step: StepDefinition = createFormStep({
       req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
     } catch (error) {
       // Any failure launching Your Support (cui-ra down, POST error, missing token) must land the
-      // citizen on the context-aware RA error page 
+      // citizen on the context-aware RA error page
       logger.error(`Failed to launch Your Support for case ${caseReference}`, error);
       if (!caseReference) {
         throw error;

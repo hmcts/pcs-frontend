@@ -15,7 +15,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     paragraph: 'paragraph',
     tryAgainButton: 'tryAgainButton',
   },
-  // Context-aware error page shown when launching Your Support fails. 
+  // Context-aware error page shown when launching Your Support fails.
   extendGetContent: (req: Request) => {
     const caseReference = req.res?.locals.validatedCase?.id;
     return { triageUrl: `/case/${caseReference}/respond-to-claim/reasonable-adjustments-triage` };

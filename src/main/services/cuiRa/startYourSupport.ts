@@ -56,7 +56,7 @@ export async function startYourSupport(req: Request): Promise<string> {
     logger.warn(`Starting Your Support for case ${caseReference} with an empty defendant party name`);
   }
 
-  // Pre-populate the microsite with any adjustments already captured for this defendant 
+  // Pre-populate the microsite with any adjustments already captured for this defendant
   const storedFlags = validatedCase.data?.possessionClaimResponse?.defendantFlags;
   const existingFlags: CuiRaFlags = {
     partyName,

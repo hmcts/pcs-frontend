@@ -138,7 +138,6 @@ const sectionDefs = [
       'uploadFiles',
     ],
 
-
     // 'equality-and-diversity-start' and
     // 'equality-and-diversity-end' are intentionally parked out of the live citizen
     // journey while PCQ integration is still in progress.

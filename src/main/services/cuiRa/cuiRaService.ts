@@ -55,7 +55,7 @@ export const cuiRaService = {
     }
   },
 
-  // Retrieves the result of a completed microsite session 
+  // Retrieves the result of a completed microsite session
   async getPayload(id: string, serviceToken: string): Promise<CuiRaGetPayloadResponse> {
     try {
       const response = await http.get<CuiRaGetPayloadResponse>(
