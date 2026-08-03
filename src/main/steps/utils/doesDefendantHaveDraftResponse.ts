@@ -13,4 +13,3 @@ export const doesDefendantHaveDraftResponse = (req: Request): boolean => {
 
   return Object.keys(selectedDefendantResponses ?? {}).length > 0;
 };
-
