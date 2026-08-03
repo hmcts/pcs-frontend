@@ -15,6 +15,11 @@ jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: mockOidcMiddleware,
 }));
 
+const mockFeatureMiddleware = jest.fn((req, res, next) => next());
+jest.mock('../../../main/middleware/respondToClaimFeatureMiddleware', () => ({
+  respondToClaimFeatureMiddleware: mockFeatureMiddleware,
+}));
+
 const mockGetPayload = jest.fn();
 jest.mock('@services/cuiRa/cuiRaService', () => ({
   cuiRaService: { getPayload: mockGetPayload },
@@ -60,7 +65,8 @@ describe('reasonableAdjustmentsCallback routes', () => {
       app: { locals: { redisClient: { get: jest.fn().mockResolvedValue(serviceToken) } } },
     }) as unknown as Request;
 
-  const getHandler = () => mockAppGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+  // The route handler is the last argument registered (after oidc + feature-flag middleware).
+  const getHandler = () => mockAppGet.mock.calls[0].at(-1) as (req: Request, res: Response) => Promise<void>;
 
   // The existing in-progress response the callback loads before writing flags. Includes
   // claimant-side fields to prove the callback narrows to the defendant slice and does not
@@ -84,8 +90,8 @@ describe('reasonableAdjustmentsCallback routes', () => {
     reasonableAdjustmentsCallbackRoutes({ get: mockAppGet } as unknown as Application);
   });
 
-  it('registers the callback route with oidc middleware', () => {
-    expect(mockAppGet).toHaveBeenCalledWith(ROUTE, mockOidcMiddleware, expect.any(Function));
+  it('registers the callback route behind oidc and the respond-to-claim feature-flag middleware', () => {
+    expect(mockAppGet).toHaveBeenCalledWith(ROUTE, mockOidcMiddleware, mockFeatureMiddleware, expect.any(Function));
   });
 
   it('redirects to the error page when no S2S service token is available', async () => {
