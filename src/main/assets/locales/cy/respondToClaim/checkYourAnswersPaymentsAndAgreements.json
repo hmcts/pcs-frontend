@@ -4,7 +4,7 @@
   "rows": {
     "anyPaymentsMade": {
       "label": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
-      "changeHidden": "taliadau a wnaed"
+      "changeHidden": "cy payments made"
     },
     "paymentDetails": {
       "label": "Rhowch fanylion faint rydych wedi’i dalu a phryd",

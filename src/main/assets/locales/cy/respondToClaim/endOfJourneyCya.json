@@ -9,8 +9,8 @@
     "yourCircumstances": "cy Your circumstances",
     "incomeAndExpenses": "cy Income and expenses",
     "regularIncome": "cy Regular income",
-    "universalCredit": "Credyd Cynhwysol",
-    "priorityDebts": "Dyledion blaenoriaeth",
+    "universalCredit": "cy Universal credit",
+    "priorityDebts": "cy Priority debts",
     "regularExpenses": "cy Regular expenses",
     "uploadFiles": "cy Upload files",
     "otherConsiderations": "cy Other considerations",
@@ -21,11 +21,11 @@
       "label": "cy Upload any files that you think are relevant to your response"
     },
     "otherConsiderations": {
-      "label": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
+      "label": "cy Is there anything else you want to tell the court as part of your response?",
       "changeHidden": "cy whether there is anything else you want to tell the court as part of your response"
     },
     "otherConsiderationsDetails": {
-      "label": "Rhowch fanylion beth arall rydych eisiau ei ddweud wrth y llys",
+      "label": "cy Give details about what else you want to tell the court",
       "changeHidden": "cy the details about what else you want to tell the court"
     },
     "languageUsed": {
@@ -39,18 +39,18 @@
     }
   },
   "statementOfTruth": {
-    "heading": "Datganiad gwirionedd",
+    "heading": "cy Statement of truth",
     "hint": "cy Please check all the details you have entered for accuracy.",
-    "contemptFieldLabel": "Datganiad gwirionedd",
+    "contemptFieldLabel": "cy Statement of truth",
     "contemptOption": "cy I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
-    "beliefFieldLabel": "Datganiad gwirionedd",
+    "beliefFieldLabel": "cy Statement of truth",
     "beliefOption": "cy I believe that the facts stated in this defence form are true.",
-    "fullNameLabel": "Eich enw llawn"
+    "fullNameLabel": "cy Your full name"
   },
   "errors": {
     "statementOfTruthContempt": "cy Select if you understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth",
     "statementOfTruthBelief": "cy Select if you believe that the facts stated in this defence form are true",
     "fullName": "cy Enter your full name",
-    "fullNameMaxLength": "Rhaid i'ch enw llawn fod yn 100 nod neu lai"
+    "fullNameMaxLength": "cyYour full name must be 100 characters or fewer"
   }
 }

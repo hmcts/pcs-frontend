@@ -1,20 +1,20 @@
 {
-  "pageTitle": "Manylion yr hysbysiad",
+  "pageTitle": "cyNotice details",
   "question": "cyDid {{claimantName}} give the defendant notice of their intention to begin possession proceedings?",
   "hintText": "",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
+    "yes": "cyYes",
+    "no": "cyNo",
     "imNotSure": "cyDefendant is not sure"
   },
   "noticeDateLabel": "cyWhen did the defendant receive notice from {{claimantName}}? (Optional)",
-  "noticeDateHint": "Er enghraifft, 16 4 2021",
+  "noticeDateHint": "cyFor example, 16 4 2021",
   "errors": {
     "possessionNoticeReceived": "cySelect if {{claimantName}} gave the defendant notice of their intention to begin possession proceedings",
     "date": {
-      "day": "Diwrnod",
-      "month": "Mis",
-      "year": "Blwyddyn",
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear",
       "required": "cyThe date must include a day, month and year",
       "notRealDate": "cyThe date must be a real date",
       "futureDate": "cyThe date must be in the past",

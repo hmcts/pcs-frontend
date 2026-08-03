@@ -1,32 +1,32 @@
 {
-  "pageTitle": "Eich tasgau",
+  "pageTitle": "cyYour tasks",
   "caseNumberLabel": "Rhif yr achos:",
-  "sidebarLabel": "Cefnogaeth a chamau ychwanegol",
+  "sidebarLabel": "cySupport and additional actions",
   "opensInNewTab": "cyopens in new tab",
   "taskList": {
     "status": {
-      "AVAILABLE": "Ar gael",
-      "IN_PROGRESS": "Yn mynd rhagddo",
-      "DONE": "Wedi ei wneud",
-      "NOT_AVAILABLE_YET": "Ddim ar gael eto"
+      "AVAILABLE": "cyAvailable",
+      "IN_PROGRESS": "cyIn progress",
+      "DONE": "cyDone",
+      "NOT_AVAILABLE_YET": "cyNot available yet"
     },
     "groups": {
-      "checkBeforeYouStart": "Gwiriwch cyn i chi ddechrau",
-      "yourResponse": "Eich ymateb",
-      "provideEvidence": "Darparu tystiolaeth",
-      "reviewAndSubmit": "Adolygu a chyflwyno"
+      "checkBeforeYouStart": "cyCheck before you start",
+      "yourResponse": "cyYour response",
+      "provideEvidence": "cyProvide evidence",
+      "reviewAndSubmit": "cyReview and submit"
     }
   },
   "iWantTo": {
     "heading": "Rwyf eisiau ...",
-    "makeApplication": "Gwneud cais cyffredinol",
-    "breathingSpace": "Hysbysu’r llys am seibiant dyledion lle i anadlu",
-    "legalAdviser": "Cael cyngor am ddim gan gynghorydd cyfreithiol"
+    "makeApplication": "cyMake a general application",
+    "breathingSpace": "cyInform the court of a breathing space debt respite",
+    "legalAdviser": "cyGet free help from a legal adviser"
   },
   "helpSupport": {
     "heading": "Cymorth a chefnogaeth",
     "fees": "Help i dalu ffioedd",
-    "mediation": "Gwybodaeth am gyfryngu",
+    "mediation": "cyFind out about mediation",
     "hearing": "Beth i’w ddisgwyl mewn gwrandawiad",
     "representYourself": "Cynrychioli fy hun mewn gwrandawiad",
     "findLegalAdvice": "Dod o hyd i gyngor cyfreithiol",

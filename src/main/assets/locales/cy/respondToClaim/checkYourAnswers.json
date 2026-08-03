@@ -1,6 +1,6 @@
 {
   "pageTitle": "Gwirio eich atebion",
   "errors": {
-    "submitResponseFailed": "Wedi  methu cyflwyno ymateb. Rhowch gynnig arall arni."
+    "submitResponseFailed": "cyFailed to submit response. Please try again."
   }
 }

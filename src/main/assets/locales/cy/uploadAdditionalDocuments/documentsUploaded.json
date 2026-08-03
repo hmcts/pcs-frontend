@@ -3,8 +3,8 @@
   "panelTitle": "cyDocuments uploaded",
   "confirmationBody": "cyWe have received the documents you uploaded",
   "whatHappensNext": {
-    "heading": "Beth fydd yn digwydd nesaf",
+    "heading": "cyWhat happens next",
     "body": "cyYou do not need to do anything else. We will review the documents."
   },
-  "closeLink": "Cau a dychwelyd i drosolwg o’r achos"
+  "closeLink": "cyClose and return to case overview"
 }

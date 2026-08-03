@@ -1,11 +1,11 @@
 {
-  "caption": "Ymateb i hawliad i feddiannu eiddo",
-  "pageTitle": "Landlord trwyddedig",
+  "caption": "cyRespond to a property possession claim",
+  "pageTitle": "cyLicensed landlord",
   "paragraph": "cyYou can check if the landlord is licensed by searching the <a href=\"https://rentsmart.gov.wales/en/check-register/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Public Register (opens in new tab)</a>.",
   "question": "cyIs the landlord licensed?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
+    "yes": "cyYes",
+    "no": "cyNo",
     "or": "cyor",
     "imNotSure": "cyDefendant is not sure"
   },

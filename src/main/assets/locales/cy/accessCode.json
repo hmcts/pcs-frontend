@@ -1,15 +1,15 @@
 {
-  "pageTitle": "Cael mynediad i’ch achos",
-  "description": "Cael mynediad a rheoli eich achos yn defnyddio rhif eich hawliad a'ch cod mynediad. Bydd y rhain yn y llythyr, yr e-bost neu’r pecyn a anfonwyd gan y llys.",
+  "pageTitle": "cyAccess your case",
+  "description": "cyAccess and manage your case using your claim number and access code. These will be in the letter, email or pack sent by the court.",
   "claimNumber": {
-    "label": "Nodwch rif eich hawliad",
-    "hint": "Mae’r rhif hwn yn cynnwys 16 digid"
+    "label": "cyEnter your claim number",
+    "hint": "cyThis is a 16-digit number"
   },
   "accessCode": {
-    "label": "Nodwch eich cod mynediad",
-    "hint": "Mae hwn yn cynnwys 12 nod"
+    "label": "cyEnter your access code",
+    "hint": "cyThis has 12 characters"
   },
-  "errorPrefix": "Gwall:",
+  "errorPrefix": "cyError:",
   "errors": {
     "respondToClaimUnavailable": "cyThe option to respond to a claim is not available at the moment."
   }

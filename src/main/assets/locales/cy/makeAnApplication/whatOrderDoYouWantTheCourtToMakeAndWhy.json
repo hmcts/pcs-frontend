@@ -1,11 +1,11 @@
 {
-  "pageTitle": "Pa orchymyn ydych chi eisiau i’r llys ei wneud, a pham?",
+  "pageTitle": "cyWhat order do you want the court to make, and why?",
   "caption": "Gwneud cais",
-  "heading": "Pa orchymyn ydych chi eisiau i’r llys ei wneud, a pham?",
-  "includeApplicationDetails": "Rhowch fanylion unrhyw ffeithiau neu dystiolaeth yr ydych yn meddwl y dylai'r llys ystyried pan mae'n gwneud penderfyniad.   Gallwch uwchlwytho eich tystiolaeth ar y dudalen nesaf.",
-  "whatOrderDoYouWantLabel": "Eglurwch beth ydych eisiau i’r llys ei wneud, a pham",
+  "heading": "cyWhat order do you want the court to make, and why?",
+  "includeApplicationDetails": "cyInclude details of any facts or evidence that you think the court should consider when it makes a decision. You can upload your evidence on the next page.",
+  "whatOrderDoYouWantLabel": "cyExplain what you want the court to do, and why",
   "list": {
-    "heading": "Er enghraifft, dywedwch wrth y llys:",
+    "heading": "cyFor example, tell the court:",
     "SOMETHING_ELSE": [
       "cywhy you want to add someone to your claim",
       "cywhy you should not be sanctioned (punished)",
@@ -17,6 +17,6 @@
     ]
   },
   "errors": {
-    "whatOrderDoYouWant": "Cadarnhau pa orchymyn ydych eisiau i’r llys ei wneud, a pham"
+    "whatOrderDoYouWant": "cyConfirm the order you want the court to make, and why"
   }
 }

@@ -7,8 +7,8 @@
   "paragraph3": "",
   "paragraph4": "",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "cyYes",
+    "no": "cyNo"
   },
   "errors": {
     "confirmInstallmentOffer": "cySelect whether the defendant would like to offer to pay off their arrears in instalments"

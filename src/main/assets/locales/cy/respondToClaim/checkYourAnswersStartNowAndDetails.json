@@ -4,7 +4,7 @@
   "rows": {
     "freeLegalAdvice": {
       "label": "A ydych wedi cael unrhyw gyngor cyfreithiol am ddim?",
-      "changeHidden": "cyngor cyfreithiol am ddim",
+      "changeHidden": "cy free legal advice",
       "options": {
         "YES": "Ydy",
         "NO": "Nac ydy",
@@ -12,7 +12,7 @@
       }
     },
     "hasSolicitor": {
-      "label": "A oes gennych gyfreithiwr?",
+      "label": "cy Do you have a solicitor?",
       "changeHidden": "cy do you have a solicitor",
       "options": {
         "YES": "Ydy",
