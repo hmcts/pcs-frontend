@@ -281,16 +281,21 @@ export const ccdCaseService = {
   },
 
   async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
-    const caseUrl = `${getBaseUrl()}/cases/${caseId}`;
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const caseUrl = `${getBaseUrl()}/cases/${safeCaseId}`;
 
     try {
-      logger.debug(`Fetching case by id for read view: ${caseId}`);
+      logger.debug(`Fetching case by id for read view: ${safeCaseId}`);
       const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
-      logger.debug(`Read case response for ${caseId}: ${JSON.stringify(response.data, null, 2)}`);
+      logger.debug(`Read case response for ${safeCaseId}: ${JSON.stringify(response.data, null, 2)}`);
       const caseData = response.data.data ?? {};
 
       return {
-        id: String(response.data.id ?? caseId),
+        id: String(response.data.id ?? safeCaseId),
         data: caseData,
       };
     } catch (error) {
