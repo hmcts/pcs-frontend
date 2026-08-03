@@ -1,10 +1,10 @@
 {
-  "pageTitle": "cyWho the counterclaim is against",
-  "heading": "cyWho are you making the counterclaim against?",
+  "pageTitle": "Yn erbyn pwy mae'r gwrth-hawliad",
+  "heading": "Yn erbyn pwy ydych chi'n gwneud y gwrth-hawliad?",
   "checkboxHint": "Dewiswch bob un sy'n berthnasol",
   "errors": {
     "counterClaimAgainst": {
-      "required": "cySelect who you are making the counterclaim against"
+      "required": "Dewiswch pwy ydych chi'n gwneud y gwrth-hawliad yn ei erbyn"
     }
   }
 }
