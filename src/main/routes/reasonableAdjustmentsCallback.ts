@@ -13,9 +13,9 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('reasonableAdjustmentsCallback');
 
-// Return leg from the CUI Your Support (cui-ra) microsite. 
+// Return leg from the CUI Your Support (cui-ra) microsite.
 // On a 'submit' — persist the returned flags to the case DRAFT
-// On a 'cancel' → the "no request sent" page; 
+// On a 'cancel' → the "no request sent" page;
 // a retrieval failure → the RA error page.
 export default function reasonableAdjustmentsCallbackRoutes(app: Application): void {
   app.get(
@@ -37,10 +37,35 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
       }
 
       try {
+        // Verify the user has access to this case BEFORE calling cui-ra with a URL-supplied id.
+        // `getCaseByIdForEvent` triggers the citizen respondPossessionClaim event (the same call the
+        // journey uses to resume): it enforces access (throws → error page if the user cannot access
+        // this case) and returns the in-progress draft response we preserve when persisting flags.
+        const accessToken = req.session.user?.accessToken;
+        const existing = await ccdCaseService.getCaseByIdForEvent(
+          accessToken ?? '',
+          caseReference,
+          'respondPossessionClaim',
+          req.session?.clientContext
+        );
+
         const payload = await cuiRaService.getPayload(payloadId, serviceToken);
         logger.info(
           `Your Support payload received for case ${caseReference}, id ${payloadId}, action ${payload.action}`
         );
+
+        // Bind the fetched payload to THIS case. `payloadId` comes straight from the URL and is not
+        // otherwise tied to the case or user, so we verify the payload's correlationId — which we set
+        // to the case reference when invoking the microsite (startYourSupport) — matches the case in
+        // the callback URL. Without this, a logged-in user could pull another party's (special-
+        // category) adjustment flags into their own draft via an arbitrary id.
+        if (payload.correlationId !== caseReference) {
+          logger.error(
+            `Your Support payload ${payloadId} correlationId '${payload.correlationId}' does not match case ` +
+              `${caseReference} — refusing to persist`
+          );
+          return safeRedirect303(res, errorUrl, fallback, ['/case']);
+        }
 
         // Only an explicit 'submit' persists flags + shows the "request sent" confirmation; 'cancel'
         // (or any other value) means nothing was sent → the "No request was sent" page.
@@ -49,20 +74,12 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
         }
 
         // Persist the returned flags to the case DRAFT via the same citizen respondPossessionClaim
-        // draft-save our journey pages use.
+        // draft-save our journey pages use. The draft-save fully REPLACES the defendant response (and
+        // the final submit reads this same draft), so re-send the existing answers — narrowed to the
+        // defendant slice — alongside the flags, or a flags-only post would wipe them.
         const rawFlags = payload.replacementFlags ?? payload.flagsAsSupplied;
         if (rawFlags) {
           const defendantFlags = toCcdFlags(rawFlags);
-          // flags-only post would wipe the defendant's answers. Load the current response first and post it back
-          // alongside the flags. `
-          const accessToken = req.session.user?.accessToken;
-          const existing = await ccdCaseService.getCaseByIdForEvent(
-            accessToken ?? '',
-            caseReference,
-            'respondPossessionClaim',
-            req.session?.clientContext
-          );
-          // Narrow to the defendant slice only
           const existingResponse = existing.data?.possessionClaimResponse ?? {};
           const possessionClaimResponse: PossessionClaimResponse = {
             defendantContactDetails: existingResponse.defendantContactDetails,

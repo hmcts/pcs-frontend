@@ -26,12 +26,13 @@ export const step: StepDefinition = createFormStep({
       const redirectUrl = await startYourSupport(req);
       req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
     } catch (error) {
-      // Any failure launching Your Support (cui-ra down, POST error, missing token) lands the
-      // citizen on the context-aware RA error page
+      // Any failure launching Your Support (cui-ra down, POST error, missing token) must land the
+      // citizen on the context-aware RA error page 
       logger.error(`Failed to launch Your Support for case ${caseReference}`, error);
-      if (caseReference) {
-        req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`);
+      if (!caseReference) {
+        throw error;
       }
+      req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`);
     }
   },
   translationKeys: {

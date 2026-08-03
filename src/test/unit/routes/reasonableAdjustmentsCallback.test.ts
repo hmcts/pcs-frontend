@@ -173,7 +173,8 @@ describe('reasonableAdjustmentsCallback routes', () => {
 
     await getHandler()(buildReq('s2s-tok'), res);
 
-    expect(mockGetCaseByIdForEvent).not.toHaveBeenCalled();
+    // The case is still loaded (access check), but with no flags nothing is persisted.
+    expect(mockGetCaseByIdForEvent).toHaveBeenCalled();
     expect(mockUpdateDraft).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
   });
@@ -197,9 +198,23 @@ describe('reasonableAdjustmentsCallback routes', () => {
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
   });
 
+  it('refuses to persist and redirects to the error page when the payload correlationId does not match the case', async () => {
+    const flags = { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] };
+    // correlationId belongs to a different case than the one in the callback URL (123).
+    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '999', replacementFlags: flags });
+    const res = {} as unknown as Response;
+
+    await getHandler()(buildReq('s2s-tok'), res);
+
+    // Access check runs first; the mismatch is caught before any persistence.
+    expect(mockGetCaseByIdForEvent).toHaveBeenCalled();
+    expect(mockUpdateDraft).not.toHaveBeenCalled();
+    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
+  });
+
   it('redirects to the error page when loading the current response fails', async () => {
     const flags = { partyName: 'x', roleOnCase: 'y', details: [] };
-    mockGetPayload.mockResolvedValue({ action: 'submit', replacementFlags: flags });
+    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
     mockGetCaseByIdForEvent.mockRejectedValue(new Error('case load down'));
     const res = {} as unknown as Response;
 
@@ -211,7 +226,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
 
   it('redirects to the error page when persisting the flags fails', async () => {
     const flags = { partyName: 'x', roleOnCase: 'y', details: [] };
-    mockGetPayload.mockResolvedValue({ action: 'submit', replacementFlags: flags });
+    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
     mockUpdateDraft.mockRejectedValue(new Error('ccd down'));
     const res = {} as unknown as Response;
 
