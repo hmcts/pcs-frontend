@@ -151,78 +151,86 @@ export class HttpService {
     return this.instance.getUri(config);
   }
 
-  public request<T = unknown, R = AxiosResponse<T>, D = unknown>(config: AxiosRequestConfig<D>): Promise<R> {
-    return this.instance.request<T, R, D>(config);
+  public request<T = unknown, D = unknown, P = unknown>(
+    config: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.request<T, AxiosResponse<T, D, {}, P>, D, P>(config);
   }
 
-  public get<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
-    return this.instance.get<T, R, D>(url, config);
-  }
-
-  public delete<T = unknown, R = AxiosResponse<T>, D = unknown>(
+  public get<T = unknown, D = unknown, P = unknown>(
     url: string,
-    config?: AxiosRequestConfig<D>
-  ): Promise<R> {
-    return this.instance.delete<T, R, D>(url, config);
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.get<T, AxiosResponse<T, D, {}, P>, D, P>(url, config);
   }
 
-  public head<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
-    return this.instance.head<T, R, D>(url, config);
-  }
-
-  public options<T = unknown, R = AxiosResponse<T>, D = unknown>(
+  public delete<T = unknown, D = unknown, P = unknown>(
     url: string,
-    config?: AxiosRequestConfig<D>
-  ): Promise<R> {
-    return this.instance.options<T, R, D>(url, config);
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.delete<T, AxiosResponse<T, D, {}, P>, D, P>(url, config);
   }
 
-  public post<T = unknown, R = AxiosResponse<T>, D = unknown>(
+  public head<T = unknown, D = unknown, P = unknown>(
     url: string,
-    data?: D,
-    config?: AxiosRequestConfig<D>
-  ): Promise<R> {
-    return this.instance.post<T, R, D>(url, data, config);
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.head<T, AxiosResponse<T, D, {}, P>, D, P>(url, config);
   }
 
-  public put<T = unknown, R = AxiosResponse<T>, D = unknown>(
+  public options<T = unknown, D = unknown, P = unknown>(
     url: string,
-    data?: D,
-    config?: AxiosRequestConfig<D>
-  ): Promise<R> {
-    return this.instance.put<T, R, D>(url, data, config);
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.options<T, AxiosResponse<T, D, {}, P>, D, P>(url, config);
   }
 
-  public patch<T = unknown, R = AxiosResponse<T>, D = unknown>(
+  public post<T = unknown, D = unknown, P = unknown>(
     url: string,
     data?: D,
-    config?: AxiosRequestConfig<D>
-  ): Promise<R> {
-    return this.instance.patch<T, R, D>(url, data, config);
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.post<T, AxiosResponse<T, D, {}, P>, D, P>(url, data, config);
   }
 
-  public postForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
+  public put<T = unknown, D = unknown, P = unknown>(
     url: string,
     data?: D,
-    config?: AxiosRequestConfig<D>
-  ): Promise<R> {
-    return this.instance.postForm<T, R, D>(url, data, config);
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.put<T, AxiosResponse<T, D, {}, P>, D, P>(url, data, config);
   }
 
-  public putForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
+  public patch<T = unknown, D = unknown, P = unknown>(
     url: string,
     data?: D,
-    config?: AxiosRequestConfig<D>
-  ): Promise<R> {
-    return this.instance.putForm<T, R, D>(url, data, config);
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.patch<T, AxiosResponse<T, D, {}, P>, D, P>(url, data, config);
   }
 
-  public patchForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
+  public postForm<T = unknown, D = unknown, P = unknown>(
     url: string,
     data?: D,
-    config?: AxiosRequestConfig<D>
-  ): Promise<R> {
-    return this.instance.patchForm<T, R, D>(url, data, config);
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.postForm<T, AxiosResponse<T, D, {}, P>, D, P>(url, data, config);
+  }
+
+  public putForm<T = unknown, D = unknown, P = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.putForm<T, AxiosResponse<T, D, {}, P>, D, P>(url, data, config);
+  }
+
+  public patchForm<T = unknown, D = unknown, P = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D, P>
+  ): Promise<AxiosResponse<T, D, {}, P>> {
+    return this.instance.patchForm<T, AxiosResponse<T, D, {}, P>, D, P>(url, data, config);
   }
 
   private resolveRequestUrl(url: string, baseUrl?: string): string {
