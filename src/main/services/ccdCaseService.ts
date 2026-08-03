@@ -54,6 +54,14 @@ import {
 
 const logger = Logger.getLogger('ccdCaseService');
 
+function normalizeAndValidateCaseId(caseId: string): string {
+  const normalized = caseId.trim();
+  if (!/^\d{1,32}$/.test(normalized)) {
+    throw new HTTPError('Invalid case reference format', 404);
+  }
+  return normalized;
+}
+
 interface EventTokenResponse {
   token: string;
 }
@@ -250,9 +258,10 @@ export const ccdCaseService = {
     eventId: string = 'respondPossessionClaim',
     clientContextHeaders?: ClientContextHeaders
   ): Promise<CcdCase> {
-    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
+    const validatedCaseId = normalizeAndValidateCaseId(caseId);
+    const eventUrl = `${getBaseUrl()}/cases/${encodeURIComponent(validatedCaseId)}/event-triggers/${encodeURIComponent(eventId)}?ignore-warning=false`;
     try {
-      logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
+      logger.info(`Validating case access for caseId: ${validatedCaseId}, eventId: ${eventId}`);
       const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
 
       if (clientContextHeaders) {
@@ -260,12 +269,12 @@ export const ccdCaseService = {
       }
 
       const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
-      logger.info(`Case access validated successfully for caseId: ${caseId}`);
+      logger.info(`Case access validated successfully for caseId: ${validatedCaseId}`);
 
       const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
 
       return {
-        id: caseId,
+        id: validatedCaseId,
         data: caseData,
       };
     } catch (error) {
@@ -274,16 +283,17 @@ export const ccdCaseService = {
   },
 
   async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
-    const caseUrl = `${getBaseUrl()}/cases/${caseId}`;
+    const validatedCaseId = normalizeAndValidateCaseId(caseId);
+    const caseUrl = `${getBaseUrl()}/cases/${encodeURIComponent(validatedCaseId)}`;
 
     try {
-      logger.debug(`Fetching case by id for read view: ${caseId}`);
+      logger.debug(`Fetching case by id for read view: ${validatedCaseId}`);
       const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
-      logger.debug(`Read case response for ${caseId}: ${JSON.stringify(response.data, null, 2)}`);
+      logger.debug(`Read case response for ${validatedCaseId}: ${JSON.stringify(response.data, null, 2)}`);
       const caseData = response.data.data ?? {};
 
       return {
-        id: String(response.data.id ?? caseId),
+        id: String(response.data.id ?? validatedCaseId),
         data: caseData,
       };
     } catch (error) {
