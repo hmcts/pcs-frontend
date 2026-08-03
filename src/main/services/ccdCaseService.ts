@@ -45,6 +45,7 @@ import type {
   DashboardRelatedApplication,
   DashboardTaskGroup,
 } from '@services/dashboard.interface';
+import { sanitiseCaseReference } from '@utils/caseReference';
 import {
   formatAddress,
   unwrapNotifications,
@@ -250,10 +251,15 @@ export const ccdCaseService = {
     eventId: string = 'respondPossessionClaim',
     clientContextHeaders?: ClientContextHeaders
   ): Promise<CcdCase> {
-    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const eventUrl = `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
-      logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
+      logger.info(`Validating case access for caseId: ${safeCaseId}, eventId: ${eventId}`);
       const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
 
       if (clientContextHeaders) {
@@ -261,12 +267,12 @@ export const ccdCaseService = {
       }
 
       const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
-      logger.info(`Case access validated successfully for caseId: ${caseId}`);
+      logger.info(`Case access validated successfully for caseId: ${safeCaseId}`);
 
       const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
 
       return {
-        id: caseId,
+        id: safeCaseId,
         data: caseData,
       };
     } catch (error) {

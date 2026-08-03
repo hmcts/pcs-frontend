@@ -116,6 +116,14 @@ describe('ccdCaseService', () => {
       });
     });
 
+    it('should throw HTTPError with 404 status for an invalid case id before calling CCD', async () => {
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, '../evil', eventId)).rejects.toMatchObject({
+        message: 'Invalid case reference format',
+        status: 404,
+      });
+      expect(mockGet).not.toHaveBeenCalled();
+    });
+
     it('should throw HTTPError with 403 status on unauthorized access', async () => {
       mockGet.mockRejectedValue({
         response: { status: 403, data: { message: 'Forbidden' } },
