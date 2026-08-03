@@ -1,5 +1,65 @@
 #!groovy
 
+properties([
+  parameters([
+    string(
+      name: 'PLAYWRIGHT_SPEC',
+      defaultValue: '',
+      description: 'Spec file filter: each keyword must appear in the path of a *.spec.ts under src/test/ui (case-sensitive). Separate keywords with comma or semicolon. Ex.: respondToAClaim | respondToAClaim,makeAnApplication. Blank = all specs. Default: empty.'
+    ),
+    choice(
+      name: 'PLAYWRIGHT_GREP_TAG',
+      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
+      description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
+    ),
+    choice(
+      name: 'ENABLE_ALL_PAGE_FUNCTIONAL_TESTS',
+      choices: ['true', 'false'],
+      description: 'Run page functional tests (content, errors, navigation). Default: true.'
+    ),
+    choice(
+      name: 'ENABLE_AXE_AUDIT',
+      choices: ['true', 'false'],
+      description: 'Run axe audits during E2E. Default: true.'
+    ),
+    booleanParam(
+      name: 'CHROME_TESTS',
+      defaultValue: true,
+      description: 'Run E2E tests in Chrome (on by default).'
+    ),
+    booleanParam(
+      name: 'FIREFOX_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests in Firefox (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'WEBKIT_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests in WebKit / desktop Safari (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'EDGE_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests in Microsoft Edge (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'MOBILE_ANDROID_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests on the Android (Pixel 5) profile (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'MOBILE_IOS_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests on the iOS (iPhone 12) WebKit profile (off by default; enable when needed).'
+    ),
+    booleanParam(
+      name: 'MOBILE_IPAD_TESTS',
+      defaultValue: false,
+      description: 'Run E2E tests on the iPad (iPad Pro 11) WebKit profile (off by default; enable when needed).'
+    ),
+  ])
+])
+
 @Library("Infrastructure@2.4.4")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -44,7 +104,11 @@ withPipeline(type, product, component) {
   env.REDIRECTS_MANAGE_CASE_RETURN_URL = "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
   env.CASE_TYPE_ID = "PCS"
   onPR() {
-    env.E2E_TEST_SCOPE = '@sanity'
+    env.E2E_TEST_SCOPE = params.PLAYWRIGHT_GREP_TAG ?: '@sanity'
+    env.E2E_SPEC = params.PLAYWRIGHT_SPEC ?: ''
+    env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS ?: 'false'
+    env.ENABLE_AXE_AUDIT = params.ENABLE_AXE_AUDIT ?: 'true'
+
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_critical_test").size() > 0) {
       env.E2E_TEST_SCOPE = '@PR'
     }
