@@ -1,13 +1,19 @@
+import type { Request } from 'express';
+
 import { isLegalRepresentativeUser, penceToPounds } from '../../utils';
 import { getCounterClaimAmountInPence } from '../../utils/counterClaimAmount';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { Logger } from '@modules/logger';
 import { getTranslationFunction } from '@modules/steps';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
-// import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 import { getPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
+import { paymentService } from '@services/pcsApi/paymentService';
+
+const logger = Logger.getLogger('paymentReturn');
 
 const legalRepFormFieldConfig: FormFieldConfig[] = [
   {
@@ -22,14 +28,18 @@ const legalRepFormFieldConfig: FormFieldConfig[] = [
           pbaAccount: {
             name: 'pbaAccounts',
             type: 'select',
+            // required: true,
             translationKey: {
               label: 'labels.pba',
             },
+            errorMessage: 'errors.paymentOptions.pba',
           },
           customerReference: {
             name: 'customerReference',
             type: 'text',
+            // required: true,
             translationKey: { label: 'labels.customerReference' },
+            errorMessage: 'errors.paymentOptions.customerReference',
           },
         },
       },
@@ -49,7 +59,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseReference = req.params.caseReference;
     if (isLegalRepresentativeUser(req)) {
       const paymentOption = req.body?.paymentOptions as string | undefined;
-
       if (paymentOption === 'pba') {
         return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start` : '#';
       } else {
@@ -71,9 +80,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     let feeAmount = paymentSession?.feeAmount;
     if (feeAmount === undefined) {
-      // const feeType = getCounterClaimFeeType(claimType, claimAmountInPence);
-      // feeAmount = await getFee(feeType, claimAmountInPence);
-      feeAmount = 123;
+      const feeType = getCounterClaimFeeType(claimType, claimAmountInPence);
+      feeAmount = await getFee(feeType, claimAmountInPence);
     }
 
     if (paymentSession) {
@@ -103,7 +111,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     let pbaAccountItems: { value: string; text: string }[] = [];
 
     if (isLegalRepresentative) {
-      pbaAccountItems = buildPbaAccountsSelections();
+      pbaAccountItems = await buildPbaAccountsSelections(req);
     }
 
     return {
@@ -130,20 +138,24 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   fields: legalRepFormFieldConfig,
 });
 
-function buildPbaAccountsSelections(): { value: string; text: string }[] {
-  // direct rendering
-  const pbaAccounts = getPbaAccounts();
-  return [
-    { value: '', text: 'labels.selectPba' },
-    ...pbaAccounts.map(account => ({
-      value: account,
-      text: account,
-    })),
-  ];
+async function buildPbaAccountsSelections(req: Request): Promise<{ value: string; text: string }[]> {
+  const pbaAccounts = await getPbaAccounts(req);
+
+  const accountOptions = (pbaAccounts ?? []).map(account => ({
+    value: account,
+    text: account,
+  }));
+
+  return [{ value: '', text: 'labels.selectPba' }, ...accountOptions];
 }
 
+async function getPbaAccounts(req: Request): Promise<string[]> {
+  const accessToken = req.session.user?.accessToken;
+  if (!accessToken) {
+    logger.error('Unable to get PBA accounts for user');
+    return [];
+  }
 
-function getPbaAccounts(): string[] {
-  // invoke api
-  return ['pba123', 'pba321'];
+  const pbaAccountsResponse = await paymentService.getPbaAccounts(accessToken);
+  return pbaAccountsResponse.pbaAccounts;
 }

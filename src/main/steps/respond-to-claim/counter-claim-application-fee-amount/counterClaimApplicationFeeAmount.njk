@@ -48,7 +48,7 @@
           },
           items: pbaAccountItems,
           value: form.pbaAccounts,
-          errorMessage: errors.pbaAccounts
+          errorMessage: errors.pba
         }) }}
 
         {{ govukInput({
@@ -61,7 +61,10 @@
               },
               hint: {
                 text: labels.customerReferenceHint
-              }
+              },
+            errorMessage: {
+                text: fieldErrors['paymentOptions.customerReference']
+              } if fieldErrors['paymentOptions.customerReference']
         }) }}
       {% endset -%}
 
@@ -94,8 +97,7 @@
     {% endfor %}
 
       {{ govukButton({
-        text: payNowButton,
-        disabled: payNowDisabled
+        text: payNowButton
       }) }}
     </form>
   {% else %}
