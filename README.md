@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-### Prerequisites
+### Prerequisites (temp)
 
 Running the application requires the following tools to be installed in your environment:
 
