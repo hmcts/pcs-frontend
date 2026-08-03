@@ -12,9 +12,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.makeCounterClaim),
   stepDir: __dirname,
   customTemplate: `${__dirname}/resumeResponse.njk`,
-  translationKeys: {
-
-  },
+  translationKeys: {},
   fields: [
     {
       name: 'resumeResponse',
@@ -42,5 +40,5 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     await saveDraftDefendantResponse(req, response);
-  }
+  },
 });

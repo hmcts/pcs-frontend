@@ -55,13 +55,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
 });
 
-async function getExistingDraftData(req: Request) : Promise<void> {
+async function getExistingDraftData(req: Request): Promise<void> {
   const accessToken = req.session?.user?.accessToken || '';
   const caseId = req.res?.locals.validatedCase?.id || '';
 
   const data = await ccdCaseService.getExistingCaseData(accessToken, caseId, req.session?.clientContext);
   if (req.res?.locals) {
-    req.res.locals.selectedDefendantResponses = data.case_details?.case_data?.possessionClaimResponse?.defendantResponses || {};
+    req.res.locals.selectedDefendantResponses =
+      data.case_details?.case_data?.possessionClaimResponse?.defendantResponses || {};
   }
 }
 

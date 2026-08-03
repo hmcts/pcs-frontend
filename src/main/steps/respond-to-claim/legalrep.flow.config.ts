@@ -80,6 +80,5 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     'defendant-name-confirmation': {
       showCondition: () => true,
     },
-
   },
 };

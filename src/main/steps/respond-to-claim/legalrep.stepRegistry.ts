@@ -7,7 +7,7 @@ import { StepDefinition } from '@modules/steps/stepFormData.interface';
 export const legalRepStepRegistry = {
   ...stepRegistry,
   'select-defendant': selectDefendant,
-  'resume-response' : resumeResponse
+  'resume-response': resumeResponse,
 } satisfies Record<string, StepDefinition>;
 
 export type LegalRepRespondToClaimStepName = keyof typeof legalRepStepRegistry;

@@ -26,7 +26,7 @@ export default function decentralisedEventRoutes(app: Application): void {
       return res.status(404).send('Not Found');
     }
 
-    if(!config.has('decentralisedEventRoutes.' + eventId)) {
+    if (!config.has('decentralisedEventRoutes.' + eventId)) {
       logger.error('Unsupported event ID redirect attempted', { eventId, caseReference });
       return res.status(404).send('Not Found');
     }
@@ -59,7 +59,9 @@ export default function decentralisedEventRoutes(app: Application): void {
       eventId,
     });
 
-    const redirectRoute = config.get<string>('decentralisedEventRoutes.' + eventId).replace(':caseReference', caseReference);
+    const redirectRoute = config
+      .get<string>('decentralisedEventRoutes.' + eventId)
+      .replace(':caseReference', caseReference);
     return safeRedirect303(res, redirectRoute);
   });
 

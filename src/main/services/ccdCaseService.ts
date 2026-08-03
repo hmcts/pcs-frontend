@@ -382,7 +382,11 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
   },
 
-  async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string, clientContextHeaders?: ClientContextHeaders): Promise<StartCallbackData> {
+  async getExistingCaseData(
+    accessToken: string | undefined,
+    ccdCaseId: string,
+    clientContextHeaders?: ClientContextHeaders
+  ): Promise<StartCallbackData> {
     const eventUrl = `${getBaseUrl()}/cases/${ccdCaseId}/event-triggers/respondPossessionClaim?ignore-warning=false`;
     logger.info('getExistingCaseData event URL', { eventUrl });
 
