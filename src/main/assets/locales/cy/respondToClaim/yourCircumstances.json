@@ -14,7 +14,7 @@
   "errors": {
     "shareCircumstances": "Dewiswch a hoffech chi rannu unrhyw beth am eich amgylchiadau",
     "shareCircumstances.circumstancesDetails": "Rhowch fanylion am eich amgylchiadau",
-    "circumstancesDetailsMaxLength": "cyCircumstances details must be 500 characters or less",
-    "circumstancesDetailsInvalidCharacters": "cyThe details of your circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "circumstancesDetailsMaxLength": "Rhaid i fanylion amgylchiadau fod yn 500 nod neu lai",
+    "circumstancesDetailsInvalidCharacters": "Dylai manylion eich amgylchiadau ond cynnwys llythrennau a i z, a nodweddion arbennig fel cysylltnod, bylchau a chollnod."
   }
 }
