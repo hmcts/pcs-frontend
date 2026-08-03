@@ -22,7 +22,9 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
   app.get(
     '/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id',
     oidcMiddleware,
-    // Gate the draft write behind the same respond-to-claim feature flag as every journey page
+    // Gate the draft write behind the same respond-to-claim feature flag as every journey page —
+    // otherwise this route stays reachable (and persists flags) when the journey is switched off.
+    respondToClaimFeatureMiddleware,
     async (req: Request, res: Response) => {
       const caseReference = String(req.params.caseReference || '');
       const payloadId = String(req.params.id || '');
