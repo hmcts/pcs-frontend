@@ -55,7 +55,7 @@
     "@router": "dist/main/router"
   },
   "dependencies": {
-    "@azure/monitor-opentelemetry": "1.18.2",
+    "@azure/monitor-opentelemetry": "1.19.0",
     "@hmcts-cft/cft-ui-component-lib": "0.1.0-alpha.4",
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
@@ -160,7 +160,7 @@
     "prettier": "3.9.6",
     "sass": "1.102.0",
     "sass-loader": "17.0.0",
-    "saucectl": "^0.211.0",
+    "saucectl": "^0.213.0",
     "style-loader": "4.0.0",
     "stylelint": "17.14.1",
     "stylelint-config-standard": "40.0.0",
