@@ -22,6 +22,6 @@ export const defendantNameConfirmation = {
   emojiTextInput: `👉 😄`,
   emojiFirstNameErrorMessage: `First name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   emojiLastNameErrorMessage: `Last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `defendant-name-confirmation`,
 };
