@@ -83,6 +83,42 @@ describe('initRedirectOnBack', () => {
     expect(redirectToMock).toHaveBeenCalledWith(dashboardUrl);
   });
 
+  it('re-pushes the guard on every Back so deeper history stacks stay trapped', () => {
+    addMarker(dashboardUrl);
+
+    initRedirectOnBack();
+    expect(pushStateSpy).toHaveBeenCalledTimes(1);
+
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    // Guard is renewed before redirecting so a subsequent Back is caught too.
+    expect(pushStateSpy).toHaveBeenCalledTimes(2);
+
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    expect(pushStateSpy).toHaveBeenCalledTimes(3);
+    expect(redirectToMock).toHaveBeenCalledTimes(2);
+    expect(redirectToMock).toHaveBeenNthCalledWith(2, dashboardUrl);
+  });
+
+  it('registers a single popstate listener regardless of bfcache re-arms', () => {
+    addMarker(dashboardUrl);
+
+    initRedirectOnBack();
+
+    const persistedPageshow = (): void => {
+      const pageshow = new Event('pageshow');
+      Object.defineProperty(pageshow, 'persisted', { value: true });
+      window.dispatchEvent(pageshow);
+    };
+    persistedPageshow();
+    persistedPageshow();
+
+    redirectToMock.mockClear();
+    window.dispatchEvent(new PopStateEvent('popstate'));
+
+    // A single Back must redirect exactly once — no accumulated listeners.
+    expect(redirectToMock).toHaveBeenCalledTimes(1);
+  });
+
   it('re-arms when the page is restored from the back/forward cache', () => {
     addMarker(dashboardUrl);
 
