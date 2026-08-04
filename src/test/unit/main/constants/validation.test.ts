@@ -41,12 +41,16 @@ describe('validateAmount', () => {
     );
   });
 
-  it('returns negative error for negative values', () => {
+  it('returns min amount error for negative values', () => {
     expect(validateAmount('-1.00', errorKeys)).toBe('The amount you entered must be £0.00 or above');
   });
 
-  it('returns large amount error for 1 billion or more', () => {
-    expect(validateAmount('1000000000', errorKeys)).toBe('The amount you entered must be less than £1 billion');
+  it('returns true for exactly 1 billion', () => {
+    expect(validateAmount('1000000000', errorKeys)).toBe(true);
+  });
+
+  it('returns max amount error for more than 1 billion', () => {
+    expect(validateAmount('1000000000.01', errorKeys)).toBe('The amount you entered must be less than £1 billion');
   });
 
   it('returns true for empty input so required validation can handle it', () => {
