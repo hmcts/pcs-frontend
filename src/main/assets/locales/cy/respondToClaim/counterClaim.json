@@ -1,28 +1,28 @@
 {
-  "pageTitle": "cyCounterclaim",
-  "whatCounterClaimIsHeading": "cyWhat a counterclaim is",
-  "whatCounterClaimIsParagraph1": "cyA counterclaim is a separate claim that you can make alongside your response. You can make it against:",
+  "pageTitle": "Gwrth-hawliad",
+  "whatCounterClaimIsHeading": "Beth yw gwrth-hawliad",
+  "whatCounterClaimIsParagraph1": "Mae gwrth-hawliad yn hawliad ar wahân y gallwch ei wneud ynghyd â'ch ymateb. Gallwch ei wneud yn erbyn:",
   "whatCounterClaimIsBullet1": "cya party in the case",
   "whatCounterClaimIsBullet2": "cyagainst a party and someone else that can be considered as part of the same case",
-  "whatCounterClaimIsParagraph2": "cyIt’s separate from the questions you’ve already answered, where you responded to specific information {{claimantName}} provided. In a counterclaim, you say that a party owes you something. This can be money or something else.",
-  "whatCounterClaimIsParagraph3": "cyYou can make a counterclaim at any time, but if you do it after you’ve submitted your response, you will have to ask a judge for permission to make it.",
+  "whatCounterClaimIsParagraph2": "Mae ar wahân i'r cwestiynau a atebwyd gennych eisoes, ble gwnaethoch ymateb i wybodaeth benodol a ddarparwyd gan {{claimantName}}. Mewn gwrth-hawliad, rydych yn dweud bod gan barti rywbeth yn ddyledus i chi.  Gall hwn fod yn arian neu rywbeth arall.",
+  "whatCounterClaimIsParagraph3": "Gallwch wneud gwrth-hawliad ar unrhyw adeg, ond os byddwch yn ei wneud ar ôl cyflwyno eich ymateb, bydd yn rhaid i chi ofyn i farnwr am ganiatâd i'w wneud.",
   "whatCounterClaimIsLinkText": "cy<a href=\"https://england.shelter.org.uk/professional_resources/legal/possession_and_eviction/tenant_defences_to_possession/tenant_defence_and_counterclaim_process\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Read guidance on counterclaims from Shelter (opens in new tab)</a>.",
-  "whenMakeCounterClaimHeading": "cyWhen you can make a counterclaim",
-  "whenMakeCounterClaimParagraph1": "cyYou can make a counterclaim if you believe a party has done something wrong or failed to act. For example, if they:",
+  "whenMakeCounterClaimHeading": "Pryd gallwch wneud gwrth-hawliad",
+  "whenMakeCounterClaimParagraph1": "Gallwch wneud gwrth-hawliad os ydych yn credu bod parti wedi gwneud rhywbeth yn anghywir neu wedi methu gweithredu. Er enghraifft, os ydynt:",
   "whenMakeCounterClaimBullet1": "cyleft the property in a state of disrepair",
   "whenMakeCounterClaimBullet2": "cydid not protect your tenancy deposit",
-  "whenMakeCounterClaimParagraph2": "cyYou must have a valid legal reason to make a counterclaim.",
-  "whenMakeCounterClaimParagraph3": "cyIf you’re not sure whether you have a valid reason, you can get free legal advice through the Housing Loss Prevention Advice Service. You can find a provider near you using the <a href=\"https://find-legal-advice.justice.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> find a legal adviser service (opens in new tab)</a>.",
-  "counterClaimFeesHeading": "cyFees for making a counterclaim",
-  "counterClaimFeesParagraph1": "cyYou will have to pay a fee to make a counterclaim, unless you’re eligible for help with fees. <a href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Check if you can get help with court fees (opens in new tab)</a>.",
-  "counterClaimFeesParagraph2": "cyThe amount you pay depends on what you’re claiming. If it’s a claim for an amount of money, the fee depends on the value of your claim. If your claim is about something else, the fee is {{counterClaimFlatFeeFEE0450, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}.",
+  "whenMakeCounterClaimParagraph2": "Rhaid i chi gael rheswm cyfreithiol dilys i wneud gwrth-hawliad.",
+  "whenMakeCounterClaimParagraph3": "Os nad ydych yn siŵr pa un a oes gennych reswm dilys, gallwch gael cyngor cyfreithiol am ddim drwy'r Gwasanaeth Cyngor Atal Colli Cartref.  Gallwch ddod o hyd i ddarparwr lleol i chi drwy ddefnyddio <a href=\"https://find-legal-advice.justice.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> dod o hyd i wasanaeth cyngor cyfreithiol (yn agor mewn tab newydd)</a>.",
+  "counterClaimFeesHeading": "Ffioedd ar gyfer gwneud gwrth-hawliad",
+  "counterClaimFeesParagraph1": "Bydd angen i chi dalu ffi ymgeisio i wneud gwrth-hawliad, oni bai eich bod yn gymwys i gael help gyda ffioedd. <a href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gwiriwch os gallwch gael help gyda ffioedd llys (yn agor mewn tab newydd)</a>.",
+  "counterClaimFeesParagraph2": "Mae'r swm rydych yn ei dalu yn dibynnu ar beth ydych yn ei hawlio. Os yw'n hawliad am swm o arian, mae'r ffi yn dibynnu ar werth eich hawliad.  Os yw eich hawliad am rywbeth arall, mae'r ffi yn  {{counterClaimFlatFeeFEE0450, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}.",
   "counterClaimFeesCourtFeesLinkText": "cy<a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about court fees (opens in new tab)</a>.",
-  "question": "cyDo you want to make a counterclaim?",
+  "question": "Ydych chi eisiau gwneud gwrth-hawliad?",
   "options": {
     "yes": "Ydy",
     "no": "Nac ydy"
   },
   "errors": {
-    "makeCounterClaim": "cySelect if you’re planning to make a counterclaim"
+    "makeCounterClaim": "Dewiswch os ydych yn bwriadu gwneud gwrth-hawliad"
   }
 }
