@@ -1,9 +1,12 @@
 {#
   Marker consumed by assets/js/redirect-on-back.ts.
 
+  Gated behind the `release-1.2-enabled` flag (`release12Enabled`, set on
+  res.locals by respondToClaimFeatureMiddleware for every step route).
+
   Citizens only: legal representatives have no citizen dashboard to redirect to,
   so the trap is suppressed for them (`isLegalRepresentative`).
 #}
-{% if redirectOnBack and dashboardUrl and not isLegalRepresentative %}
+{% if release12Enabled and redirectOnBack and dashboardUrl and not isLegalRepresentative %}
   <span id="redirect-on-back" data-dashboard-url="{{ dashboardUrl }}" hidden></span>
 {% endif %}
