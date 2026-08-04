@@ -1,5 +1,5 @@
 export * from './startNow.page.data.lr';
-export * from './defendantNameConfirmationLR.page.data';
+export * from './defendantNameConfirmation.page.data.lr';
 export * from './defendantDateOfBirthLR.page.data';
 export * from './correspondenceAddressLR.page.data';
 export * from './contactPreferenceEmailOrPostLR.page.data';

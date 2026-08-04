@@ -16,7 +16,7 @@ import {
   counterclaimDoYouWantToUploadFilesLR,
   counterclaimYouNeedToApplyForHelpWithYourFeesLR,
   defendantDateOfBirthLR,
-  defendantNameConfirmationLR,
+  defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
@@ -135,8 +135,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pin2User.firstName, pin2User.lastName),
-      option: defendantNameConfirmationLR.yesRadioOption,
+      question: defendantNameConfirmation.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirthLR.dayInputText,
