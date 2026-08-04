@@ -72,6 +72,9 @@ withPipeline(type, product, component) {
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_navigation_tests").size() > 0) {
       env.ENABLE_NAVIGATION_TESTS = 'true'
     }
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run_e2e_in_welsh").size() > 0) {
+      env.RUN_E2E_IN_WELSH = 'true'
+    }
     env.TEST_URL = "https://pcs-frontend-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     def apiLabels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pcs-api-pr:")
     if (apiLabels && apiLabels.size() > 0) {
