@@ -26,20 +26,20 @@ const legalRepFormFieldConfig: FormFieldConfig[] = [
         translationKey: 'options.pba',
         subFields: {
           pbaAccount: {
-            name: 'pbaAccounts',
+            name: 'pbaAccount',
             type: 'select',
-            // required: true,
+            required: true,
             translationKey: {
               label: 'labels.pba',
             },
-            errorMessage: 'errors.paymentOptions.pba',
+            errorMessage: 'errors.pbaAccount',
           },
           customerReference: {
             name: 'customerReference',
             type: 'text',
-            // required: true,
+            required: true,
             translationKey: { label: 'labels.customerReference' },
-            errorMessage: 'errors.paymentOptions.customerReference',
+            errorMessage: 'errors.customerReference',
           },
         },
       },
@@ -60,6 +60,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     if (isLegalRepresentativeUser(req)) {
       const paymentOption = req.body?.paymentOptions as string | undefined;
       if (paymentOption === 'pba') {
+        const paymentSession = getPaymentSessionState(req);
+        if (paymentSession) {
+          setPaymentSessionState(req, {
+            ...paymentSession,
+            customerReference: req.body?.['paymentOptions.customerReference'],
+            pbaAccount: req.body?.['paymentOptions.pbaAccounts'],
+          });
+        }
         return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start` : '#';
       } else {
         return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
@@ -70,8 +78,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const paymentSession = getPaymentSessionState(req);
     const caseModel = req.res?.locals?.validatedCase;
     const counterClaim = caseModel instanceof CcdCaseModel ? caseModel.defendantResponsesCounterClaim : undefined;
-    const claimType = 'SOMETHING_ELSE';
-
+    const claimType = paymentSession?.counterClaimType ?? counterClaim?.claimType;
     if (!claimType) {
       throw new Error('Counterclaim fee unavailable: missing claimType');
     }
@@ -126,15 +133,29 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       payNowDisabled,
       showPaymentError,
       backUrl,
+      errors: {
+        paymentOptions: t('errors.paymentOptions'),
+        pbaAccount: t('errors.pbaAccount'),
+        customerReference: t('errors.customerReference'),
+      },
       labels: {
         pba: t('labels.pba'),
         customerReferenceHeading: t('labels.customerReferenceHeading'),
         customerReferenceHint: t('labels.customerReferenceHint'),
-        selectPba: t('labels.selectPba')
+        selectPba: t('labels.selectPba'),
       },
+      pageTitle: t('pageTitle'),
     };
   },
-  translationKeys: { pageTitle: 'pageTitle' },
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    caption: 'caption',
+    notApplicable: 'notApplicable',
+    counterClaimAmountLabel: 'counterClaimAmountLabel',
+    counterClaimFeeLabel: 'counterClaimFeeLabel',
+    payNowButton: 'payNowButton',
+    paymentError: 'paymentError',
+  },
   fields: legalRepFormFieldConfig,
 });
 

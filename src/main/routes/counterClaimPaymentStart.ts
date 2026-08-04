@@ -21,30 +21,17 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
       const { serviceRequestReference, feeAmount } = req.session.payment ?? {};
 
       if (!accessToken) {
-        logger.error(`Missing access token when starting counterclaim payment for case ${caseReference}`);
-        return next(new HTTPError('Authentication required', 401));
+        return redirectOnMissingAccessToken(caseReference, next);
       }
 
       if (!serviceRequestReference || feeAmount === undefined) {
-        logger.warn(`Missing payment session data for counterclaim payment start case ${caseReference}`);
-        return safeRedirect303(
-          res,
-          `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount`,
-          `/case/${caseReference}`,
-          ['/case']
-        );
+        return redirectOnMissingPaymentSessionData(res, caseReference);
       }
 
       const paymentReturnUrl = config.get<string>('payment.returnUrl');
 
       if (!paymentReturnUrl) {
-        logger.error(`No payment return URL configured when starting counterclaim payment for case ${caseReference}`);
-        return safeRedirect303(
-          res,
-          `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount?payment=failed`,
-          `/case/${caseReference}`,
-          ['/case']
-        );
+        return redirectOnMissingPaymentReturnUrl(res, caseReference);
       }
 
       try {
@@ -85,48 +72,30 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
     oidcMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
       const caseReference = String(req.params.caseReference || '');
-      const customerReference = String(req.params.customerReference || '');
-      const pbaAccount = String(req.params.pbaAccount || '');
       const accessToken = req.session.user?.accessToken;
-      const { serviceRequestReference, feeAmount } = req.session.payment ?? {};
-
-      console.log('customerReference', customerReference);
-      console.log('pbaAccount', pbaAccount);
+      const { serviceRequestReference, feeAmount, customerReference, pbaAccount } = req.session.payment ?? {};
 
       if (!accessToken) {
-        logger.error(`Missing access token when starting counterclaim payment for case ${caseReference}`);
-        return next(new HTTPError('Authentication required', 401));
+        return redirectOnMissingAccessToken(caseReference, next);
       }
 
       if (!serviceRequestReference || feeAmount === undefined) {
-        logger.warn(`Missing payment session data for counterclaim payment start case ${caseReference}`);
-        return safeRedirect303(
-          res,
-          `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount`,
-          `/case/${caseReference}`,
-          ['/case']
-        );
+        return redirectOnMissingPaymentSessionData(res, caseReference);
       }
 
       const paymentReturnUrl = config.get<string>('payment.returnUrl');
 
       if (!paymentReturnUrl) {
-        logger.error(`No payment return URL configured when starting counterclaim payment for case ${caseReference}`);
-        return safeRedirect303(
-          res,
-          `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount?payment=failed`,
-          `/case/${caseReference}`,
-          ['/case']
-        );
+        return redirectOnMissingPaymentReturnUrl(res, caseReference);
       }
 
       try {
         const paymentResponse = await paymentService.startPbaPaymentRequest({
           accessToken,
-          serviceRequestReference: 'serviceRequestReference',
-          amount: 123,
-          accountNumber: '',
-          customerReference: '',
+          serviceRequestReference,
+          amount: feeAmount,
+          pbaAccount,
+          customerReference,
         });
 
         await persistPaymentSessionState(req, {
@@ -150,3 +119,29 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
     }
   );
 }
+
+function redirectOnMissingAccessToken(caseReference: string, next: NextFunction) {
+  logger.error(`Missing access token when starting counterclaim payment for case ${caseReference}`);
+  return next(new HTTPError('Authentication required', 401));
+}
+
+function redirectOnMissingPaymentSessionData(res: Response, caseReference: string) {
+  logger.warn(`Missing payment session data for counterclaim payment start case ${caseReference}`);
+  return safeRedirect303(
+    res,
+    `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount`,
+    `/case/${caseReference}`,
+    ['/case']
+  );
+}
+
+function redirectOnMissingPaymentReturnUrl(res: Response, caseReference: string) {
+  logger.error(`No payment return URL configured when starting counterclaim payment for case ${caseReference}`);
+  return safeRedirect303(
+    res,
+    `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount?payment=failed`,
+    `/case/${caseReference}`,
+    ['/case']
+  );
+}
+

@@ -193,19 +193,6 @@ export function buildComponentConfig({
       componentType = 'radios';
       break;
     }
-    case 'select': {
-      const selectValue = (fieldValue as string) || '';
-      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
-      component.items = buildSelectionItems(
-        field.options,
-        translatedOptions,
-        option => selectValue === option.value,
-        nunjucksEnv
-      );
-
-      componentType = 'select';
-      break;
-    }
     case 'checkbox': {
       // Normalize checkbox value to handle edge case: [{ '0': 'value1', '1': 'value2' }]
       // This ensures checkbox values are always in the correct format for rendering

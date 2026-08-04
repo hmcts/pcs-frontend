@@ -1,4 +1,12 @@
 {
+  "pageTitle": "Pay your counterclaim fee",
+  "caption": "Respond to a property possession claim",
+  "notApplicable": "Not applicable",
+  "counterClaimAmountLabel": "Counterclaim amount",
+  "counterClaimFeeLabel": "Counterclaim fee",
+  "counterClaimAmountDisplay": "{{counterClaimAmount, currency(currency: GBP)}}",
+  "counterClaimFeeDisplay": "{{counterClaimFee, currency(currency: GBP)}}",
+  "payNowButton": "Pay your counterclaim fee ({{counterClaimFee, currency(currency: GBP)}})",
   "paymentError": "We could not start your payment. Try again.",
   "options": {
     "pba": "Pay fee using Payment by Account (PBA)",
@@ -11,6 +19,8 @@
     "customerReferenceHint": "This should be your own unique reference to identify the case. It will appear on your statements."
   },
   "errors": {
-    "paymentOptions": "You must select a payment option"
+    "paymentOptions": "You must select a payment option",
+    "pbaAccount": "You must select a PBA account",
+    "customerReference": "You must enter a customer reference"
   }
 }

@@ -10,6 +10,16 @@
     "customerReferenceHint": "cyThis should be your own unique reference to identify the case. It will appear on your statements."
   },
   "errors": {
-    "paymentOptions": "cyYou must select a payment option"
-  }
+    "paymentOptions": "cyYou must select a payment option",
+    "pbaAccount": "cyYou must select a PBA account",
+    "customerReference": "cyYou must enter a customer reference"
+  },
+  "pageTitle": "cyPay your counterclaim fee",
+  "caption": "Ymateb i hawliad i feddiannu eiddo",
+  "notApplicable": "cyNot applicable",
+  "counterClaimAmountLabel": "cyCounterclaim amount",
+  "counterClaimFeeLabel": "Ffi gwrth-hawliad",
+  "counterClaimAmountDisplay": "cy{{counterClaimAmount, currency(currency: GBP)}}",
+  "counterClaimFeeDisplay": "cy{{counterClaimFee, currency(currency: GBP)}}",
+  "payNowButton": "cyPay your counterclaim fee ({{counterClaimFee, currency(currency: GBP)}})"
 }

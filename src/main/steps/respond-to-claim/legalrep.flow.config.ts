@@ -84,10 +84,6 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
     },
 
-    'counter-claim-application-fee-amount': {
-      showCondition: () => true,
-    },
-
     'defendant-name-confirmation': {
       showCondition: () => true,
     },

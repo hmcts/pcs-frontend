@@ -43,13 +43,13 @@ export interface StartPbaPaymentRequestInput {
   accessToken: string;
   serviceRequestReference: string;
   amount: number;
-  accountNumber?: string;
-  customerReference: string;
+  pbaAccount?: string;
+  customerReference?: string;
 }
 
 export interface CreatePbaPaymentRequest {
   amount: number;
-  accountNumber?: string;
+  pbaAccount: string;
   customerReference: string;
 }
 
@@ -156,7 +156,7 @@ export const paymentService = {
   async startPbaPaymentRequest(input: StartPbaPaymentRequestInput): Promise<PbaPaymentResponse> {
     const paymentResponse = await this.createPbaPaymentRequest(input.accessToken, input.serviceRequestReference, {
       amount: input.amount,
-      accountNumber: input.accountNumber,
+      pbaAccount: input.pbaAccount,
       customerReference: input.customerReference,
     });
 

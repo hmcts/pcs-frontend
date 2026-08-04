@@ -9,6 +9,7 @@
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
+  {% set fieldErrors = validationErrors or {} %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
@@ -48,7 +49,9 @@
           },
           items: pbaAccountItems,
           value: form.pbaAccounts,
-          errorMessage: errors.pba
+          errorMessage: {
+                   text: fieldErrors['paymentOptions.pbaAccount']
+                 } if fieldErrors['paymentOptions.pbaAccount']
         }) }}
 
         {{ govukInput({
@@ -62,10 +65,11 @@
               hint: {
                 text: labels.customerReferenceHint
               },
-            errorMessage: {
-                text: fieldErrors['paymentOptions.customerReference']
-              } if fieldErrors['paymentOptions.customerReference']
-        }) }}
+              errorMessage: {
+                   text: fieldErrors['paymentOptions.customerReference']
+                 } if fieldErrors['paymentOptions.customerReference']
+            })
+        }}
       {% endset -%}
 
     {% for field in fields %}
@@ -97,7 +101,8 @@
     {% endfor %}
 
       {{ govukButton({
-        text: payNowButton
+        text: payNowButton,
+        disabled: payNowDisabled
       }) }}
     </form>
   {% else %}
