@@ -1,18 +1,18 @@
 {
-  "pageTitle": "cyConfirm if these documents relate to an existing application",
-  "heading": "cyConfirm if these documents relate to an existing application",
-  "paragraph1": "cyWe usually share anything you upload with the other party, for example your landlord, housing association or mortgage provider.",
-  "paragraph2": "cyIf your application is ‘without notice’ (where you have asked us to consider your application without telling the other party) we will not share anything with them.",
-  "question": "cyDo these documents relate to an existing application?",
-  "applicationOptionAdjourn": "cyYes, the documents I’m uploading relate to the application to adjourn the hearing - submitted on {{date}}",
+  "pageTitle": "Cadarnhewch os yw'r dogfennau hyn yn ymwneud â chais presennol",
+  "heading": "Cadarnhewch os yw'r dogfennau hyn yn ymwneud â chais presennol",
+  "paragraph1": "Rydym fel arfer yn rhannu unrhyw beth rydych yn ei uwchlwytho gyda'r parti arall, er enghraifft eich landlord, cymdeithas dai neu ddarparwyr morgais",
+  "paragraph2": "Os yw eich cais yn un 'heb rybudd' (ble rydych wedi gofyn i ni ystyried eich cais heb ddweud wrth y parti arall) ni fyddwn yn rhannu unrhyw beth gyda nhw.",
+  "question": "A yw'r ceisiadau hyn yn ymwneud â chais presennol?",
+  "applicationOptionAdjourn": "Ydyn, mae'r dogfennau rwy'n eu huwchlwytho yn ymwneud â'r cais i ohirio'r gwrandawiad - cyflwynwyd ar  {{date}}",
   "applicationOptionSuspend": "cyYes, the documents I’m uploading relate to the application to suspend the eviction - submitted on {{date}}",
-  "applicationOptionSetAside": "cyYes, the documents I’m uploading relate to the application to set aside the order - submitted on {{date}}",
-  "applicationOptionGeneric": "cyYes, the documents I’m uploading relate to the application submitted on {{date}}",
-  "optionClaimOrCounterclaim": "cyNo, the documents I’m uploading relate to the main claim or counterclaim",
+  "applicationOptionSetAside": "Ydyn, mae'r dogfennau rwy'n eu huwchlwytho yn ymwneud â'r cais i roi'r gorchymyn o'r neilltu - cyflwynwyd ar {{date}}",
+  "applicationOptionGeneric": "Ydyn, mae'r dogfennau rwy'n eu huwchlwytho yn ymwneud â'r cais a gyflwynwyd ar  {{date}}",
+  "optionClaimOrCounterclaim": "Na, mae'r dogfennau rwy'n uwchlwytho yn ymwneud â'r prif gais neu'r gwrth-hawliad",
   "errors": {
     "title": "Mae yna broblem",
     "relatedApplicationId": {
-      "required": "cyConfirm if these documents relate to an existing application"
+      "required": "Cadarnhewch os yw'r dogfennau hyn yn ymwneud â chais presennol"
     }
   }
 }
