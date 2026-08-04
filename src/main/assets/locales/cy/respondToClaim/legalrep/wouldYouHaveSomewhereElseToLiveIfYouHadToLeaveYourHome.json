@@ -1,19 +1,19 @@
 {
   "question": "",
-  "heading": "cyAlternative accommodation",
-  "accommodationQuestion": "cyWould the defendant have somewhere else to live if they had to leave their home?",
-  "dateLabel": "cyWhen would they be able to move in? (Optional)",
+  "heading": "Llety amgen",
+  "accommodationQuestion": "A fyddai gan y diffynnydd rywle arall i fyw os byddai'n rhaid iddynt adael eu cartref?",
+  "dateLabel": "Pryd fyddent yn gallu symud i mewn? (Dewisol)",
   "options": {
-    "notSure": "cyDefendant is not sure"
+    "notSure": "Diffynnydd ddim yn siŵr"
   },
   "errors": {
     "date": {
-      "notRealDate": "cyThe date the defendant would be able to move in must be a real date ",
-      "pastDate": "cyThe date the defendant would be able to move in must be in the future",
-      "invalidValue": "cyThe date the defendant would be able to move in must be a real date ",
-      "missingOne": "cyThe date the defendant would be able to move in must include a {{missingField}}",
-      "missingTwo": "cyThe date the defendant would be able to move in must include a {{first}} and {{second}}"
+      "notRealDate": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn fod yn ddyddiad go iawn",
+      "pastDate": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn fod yn y dyfodol",
+      "invalidValue": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn fod yn ddyddiad go iawn",
+      "missingOne": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn gynnwys {{first}} a {{second}}"
     },
-    "confirmAlternativeAccommodation": "cySelect if the defendant would have somewhere else to live if they had to leave their home"
+    "confirmAlternativeAccommodation": "Dewiswch a fyddai gan y diffynnydd rywle arall i fyw os byddai'n rhaid iddynt adael eu cartref"
   }
 }

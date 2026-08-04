@@ -1,15 +1,15 @@
 {
   "caption": "Ymateb i hawliad i feddiannu eiddo",
   "pageTitle": "Landlord cofrestredig",
-  "introText": "cyYou can check if the landlord is registered by searching the",
-  "question": "cyIs the landlord registered?",
+  "introText": "Gallwch wirio a yw'r landlord yn gofrestredig drwy chwilio",
+  "question": "A yw'r landlord wedi'i gofrestru?",
   "options": {
     "yes": "Ydy",
     "no": "Nac ydy",
-    "or": "cyor",
-    "imNotSure": "cyDefendant is not sure"
+    "or": "neu",
+    "imNotSure": "Diffynnydd ddim yn siŵr"
   },
   "errors": {
-    "landlordRegistered": "cySelect if the defendant agrees with the landlord’s claim to be registered"
+    "landlordRegistered": "Dewiswch os yw'r diffynnydd yn cytuno i hawliad y landlord gael ei gofrestru"
   }
 }

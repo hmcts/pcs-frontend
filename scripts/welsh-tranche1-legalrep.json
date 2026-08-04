@@ -1,0 +1,1694 @@
+[
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "pageTitle",
+    "welsh": "Dyddiad yr hysbysiad"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "question",
+    "welsh": "Pryd wnaeth y diffynnydd gael yr hysbysiad gan {{claimantName}} (dewisol)?"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "noticeDateHint",
+    "welsh": "Er enghraifft, 27 9 2022"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "paragraph",
+    "welsh": "Ni wnaeth {{claimantName}} roi'r dyddiad y gwnaethant gyflwyno'r hysbysiad i'r diffynnydd."
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "errors.date.day",
+    "welsh": "Diwrnod"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "errors.date.month",
+    "welsh": "Mis"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "errors.date.year",
+    "welsh": "Blwyddyn"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "errors.date.notRealDate",
+    "welsh": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "errors.date.futureDate",
+    "welsh": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad fod naill ai'n ddyddiad heddiw neu yn y gorffennol"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "errors.date.invalidValue",
+    "welsh": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "errors.date.missingOne",
+    "welsh": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{missingField}}"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenNotProvided.json",
+    "key": "errors.date.missingTwo",
+    "welsh": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{first}} a {{second}}"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "pageTitle",
+    "welsh": "Dyddiad yr hysbysiad"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "bulletPointLabel",
+    "welsh": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "hintText",
+    "welsh": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i'r diffynnydd (y dyddiad cyflwyno)."
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "question",
+    "welsh": "Pryd wnaeth y diffynnydd gael yr hysbysiad gan {{claimantName}} (dewisol)?"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "noticeDateHint",
+    "welsh": "Er enghraifft, 27 9 2022"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "errors.date.day",
+    "welsh": "Diwrnod"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "errors.date.month",
+    "welsh": "Mis"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "errors.date.year",
+    "welsh": "Blwyddyn"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "errors.date.notRealDate",
+    "welsh": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "errors.date.futureDate",
+    "welsh": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad fod naill ai'n ddyddiad heddiw neu yn y gorffennol"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "errors.date.invalidValue",
+    "welsh": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "errors.date.missingOne",
+    "welsh": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{missingField}}"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "errors.date.missingTwo",
+    "welsh": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{first}} a {{second}}"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "pageTitle",
+    "welsh": "Manylion yr hysbysiad"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "question",
+    "welsh": "A wnaeth {{claimantName}} hysbysu'r diffynnydd am eu bwriad i ddechrau achos meddiannu?"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "options.yes",
+    "welsh": "Do"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "options.no",
+    "welsh": "Naddo"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "options.imNotSure",
+    "welsh": "Dydy'r Diffynnydd ddim yn siŵr"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "noticeDateLabel",
+    "welsh": "Pryd gafodd y diffynnydd yr hysbysiad gan {{claimantName}}? (Dewisol)"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "noticeDateHint",
+    "welsh": "Er enghraifft, 16 4 2021"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "errors.possessionNoticeReceived",
+    "welsh": "Dewiswch a wnaeth {{claimantName}} hysbysu'r diffynnydd am eu bwriad i ddechrau achos meddiannu"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "errors.date.day",
+    "welsh": "Diwrnod"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "errors.date.month",
+    "welsh": "Mis"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "errors.date.year",
+    "welsh": "Blwyddyn"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "errors.date.required",
+    "welsh": "Rhaid i’r dyddiad gynnwys diwrnod, mis a blwyddyn"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "errors.date.notRealDate",
+    "welsh": "Rhaid i'r dyddiad fod yn ddyddiad go iawn"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "errors.date.futureDate",
+    "welsh": "Rhaid i'r dyddiad fod yn y gorffennol"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "errors.date.missingOne",
+    "welsh": "Rhaid i'r dyddiad gynnwys {{missingField}}"
+  },
+  {
+    "file": "confirmationOfNoticeGiven.json",
+    "key": "errors.date.missingTwo",
+    "welsh": "Rhaid i'r dyddiad gynnwys {{first}} a {{second}}"
+  },
+  {
+    "file": "doAnyOtherAdultsLiveInYourHome.json",
+    "key": "heading",
+    "welsh": "Oedolion eraill"
+  },
+  {
+    "file": "doAnyOtherAdultsLiveInYourHome.json",
+    "key": "dependantQuestion",
+    "welsh": "A oes yna unrhyw oedolion eraill yn byw yng nghartref y diffynnydd?"
+  },
+  {
+    "file": "doAnyOtherAdultsLiveInYourHome.json",
+    "key": "textAreaLabel",
+    "welsh": "Rhowch fanylion yr oedolion eraill sy'n byw yng nghartref y diffynnydd"
+  },
+  {
+    "file": "doAnyOtherAdultsLiveInYourHome.json",
+    "key": "errors.confirmOtherAdults",
+    "welsh": "Dewiswch a oes yna unrhyw oedolion eraill yn byw yng nghartref y diffynnydd"
+  },
+  {
+    "file": "doAnyOtherAdultsLiveInYourHome.json",
+    "key": "errors.otherAdultsDetails",
+    "welsh": "Rhowch fanylion yr oedolion eraill sy'n byw yn eu cartref"
+  },
+  {
+    "file": "doAnyOtherAdultsLiveInYourHome.json",
+    "key": "errors.otherAdultsDetailsInvalidCharacters",
+    "welsh": "Rhowch fanylion am yr oedolion eraill sy'n byw yn eu cartref, rhaid iddynt gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
+  },
+  {
+    "file": "doYouHaveAnyDependantChildren.json",
+    "key": "heading",
+    "welsh": "Plant sy'n ddibynnol"
+  },
+  {
+    "file": "doYouHaveAnyDependantChildren.json",
+    "key": "dependentQuestion",
+    "welsh": "A oes gan y diffynnydd unrhyw blant sy'n ddibynnol arnynt?"
+  },
+  {
+    "file": "doYouHaveAnyDependantChildren.json",
+    "key": "dependentChildrenDetailsLabel",
+    "welsh": "Rhowch fanylion am eu plant dibynnol"
+  },
+  {
+    "file": "doYouHaveAnyDependantChildren.json",
+    "key": "errors.dependentChildren",
+    "welsh": "Dewiswch a oes ganddynt unrhyw blant sy'n ddibynnol arnynt"
+  },
+  {
+    "file": "doYouHaveAnyDependantChildren.json",
+    "key": "errors.dependentChildrenDetails",
+    "welsh": "Rhowch fanylion eu plant dibynnol"
+  },
+  {
+    "file": "doYouHaveAnyOtherDependants.json",
+    "key": "heading",
+    "welsh": "Dibynyddion eraill"
+  },
+  {
+    "file": "doYouHaveAnyOtherDependants.json",
+    "key": "dependantQuestion",
+    "welsh": "A oes gan y diffynnydd unrhyw un arall sy'n ddibynnol arnynt?"
+  },
+  {
+    "file": "doYouHaveAnyOtherDependants.json",
+    "key": "otherDependantDetailsLabel",
+    "welsh": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnynt"
+  },
+  {
+    "file": "doYouHaveAnyOtherDependants.json",
+    "key": "errors.otherDependants",
+    "welsh": "Nodwch a oes ganddynt unrhyw un arall sy'n ddibynnol arnynt"
+  },
+  {
+    "file": "doYouHaveAnyOtherDependants.json",
+    "key": "errors.otherDependantDetails",
+    "welsh": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnynt"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "pageTitle",
+    "welsh": "Caledi eithriadol"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "introParagraph1",
+    "welsh": "Gallwch ddefnyddio'r adran hon i egluro unrhyw galedi eithriadol a brofir gan y diffynnydd os gofynnir iddynt adael eu cartref."
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "introParagraph3",
+    "welsh": "Caiff unrhyw fanylion a ddarperir gan y diffynnydd eu hystyried gan farnwr wrth wneud eu penderfyniad, ond eu dewis nhw yw penderfynu a yw caledi eithriadol yn berthnasol."
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "forExample",
+    "welsh": "Er enghraifft, efallai bod y diffynnydd wedi:"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "bullet1",
+    "welsh": "mynd drwy ysgariad neu wahanu"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "bullet2",
+    "welsh": "colli eu swydd neu wedi cael eu diswyddo"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "bullet3",
+    "welsh": "profi galar neu salwch hirdymor"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "bullet4",
+    "welsh": "cael eu datgan yn fethdalwr"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "question",
+    "welsh": "A fyddai'r diffynnydd yn profi caledi eithriadol os gofynnir iddynt adael eu cartref?"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "textAreaLabel",
+    "welsh": "Rhowch fanylion am y caledi eithriadol y byddai'r diffynnydd yn ei brofi"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "errors.exceptionalHardship",
+    "welsh": "Dewiswch a fyddai'r diffynnydd yn profi caledi eithriadol os gofynnir iddynt adael eu cartref"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "errors.exceptionalHardshipDetails",
+    "welsh": "Rhowch fanylion am y caledi eithriadol y byddai'r diffynnydd yn ei brofi"
+  },
+  {
+    "file": "exceptionalHardship.json",
+    "key": "errors.exceptionalHardshipDetailsInvalidCharacters",
+    "welsh": "Dylai manylion y caledi eithriadol a brofir gan y diffynnydd ond cynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
+  },
+  {
+    "file": "haveYouAppliedForUniversalCredit.json",
+    "key": "question",
+    "welsh": "A yw'r diffynnydd wedi gwneud cais am Gredyd Cynhwysol?"
+  },
+  {
+    "file": "haveYouAppliedForUniversalCredit.json",
+    "key": "heading",
+    "welsh": "Credyd Cynhwysol"
+  },
+  {
+    "file": "haveYouAppliedForUniversalCredit.json",
+    "key": "dateLabel",
+    "welsh": "Pryd wnaeth y diffynnydd wneud cais?"
+  },
+  {
+    "file": "haveYouAppliedForUniversalCredit.json",
+    "key": "errors.haveAppliedForUniversalCredit",
+    "welsh": "Dewiswch os yw'r diffynnydd wedi gwneud cais am Gredyd Cynhwysol neu beidio"
+  },
+  {
+    "file": "haveYouAppliedForUniversalCredit.json",
+    "key": "errors.date.required",
+    "welsh": "Rhowch y dyddiad wnaeth y diffynnydd wneud cais am Gredyd Cynhwysol"
+  },
+  {
+    "file": "haveYouAppliedForUniversalCredit.json",
+    "key": "errors.date.missingOne",
+    "welsh": "Rhaid i'r dyddiad pan wnaeth y diffynnydd gais am Gredyd Cynhwysol gynnwys {{missingField}}"
+  },
+  {
+    "file": "haveYouAppliedForUniversalCredit.json",
+    "key": "errors.date.missingTwo",
+    "welsh": "Rhaid i'r dyddiad pan wnaeth y diffynnydd gais am Gredyd Cynhwysol gynnwys {{first}} ac {{second}}"
+  },
+  {
+    "file": "haveYouAppliedForUniversalCredit.json",
+    "key": "errors.date.notRealDate",
+    "welsh": "Rhaid i’r dyddiad pan wnaeth y diffynnydd gais am Gredyd Cynhwysol fod yn ddyddiad go iawn"
+  },
+  {
+    "file": "haveYouAppliedForUniversalCredit.json",
+    "key": "errors.date.futureDate",
+    "welsh": "Rhaid i'r dyddiad pan wnaeth y diffynnydd gais am Gredyd Cynhwysol fod naill ai'n ddyddiad heddiw neu yn y gorffennol"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "pageTitle",
+    "welsh": "Rhandaliadau"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "heading",
+    "welsh": "Rhandaliadau"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "amountQuestion",
+    "welsh": "Faint allai'r diffynnydd fforddio’i dalu ar ben eu rhent cyfredol?"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "frequencyQuestion",
+    "welsh": "Pa mor aml allai'r diffynnydd fforddio talu'r swm hwn?"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "frequencyOptions.weekly",
+    "welsh": "Pob wythnos"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "frequencyOptions.every2Weeks",
+    "welsh": "Pob pythefnos"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "frequencyOptions.every4Weeks",
+    "welsh": "Pob 4 wythnos"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "frequencyOptions.monthly",
+    "welsh": "Pob mis"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "errors.installmentAmount",
+    "welsh": "Nodwch faint gall y diffynnydd fforddio’i dalu ar ben eu rhent cyfredol"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "errors.installmentAmountFormat",
+    "welsh": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "errors.installmentAmountMax",
+    "welsh": "Rhaid i'r swm y gallai'r diffynnydd fforddio ei dalu ar ben y rhent cyfredol fod yn llai nag £1 biliwn."
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "errors.installmentAmountMin",
+    "welsh": "Rhaid i'r swm y gallai'r diffynnydd fforddio ei dalu ar ben y rhent cyfredol fod yn £0.00 neu'n uwch."
+  },
+  {
+    "file": "howMuchAffordToPay.json",
+    "key": "errors.installmentFrequency",
+    "welsh": "Dewiswch pa mor aml y gallai'r diffynnydd fforddio talu'r swm hwn"
+  },
+  {
+    "file": "incomeAndExpenses.json",
+    "key": "pageTitle",
+    "welsh": "Incwm a chostau"
+  },
+  {
+    "file": "incomeAndExpenses.json",
+    "key": "infoParagraph1",
+    "welsh": "Gall barnwr ddefnyddio manylion am incwm a chostau'r diffynnydd i ddod i benderfyniad ar eu hachos, a hefyd i benderfynu faint y gallent fforddio ei ad-dalu os oes ganddynt ôl-ddyledion rhent."
+  },
+  {
+    "file": "incomeAndExpenses.json",
+    "key": "infoParagraph2",
+    "welsh": "Mae darparu manylion am incwm a threuliau'r diffynnydd yn ddewisol."
+  },
+  {
+    "file": "incomeAndExpenses.json",
+    "key": "infoParagraph3",
+    "welsh": "Bydd yr hawlydd yn gallu gweld atebion y diffynnydd."
+  },
+  {
+    "file": "incomeAndExpenses.json",
+    "key": "question",
+    "welsh": "Ydy'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau?"
+  },
+  {
+    "file": "incomeAndExpenses.json",
+    "key": "errors.provideFinanceDetails",
+    "welsh": "Dewiswch a yw'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau"
+  },
+  {
+    "file": "installmentPayments.json",
+    "key": "pageTitle",
+    "welsh": "Taliadau mewn rhandaliadau"
+  },
+  {
+    "file": "installmentPayments.json",
+    "key": "heading",
+    "welsh": "Taliadau mewn rhandaliadau"
+  },
+  {
+    "file": "installmentPayments.json",
+    "key": "question",
+    "welsh": "A hoffai'r diffynnydd gynnig talu ôl-ddyledion mewn rhandaliadau?"
+  },
+  {
+    "file": "installmentPayments.json",
+    "key": "options.yes",
+    "welsh": "Byddai"
+  },
+  {
+    "file": "installmentPayments.json",
+    "key": "options.no",
+    "welsh": "Na fyddai"
+  },
+  {
+    "file": "installmentPayments.json",
+    "key": "errors.confirmInstallmentOffer",
+    "welsh": "Dewiswch a hoffai'r diffynnydd gynnig talu eu hôl-ddyledion mewn rhandaliadau"
+  },
+  {
+    "file": "landlordLicensed.json",
+    "key": "caption",
+    "welsh": "Ymateb i hawliad i feddiannu eiddo"
+  },
+  {
+    "file": "landlordLicensed.json",
+    "key": "pageTitle",
+    "welsh": "Landlord trwyddedig"
+  },
+  {
+    "file": "landlordLicensed.json",
+    "key": "paragraph",
+    "welsh": "Gallwch wirio a yw'r landlord wedi'i drwyddedu drwy chwilio'r <a href=\"https://rentsmart.gov.wales/en/check-register/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Gofrestr Gyhoeddus (yn agor mewn tab newydd)</a>."
+  },
+  {
+    "file": "landlordLicensed.json",
+    "key": "question",
+    "welsh": "A yw'r landlord wedi'i drwyddedu?"
+  },
+  {
+    "file": "landlordLicensed.json",
+    "key": "options.yes",
+    "welsh": "Ydy"
+  },
+  {
+    "file": "landlordLicensed.json",
+    "key": "options.no",
+    "welsh": "Nac ydy"
+  },
+  {
+    "file": "landlordLicensed.json",
+    "key": "options.or",
+    "welsh": "neu"
+  },
+  {
+    "file": "landlordLicensed.json",
+    "key": "options.imNotSure",
+    "welsh": "Diffynnydd ddim yn siŵr"
+  },
+  {
+    "file": "landlordLicensed.json",
+    "key": "errors.confirmLandlordLicensed",
+    "welsh": "Dewiswch a yw'r diffynnydd yn cytuno â hawliad y landlord i gael ei drwyddedu"
+  },
+  {
+    "file": "landlordRegistered.json",
+    "key": "caption",
+    "welsh": "Ymateb i hawliad i feddiannu eiddo"
+  },
+  {
+    "file": "landlordRegistered.json",
+    "key": "pageTitle",
+    "welsh": "Landlord cofrestredig"
+  },
+  {
+    "file": "landlordRegistered.json",
+    "key": "introText",
+    "welsh": "Gallwch wirio a yw'r landlord yn gofrestredig drwy chwilio"
+  },
+  {
+    "file": "landlordRegistered.json",
+    "key": "question",
+    "welsh": "A yw'r landlord wedi'i gofrestru?"
+  },
+  {
+    "file": "landlordRegistered.json",
+    "key": "options.yes",
+    "welsh": "Ydy"
+  },
+  {
+    "file": "landlordRegistered.json",
+    "key": "options.no",
+    "welsh": "Nac ydy"
+  },
+  {
+    "file": "landlordRegistered.json",
+    "key": "options.or",
+    "welsh": "neu"
+  },
+  {
+    "file": "landlordRegistered.json",
+    "key": "options.imNotSure",
+    "welsh": "Diffynnydd ddim yn siŵr"
+  },
+  {
+    "file": "landlordRegistered.json",
+    "key": "errors.landlordRegistered",
+    "welsh": "Dewiswch os yw'r diffynnydd yn cytuno i hawliad y landlord gael ei gofrestru"
+  },
+  {
+    "file": "languageUsed.json",
+    "key": "languageHeading",
+    "welsh": "Iaith a ddefnyddiwyd"
+  },
+  {
+    "file": "languageUsed.json",
+    "key": "question",
+    "welsh": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?"
+  },
+  {
+    "file": "languageUsed.json",
+    "key": "languageUsedHint",
+    "welsh": "Os wnaeth rhywun arall eich helpu i ateb cwestiwn yn y gwasanaeth hwn, gofynnwch iddynt a wnaethant ateb unrhyw gwestiynau yn Gymraeg. Byddwn yn defnyddio hwn i sicrhau bod eich ymateb yn cael ei brosesu'n gywir"
+  },
+  {
+    "file": "languageUsed.json",
+    "key": "language.english",
+    "welsh": "Saesneg"
+  },
+  {
+    "file": "languageUsed.json",
+    "key": "language.welsh",
+    "welsh": "Cymraeg"
+  },
+  {
+    "file": "languageUsed.json",
+    "key": "language.englishAndWelsh",
+    "welsh": "Saesneg a Chymraeg"
+  },
+  {
+    "file": "languageUsed.json",
+    "key": "errors.languageUsed",
+    "welsh": "Dewiswch pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn"
+  },
+  {
+    "file": "nonRentArrearsDispute.json",
+    "key": "pageTitle",
+    "welsh": "Gwrthwynebu’r hawliad"
+  },
+  {
+    "file": "nonRentArrearsDispute.json",
+    "key": "heading",
+    "welsh": "hawliad {{claimantName}}"
+  },
+  {
+    "file": "nonRentArrearsDispute.json",
+    "key": "disputeOtherPartsQuestion",
+    "welsh": "A ydy'r diffynnydd yn gwrthwynebu unrhyw rannau eraill o'r hawliad?"
+  },
+  {
+    "file": "nonRentArrearsDispute.json",
+    "key": "disputeDetails.label",
+    "welsh": "Eglurwch pa rannau o'r hawliad nad yw'r diffynnydd yn cytuno â nhw"
+  },
+  {
+    "file": "nonRentArrearsDispute.json",
+    "key": "disputeOtherPartsOptions.yes",
+    "welsh": "Ydy"
+  },
+  {
+    "file": "nonRentArrearsDispute.json",
+    "key": "disputeOtherPartsOptions.no",
+    "welsh": "Nac ydy"
+  },
+  {
+    "file": "nonRentArrearsDispute.json",
+    "key": "errors.disputeOtherParts",
+    "welsh": "Dewiswch a yw'r diffynnydd eisiau gwrthwynebu unrhyw rannau eraill o'r hawliad"
+  },
+  {
+    "file": "nonRentArrearsDispute.json",
+    "key": "errors.disputeDetails.required",
+    "welsh": "Rhowch y rhannau o'r hawliad mae'r diffynnydd yn eu gwrthwynebu"
+  },
+  {
+    "file": "nonRentArrearsDispute.json",
+    "key": "errors.disputeDetailsMaxLength",
+    "welsh": "Rhaid i’r eglurhad fod yn 6500 o nodau neu lai"
+  },
+  {
+    "file": "otherConsiderations.json",
+    "key": "pageTitle",
+    "welsh": "Unrhyw beth arall i'w ddweud"
+  },
+  {
+    "file": "otherConsiderations.json",
+    "key": "heading",
+    "welsh": "Ystyriaethau eraill"
+  },
+  {
+    "file": "otherConsiderations.json",
+    "key": "question",
+    "welsh": "Oes yna unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fel rhan o'u hymateb?"
+  },
+  {
+    "file": "otherConsiderations.json",
+    "key": "otherConsiderationsDetailsLabel",
+    "welsh": "Rhowch fanylion beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys"
+  },
+  {
+    "file": "otherConsiderations.json",
+    "key": "errors.otherConsiderations",
+    "welsh": "Dewiswch os oes unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys"
+  },
+  {
+    "file": "otherConsiderations.json",
+    "key": "errors.otherConsiderationsDetails",
+    "welsh": "Rhowch fanylion yr hyn mae'r diffynnydd am ei ddweud wrth y llys"
+  },
+  {
+    "file": "otherConsiderations.json",
+    "key": "errors.otherConsiderationsInvalid",
+    "welsh": "Rhowch fanylion beth arall mae'r diffynnydd am ei ddweud wrth y llys, ac rhaid iddo gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
+  },
+  {
+    "file": "otherConsiderations.json",
+    "key": "errors.otherConsiderationsDetailsMaxLength",
+    "welsh": "Rhaid i fanylion am beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fod yn 6400 o nodau neu lai"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "pageTitle",
+    "welsh": "Manylion dyledion blaenoriaeth"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "caption",
+    "welsh": "Ymateb i hawliad i feddiannu eiddo"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "totalQuestion",
+    "welsh": "Beth yw'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth?"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "contributionQuestion",
+    "welsh": "Faint mae'r diffynnydd yn ei dalu tuag at eu dyledion blaenoriaeth bob wythnos neu fis?"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "errors.priorityDebtTotal",
+    "welsh": "Rhowch y cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "errors.priorityDebtTotalMin",
+    "welsh": "Rhaid i'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth fod yn £0.00 neu fwy"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "errors.priorityDebtTotalMax",
+    "welsh": "Rhaid i'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "errors.priorityDebtContribution",
+    "welsh": "Rhowch faint mae'r diffynnydd yn ei dalu tuag at eu dyledion blaenoriaeth bob wythnos neu fis"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "errors.priorityDebtContributionMin",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd tuag at eu dyledion blaenoriaeth bob wythnos neu bob mis fod yn £0.00 neu fwy"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "errors.priorityDebtContributionMax",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd tuag at eu dyledion blaenoriaeth bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "priorityDebtDetails.json",
+    "key": "errors.priorityDebtContributionFrequency",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn talu'r swm a nodwyd ganddynt uchod"
+  },
+  {
+    "file": "priorityDebts.json",
+    "key": "paragraph1",
+    "welsh": "Mae dyledion blaenoriaeth yn ddyledion a allai arwain at ganlyniadau difrifol os nad yw'r diffynnydd yn eu talu."
+  },
+  {
+    "file": "priorityDebts.json",
+    "key": "question",
+    "welsh": "A oes gan y diffynnydd unrhyw ddyledion blaenoriaeth?"
+  },
+  {
+    "file": "priorityDebts.json",
+    "key": "errors.havePriorityDebts",
+    "welsh": "Dewiswch os oes gan y diffynnydd unrhyw ddyledion blaenoriaeth"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "pageTitle",
+    "welsh": "Ôl-ddyledion rhent"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "amountOwedHeading",
+    "welsh": "Swm sy'n ddyledus gan y diffynnydd mewn ôl-ddyledion rhent a roddwyd gan {{claimantName}}:"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "rentArrearsQuestion",
+    "welsh": "A yw'r swm hwn yn ddyledus gan y diffynnydd mewn ôl-ddyledion rhent?"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "rentArrearsOptions.yes",
+    "welsh": "Ydy"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "rentArrearsOptions.no",
+    "welsh": "Nac ydy"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "rentArrearsOptions.notSure",
+    "welsh": "Diffynnydd ddim yn siŵr"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "rentArrearsAmountCorrection.label",
+    "welsh": "Faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent?"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "errors.rentArrears.required",
+    "welsh": "Dewiswch a yw'r swm hwn yn ddyledus gan y diffynnydd mewn ôl-ddyledion rhent"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "errors.rentArrearsAmountCorrection.required",
+    "welsh": "Nodwch y swm mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "errors.rentArrearsAmountCorrection.negativeAmount",
+    "welsh": "Rhaid i'r swm mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent fod yn £0.00 neu fwy"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "errors.rentArrearsAmountCorrection.largeAmount",
+    "welsh": "Rhaid i'r swm mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "errors.rentArrearsAmountCorrection.invalidFormat",
+    "welsh": "Nodwch faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent, yn y fformat cywir (e.e. os yw £148 yn ddyledus gan y diffynnydd, ysgrifennwch - £148.00)"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "errors.rentArrears.rentArrearsAmountCorrection",
+    "welsh": "Faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent?"
+  },
+  {
+    "file": "repaymentsAgreed.json",
+    "key": "heading",
+    "welsh": "Cytundeb ad-dalu"
+  },
+  {
+    "file": "repaymentsAgreed.json",
+    "key": "options.imNotSure",
+    "welsh": "Diffynnydd ddim yn siŵr"
+  },
+  {
+    "file": "repaymentsAgreed.json",
+    "key": "textAreaLabel",
+    "welsh": "Rhowch fanylion faint maent wedi cytuno i'w dalu a phryd"
+  },
+  {
+    "file": "repaymentsAgreed.json",
+    "key": "textAreaHint",
+    "welsh": "Rhowch hyd at 500 nod"
+  },
+  {
+    "file": "repaymentsMade.json",
+    "key": "heading",
+    "welsh": "Taliadau blaenorol"
+  },
+  {
+    "file": "repaymentsMade.json",
+    "key": "textAreaLabel",
+    "welsh": "Rhowch fanylion faint wnaeth y diffynnydd ei dalu a phryd"
+  },
+  {
+    "file": "repaymentsMade.json",
+    "key": "errors.repaymentsInfo",
+    "welsh": "Rhowch fanylion faint wnaeth y diffynnydd ei dalu a phryd"
+  },
+  {
+    "file": "selectDefendant.json",
+    "key": "pageTitle",
+    "welsh": "Cynrychiolaeth"
+  },
+  {
+    "file": "selectDefendant.json",
+    "key": "heading",
+    "welsh": "Cynrychiolaeth"
+  },
+  {
+    "file": "selectDefendant.json",
+    "key": "detailsHeading",
+    "welsh": "Os ydych yn cynrychioli mwy nag un diffynnydd yn yr achos hwn, rhaid i chi gyflwyno ymateb ar wahân i bob un."
+  },
+  {
+    "file": "selectDefendant.json",
+    "key": "selectDefendantLabel",
+    "welsh": "Ar ran pa ddiffynnydd ydych yn llenwi'r ymateb hwn?"
+  },
+  {
+    "file": "selectDefendant.json",
+    "key": "errors.selectDefendant",
+    "welsh": "Rhaid i chi ddewis diffynnydd i'w gynrychioli"
+  },
+  {
+    "file": "startNow.json",
+    "key": "title",
+    "welsh": "Ymateb i hawliad i feddiannu eiddo ar-lein"
+  },
+  {
+    "file": "startNow.json",
+    "key": "saveDraftInfo",
+    "welsh": "Gallwch gadw eich ymateb fel drafft a dychwelyd ato nes ymlaen. Byddwch yn gallu adolygu a golygu eich atebion cyn eu cyflwyno."
+  },
+  {
+    "file": "startNow.json",
+    "key": "claimantVisibilityInfo",
+    "welsh": "Bydd yr hawlydd yn gallu gweld unrhyw ddogfennau fyddwch wedi uwchlwytho a'ch atebion."
+  },
+  {
+    "file": "startNow.json",
+    "key": "provideDetailsInfo",
+    "welsh": "Mae'r gwasanaeth hwn hefyd ar gael <a href=\"?lang=en\" class=\"govuk-link language\">yn Saesneg</a>."
+  },
+  {
+    "file": "startNow.json",
+    "key": "hmctsSupportInfo",
+    "welsh": "Os ydych chi neu'r diffynnydd angen cymorth i ddefnyddio gwasanaethau GLlTEF, fel mynediad heb risiau i'r llys ar gyfer eich gwrandawiad, gallwch ofyn am hyn ar ôl cyflwyno eich ymateb."
+  },
+  {
+    "file": "tenancyDateDetails.json",
+    "key": "bulletPoint",
+    "welsh": "Dechreuodd y denantiaeth, contract meddiannaeth neu drwydded ar {{tenancyStartDate}}"
+  },
+  {
+    "file": "tenancyDateDetails.json",
+    "key": "options.yes",
+    "welsh": "Do"
+  },
+  {
+    "file": "tenancyDateDetails.json",
+    "key": "options.no",
+    "welsh": "Naddo"
+  },
+  {
+    "file": "tenancyDateDetails.json",
+    "key": "options.notSure",
+    "welsh": "Diffynnydd ddim yn siŵr"
+  },
+  {
+    "file": "tenancyDateUnknown.json",
+    "key": "question",
+    "welsh": "Beth yw dyddiad dechrau'r denantiaeth, contract meddiannaeth neu drwydded? (Dewisol)"
+  },
+  {
+    "file": "tenancyDateUnknown.json",
+    "key": "paragraph",
+    "welsh": "Ni wnaeth {{claimantName}} ddarparu dyddiad dechrau tenantiaeth, contract meddiannaeth neu drwydded."
+  },
+  {
+    "file": "tenancyTypeDetails.json",
+    "key": "insetText",
+    "welsh": "Pan wnaethant wneud eu hawliad, roedd yn rhaid i {{orgname}} roi manylion am y math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a lofnodwyd gan y diffynnydd i rentu eu heiddo, a'r dyddiad dechrau, os yn hysbys."
+  },
+  {
+    "file": "tenancyTypeDetails.json",
+    "key": "notSure",
+    "welsh": "Diffynnydd ddim yn siŵr"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "pageTitle",
+    "welsh": "Treuliau"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "heading",
+    "welsh": "Treuliau"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "expenseQuestion",
+    "welsh": "Pa dreuliau misol rheolaidd sydd gan y diffynnydd?  (Dewisol)"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "hintText",
+    "welsh": "Dewiswch bopeth sy'n berthnasol. Rhaid i’r wybodaeth a ddarperir gan y diffynnydd fod yn wir ac yn gywir."
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "options.householdBills",
+    "welsh": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "options.loanPayments",
+    "welsh": "Taliadau benthyciadau"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "options.childSpousalMaintenance",
+    "welsh": "Cynhaliaeth plant neu ŵr/wraig"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "options.mobilePhone",
+    "welsh": "Ffôn symudol"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "options.groceryShopping",
+    "welsh": "Siopa bwyd"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "options.fuelParkingTransport",
+    "welsh": "Tanwydd, parcio a chludiant"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "options.schoolCosts",
+    "welsh": "Costau ysgol (er enghraifft, gwisg a chinio ysgol)"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "options.clothing",
+    "welsh": "Dillad"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "options.otherExpenses",
+    "welsh": "Arall"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "subFields.amount",
+    "welsh": "Swm a dalwyd"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "subFields.frequency",
+    "welsh": "Talu pob:"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "frequency.week",
+    "welsh": "Wythnos"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "frequency.month",
+    "welsh": "Mis"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.householdBillsAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn dalu am filiau'r cartref"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.householdBillsAmount.negative",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am filiau'r cartref bob wythnos neu bob mis fod yn £0.00 neu fwy"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.householdBillsAmount.largeAmount",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am filiau'r cartref bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.householdBillsFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn talu biliau'r cartref"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.loanPaymentsAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn dalu am daliadau benthyciadau"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.loanPaymentsAmount.negative",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am daliadau benthyciadau bob wythnos neu bob mis fod yn £0.00 neu fwy"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.loanPaymentsAmount.largeAmount",
+    "welsh": "Rhaid i'r swm a delir am daliadau benthyciadau bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.loanPaymentsFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn gwneud taliadau benthyciadau"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.childSpousalMaintenanceAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn dalu am gynhaliaeth plant neu gynhaliaeth briod"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.childSpousalMaintenanceAmount.negative",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am gynhaliaeth plant neu gynhaliaeth briod bob wythnos neu bob mis fod yn £0.00 neu uwch"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.childSpousalMaintenanceAmount.largeAmount",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am gynhaliaeth plant neu ŵr/gwraig bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.childSpousalMaintenanceFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn talu cynhaliaeth plant neu gynhaliaeth briod"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.mobilePhoneAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn ei dalu am ffôn symudol"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.mobilePhoneAmount.negative",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am ffôn symudol bob wythnos neu bob mis fod yn £0.00 neu uwch"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.mobilePhoneAmount.largeAmount",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am ffôn symudol bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.mobilePhoneFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn talu am ffôn symudol"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.groceryShoppingAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn ei dalu am siopa bwyd"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.groceryShoppingAmount.negative",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am siopa bwyd bob wythnos neu bob mis fod yn £0.00 neu uwch"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.groceryShoppingAmount.largeAmount",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am siopa bwyd bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.groceryShoppingFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn talu am siopa bwyd"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.fuelParkingTransportAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn ei dalu am danwydd, parcio a chludiant"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.fuelParkingTransportAmount.negative",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am danwydd, parcio a chludiant bob wythnos neu bob mis fod yn £0.00 neu uwch"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.fuelParkingTransportAmount.largeAmount",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am danwydd, parcio a chludiant bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.fuelParkingTransportFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn talu am danwydd, parcio a chludiant"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.schoolCostsAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn ei dalu am gostau ysgol"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.schoolCostsAmount.negative",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am gostau ysgol bob wythnos neu bob mis fod yn £0.00 neu uwch"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.schoolCostsAmount.largeAmount",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am gostau ysgol bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.schoolCostsFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn talu costau ysgol"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.clothingAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn ei dalu am ddillad"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.clothingAmount.negative",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am ddillad bob wythnos neu bob mis fod yn £0.00 neu uwch"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.clothingAmount.largeAmount",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am ddillad bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.clothingFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn talu am ddillad"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.otherExpensesAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn ei dalu am gostau rheolaidd eraill"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.otherExpensesAmount.negative",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am gostau eraill bob wythnos neu bob mis fod yn £0.00 neu uwch"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.otherExpensesAmount.largeAmount",
+    "welsh": "Rhaid i'r swm a delir gan y diffynnydd am gostau eraill bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.otherExpensesFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn talu am unrhyw gostau eraill"
+  },
+  {
+    "file": "whatOtherRegularExpensesDoYouHave.json",
+    "key": "errors.amount.invalidFormat",
+    "welsh": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "pageTitle",
+    "welsh": "Incwm rheolaidd"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "heading",
+    "welsh": "Incwm"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "incomeQuestion",
+    "welsh": "Pa incwm rheolaidd mae'r diffynnydd yn ei dderbyn? (Dewisol)"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "groupName",
+    "welsh": "Dewisiadau incwm rheolaidd"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "hintText",
+    "welsh": "Dewiswch bopeth sy'n berthnasol. Rhaid i’r wybodaeth a ddarperir gan y diffynnydd fod yn wir ac yn gywir."
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "options.incomeFromJobs",
+    "welsh": "Incwm o bob swydd a wneir ganddynt"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "options.pension",
+    "welsh": "Pensiwn - y wladwriaeth a phreifat"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "options.universalCredit",
+    "welsh": "Credyd Cynhwysol"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "options.otherBenefits",
+    "welsh": "Budd-daliadau a chredydau eraill"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "options.moneyFromElsewhere",
+    "welsh": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yng nghartref y diffynnydd yn rhoi arian iddynt)"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "subFields.amount",
+    "welsh": "Cyfanswm a dderbynnir"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "subFields.frequency",
+    "welsh": "Derbynnir bob:"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "subFields.moneyFromElsewhereDetailsLabel",
+    "welsh": "Rhowch fanylion"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "subFields.moneyFromElsewhereDetailsHint",
+    "welsh": "Rhowch fanylion y ffynonellau eraill o incwm a faint mae'r diffynnydd fel arfer yn ei dderbyn y mis"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "frequency.week",
+    "welsh": "Wythnos"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "frequency.month",
+    "welsh": "Mis"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.incomeFromJobsAmount.required",
+    "welsh": "Nodwch y cyfanswm mae'r diffynnydd yn ei gael o'r holl swyddi a wneir ganddynt"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.incomeFromJobsAmount.negative",
+    "welsh": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o'r holl swyddi a wneir ganddynt bob wythnos neu bob mis fod yn £0.00 neu fwy"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.incomeFromJobsAmount.largeAmount",
+    "welsh": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o'r holl swyddi a wneir bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.incomeFromJobsFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn cael incwm o’r holl swyddi a wneir ganddynt"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.pensionAmount.required",
+    "welsh": "Nodwch faint mae'r diffynnydd yn ei gael o bensiwn gwladol neu breifat"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.pensionAmount.negative",
+    "welsh": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn £0.00 neu fwy"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.pensionAmount.largeAmount",
+    "welsh": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.pensionFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn cael incwm o bensiwn gwladol neu breifat"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.universalCreditAmount.required",
+    "welsh": "Nodwch faint o Gredyd Cynhwysol mae'r diffynnydd yn ei gael"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.universalCreditAmount.negative",
+    "welsh": "Rhaid i faint o Gredyd Cynhwysol mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn £0.00 neu fwy"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.universalCreditAmount.largeAmount",
+    "welsh": "Rhaid i faint o Gredyd Cynhwysol mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.universalCreditFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn cael Credyd Cynhwysol"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.otherBenefitsAmount.required",
+    "welsh": "Nodwch faint o fudd-daliadau a chredydau eraill mae'r diffynnydd yn ei gael"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.otherBenefitsAmount.negative",
+    "welsh": "Rhaid i faint o fudd-daliadau a chredydau eraill mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn £0.00 neu fwy"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.otherBenefitsAmount.largeAmount",
+    "welsh": "Rhaid i faint o fudd-daliadau a chredydau eraill mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.otherBenefitsFrequency.required",
+    "welsh": "Dewiswch pa mor aml mae'r diffynnydd yn cael incwm o fudd-daliadau a chredydau eraill"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.moneyFromElsewhereDetailsMaxLength",
+    "welsh": "Rhaid i fanylion arian o rhywle arall fod yn 500 o nodau neu lai"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.moneyFromElsewhereDetails.required",
+    "welsh": "Rhowch fanylion yr arian mae'r diffynnydd yn ei gael o rywle arall a faint mae'r diffynnydd fel arfer yn ei gael"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.moneyFromElsewhereDetails.invalidCharacters",
+    "welsh": "Rhowch fanylion am y ffynonellau eraill o incwm a faint mae'r diffynnydd fel arfer yn ei gael - dylai gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
+  },
+  {
+    "file": "whatRegularIncomeDoYouReceive.json",
+    "key": "errors.amount.invalidFormat",
+    "welsh": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "heading",
+    "welsh": "Llety amgen"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "accommodationQuestion",
+    "welsh": "A fyddai gan y diffynnydd rywle arall i fyw os byddai'n rhaid iddynt adael eu cartref?"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "dateLabel",
+    "welsh": "Pryd fyddent yn gallu symud i mewn? (Dewisol)"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "options.notSure",
+    "welsh": "Diffynnydd ddim yn siŵr"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "errors.date.notRealDate",
+    "welsh": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn fod yn ddyddiad go iawn"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "errors.date.pastDate",
+    "welsh": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn fod yn y dyfodol"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "errors.date.invalidValue",
+    "welsh": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn fod yn ddyddiad go iawn"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "errors.date.missingOne",
+    "welsh": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn gynnwys {{missingField}}"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "errors.date.missingTwo",
+    "welsh": "Rhaid i’r dyddiad y byddai'r diffynnydd yn gallu symud i mewn gynnwys {{first}} a {{second}}"
+  },
+  {
+    "file": "wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.json",
+    "key": "errors.confirmAlternativeAccommodation",
+    "welsh": "Dewiswch a fyddai gan y diffynnydd rywle arall i fyw os byddai'n rhaid iddynt adael eu cartref"
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "pageTitle",
+    "welsh": "Telerau ysgrifenedig"
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "introText",
+    "welsh": "Mae'n ofynnol o dan y Ddeddf Rhentu Cartrefi (Cymru) 2016 i landlord anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth."
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "question",
+    "welsh": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?"
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "heading",
+    "welsh": "Telerau ysgrifenedig"
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "termsQuestion",
+    "welsh": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?"
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "options.yes",
+    "welsh": "Ydy"
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "options.no",
+    "welsh": "Nac ydy"
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "options.or",
+    "welsh": "neu"
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "options.imNotSure",
+    "welsh": "Diffynnydd ddim yn siŵr"
+  },
+  {
+    "file": "writtenTerms.json",
+    "key": "errors.writtenTerms",
+    "welsh": "Dewiswch a yw'r landlord wedi anfon telerau ysgrifenedig y contract meddiannaeth at y diffynnydd"
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "pageTitle",
+    "welsh": "Amgylchiadau"
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "introParagraph",
+    "welsh": "Defnyddiwch yr adran hon i roi manylion unrhyw ddigwyddiadau neu amgylchiadau sydd wedi effeithio ar achos y diffynnydd y dylai barnwr wybod amdanynt."
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "bullet1",
+    "welsh": "mae gan rywun yng nghartref y diffynnydd salwch neu anabledd"
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "bullet2",
+    "welsh": "mae plant yng nghartref y diffynnydd yn mynychu ysgol leol"
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "bullet3",
+    "welsh": "mae'r diffynnydd yn gweithio oriau afreolaidd, sy'n ei gwneud yn anodd dod o hyd i le newydd i fyw"
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "circumstanceQuestion",
+    "welsh": "Hoffech chi rannu unrhyw beth am amgylchiadau'r diffynnydd?"
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "textAreaLabel",
+    "welsh": "Rhowch fanylion am amgylchiadau'r diffynnydd"
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "errors.shareCircumstances",
+    "welsh": "Rhannwch os hoffai'r diffynnydd rannu unrhyw beth am eu hamgylchiadau"
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "errors.circumstancesDetails",
+    "welsh": "Rhowch fanylion am amgylchiadau'r diffynnydd"
+  },
+  {
+    "file": "yourCircumstances.json",
+    "key": "errors.circumstancesDetailsInvalidCharacters",
+    "welsh": "Dylai manylion eu hamgylchiadau ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnod, bylchau a chollnod."
+  },
+  {
+    "file": "defendantNameCapture.json",
+    "key": "heading",
+    "welsh": "Beth yw enw eich cleient?"
+  },
+  {
+    "file": "defendantNameCapture.json",
+    "key": "pageTitle",
+    "welsh": "Enw eich cleient"
+  },
+  {
+    "file": "defendantNameCapture.json",
+    "key": "errors.firstName",
+    "welsh": "Nodwch enw cyntaf eich cleient",
+    "note": "sheet row corrupt (English \"ntaf eich cleient\"); kept existing correct Welsh"
+  },
+  {
+    "file": "defendantNameCapture.json",
+    "key": "errors.firstNameMaxLength",
+    "welsh": "Rhaid i enw cyntaf y cleient fod yn 60 nod neu lai"
+  },
+  {
+    "file": "defendantNameCapture.json",
+    "key": "errors.lastName",
+    "welsh": "Nodwch cyfenw eich cleient",
+    "note": "sheet row corrupt (English \"fenw eich cleient\"); kept existing correct Welsh"
+  },
+  {
+    "file": "defendantNameCapture.json",
+    "key": "errors.lastNameMaxLength",
+    "welsh": "Rhaid i gyfenw'r cleient fod yn 60 nod neu lai"
+  },
+  {
+    "file": "defendantNameConfirmation.json",
+    "key": "pageTitle",
+    "welsh": "Enw eich cleient"
+  },
+  {
+    "file": "defendantNameConfirmation.json",
+    "key": "nameConfirmationLabel",
+    "welsh": "Ai enw eich cleient yw {{defendantName}}?"
+  },
+  {
+    "file": "defendantNameConfirmation.json",
+    "key": "errors.nameConfirmation",
+    "welsh": "Mae'n rhaid i chi ddweud os mai enw eich cleient yw {{defendantName}}"
+  },
+  {
+    "file": "defendantNameConfirmation.json",
+    "key": "errors.firstName",
+    "welsh": "Nodwch enw cyntaf eich cleient",
+    "note": "sheet row corrupt; kept existing correct Welsh"
+  },
+  {
+    "file": "defendantNameConfirmation.json",
+    "key": "errors.lastName",
+    "welsh": "Nodwch cyfenw eich cleient",
+    "note": "sheet row corrupt; kept existing correct Welsh"
+  },
+  {
+    "file": "confirmationOfNoticeDateWhenProvided.json",
+    "key": "listItem1",
+    "welsh": "Gwnaethant gyflwyno hysbysiad i'r diffynnydd yn ceisio meddiant ar {{noticeDate}}",
+    "note": "sheet had malformed brace {noticeDate}}; corrected to {{noticeDate}}"
+  },
+  {
+    "file": "rentArrearsDispute.json",
+    "key": "errors.rentArrears.rentArrearsAmountCorrection",
+    "welsh": "Faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent?",
+    "flatKey": true,
+    "note": "flat literal dotted key in JSON"
+  },
+  {
+    "file": "repaymentsAgreed.json",
+    "key": "repaymentsAgreedQuestion",
+    "welsh": "A yw'r diffynnydd wedi dod i unrhyw gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
+    "note": "sheet used wrong var {{claimIssueDate}}; corrected to code var {{dateIssued, ordinalDate}}"
+  },
+  {
+    "file": "repaymentsAgreed.json",
+    "key": "errors.repaymentsAgreed",
+    "welsh": "Dewiswch a yw'r diffynnydd wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}",
+    "note": "sheet used wrong var {{claimIssueDate}}; corrected"
+  },
+  {
+    "file": "repaymentsAgreed.json",
+    "key": "errors.repaymentsAgreed.repaymentsAgreedDetails",
+    "welsh": "Rhowch fanylion faint mae'r diffynnydd wedi cytuno i'w dalu, pa mor aml y bydd y diffynnydd yn talu a phryd wnaed y cytundeb",
+    "flatKey": true,
+    "note": "flat literal dotted key in JSON"
+  },
+  {
+    "file": "repaymentsMade.json",
+    "key": "repaymentsMadeQuestion",
+    "welsh": "A yw'r diffynnydd wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?"
+  },
+  {
+    "file": "repaymentsMade.json",
+    "key": "errors.confirmRepaymentsMade",
+    "welsh": "Dewiswch a yw'r diffynnydd wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}",
+    "note": "sheet used wrong var {{claimIssueDate}}; corrected"
+  }
+]
