@@ -4,7 +4,7 @@ import {
   contactPreferenceEmailOrPostLR,
   contactPreferencesTelephoneLR,
   contactPreferencesTextMessageLR,
-  correspondenceAddressLR,
+  correspondenceAddress,
   counterClaimAboutLR,
   counterClaimAgainstWhomLR,
   counterClaimFeeLR,
@@ -15,8 +15,8 @@ import {
   counterClaimWhatAreYouClaimingForLR,
   counterclaimDoYouWantToUploadFilesLR,
   counterclaimYouNeedToApplyForHelpWithYourFeesLR,
-  defendantDateOfBirthLR,
-  defendantNameConfirmationLR,
+  defendantDateOfBirth,
+  defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
@@ -115,6 +115,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('fetchPINsAPI');
   await performAction('getCaseAPI');
   //await performAction('navigateToUrl', home_url);
+  console.log(`${process.env.CASE_NUMBER}`);
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
   //await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
@@ -134,27 +135,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pin2User.firstName, pin2User.lastName),
-      option: defendantNameConfirmationLR.yesRadioOption,
+    await performAction('confirmDefendantDetailsLR', {
+      question: defendantNameConfirmation.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmation.yesRadioOption,
     });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirthLR.dayInputText,
-      dobMonth: defendantDateOfBirthLR.monthInputText,
-      dobYear: defendantDateOfBirthLR.yearInputText,
+    await performAction('enterDateOfBirthDetailsLR', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddressLR.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddressLR.walesTownOrCityTextInput,
-      postcode: correspondenceAddressLR.walesPostcodeTextInput,
-    });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byEmailCheckbox,
-      emailAddress: contactPreferenceEmailOrPostLR.emailAddressTextInput,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.noRadioOption,
+    await performAction('selectCorrespondenceAddressKnownLR', {
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
@@ -278,27 +269,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pin2User.firstName, pin2User.lastName),
-      option: defendantNameConfirmationLR.yesRadioOption,
+    await performAction('confirmDefendantDetailsLR', {
+      question: defendantNameConfirmation.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmation.yesRadioOption,
     });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirthLR.dayInputText,
-      dobMonth: defendantDateOfBirthLR.monthInputText,
-      dobYear: defendantDateOfBirthLR.yearInputText,
+    await performAction('enterDateOfBirthDetailsLR', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddressLR.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddressLR.walesTownOrCityTextInput,
-      postcode: correspondenceAddressLR.walesPostcodeTextInput,
-    });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byEmailCheckbox,
-      emailAddress: contactPreferenceEmailOrPostLR.emailAddressTextInput,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.noRadioOption,
+    await performAction('selectCorrespondenceAddressKnownLR', {
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
@@ -419,27 +400,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
-    await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pin2User.firstName, pin2User.lastName),
-      option: defendantNameConfirmationLR.yesRadioOption,
+    await performAction('confirmDefendantDetailsLR', {
+      question: defendantNameConfirmation.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmation.yesRadioOption,
     });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirthLR.dayInputText,
-      dobMonth: defendantDateOfBirthLR.monthInputText,
-      dobYear: defendantDateOfBirthLR.yearInputText,
+    await performAction('enterDateOfBirthDetailsLR', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressUnKnown', {
-      addressLine1: correspondenceAddressLR.walesAddressLine1TextInput,
-      townOrCity: correspondenceAddressLR.walesTownOrCityTextInput,
-      postcode: correspondenceAddressLR.walesPostcodeTextInput,
-    });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byEmailCheckbox,
-      emailAddress: contactPreferenceEmailOrPostLR.emailAddressTextInput,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.noRadioOption,
+    await performAction('selectCorrespondenceAddressKnownLR', {
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
@@ -561,26 +532,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
-      option: defendantNameConfirmationLR.noRadioOption,
-      fName: defendantNameConfirmationLR.firstNameInputText,
-      lName: defendantNameConfirmationLR.lastNameInputText,
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
     });
-    await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirthLR.dayInputText,
-      dobMonth: defendantDateOfBirthLR.monthInputText,
-      dobYear: defendantDateOfBirthLR.yearInputText,
+    await performAction('enterDateOfBirthDetailsLR', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnknownLR', {
-      radioOption: correspondenceAddressLR.yesRadioOption,
-    });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byPostCheckbox,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.yesRadioOption,
-      phoneNumber: contactPreferencesTelephoneLR.ukPhoneNumberTextInput,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
@@ -703,18 +666,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @smoke @PR @regression @rentNonRent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
-      option: defendantNameConfirmationLR.noRadioOption,
-      fName: defendantNameConfirmationLR.firstNameInputText,
-      lName: defendantNameConfirmationLR.lastNameInputText,
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirthLR.dayInputText,
-      dobMonth: defendantDateOfBirthLR.monthInputText,
-      dobYear: defendantDateOfBirthLR.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnknownLR', {
-      radioOption: correspondenceAddressLR.yesRadioOption,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
@@ -850,18 +813,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('RentArrears - DemotedTenancy - LR @smoke @regression @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
-      option: defendantNameConfirmationLR.noRadioOption,
-      fName: defendantNameConfirmationLR.firstNameInputText,
-      lName: defendantNameConfirmationLR.lastNameInputText,
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirthLR.dayInputText,
-      dobMonth: defendantDateOfBirthLR.monthInputText,
-      dobYear: defendantDateOfBirthLR.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnknownLR', {
-      radioOption: correspondenceAddressLR.yesRadioOption,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
@@ -941,18 +904,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @regression @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
-      option: defendantNameConfirmationLR.noRadioOption,
-      fName: defendantNameConfirmationLR.firstNameInputText,
-      lName: defendantNameConfirmationLR.lastNameInputText,
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirthLR.dayInputText,
-      dobMonth: defendantDateOfBirthLR.monthInputText,
-      dobYear: defendantDateOfBirthLR.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnknownLR', {
-      radioOption: correspondenceAddressLR.yesRadioOption,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
@@ -1056,18 +1019,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @regression @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName),
-      option: defendantNameConfirmationLR.noRadioOption,
-      fName: defendantNameConfirmationLR.firstNameInputText,
-      lName: defendantNameConfirmationLR.lastNameInputText,
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
     });
     await performAction('enterDateOfBirthDetails', {
-      dobDay: defendantDateOfBirthLR.dayInputText,
-      dobMonth: defendantDateOfBirthLR.monthInputText,
-      dobYear: defendantDateOfBirthLR.yearInputText,
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
     });
     await performAction('selectCorrespondenceAddressUnknownLR', {
-      radioOption: correspondenceAddressLR.yesRadioOption,
+      radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('selectContactPreferenceEmailOrPost', {
       question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
@@ -1122,7 +1085,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('midEventRespondPossessionClaimLRAPI');
     await performAction('submitPossessionClaimResponseLRAPI');
     const submittedUser = await getPinUserAt(2);
-    await performAction('clickLink', defendantNameConfirmationLR.backLink);
+    await performAction('clickLink', defendantNameConfirmation.backLink);
     await performValidation('textNotVisible', {
       elementType: 'text',
       text: `${submittedUser.firstName} ${submittedUser.lastName}`,

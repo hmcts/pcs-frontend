@@ -21,10 +21,10 @@ function getDefaultPostalAddressLR(): string {
     .join(', ');
 }
 
-export const correspondenceAddressLR = {
+export const correspondenceAddress = {
   get correspondenceAddressPostalMainHeader(): string {
     const postalAddress = process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN' ? getDefaultPostalAddressLR() : address;
-    return `Is your postal address ${postalAddress}?`;
+    return `Is the defendant’s postal address ${postalAddress}?`;
   },
   correspondenceAddressUnKnownMainHeader: `What’s your correspondence address?`,
   correspondenceAddressUnKnownParagraph: `Your correspondence address is your postal address.`,

@@ -1,9 +1,10 @@
 import { Page } from '@playwright/test';
 
+import { defendantDateOfBirth, defendantNameConfirmation } from '../../../data/page-data';
 import {
   confirmationOfNoticeDateWhenNotProvidedLR,
   confirmationOfNoticeGiven,
-  correspondenceAddressLR,
+  correspondenceAddress,
   counterClaimAboutLR,
   counterClaimAgainstWhomLR,
   counterClaimFeeLR,
@@ -89,6 +90,9 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['enterNoticeDateKnownLR', () => this.enterNoticeDateKnownLR(fieldName as actionRecord)],
       ['doYouWantToUploadFilesLR', () => this.doYouWantToUploadFilesLR(fieldName as actionRecord)],
       ['uploadFilesToSupportCounterclaimLR', () => this.uploadFilesToSupportCounterclaimLR(fieldName as actionRecord)],
+      ['selectCorrespondenceAddressKnownLR', () => this.selectCorrespondenceAddressKnownLR(fieldName as actionRecord)],
+      ['confirmDefendantDetailsLR', () => this.confirmDefendantDetailsLR(fieldName as actionRecord)],
+      ['enterDateOfBirthDetailsLR', () => this.enterDateOfBirthDetailsLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -106,31 +110,31 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async selectCorrespondenceAddressUnknownLR(addressData: actionRecord) {
-    await performValidation('mainHeader', correspondenceAddressLR.correspondenceAddressPostalMainHeader);
+    await performValidation('mainHeader', correspondenceAddress.correspondenceAddressPostalMainHeader);
     await performAction('clickRadioButton', {
-      question: correspondenceAddressLR.correspondenceAddressConfirmHintText(),
+      question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
     });
 
-    if (addressData.radioOption === correspondenceAddressLR.noRadioOption) {
+    if (addressData.radioOption === correspondenceAddress.noRadioOption) {
       if (addressData.addressIndex) {
         await performActions(
           'Find Address based on postcode',
-          ['inputText', correspondenceAddressLR.enterUKPostcodeHiddenTextLabel, addressData.postcode],
-          ['clickButton', correspondenceAddressLR.findAddressHiddenButton],
-          ['select', correspondenceAddressLR.addressSelectHiddenLabel, addressData.addressIndex]
+          ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
+          ['clickButton', correspondenceAddress.findAddressHiddenButton],
+          ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
         );
       } else if (addressData.addressLine1) {
         await performActions(
           'Enter Address Manually',
-          ['clickLink', correspondenceAddressLR.enterAddressManuallyHiddenLink],
-          ['inputText', correspondenceAddressLR.addressLine1HiddenTextLabel, addressData.addressLine1],
-          ['inputText', correspondenceAddressLR.townOrCityHiddenTextLabel, addressData.townOrCity],
-          ['inputText', correspondenceAddressLR.postcodeHiddenTextLabel, addressData.postcode]
+          ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
+          ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
+          ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
+          ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
         );
       }
     }
-    await performAction('clickButton', correspondenceAddressLR.saveAndContinueButton);
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
   private async enterNoticeDateKnownLR(noticeData: actionRecord): Promise<void> {
@@ -311,6 +315,59 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       option: representationOption.radioOption,
     });
     await performAction('clickButton', selectDefendant.saveAndContinueButton);
+  }
+
+  private async confirmDefendantDetailsLR(defendantData: actionRecord) {
+    await performValidation('mainHeader', defendantData.question);
+    await performAction('clickRadioButton', {
+      question: defendantData.question,
+      option: defendantData.option,
+    });
+    if (defendantData.option === 'No') {
+      await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
+      await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
+    }
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  }
+
+  private async enterDateOfBirthDetailsLR(defendantData: actionRecord) {
+    if (defendantData?.dobDay && defendantData?.dobMonth && defendantData?.dobYear) {
+      await performActions(
+        'Defendant Date of Birth Entry',
+        ['inputText', defendantDateOfBirth.dayTextLabel, defendantData.dobDay],
+        ['inputText', defendantDateOfBirth.monthTextLabel, defendantData.dobMonth],
+        ['inputText', defendantDateOfBirth.yearTextLabel, defendantData.dobYear]
+      );
+    }
+    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
+  }
+
+  private async selectCorrespondenceAddressKnownLR(addressData: actionRecord) {
+    await performValidation('mainHeader', correspondenceAddress.correspondenceAddressPostalMainHeader);
+    await performAction('clickRadioButton', {
+      question: correspondenceAddress.correspondenceAddressConfirmHintText(),
+      option: addressData.radioOption,
+    });
+
+    if (addressData.radioOption === correspondenceAddress.noRadioOption) {
+      if (addressData.addressIndex) {
+        await performActions(
+          'Find Address based on postcode',
+          ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
+          ['clickButton', correspondenceAddress.findAddressHiddenButton],
+          ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
+        );
+      }
+      await performActions(
+        'Enter Address Manually',
+        ['clickLink', correspondenceAddress.enterAddressManuallyHiddenLink],
+        ['inputText', correspondenceAddress.addressLine1HiddenTextLabel, addressData.addressLine1],
+        ['inputText', correspondenceAddress.townOrCityHiddenTextLabel, addressData.townOrCity],
+        ['inputText', correspondenceAddress.postcodeHiddenTextLabel, addressData.postcode]
+      );
+    }
+
+    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
   }
 
   private async selectWhatRegularIncomeDoTheyReceiveLR(regularIncome?: actionRecord): Promise<void> {

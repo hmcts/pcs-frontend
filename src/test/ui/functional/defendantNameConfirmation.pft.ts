@@ -1,10 +1,74 @@
 import { defendantNameConfirmation, feedback, taskList } from '../data/page-data';
+// import * as defendantNameConfirmationLR from '../data/page-data/lr-page-data/defendantNameConfirmation.page.data.lr';
 import { performAction, performValidation } from '../utils/controller';
 
 import { defendantNameCaptureInputValuesPrePopulated } from './defendantNameCapture.pft';
 
 const overMaxLengthString = 'A'.repeat(61);
 export async function defendantNameConfirmationErrorValidation(): Promise<void> {
+  // Test: Error message validation for mandatory radio button selection
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.nameErrorMessage,
+  });
+  // Test: Both first name and last name text fields are empty
+  await performAction('clickRadioButton', defendantNameConfirmation.noRadioOption);
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterYourFirstNameErrorMessage,
+  });
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterYourLastNameErrorMessage,
+  });
+  //Test: First name empty and last name over max length
+  await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, overMaxLengthString);
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterYourFirstNameErrorMessage,
+  });
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterLastNameMaxLengthErrorMessage,
+  });
+  //Test: Both first name and last name over max length
+  await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, overMaxLengthString);
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
+  });
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
+  });
+  //Test: Both first name and last name for emoji
+  await performAction(
+    'inputText',
+    defendantNameConfirmation.firstNameHiddenTextLabel,
+    defendantNameConfirmation.emojiTextInput
+  );
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.emojiFirstNameErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    defendantNameConfirmation.lastNameHiddenTextLabel,
+    defendantNameConfirmation.emojiTextInput
+  );
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.emojiLastNameErrorMessage,
+  });
+}
+
+export async function defendantNameConfirmationLRErrorValidation(): Promise<void> {
   // Test: Error message validation for mandatory radio button selection
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {

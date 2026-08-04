@@ -83,4 +83,5 @@ export default {
   'response-submitted-counter-claim-fee-payment-needed': 'responseSubmittedCounterclaimFeePaymentNeeded',
   'response-and-counter-claim-submitted': 'responseAndCounterClaimSubmitted',
   'response-submitted': 'responseSubmitted',
+  'defendant-date-of-birth': 'defendantDateOfBirth',
 };
