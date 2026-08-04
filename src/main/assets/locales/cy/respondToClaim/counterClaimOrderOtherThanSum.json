@@ -1,15 +1,15 @@
 {
-  "pageTitle": "cyClaim for something else",
-  "heading": "cyCounterclaim for an order other than a sum of money",
-  "infoParagraph1": "cyYou will be able to upload any evidence you have on the next page.",
+  "pageTitle": "Hawliad ar gyfer rhywbeth arall",
+  "heading": "Gwrth-hawliad am orchymyn heblaw swm o arian",
+  "infoParagraph1": "Byddwch yn gallu uwchlwytho unrhyw dystiolaeth sydd gennych ar y dudalen nesaf.",
   "infoParagraph2": "Bydd yr hawlydd yn gallu gweld eich atebion.",
-  "characterCountHint": "cyFor example, 'for the landlord to conduct remedial works'",
-  "otherOrderRequestDetailsLabel": "cyWhat orders are you asking the court to make?",
-  "otherOrderRequestFactsLabel": "cyWhat facts would you like the court to consider when deciding the claim?",
+  "characterCountHint": "Er enghraifft, 'i'r landlord wneud gwaith adfer'",
+  "otherOrderRequestDetailsLabel": "Pa orchymyn ydych chi’n gofyn i’r tribiwnlys ei wneud?",
+  "otherOrderRequestFactsLabel": "Pa ffeithiau hoffech chi i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
   "errors": {
-    "otherOrderRequestDetailsRequired": "cyEnter what orders you are asking the court to make",
-    "otherOrderRequestDetailsMaxLength": "cyWhat orders you are asking the court to make must be 6800 characters or less",
-    "otherOrderRequestFactsRequired": "cyEnter what facts you would like the court to consider when deciding the claim",
-    "otherOrderRequestFactsMaxLength": "cyWhat facts you would like the court to consider must be 6800 characters or less"
+    "otherOrderRequestDetailsRequired": "Nodwch pa orchmynion yr ydych yn gofyn i’r llys eu gwneud",
+    "otherOrderRequestDetailsMaxLength": "Rhaid i unrhyw orchmynion y gofynnwch i'r llys eu gwneud fod yn 6800 nod neu lai",
+    "otherOrderRequestFactsRequired": "Nodwch pa ffeithiau yr hoffech i'r llys eu hystyried wrth benderfynu ar yr hawliad",
+    "otherOrderRequestFactsMaxLength": "Rhaid i pa ffeithiau y dymunwch i'r llys eu hystyried fod yn 6800 nod neu lai"
   }
 }
