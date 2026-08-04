@@ -36,7 +36,7 @@ export const validateAmount = (
       return minAmountError;
     }
 
-    if (numericValue > MAX_AMOUNT) {
+    if (numericValue >= MAX_AMOUNT) {
       return maxAmountError;
     }
   }

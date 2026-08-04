@@ -45,8 +45,8 @@ describe('validateAmount', () => {
     expect(validateAmount('-1.00', errorKeys)).toBe('The amount you entered must be £0.00 or above');
   });
 
-  it('returns true for exactly 1 billion', () => {
-    expect(validateAmount('1000000000', errorKeys)).toBe(true);
+  it('returns max amount error for exactly 1 billion', () => {
+    expect(validateAmount('1000000000', errorKeys)).toBe('The amount you entered must be less than £1 billion');
   });
 
   it('returns max amount error for more than 1 billion', () => {
