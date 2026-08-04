@@ -1,4 +1,4 @@
-import { AMOUNT_FORMAT_REGEX } from '../../../constants/validation';
+import { validateAmount } from '../../../constants/validation';
 import type { FrequencyValue } from '../../../services/ccdCase.interface';
 import { ccdPenceToPoundsString, getValidatedCaseHouseholdCircumstances, poundsStringToPence } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
@@ -6,40 +6,11 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-const MAX_AMOUNT = 1_000_000_000;
 type FrequencyFormValue = Lowercase<FrequencyValue>;
 const FREQUENCY_MAP: Record<FrequencyValue, FrequencyFormValue> = {
   WEEKLY: 'weekly',
   MONTHLY: 'monthly',
 };
-
-const validateMoney =
-  (negativeKey: string, largeKey: string) =>
-  (value: unknown): boolean | string => {
-    if (typeof value !== 'string' || !value.trim()) {
-      return true;
-    }
-    const normalized = value.trim().split(',').join('');
-    const numericValue = parseFloat(normalized);
-
-    if (!Number.isNaN(numericValue)) {
-      if (numericValue < 0) {
-        return negativeKey;
-      }
-      if (numericValue >= MAX_AMOUNT) {
-        return largeKey;
-      }
-    }
-
-    if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
-      return 'errors.amount.invalidFormat';
-    }
-
-    if (Number.isNaN(numericValue)) {
-      return 'errors.amount.invalidFormat';
-    }
-    return true;
-  };
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'priority-debt-details',
@@ -131,7 +102,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       prefix: { text: '£' },
       classes: 'govuk-input--width-10',
       attributes: { inputmode: 'decimal' },
-      validator: validateMoney('errors.priorityDebtTotalMin', 'errors.priorityDebtTotalMax'),
+      validator: (value: unknown): boolean | string =>
+        validateAmount(value, {
+          invalidAmountFormatError: 'errors.amount.invalidFormat',
+          minAmountError: 'errors.priorityDebtTotalMin',
+          maxAmountError: 'errors.priorityDebtTotalMax',
+        }),
     },
     {
       name: 'priorityDebtContribution',
@@ -148,7 +124,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       prefix: { text: '£' },
       classes: 'govuk-input--width-10',
       attributes: { inputmode: 'decimal' },
-      validator: validateMoney('errors.priorityDebtContributionMin', 'errors.priorityDebtContributionMax'),
+      validator: (value: unknown): boolean | string =>
+        validateAmount(value, {
+          invalidAmountFormatError: 'errors.amount.invalidFormat',
+          minAmountError: 'errors.priorityDebtContributionMin',
+          maxAmountError: 'errors.priorityDebtContributionMax',
+        }),
     },
     {
       name: 'priorityDebtContributionFrequency',
