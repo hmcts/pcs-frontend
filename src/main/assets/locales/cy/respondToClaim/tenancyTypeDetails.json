@@ -17,6 +17,6 @@
     "tenancyTypeConfirm": "Dewiswch ydy, nac ydy neu ddim yn siŵr",
     "tenancyDetails.correctType": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded",
     "requiredText": "Rhowch y manylion cywir ar gyfer y denantiaeth, drwydded neu gontract meddiannaeth",
-    "defaultMaxLength": "cyTenancy, occupation contract or licence type must be 60 characters or less"
+    "defaultMaxLength": "Rhaid i'r math cywir o denantiaeth, contract meddiannaeth neu drwydded fod yn 60 nod neu lai"
   }
 }
